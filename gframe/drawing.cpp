@@ -464,7 +464,8 @@ __forceinline void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, con
 	DrawShadowTextPos(font, text, shadowposition, position, std::forward<Args>(args)...);
 }
 void Game::DrawMisc() {
-	static float act_rot = 0.0;
+	const float twoPI = 2.0f * irr::core::PI;
+	static float act_rot = 0.0f;
 	//pre expanded version of setRotationRadians, we're only setting the z value, saves computations
 	auto SetZRotation = [](irr::core::matrix4& mat) {
 		mat[2] = mat[6] = mat[8] = mat[9] = 0;
@@ -479,6 +480,8 @@ void Game::DrawMisc() {
 	const int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	irr::core::matrix4 im, ic, it;
 	act_rot += (1.2f / 1000.0f) * delta_time;
+	if(act_rot >= twoPI)
+		act_rot -= twoPI;
 	SetZRotation(im);
 	matManager.mTexture.setTexture(0, imageManager.tAct);
 	driver->setMaterial(matManager.mTexture);
