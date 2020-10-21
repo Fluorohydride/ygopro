@@ -464,12 +464,22 @@ __forceinline void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, con
 	DrawShadowTextPos(font, text, shadowposition, position, std::forward<Args>(args)...);
 }
 void Game::DrawMisc() {
-	static irr::core::vector3df act_rot(0, 0, 0);
+	static float act_rot = 0.0;
+	//pre expanded version of setRotationRadians, we're only setting the z value, saves computations
+	auto SetZRotation = [](irr::core::matrix4& mat) {
+		mat[2] = mat[6] = mat[8] = mat[9] = 0;
+		mat[10] = 1;
+		const auto _cos = std::cos(act_rot);
+		const auto _sin = std::sin(act_rot);
+		mat[0] = mat[5] = _cos;
+		mat[1] = _sin;
+		mat[4] = -_sin;
+	};
 	const int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
 	const int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	irr::core::matrix4 im, ic, it;
-	act_rot.Z += (1.2f / 1000.0f) * delta_time;
-	im.setRotationRadians(act_rot);
+	act_rot += (1.2f / 1000.0f) * delta_time;
+	SetZRotation(im);
 	matManager.mTexture.setTexture(0, imageManager.tAct);
 	driver->setMaterial(matManager.mTexture);
 
@@ -507,7 +517,7 @@ void Game::DrawMisc() {
 			break;
 		matManager.mTRTexture.setTexture(0, imageManager.tChain);
 		matManager.mTRTexture.AmbientColor = 0xffffff00;
-		ic.setRotationRadians(act_rot);
+		SetZRotation(ic);
 		ic.setTranslation(chain.chain_pos);
 		driver->setMaterial(matManager.mTRTexture);
 		driver->setTransform(irr::video::ETS_WORLD, ic);
