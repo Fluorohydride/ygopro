@@ -68,11 +68,14 @@ local ygopro_config=function(static_core)
 				links { "CoreAudio.framework", "AudioToolbox.framework" }
 		end
 	end
+	
+	filter {}
+		includedirs { "../freetype/include" }
 
 	filter "system:windows"
 		kind "ConsoleApp"
 		files "ygopro.rc"
-		includedirs { "../freetype/include", "../irrlicht/include" }
+		includedirs { "../irrlicht/include" }
 		dofile("../irrlicht/defines.lua")
 		links { "if_nametoindex" }
 		links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32", "wldap32", "crypt32", "advapi32", "rpcrt4", "ole32", "winhttp" }
@@ -121,7 +124,6 @@ local ygopro_config=function(static_core)
 
 	filter "system:linux"
 		defines "LUA_USE_LINUX"
-		includedirs "/usr/include/freetype2"
 		if _OPTIONS["vcpkg-root"] then
 			includedirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-linux/include/irrlicht" }
 		else

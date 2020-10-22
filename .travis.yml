@@ -15,7 +15,6 @@ addons:
     update: true
     packages:
     - p7zip-full
-    - libfreetype6-dev
     - libgl1-mesa-dev
     - libglu-dev
     - libasound2-dev

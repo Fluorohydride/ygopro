@@ -123,8 +123,8 @@ workspace "ygo"
 		include "ocgcore"
 	end
 	include "gframe"
+	include "freetype"
 	if os.istarget("windows") then
-		include "freetype"
 		include "irrlicht"
 	end
 	if os.istarget("macosx") and _OPTIONS["discord"] then
