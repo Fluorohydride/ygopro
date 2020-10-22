@@ -11,4 +11,4 @@ mv irrlicht/lib/* /usr/local/lib
 rm -rf installed/x64-osx/include/freetype
 rm installed/x64-osx/include/ft2build.h
 rm installed/x64-osx/lib/libfreetype.a
-rm installed/x64-osx/debug/lib/libfreetype.a
+rm installed/x64-osx/debug/lib/libfreetyped.a
