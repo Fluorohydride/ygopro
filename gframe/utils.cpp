@@ -245,14 +245,15 @@ namespace ygo {
 				if (name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
 					return;
 				}
+				path_string fullpath = fmt::format(EPRO_TEXT("{}{}/"), path, name);
+				path_stringview cur = name;
 				if(addparentpath)
-					results.push_back(fmt::format(EPRO_TEXT("{}{}/"), path, name));
-				else
-					results.push_back(name.data());
+					cur = fullpath;
+				results.push_back({ cur.data(), cur.size() });
 				if (subdirectorylayers > 1) {
-					auto subresults = FindSubfolders(fmt::format(EPRO_TEXT("{}{}/"), path, name), subdirectorylayers - 1, false);
+					auto subresults = FindSubfolders(fullpath, subdirectorylayers - 1, false);
 					for (auto& folder : subresults) {
-						folder = fmt::format(EPRO_TEXT("{}/{}"), name, folder);
+						folder = fmt::format(EPRO_TEXT("{}{}/"), fullpath, folder);
 					}
 					results.insert(results.end(), std::make_move_iterator(subresults.begin()), std::make_move_iterator(subresults.end()));
 				}
