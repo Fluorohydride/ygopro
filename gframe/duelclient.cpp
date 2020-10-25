@@ -2946,11 +2946,11 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 						if (current.location == LOCATION_HAND) {
 							for (const auto& hcard : mainGame->dField.hand[current.controler])
 								mainGame->dField.MoveCard(hcard, 10);
-						} else {
+						} else
 							mainGame->dField.MoveCard(pcard, 10);
-							if (previous.location == LOCATION_HAND)
-								for(const auto& hcard : mainGame->dField.hand[current.controler])
-									mainGame->dField.MoveCard(hcard, 10);
+						if(previous.location == LOCATION_HAND) {
+							for(const auto& hcard : mainGame->dField.hand[previous.controler])
+								mainGame->dField.MoveCard(hcard, 10);
 						}
 						mainGame->WaitFrameSignal(5, lock);
 					}
