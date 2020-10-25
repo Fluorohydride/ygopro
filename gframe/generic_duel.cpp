@@ -18,38 +18,6 @@ GenericDuel::GenericDuel(int team1, int team2, bool relay, int best_of) :relay(r
 GenericDuel::~GenericDuel() {
 }
 
-template<typename T, typename T2>
-inline void Iter(T& list, const T2& func) {
-	for(auto& dlr : list) {
-		if(dlr)
-			func(dlr);
-	}
-}
-
-template<typename T>
-void GenericDuel::IteratePlayersAndObs(T func) {
-	IteratePlayers(func);
-	Iter(observers, func);
-}
-
-template<typename T>
-void GenericDuel::IteratePlayers(T func) {
-	Iter(players.home, func);
-	Iter(players.opposing, func);
-}
-
-bool GenericDuel::IteratePlayers(iter_bool func) {
-	for(auto& dueler : players.home) {
-		if(dueler && !func(dueler))
-			return false;
-	}
-	for(auto& dueler : players.opposing) {
-		if(dueler && !func(dueler))
-			return false;
-	}
-	return true;
-}
-
 void GenericDuel::ResendToAll() {
 	IteratePlayersAndObs(NetServer::ReSendToPlayer);
 }
@@ -466,9 +434,7 @@ void GenericDuel::UpdateDeck(DuelPlayer* dp, void* pdata, uint32_t len) {
 void GenericDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)
 		return;
-	if(!IteratePlayers(iter_bool([](auto& dueler)->bool {
-		return dueler.ready;
-	})))
+	if(!IteratePlayers([](duelist& dueler) { return dueler.ready; }))
 		return;
 	if(!CheckReady())
 		return;

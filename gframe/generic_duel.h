@@ -4,6 +4,7 @@
 #include <functional>
 #include <cstdint>
 #include <set>
+#include <type_traits>
 #include "config.h"
 #include "network.h"
 #include "replay.h"
@@ -90,12 +91,37 @@ protected:
 	void Catchup(DuelPlayer* dp);
 	int GetPos(DuelPlayer* dp);
 	void OrderPlayers(std::vector<duelist>& players, int offset = 0);
+	template<typename T, typename T2>
+	inline void Iter(T& list, const T2& func) {
+		for(auto& dlr : list) {
+			if(dlr)
+				func(dlr);
+		}
+	}
+	template<typename T, typename T2>
+	using EnableIf = std::enable_if_t<std::is_same<std::result_of_t<T(duelist&)>, void>::value == std::is_same<T2, void>::value, T2>;
 	template<typename T>
-	inline void IteratePlayersAndObs(T func);
+	inline EnableIf<T, void> IteratePlayers(T func) {
+		Iter(players.home, func);
+		Iter(players.opposing, func);
+	}
 	template<typename T>
-	inline void IteratePlayers(T func);
-	using iter_bool = std::function<bool(duelist&)>;
-	inline bool IteratePlayers(iter_bool func);
+	inline EnableIf<T, bool> IteratePlayers(T func) {
+		for(auto& dueler : players.home) {
+			if(dueler && !func(dueler))
+				return false;
+		}
+		for(auto& dueler : players.opposing) {
+			if(dueler && !func(dueler))
+				return false;
+		}
+		return true;
+	}
+	template<typename T>
+	inline void IteratePlayersAndObs(T func) {
+		IteratePlayers(func);
+		Iter(observers, func);
+	}
 	inline void ResendToAll();
 	inline void ResendToAll(DuelPlayer* except);
 	struct {
