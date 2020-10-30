@@ -13,6 +13,16 @@ function copy_if_exists {
     fi
 }
 
+function compress_if_exist {
+    if [[ -f bin/$BUILD_CONFIG/$1 ]]; then
+		if [[ "$PLATFORM" == "windows" ]]; then
+			./upx deploy/$1 -o deploy/compressed-$1
+		else
+			upx deploy/$1 -o deploy/compressed-$1
+		fi
+    fi
+}
+
 function strip_if_exists {
     if [[ "$BUILD_CONFIG" == "release" ]] && [[ -f bin/$BUILD_CONFIG/$1 ]]; then
         strip bin/$BUILD_CONFIG/$1
@@ -49,15 +59,19 @@ mkdir -p deploy
 if [[ "$PLATFORM" == "windows" ]]; then
 	copy_if_exists ocgcore.dll
 	copy_if_exists ygopro.exe
+	compress_if_exist ygopro.exe
 	copy_if_exists ygoprodll.exe
+	compress_if_exist ygoprodll.exe
 	copy_if_exists ygoprodll.pdb
 fi
 if [[ "$PLATFORM" == "linux" ]]; then
 	copy_if_exists libocgcore.so
 	# strip_if_exists ygopro
 	copy_if_exists ygopro
+	compress_if_exist ygopro
 	# strip_if_exists ygoprodll
 	copy_if_exists ygoprodll
+	compress_if_exist ygoprodll
 fi
 if [[ "$PLATFORM" == "osx" ]]; then
 	copy_if_exists libocgcore.dylib
