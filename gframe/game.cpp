@@ -38,9 +38,6 @@
 #include "utils_gui.h"
 #include "custom_skin_enum.h"
 #include "joystick_wrapper.h"
-#if defined(__APPLE__)
-#include <OpenGL/gl.h>
-#endif
 
 #ifdef __ANDROID__
 #include "CGUICustomComboBox/CGUICustomComboBox.h"
@@ -1650,9 +1647,6 @@ bool Game::MainLoop() {
 			last_resize = false;
 #else
 		if(window_size != size) {
-#endif
-#ifdef __APPLE__
-			glViewport(0, 0, size.Width * 2, size.Height * 2);
 #endif
 			resized = true;
 			window_size = size;
