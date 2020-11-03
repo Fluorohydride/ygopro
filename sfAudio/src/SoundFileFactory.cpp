@@ -27,7 +27,7 @@
 ////////////////////////////////////////////////////////////
 #include "sfAudio/SoundFileFactory.hpp"
 #include "sfAudio/SoundFileReaderFlac.hpp"
-#idef SFAUDIO_USE_MPG123
+#ifdef SFAUDIO_USE_MPG123
 #include "sfAudio/SoundFileReaderMp3_mpg123.hpp"
 #else
 #include "sfAudio/SoundFileReaderMp3_minimp3.hpp"
