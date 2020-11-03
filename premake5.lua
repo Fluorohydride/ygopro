@@ -13,6 +13,10 @@ newoption {
 	}
 }
 newoption {
+	trigger = "use-mpg123",
+	description = "Use mpg123 mp3 backend instead of minimp3 (Available only when using SFML audio backend)"
+}
+newoption {
 	trigger = "no-joystick",
 	description = "Add base joystick compatibility (Requires SDL2)"
 }

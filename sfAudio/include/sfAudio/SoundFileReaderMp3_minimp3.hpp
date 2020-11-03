@@ -22,8 +22,8 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef SFML_SOUNDFILEREADERMP3_HPP
-#define SFML_SOUNDFILEREADERMP3_HPP
+#ifndef SFML_SOUNDFILEREADERMP3_MINIMP3_HPP
+#define SFML_SOUNDFILEREADERMP3_MINIMP3_HPP
 
 ////////////////////////////////////////////////////////////
 // Headers
@@ -128,4 +128,4 @@ private:
 } // namespace sf
 
 
-#endif // SFML_SOUNDFILEREADERMP3_HPP
+#endif // SFML_SOUNDFILEREADERMP3_MINIMP3_HPP

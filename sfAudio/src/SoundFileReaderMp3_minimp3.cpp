@@ -26,9 +26,11 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #define MINIMP3_IMPLEMENTATION
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <algorithm>
-#include "sfAudio/SoundFileReaderMp3.hpp"
+#include "sfAudio/SoundFileReaderMp3_minimp3.hpp"
 #include "sfAudio/System/MemoryInputStream.hpp"
 #include <iostream>
 
