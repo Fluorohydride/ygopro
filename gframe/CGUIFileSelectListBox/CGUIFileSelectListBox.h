@@ -154,13 +154,13 @@ public:
 
 	void setWorkingPath(const std::wstring& newDirectory, bool setAsRoot = false);
 
-	using callback = bool(std::wstring, bool, void*);
+	using callback = bool(std::wstring, bool);
 
 	void addFilterFunction(callback* function);
 
 	void addFilteredExtensions(std::vector<std::wstring> extensions);
 
-	bool defaultFilter(std::wstring name, bool is_directory, void*);
+	bool defaultFilter(std::wstring name, bool is_directory);
 
 	void nativeDirectory(bool native_directory);
 

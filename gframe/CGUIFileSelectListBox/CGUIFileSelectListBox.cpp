@@ -650,7 +650,7 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 	TotalFolders = 0;
 	curRelPath = ygo::Utils::NormalizePath(curRelPath);
 	bool is_root = BaseIsRoot && curRelPath == basePath;
-	ygo::Utils::FindFiles(ygo::Utils::ToPathString(curRelPath), [&](path_stringview _name, bool is_directory, void* payload) {
+	ygo::Utils::FindFiles(ygo::Utils::ToPathString(curRelPath), [&](path_stringview _name, bool is_directory) {
 		auto name = ygo::Utils::ToUnicodeIfNeeded(_name);
 		if(name == L".")
 			return;
@@ -659,7 +659,7 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 				return;
 			}
 		}
-		if((filter && !filter(curRelPath + name, is_directory, payload)) || (!filter && !defaultFilter(curRelPath + name, is_directory, payload))) {
+		if((filter && !filter(curRelPath + name, is_directory)) || (!filter && !defaultFilter(curRelPath + name, is_directory))) {
 			return;
 		}
 		ListItem item;
@@ -890,17 +890,12 @@ void CGUIFileSelectListBox::addFilteredExtensions(std::vector<std::wstring> exte
 	filter = nullptr;
 }
 
-bool CGUIFileSelectListBox::defaultFilter(std::wstring name, bool is_directory, void *) {
+bool CGUIFileSelectListBox::defaultFilter(std::wstring name, bool is_directory) {
 	if(is_directory) {
 		auto elements = ygo::Utils::TokenizeString<std::wstring>(name, L"/");
 		return !(elements.size() && elements.back().size() && elements.back().front() == L'.' && elements.back() != L"..");
 	}
-	auto pos = name.find_last_of('.');
-	if(pos == std::wstring::npos)
-		return false;
-	auto extension = name.substr(pos + 1);
-	std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-	if(std::find(filtered_extensions.begin(), filtered_extensions.end(), extension) == filtered_extensions.end())
+	if(std::find(filtered_extensions.begin(), filtered_extensions.end(), ygo::Utils::GetFileExtension(name)) == filtered_extensions.end())
 		return false;
 	return true;
 }

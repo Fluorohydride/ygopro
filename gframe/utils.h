@@ -91,7 +91,7 @@ namespace ygo {
 		static bool ClearDirectory(path_stringview path);
 		static bool DeleteDirectory(path_stringview source);
 		static void CreateResourceFolders();
-		static void FindFiles(path_stringview path, const std::function<void(path_stringview, bool, void*)>& cb, void* payload = nullptr);
+		static void FindFiles(path_stringview path, const std::function<void(path_stringview, bool)>& cb);
 		static std::vector<path_string> FindFiles(path_stringview path, const std::vector<path_stringview>& extensions, int subdirectorylayers = 0);
 		/** Returned subfolder names are prefixed by the provided path */
 		static std::vector<path_string> FindSubfolders(path_stringview path, int subdirectorylayers = 1, bool addparentpath = true);

@@ -34,31 +34,24 @@ namespace WindowsWeirdStuff {
 
 //https://docs.microsoft.com/en-us/visualstudio/debugger/how-to-set-a-thread-name-in-native-code?view=vs-2015&redirectedfrom=MSDN
 
-const DWORD MS_VC_EXCEPTION = 0x406D1388;
-#pragma pack(push,8)
-typedef struct tagTHREADNAME_INFO {
+constexpr DWORD MS_VC_EXCEPTION = 0x406D1388;
+#pragma warning(push)
+#pragma warning(disable: 6320 6322)
+#pragma pack(push, 8)
+struct THREADNAME_INFO {
 	DWORD dwType; // Must be 0x1000.
 	LPCSTR szName; // Pointer to name (in user addr space).
 	DWORD dwThreadID; // Thread ID (-1=caller thread).
 	DWORD dwFlags; // Reserved for future use, must be zero.
-} THREADNAME_INFO;
+};
 #pragma pack(pop)
-void NameThread(const char* threadName, DWORD dwThreadID = ((DWORD)-1)) {
-	THREADNAME_INFO info;
-	info.dwType = 0x1000;
-	info.szName = threadName;
-	info.dwThreadID = dwThreadID;
-	info.dwFlags = 0;
-#pragma warning(push)
-#pragma warning(disable: 6320 6322)
-	__try {
-		RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
-	}
-	__except(EXCEPTION_EXECUTE_HANDLER) {
-	}
+void NameThread(const char* threadName) {
+	const THREADNAME_INFO info{ 0x1000, threadName, ((DWORD)-1), 0 };
+	__try {	RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info); }
+	__except(EXCEPTION_EXECUTE_HANDLER) {}
+}
+}
 #pragma warning(pop)
-}
-}
 #endif
 
 namespace ygo {
@@ -107,17 +100,14 @@ namespace ygo {
 #else
 		return rename(source.data(), destination.data()) == 0;
 #endif
-		return false;
 	}
 	bool Utils::FileExists(path_stringview path) {
 #ifdef _WIN32
-		auto dwAttrib = GetFileAttributes(path.data());
+		const auto dwAttrib = GetFileAttributes(path.data());
 		return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 #else
 		Stat sb;
-		if(stat(path.data(), &sb) == -1)
-			return false;
-		return S_ISREG(sb.st_mode) != 0;
+		return stat(path.data(), &sb) != 0 && S_ISREG(sb.st_mode) != 0;
 #endif
 	}
 	bool Utils::ChangeDirectory(path_stringview newpath) {
@@ -134,39 +124,47 @@ namespace ygo {
 		return remove(source.data()) == 0;
 #endif
 	}
-	bool Utils::ClearDirectory(path_stringview path) {
+
+	void Utils::FindFiles(path_stringview path, const std::function<void(path_stringview, bool)>& cb) {
 #ifdef _WIN32
-		WIN32_FIND_DATA fdata;
-		HANDLE fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), path).data(), &fdata);
+		WIN32_FIND_DATA fdataw;
+		HANDLE fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), NormalizePath<path_string>(path.data())).data(), &fdataw);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
-				path_stringview name = fdata.cFileName;
-				if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY
-				   && name != EPRO_TEXT("..") && name != EPRO_TEXT("."))
-					DeleteDirectory(fmt::format(EPRO_TEXT("{}{}/"), path, name));
-				else
-					FileDelete(fmt::format(EPRO_TEXT("{}{}"),path, name));
-			} while(FindNextFile(fh, &fdata));
+				cb(fdataw.cFileName, !!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+			} while(FindNextFile(fh, &fdataw));
 			FindClose(fh);
 		}
-		return true;
 #else
-		DIR* dir;
+		DIR* dir = nullptr;
 		Dirent* dirp = nullptr;
-		if((dir = opendir(path.data())) != nullptr) {
-			Stat fileStat;
+		auto _path = NormalizePath<path_string>(path.data());
+		if((dir = opendir(_path.data())) != nullptr) {
 			while((dirp = readdir(dir)) != nullptr) {
-				path_stringview name = dirp->d_name;
-				stat(fmt::format("{}{}", path, name).data(), &fileStat);
-				if(S_ISDIR(fileStat.st_mode) && name != ".." && name != ".")
-					DeleteDirectory(fmt::format("{}{}/", path, name));
-				else
-					FileDelete(fmt::format("{}{}", path, name));
+#ifdef _DIRENT_HAVE_D_TYPE //avoid call to format and stat
+				const bool isdir = dirp->d_type == DT_DIR;
+#else
+				Stat fileStat;
+				stat(fmt::format("{}{}", _path, dirp->d_name).data(), &fileStat);
+				const bool isdir = !!S_ISDIR(fileStat.st_mode);
+#endif
+				cb(dirp->d_name, isdir);
 			}
 			closedir(dir);
 		}
-		return true;
 #endif
+	}
+
+#define ROOT_OR_CUR(str) (str == EPRO_TEXT(".") || (str == EPRO_TEXT("..")))
+	bool Utils::ClearDirectory(path_stringview path) {
+		FindFiles(path, [&path](path_stringview name, bool isdir) {
+			if(isdir) {
+				if(!ROOT_OR_CUR(name))
+					DeleteDirectory(fmt::format(EPRO_TEXT("{}{}/"), path, name));
+			} else
+				FileDelete(fmt::format(EPRO_TEXT("{}{}"), path, name));
+		});
+		return true;
 	}
 	bool Utils::DeleteDirectory(path_stringview source) {
 		ClearDirectory(source);
@@ -176,6 +174,7 @@ namespace ygo {
 		return rmdir(source.data()) == 0;
 #endif
 	}
+
 	void Utils::CreateResourceFolders() {
 		//create directories if missing
 		MakeDirectory(EPRO_TEXT("deck"));
@@ -189,46 +188,16 @@ namespace ygo {
 		MakeDirectory(EPRO_TEXT("screenshots"));
 	}
 
-	void Utils::FindFiles(path_stringview path, const std::function<void(path_stringview, bool, void*)>& cb, void* payload) {
-#ifdef _WIN32
-		WIN32_FIND_DATA fdataw;
-		HANDLE fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), NormalizePath<path_string>(path.data())).data(), &fdataw);
-		if(fh != INVALID_HANDLE_VALUE) {
-			do {
-				cb(fdataw.cFileName, !!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY), payload);
-			} while(FindNextFile(fh, &fdataw));
-			FindClose(fh);
-		}
-#else
-		DIR* dir;
-		Dirent* dirp = nullptr;
-		auto _path = NormalizePath<path_string>(path.data());
-		if((dir = opendir(_path.data())) != nullptr) {
-			Stat fileStat;
-			while((dirp = readdir(dir)) != nullptr) {
-				stat(fmt::format("{}{}",_path, dirp->d_name).data(), &fileStat);
-				cb(dirp->d_name, !!S_ISDIR(fileStat.st_mode), payload);
-			}
-			closedir(dir);
-		}
-#endif
-	}
-
 	std::vector<path_string> Utils::FindFiles(path_stringview path, const std::vector<path_stringview>& extensions, int subdirectorylayers) {
 		std::vector<path_string> res;
-		FindFiles(path, [&res, extensions, path, subdirectorylayers](path_stringview name, bool isdir, void* payload) {
+		FindFiles(path, [&res, extensions, path, subdirectorylayers](path_stringview name, bool isdir) {
 			if(isdir) {
-				if(subdirectorylayers) {
-					if(name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
-						return;
-					}
-					std::vector<path_string> res2 = FindFiles(fmt::format(EPRO_TEXT("{}{}/"), path, name), extensions, subdirectorylayers - 1);
-					for(auto& file : res2) {
+				if(subdirectorylayers && !ROOT_OR_CUR(name)) {
+					auto res2 = FindFiles(fmt::format(EPRO_TEXT("{}{}/"), path, name), extensions, subdirectorylayers - 1);
+					for(auto& file : res2)
 						file = fmt::format(EPRO_TEXT("{}/{}"), name, file);
-					}
 					res.insert(res.end(), std::make_move_iterator(res2.begin()), std::make_move_iterator(res2.end()));
 				}
-				return;
 			} else {
 				if(extensions.size() && std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<path_string>(name.data())) == extensions.end())
 					return;
@@ -240,24 +209,20 @@ namespace ygo {
 	}
 	std::vector<path_string> Utils::FindSubfolders(path_stringview path, int subdirectorylayers, bool addparentpath) {
 		std::vector<path_string> results;
-		FindFiles(path, [&results, path, subdirectorylayers, addparentpath](path_stringview name, bool isdir, void* payload) {
-			if (isdir) {
-				if (name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
-					return;
-				}
-				path_string fullpath = fmt::format(EPRO_TEXT("{}{}/"), path, name);
-				path_stringview cur = name;
-				if(addparentpath)
-					cur = fullpath;
-				results.push_back({ cur.data(), cur.size() });
-				if (subdirectorylayers > 1) {
-					auto subresults = FindSubfolders(fullpath, subdirectorylayers - 1, false);
-					for (auto& folder : subresults) {
-						folder = fmt::format(EPRO_TEXT("{}{}/"), fullpath, folder);
-					}
-					results.insert(results.end(), std::make_move_iterator(subresults.begin()), std::make_move_iterator(subresults.end()));
-				}
+		FindFiles(path, [&results, path, subdirectorylayers, addparentpath](path_stringview name, bool isdir) {
+			if (!isdir || ROOT_OR_CUR(name))
 				return;
+			path_string fullpath = fmt::format(EPRO_TEXT("{}{}/"), path, name);
+			path_stringview cur = name;
+			if(addparentpath)
+				cur = fullpath;
+			results.push_back({ cur.data(), cur.size() });
+			if(subdirectorylayers > 1) {
+				auto subresults = FindSubfolders(fullpath, subdirectorylayers - 1, false);
+				for(auto& folder : subresults) {
+					folder = fmt::format(EPRO_TEXT("{}{}/"), fullpath, folder);
+				}
+				results.insert(results.end(), std::make_move_iterator(subresults.begin()), std::make_move_iterator(subresults.end()));
 			}
 		});
 		std::sort(results.begin(), results.end(), CompareIgnoreCase<path_string>);
