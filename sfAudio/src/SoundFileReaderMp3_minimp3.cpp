@@ -25,6 +25,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#ifndef SFAUDIO_USE_MPG123
 #define MINIMP3_IMPLEMENTATION
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -130,3 +131,5 @@ void SoundFileReaderMp3::close()
 } // namespace priv
 
 } // namespace sf
+
+#endif //SFAUDIO_USE_MPG123

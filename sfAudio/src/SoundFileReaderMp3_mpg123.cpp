@@ -25,6 +25,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#ifdef SFAUDIO_USE_MPG123
 #include <algorithm>
 #include "sfAudio/SoundFileReaderMp3_mpg123.hpp"
 #include "sfAudio/System/MemoryInputStream.hpp"
@@ -190,3 +191,5 @@ void MemoryDataCleanup(void* rawMp3Data) {
 } // namespace priv
 
 } // namespace sf
+
+#endif //SFAUDIO_USE_MPG123
