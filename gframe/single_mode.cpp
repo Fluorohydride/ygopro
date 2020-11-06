@@ -372,30 +372,21 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 				record = false;
 			break;
 		}
-		case MSG_AI_NAME: {
-			char* pbuf = Data();
-			int len = BufferIO::Read<uint16_t>(pbuf);
-			char* begin = pbuf;
-			pbuf += len + 1;
-			std::string namebuf;
-			namebuf.resize(len);
-			memcpy(&namebuf[0], begin, len + 1);
-			mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8s(namebuf);
-			break;
-		}
+		case MSG_AI_NAME:
 		case MSG_SHOW_HINT: {
-			char msgbuf[1024];
-			wchar_t msg[1024];
 			char* pbuf = Data();
 			int len = BufferIO::Read<uint16_t>(pbuf);
-			char* begin = pbuf;
-			pbuf += len + 1;
-			memcpy(msgbuf, begin, len + 1);
-			BufferIO::DecodeUTF8(msgbuf, msg);
-			std::unique_lock<std::mutex> lock(mainGame->gMutex);
-			mainGame->stMessage->setText(msg);
-			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->actionSignal.Wait(lock);
+			if((len + 1) != packet.data.size() - (sizeof(uint8_t) + sizeof(uint16_t)))
+				break;
+			pbuf[len] = 0;
+			if(packet.message == MSG_AI_NAME) {
+				mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8s(pbuf);
+			} else {
+				std::unique_lock<std::mutex> lock(mainGame->gMutex);
+				mainGame->stMessage->setText(BufferIO::DecodeUTF8s(pbuf).data());
+				mainGame->PopupElement(mainGame->wMessage);
+				mainGame->actionSignal.Wait(lock);
+			}
 			break;
 		}
 		case MSG_SELECT_BATTLECMD:

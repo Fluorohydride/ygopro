@@ -271,10 +271,10 @@ void Replay::ParseStream() {
 			int len = BufferIO::Read<uint16_t>(pbuf);
 			if(!can_read)
 				break;
-			std::string namebuf;
-			namebuf.resize(len);
-			memcpy(&namebuf[0], pbuf, len + 1);
-			players[1] = BufferIO::DecodeUTF8s(namebuf);
+			if((len + 1) != p.data.size() - sizeof(uint16_t))
+				break;
+			pbuf[len] = 0;
+			players[1] = BufferIO::DecodeUTF8s(pbuf);
 			continue;
 		}
 		if(p.message == MSG_NEW_TURN) {
