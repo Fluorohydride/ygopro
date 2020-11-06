@@ -427,7 +427,7 @@ bool DeckManager::SaveDeck(Deck& deck, const path_string& name) {
 	deckfile.close();
 	return true;
 }
-bool DeckManager::SaveDeck(const path_string& name, cardlist_type& mainlist, cardlist_type& extralist, cardlist_type& sidelist) {
+bool DeckManager::SaveDeck(const path_string& name, const cardlist_type& mainlist, const cardlist_type& extralist, const cardlist_type& sidelist) {
 	std::ofstream deckfile(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name), std::ofstream::out);
 	if(!deckfile.is_open())
 		return false;

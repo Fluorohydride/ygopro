@@ -66,7 +66,7 @@ public:
 	bool LoadDeck(const path_string& file, Deck* deck = nullptr, bool separated = false);
 	bool LoadDeckDouble(const path_string& file, const path_string& file2, Deck* deck = nullptr);
 	bool SaveDeck(Deck& deck, const path_string& name);
-	bool SaveDeck(const path_string& name, cardlist_type& mainlist, cardlist_type& extralist, cardlist_type& sidelist);
+	bool SaveDeck(const path_string& name, const cardlist_type& mainlist, const cardlist_type& extralist, const cardlist_type& sidelist);
 	const wchar_t* ExportDeckBase64(Deck& deck);
 	const wchar_t* ExportDeckCardNames(Deck deck);
 	void ImportDeckBase64(Deck& deck, const wchar_t* buffer);
