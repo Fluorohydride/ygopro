@@ -29,7 +29,7 @@ using Dirent = struct dirent;
 #include <fmt/format.h>
 #include "bufferio.h"
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSC_VER)
 namespace WindowsWeirdStuff {
 
 //https://docs.microsoft.com/en-us/visualstudio/debugger/how-to-set-a-thread-name-in-native-code?view=vs-2015&redirectedfrom=MSDN
@@ -60,7 +60,7 @@ namespace ygo {
 	path_string Utils::working_dir;
 
 	void Utils::InternalSetThreadName(const char* name) {
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSC_VER)
 		WindowsWeirdStuff::NameThread(name);
 #elif defined(__linux__)
 		pthread_setname_np(pthread_self(), name);
