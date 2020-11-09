@@ -7,6 +7,7 @@
 #endif
 #ifndef _WIN32
 #include <arpa/inet.h>
+#include <unistd.h>
 #endif
 #include "game_config.h"
 #include <irrlicht.h>
