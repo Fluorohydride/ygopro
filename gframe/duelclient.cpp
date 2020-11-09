@@ -5,10 +5,12 @@
 #include <sys/types.h>
 #include <signal.h>
 #endif
+#ifndef _WIN32
+#include <arpa/inet.h>
+#endif
 #include "game_config.h"
 #include <irrlicht.h>
 #include "duelclient.h"
-#include "sockets.h"
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
@@ -4187,14 +4189,14 @@ void DuelClient::BeginRefreshHost() {
 	for(int i = 0; i < 8 && list[i] != 0; ++i)
 		addresses[i] = list[i]->s_addr;
 #endif
-	SOCKET reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	evutil_socket_t reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	sockaddr_in reply_addr;
 	memset(&reply_addr, 0, sizeof(reply_addr));
 	reply_addr.sin_family = AF_INET;
 	reply_addr.sin_port = htons(7921);
 	reply_addr.sin_addr.s_addr = 0;
-	if(bind(reply, (sockaddr*)&reply_addr, sizeof(reply_addr)) == SOCKET_ERROR) {
-		closesocket(reply);
+	if(bind(reply, (sockaddr*)&reply_addr, sizeof(reply_addr)) == -1) {
+		evutil_closesocket(reply);
 		return;
 	}
 	timeval timeout = { 3, 0 };
@@ -4215,19 +4217,19 @@ void DuelClient::BeginRefreshHost() {
 		if(address == 0)
 			break;
 		local.sin_addr.s_addr = address;
-		SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-		if(sSend == INVALID_SOCKET)
+		evutil_socket_t sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		if(sSend == EVUTIL_INVALID_SOCKET)
 			continue;
-		socklen_t opt = true;
+		ev_socklen_t opt = true;
 		setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt,
-				   sizeof(socklen_t));
-		if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_ERROR) {
-			closesocket(sSend);
+				   sizeof(ev_socklen_t));
+		if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == -1) {
+			evutil_closesocket(sSend);
 			continue;
 		}
 		sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0,
 			(sockaddr*)&sockTo, sizeof(sockaddr));
-		closesocket(sSend);
+		evutil_closesocket(sSend);
 	}
 }
 int DuelClient::RefreshThread(event_base* broadev) {
@@ -4249,7 +4251,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 			mainGame->btnLanRefresh->setEnabled(true);
 	} else if(events & EV_READ) {
 		sockaddr_in bc_addr;
-		socklen_t sz = sizeof(sockaddr_in);
+		ev_socklen_t sz = sizeof(sockaddr_in);
 		char buf[256];
 		/*int ret = */recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
 		uint32_t ipaddr = bc_addr.sin_addr.s_addr;

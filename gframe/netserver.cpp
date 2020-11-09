@@ -1,7 +1,9 @@
 #include <thread>
+#ifndef _WIN32
+#include <arpa/inet.h>
+#endif
 #include "netserver.h"
 #include "generic_duel.h"
-#include "sockets.h"
 #include "common.h"
 
 namespace ygo {
@@ -49,16 +51,16 @@ bool NetServer::StartServer(uint16_t port) {
 bool NetServer::StartBroadcast() {
 	if(!net_evbase)
 		return false;
-	SOCKET udp = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	socklen_t opt = true;
-	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(socklen_t));
+	evutil_socket_t udp = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	ev_socklen_t opt = true;
+	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(ev_socklen_t));
 	sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(7920);
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	if(bind(udp, (sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR) {
-		closesocket(udp);
+	if(bind(udp, (sockaddr*)&addr, sizeof(addr)) == -1) {
+		evutil_closesocket(udp);
 		return false;
 	}
 	broadcast_ev = event_new(net_evbase, udp, EV_READ | EV_PERSIST, BroadcastEvent, NULL);
@@ -89,7 +91,7 @@ void NetServer::StopListen() {
 }
 void NetServer::BroadcastEvent(evutil_socket_t fd, short events, void* arg) {
 	sockaddr_in bc_addr;
-	socklen_t sz = sizeof(sockaddr_in);
+	ev_socklen_t sz = sizeof(sockaddr_in);
 	char buf[256];
 	int ret = recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
 	if(ret == -1)
