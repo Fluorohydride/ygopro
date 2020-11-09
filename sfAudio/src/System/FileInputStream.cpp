@@ -26,9 +26,6 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include <sfAudio/System/FileInputStream.hpp>
-#ifdef ANDROID
-#include <sfAudio/System/Android/ResourceStream.hpp>
-#endif
 
 
 namespace sf
@@ -44,55 +41,36 @@ FileInputStream::FileInputStream()
 ////////////////////////////////////////////////////////////
 FileInputStream::~FileInputStream()
 {
-#ifdef ANDROID
-    if (m_file)
-        delete m_file;
-#else
     if (m_file)
         std::fclose(m_file);
-#endif
 }
 
 
 ////////////////////////////////////////////////////////////
 bool FileInputStream::open(const std::string &filename)
 {
-#ifdef ANDROID
-    if (m_file)
-        delete m_file;
-    m_file = new priv::ResourceStream(filename);
-    return m_file->tell() != -1;
-#else
     if (m_file)
         std::fclose(m_file);
 
     m_file = std::fopen(filename.c_str(), "rb");
 
     return m_file != NULL;
-#endif
 }
 
 
 ////////////////////////////////////////////////////////////
 uint64_t FileInputStream::read(void *data, uint64_t size)
 {
-#ifdef ANDROID
-    return m_file->read(data, size);
-#else
     if (m_file)
         return std::fread(data, 1, static_cast<std::size_t>(size), m_file);
     else
         return -1;
-#endif
 }
 
 
 ////////////////////////////////////////////////////////////
 uint64_t FileInputStream::seek(uint64_t position)
 {
-#ifdef ANDROID
-    return m_file->seek(position);
-#else
     if (m_file) {
         if (std::fseek(m_file, static_cast<std::size_t>(position), SEEK_SET))
             return -1;
@@ -102,30 +80,22 @@ uint64_t FileInputStream::seek(uint64_t position)
     else {
         return -1;
     }
-#endif
 }
 
 
 ////////////////////////////////////////////////////////////
 uint64_t FileInputStream::tell()
 {
-#ifdef ANDROID
-    return m_file->tell();
-#else
     if (m_file)
         return std::ftell(m_file);
     else
         return -1;
-#endif
 }
 
 
 ////////////////////////////////////////////////////////////
 uint64_t FileInputStream::getSize()
 {
-#ifdef ANDROID
-    return m_file->getSize();
-#else
     if (m_file) {
         uint64_t position = tell();
         std::fseek(m_file, 0, SEEK_END);
@@ -136,7 +106,6 @@ uint64_t FileInputStream::getSize()
     else {
         return -1;
     }
-#endif
 }
 
 } // namespace sf
