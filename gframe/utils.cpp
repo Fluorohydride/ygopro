@@ -107,7 +107,7 @@ namespace ygo {
 		return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 #else
 		Stat sb;
-		return stat(path.data(), &sb) != 0 && S_ISREG(sb.st_mode) != 0;
+		return stat(path.data(), &sb) != -1 && S_ISREG(sb.st_mode) != 0;
 #endif
 	}
 	bool Utils::ChangeDirectory(path_stringview newpath) {
