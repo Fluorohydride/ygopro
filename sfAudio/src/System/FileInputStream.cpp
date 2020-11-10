@@ -25,8 +25,11 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#ifdef _WIN32
+#define _WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#endif
 #include <sfAudio/System/FileInputStream.hpp>
-
 
 namespace sf
 {
@@ -52,7 +55,15 @@ bool FileInputStream::open(const std::string &filename)
     if (m_file)
         std::fclose(m_file);
 
+#if defined(UNICODE) && defined(_WIN32)
+	auto len = MultiByteToWideChar(CP_UTF8, 0, filename.data(), -1, nullptr, 0);
+	wchar_t* str = new wchar_t[len];
+	MultiByteToWideChar(CP_UTF8, 0, filename.data(), -1, str, len);
+	m_file = _wfopen(str, L"rb");
+	delete[] str;
+#else
     m_file = std::fopen(filename.c_str(), "rb");
+#endif
 
     return m_file != NULL;
 }
