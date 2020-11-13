@@ -90,7 +90,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 			SetWindowPlacement(hWnd, (WINDOWPLACEMENT*)winstruct.data());
 	}
 #endif
-	device->getLogger()->setLogLevel(irr::ELL_DEBUG);
+	device->getLogger()->setLogLevel(irr::ELL_ERROR);
 	return device;
 }
 
