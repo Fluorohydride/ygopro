@@ -3,6 +3,10 @@ newoption {
 	description = "Disable DirectX options in irrlicht if the DirectX SDK isn't installed"
 }
 newoption {
+	trigger = "oldwindows",
+	description = "Use some tricks to support up to windows 2000"
+}
+newoption {
 	trigger = "sound",
 	value = "backend",
 	description = "Choose sound backend",
@@ -61,10 +65,11 @@ workspace "ygo"
 	objdir "obj"
 	startproject "ygopro"
 	staticruntime "on"
-	filter "action:vs*"
-		toolset "v141_xp"
-
-	filter {}
+	if _OPTIONS["oldwindows"] then
+		filter "action:vs*"
+			toolset "v141_xp"
+		filter {}
+	end
 
 	configurations { "Debug", "Release" }
 

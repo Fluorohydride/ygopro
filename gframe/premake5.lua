@@ -4,6 +4,12 @@ local ygopro_config=function(static_core)
 	rtti "Off"
 	files { "**.cpp", "**.cc", "**.c", "**.h", "**.hpp" }
 	excludes { "lzma/**", "sound_sdlmixer.*", "sound_irrklang.*", "irrklang_dynamic_loader.*", "sound_sfml.*", "sfAudio/**", "Android/**" }
+	if _OPTIONS["oldwindows"] then
+		files { "../overwrites/overwrites.cpp", "../overwrites/loader.asm" }
+		filter "files:**.asm"
+			exceptionhandling 'SEH'
+		filter {}
+	end
 
 	defines "CURL_STATICLIB"
 	if _OPTIONS["pics"] then
@@ -148,11 +154,6 @@ end
 include "lzma/."
 if _OPTIONS["sound"]=="sfml" then
 	include "../sfAudio"
-end
-if os.istarget("windows") then
-project "if_nametoindex"
-	kind "StaticLib"
-	files { "../dummy/if_nametoindex.c" }
 end
 project "ygopro"
 	targetname "ygopro"
