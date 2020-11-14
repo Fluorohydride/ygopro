@@ -46,7 +46,7 @@ and internalimplxxx that is the fallback function called if the function isn't l
 on first call GetProcAddress is called, and if the function is found, then that will be called onwards
 otherwise fall back to the internal implementation
 */
-#define GETFUNC(funcname) (decltype(&handled##funcname))GetProcAddress(GetModuleHandleA("kernel32.dll"), #funcname)
+#define GETFUNC(funcname) (decltype(&handled##funcname))GetProcAddress(GetModuleHandleA(LIBNAME), #funcname)
 #define MAKELOADER(funcname,ret,args,argnames)\
 ret __stdcall internalimpl##funcname args ;\
 extern "C" ret __stdcall handled##funcname args {\
@@ -56,6 +56,15 @@ extern "C" ret __stdcall handled##funcname args {\
 	return internalimpl##funcname argnames ;\
 }\
 ret __stdcall internalimpl##funcname args
+
+#define LIBNAME "Advapi32.dll"
+
+MAKELOADER(IsWellKnownSid, PSLIST_ENTRY, (PSID pSid, WELL_KNOWN_SID_TYPE WellKnownSidType), (pSid, WellKnownSidType)) {
+	return FALSE;
+}
+
+#undef LIBNAME
+#define LIBNAME "kernel32.dll"
 
 typedef struct _LDR_MODULE {
 	LIST_ENTRY InLoadOrderModuleList;
