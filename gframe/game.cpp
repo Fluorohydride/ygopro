@@ -68,8 +68,8 @@ bool Game::Initialize() {
 	if(!device) {
 		try {
 			device = GUIUtils::CreateDevice(gGameConfig);
-		} catch (...) {
-			ErrorLog("Failed to create Irrlicht Engine device!");
+		} catch (std::exception e) {
+			ErrorLog(e.what());
 			return false;
 		}
 	}

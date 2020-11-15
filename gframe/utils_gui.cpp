@@ -51,10 +51,11 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	params.WindowSize = irr::core::dimension2du(0, 0);
 #endif
 	irr::IrrlichtDevice* device = irr::createDeviceEx(params);
-	if(!device) {
+	if(!device)
 		throw std::runtime_error("Failed to create Irrlicht Engine device!");
-	}
-	auto driver = device->getVideoDriver();
+	const auto driver = device->getVideoDriver();
+	if(!driver)
+		throw std::runtime_error("Failed to create video driver!");
 #ifdef __ANDROID__
 	auto filesystem = device->getFileSystem();
 	// The Android assets file-system does not know which sub-directories it has (blame google).
@@ -108,9 +109,8 @@ bool GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device)
 {
 	const auto driver = device->getVideoDriver();
 	const auto image = driver->createScreenShot();
-	if (!image) {
+	if (!image)
 		return false;
-	}
 	auto now = std::time(nullptr);
 	path_string filename = fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now));
 	if(!driver->writeImageToFile(image, { filename.data(), static_cast<irr::u32>(filename.size()) })) {
@@ -127,7 +127,7 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	static WINDOWPLACEMENT nonFullscreenSize;
 	static LONG nonFullscreenStyle;
 	static constexpr LONG_PTR fullscreenStyle = WS_POPUP | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-	static const std::vector<RECT> monitors = []() {
+	static const auto monitors = [] {
 		std::vector<RECT> ret;
 		EnumDisplayMonitors(0, 0, [](HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM pData) -> BOOL {
 			auto monitors = reinterpret_cast<std::vector<RECT>*>(pData);
@@ -171,11 +171,10 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 		unsigned long   decorations;
 		long			inputMode;
 		unsigned long   status;
-	} hints = {};
+	} hints{};
 	Display* display = XOpenDisplay(NULL);;
 	Window window;
 	static bool wasHorizontalMaximized = false, wasVerticalMaximized = false;
-	Window child;
 	int revert;
 	fullscreen = !fullscreen;
 	XGetInputFocus(display, &window, &revert);
