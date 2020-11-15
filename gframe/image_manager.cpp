@@ -48,11 +48,15 @@ bool ImageManager::Initial() {
 	GET_TEXTURE_SIZED(tHand[2], "f3", 89, 128)
 	GET_TEXTURE(tBackGround, "bg")
 	GET_TEXTURE(tBackGround_menu, "bg_menu")
-	if(!tBackGround_menu)
+	if(!tBackGround_menu){
 		tBackGround_menu = tBackGround;
+		def_tBackGround_menu = tBackGround;
+	}
 	GET_TEXTURE(tBackGround_deck, "bg_deck")
-	if(!tBackGround_deck)
+	if(!tBackGround_deck){
 		tBackGround_deck = tBackGround;
+		def_tBackGround_deck = tBackGround;
+	}
 	GET_TEXTURE(tField[0][0], "field2")
 	GET_TEXTURE(tFieldTransparent[0][0], "field-transparent2")
 	GET_TEXTURE(tField[0][1], "field3")
@@ -88,7 +92,7 @@ bool ImageManager::Initial() {
 		tmp = fun2;\
 	if(!tmp)\
 		tmp = fallback;\
-	if(tmp != fallback)\
+	if(to_set != fallback)\
 		driver->removeTexture(to_set);\
 	to_set = tmp;\
 } while(0)
@@ -97,7 +101,8 @@ bool ImageManager::Initial() {
 void ImageManager::ChangeTextures(path_stringview _path) {
 	if(_path == textures_path)
 		return;
-	textures_path = _path.data();
+	textures_path = { _path.data(), _path.size() };
+	const bool is_base = textures_path == BASE_PATH;
 	GET_TEXTURE_SIZED(tUnknown, "unknown", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	GET_TEXTURE(tAct, "act");
 	GET_TEXTURE(tAttack, "attack");
@@ -117,10 +122,10 @@ void ImageManager::ChangeTextures(path_stringview _path) {
 	GET_TEXTURE_SIZED(tHand[2], "f3", 89, 128);
 	GET_TEXTURE(tBackGround, "bg");
 	GET_TEXTURE(tBackGround_menu, "bg_menu");
-	if(!tBackGround_menu)
+	if(!is_base && tBackGround_menu == def_tBackGround_menu)
 		tBackGround_menu = tBackGround;
 	GET_TEXTURE(tBackGround_deck, "bg_deck");
-	if(!tBackGround_deck)
+	if(!is_base && tBackGround_deck == def_tBackGround_deck)
 		tBackGround_deck = tBackGround;
 	GET_TEXTURE(tField[0][0], "field2");
 	GET_TEXTURE(tFieldTransparent[0][0], "field-transparent2");
