@@ -82,54 +82,63 @@ bool ImageManager::Initial() {
 #undef GET
 #undef GET_TEXTURE
 #undef GET_TEXTURE_SIZED
-#define GET(obj,fun1,fun2,fallback) obj=fun1; if(!obj) obj=fun2; if(!obj) obj=fallback;
+#define GET(to_set,fun1,fun2,fallback) do  {\
+	irr::video::ITexture* tmp = fun1;\
+	if(!tmp)\
+		tmp = fun2;\
+	if(!tmp)\
+		tmp = fallback;\
+	if(tmp != fallback)\
+		driver->removeTexture(to_set);\
+	to_set = tmp;\
+} while(0)
 #define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GTFF(path,".png",w,h),GTFF(path,".jpg",w,h),def_##obj)
 #define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(X(path ".png")),driver->getTexture(X(path ".jpg")),def_##obj)
 void ImageManager::ChangeTextures(path_stringview _path) {
 	if(_path == textures_path)
 		return;
 	textures_path = _path.data();
-	GET_TEXTURE_SIZED(tUnknown, "unknown", CARD_IMG_WIDTH, CARD_IMG_HEIGHT)
-	GET_TEXTURE(tAct, "act")
-	GET_TEXTURE(tAttack, "attack")
-	GET_TEXTURE(tChain, "chain")
-	GET_TEXTURE_SIZED(tNegated, "negated", 128, 128)
-	GET_TEXTURE_SIZED(tNumber, "number", 320, 256)
-	GET_TEXTURE(tLPBar, "lp")
-	GET_TEXTURE(tLPFrame, "lpf")
-	GET_TEXTURE_SIZED(tMask, "mask", 254, 254)
-	GET_TEXTURE(tEquip, "equip")
-	GET_TEXTURE(tTarget, "target")
-	GET_TEXTURE(tChainTarget, "chaintarget")
-	GET_TEXTURE(tLim, "lim")
-	GET_TEXTURE(tOT, "ot")
-	GET_TEXTURE_SIZED(tHand[0], "f1", 89, 128)
-	GET_TEXTURE_SIZED(tHand[1], "f2", 89, 128)
-	GET_TEXTURE_SIZED(tHand[2], "f3", 89, 128)
-	GET_TEXTURE(tBackGround, "bg")
-	GET_TEXTURE(tBackGround_menu, "bg_menu")
+	GET_TEXTURE_SIZED(tUnknown, "unknown", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+	GET_TEXTURE(tAct, "act");
+	GET_TEXTURE(tAttack, "attack");
+	GET_TEXTURE(tChain, "chain");
+	GET_TEXTURE_SIZED(tNegated, "negated", 128, 128);
+	GET_TEXTURE_SIZED(tNumber, "number", 320, 256);
+	GET_TEXTURE(tLPBar, "lp");
+	GET_TEXTURE(tLPFrame, "lpf");
+	GET_TEXTURE_SIZED(tMask, "mask", 254, 254);
+	GET_TEXTURE(tEquip, "equip");
+	GET_TEXTURE(tTarget, "target");
+	GET_TEXTURE(tChainTarget, "chaintarget");
+	GET_TEXTURE(tLim, "lim");
+	GET_TEXTURE(tOT, "ot");
+	GET_TEXTURE_SIZED(tHand[0], "f1", 89, 128);
+	GET_TEXTURE_SIZED(tHand[1], "f2", 89, 128);
+	GET_TEXTURE_SIZED(tHand[2], "f3", 89, 128);
+	GET_TEXTURE(tBackGround, "bg");
+	GET_TEXTURE(tBackGround_menu, "bg_menu");
 	if(!tBackGround_menu)
 		tBackGround_menu = tBackGround;
-	GET_TEXTURE(tBackGround_deck, "bg_deck")
+	GET_TEXTURE(tBackGround_deck, "bg_deck");
 	if(!tBackGround_deck)
 		tBackGround_deck = tBackGround;
-	GET_TEXTURE(tField[0][0], "field2")
-	GET_TEXTURE(tFieldTransparent[0][0], "field-transparent2")
-	GET_TEXTURE(tField[0][1], "field3")
-	GET_TEXTURE(tFieldTransparent[0][1], "field-transparent3")
-	GET_TEXTURE(tField[0][2], "field")
-	GET_TEXTURE(tFieldTransparent[0][2], "field-transparent")
-	GET_TEXTURE(tField[0][3], "field4")
-	GET_TEXTURE(tFieldTransparent[0][3], "field-transparent4")
-	GET_TEXTURE(tField[1][0], "fieldSP2")
-	GET_TEXTURE(tFieldTransparent[1][0], "field-transparentSP2")
-	GET_TEXTURE(tField[1][1], "fieldSP3")
-	GET_TEXTURE(tFieldTransparent[1][1], "field-transparentSP3")
-	GET_TEXTURE(tField[1][2], "fieldSP")
-	GET_TEXTURE(tFieldTransparent[1][2], "field-transparentSP")
-	GET_TEXTURE(tField[1][3], "fieldSP4")
-	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4")
-	GET_TEXTURE(tSettings, "settings")
+	GET_TEXTURE(tField[0][0], "field2");
+	GET_TEXTURE(tFieldTransparent[0][0], "field-transparent2");
+	GET_TEXTURE(tField[0][1], "field3");
+	GET_TEXTURE(tFieldTransparent[0][1], "field-transparent3");
+	GET_TEXTURE(tField[0][2], "field");
+	GET_TEXTURE(tFieldTransparent[0][2], "field-transparent");
+	GET_TEXTURE(tField[0][3], "field4");
+	GET_TEXTURE(tFieldTransparent[0][3], "field-transparent4");
+	GET_TEXTURE(tField[1][0], "fieldSP2");
+	GET_TEXTURE(tFieldTransparent[1][0], "field-transparentSP2");
+	GET_TEXTURE(tField[1][1], "fieldSP3");
+	GET_TEXTURE(tFieldTransparent[1][1], "field-transparentSP3");
+	GET_TEXTURE(tField[1][2], "fieldSP");
+	GET_TEXTURE(tFieldTransparent[1][2], "field-transparentSP");
+	GET_TEXTURE(tField[1][3], "fieldSP4");
+	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4");
+	GET_TEXTURE(tSettings, "settings");
 	RefreshCovers();
 }
 void ImageManager::ResetTextures() {
@@ -140,10 +149,11 @@ void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 	driver = dev->getVideoDriver();
 }
 void ImageManager::ClearTexture(bool resize) {
-	auto f = [&](texture_map &map) {
-		for(auto tit = map.begin(); tit != map.end(); ++tit) {
-			if(tit->second)
-				driver->removeTexture(tit->second);
+	auto ClearMap = [&](texture_map &map) {
+		for(const auto& tit : map) {
+			if(tit.second) {
+				driver->removeTexture(tit.second);
+			}
 		}
 		map.clear();
 	};
@@ -154,17 +164,17 @@ void ImageManager::ClearTexture(bool resize) {
 		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
 		const auto s1 = CARD_IMG_WIDTH * mainGame->window_scale.X;
 		const auto s2 = CARD_IMG_HEIGHT * mainGame->window_scale.Y;
-		GET_TEXTURE_SIZED(tUnknown, "unknown", s1, s2)
+		GET_TEXTURE_SIZED(tUnknown, "unknown", s1, s2);
 		RefreshCovers();
 	}
 	if(!resize) {
 		ClearCachedTextures(resize);
 	}
-	f(tMap[0]);
-	f(tMap[1]);
-	f(tThumb);
-	f(tFields);
-	f(tCovers);
+	ClearMap(tMap[0]);
+	ClearMap(tMap[1]);
+	ClearMap(tThumb);
+	ClearMap(tFields);
+	ClearMap(tCovers);
 }
 #undef GET_TEXTURE
 #undef GET_TEXTURE_SIZED
@@ -232,6 +242,7 @@ void ImageManager::RefreshCovers() {
 #define X(x) BASE_PATH x
 #define GET_TEXTURE_SIZED(obj,path) GET(tmp_cover,GetTextureFromFile(X( path".png"),sizes[1].first,sizes[1].second),GetTextureFromFile(X( path".jpg"),sizes[1].first,sizes[1].second))\
 										if(tmp_cover) {\
+											driver->removeTexture(obj); \
 											obj = tmp_cover;\
 										}
 	GET_TEXTURE_SIZED(tCover[0], "cover")
@@ -241,10 +252,12 @@ void ImageManager::RefreshCovers() {
 	if(textures_path != BASE_PATH) {
 		GET(tmp_cover, GetTextureFromFile(X("cover.png"), sizes[1].first, sizes[1].second), GetTextureFromFile(X("cover.jpg"), sizes[1].first, sizes[1].second))
 		if(tmp_cover){
+			driver->removeTexture(tCover[0]);
 			tCover[0] = tmp_cover;
 		}
 		GET(tmp_cover, GetTextureFromFile(X("cover2.png"), sizes[1].first, sizes[1].second), GetTextureFromFile(X("cover2.jpg"), sizes[1].first, sizes[1].second))
 		if(tmp_cover){
+			driver->removeTexture(tCover[1]);
 			tCover[1] = tmp_cover;
 		}
 	}
