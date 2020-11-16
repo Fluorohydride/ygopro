@@ -5,7 +5,7 @@
 #include <sfAudio/SoundBuffer.hpp>
 
 SoundSFML::SoundSFML() :
-	music(new sf::Music()), music_volume(0.0f), sound_volume(0.0f) {
+	music(), music_volume(0.0f), sound_volume(0.0f) {
 };
 SoundSFML::~SoundSFML() = default;
 
@@ -19,16 +19,16 @@ void SoundSFML::SetSoundVolume(double volume)
 void SoundSFML::SetMusicVolume(double volume)
 {
 	music_volume = (float)(volume * 100);
-	music->setVolume(music_volume);
+	music.setVolume(music_volume);
 }
 
 bool SoundSFML::PlayMusic(const std::string& name, bool loop)
 {
-	if (music->getStatus() == sf::SoundSource::Status::Playing)
-		music->stop();
-	if(!music->openFromFile(name))
+	if(music.getStatus() == sf::SoundSource::Status::Playing)
+		music.stop();
+	if(!music.openFromFile(name))
 		return false;
-	music->play();
+	music.play();
 	return true;
 }
 const sf::SoundBuffer& SoundSFML::LookupSound(const std::string& name)
@@ -56,25 +56,24 @@ bool SoundSFML::PlaySound(const std::string& name)
 
 void SoundSFML::StopSounds()
 {
-	for (auto it = sounds.begin(); it != sounds.end(); it = sounds.erase(it))
-		(*it)->stop();
+	sounds.clear();
 	buffers.clear();
 }
 
 void SoundSFML::StopMusic()
 {
-	music->stop();
+	music.stop();
 }
 
 void SoundSFML::PauseMusic(bool pause)
 {
-	if (pause) music->pause();
-	else music->play();
+	if (pause) music.pause();
+	else music.play();
 }
 
 bool SoundSFML::MusicPlaying()
 {
-	return music->getStatus() == sf::SoundSource::Status::Playing;
+	return music.getStatus() == sf::SoundSource::Status::Playing;
 }
 
 void SoundSFML::Tick()

@@ -3,10 +3,9 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <sfAudio/Music.hpp>
 
-namespace sf
-{
-	class Music;
+namespace sf {
 	class Sound;
 	class SoundBuffer;
 }
@@ -25,9 +24,9 @@ public:
 	virtual bool MusicPlaying() override;
 	virtual void Tick() override;
 private:
-	std::unique_ptr<sf::Music> music;
+	sf::Music music;
 	std::vector<std::unique_ptr<sf::Sound>> sounds;
 	float music_volume, sound_volume;
-	std::map<std::string,std::unique_ptr<sf::SoundBuffer>> buffers;
+	std::map<std::string, std::unique_ptr<sf::SoundBuffer>> buffers;
 	const sf::SoundBuffer& LookupSound(const std::string& name);
 };
