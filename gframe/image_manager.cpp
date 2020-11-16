@@ -16,64 +16,75 @@
 namespace ygo {
 
 #define X(x) (textures_path + EPRO_TEXT(x)).data()
-#define GET(obj,fun1,fun2) obj=fun1; if(!obj) obj=fun2;
+#define GET(obj,fun1,fun2) do {obj=fun1; if(!obj) obj=fun2; def_##obj=obj;}while(0)
 #define GTFF(path,ext,w,h) GetTextureFromFile(X(path ext), mainGame->Scale(w), mainGame->Scale(h))
-#define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GTFF(path,".png",w,h),GTFF(path,".jpg",w,h)) def_##obj=obj;
-#define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(X(path ".png")),driver->getTexture(X(path ".jpg"))) def_##obj=obj;
+#define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GTFF(path,".png",w,h),GTFF(path,".jpg",w,h))
+#define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(X(path ".png")),driver->getTexture(X(path ".jpg")))
+ImageManager::ImageManager() {
+	stop_threads = false;
+	obj_clear_thread = std::thread(&ImageManager::ClearFutureObjects, this);
+}
+ImageManager::~ImageManager() {
+	obj_clear_lock.lock();
+	stop_threads = true;
+	cv.notify_all();
+	obj_clear_lock.unlock();
+	obj_clear_thread.join();
+}
 bool ImageManager::Initial() {
 	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	textures_path = BASE_PATH;
-	GET_TEXTURE_SIZED(tCover[0],"cover", CARD_IMG_WIDTH, CARD_IMG_HEIGHT)
-	GET_TEXTURE_SIZED(tCover[1],"cover2", CARD_IMG_WIDTH, CARD_IMG_HEIGHT)
+	GET_TEXTURE_SIZED(tCover[0], "cover", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+	GET_TEXTURE_SIZED(tCover[1], "cover2", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	if(!tCover[1]){
 		tCover[1] = tCover[0];
 		def_tCover[1] = tCover[1];
 	}
-	GET_TEXTURE_SIZED(tUnknown, "unknown", CARD_IMG_WIDTH, CARD_IMG_HEIGHT)
-	GET_TEXTURE(tAct, "act")
-	GET_TEXTURE(tAttack, "attack")
-	GET_TEXTURE(tChain, "chain")
-	GET_TEXTURE_SIZED(tNegated, "negated", 128, 128)
-	GET_TEXTURE_SIZED(tNumber, "number", 320, 256)
-	GET_TEXTURE(tLPBar, "lp")
-	GET_TEXTURE(tLPFrame, "lpf")
-	GET_TEXTURE_SIZED(tMask, "mask", 254, 254)
-	GET_TEXTURE(tEquip, "equip")
-	GET_TEXTURE(tTarget, "target")
-	GET_TEXTURE(tChainTarget, "chaintarget")
-	GET_TEXTURE(tLim, "lim")
-	GET_TEXTURE(tOT, "ot")
-	GET_TEXTURE_SIZED(tHand[0], "f1", 89, 128)
-	GET_TEXTURE_SIZED(tHand[1], "f2", 89, 128)
-	GET_TEXTURE_SIZED(tHand[2], "f3", 89, 128)
-	GET_TEXTURE(tBackGround, "bg")
-	GET_TEXTURE(tBackGround_menu, "bg_menu")
+	GET_TEXTURE_SIZED(tUnknown, "unknown", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+	GET_TEXTURE(tAct, "act");
+	GET_TEXTURE(tAttack, "attack");
+	GET_TEXTURE(tChain, "chain");
+	GET_TEXTURE_SIZED(tNegated, "negated", 128, 128);
+	GET_TEXTURE_SIZED(tNumber, "number", 320, 256);
+	GET_TEXTURE(tLPBar, "lp");
+	GET_TEXTURE(tLPFrame, "lpf");
+	GET_TEXTURE_SIZED(tMask, "mask", 254, 254);
+	GET_TEXTURE(tEquip, "equip");
+	GET_TEXTURE(tTarget, "target");
+	GET_TEXTURE(tChainTarget, "chaintarget");
+	GET_TEXTURE(tLim, "lim");
+	GET_TEXTURE(tOT, "ot");
+	GET_TEXTURE_SIZED(tHand[0], "f1", 89, 128);
+	GET_TEXTURE_SIZED(tHand[1], "f2", 89, 128);
+	GET_TEXTURE_SIZED(tHand[2], "f3", 89, 128);
+	GET_TEXTURE(tBackGround, "bg");
+	GET_TEXTURE(tBackGround_menu, "bg_menu");
 	if(!tBackGround_menu){
 		tBackGround_menu = tBackGround;
 		def_tBackGround_menu = tBackGround;
 	}
-	GET_TEXTURE(tBackGround_deck, "bg_deck")
+	GET_TEXTURE(tBackGround_deck, "bg_deck");
 	if(!tBackGround_deck){
 		tBackGround_deck = tBackGround;
 		def_tBackGround_deck = tBackGround;
 	}
-	GET_TEXTURE(tField[0][0], "field2")
-	GET_TEXTURE(tFieldTransparent[0][0], "field-transparent2")
-	GET_TEXTURE(tField[0][1], "field3")
-	GET_TEXTURE(tFieldTransparent[0][1], "field-transparent3")
-	GET_TEXTURE(tField[0][2], "field")
-	GET_TEXTURE(tFieldTransparent[0][2], "field-transparent")
-	GET_TEXTURE(tField[0][3], "field4")
-	GET_TEXTURE(tFieldTransparent[0][3], "field-transparent4")
-	GET_TEXTURE(tField[1][0], "fieldSP2")
-	GET_TEXTURE(tFieldTransparent[1][0], "field-transparentSP2")
-	GET_TEXTURE(tField[1][1], "fieldSP3")
-	GET_TEXTURE(tFieldTransparent[1][1], "field-transparentSP3")
-	GET_TEXTURE(tField[1][2], "fieldSP")
-	GET_TEXTURE(tFieldTransparent[1][2], "field-transparentSP")
-	GET_TEXTURE(tField[1][3], "fieldSP4")
-	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4")
-	GET_TEXTURE(tSettings, "settings")
+	GET_TEXTURE(tField[0][0], "field2");
+	GET_TEXTURE(tFieldTransparent[0][0], "field-transparent2");
+	GET_TEXTURE(tField[0][1], "field3");
+	GET_TEXTURE(tFieldTransparent[0][1], "field-transparent3");
+	GET_TEXTURE(tField[0][2], "field");
+	GET_TEXTURE(tFieldTransparent[0][2], "field-transparent");
+	GET_TEXTURE(tField[0][3], "field4");
+	GET_TEXTURE(tFieldTransparent[0][3], "field-transparent4");
+	GET_TEXTURE(tField[1][0], "fieldSP2");
+	GET_TEXTURE(tFieldTransparent[1][0], "field-transparentSP2");
+	GET_TEXTURE(tField[1][1], "fieldSP3");
+	GET_TEXTURE(tFieldTransparent[1][1], "field-transparentSP3");
+	GET_TEXTURE(tField[1][2], "fieldSP");
+	GET_TEXTURE(tFieldTransparent[1][2], "field-transparentSP");
+	GET_TEXTURE(tField[1][3], "fieldSP4");
+	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4");
+	GET_TEXTURE(tSettings, "settings");
 	sizes[0].first = CARD_IMG_WIDTH * gGameConfig->dpi_scale;
 	sizes[0].second = CARD_IMG_HEIGHT * gGameConfig->dpi_scale;
 	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * gGameConfig->dpi_scale;
@@ -195,16 +206,16 @@ void ImageManager::RemoveTexture(uint32_t code) {
 	}
 }
 void ImageManager::RefreshCachedTextures() {
-	auto StartLoad = [this](loading_map* src, texture_map& dest, int index, imgType type) {
+	auto StartLoad = [this](loading_map& src, texture_map& dest, int index, imgType type) {
 		std::vector<int> readd;
-		for (auto it = src->begin(); it != src->end();) {
+		for (auto it = src.begin(); it != src.end();) {
 			if (it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 				auto pair = it->second.get();
 				if (pair.first) {
 					if (pair.first->getDimension().Width != sizes[index].first || pair.first->getDimension().Height != sizes[index].second) {
 						readd.push_back(it->first);
 						dest[it->first] = nullptr;
-						it = src->erase(it);
+						it = src.erase(it);
 						continue;
 					}
 					dest[it->first] = driver->addTexture(pair.second.data(), pair.first);
@@ -212,13 +223,13 @@ void ImageManager::RefreshCachedTextures() {
 				} else if (pair.second != EPRO_TEXT("wait for download")) {
 					dest[it->first] = nullptr;
 				}
-				it = src->erase(it);
+				it = src.erase(it);
 				continue;
 			}
 			it++;
 		}
 		for (auto& code : readd) {
-			(*src)[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id));
+			src[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id));
 		}
 	};
 	StartLoad(loading_pics[0], tMap[0], 0, ART);
@@ -226,18 +237,21 @@ void ImageManager::RefreshCachedTextures() {
 	StartLoad(loading_pics[2], tThumb, 2, THUMB);
 	StartLoad(loading_pics[3], tCovers, 1, COVER);
 }
-void ImageManager::ClearFutureObjects(loading_map* map1, loading_map* map2, loading_map* map3, loading_map* map4) {
+void ImageManager::ClearFutureObjects() {
 	Utils::SetThreadName("ImgObjsClear");
-	for(auto& map : { &map1, &map2, &map3 }) {
-		if(*map) {
-			for(auto it = (*map)->begin(); it != (*map)->end();) {
-				auto pair = it->second.get();
-				if(pair.first)
-					pair.first->drop();
-				it = (*map)->erase(it);
-			}
-			delete (*map);
+	while(true) {
+		std::unique_lock<std::mutex> lck(obj_clear_lock);
+		while(to_clear.size() == 0) {
+			if(stop_threads)
+				return;
+			cv.wait(lck);
 		}
+		auto img = std::move(to_clear.front());
+		to_clear.pop_front();
+		lck.unlock();
+		auto pair = img.second.get();
+		if(pair.first)
+			pair.first->drop();
 	}
 }
 void ImageManager::RefreshCovers() {
@@ -272,13 +286,12 @@ void ImageManager::RefreshCovers() {
 }
 void ImageManager::ClearCachedTextures(bool resize) {
 	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	if(loading_pics[0]->size() + loading_pics[1]->size() + loading_pics[2]->size() + loading_pics[3]->size()) {
-		std::thread(&ImageManager::ClearFutureObjects, this, loading_pics[0], loading_pics[1], loading_pics[2], loading_pics[3]).detach();
-		loading_pics[0] = new loading_map();
-		loading_pics[1] = new loading_map();
-		loading_pics[2] = new loading_map();
-		loading_pics[3] = new loading_map();
+	std::unique_lock<std::mutex> lck(obj_clear_lock);
+	for(auto& map : loading_pics) {
+		to_clear.insert(to_clear.end(), std::make_move_iterator(map.begin()), std::make_move_iterator(map.end()));
+		map.clear();
 	}
+	cv.notify_one();
 }
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
 bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest, irr::s32 width, irr::s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
@@ -533,10 +546,10 @@ irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, 
 			map[code] = nullptr;
 			return ret_unk;
 		}
-		auto a = loading_pics[index]->find(code);
+		auto a = loading_pics[index].find(code);
 		if(chk)
 			*chk = 2;
-		if(a == loading_pics[index]->end()) {
+		if(a == loading_pics[index].end()) {
 			if(wait) {
 				auto tmp_img = LoadCardTexture(code, type, std::ref(sizes[size_index].first), std::ref(sizes[size_index].second), timestamp_id.load(), std::ref(timestamp_id));
 				if(tmp_img.first) {
@@ -551,7 +564,7 @@ irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, 
 				}
 				return (map[code]) ? map[code] : ret_unk;
 			} else {
-				(*loading_pics[index])[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[size_index].first), std::ref(sizes[size_index].second), timestamp_id.load(), std::ref(timestamp_id));
+				loading_pics[index][code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[size_index].first), std::ref(sizes[size_index].second), timestamp_id.load(), std::ref(timestamp_id));
 			}
 		}
 		return ret_unk;
