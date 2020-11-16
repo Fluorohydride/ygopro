@@ -137,7 +137,7 @@ public:
 	virtual bool OnCommonEvent(const irr::SEvent& event, bool& stopPropagation);
 	void GetHoverField(int x, int y);
 	void ShowMenu(int flag, int x, int y);
-	void UpdateChainButtons();
+	void UpdateChainButtons(irr::gui::IGUIElement* caller = nullptr);
 	void ShowCancelOrFinishButton(int buttonOp);
 	void SetShowMark(ClientCard* pcard, bool enable);
 	void ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* element, irr::gui::IGUIElement* parent);
