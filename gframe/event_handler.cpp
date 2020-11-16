@@ -2365,19 +2365,19 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 	return false;
 }
 void ClientField::GetHoverField(int x, int y) {
-	irr::core::recti sfRect(430, 504, 875, 600);
-	irr::core::recti ofRect(531, 135, 800, 191);
-	if(mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
-		sfRect = irr::core::recti(509, 504, 796, 600);
-		ofRect = irr::core::recti(531+ 46, 135, 800- 46, 191);
-	}
-	irr::core::vector2di pos(x, y);
-	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
-	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	static const irr::core::recti NormalSelfHand(430, 504, 875, 600);
+	static const irr::core::recti NormalOppoHand(531, 135, 800, 191);
+	static const irr::core::recti SpeedSelfHand(509, 504, 796, 600);
+	static const irr::core::recti SpeedOppoHand(531 + 46, 135, 800 - 46, 191);
+	const int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	const int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
+	const auto& sfRect = (speed) ? SpeedSelfHand : NormalSelfHand;
+	const auto& ofRect = (speed) ? SpeedOppoHand : NormalOppoHand;
+	const irr::core::vector2di pos(x, y);
 	if(sfRect.isPointInside(pos)) {
-		int hc = hand[0].size();
-		int cardSize = 66;
-		int cardSpace = 10;
+		const int hc = hand[0].size();
+		constexpr int cardSize = 66;
+		constexpr int cardSpace = 10;
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7 - speed * 2) {
@@ -2402,9 +2402,9 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_sequence = (x - sfRect.UpperLeftCorner.X) * (hc - 1) / ((cardSize + cardSpace) * (5 - speed * 2));
 		}
 	} else if(ofRect.isPointInside(pos)) {
-		int hc = hand[1].size();
-		int cardSize = 39;
-		int cardSpace = 7;
+		const int hc = hand[1].size();
+		constexpr int cardSize = 39;
+		constexpr int cardSpace = 7;
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7 - speed * 2) {
@@ -2429,12 +2429,12 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_sequence = hc - 1 - (x - ofRect.UpperLeftCorner.X) * (hc - 1) / ((cardSize + cardSpace) * (5 - speed * 2));
 		}
 	} else {
-		double screenx = x / 1024.0 * (CAMERA_RIGHT - CAMERA_LEFT) + CAMERA_LEFT;
-		double screeny = y / 640.0 * (CAMERA_TOP - CAMERA_BOTTOM) + CAMERA_BOTTOM;
-		double angle = FIELD_ANGLE - atan(screeny);
-		double vlen = sqrt(1.0 + screeny * screeny);
-		double boardx = FIELD_X + FIELD_Z * screenx / vlen / cos(angle);
-		double boardy = FIELD_Y - FIELD_Z * tan(angle);
+		const double screenx = x / 1024.0 * (CAMERA_RIGHT - CAMERA_LEFT) + CAMERA_LEFT;
+		const double screeny = y / 640.0 * (CAMERA_TOP - CAMERA_BOTTOM) + CAMERA_BOTTOM;
+		const double angle = FIELD_ANGLE - atan(screeny);
+		const double vlen = sqrt(1.0 + screeny * screeny);
+		const double boardx = FIELD_X + FIELD_Z * screenx / vlen / cos(angle);
+		const double boardy = FIELD_Y - FIELD_Z * tan(angle);
 		hovered_location = 0;
 		if(boardx >= matManager.vFieldExtra[0][speed][0].Pos.X && boardx <= matManager.vFieldExtra[0][speed][1].Pos.X) {
 			if(boardy >= matManager.vFieldExtra[0][speed][0].Pos.Y && boardy <= matManager.vFieldExtra[0][speed][2].Pos.Y) {
