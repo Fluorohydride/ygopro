@@ -133,10 +133,10 @@ void ImageManager::ChangeTextures(path_stringview _path) {
 	GET_TEXTURE_SIZED(tHand[2], "f3", 89, 128);
 	GET_TEXTURE(tBackGround, "bg");
 	GET_TEXTURE(tBackGround_menu, "bg_menu");
-	if(!is_base && tBackGround_menu == def_tBackGround_menu)
+	if(!is_base && tBackGround != def_tBackGround && tBackGround_menu == def_tBackGround_menu)
 		tBackGround_menu = tBackGround;
 	GET_TEXTURE(tBackGround_deck, "bg_deck");
-	if(!is_base && tBackGround_deck == def_tBackGround_deck)
+	if(!is_base && tBackGround != def_tBackGround && tBackGround_deck == def_tBackGround_deck)
 		tBackGround_deck = tBackGround;
 	GET_TEXTURE(tField[0][0], "field2");
 	GET_TEXTURE(tFieldTransparent[0][0], "field-transparent2");
