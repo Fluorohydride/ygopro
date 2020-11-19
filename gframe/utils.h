@@ -70,9 +70,9 @@ namespace ygo {
 	class Utils {
 	public:
 		template<std::size_t N>
-		static constexpr void SetThreadName(char const (&s)[N]) {
+		static constexpr void SetThreadName(char const (&s)[N], wchar_t const (&ws)[N]) {
 			static_assert(N <= 16, "Thread name on posix can't be more than 16 bytes!");
-			InternalSetThreadName(s);
+			InternalSetThreadName(s, ws);
 		}
 		
 		static std::vector<SynchronizedIrrArchive> archives;
@@ -146,7 +146,7 @@ namespace ygo {
 		static void SystemOpen(path_stringview url, OpenType type = OPEN_URL);
 
 	private:
-		static void InternalSetThreadName(const char* name);
+		static void InternalSetThreadName(const char* name, const wchar_t* wname);
 	};
 
 #define CHAR_T typename T::value_type
@@ -336,5 +336,6 @@ std::wstring Utils::ToUnicodeIfNeeded(path_stringview input) {
 }
 
 }
+#define SetThreadName(name) SetThreadName(name, L##name)
 
 #endif //UTILS_H

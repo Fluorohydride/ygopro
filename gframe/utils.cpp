@@ -59,9 +59,15 @@ namespace ygo {
 	irr::io::IFileSystem* Utils::filesystem;
 	path_string Utils::working_dir;
 
-	void Utils::InternalSetThreadName(const char* name) {
-#if defined(_WIN32) && defined(_MSC_VER)
+	void Utils::InternalSetThreadName(const char* name, const wchar_t* wname) {
+		(void)wname;
+#if defined(_WIN32)
+		static const auto PSetThreadDescription = (HRESULT(WINAPI *)(HANDLE, PCWSTR))GetProcAddress(GetModuleHandle(EPRO_TEXT("kernel32.dll")), "SetThreadDescription");
+		if(PSetThreadDescription && SUCCEEDED(PSetThreadDescription(GetCurrentThread(), wname)))
+			return;
+#if defined(_MSC_VER)
 		WindowsWeirdStuff::NameThread(name);
+#endif
 #elif defined(__linux__)
 		pthread_setname_np(pthread_self(), name);
 #elif defined(__APPLE__)
