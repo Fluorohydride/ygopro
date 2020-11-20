@@ -113,15 +113,13 @@ void Reboot() {
 	CloseHandle(pi.hThread);
 #elif defined(__APPLE__)
 	system("open -b io.github.edo9300.ygoprodll --args show_changelog");
-#else
+#elif !defined(__ANDROID__)
 	struct stat fileStat;
-	stat(ygo::Utils::GetExePath().data(), &fileStat);
-	chmod(ygo::Utils::GetExePath().data(), fileStat.st_mode | S_IXUSR | S_IXGRP | S_IXOTH);
-	pid_t pid = vfork();
-	if(pid == 0) {
-		execl(ygo::Utils::GetExePath().data(), "show_changelog", nullptr);
-		exit(EXIT_FAILURE);
-	}
+	const char* path = ygo::Utils::GetExePath().data();
+	stat(path, &fileStat);
+	chmod(path, fileStat.st_mode | S_IXUSR | S_IXGRP | S_IXOTH);
+	execl(path, "show_changelog", nullptr);
+	exit(EXIT_FAILURE);
 #endif
 	exit(0);
 }
@@ -224,7 +222,7 @@ void ClientUpdater::Unzip(path_string src, void* payload, unzip_callback callbac
 	ygo::Utils::FileMove(path, fmt::format(EPRO_TEXT("{}.old"), path));
 #if !defined(__linux__)
 	auto corepath = ygo::Utils::GetCorePath();
-	ygo::Utils::FileMove(corepath, fmt::format(EPRO_TEXT("{}.old"), path));
+	ygo::Utils::FileMove(corepath, fmt::format(EPRO_TEXT("{}.old"), corepath));
 #endif
 #endif
 	unzip_payload cbpayload{};
