@@ -4305,7 +4305,7 @@ void DuelClient::ReplayPrompt(bool local_stream) {
 		pheader.version = CLIENT_VERSION;
 		if(!mainGame->dInfo.compat_mode)
 			pheader.flag = REPLAY_LUA64;
-		pheader.flag |= REPLAY_NEWREPLAY;
+		pheader.flag |= REPLAY_NEWREPLAY | REPLAY_64BIT_DUELFLAG;
 		last_replay.BeginRecord(false);
 		last_replay.WriteHeader(pheader);
 		last_replay.Write<uint32_t>(mainGame->dInfo.selfnames.size(), false);
@@ -4316,7 +4316,7 @@ void DuelClient::ReplayPrompt(bool local_stream) {
 		for(auto& name : mainGame->dInfo.opponames) {
 			last_replay.WriteData(name.data(), 40, false);
 		}
-		last_replay.Write<uint32_t>(mainGame->dInfo.duel_params);
+		last_replay.Write<uint64_t>(mainGame->dInfo.duel_params);
 		last_replay.WriteStream(replay_stream);
 		last_replay.EndRecord();
 	}

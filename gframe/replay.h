@@ -19,6 +19,7 @@ namespace ygo {
 #define REPLAY_NEWREPLAY	0x20
 #define REPLAY_HAND_TEST	0x40
 #define REPLAY_DIRECT_SEED	0x80
+#define REPLAY_64BIT_DUELFLAG	0x100
 
 #define REPLAY_YRP1			0x31707279
 #define REPLAY_YRPX			0x58707279
@@ -64,6 +65,7 @@ public:
 	void BeginRecord(bool write = true, path_string name = EPRO_TEXT("./replay/_LastReplay.yrpX"));
 	void WriteStream(const ReplayStream& stream);
 	void WritePacket(const ReplayPacket& p);
+	bool IsStreamedReplay();
 	template<typename T>
 	void Write(T data, bool flush = true);
 	void WritetoFile(const void* data, size_t size, bool flush);

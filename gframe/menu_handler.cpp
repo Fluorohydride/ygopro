@@ -638,7 +638,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				auto& replay = ReplayMode::cur_replay;
 				if(!replay.OpenReplay(Utils::ToPathString(mainGame->lstReplayList->getListItem(sel, true))))
 					break;
-				bool has_yrp = (replay.pheader.id == REPLAY_YRPX) && (replay.yrp != nullptr);
+				bool has_yrp = replay.IsStreamedReplay() && (replay.yrp != nullptr);
 				if(!(replay.pheader.id == REPLAY_YRP1 && (!mainGame->coreloaded || !(replay.pheader.flag & REPLAY_NEWREPLAY))))
 					mainGame->btnLoadReplay->setEnabled(true);
 				mainGame->btnDeleteReplay->setEnabled(true);

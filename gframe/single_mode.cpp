@@ -68,11 +68,11 @@ int SingleMode::SinglePlayThread(DuelOptions duelOptions) {
 		last_replay.Write<uint32_t>(duelOptions.startingLP, false);
 		last_replay.Write<uint32_t>(duelOptions.startingDrawCount, false);
 		last_replay.Write<uint32_t>(duelOptions.drawCountPerTurn, false);
-		last_replay.Write<uint32_t>(opt, false);
+		last_replay.Write<uint64_t>(opt, false);
 		last_replay.Write<uint16_t>((uint16_t)script_name.size(), false);
 		last_replay.WriteData(script_name.data(), script_name.size(), false);
 		last_replay.Flush();
-		new_replay.Write<uint32_t>(opt);
+		new_replay.Write<uint64_t>(opt);
 	};
 	mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 45));
 	is_continuing = false;
@@ -97,7 +97,7 @@ restart:
 	ReplayHeader rh;
 	rh.id = REPLAY_YRP1;
 	rh.version = CLIENT_VERSION;
-	rh.flag = REPLAY_SINGLE_MODE | REPLAY_LUA64 | REPLAY_NEWREPLAY;
+	rh.flag = REPLAY_SINGLE_MODE | REPLAY_LUA64 | REPLAY_NEWREPLAY | REPLAY_64BIT_DUELFLAG;
 	if(hand_test)
 		rh.flag |= REPLAY_HAND_TEST;
 	rh.seed = seed;
