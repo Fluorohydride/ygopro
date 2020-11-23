@@ -11,7 +11,9 @@
 #include "client_card.h"
 
 namespace ygo {
-CardDataC* DeckManager::GetDummyCardData(uint32_t code) {
+CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) {
+	if(!load_dummies)
+		return GetMappedCardData(code);
 	auto it = dummy_entries.find(code);
 	if(it != dummy_entries.end())
 		return it->second;
@@ -21,7 +23,13 @@ CardDataC* DeckManager::GetDummyCardData(uint32_t code) {
 	dummy_entries[code] = tmp;
 	return tmp;
 }
-DeckManager::~DeckManager() {
+CardDataC* DeckManager::GetMappedCardData(uint32_t code) {
+	auto it = mapped_ids.find(code);
+	if(it != mapped_ids.end())
+		return gDataManager->GetCardData(it->second);
+	return nullptr;
+}
+void DeckManager::ClearDummies() {
 	for(auto& card : dummy_entries) {
 		delete card.second;
 	}
@@ -276,9 +284,9 @@ uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const 
 				errorcode = code;
 				continue;
 			}
-			cd = GetDummyCardData(code);
+			cd = GetDummyOrMappedCardData(code);
 		}
-		if(cd->type & TYPE_TOKEN)
+		if(!cd || cd->type & TYPE_TOKEN)
 			continue;
 		else if(!extralist && (cd->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ) || (cd->type & TYPE_LINK && cd->type & TYPE_MONSTER))) {
 			deck.extra.push_back(cd);
@@ -293,9 +301,9 @@ uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const 
 					errorcode = code;
 					continue;
 				}
-				cd = GetDummyCardData(code);
+				cd = GetDummyOrMappedCardData(code);
 			}
-			if(cd->type & TYPE_TOKEN)
+			if(!cd || cd->type & TYPE_TOKEN)
 				continue;
 			deck.extra.push_back(cd);
 		}
@@ -306,9 +314,9 @@ uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const 
 				errorcode = code;
 				continue;
 			}
-			cd = GetDummyCardData(code);
+			cd = GetDummyOrMappedCardData(code);
 		}
-		if(cd->type & TYPE_TOKEN)
+		if(!cd || cd->type & TYPE_TOKEN)
 			continue;
 		deck.side.push_back(cd);
 	}

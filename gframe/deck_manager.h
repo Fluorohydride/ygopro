@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include <map>
 #include "network.h"
 #include "text_types.h"
 #include "data_manager.h"
@@ -45,12 +46,21 @@ class DeckManager {
 private:
 	int null_lflist_index = -1;
 	std::unordered_map<uint32_t, CardDataC*> dummy_entries;
-	CardDataC* GetDummyCardData(uint32_t code);
+	CardDataC* GetDummyOrMappedCardData(uint32_t code);
+	CardDataC* GetMappedCardData(uint32_t code);
+	bool load_dummies{ true };
+	std::map<uint32_t, uint32_t> mapped_ids;
 public:
 	Deck current_deck;
 	Deck pre_deck;
 	std::vector<LFList> _lfList;
-	~DeckManager();
+	~DeckManager() {
+		ClearDummies();
+	}
+	void StopDummyLoading() {
+		load_dummies = false;
+	}
+	void ClearDummies();
 	bool LoadLFListSingle(const path_string& path);
 	bool LoadLFListFolder(path_string path);
 	void LoadLFList();

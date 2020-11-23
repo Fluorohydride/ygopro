@@ -1589,11 +1589,12 @@ bool Game::MainLoop() {
 					}
 				}
 			}
-			if(refresh_db && is_building && !is_siding) {
+			if(refresh_db && is_building && !is_siding)
 				gdeckManager->RefreshDeck(gdeckManager->current_deck);
-			}
 			if(refresh_db && is_building && deckBuilder.results.size())
 				deckBuilder.StartFilter(true);
+			if(gRepoManager->GetUpdatingReposNumber() == 0)
+				gdeckManager->StopDummyLoading();
 		}
 #ifdef YGOPRO_BUILD_DLL
 		bool coreJustLoaded = false;
