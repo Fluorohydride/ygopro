@@ -56,7 +56,7 @@ typedef void (*OCG_LogHandler)(void* payload, const char* string, int type);
 
 typedef struct OCG_DuelOptions {
 	uint32_t seed;
-	uint32_t flags;
+	uint64_t flags;
 	OCG_Player team1;
 	OCG_Player team2;
 	OCG_DataReader cardReader;
