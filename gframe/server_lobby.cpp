@@ -88,7 +88,7 @@ void ServerLobby::FillOnlineRooms() {
 					continue;
 				}
 			}
-			if(mainGame->btnFilterRelayMode->isPressed() && !(room.info.duel_flag & DUEL_RELAY))
+			if(mainGame->btnFilterRelayMode->isPressed() && !(room.info.duel_flag_low & DUEL_RELAY))
 				continue;
 		}
 		std::wstring banlist;
@@ -109,9 +109,9 @@ void ServerLobby::FillOnlineRooms() {
 		roomListTable->setCellText(index, 1, gDataManager->GetSysString(room.info.rule + 1900).data());
 		roomListTable->setCellText(index, 2, fmt::format(L"[{}vs{}]{}{}", room.info.team1, room.info.team2,
 			(room.info.best_of > 1) ? fmt::format(L" (best of {})", room.info.best_of).data() : L"",
-			(room.info.duel_flag & DUEL_RELAY) ? L" (Relay)" : L"").data());
+			(room.info.duel_flag_low & DUEL_RELAY) ? L" (Relay)" : L"").data());
 		int rule;
-		mainGame->GetMasterRule(room.info.duel_flag & ~DUEL_RELAY, room.info.forbiddentypes, &rule);
+		mainGame->GetMasterRule((((uint64_t)room.info.duel_flag_low) | ((uint64_t)room.info.duel_flag_high) << 32) & ~DUEL_RELAY, room.info.forbiddentypes, &rule);
 		if(rule == 6)
 			roomListTable->setCellText(index, 3, "Custom");
 		else
@@ -213,7 +213,9 @@ int ServerLobby::GetRoomsThread() {
 					room.info.team1 = GET("team1", int);
 					room.info.team2 = GET("team2", int);
 					room.info.best_of = GET("best_of", int);
-					room.info.duel_flag = GET("duel_flag", int);
+					const auto flag = GET("duel_flag", uint64_t);
+					room.info.duel_flag_low = flag & 0xffffffff;
+					room.info.duel_flag_low = (flag >> 32) & 0xffffffff;
 					room.info.forbiddentypes = GET("forbidden_types", int);
 					room.info.extra_rules = GET("extra_rules", int);
 					room.info.start_lp = GET("start_lp", int);

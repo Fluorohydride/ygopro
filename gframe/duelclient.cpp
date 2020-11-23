@@ -217,7 +217,8 @@ catch(...) { what = def; }
 			TOI(cscg.info.time_limit, mainGame->ebTimeLimit->getText(), 0);
 			cscg.info.lflist = gGameConfig->lastlflist = mainGame->cbHostLFList->getItemData(mainGame->cbHostLFList->getSelected());
 			cscg.info.duel_rule = 0;
-			cscg.info.duel_flag = mainGame->duel_param;
+			cscg.info.duel_flag_low = mainGame->duel_param & 0xffffffff;
+			cscg.info.duel_flag_high = (mainGame->duel_param >> 32) & 0xffffffff;
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			cscg.info.handshake = SERVER_HANDSHAKE;
@@ -227,7 +228,7 @@ catch(...) { what = def; }
 			TOI(cscg.info.best_of, mainGame->ebBestOf->getText(), 1);
 #undef TOI
 			if(mainGame->btnRelayMode->isPressed()) {
-				cscg.info.duel_flag |= DUEL_RELAY;
+				cscg.info.duel_flag_low |= DUEL_RELAY;
 			}
 			cscg.info.forbiddentypes = mainGame->forbiddentypes;
 			cscg.info.extra_rules = mainGame->extra_rules;
@@ -679,7 +680,8 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		mainGame->dInfo.isInLobby = true;
 		mainGame->dInfo.compat_mode = pkt.info.handshake != SERVER_HANDSHAKE;
 		if(mainGame->dInfo.compat_mode) {
-			pkt.info.duel_flag = 0;
+			pkt.info.duel_flag_low = 0;
+			pkt.info.duel_flag_high = 0;
 			pkt.info.forbiddentypes = 0;
 			pkt.info.extra_rules = 0;
 			pkt.info.best_of = 1;
@@ -692,7 +694,7 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 				pkt.info.team1 = 2;
 				pkt.info.team2 = 2;
 			}
-#define CHK(rule) case rule : pkt.info.duel_flag = DUEL_MODE_MR##rule;break;
+#define CHK(rule) case rule : pkt.info.duel_flag_low = DUEL_MODE_MR##rule;break;
 			switch(pkt.info.duel_rule) {
 				CHK(1)
 				CHK(2)
@@ -702,9 +704,10 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 			}
 #undef CHK
 		}
-		mainGame->dInfo.duel_params = pkt.info.duel_flag;
-		mainGame->dInfo.isRelay = pkt.info.duel_flag & DUEL_RELAY;
-		pkt.info.duel_flag &= ~DUEL_RELAY;
+		uint64_t params = (pkt.info.duel_flag_low | ((uint64_t)pkt.info.duel_flag_high) << 32);
+		mainGame->dInfo.duel_params = params;
+		mainGame->dInfo.isRelay = params & DUEL_RELAY;
+		params &= ~DUEL_RELAY;
 		mainGame->dInfo.team1 = pkt.info.team1;
 		mainGame->dInfo.team2 = pkt.info.team2;
 		mainGame->dInfo.best_of = pkt.info.best_of;
@@ -724,19 +727,19 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1232), pkt.info.start_hand));
 		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1233), pkt.info.draw_count));
 		int rule;
-		mainGame->dInfo.duel_field = mainGame->GetMasterRule(pkt.info.duel_flag, pkt.info.forbiddentypes, &rule);
+		mainGame->dInfo.duel_field = mainGame->GetMasterRule(params, pkt.info.forbiddentypes, &rule);
 		if(mainGame->dInfo.compat_mode)
 			rule = pkt.info.duel_rule;
-		if((pkt.info.duel_flag & DUEL_MODE_SPEED) == pkt.info.duel_flag) {
+		if((params & DUEL_MODE_SPEED) == params) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1258)));
-		} else if((pkt.info.duel_flag & DUEL_MODE_RUSH) == pkt.info.duel_flag) {
+		} else if((params & DUEL_MODE_RUSH) == params) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1259)));
-		} else if((pkt.info.duel_flag & DUEL_MODE_GOAT) == pkt.info.duel_flag) {
+		} else if((params & DUEL_MODE_GOAT) == params) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1248)));
 		} else if (rule == 6) {
-			uint32_t filter = 0x100;
+			uint64_t filter = 0x100;
 			for (int i = 0; filter && i < sizeofarr(mainGame->chkCustomRules); ++i, filter <<= 1)
-				if (pkt.info.duel_flag & filter) {
+				if (params & filter) {
 					strR.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1631 + i)));
 				}
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1630)));
@@ -4269,7 +4272,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 			auto GetRuleString = [&]()-> epro_wstringview {
 				static std::wstring tmp;
 				if(pHP->host.handshake == SERVER_HANDSHAKE) {
-					mainGame->GetMasterRule(pHP->host.duel_flag & ~DUEL_RELAY, pHP->host.forbiddentypes, &rule);
+					mainGame->GetMasterRule((pHP->host.duel_flag_low | ((uint64_t)pHP->host.duel_flag_high) << 32) & ~DUEL_RELAY, pHP->host.forbiddentypes, &rule);
 				} else
 					rule = pHP->host.duel_rule;
 				if(rule == 6)

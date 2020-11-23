@@ -32,14 +32,14 @@ struct HostInfo {
 	uint8_t start_hand;
 	uint8_t draw_count;
 	uint16_t time_limit;
-	uint32_t : 32; //padding to account for the previous 64 bit value
+	uint32_t duel_flag_high;
 	uint32_t handshake;
 	ClientVersion version;
 	int32_t team1;
 	int32_t team2;
 	int32_t best_of;
-	uint32_t duel_flag;
-	int32_t forbiddentypes;
+	uint32_t duel_flag_low;
+	uint32_t forbiddentypes;
 	uint16_t extra_rules;
 };
 struct HostPacket {
