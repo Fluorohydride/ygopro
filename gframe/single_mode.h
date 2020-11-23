@@ -20,7 +20,7 @@ public:
 		uint32_t startingLP = 8000;
 		uint32_t startingDrawCount = 5;
 		uint32_t drawCountPerTurn = 1;
-		uint32_t duelFlags = 0;
+		uint64_t duelFlags = 0;
 		bool handTestNoOpponent = true;
 		bool handTestNoShuffle = false;
 		DuelOptions() {};

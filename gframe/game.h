@@ -81,7 +81,7 @@ struct DuelInfo {
 	int lp[2];
 	int startlp;
 	int duel_field;
-	int duel_params;
+	uint64_t duel_params;
 	int turn;
 	uint8_t curMsg;
 	int team1;
@@ -170,7 +170,7 @@ public:
 	uint8_t LocalPlayer(uint8_t player);
 	void UpdateDuelParam();
 	void UpdateExtraRules(bool set = false);
-	int GetMasterRule(uint32_t param, uint32_t forbidden = 0, int* truerule = 0);
+	int GetMasterRule(uint64_t param, uint32_t forbidden = 0, int* truerule = 0);
 	void SetPhaseButtons(bool visibility = false);
 	void SetMessageWindow();
 
@@ -281,7 +281,7 @@ public:
 	bool is_siding;
 	uint32_t forbiddentypes;
 	uint16_t extra_rules;
-	uint32_t duel_param;
+	uint64_t duel_param;
 	uint32_t showingcard;
 	bool cardimagetextureloading;
 	float dpi_scale;
@@ -424,7 +424,7 @@ public:
 	irr::gui::IGUIButton* btnRulesOK;
 	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUIButton* btnCustomRule;
-	irr::gui::IGUICheckBox* chkCustomRules[7+12+8];
+	irr::gui::IGUICheckBox* chkCustomRules[7+12+8+2];
 	irr::gui::IGUICheckBox* chkTypeLimit[5];
 	irr::gui::IGUIWindow* wCustomRules;
 	irr::gui::IGUIButton* btnCustomRulesOK;

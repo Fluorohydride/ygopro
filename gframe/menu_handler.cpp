@@ -284,9 +284,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					else if(i == 21)
 						set = mainGame->duel_param & DUEL_TRIGGER_WHEN_PRIVATE_KNOWLEDGE;
 					else if(i > 21)
-						set = mainGame->duel_param & 0x100U << (i - 3);
+						set = mainGame->duel_param & 0x100ULL << (i - 3);
 					else
-						set = mainGame->duel_param & 0x100U << i;
+						set = mainGame->duel_param & 0x100ULL << i;
 					mainGame->chkCustomRules[i]->setChecked(set);
 					if(i == 3)
 						mainGame->chkCustomRules[4]->setEnabled(set);
@@ -888,9 +888,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					else if(i == 21)
 						set = mainGame->duel_param & DUEL_TRIGGER_WHEN_PRIVATE_KNOWLEDGE;
 					else if(i > 21)
-						set = mainGame->duel_param & 0x100U << (i - 3);
+						set = mainGame->duel_param & 0x100ULL << (i - 3);
 					else
-						set = mainGame->duel_param & 0x100U << i;
+						set = mainGame->duel_param & 0x100ULL << i;
 					mainGame->chkCustomRules[i]->setChecked(set);
 					if(i == 3)
 						mainGame->chkCustomRules[4]->setEnabled(set);

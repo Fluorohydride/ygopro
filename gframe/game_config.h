@@ -37,7 +37,7 @@ struct GameConfig
 	std::wstring lastdeck = L"";
 	uint32_t lastlflist = 0;
 	uint32_t lastallowedcards = 3;
-	uint32_t lastDuelParam = 0x2E800; //#define DUEL_MODE_MR5
+	uint64_t lastDuelParam = 0x2E800; //#define DUEL_MODE_MR5
 	uint32_t lastExtraRules = 0;
 	uint32_t lastDuelForbidden = 0; //#define DUEL_MODE_MR5_FORB
 	uint32_t timeLimit = 180;

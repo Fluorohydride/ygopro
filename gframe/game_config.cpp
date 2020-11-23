@@ -75,12 +75,13 @@ bool GameConfig::Load(const path_char* filename)
 					val = static_cast<uint32_t>(std::stoul(str));
 				maxFPS = val;
 			}
+			else if (type == "lastDuelParam") {
+				lastDuelParam = static_cast<uint64_t>(std::stoull(str));
+			}
 #define DESERIALIZE_UNSIGNED(name) \
 			else if (type == #name) { \
-				uint32_t val = static_cast<uint32_t>(std::stoul(str)); \
-				name = val; \
+				name = static_cast<uint32_t>(std::stoul(str)); \
 			}
-			DESERIALIZE_UNSIGNED(lastDuelParam)
 			DESERIALIZE_UNSIGNED(coreLogOutput)
 			DESERIALIZE_UNSIGNED(lastlflist)
 			DESERIALIZE_UNSIGNED(lastallowedcards)

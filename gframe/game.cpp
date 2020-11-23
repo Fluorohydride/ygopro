@@ -359,9 +359,9 @@ bool Game::Initialize() {
 		else if(i == 21)
 			set = duel_param & DUEL_TRIGGER_WHEN_PRIVATE_KNOWLEDGE;
 		else if(i > 21)
-			set = duel_param & 0x100U << (i - 3);
+			set = duel_param & 0x100ULL << (i - 3);
 		else
-			set = duel_param & 0x100U << i;
+			set = duel_param & 0x100ULL << i;
 		chkCustomRules[i] = env->addCheckBox(set, rectsize(), crPanel, CHECKBOX_OBSOLETE + i, gDataManager->GetSysString(1631 + i).data());
 		defaultStrings.emplace_back(chkCustomRules[i], 1631 + i);
 	}
@@ -2475,7 +2475,7 @@ uint8_t Game::LocalPlayer(uint8_t player) {
 }
 void Game::UpdateDuelParam() {
 	ReloadCBDuelRule();
-	uint32_t flag = 0;
+	uint64_t flag = 0;
 	for (int i = 0; i < sizeofarr(chkCustomRules); ++i)
 		if (chkCustomRules[i]->isChecked()) {
 			if(i == 19)
@@ -2485,9 +2485,9 @@ void Game::UpdateDuelParam() {
 			else if(i == 21)
 				flag |= DUEL_TRIGGER_WHEN_PRIVATE_KNOWLEDGE;
 			else if(i > 21)
-				flag |= 0x100U << (i - 3);
+				flag |= 0x100ULL << (i - 3);
 			else
-				flag |= 0x100U << i;
+				flag |= 0x100ULL << i;
 		}
 	constexpr uint32_t limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 	uint32_t flag2 = 0;
@@ -2570,7 +2570,7 @@ void Game::UpdateExtraRules(bool set) {
 			extra_rules |= flag;
 	}
 }
-int Game::GetMasterRule(uint32_t param, uint32_t forbiddentypes, int* truerule) {
+int Game::GetMasterRule(uint64_t param, uint32_t forbiddentypes, int* truerule) {
 	if(truerule)
 		*truerule = 0;
 #define CHECK(MR) case DUEL_MODE_MR##MR:{ if (truerule && forbiddentypes == DUEL_MODE_MR##MR##_FORB) *truerule = MR; break; }
