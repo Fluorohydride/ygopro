@@ -2345,7 +2345,7 @@ void Game::ClearCardInfo(int player) {
 }
 void Game::AddChatMsg(epro_wstringview msg, int player, int type) {
 	for(int i = 7; i > 0; --i) {
-		chatMsg[i] = chatMsg[i - 1];
+		chatMsg[i].swap(chatMsg[i - 1]);
 		chatTiming[i] = chatTiming[i - 1];
 		chatType[i] = chatType[i - 1];
 	}

@@ -10,15 +10,15 @@ namespace ygo {
 
 ImageDownloader::ImageDownloader() {
 	stop_threads = false;
-	for(int i = 0; i < 8; i++) {
-		download_threads[i] = std::thread(&ImageDownloader::DownloadPic, this);
+	for(auto& thread : download_threads) {
+		thread = std::thread(&ImageDownloader::DownloadPic, this);
 	}
 }
 ImageDownloader::~ImageDownloader() {
 	stop_threads = true;
 	cv.notify_all();
-	for(int i = 0; i < 8; i++) {
-		download_threads[i].join();
+	for(auto& thread : download_threads) {
+		thread.join();
 	}
 }
 void ImageDownloader::AddDownloadResource(PicSource src) {
@@ -106,7 +106,7 @@ void ImageDownloader::DownloadPic() {
 		for(auto& src : pic_urls) {
 			if(src.type != type)
 				continue;
-			CURL *curl = NULL;
+			CURL* curl = nullptr;
 			struct {
 				std::ofstream* stream;
 				char header[8] = { 0 };

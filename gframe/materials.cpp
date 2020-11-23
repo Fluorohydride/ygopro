@@ -358,8 +358,8 @@ Materials::Materials() {
 void Materials::GenArrow(float y) {
 	float ay = 1.0f;
 	for (int i = 0; i < 19; ++i) {
-		vArrow[i * 2] = irr::video::S3DVertex(irr::core::vector3df(0.1f, ay * y, -2.0f * (ay * ay - 1.0f)), irr::core::vector3df(0, ay * y, 1), 0xc000ff00, irr::core::vector2df(0, 0));
-		vArrow[i * 2 + 1] = irr::video::S3DVertex(irr::core::vector3df(-0.1f, ay * y, -2.0f * (ay * ay - 1.0f)), irr::core::vector3df(0, ay * y, 1), 0xc000ff00, irr::core::vector2df(0, 0));
+		vArrow[i * 2] = vArrow[i * 2 + 1] = irr::video::S3DVertex(irr::core::vector3df(0.1f, ay * y, -2.0f * (ay * ay - 1.0f)), irr::core::vector3df(0, ay * y, 1), 0xc000ff00, irr::core::vector2df(0, 0));
+		vArrow[i * 2 + 1].Pos.X = -0.1f;
 		ay -= 0.1f;
 	}
 	vArrow[36].Pos.X = 0.2f;

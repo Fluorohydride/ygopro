@@ -1,5 +1,5 @@
 #include <ICursorControl.h>
-#include <windowsx.h>
+#include <WindowsX.h>
 
 namespace irr {
 

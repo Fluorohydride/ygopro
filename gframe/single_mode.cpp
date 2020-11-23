@@ -83,16 +83,12 @@ restart:
 	mainGame->dInfo.isSingleMode = true;
 	OCG_Player team = { duelOptions.startingLP, duelOptions.startingDrawCount, duelOptions.drawCountPerTurn };
 	bool hand_test = mainGame->dInfo.isHandTest = open_file && open_file_name == EPRO_TEXT("hand-test-mode");
-	if(hand_test) {
+	if(hand_test)
 		opt |= DUEL_ATTACK_FIRST_TURN;
-	}
 	pduel = mainGame->SetupDuel({ DuelClient::rnd(), opt, team, team });
 	mainGame->dInfo.compat_mode = false;
-	mainGame->dInfo.lp[0] = duelOptions.startingLP;
-	mainGame->dInfo.lp[1] = duelOptions.startingLP;
-	mainGame->dInfo.startlp = duelOptions.startingLP;
-	mainGame->dInfo.strLP[0] = fmt::to_wstring(mainGame->dInfo.lp[0]);
-	mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[1]);
+	mainGame->dInfo.startlp = mainGame->dInfo.lp[0] = mainGame->dInfo.lp[1] = duelOptions.startingLP;
+	mainGame->dInfo.strLP[0] = mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[0]);
 	mainGame->dInfo.selfnames = { mainGame->ebNickName->getText() };
 	mainGame->dInfo.opponames = { L"" };
 	mainGame->dInfo.player_type = 0;

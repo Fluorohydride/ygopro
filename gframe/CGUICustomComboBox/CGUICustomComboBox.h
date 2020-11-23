@@ -9,7 +9,6 @@
 #ifdef _IRR_COMPILE_WITH_GUI_
 
 #include <IGUIComboBox.h>
-#include <IGUIStaticText.h>
 #include <irrString.h>
 #include <irrArray.h>
 #ifndef _IRR_OVERRIDE_
@@ -20,6 +19,7 @@ namespace irr {
 namespace gui {
 class IGUIButton;
 class IGUIListBox;
+class IGUIStaticText;
 
 //! Single line edit box for editing simple text.
 class CGUICustomComboBox : public IGUIComboBox {

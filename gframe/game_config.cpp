@@ -47,7 +47,7 @@ bool GameConfig::Load(const path_char* filename)
 		if (str.empty() || str.at(0) == '#') {
 			continue;
 		}
-		pos = str.find_first_of("=");
+		pos = str.find('=');
 		if (pos == std::wstring::npos)
 			continue;
 		auto type = str.substr(0, pos - 1);

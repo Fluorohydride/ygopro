@@ -17,10 +17,7 @@ public:
 	}
 	template<typename T>
 	static void insert_value(std::vector<uint8_t>& vec, T val) {
-		const auto vec_size = vec.size();
-		const auto val_size = sizeof(T);
-		vec.resize(vec_size + val_size);
-		std::memcpy(&vec[vec_size], &val, val_size);
+		insert_data(vec, &val, sizeof(T));
 	}
 	inline static void Read(char*& p, void* dest, size_t size) {
 		memcpy(dest, p, size);
@@ -29,8 +26,7 @@ public:
 	template<typename T>
 	inline static T Read(char*& p) {
 		T ret;
-		memcpy((void*)&ret, p, sizeof(T));
-		p += sizeof(T);
+		Read(p, &ret, sizeof(T));
 		return ret;
 	}
 	template<typename T>

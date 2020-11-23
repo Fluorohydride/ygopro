@@ -123,6 +123,7 @@ void DeckBuilder::Terminate(bool showmenu) {
 		mainGame->PopupElement(mainGame->wMainMenu);
 		mainGame->ClearTextures();
 		mainGame->ClearCardInfo(0);
+		gdeckManager->ClearDummies();
 	}
 	mainGame->btnHandTest->setVisible(false);
 	mainGame->btnHandTestSettings->setVisible(false);
