@@ -166,16 +166,19 @@ void CheckArguments(int argc, path_char* argv[]) {
 
 
 #ifdef _WIN32
-#define Cleanup() WSACleanup()
-inline void Startup() {
+inline void ThreadsCleanup() {
+	WSACleanup();
+	libevent_global_shutdown();
+}
+inline void ThreadsStartup() {
 	const WORD wVersionRequested = MAKEWORD(2, 2);
 	WSADATA wsaData;
 	WSAStartup(wVersionRequested, &wsaData);
 	evthread_use_windows_threads();
 }
 #else
-#define Cleanup() ((void)0)
-#define Startup() evthread_use_pthreads()
+#define ThreadsCleanup() libevent_global_shutdown()
+#define ThreadsStartup() evthread_use_pthreads()
 #endif //_WIN32
 
 int _tmain(int argc, path_char* argv[]) {
@@ -192,7 +195,7 @@ int _tmain(int argc, path_char* argv[]) {
 	}
 	if(argc >= 2 && argv[1] == EPRO_TEXT("show_changelog"_sv))
 		show_changelog = true;
-	Startup();
+	ThreadsStartup();
 #ifndef _WIN32
 	setlocale(LC_CTYPE, "UTF-8");
 #endif //_WIN32
@@ -210,7 +213,7 @@ int _tmain(int argc, path_char* argv[]) {
 	}
 	catch(std::exception e) {
 		ygo::ErrorLog(e.what());
-		Cleanup();
+		ThreadsCleanup();
 		return EXIT_FAILURE;
 	}
 	if (!data->configs->noClientUpdates)
@@ -237,7 +240,7 @@ int _tmain(int argc, path_char* argv[]) {
 			data->tmp_device = nullptr;
 		}
 		if(!ygo::mainGame->Initialize()) {
-			Cleanup();
+			ThreadsCleanup();
 			return EXIT_FAILURE;
 		}
 		if(firstlaunch) {
@@ -259,6 +262,6 @@ int _tmain(int argc, path_char* argv[]) {
 			data->tmp_device->getGUIEnvironment()->clear();
 		}
 	} while(reset);
-	Cleanup();
+	ThreadsCleanup();
 	return EXIT_SUCCESS;
 }
