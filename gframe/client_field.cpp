@@ -1176,6 +1176,7 @@ bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::se
 							}
 static bool is_declarable(CardDataC* cd, const std::vector<uint64_t>& opcodes) {
 	std::stack<uint64_t> stack;
+	bool alias = false, token = false;
 	for(auto& opcode : opcodes) {
 		switch(opcode << (mainGame->dInfo.compat_mode ? 32 : 0)) {
 		BINARY_OP(OPCODE_ADD, +);
@@ -1218,6 +1219,14 @@ static bool is_declarable(CardDataC* cd, const std::vector<uint64_t>& opcodes) {
 			}
 			break;
 		}
+		case OPCODE_ALLOW_ALIASES: {
+			alias = true;
+			break;
+		}
+		case OPCODE_ALLOW_TOKENS: {
+			token = true;
+			break;
+		}
 		default: {
 			stack.push(opcode);
 			break;
@@ -1227,7 +1236,7 @@ static bool is_declarable(CardDataC* cd, const std::vector<uint64_t>& opcodes) {
 	if(stack.size() != 1 || stack.top() == 0)
 		return false;
 	return cd->code == CARD_MARINE_DOLPHIN || cd->code == CARD_TWINKLE_MOSS
-		|| (!cd->alias && (cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
+		|| ((alias || !cd->alias) && (token || ((cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN))));
 }
 #undef BINARY_OP
 #undef UNARY_OP
