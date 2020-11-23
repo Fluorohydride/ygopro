@@ -715,16 +715,6 @@ irr::core::rect<T> Game::Scale(irr::core::rect<T> rect) {
 
 }
 
-#define FIELD_X			4.2f	
-#define FIELD_Y			8.0f
-#define FIELD_Z			7.8f
-#define FIELD_ANGLE		0.7980557f //atan(FIELD_Y / FIELD_Z)
-
-#define CAMERA_LEFT		-0.90f
-#define CAMERA_RIGHT	0.45f
-#define CAMERA_BOTTOM	-0.42f
-#define CAMERA_TOP		0.42f
-
 #define UEVENT_EXIT			0x1
 #define UEVENT_TOWINDOW		0x2
 
