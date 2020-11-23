@@ -569,8 +569,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			click_pos = hovered_pos;
 			dragx = event.MouseInput.X;
 			dragy = event.MouseInput.Y;
-			draging_pointer = gDataManager->GetCardData(hovered_code);
-			if(!draging_pointer)
+			if(!hovered_code || !(draging_pointer = gDataManager->GetCardData(hovered_code)))
 				break;
 			if(hovered_pos == 4) {
 				if(!event.MouseInput.Shift && !check_limit(draging_pointer))
