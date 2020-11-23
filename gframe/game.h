@@ -234,7 +234,7 @@ public:
 	std::atomic<bool> closeDuelWindow{ false };
 	Signal closeDoneSignal;
 	DuelInfo dInfo;
-	DiscordWrapper discord;
+	DiscordWrapper discord{};
 	ImageManager imageManager;
 #ifdef YGOPRO_BUILD_DLL
 	void* ocgcore;
