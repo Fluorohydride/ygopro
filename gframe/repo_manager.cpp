@@ -81,10 +81,10 @@ std::vector<const GitRepo*> RepoManager::GetReadyRepos() {
 			auto results = it->second.get();
 			for(auto& repo : available_repos) {
 				if(repo->repo_path == it->first) {
-					repo->error = results.error;
-					repo->warning = results.warning;
-					repo->commit_history_full = results.full_history;
-					repo->commit_history_partial = results.partial_history;
+					repo->error.swap(results.error);
+					repo->warning.swap(results.warning);
+					repo->commit_history_full.swap(results.full_history);
+					repo->commit_history_partial.swap(results.partial_history);
 					repo->ready = true;
 					break;
 				}
@@ -96,12 +96,14 @@ std::vector<const GitRepo*> RepoManager::GetReadyRepos() {
 	}
 	//
 	std::vector<const GitRepo*> res;
-	for(auto it = available_repos.begin(); it != available_repos.end();) {
+	auto it = available_repos.cbegin();
+	for(it = available_repos.cbegin(); it != available_repos.cend(); it++) {
 		if(!(*it)->ready)
 			break;
 		res.push_back(*it);
-		it = available_repos.erase(it);
 	}
+	if(res.size())
+		available_repos.erase(available_repos.cbegin(), it);
 	return res;
 }
 
@@ -170,17 +172,12 @@ void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
 // private
 
 void RepoManager::AddRepo(GitRepo repo) {
-	if(!TryCloneOrUpdate(repo))
-		return;
-	all_repos.push_front(repo);
-	available_repos.push_back(&all_repos.front());
-}
-
-bool RepoManager::TryCloneOrUpdate(GitRepo repo) {
 	if(working_repos.find(repo.repo_path) != working_repos.end())
-		return false;
-	working_repos[repo.repo_path] = std::async(std::launch::async, &RepoManager::CloneOrUpdateTask, this, repo);
-	return true;
+		return;
+	all_repos.emplace_front(std::move(repo));
+	available_repos.push_back(&all_repos.front());
+	const GitRepo* moved = available_repos.back();
+	working_repos[moved->repo_path] = std::async(std::launch::async, &RepoManager::CloneOrUpdateTask, this, std::ref(*moved));
 }
 
 void RepoManager::SetRepoPercentage(const std::string& path, int percent)
@@ -189,7 +186,7 @@ void RepoManager::SetRepoPercentage(const std::string& path, int percent)
 	repos_status[path] = percent;
 }
 
-RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
+RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(const GitRepo& _repo) {
 	git_libgit2_init();
 	if(gGameConfig->ssl_certificate_path.size())
 		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, gGameConfig->ssl_certificate_path.data(), "/system/etc/security/cacerts");
@@ -207,7 +204,7 @@ RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 			return status == 0;
 		};
 		auto AppendCommit = [](std::vector<std::string>& v, git_commit* commit) {
-			std::string message{git_commit_message(commit)};
+			std::string message{ git_commit_message(commit) };
 			message.resize(message.find_last_not_of(" \n") + 1);
 			auto authorName = git_commit_author(commit)->name;
 			v.push_back(fmt::format("{:s}\nAuthor: {:s}\n", message, authorName));
@@ -216,8 +213,7 @@ RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 			git_revwalk_reset(walker);
 			// git log HEAD~1500..HEAD
 			Git::Check(git_revwalk_push_head(walker));
-			for(git_oid oid; git_revwalk_next(&oid, walker) == 0;)
-			{
+			for(git_oid oid; git_revwalk_next(&oid, walker) == 0;) {
 				auto commit = Git::MakeUnique(git_commit_lookup, repo, &oid);
 				if(git_oid_iszero(&oid) || history.full_history.size() > 1500)
 					break;
@@ -228,18 +224,17 @@ RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 			git_revwalk_reset(walker);
 			// git log HEAD..FETCH_HEAD
 			Git::Check(git_revwalk_push_range(walker, "HEAD..FETCH_HEAD"));
-			for(git_oid oid; git_revwalk_next(&oid, walker) == 0;)
-			{
+			for(git_oid oid; git_revwalk_next(&oid, walker) == 0;) {
 				auto commit = Git::MakeUnique(git_commit_lookup, repo, &oid);
 				AppendCommit(history.partial_history, commit.get());
 			}
 		};
 		const std::string& url = _repo.url;
 		const std::string& path = _repo.repo_path;
-		FetchCbPayload payload{this, path};
+		FetchCbPayload payload{ this, path };
 		if(DoesRepoExist(path.data())) {
 			auto repo = Git::MakeUnique(git_repository_open_ext, path.data(),
-			                            GIT_REPOSITORY_OPEN_NO_SEARCH, nullptr);
+										GIT_REPOSITORY_OPEN_NO_SEARCH, nullptr);
 			auto walker = Git::MakeUnique(git_revwalk_new, repo.get());
 			git_revwalk_sorting(walker.get(), GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
 			if(_repo.should_update) {
