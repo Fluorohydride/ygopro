@@ -56,11 +56,22 @@ bool GitRepo::Sanitize() {
 
 // public
 
+RepoManager::RepoManager() {
+	git_libgit2_init();
+	if(gGameConfig->ssl_certificate_path.size())
+		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, gGameConfig->ssl_certificate_path.data(), "/system/etc/security/cacerts");
+#ifdef _WIN32
+	else
+		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, "SYSTEM", "");
+#endif
+}
+
 RepoManager::~RepoManager() {
 	fetchReturnValue = -1;
 	for(const auto& kv : working_repos) {
 		kv.second.wait();
 	}
+	git_libgit2_shutdown();
 }
 
 size_t RepoManager::GetUpdatingReposNumber() const {
@@ -188,12 +199,6 @@ void RepoManager::SetRepoPercentage(const std::string& path, int percent)
 
 RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(const GitRepo& _repo) {
 	git_libgit2_init();
-	if(gGameConfig->ssl_certificate_path.size())
-		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, gGameConfig->ssl_certificate_path.data(), "/system/etc/security/cacerts");
-#ifdef _WIN32
-	else
-		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, "SYSTEM", "");
-#endif
 	CommitHistory history;
 	try {
 		auto DoesRepoExist = [](const char* path) -> bool {
@@ -275,7 +280,6 @@ RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(const GitRepo& _repo) 
 		history.error = e.what();
 		ErrorLog(fmt::format("Exception occurred in repo {}: {}", _repo.url, e.what()));
 	}
-	git_libgit2_shutdown();
 	return history;
 }
 

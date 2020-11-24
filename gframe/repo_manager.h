@@ -57,7 +57,8 @@ public:
 		std::string error;
 		std::string warning;
 	};
-	
+
+	RepoManager();	
 	// Cancel fetching of repos and synchronize with futures
 	~RepoManager();
 
