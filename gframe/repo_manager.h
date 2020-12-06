@@ -8,12 +8,13 @@
 #include <atomic>
 #include <map>
 #include <forward_list>
-#include <future>
 #include <string>
 #include <vector>
 #include <mutex>
 #include <nlohmann/json.hpp>
 #include <git2/version.h>
+#include <queue>
+#include <condition_variable>
 
 // libgit2 forward declarations
 struct git_repository;
@@ -28,6 +29,13 @@ namespace ygo {
 
 class GitRepo {
 public:
+	// first = all changes history, second = only HEAD..FETCH_HEAD changes
+	struct CommitHistory {
+		std::vector<std::string> full_history;
+		std::vector<std::string> partial_history;
+		std::string error;
+		std::string warning;
+	};
 	std::string url{};
 	std::string repo_name{};
 	std::string repo_path{};
@@ -40,23 +48,14 @@ public:
 	bool should_update{true};
 	bool has_core{false};
 	bool ready{false};
+	bool internal_ready{false};
 	bool is_language{false};
-	std::string error{};
-	std::string warning{};
-	std::vector<std::string> commit_history_partial{};
-	std::vector<std::string> commit_history_full{};
+	CommitHistory history;
 	bool Sanitize();
 };
 
 class RepoManager {
 public:
-	// first = all changes history, second = only HEAD..FETCH_HEAD changes
-	struct CommitHistory {
-		std::vector<std::string> full_history;
-		std::vector<std::string> partial_history;
-		std::string error;
-		std::string warning;
-	};
 
 	RepoManager();	
 	// Cancel fetching of repos and synchronize with futures
@@ -69,11 +68,14 @@ public:
 
 	void LoadRepositoriesFromJson(const nlohmann::json& configs);
 private:
+	void TerminateThreads();
 	std::forward_list<GitRepo> all_repos{};
 	std::vector<GitRepo*> available_repos{};
-	std::map<std::string, std::future<CommitHistory>> working_repos{};
 	std::map<std::string, int> repos_status{};
-	std::mutex repos_status_mutex{};
+	std::queue<GitRepo*> to_sync;
+	std::mutex syncing_mutex;
+	std::condition_variable cv;
+	std::vector<std::thread> cloning_threads;
 	// Initialized with GIT_OK (0), changed to cancel fetching
 	std::atomic<int> fetchReturnValue{0};
 
@@ -81,7 +83,7 @@ private:
 	void SetRepoPercentage(const std::string& path, int percent);
 	
 	// Will be started on a new thread
-	CommitHistory CloneOrUpdateTask(const GitRepo& repo);
+	void CloneOrUpdateTask();
 	
 	// libgit2 Callbacks stuff
 	struct FetchCbPayload

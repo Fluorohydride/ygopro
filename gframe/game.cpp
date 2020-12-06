@@ -2154,9 +2154,9 @@ void Game::LoadGithubRepositories() {
 	}
 }
 void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
-	if(repo->error.size()) {
+	if(repo->history.error.size()) {
 		ErrorLog(fmt::format("The repo {} couldn't be cloned", repo->url));
-		ErrorLog(fmt::format("Error: {}", repo->error));
+		ErrorLog(fmt::format("Error: {}", repo->history.error));
 		grepo->history_button1->setText(gDataManager->GetSysString(1434).data());
 		defaultStrings.emplace_back(grepo->history_button1, 1434);
 		grepo->history_button1->setEnabled(true);
@@ -2165,34 +2165,34 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 		grepo->history_button2->setEnabled(true);
 		grepo->commit_history_full = fmt::format(L"{}\n{}",
 												fmt::format(gDataManager->GetSysString(1435), BufferIO::DecodeUTF8s(repo->url)),
-												fmt::format(gDataManager->GetSysString(1436), BufferIO::DecodeUTF8s(repo->error))
+												fmt::format(gDataManager->GetSysString(1436), BufferIO::DecodeUTF8s(repo->history.error))
 		);
 		grepo->commit_history_partial = grepo->commit_history_full;
 		return;
 	}
 	std::string text;
-	std::for_each(repo->commit_history_full.begin(), repo->commit_history_full.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
+	std::for_each(repo->history.full_history.begin(), repo->history.full_history.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
 	if(text.size())
 		text.erase(text.size() - 2, 2);
 	grepo->commit_history_full = BufferIO::DecodeUTF8s(text);
 	grepo->commit_history_partial.clear();
-	if(repo->commit_history_partial.size()) {
-		if(repo->commit_history_full.front() == repo->commit_history_partial.front() && repo->commit_history_full.back() == repo->commit_history_partial.back()) {
+	if(repo->history.partial_history.size()) {
+		if(repo->history.partial_history.front() == repo->history.partial_history.front() && repo->history.full_history.back() == repo->history.full_history.back()) {
 			grepo->commit_history_partial = grepo->commit_history_full;
 		} else {
 			text.clear();
-			std::for_each(repo->commit_history_partial.begin(), repo->commit_history_partial.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
+			std::for_each(repo->history.partial_history.begin(), repo->history.partial_history.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
 			if(text.size())
 				text.erase(text.size() - 2, 2);
 			grepo->commit_history_partial = BufferIO::DecodeUTF8s(text);
 		}
 	} else {
-		if(repo->warning.size()) {
+		if(repo->history.warning.size()) {
 			grepo->history_button1->setText(gDataManager->GetSysString(1448).data());
 			grepo->commit_history_partial = fmt::format(L"{}\n{}\n\n{}",
 				gDataManager->GetSysString(1449),
 				gDataManager->GetSysString(1450),
-				BufferIO::DecodeUTF8s(repo->warning));
+				BufferIO::DecodeUTF8s(repo->history.warning));
 		} else {
 			grepo->commit_history_partial = gDataManager->GetSysString(1446).data();
 		}
@@ -2201,7 +2201,7 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 	grepo->history_button2->setEnabled(true);
 	if(!repo->is_language) {
 		script_dirs.insert(script_dirs.begin(), Utils::ToPathString(repo->script_path));
-		auto script_subdirs = Utils::FindSubfolders(Utils::ToPathString(repo->script_path));
+		auto script_subdirs = Utils::FindSubfolders(Utils::ToPathString(repo->script_path), 2);
 		script_dirs.insert(script_dirs.begin(), std::make_move_iterator(script_subdirs.begin()), std::make_move_iterator(script_subdirs.end()));
 		pic_dirs.insert(pic_dirs.begin(), Utils::ToPathString(repo->pics_path));
 		if(repo->has_core)
