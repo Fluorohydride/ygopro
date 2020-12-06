@@ -66,3 +66,13 @@ if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     # We will build against vcpkg-provided versions of these libs
     rm -rf irrlicht/src/bzip2 irrlicht/src/jpeglib irrlicht/src/libpng irrlicht/src/zlib irrlicht/src/MacOSX
 fi
+
+
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+	# install UPX
+	curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/upx/upx/releases/download/v3.96/upx-3.96-amd64_linux.tar.xz
+	tar xf upx-3.96-amd64_linux.tar.xz > /dev/null
+    mv upx-3.96-amd64_linux/upx upx
+    rm -rf upx-3.96-amd64_linux
+    rm upx-3.96-amd64_linux.tar.xz
+fi

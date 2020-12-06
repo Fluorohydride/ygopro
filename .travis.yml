@@ -19,7 +19,6 @@ addons:
     - libglu-dev
     - libasound2-dev
     - libpulse-dev
-    - upx-ucl
   homebrew:
     update: true
     packages:

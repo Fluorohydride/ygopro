@@ -15,11 +15,7 @@ function copy_if_exists {
 
 function compress_if_exist {
     if [[ -f bin/$BUILD_CONFIG/$1 ]]; then
-		if [[ "$PLATFORM" == "windows" ]]; then
-			./upx deploy/$1 -o deploy/compressed-$1
-		else
-			upx deploy/$1 -o deploy/compressed-$1
-		fi
+		./upx deploy/$1 -o deploy/compressed-$1
     fi
 }
 
