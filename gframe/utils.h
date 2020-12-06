@@ -258,10 +258,10 @@ T Utils::ToUpperChar(T c) {
 	if(IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
 		return static_cast<T>('A');
 	}
-	if(IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
+	if(IN_INTERVAL(200, 203) || IN_INTERVAL(232, 235)) {
 		return static_cast<T>('E');
 	}
-	if(IN_INTERVAL(200, 203) || IN_INTERVAL(232, 235)) {
+	if(IN_INTERVAL(204, 207) || IN_INTERVAL(236, 239)) {
 		return static_cast<T>('I');
 	}
 	if(IN_INTERVAL(210, 214) || IN_INTERVAL(242, 246)) {
