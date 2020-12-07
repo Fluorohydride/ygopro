@@ -15,6 +15,7 @@
 #include <git2/version.h>
 #include <queue>
 #include <condition_variable>
+#include <thread>
 
 // libgit2 forward declarations
 struct git_repository;
