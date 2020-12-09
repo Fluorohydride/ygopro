@@ -239,7 +239,7 @@ inline std::vector<T> Utils::TokenizeString(const T& input, const T& token) {
 }
 
 template<typename T>
-inline std::vector<T> Utils::TokenizeString(const T & input, const typename T::value_type & token) {
+inline std::vector<T> Utils::TokenizeString(const T& input, const typename T::value_type& token) {
 	std::vector<T> res;
 	typename T::size_type pos1, pos2 = 0;
 	while((pos1 = input.find(token, pos2)) != T::npos) {
@@ -255,7 +255,9 @@ inline std::vector<T> Utils::TokenizeString(const T & input, const typename T::v
 template<typename T>
 T Utils::ToUpperChar(T c) {
 #define IN_INTERVAL(start, end) (c >= start && c <= end)
-	if(IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
+	if(IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)
+	   || c == 0x2c6f) //latin capital letter turned a
+	{
 		return static_cast<T>('A');
 	}
 	if(IN_INTERVAL(200, 203) || IN_INTERVAL(232, 235)) {
