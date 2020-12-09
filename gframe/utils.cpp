@@ -79,7 +79,7 @@ namespace ygo {
 #ifdef _WIN32
 		return CreateDirectory(path.data(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
 #else
-		return !mkdir(&path[0], 0777) || errno == EEXIST;
+		return mkdir(path.data(), 0777) == 0 || errno == EEXIST;
 #endif
 	}
 	bool Utils::FileCopy(path_stringview source, path_stringview destination) {
@@ -205,9 +205,8 @@ namespace ygo {
 					res.insert(res.end(), std::make_move_iterator(res2.begin()), std::make_move_iterator(res2.end()));
 				}
 			} else {
-				if(extensions.size() && std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<path_string>(name.data())) == extensions.end())
-					return;
-				res.push_back(name.data());
+				if(extensions.empty() || std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<path_string>(name.data())) != extensions.end())
+					res.emplace_back(name.data(), name.size());
 			}
 		});
 		std::sort(res.begin(), res.end(), CompareIgnoreCase<path_string>);
@@ -243,19 +242,16 @@ namespace ygo {
 			path_stringview name = list->getFullFileName(i).c_str();
 			if(std::count(name.begin(), name.end(), EPRO_TEXT('/')) > subdirectorylayers)
 				continue;
-			if(extensions.size() && std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<path_string>(name.data())) == extensions.end())
-				continue;
-			res.push_back(i);
+			if(extensions.empty() || std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<path_string>(name.data())) != extensions.end())
+				res.push_back(i);
 		}
 		return res;
 	}
 	MutexLockedIrrArchivedFile::~MutexLockedIrrArchivedFile() {
-		if (reader) {
+		if (reader)
 			reader->drop();
-		}
-		if (mutex) {
+		if (mutex)
 			mutex->unlock();
-		}
 	}
 	MutexLockedIrrArchivedFile Utils::FindFileInArchives(path_stringview path, path_stringview name) {
 		for(auto& archive : archives) {
@@ -304,41 +300,34 @@ namespace ygo {
 		} else {
 			return input.find(convertTokenCasing ? ToUpperNoAccents<std::wstring>(token.data()).data() : token.data()) != epro_wstringview::npos;
 		}
-		//return (convertInputCasing ? ToUpperNoAccents<std::wstring>(input.data()) : input).find(convertTokenCasing ? ToUpperNoAccents<std::wstring>(token.data()) : token) != std::wstring::npos;
 	}
-	bool Utils::CreatePath(path_stringview path, path_stringview workingdir) {
-		std::vector<path_string> folders;
-		path_string temp;
-		for(int i = 0; i < (int)path.size(); i++) {
-			if(path[i] == EPRO_TEXT('/')) {
-				folders.push_back(temp);
-				temp.clear();
-			} else
-				temp += path[i];
-		}
-		temp.clear();
-		for(auto folder : folders) {
-			if(temp.empty() && workingdir.size())
-				temp = fmt::format(EPRO_TEXT("{}/{}"),workingdir, folder);
-			else
-				temp += EPRO_TEXT("/") + folder;
-			if(!MakeDirectory(temp.data()))
-				return false;
+	bool Utils::CreatePath(path_stringview path, path_string workingdir) {
+		const bool wasempty = workingdir.empty();
+		path_stringview::size_type pos1, pos2 = 0;
+		while((pos1 = path.find(EPRO_TEXT('/'), pos2)) != path_stringview::npos) {
+			if(pos1 != pos2) {
+				if(pos2 != 0 || !wasempty)
+					workingdir.append(1, EPRO_TEXT('/'));
+				workingdir.append(path.begin() + pos2, path.begin() + pos1);
+				if(!MakeDirectory(workingdir))
+					return false;
+			}
+			pos2 = pos1 + 1;
 		}
 		return true;
 	}
 
 	path_stringview Utils::GetExePath() {
-		static path_string binarypath = []()->path_string {
+		static path_string binarypath = [] {
 #ifdef _WIN32
 			TCHAR exepath[MAX_PATH];
 			GetModuleFileName(NULL, exepath, MAX_PATH);
 			return Utils::NormalizePath<path_string>(exepath, false);
 #elif defined(__linux__) && !defined(__ANDROID__)
-			char buff[PATH_MAX];
+			path_char buff[PATH_MAX];
 			ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
 			if(len != -1)
-				buff[len] = '\0';
+				buff[len] = EPRO_TEXT('\0');
 			return buff;
 #elif defined(__APPLE__)
 			CFStringRef uti;
@@ -360,18 +349,18 @@ namespace ygo {
 				CFRelease(bundle_path);
 				return res;
 			} else { //program is launched standalone
-				auto FindRootFolder = [](const std::string& path)->std::string {//check if it's a binary launched from an app bundle
-					auto pos = path.find(".app/");
-					if(pos != std::string::npos) {
+				auto FindRootFolder = [](const path_string& path)->path_string {//check if it's a binary launched from an app bundle
+					auto pos = path.find(EPRO_TEXT(".app/"));
+					if(pos != path_string::npos) {
 						return GetFilePath(path.substr(0, pos + 4));
 					}
 					return path;
 				};
-				char buff[PATH_MAX];
+				path_char buff[PATH_MAX];
 				uint32_t bufsize = PATH_MAX;
 				if(_NSGetExecutablePath(buff, &bufsize) == 0)
 					return FindRootFolder(buff);
-				return "./";
+				return EPRO_TEXT("./");
 			}
 #else
 			return EPRO_TEXT("");
@@ -381,14 +370,12 @@ namespace ygo {
 	}
 
 	path_stringview Utils::GetExeFolder() {
-		static path_string binarypath = GetFilePath([]()->path_string {
-			return GetExePath().to_string();
-		}());
+		static path_string binarypath = GetFilePath(GetExePath().to_string());
 		return binarypath;
 	}
 
 	path_stringview Utils::GetCorePath() {
-		static path_string binarypath = []()->path_string {
+		static path_string binarypath = [] {
 #ifdef _WIN32
 			return fmt::format(EPRO_TEXT("{}/ocgcore.dll"), GetExeFolder());
 #else
@@ -425,9 +412,9 @@ namespace ygo {
 			path_stringview filename = filelist->getFullFileName(i).c_str();
 			bool isdir = filelist->isDirectory(i);
 			if(isdir)
-				CreatePath(fmt::format(EPRO_TEXT("{}/"), filename), dest);
+				CreatePath(fmt::format(EPRO_TEXT("{}/"), filename), { dest.data(), dest.size() });
 			else
-				CreatePath(filename, dest);
+				CreatePath(filename, { dest.data(), dest.size() });
 			if(!isdir) {
 				int percentage = 0;
 				auto reader = archive->createAndOpenFile(i);
@@ -468,7 +455,6 @@ namespace ygo {
 	void Utils::SystemOpen(path_stringview url, OpenType type) {
 #ifdef _WIN32
 		ShellExecute(NULL, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), working_dir, url).data() : url.data(), NULL, NULL, SW_SHOWNORMAL);
-		// system("start URL") opens a shell
 #elif !defined(__ANDROID__)
 		auto pid = vfork();
 		if(pid == 0) {

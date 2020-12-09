@@ -132,7 +132,7 @@ namespace ygo {
 			});
 			//return Utils::ToUpperNoAccents(a) < Utils::ToUpperNoAccents(b);
 		};
-		static bool CreatePath(path_stringview path, path_stringview workingdir = EPRO_TEXT("./"));
+		static bool CreatePath(path_stringview path, path_string workingdir = EPRO_TEXT("./"));
 		static path_stringview GetExePath();
 		static path_stringview GetExeFolder();
 		static path_stringview GetCorePath();
