@@ -230,7 +230,7 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	XMapWindow(display, window);
 	XFlush(display);
 #elif defined(__APPLE__)
-	(void)fullscreen:
+	(void)fullscreen;
 	EDOPRO_ToggleFullScreen();
 #endif
 }
