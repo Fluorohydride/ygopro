@@ -318,7 +318,7 @@ namespace ygo {
 	}
 
 	path_stringview Utils::GetExePath() {
-		static path_string binarypath = [] {
+		static path_string binarypath = []()->path_string {
 #ifdef _WIN32
 			TCHAR exepath[MAX_PATH];
 			GetModuleFileName(NULL, exepath, MAX_PATH);
