@@ -125,7 +125,7 @@ bool GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device)
 void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 #ifdef _WIN32
 	static WINDOWPLACEMENT nonFullscreenSize;
-	static LONG nonFullscreenStyle;
+	static LONG_PTR nonFullscreenStyle;
 	static constexpr LONG_PTR fullscreenStyle = WS_POPUP | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 	static const auto monitors = [] {
 		std::vector<RECT> ret;
@@ -139,29 +139,29 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	fullscreen = !fullscreen;
 	const auto driver = device->getVideoDriver();
 	HWND hWnd = reinterpret_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
-	RECT clientSize = {};
 	if(fullscreen) {
 		GetWindowPlacement(hWnd, &nonFullscreenSize);
-		nonFullscreenStyle = GetWindowLong(hWnd, GWL_STYLE);
-		static RECT curSize;
+		nonFullscreenStyle = GetWindowLongPtr(hWnd, GWL_STYLE);
+		RECT curSize{};
 		GetWindowRect(hWnd, &curSize);
+		const POINT windowCenter = { (curSize.left + (curSize.right - curSize.left) / 2), (curSize.top + (curSize.bottom - curSize.top) / 2) };
 		for(const auto& rect : monitors) {
-			POINT windowCenter = { (curSize.left + (curSize.right - curSize.left) / 2), (curSize.top + (curSize.bottom - curSize.top) / 2) };
 			if(PtInRect(&rect, windowCenter)) {
-				clientSize = rect;
+				curSize = rect;
 				break;
 			}
 		}
 		if(!SetWindowLongPtr(hWnd, GWL_STYLE, fullscreenStyle))
 			ErrorLog("Could not change window style.");
 
-		const auto width = clientSize.right - clientSize.left;
-		const auto height = clientSize.bottom - clientSize.top;
+		const auto width = curSize.right - curSize.left;
+		const auto height = curSize.bottom - curSize.top;
 
-		SetWindowPos(hWnd, HWND_TOP, clientSize.left, clientSize.top, width, height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+		SetWindowPos(hWnd, HWND_TOP, curSize.left, curSize.top, width, height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 	} else {
 		SetWindowPlacement(hWnd, &nonFullscreenSize);
 		SetWindowLongPtr(hWnd, GWL_STYLE, nonFullscreenStyle);
+		SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 	static_cast<irr::CCursorControl*>(device->getCursorControl())->updateBorderSize(fullscreen, true);
 #elif defined(__linux__) && !defined(__ANDROID__)
@@ -230,6 +230,7 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	XMapWindow(display, window);
 	XFlush(display);
 #elif defined(__APPLE__)
+	(void)fullscreen:
 	EDOPRO_ToggleFullScreen();
 #endif
 }
