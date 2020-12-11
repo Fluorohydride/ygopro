@@ -117,8 +117,8 @@ class Game {
 public:
 	bool Initialize();
 	bool MainLoop();
-	path_string NoSkinLabel();
-	bool ApplySkin(const path_string& skin, bool reload = false, bool firstrun = false);
+	epro::path_string NoSkinLabel();
+	bool ApplySkin(const epro::path_string& skin, bool reload = false, bool firstrun = false);
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshLFLists();
 	void RefreshAiDecks();
@@ -132,7 +132,7 @@ public:
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard);
 	void DrawPendScale(ClientCard* pcard);
-	void DrawStackIndicator(epro_wstringview text, irr::video::S3DVertex* v, bool opponent);
+	void DrawStackIndicator(epro::wstringview text, irr::video::S3DVertex* v, bool opponent);
 	void DrawGUI();
 	void DrawSpec();
 	void DrawBackImage(irr::video::ITexture* texture, bool resized);
@@ -159,13 +159,13 @@ public:
 	void ShowCardInfo(uint32_t code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
 	void RefreshCardInfoTextPositions();
 	void ClearCardInfo(int player = 0);
-	void AddChatMsg(epro_wstringview msg, int player, int type);
-	void AddLog(epro_wstringview msg, int param = 0);
+	void AddChatMsg(epro::wstringview msg, int player, int type);
+	void AddLog(epro::wstringview msg, int param = 0);
 	void ClearChatMsg();
-	void AddDebugMsg(epro_stringview msg);
+	void AddDebugMsg(epro::stringview msg);
 	void ClearTextures();
 	void CloseDuelWindow();
-	void PopupMessage(epro_wstringview text, epro_wstringview caption = L"");
+	void PopupMessage(epro::wstringview text, epro::wstringview caption = L"");
 
 	uint8_t LocalPlayer(uint8_t player);
 	void UpdateDuelParam();
@@ -219,9 +219,9 @@ public:
 	
 	std::wstring ReadPuzzleMessage(const std::wstring& script_name);
 	OCG_Duel SetupDuel(OCG_DuelOptions opts);
-	path_string FindScript(path_stringview script_name, MutexLockedIrrArchivedFile* retarchive = nullptr);
-	std::vector<char> LoadScript(epro_stringview script_name);
-	bool LoadScript(OCG_Duel pduel, epro_stringview script_name);
+	epro::path_string FindScript(epro::path_stringview script_name, MutexLockedIrrArchivedFile* retarchive = nullptr);
+	std::vector<char> LoadScript(epro::stringview script_name);
+	bool LoadScript(OCG_Duel pduel, epro::stringview script_name);
 	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
 	static void MessageHandler(void* payload, const char* string, int type);
 	static void UpdateDownloadBar(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload);
@@ -301,14 +301,14 @@ public:
 	irr::scene::ICameraSceneNode* camera;
 	irr::io::IFileSystem* filesystem;
 	void PopulateResourcesDirectories();
-	std::vector<path_string> field_dirs;
-	std::vector<path_string> pic_dirs;
-	std::vector<path_string> cover_dirs;
-	std::vector<path_string> script_dirs;
-	std::vector<path_string> cores_to_load;
+	std::vector<epro::path_string> field_dirs;
+	std::vector<epro::path_string> pic_dirs;
+	std::vector<epro::path_string> cover_dirs;
+	std::vector<epro::path_string> script_dirs;
+	std::vector<epro::path_string> cores_to_load;
 	void PopulateLocales();
 	void ApplyLocale(size_t index, bool forced = false);
-	std::vector<std::pair<path_string, std::vector<path_string>>> locales;
+	std::vector<std::pair<epro::path_string, std::vector<epro::path_string>>> locales;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
 	std::wstring queued_caption;

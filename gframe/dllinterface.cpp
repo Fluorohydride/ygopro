@@ -44,7 +44,7 @@
 #undef CREATE_CLONE
 
 #ifdef _WIN32
-void* OpenLibrary(path_stringview path) {
+void* OpenLibrary(epro::path_stringview path) {
 	return LoadLibrary(fmt::format("{}" CORENAME, path).data());
 }
 #define CloseLibrary(core) FreeLibrary((HMODULE)core)
@@ -53,7 +53,7 @@ void* OpenLibrary(path_stringview path) {
 
 #else
 
-void* OpenLibrary(path_stringview path) {
+void* OpenLibrary(epro::path_stringview path) {
 #ifdef __ANDROID__
 	void* lib = nullptr;
 	const auto dest_dir = porting::internal_storage + "/libocgcore.so";
@@ -98,7 +98,7 @@ bool check_api_version() {
 #define LOAD_FUNCTION(x) x = GetFunction(newcore, x);\
 		if(!x){ UnloadCore(newcore); return nullptr; }
 
-void* LoadOCGcore(path_stringview path) {
+void* LoadOCGcore(epro::path_stringview path) {
 	void* newcore = OpenLibrary(path);
 	if(!newcore)
 		return nullptr;
@@ -156,7 +156,7 @@ void UnloadCore(void* handle) {
 			return nullptr;\
 		}
 
-void* ChangeOCGcore(path_stringview path, void* handle) {
+void* ChangeOCGcore(epro::path_stringview path, void* handle) {
 	void* newcore = OpenLibrary(path);
 	if(!newcore)
 		return nullptr;

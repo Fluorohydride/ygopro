@@ -186,7 +186,7 @@ void FreeLock(ygo::ClientUpdater::lock_type lock) {
 #endif
 namespace ygo {
 
-void ClientUpdater::StartUnzipper(unzip_callback callback, void* payload, const path_string& src) {
+void ClientUpdater::StartUnzipper(unzip_callback callback, void* payload, const epro::path_string& src) {
 #ifdef UPDATE_URL
 #ifdef __ANDROID__
 	porting::installUpdate(fmt::format("{}{}{}.apk", Utils::working_dir, src, update_urls.front().name));
@@ -204,7 +204,7 @@ void ClientUpdater::CheckUpdates() {
 #endif
 }
 
-bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const path_string& dest) {
+bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const epro::path_string& dest) {
 #ifdef UPDATE_URL
 	if(!has_update || downloading || !Lock)
 		return false;
@@ -215,7 +215,7 @@ bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const p
 #endif
 }
 #ifdef UPDATE_URL
-void ClientUpdater::Unzip(path_string src, void* payload, unzip_callback callback) {
+void ClientUpdater::Unzip(epro::path_string src, void* payload, unzip_callback callback) {
 	Utils::SetThreadName("Unzip");
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
 	auto path = ygo::Utils::GetExePath();
@@ -241,7 +241,7 @@ void ClientUpdater::Unzip(path_string src, void* payload, unzip_callback callbac
 	Reboot();
 }
 
-void ClientUpdater::DownloadUpdate(path_string dest_path, void* payload, update_callback callback) {
+void ClientUpdater::DownloadUpdate(epro::path_string dest_path, void* payload, update_callback callback) {
 	Utils::SetThreadName("Updater");
 	downloading = true;
 	Payload cbpayload{};

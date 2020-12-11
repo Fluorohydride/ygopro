@@ -15,8 +15,8 @@ enum CoreLogOutput {
 struct GameConfig
 {
 	GameConfig();
-	bool Load(const path_char* filename);
-	bool Save(const path_char* filename);
+	bool Load(const epro::path_char* filename);
+	bool Save(const epro::path_char* filename);
 
 	bool use_d3d = true;
 	bool vsync = true;
@@ -99,8 +99,8 @@ struct GameConfig
 	bool loopMusic = true;
 	bool noClientUpdates = false;
 	bool controller_input = false;
-	path_string skin = EPRO_TEXT("none");
-	path_string locale = EPRO_TEXT("English");
+	epro::path_string skin = EPRO_TEXT("none");
+	epro::path_string locale = EPRO_TEXT("English");
 	std::string ssl_certificate_path = "";
 
 	nlohmann::json configs;

@@ -109,7 +109,7 @@ bool ImageManager::Initial() {
 } while(0)
 #define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GTFF(path,".png",w,h),GTFF(path,".jpg",w,h),def_##obj)
 #define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(X(path ".png")),driver->getTexture(X(path ".jpg")),def_##obj)
-void ImageManager::ChangeTextures(path_stringview _path) {
+void ImageManager::ChangeTextures(epro::path_stringview _path) {
 	if(_path == textures_path)
 		return;
 	textures_path = { _path.data(), _path.size() };
@@ -446,7 +446,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 				if(timestamp_id != source_timestamp_id.load())
 					return std::make_pair(nullptr, EPRO_TEXT("fail"));
 				irr::video::IImage* readerimg = nullptr;
-				path_string file;
+				epro::path_string file;
 				if(path == EPRO_TEXT("archives")) {
 					auto lockedIrrFile = Utils::FindFileInArchives(
 						(type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"),

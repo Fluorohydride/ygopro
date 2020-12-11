@@ -252,7 +252,7 @@ void displayKeyboard(bool pShow) {
  * @param editType type of texfield
  * (1==multiline text input; 2==single line text input; 3=password field)
  */
-void showInputDialog(path_stringview current) {
+void showInputDialog(epro::path_stringview current) {
 	jmethodID showdialog = jnienv->GetMethodID(nativeActivity, "showDialog", JPARAMS(JSTRING)JVOID);
 
 	if(showdialog == 0) {
@@ -432,7 +432,7 @@ int getLocalIP() {
 }
 
 #define JAVAVOIDSTRINGMETHOD(name)\
-void name(path_stringview arg) {\
+void name(epro::path_stringview arg) {\
 jmethodID name = jnienv->GetMethodID(nativeActivity, #name, JPARAMS(JSTRING)JVOID);\
 if(name == 0) assert("porting::" #name " unable to find java " #name " method" == 0);\
 jstring jargs = jnienv->NewStringUTF(arg.data());\
@@ -444,7 +444,7 @@ JAVAVOIDSTRINGMETHOD(installUpdate)
 JAVAVOIDSTRINGMETHOD(openUrl)
 JAVAVOIDSTRINGMETHOD(openFile)
 
-void setTextToClipboard(epro_wstringview text) {
+void setTextToClipboard(epro::wstringview text) {
 	jmethodID setClip = jnienv->GetMethodID(nativeActivity, "setClipboard", JPARAMS(JSTRING)JVOID);
 	if(setClip == 0)
 		assert("porting::setTextToClipboard unable to find java setClipboard method" == 0);

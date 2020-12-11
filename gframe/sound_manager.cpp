@@ -14,7 +14,7 @@
 #endif
 
 namespace ygo {
-SoundManager::SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, path_stringview working_directory) {
+SoundManager::SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, epro::path_stringview working_directory) {
 #ifdef BACKEND
 	fmt::print("Using: " STR(BACKEND)" for audio playback.\n");
 	working_dir = Utils::ToUTF8IfNeeded(working_directory);
@@ -72,7 +72,7 @@ void SoundManager::RefreshBGMList() {
 	RefreshBGMDir(EPRO_TEXT("lose"), BGM::LOSE);
 #endif
 }
-void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
+void SoundManager::RefreshBGMDir(epro::path_string path, BGM scene) {
 #ifdef BACKEND
 	for(auto& file : Utils::FindFiles(fmt::format(EPRO_TEXT("./sound/BGM/{}"), path), { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
 		auto conv = Utils::ToUTF8IfNeeded(fmt::format(EPRO_TEXT("{}/{}"), path, file));
@@ -83,14 +83,14 @@ void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
 }
 void SoundManager::RefreshChantsList() {
 #ifdef BACKEND
-	static const std::pair<CHANT, path_string> types[] = {
+	static const std::pair<CHANT, epro::path_string> types[] = {
 		{CHANT::SUMMON,    EPRO_TEXT("summon")},
 		{CHANT::ATTACK,    EPRO_TEXT("attack")},
 		{CHANT::ACTIVATE,  EPRO_TEXT("activate")}
 	};
 	ChantsList.clear();
 	for (const auto& chantType : types) {
-		const path_string searchPath = EPRO_TEXT("./sound/") + chantType.second;
+		const epro::path_string searchPath = EPRO_TEXT("./sound/") + chantType.second;
 		Utils::MakeDirectory(searchPath);
 		for (auto& file : Utils::FindFiles(searchPath, { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
 			const auto filepath = fmt::format(EPRO_TEXT("{}/{}"), searchPath, file);

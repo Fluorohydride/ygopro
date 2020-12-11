@@ -5,7 +5,7 @@
 
 namespace ygo {
 
-void ErrorLog(epro_stringview msg);
+void ErrorLog(epro::stringview msg);
 
 }
 

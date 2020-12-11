@@ -61,27 +61,27 @@ public:
 		load_dummies = false;
 	}
 	void ClearDummies();
-	bool LoadLFListSingle(const path_string& path);
-	bool LoadLFListFolder(path_string path);
+	bool LoadLFListSingle(const epro::path_string& path);
+	bool LoadLFListFolder(epro::path_string path);
 	void LoadLFList();
 	void RefreshLFList();
 	void RefreshDeck(Deck & deck);
 	LFList* GetLFList(uint32_t lfhash);
-	epro_wstringview GetLFListName(uint32_t lfhash);
+	epro::wstringview GetLFListName(uint32_t lfhash);
 	DeckError CheckDeck(Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes = 0);
 	int TypeCount(std::vector<CardDataC*> cards, uint32_t type);
 	uint32_t LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec, uint32_t mainc2 = 0, uint32_t sidec2 = 0);
 	uint32_t LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, cardlist_type* extralist = nullptr);
 	bool LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec);
-	bool LoadDeck(const path_string& file, Deck* deck = nullptr, bool separated = false);
-	bool LoadDeckDouble(const path_string& file, const path_string& file2, Deck* deck = nullptr);
-	bool SaveDeck(Deck& deck, const path_string& name);
-	bool SaveDeck(const path_string& name, const cardlist_type& mainlist, const cardlist_type& extralist, const cardlist_type& sidelist);
+	bool LoadDeck(const epro::path_string& file, Deck* deck = nullptr, bool separated = false);
+	bool LoadDeckDouble(const epro::path_string& file, const epro::path_string& file2, Deck* deck = nullptr);
+	bool SaveDeck(Deck& deck, const epro::path_string& name);
+	bool SaveDeck(const epro::path_string& name, const cardlist_type& mainlist, const cardlist_type& extralist, const cardlist_type& sidelist);
 	const wchar_t* ExportDeckBase64(Deck& deck);
 	const wchar_t* ExportDeckCardNames(Deck deck);
 	void ImportDeckBase64(Deck& deck, const wchar_t* buffer);
-	bool DeleteDeck(Deck& deck, const path_string& name);
-	bool RenameDeck(const path_string& oldname, const path_string& newname);
+	bool DeleteDeck(Deck& deck, const epro::path_string& name);
+	bool RenameDeck(const epro::path_string& oldname, const epro::path_string& newname);
 };
 
 extern DeckManager* gdeckManager;

@@ -91,25 +91,25 @@ public:
 	}
 	~DataManager() {}
 	void ClearLocaleTexts();
-	bool LoadLocaleDB(const path_string& file, bool usebuffer = false);
-	bool LoadDB(const path_string& file, bool usebuffer = false);
+	bool LoadLocaleDB(const epro::path_string& file, bool usebuffer = false);
+	bool LoadDB(const epro::path_string& file, bool usebuffer = false);
 	bool LoadDBFromBuffer(const std::vector<char>& buffer, const std::string& filename = "");
-	bool LoadStrings(const path_string& file);
-	bool LoadLocaleStrings(const path_string& file);
+	bool LoadStrings(const epro::path_string& file);
+	bool LoadLocaleStrings(const epro::path_string& file);
 	void ClearLocaleStrings();
 	bool GetData(uint32_t code, CardData* pData);
 	CardDataC* GetCardData(uint32_t code);
 	bool GetString(uint32_t code, CardString* pStr);
-	epro_wstringview GetName(uint32_t code);
-	epro_wstringview GetText(uint32_t code);
-	epro_wstringview GetDesc(uint64_t strCode, bool compat);
-	epro_wstringview GetSysString(uint32_t code);
-	epro_wstringview GetVictoryString(int code);
-	epro_wstringview GetCounterName(uint32_t code);
-	epro_wstringview GetSetName(uint32_t code);
+	epro::wstringview GetName(uint32_t code);
+	epro::wstringview GetText(uint32_t code);
+	epro::wstringview GetDesc(uint64_t strCode, bool compat);
+	epro::wstringview GetSysString(uint32_t code);
+	epro::wstringview GetVictoryString(int code);
+	epro::wstringview GetCounterName(uint32_t code);
+	epro::wstringview GetSetName(uint32_t code);
 	std::vector<uint32_t> GetSetCode(std::vector<std::wstring>& setname);
 	std::wstring GetNumString(int num, bool bracket = false);
-	epro_wstringview FormatLocation(uint32_t location, int sequence);
+	epro::wstringview FormatLocation(uint32_t location, int sequence);
 	std::wstring FormatAttribute(uint32_t attribute);
 	std::wstring FormatRace(uint32_t race, bool isSkill = false);
 	std::wstring FormatType(uint32_t type);

@@ -11,7 +11,7 @@
 struct UnzipperPayload {
 	int cur;
 	int tot;
-	const path_char* filename;
+	const epro::path_char* filename;
 	void* payload;
 };
 
@@ -23,8 +23,8 @@ class ClientUpdater {
 public:
 	ClientUpdater();
 	~ClientUpdater();
-	bool StartUpdate(update_callback callback, void* payload, const path_string& dest = EPRO_TEXT("./updates/"));
-	void StartUnzipper(unzip_callback callback, void* payload, const path_string& src = EPRO_TEXT("./updates/"));
+	bool StartUpdate(update_callback callback, void* payload, const epro::path_string& dest = EPRO_TEXT("./updates/"));
+	void StartUnzipper(unzip_callback callback, void* payload, const epro::path_string& src = EPRO_TEXT("./updates/"));
 	void CheckUpdates();
 #ifdef UPDATE_URL
 	bool HasUpdate() {
@@ -40,8 +40,8 @@ public:
 #endif
 private:
 	void CheckUpdate();
-	void DownloadUpdate(path_string dest_path, void* payload, update_callback callback);
-	void Unzip(path_string src, void* payload, unzip_callback callback);
+	void DownloadUpdate(epro::path_string dest_path, void* payload, update_callback callback);
+	void Unzip(epro::path_string src, void* payload, unzip_callback callback);
 	struct DownloadInfo {
 		std::string name;
 		std::string url;

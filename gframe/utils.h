@@ -25,7 +25,7 @@ struct unzip_payload {
 	int percentage;
 	int cur;
 	int tot;
-	const path_char* filename;
+	const epro::path_char* filename;
 	bool is_new;
 	void* payload;
 };
@@ -77,26 +77,26 @@ namespace ygo {
 		
 		static std::vector<SynchronizedIrrArchive> archives;
 		static irr::io::IFileSystem* filesystem;
-		static path_string working_dir;
-		static bool MakeDirectory(path_stringview path);
-		static bool FileCopy(path_stringview source, path_stringview destination);
-		static bool FileMove(path_stringview source, path_stringview destination);
-		static bool FileExists(path_stringview path);
-		static inline path_string ToPathString(epro_wstringview input);
-		static inline path_string ToPathString(epro_stringview input);
-		static inline std::string ToUTF8IfNeeded(path_stringview input);
-		static inline std::wstring ToUnicodeIfNeeded(path_stringview input);
-		static bool ChangeDirectory(path_stringview newpath);
-		static bool FileDelete(path_stringview source);
-		static bool ClearDirectory(path_stringview path);
-		static bool DeleteDirectory(path_stringview source);
+		static epro::path_string working_dir;
+		static bool MakeDirectory(epro::path_stringview path);
+		static bool FileCopy(epro::path_stringview source, epro::path_stringview destination);
+		static bool FileMove(epro::path_stringview source, epro::path_stringview destination);
+		static bool FileExists(epro::path_stringview path);
+		static inline epro::path_string ToPathString(epro::wstringview input);
+		static inline epro::path_string ToPathString(epro::stringview input);
+		static inline std::string ToUTF8IfNeeded(epro::path_stringview input);
+		static inline std::wstring ToUnicodeIfNeeded(epro::path_stringview input);
+		static bool ChangeDirectory(epro::path_stringview newpath);
+		static bool FileDelete(epro::path_stringview source);
+		static bool ClearDirectory(epro::path_stringview path);
+		static bool DeleteDirectory(epro::path_stringview source);
 		static void CreateResourceFolders();
-		static void FindFiles(path_stringview path, const std::function<void(path_stringview, bool)>& cb);
-		static std::vector<path_string> FindFiles(path_stringview path, const std::vector<path_stringview>& extensions, int subdirectorylayers = 0);
+		static void FindFiles(epro::path_stringview path, const std::function<void(epro::path_stringview, bool)>& cb);
+		static std::vector<epro::path_string> FindFiles(epro::path_stringview path, const std::vector<epro::path_stringview>& extensions, int subdirectorylayers = 0);
 		/** Returned subfolder names are prefixed by the provided path */
-		static std::vector<path_string> FindSubfolders(path_stringview path, int subdirectorylayers = 1, bool addparentpath = true);
-		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, path_stringview path, const std::vector<path_stringview>& extensions, int subdirectorylayers = 0);
-		static MutexLockedIrrArchivedFile FindFileInArchives(path_stringview path, path_stringview name);
+		static std::vector<epro::path_string> FindSubfolders(epro::path_stringview path, int subdirectorylayers = 1, bool addparentpath = true);
+		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, epro::path_stringview path, const std::vector<epro::path_stringview>& extensions, int subdirectorylayers = 0);
+		static MutexLockedIrrArchivedFile FindFileInArchives(epro::path_stringview path, epro::path_stringview name);
 		template<typename T>
 		static T NormalizePath(T path, bool trailing_slash = true);
 		template<typename T>
@@ -115,8 +115,8 @@ namespace ygo {
 		template<typename T>
 		static T ToUpperNoAccents(T input);
 		/** Returns true if and only if all tokens are contained in the input. */
-		static bool ContainsSubstring(epro_wstringview input, const std::vector<std::wstring>& tokens, bool convertInputCasing = false, bool convertTokenCasing = false);
-		static bool ContainsSubstring(epro_wstringview input, epro_wstringview token, bool convertInputCasing = false, bool convertTokenCasing = false);
+		static bool ContainsSubstring(epro::wstringview input, const std::vector<std::wstring>& tokens, bool convertInputCasing = false, bool convertTokenCasing = false);
+		static bool ContainsSubstring(epro::wstringview input, epro::wstringview token, bool convertInputCasing = false, bool convertTokenCasing = false);
 		template<typename T>
 		static bool KeepOnlyDigits(T& input, bool negative = false);
 		template<typename T>
@@ -132,18 +132,18 @@ namespace ygo {
 			});
 			//return Utils::ToUpperNoAccents(a) < Utils::ToUpperNoAccents(b);
 		};
-		static bool CreatePath(path_stringview path, path_string workingdir = EPRO_TEXT("./"));
-		static path_stringview GetExePath();
-		static path_stringview GetExeFolder();
-		static path_stringview GetCorePath();
-		static bool UnzipArchive(path_stringview input, unzip_callback callback = nullptr, unzip_payload* payload = nullptr, path_stringview dest = EPRO_TEXT("./"));
+		static bool CreatePath(epro::path_stringview path, epro::path_string workingdir = EPRO_TEXT("./"));
+		static epro::path_stringview GetExePath();
+		static epro::path_stringview GetExeFolder();
+		static epro::path_stringview GetCorePath();
+		static bool UnzipArchive(epro::path_stringview input, unzip_callback callback = nullptr, unzip_payload* payload = nullptr, epro::path_stringview dest = EPRO_TEXT("./"));
 
 		enum OpenType {
 			OPEN_URL,
 			OPEN_FILE
 		};
 
-		static void SystemOpen(path_stringview url, OpenType type = OPEN_URL);
+		static void SystemOpen(epro::path_stringview url, OpenType type = OPEN_URL);
 
 	private:
 		static void InternalSetThreadName(const char* name, const wchar_t* wname);
@@ -309,28 +309,28 @@ inline bool Utils::KeepOnlyDigits(T& input, bool negative) {
 #undef CAST
 #undef CHAR_T
 
-path_string Utils::ToPathString(epro_wstringview input) {
+epro::path_string Utils::ToPathString(epro::wstringview input) {
 #ifdef UNICODE
 	return { input.data(), input.size() };
 #else
 	return BufferIO::EncodeUTF8s(input);
 #endif
 }
-path_string Utils::ToPathString(epro_stringview input) {
+epro::path_string Utils::ToPathString(epro::stringview input) {
 #ifdef UNICODE
 	return BufferIO::DecodeUTF8s(input);
 #else
 	return { input.data(), input.size() };
 #endif
 }
-std::string Utils::ToUTF8IfNeeded(path_stringview input) {
+std::string Utils::ToUTF8IfNeeded(epro::path_stringview input) {
 #ifdef UNICODE
 	return BufferIO::EncodeUTF8s(input);
 #else
 	return { input.data(), input.size() };
 #endif
 }
-std::wstring Utils::ToUnicodeIfNeeded(path_stringview input) {
+std::wstring Utils::ToUnicodeIfNeeded(epro::path_stringview input) {
 #ifdef UNICODE
 	return { input.data(), input.size() };
 #else

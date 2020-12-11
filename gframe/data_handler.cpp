@@ -92,7 +92,7 @@ void DataHandler::LoadZipArchives() {
 		}
 	}
 }
-DataHandler::DataHandler(path_stringview working_dir) {
+DataHandler::DataHandler(epro::path_stringview working_dir) {
 	configs = std::unique_ptr<GameConfig>(new GameConfig);
 	gGameConfig = configs.get();
 	tmp_device = nullptr;

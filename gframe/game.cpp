@@ -1575,7 +1575,7 @@ bool Game::MainLoop() {
 					auto lang = Utils::ToUpperNoAccents(langpath);
 					auto it = std::find_if(locales.begin(), locales.end(),
 										   [&lang]
-					(const std::pair<path_string, std::vector<path_string>>& locale)->bool
+					(const std::pair<epro::path_string, std::vector<epro::path_string>>& locale)->bool
 					{
 						return Utils::ToUpperNoAccents(locale.first) == lang;
 					});
@@ -1584,7 +1584,7 @@ bool Game::MainLoop() {
 						ReloadElementsStrings();
 					} else {
 						Utils::MakeDirectory(EPRO_TEXT("./config/languages/") + langpath);
-						locales.emplace_back(std::move(langpath), std::vector<path_string>{ std::move(data_path) });
+						locales.emplace_back(std::move(langpath), std::vector<epro::path_string>{ std::move(data_path) });
 						gSettings.cbCurrentLocale->addItem(BufferIO::DecodeUTF8s(repo->language).data());
 					}
 				}
@@ -1856,11 +1856,11 @@ bool Game::MainLoop() {
 	//device->drop();
 	return restart;
 }
-path_string Game::NoSkinLabel() {
+epro::path_string Game::NoSkinLabel() {
 	return Utils::ToPathString(gDataManager->GetSysString(2065));
 }
-bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
-	static path_string prev_skin = EPRO_TEXT("");
+bool Game::ApplySkin(const epro::path_string& skinname, bool reload, bool firstrun) {
+	static epro::path_string prev_skin = EPRO_TEXT("");
 	bool applied = true;
 	auto reapply_colors = [&] () {
 		wCardImg->setBackgroundColor(skin::CARDINFO_IMAGE_BACKGROUND_VAL);
@@ -2026,9 +2026,9 @@ void Game::RefreshAiDecks() {
 					bot.executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
 #else
 					if(gGameConfig->user_configs.size() && gGameConfig->user_configs["posixPathExtension"].is_string()) {
-						bot.executablePath = gGameConfig->user_configs["posixPathExtension"].get<path_string>();
+						bot.executablePath = gGameConfig->user_configs["posixPathExtension"].get<epro::path_string>();
 					} else if (gGameConfig->configs.size() && gGameConfig->configs["posixPathExtension"].is_string()) {
-						bot.executablePath = gGameConfig->configs["posixPathExtension"].get<path_string>();
+						bot.executablePath = gGameConfig->configs["posixPathExtension"].get<epro::path_string>();
 					} else {
 						bot.executablePath = EPRO_TEXT("");
 					}
@@ -2141,7 +2141,7 @@ void Game::LoadGithubRepositories() {
 				auto lang = Utils::ToPathString(repo->language);
 				auto it = std::find_if(locales.begin(), locales.end(),
 									   [&lang]
-				(const std::pair<path_string, std::vector<path_string>>& locale)->bool {
+				(const std::pair<epro::path_string, std::vector<epro::path_string>>& locale)->bool {
 					return locale.first == lang;
 				});
 				if(it != locales.end()) {
@@ -2343,7 +2343,7 @@ void Game::ClearCardInfo(int player) {
 	cardimagetextureloading = false;
 	showingcard = 0;
 }
-void Game::AddChatMsg(epro_wstringview msg, int player, int type) {
+void Game::AddChatMsg(epro::wstringview msg, int player, int type) {
 	for(int i = 7; i > 0; --i) {
 		chatMsg[i].swap(chatMsg[i - 1]);
 		chatTiming[i] = chatTiming[i - 1];
@@ -2352,7 +2352,7 @@ void Game::AddChatMsg(epro_wstringview msg, int player, int type) {
 	chatMsg[0].clear();
 	chatTiming[0] = 1200.0f;
 	chatType[0] = player;
-	epro_wstringview sender = L"";
+	epro::wstringview sender = L"";
 	if(type == 0) {
 		gSoundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
 		sender = dInfo.selfnames[player];
@@ -2379,7 +2379,7 @@ void Game::AddChatMsg(epro_wstringview msg, int player, int type) {
 	chatMsg[0] = fmt::format(L"{}: {}", sender, msg);
 	lstChat->addItem(chatMsg[0].data());
 }
-void Game::AddLog(epro_wstringview msg, int param) {
+void Game::AddLog(epro::wstringview msg, int param) {
 	logParam.push_back(param);
 	lstLog->addItem(msg.data());
 	if(!env->hasFocus(lstLog)) {
@@ -2391,7 +2391,7 @@ void Game::ClearChatMsg() {
 		chatTiming[i] = 0;
 	}
 }
-void Game::AddDebugMsg(epro_stringview msg) {
+void Game::AddDebugMsg(epro::stringview msg) {
 	if (gGameConfig->coreLogOutput & CORE_LOG_TO_CHAT)
 		AddChatMsg(BufferIO::DecodeUTF8s(msg), 9, 2);
 	if (gGameConfig->coreLogOutput & CORE_LOG_TO_FILE)
@@ -2464,7 +2464,7 @@ void Game::CloseDuelWindow() {
 	closeDuelWindow = false;
 	closeDoneSignal.Set();
 }
-void Game::PopupMessage(epro_wstringview text, epro_wstringview caption) {
+void Game::PopupMessage(epro::wstringview text, epro::wstringview caption) {
 	popupCheck.lock();
 	queued_msg = text.data();
 	queued_caption = caption.data();
@@ -3206,7 +3206,7 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	}
 	return BufferIO::DecodeUTF8s(res);
 }
-path_string Game::FindScript(path_stringview name, MutexLockedIrrArchivedFile* retarchive) {
+epro::path_string Game::FindScript(epro::path_stringview name, MutexLockedIrrArchivedFile* retarchive) {
 	for(auto& path : script_dirs) {
 		if(path == EPRO_TEXT("archives")) {
 			if(auto tmp = Utils::FindFileInArchives(EPRO_TEXT("script/"), name)) {
@@ -3224,7 +3224,7 @@ path_string Game::FindScript(path_stringview name, MutexLockedIrrArchivedFile* r
 		return name.data();
 	return EPRO_TEXT("");
 }
-std::vector<char> Game::LoadScript(epro_stringview _name) {
+std::vector<char> Game::LoadScript(epro::stringview _name) {
 	MutexLockedIrrArchivedFile tmp;
 	auto path = FindScript(Utils::ToPathString(_name), &tmp);
 	if(path.size()) {
@@ -3245,7 +3245,7 @@ std::vector<char> Game::LoadScript(epro_stringview _name) {
 	}
 	return {};
 }
-bool Game::LoadScript(OCG_Duel pduel, epro_stringview script_name) {
+bool Game::LoadScript(OCG_Duel pduel, epro::stringview script_name) {
 	auto buf = LoadScript(script_name);
 	return buf.size() && OCG_LoadScript(pduel, buf.data(), buf.size(), script_name.data());
 }
@@ -3329,7 +3329,7 @@ void Game::PopulateResourcesDirectories() {
 void Game::PopulateLocales() {
 	locales.clear();
 	for(auto& locale : Utils::FindSubfolders(EPRO_TEXT("./config/languages/"), 1, false)) {
-		locales.emplace_back(locale, std::vector<path_string>());
+		locales.emplace_back(locale, std::vector<epro::path_string>());
 	}
 }
 

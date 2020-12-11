@@ -125,14 +125,14 @@ public:
 		*wp = 0;
 		return wp - wstr;
 	}
-	static std::string EncodeUTF8s(epro_wstringview source) {
+	static std::string EncodeUTF8s(epro::wstringview source) {
 		thread_local std::vector<char> res;
 		res.reserve(source.size() * 4 + 1);
 		EncodeUTF8(source.data(), const_cast<char*>(res.data()));
 		return res.data();
 	}
 	// UTF-8 to UTF-16/UTF-32
-	static std::wstring DecodeUTF8s(epro_stringview source) {
+	static std::wstring DecodeUTF8s(epro::stringview source) {
 		thread_local std::vector<wchar_t> res;
 #if	WCHAR_MAX == 0xffff
 			res.reserve(source.size() * 2 + 1);

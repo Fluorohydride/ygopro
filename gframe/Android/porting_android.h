@@ -24,15 +24,15 @@ void showComboBox(const std::vector<std::string>& list);
 
 int getLocalIP();
 
-void launchWindbot(path_stringview args);
+void launchWindbot(epro::path_stringview args);
 
-void installUpdate(path_stringview args);
+void installUpdate(epro::path_stringview args);
 
-void openUrl(path_stringview url);
+void openUrl(epro::path_stringview url);
 
-void openFile(path_stringview file);
+void openFile(epro::path_stringview file);
 
-void setTextToClipboard(epro_wstringview text);
+void setTextToClipboard(epro::wstringview text);
 
 const wchar_t* getTextFromClipboard();
 }

@@ -25,7 +25,7 @@ struct WindBot {
 
 	// Can be made static
 	uint32_t version;
-	path_string executablePath;
+	epro::path_string executablePath;
 };
 
 }

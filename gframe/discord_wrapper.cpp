@@ -27,7 +27,7 @@
 bool DiscordWrapper::Initialize() {
 #ifdef DISCORD_APP_ID
 #if defined(_WIN32) || defined(__linux__)
-	path_string param = fmt::format(formatstr, ygo::Utils::GetExePath(), ygo::Utils::working_dir);
+	epro::path_string param = fmt::format(formatstr, ygo::Utils::GetExePath(), ygo::Utils::working_dir);
 	Discord_Register(DISCORD_APP_ID, ygo::Utils::ToUTF8IfNeeded(param).data());
 #else
 	RegisterURL(DISCORD_APP_ID);

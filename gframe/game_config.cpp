@@ -34,7 +34,7 @@ GameConfig::GameConfig() {
 	}
 }
 
-bool GameConfig::Load(const path_char* filename)
+bool GameConfig::Load(const epro::path_char* filename)
 {
 	std::ifstream conf_file(filename, std::ifstream::in);
 	if(!conf_file.is_open())
@@ -227,7 +227,7 @@ inline void Serialize(std::ofstream& conf_file, const char* name, std::wstring v
 	conf_file << name << " = " << BufferIO::EncodeUTF8s(value) << "\n";
 }
 
-bool GameConfig::Save(const path_char* filename)
+bool GameConfig::Save(const epro::path_char* filename)
 {
 	std::ofstream conf_file(filename, std::ofstream::out);
 	if (!conf_file.is_open())

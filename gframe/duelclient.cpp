@@ -66,7 +66,7 @@ uint16_t DuelClient::temp_port = 0;
 uint16_t DuelClient::temp_ver = 0;
 bool DuelClient::try_needed = false;
 
-std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro_wstringview address, epro_wstringview _port) {
+std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::wstringview address, epro::wstringview _port) {
 	char ip[20];
 	BufferIO::CopyWStr(address.data(), ip, 16);
 	uint32_t remote_addr = htonl(inet_addr(ip));
@@ -94,7 +94,7 @@ std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro_wstringview address
 	return { remote_addr, (uint16_t)std::stoi(_port.data()) };
 }
 
-std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro_wstringview address, int port) {
+std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::wstringview address, int port) {
 	return DuelClient::ResolveServer(address, fmt::to_wstring(port));
 }
 
@@ -4269,7 +4269,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 			pHP->ipaddr = ipaddr;
 			hosts.push_back(*pHP);
 			int rule;
-			auto GetRuleString = [&]()-> epro_wstringview {
+			auto GetRuleString = [&]()-> epro::wstringview {
 				static std::wstring tmp;
 				if(pHP->host.handshake == SERVER_HANDSHAKE) {
 					mainGame->GetMasterRule((pHP->host.duel_flag_low | ((uint64_t)pHP->host.duel_flag_high) << 32) & ~DUEL_RELAY, pHP->host.forbiddentypes, &rule);
@@ -4280,7 +4280,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 				tmp = fmt::format(L"MR {}", (rule == 0) ? 3 : rule);
 				return tmp;
 			};
-			auto GetIsCustom = [&]()-> epro_wstringview {
+			auto GetIsCustom = [&]()-> epro::wstringview {
 				if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
 				   && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck
 				   && rule == DEFAULT_DUEL_RULE && pHP->host.extra_rules == 0)

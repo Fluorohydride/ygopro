@@ -453,7 +453,7 @@ inline void DrawShadowTextPos(irr::gui::CGUITTFont* font, const T& text, const i
 #define __forceinline __attribute__((always_inline)) inline
 #endif
 template<typename... Args>
-__forceinline void DrawShadowTextPos(irr::gui::CGUITTFont* font, epro_wstringview text, Args&&... args) {
+__forceinline void DrawShadowTextPos(irr::gui::CGUITTFont* font, epro::wstringview text, Args&&... args) {
 	const irr::core::ustring _text(text.data(), text.size());
 	DrawShadowTextPos(font, _text, std::forward<Args>(args)...);
 }
@@ -742,7 +742,7 @@ void Game::DrawPendScale(ClientCard* pcard) {
 /*
 Draws the text in the middle of the bottom side of the zone
 */
-void Game::DrawStackIndicator(epro_wstringview text, irr::video::S3DVertex* v, bool opponent) {
+void Game::DrawStackIndicator(epro::wstringview text, irr::video::S3DVertex* v, bool opponent) {
 	const irr::core::ustring utext(text.data(), text.size());
 	const auto dim = textFont->getDimension(utext) / 2;
 	//int width = dim.Width / 2, height = dim.Height / 2;

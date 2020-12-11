@@ -492,7 +492,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_EXPORT_DECK: {
-				auto sanitize = [](path_string text) {
+				auto sanitize = [](epro::path_string text) {
 					const wchar_t chars[] = L"<>:\"/\\|?*";
 					for(auto& forbid : chars)
 						text.erase(std::remove(text.begin(), text.end(), forbid), text.end());

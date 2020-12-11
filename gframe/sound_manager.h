@@ -52,7 +52,7 @@ public:
 		ATTACK,
 		ACTIVATE
 	};
-	SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, path_stringview working_directory);
+	SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, epro::path_stringview working_directory);
 	bool IsUsable();
 	void RefreshBGMList();
 	void RefreshChantsList();
@@ -74,7 +74,7 @@ private:
 	int bgm_scene = -1;
 	randengine rnd;
 	std::unique_ptr<SoundBackend> mixer;
-	void RefreshBGMDir(path_string path, BGM scene);
+	void RefreshBGMDir(epro::path_string path, BGM scene);
 	bool soundsEnabled = false;
 	bool musicEnabled = false;
 	std::string working_dir = "./";

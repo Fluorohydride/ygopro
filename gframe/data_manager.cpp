@@ -23,7 +23,7 @@ void DataManager::ClearLocaleTexts() {
 	locales.clear();
 }
 
-bool DataManager::LoadLocaleDB(const path_string& _file, bool usebuffer) {
+bool DataManager::LoadLocaleDB(const epro::path_string& _file, bool usebuffer) {
 	sqlite3* pDB;
 	cur_database = Utils::ToUTF8IfNeeded(_file);
 	if(sqlite3_open_v2(cur_database.c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
@@ -31,7 +31,7 @@ bool DataManager::LoadLocaleDB(const path_string& _file, bool usebuffer) {
 	return ParseLocaleDB(pDB);
 }
 
-bool DataManager::LoadDB(const path_string& _file, bool usebuffer) {
+bool DataManager::LoadDB(const epro::path_string& _file, bool usebuffer) {
 	cur_database = Utils::ToUTF8IfNeeded(_file);
 	if(usebuffer) {
 		std::ifstream db(_file, std::ifstream::binary);
@@ -166,7 +166,7 @@ bool DataManager::ParseLocaleDB(sqlite3* pDB) {
 	sqlite3_close(pDB);
 	return true;
 }
-bool DataManager::LoadStrings(const path_string& file) {
+bool DataManager::LoadStrings(const epro::path_string& file) {
 	std::ifstream string_file(file, std::ifstream::in);
 	if(!string_file.is_open())
 		return false;
@@ -203,7 +203,7 @@ bool DataManager::LoadStrings(const path_string& file) {
 	string_file.close();
 	return true;
 }
-bool DataManager::LoadLocaleStrings(const path_string& file) {
+bool DataManager::LoadLocaleStrings(const epro::path_string& file) {
 	std::ifstream string_file(file, std::ifstream::in);
 	if(!string_file.is_open())
 		return false;
@@ -278,19 +278,19 @@ bool DataManager::GetString(uint32_t code, CardString* pStr) {
 	*pStr = *csit->second.GetStrings();
 	return true;
 }
-epro_wstringview DataManager::GetName(uint32_t code) {
+epro::wstringview DataManager::GetName(uint32_t code) {
 	auto csit = cards.find(code);
 	if(csit == cards.end() || csit->second.GetStrings()->name.empty())
 		return unknown_string;
 	return csit->second.GetStrings()->name;
 }
-epro_wstringview DataManager::GetText(uint32_t code) {
+epro::wstringview DataManager::GetText(uint32_t code) {
 	auto csit = cards.find(code);
 	if(csit == cards.end() || csit->second.GetStrings()->text.empty())
 		return unknown_string;
 	return csit->second.GetStrings()->text;
 }
-epro_wstringview DataManager::GetDesc(uint64_t strCode, bool compat) {
+epro::wstringview DataManager::GetDesc(uint64_t strCode, bool compat) {
 	uint32_t code = 0;
 	uint32_t stringid = 0;
 	if(compat) {
@@ -309,25 +309,25 @@ epro_wstringview DataManager::GetDesc(uint64_t strCode, bool compat) {
 		return unknown_string;
 	return csit->second.GetStrings()->desc[stringid];
 }
-epro_wstringview DataManager::GetSysString(uint32_t code) {
+epro::wstringview DataManager::GetSysString(uint32_t code) {
 	auto csit = _sysStrings.GetLocale(code);
 	if(!csit)
 		return unknown_string;
 	return csit;
 }
-epro_wstringview DataManager::GetVictoryString(int code) {
+epro::wstringview DataManager::GetVictoryString(int code) {
 	auto csit = _victoryStrings.GetLocale(code);
 	if(!csit)
 		return unknown_string;
 	return csit;
 }
-epro_wstringview DataManager::GetCounterName(uint32_t code) {
+epro::wstringview DataManager::GetCounterName(uint32_t code) {
 	auto csit = _counterStrings.GetLocale(code);
 	if(!csit)
 		return unknown_string;
 	return csit;
 }
-epro_wstringview DataManager::GetSetName(uint32_t code) {
+epro::wstringview DataManager::GetSetName(uint32_t code) {
 	auto csit = _setnameStrings.GetLocale(code);
 	if(!csit)
 		return L"";
@@ -358,7 +358,7 @@ std::wstring DataManager::GetNumString(int num, bool bracket) {
 		return fmt::to_wstring(num);
 	return fmt::format(L"({})", num);
 }
-epro_wstringview DataManager::FormatLocation(uint32_t location, int sequence) {
+epro::wstringview DataManager::FormatLocation(uint32_t location, int sequence) {
 	if(location == 0x8) {
 		if(sequence < 5)
 			return GetSysString(1003);

@@ -5,7 +5,7 @@
 
 namespace ygo {
 
-void ErrorLog(epro_stringview msg) {
+void ErrorLog(epro::stringview msg) {
 	std::ofstream log("error.log", std::ofstream::app);
 	if (!log.is_open())
 		return;

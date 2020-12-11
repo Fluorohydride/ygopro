@@ -25,7 +25,7 @@ void ReplayPacket::Set(uint8_t msg, char* buf, uint32_t len) {
 	if(len)
 		memcpy(data.data(), buf, data.size());
 }
-void Replay::BeginRecord(bool write, path_string name) {
+void Replay::BeginRecord(bool write, epro::path_string name) {
 	Reset();
 	if(fp.is_open())
 		fp.close();
@@ -91,7 +91,7 @@ void Replay::EndRecord(size_t size) {
 	comp_data.resize(comp_size);
 	is_recording = false;
 }
-void Replay::SaveReplay(const path_string& name) {
+void Replay::SaveReplay(const epro::path_string& name) {
 	std::ofstream replay_file(fmt::format(EPRO_TEXT("./replay/{}.yrpX"), name), std::ofstream::binary);
 	if(!replay_file.is_open())
 		return;
@@ -138,7 +138,7 @@ bool Replay::IsExportable() {
 		return false;
 	return true;
 }
-bool Replay::OpenReplay(const path_string& name) {
+bool Replay::OpenReplay(const epro::path_string& name) {
 	if(replay_name == name) {
 		Rewind();
 		return true;
@@ -161,10 +161,10 @@ bool Replay::OpenReplay(const path_string& name) {
 	replay_name.clear();
 	return false;
 }
-bool Replay::DeleteReplay(const path_string& name) {
+bool Replay::DeleteReplay(const epro::path_string& name) {
 	return Utils::FileDelete(name);
 }
-bool Replay::RenameReplay(const path_string& oldname, const path_string& newname) {
+bool Replay::RenameReplay(const epro::path_string& oldname, const epro::path_string& newname) {
 	return Utils::FileMove(oldname, newname);
 }
 bool Replay::GetNextResponse(ReplayResponse* res) {
@@ -335,7 +335,7 @@ int Replay::GetPlayersCount(int side) {
 int Replay::GetTurnsCount() {
 	return turn_count;
 }
-path_string Replay::GetReplayName() {
+epro::path_string Replay::GetReplayName() {
 	return replay_name;
 }
 std::vector<uint8_t> Replay::GetSerializedBuffer() {

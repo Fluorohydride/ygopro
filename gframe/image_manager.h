@@ -36,7 +36,7 @@ public:
 		THUMB
 	};
 private:
-	using image_path = std::pair<irr::video::IImage*, path_string>;
+	using image_path = std::pair<irr::video::IImage*, epro::path_string>;
 	using loading_map = std::map<int, std::future<image_path>>;
 	using chrono_time = uint64_t;
 	using texture_map = std::unordered_map<uint32_t, irr::video::ITexture*>;
@@ -44,7 +44,7 @@ public:
 	ImageManager();
 	~ImageManager();
 	bool Initial();
-	void ChangeTextures(path_stringview path);
+	void ChangeTextures(epro::path_stringview path);
 	void ResetTextures();
 	void SetDevice(irr::IrrlichtDevice* dev);
 	void ClearTexture(bool resize = false);
@@ -121,7 +121,7 @@ private:
 	void ClearFutureObjects();
 	void RefreshCovers();
 	image_path LoadCardTexture(uint32_t code, imgType type, std::atomic<irr::s32>& width, std::atomic<irr::s32>& height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
-	path_string textures_path;
+	epro::path_string textures_path;
 	std::pair<std::atomic<irr::s32>, std::atomic<irr::s32>> sizes[3];
 	std::atomic<chrono_time> timestamp_id;
 	std::map<irr::io::path, irr::video::ITexture*> g_txrCache;

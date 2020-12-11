@@ -55,7 +55,7 @@ size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
 	out->write(ptr, nbytes);
 	return nbytes;
 }
-const path_char* GetExtension(char* header) {
+const epro::path_char* GetExtension(char* header) {
 	int res = CheckImageHeader(header);
 	if(res == PNG_FILE)
 		return EPRO_TEXT(".png");
@@ -65,9 +65,9 @@ const path_char* GetExtension(char* header) {
 }
 void ImageDownloader::DownloadPic() {
 	Utils::SetThreadName("PicDownloader");
-	path_string dest_folder;// = fmt::format(EPRO_TEXT("./pics/{}"), code);
-	path_string name;// = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
-	path_string ext;
+	epro::path_string dest_folder;// = fmt::format(EPRO_TEXT("./pics/{}"), code);
+	epro::path_string name;// = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
+	epro::path_string ext;
 	while(!stop_threads) {
 		std::unique_lock<std::mutex> lck(pic_download);
 		while(to_download.size() == 0) {
@@ -171,7 +171,7 @@ ImageDownloader::downloadStatus ImageDownloader::GetDownloadStatus(uint32_t code
 		return NONE;
 	return downloading_images[index][code].status;
 }
-path_string ImageDownloader::GetDownloadPath(uint32_t code, imgType type) {
+epro::path_string ImageDownloader::GetDownloadPath(uint32_t code, imgType type) {
 	if(type == THUMB)
 		type = ART;
 	int index = static_cast<int>(type);
