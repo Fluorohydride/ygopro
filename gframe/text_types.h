@@ -19,15 +19,15 @@ namespace epro {
 #ifndef EPRO_TEXT
 #define EPRO_TEXT(x) L##x
 #endif
-using epro::path_char = wchar_t;
+using path_char = wchar_t;
 #else
 #ifndef EPRO_TEXT
 #define EPRO_TEXT(x) x
 #endif
-using epro::path_char = char;
+using path_char = char;
 #endif // UNICODE
-using epro::epro::path_string = std::basic_string<epro::path_char>;
-using epro::epro::path_stringview = nonstd::basic_string_view<epro::path_char>;
+using path_string = std::basic_string<path_char>;
+using path_stringview = nonstd::basic_string_view<path_char>;
 using stringview = nonstd::basic_string_view<char>;
 using wstringview = nonstd::basic_string_view<wchar_t>;
 }
