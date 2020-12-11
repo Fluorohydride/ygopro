@@ -113,13 +113,11 @@ bool GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device)
 		return false;
 	auto now = std::time(nullptr);
 	path_string filename = fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now));
-	if(!driver->writeImageToFile(image, { filename.data(), static_cast<irr::u32>(filename.size()) })) {
+	auto written = driver->writeImageToFile(image, { filename.data(), static_cast<irr::u32>(filename.size()) });
+	if(!written)
 		device->getLogger()->log(L"Failed to take screenshot.", irr::ELL_WARNING);
-		image->drop();
-		return false;
-	}
 	image->drop();
-	return true;
+	return written;
 }
 
 void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
