@@ -256,7 +256,8 @@ template<typename T>
 T Utils::ToUpperChar(T c) {
 #define IN_INTERVAL(start, end) (c >= start && c <= end)
 	if(IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)
-	   || c == 0x2c6f) //latin capital letter turned a
+	   || c == 0x2c6f|| c == 0x250 //latin capital/small letter turned a
+	   || c == 0x2200) //for all
 	{
 		return static_cast<T>('A');
 	}
