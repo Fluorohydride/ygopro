@@ -761,13 +761,13 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	}
 #ifndef __ANDROID__
 	case irr::EET_DROP_EVENT: {
-		static std::wstring to_open_deck;
+		static std::wstring to_open_file;
 		switch(event.DropEvent.DropType) {
 			case irr::DROP_FILE: {
 				irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 				if(root->getElementFromPoint({ event.DropEvent.X, event.DropEvent.Y }) != root)
 					break;
-				to_open_deck = event.DropEvent.Text;
+				to_open_file = event.DropEvent.Text;
 				break;
 			}
 			case irr::DROP_TEXT: {
@@ -826,13 +826,16 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				return true;
 			}
 			case irr::DROP_END:	{
-				if(to_open_deck.size()) {
-					if(Utils::GetFileExtension(to_open_deck) == L"ydk" && gdeckManager->LoadDeck(Utils::ToPathString(to_open_deck), nullptr, true)) {
-						auto name = Utils::GetFileName(to_open_deck);
+				if(to_open_file.size()) {
+					auto extension = Utils::GetFileExtension(to_open_file);
+					if(extension == L"ydk" && gdeckManager->LoadDeck(Utils::ToPathString(to_open_file), nullptr, true)) {
+						auto name = Utils::GetFileName(to_open_file);
 						mainGame->ebDeckname->setText(name.data());
 						mainGame->cbDBDecks->setSelected(-1);
+					} else if(extension == L"pem" || extension == L"cer" || extension == L"crt") {
+						gGameConfig->ssl_certificate_path = BufferIO::EncodeUTF8s(to_open_file);
 					}
-					to_open_deck.clear();
+					to_open_file.clear();
 				}
 				break;
 			}

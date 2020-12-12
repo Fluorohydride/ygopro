@@ -994,6 +994,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 							ClickButton(mainGame->btnReplayMode);
 						ClickButton(mainGame->btnLoadReplay);
 						return true;
+					} else if(extension == L"pem" || extension == L"cer" || extension == L"crt") {
+						gGameConfig->ssl_certificate_path = BufferIO::EncodeUTF8s(to_open_file);
 					}
 					to_open_file.clear();
 				}
