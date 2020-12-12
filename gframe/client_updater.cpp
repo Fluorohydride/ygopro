@@ -83,7 +83,8 @@ CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 	curl_easy_setopt(curl_handle, CURLOPT_XFERINFOFUNCTION, progress_callback);
 	curl_easy_setopt(curl_handle, CURLOPT_XFERINFODATA, payload2);
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 0L);
-	if(ygo::gGameConfig->ssl_certificate_path.size())
+	if(ygo::gGameConfig->ssl_certificate_path.size()
+	   && ygo::Utils::FileExists(ygo::Utils::ToPathString(ygo::gGameConfig->ssl_certificate_path)))
 		curl_easy_setopt(curl_handle, CURLOPT_CAINFO, ygo::gGameConfig->ssl_certificate_path.c_str());
 #ifdef _WIN32
 	else

@@ -174,7 +174,7 @@ int ServerLobby::GetRoomsThread() {
 
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROXY, "*"); 
 	curl_easy_setopt(curl_handle, CURLOPT_DNS_CACHE_TIMEOUT, 0);
-	if(gGameConfig->ssl_certificate_path.size())
+	if(gGameConfig->ssl_certificate_path.size() && Utils::FileExists(Utils::ToPathString(gGameConfig->ssl_certificate_path)))
 		curl_easy_setopt(curl_handle, CURLOPT_CAINFO, gGameConfig->ssl_certificate_path.data());
 #ifdef _WIN32
 	else

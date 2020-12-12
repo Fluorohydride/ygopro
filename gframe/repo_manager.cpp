@@ -58,7 +58,7 @@ bool GitRepo::Sanitize() {
 
 RepoManager::RepoManager() {
 	git_libgit2_init();
-	if(gGameConfig->ssl_certificate_path.size())
+	if(gGameConfig->ssl_certificate_path.size() && Utils::FileExists(Utils::ToPathString(gGameConfig->ssl_certificate_path)))
 		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, gGameConfig->ssl_certificate_path.data(), "/system/etc/security/cacerts");
 #ifdef _WIN32
 	else
