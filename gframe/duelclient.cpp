@@ -291,12 +291,12 @@ T getStruct(void* data, size_t len) {
 
 void DuelClient::ParserThread() {
 	Utils::SetThreadName("ParserThread");
-	while(true) {
+	while(!stop_threads) {
 		std::unique_lock<std::mutex> lck(to_analyze_mutex);
-		while(to_analyze.size() == 0) {
+		while(to_analyze.empty()) {
+			cv.wait(lck);
 			if(stop_threads)
 				return;
-			cv.wait(lck);
 		}
 		auto pkt = std::move(to_analyze.front());
 		to_analyze.pop_front();

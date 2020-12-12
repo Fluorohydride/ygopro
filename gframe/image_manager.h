@@ -131,7 +131,7 @@ private:
 	std::condition_variable cv;
 	loading_map loading_pics[4];
 	std::deque<std::pair<loading_map::key_type, loading_map::mapped_type>> to_clear;
-	bool stop_threads;
+	std::atomic<bool> stop_threads;
 };
 
 #define CARD_IMG_WIDTH		177

@@ -200,12 +200,12 @@ void RepoManager::SetRepoPercentage(const std::string& path, int percent)
 
 void RepoManager::CloneOrUpdateTask() {
 	Utils::SetThreadName("Git update task");
-	while(true) {
+	while(fetchReturnValue != -1) {
 		std::unique_lock<std::mutex> lck(syncing_mutex);
-		while(to_sync.size() == 0) {
+		while(to_sync.empty()) {
+			cv.wait(lck);
 			if(fetchReturnValue == -1)
 				return;
-			cv.wait(lck);
 		}
 		auto& _repo = *to_sync.front();
 		to_sync.pop();

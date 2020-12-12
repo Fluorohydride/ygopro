@@ -94,11 +94,11 @@ void ImageDownloader::DownloadPic() {
 	while(!stop_threads) {
 		std::unique_lock<std::mutex> lck(pic_download);
 		while(to_download.empty()) {
+			cv.wait(lck);
 			if(stop_threads) {
 				curl_easy_cleanup(curl);
 				return;
 			}
-			cv.wait(lck);
 		}
 		auto file = std::move(to_download.front());
 		to_download.pop();

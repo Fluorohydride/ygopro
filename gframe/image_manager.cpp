@@ -239,12 +239,12 @@ void ImageManager::RefreshCachedTextures() {
 }
 void ImageManager::ClearFutureObjects() {
 	Utils::SetThreadName("ImgObjsClear");
-	while(true) {
+	while(!stop_threads) {
 		std::unique_lock<std::mutex> lck(obj_clear_lock);
-		while(to_clear.size() == 0) {
+		while(to_clear.empty()) {
+			cv.wait(lck);
 			if(stop_threads)
 				return;
-			cv.wait(lck);
 		}
 		auto img = std::move(to_clear.front());
 		to_clear.pop_front();
