@@ -6,6 +6,7 @@
 #define _tmain main
 #include <unistd.h>
 #endif
+#include <curl/curl.h>
 #include <event2/thread.h>
 #include <IrrlichtDevice.h>
 #include <IGUIButton.h>
@@ -164,22 +165,24 @@ void CheckArguments(int argc, epro::path_char* argv[]) {
 #undef SET_TXT
 #undef PARAM_CHECK
 
-
-#ifdef _WIN32
-inline void ThreadsCleanup() {
-	WSACleanup();
-	libevent_global_shutdown();
-}
 inline void ThreadsStartup() {
+	curl_global_init(CURL_GLOBAL_NOTHING);
+#ifdef _WIN32
 	const WORD wVersionRequested = MAKEWORD(2, 2);
 	WSADATA wsaData;
 	WSAStartup(wVersionRequested, &wsaData);
 	evthread_use_windows_threads();
-}
 #else
-#define ThreadsCleanup() libevent_global_shutdown()
-#define ThreadsStartup() evthread_use_pthreads()
-#endif //_WIN32
+	evthread_use_pthreads();
+#endif
+}
+inline void ThreadsCleanup() {
+	curl_global_cleanup();
+	libevent_global_shutdown();
+#ifdef _WIN32
+	WSACleanup();
+#endif
+}
 
 int _tmain(int argc, epro::path_char* argv[]) {
 	epro::path_stringview dest{};
