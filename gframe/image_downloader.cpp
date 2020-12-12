@@ -8,6 +8,12 @@
 
 namespace ygo {
 
+struct curl_payload {
+	std::ofstream* stream;
+	char header[8];
+	int header_written;
+};
+
 ImageDownloader::ImageDownloader() {
 	stop_threads = false;
 	for(auto& thread : download_threads) {
@@ -37,12 +43,7 @@ int CheckImageHeader(void* header) {
 		return 0;
 }
 size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
-	struct payload {
-		std::ofstream* stream;
-		char header[8];
-		int header_written;
-	};
-	auto data = static_cast<payload*>(userdata);
+	auto data = static_cast<curl_payload*>(userdata);
 	if(data->header_written < sizeof(data->header)) {
 		auto increase = std::min(nmemb * size, (size_t)(sizeof(data->header) - data->header_written));
 		memcpy(&data->header[data->header_written], ptr, increase);
@@ -65,14 +66,38 @@ const epro::path_char* GetExtension(char* header) {
 }
 void ImageDownloader::DownloadPic() {
 	Utils::SetThreadName("PicDownloader");
-	epro::path_string dest_folder;// = fmt::format(EPRO_TEXT("./pics/{}"), code);
-	epro::path_string name;// = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
-	epro::path_string ext;
+	curl_payload payload;
+	CURL* curl = [&payload] {
+		auto curl = curl_easy_init();
+		if(!curl)
+			return curl;
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &payload);
+		if(gGameConfig->ssl_certificate_path.size() && Utils::FileExists(Utils::ToPathString(gGameConfig->ssl_certificate_path)))
+			curl_easy_setopt(curl, CURLOPT_CAINFO, gGameConfig->ssl_certificate_path.data());
+#ifdef _WIN32
+		else
+			curl_easy_setopt(curl, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
+#endif
+		return curl;
+	}();
+	if(curl == nullptr) {
+		ErrorLog("Failed to start downloader thread");
+		return;
+	}
+	auto SetPayloadAndUrl = [&payload,&curl](epro::stringview url, std::ofstream* stream) {
+		payload.stream = stream;
+		memset(&payload.header, 0, sizeof(payload.header));
+		payload.header_written = 0;
+		curl_easy_setopt(curl, CURLOPT_URL, url.data());
+	};
 	while(!stop_threads) {
 		std::unique_lock<std::mutex> lck(pic_download);
-		while(to_download.size() == 0) {
-			if(stop_threads)
+		while(to_download.empty()) {
+			if(stop_threads) {
+				curl_easy_cleanup(curl);
 				return;
+			}
 			cv.wait(lck);
 		}
 		auto file = std::move(to_download.front());
@@ -82,65 +107,48 @@ void ImageDownloader::DownloadPic() {
 		downloading_images[type][file.code].status = DOWNLOADING;
 		downloading.push_back(std::move(file));
 		lck.unlock();
-		name = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
-		if(type == THUMB)
-			type = ART;
-		switch(type) {
-			case ART:
-			case THUMB: {
-				dest_folder = fmt::format(EPRO_TEXT("./pics/{}"), code);
-				break;
+		auto name = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
+		if(type == imgType::THUMB)
+			type = imgType::ART;
+		const auto dest_folder = [type, &name, code]()->epro::path_string {
+			epro::path_char* dest = nullptr;
+			switch(type) {
+				default:
+				case imgType::ART:
+				case imgType::THUMB: {
+					dest = EPRO_TEXT("./pics/{}");
+					break;
+				}
+				case imgType::FIELD: {
+					dest = EPRO_TEXT("./pics/field/{}");
+					name.append(EPRO_TEXT("_f"));
+					break;
+				}
+				case imgType::COVER: {
+					dest = EPRO_TEXT("./pics/cover/{}");
+					name.append(EPRO_TEXT("_c"));
+					break;
+				}
 			}
-			case FIELD: {
-				dest_folder = fmt::format(EPRO_TEXT("./pics/field/{}"), code);
-				name.append(EPRO_TEXT("_f"));
-				break;
-			}
-			case COVER: {
-				dest_folder = fmt::format(EPRO_TEXT("./pics/cover/{}"), code);
-				name.append(EPRO_TEXT("_c"));
-				break;
-			}
-		}
-		auto& map = downloading_images[static_cast<int>(type)];
+			return fmt::format(dest, code);
+		}();
+		auto& map = downloading_images[type];
+		epro::path_string ext;
 		for(auto& src : pic_urls) {
 			if(src.type != type)
 				continue;
-			CURL* curl = nullptr;
-			struct {
-				std::ofstream* stream;
-				char header[8] = { 0 };
-				int header_written = 0;
-			} payload;
 			std::ofstream fp(name, std::ofstream::binary);
 			if(fp.is_open()) {
-				payload.stream = &fp;
-				CURLcode res;
-				curl = curl_easy_init();
-				if(curl) {
-					curl_easy_setopt(curl, CURLOPT_URL, fmt::format(src.url, code).data());
-					curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-					curl_easy_setopt(curl, CURLOPT_WRITEDATA, &payload);
-					if(gGameConfig->ssl_certificate_path.size() && Utils::FileExists(Utils::ToPathString(gGameConfig->ssl_certificate_path)))
-						curl_easy_setopt(curl, CURLOPT_CAINFO, gGameConfig->ssl_certificate_path.data());
-#ifdef _WIN32
-					else
-						curl_easy_setopt(curl, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
-#endif
-					res = curl_easy_perform(curl);
-					curl_easy_cleanup(curl);
-					fp.close();
-					if(res == CURLE_OK) {
-						ext = GetExtension(payload.header);
-						if(!Utils::FileMove(name, dest_folder + ext)) {
-							Utils::FileDelete(name);
-							ext.clear();
-						}
-						break;
-					} else {
+				SetPayloadAndUrl(fmt::format(src.url, code), &fp);
+				CURLcode res = curl_easy_perform(curl);
+				fp.close();
+				if(res == CURLE_OK) {
+					ext = GetExtension(payload.header);
+					if(!Utils::FileMove(name, dest_folder + ext))
 						Utils::FileDelete(name);
-					}
-				}
+					break;
+				} else
+					Utils::FileDelete(name);
 			}
 		}
 		lck.lock();
