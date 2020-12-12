@@ -828,7 +828,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case irr::DROP_END:	{
 				if(to_open_file.size()) {
 					auto extension = Utils::GetFileExtension(to_open_file);
-					if(extension == L"ydk" && gdeckManager->LoadDeck(Utils::ToPathString(to_open_file), nullptr, true)) {
+					if(!mainGame->is_siding && extension == L"ydk" && gdeckManager->LoadDeck(Utils::ToPathString(to_open_file), nullptr, true)) {
 						auto name = Utils::GetFileName(to_open_file);
 						mainGame->ebDeckname->setText(name.data());
 						mainGame->cbDBDecks->setSelected(-1);
