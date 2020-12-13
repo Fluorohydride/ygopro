@@ -42,6 +42,7 @@ SoundManager::SoundManager(double sounds_volume, double music_volume, bool sound
 	RefreshChantsList();
 	succesfully_initied = true;
 #else
+	fmt::print("No audio backend available.\nAudio will be disabled.\n");
 	succesfully_initied = soundsEnabled = musicEnabled = false;
 	return;
 #endif // BACKEND
