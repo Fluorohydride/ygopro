@@ -2263,6 +2263,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			irr::gui::IGUIElement* elem = root->getElementFromPoint({ event.MouseInput.X, event.MouseInput.Y });
 			if(elem == mainGame->stName) {
 				auto path = mainGame->FindScript(fmt::format(EPRO_TEXT("c{}.lua"), mainGame->showingcard));
+				if(path.empty()) {
+					auto cd = gDataManager->GetCardData(mainGame->showingcard);
+					if(cd && cd->alias && (cd->alias - mainGame->showingcard < CARD_ARTWORK_VERSIONS_OFFSET || mainGame->showingcard - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
+						path = mainGame->FindScript(fmt::format(EPRO_TEXT("c{}.lua"), cd->alias));
+				}
 				if(path.size() && path != EPRO_TEXT("archives"))
 					Utils::SystemOpen(path, Utils::OPEN_FILE);
 			}
