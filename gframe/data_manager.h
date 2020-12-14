@@ -85,19 +85,15 @@ public:
 
 class DataManager {
 public:
-	DataManager() {
-		cards.reserve(10000);
-		locales.reserve(10000);
-	}
+	DataManager();
 	~DataManager() {}
 	void ClearLocaleTexts();
-	bool LoadLocaleDB(const epro::path_string& file, bool usebuffer = false);
-	bool LoadDB(const epro::path_string& file, bool usebuffer = false);
+	bool LoadLocaleDB(const epro::path_string& file);
+	bool LoadDB(const epro::path_string& file);
 	bool LoadDBFromBuffer(const std::vector<char>& buffer, const std::string& filename = "");
 	bool LoadStrings(const epro::path_string& file);
 	bool LoadLocaleStrings(const epro::path_string& file);
 	void ClearLocaleStrings();
-	bool GetData(uint32_t code, CardData* pData);
 	CardDataC* GetCardData(uint32_t code);
 	bool GetString(uint32_t code, CardString* pStr);
 	epro::wstringview GetName(uint32_t code);
@@ -121,6 +117,7 @@ public:
 	std::unordered_map<uint32_t, CardDataM> cards;
 
 	static const wchar_t* unknown_string;
+	static std::string cur_database;
 	static void CardReader(void* payload, uint32_t code, OCG_CardData* data);
 	static bool deck_sort_lv(CardDataC* l1, CardDataC* l2);
 	static bool deck_sort_atk(CardDataC* l1, CardDataC* l2);
@@ -137,7 +134,7 @@ private:
 			auto search = map.find(code);
 			if(search == map.end() || search->second.first.empty())
 				return nullptr;
-			return search->second.second.size() ? search->second.second.c_str() : search->second.first.c_str();
+			return search->second.second.size() ? search->second.second.data() : search->second.first.data();
 		}
 		void ClearLocales() {
 			for(auto& elem : map)
@@ -150,6 +147,7 @@ private:
 			map[code].second = val;
 		}
 	};
+	sqlite3* OpenDb(epro::path_stringview file, const char* fielsystem = nullptr);
 	bool ParseDB(sqlite3* pDB);
 	bool ParseLocaleDB(sqlite3* pDB);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = nullptr);

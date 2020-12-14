@@ -12,7 +12,13 @@ namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
 
-std::string cur_database = "";
+std::string DataManager::cur_database = "";
+
+DataManager::DataManager() {
+	readonlymemvfs_init();
+	cards.reserve(10000);
+	locales.reserve(10000);
+}
 
 void DataManager::ClearLocaleTexts() {
 	for(auto& val : indexes) {
@@ -23,35 +29,32 @@ void DataManager::ClearLocaleTexts() {
 	locales.clear();
 }
 
-bool DataManager::LoadLocaleDB(const epro::path_string& _file, bool usebuffer) {
-	sqlite3* pDB;
-	cur_database = Utils::ToUTF8IfNeeded(_file);
-	if(sqlite3_open_v2(cur_database.c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
-		return Error(pDB);
-	return ParseLocaleDB(pDB);
+sqlite3* DataManager::OpenDb(epro::path_stringview file, const char* fielsystem) {
+	sqlite3* pDB{ nullptr };
+	if(fielsystem == nullptr)
+		cur_database = Utils::ToUTF8IfNeeded(file);
+	if(sqlite3_open_v2(cur_database.data(), &pDB, SQLITE_OPEN_READONLY, fielsystem) != SQLITE_OK) {
+		Error(pDB);
+		pDB = nullptr;
+	}
+	return pDB;
 }
 
-bool DataManager::LoadDB(const epro::path_string& _file, bool usebuffer) {
-	cur_database = Utils::ToUTF8IfNeeded(_file);
-	if(usebuffer) {
-		std::ifstream db(_file, std::ifstream::binary);
-		return LoadDBFromBuffer({ std::istreambuf_iterator<char>(db), std::istreambuf_iterator<char>() }, cur_database);
-	}
-	sqlite3* pDB;
-	if(sqlite3_open_v2(cur_database.c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
-		return Error(pDB);
-	return ParseDB(pDB);
+bool DataManager::LoadLocaleDB(const epro::path_string& file) {
+	return ParseLocaleDB(OpenDb(file));
+}
+
+bool DataManager::LoadDB(const epro::path_string& file) {
+	return ParseDB(OpenDb(file));
 }
 bool DataManager::LoadDBFromBuffer(const std::vector<char>& buffer, const std::string& filename) {
 	cur_database = filename;
-	sqlite3* pDB;
-	readonlymemvfs_init();
 	set_mem_db((void*)buffer.data(), buffer.size());
-	if(sqlite3_open_v2("0", &pDB, SQLITE_OPEN_READONLY, READONLY_MEM_VFS_NAME) != SQLITE_OK)
-		return Error(pDB);
-	return ParseDB(pDB);
+	return ParseDB(OpenDb(EPRO_TEXT("0"), READONLY_MEM_VFS_NAME));
 }
 bool DataManager::ParseDB(sqlite3* pDB) {
+	if(pDB == nullptr)
+		return false;
 	sqlite3_stmt* pStmt;
 	const char* sql = "select * from datas,texts where datas.id=texts.id ORDER BY texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
@@ -124,6 +127,8 @@ bool DataManager::ParseDB(sqlite3* pDB) {
 	return true;
 }
 bool DataManager::ParseLocaleDB(sqlite3* pDB) {
+	if(pDB == nullptr)
+		return false;
 	sqlite3_stmt* pStmt;
 	const char* sql = "select * from texts ORDER BY texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
@@ -253,14 +258,6 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 		sqlite3_finalize(pStmt);
 	sqlite3_close(pDB);
 	return false;
-}
-bool DataManager::GetData(uint32_t code, CardData* pData) {
-	auto cdit = cards.find(code);
-	if(cdit == cards.end())
-		return false;
-	if(pData)
-		*pData = *((CardData*)&cdit->second._data);
-	return true;
 }
 CardDataC* DataManager::GetCardData(uint32_t code) {
 	auto it = cards.find(code);
@@ -495,8 +492,9 @@ std::wstring DataManager::FormatLinkMarker(uint32_t link_marker) {
 	return res;
 }
 void DataManager::CardReader(void* payload, uint32_t code, OCG_CardData* data) {
-	if(!static_cast<DataManager*>(payload)->GetData(code, (CardData*)data))
-		memset(data, 0, sizeof(CardData));
+	auto carddata = static_cast<DataManager*>(payload)->GetCardData(code);
+	if(carddata != nullptr)
+		memcpy(data, carddata, sizeof(CardData));
 }
 bool is_skill(uint32_t type) {
 	return (type & (TYPE_SKILL | TYPE_ACTION));
