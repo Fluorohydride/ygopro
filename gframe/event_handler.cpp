@@ -2270,6 +2270,8 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				}
 				if(path.size() && path != EPRO_TEXT("archives"))
 					Utils::SystemOpen(path, Utils::OPEN_FILE);
+			} else if(elem == mainGame->stPasscodeScope) {
+				mainGame->env->getOSOperator()->copyToClipboard(fmt::format(L"{}", mainGame->showingcard).data());
 			}
 		}
 		break;
