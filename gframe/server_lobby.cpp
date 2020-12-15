@@ -215,7 +215,7 @@ int ServerLobby::GetRoomsThread() {
 					room.info.best_of = GET("best_of", int);
 					const auto flag = GET("duel_flag", uint64_t);
 					room.info.duel_flag_low = flag & 0xffffffff;
-					room.info.duel_flag_low = (flag >> 32) & 0xffffffff;
+					room.info.duel_flag_high = (flag >> 32) & 0xffffffff;
 					room.info.forbiddentypes = GET("forbidden_types", int);
 					room.info.extra_rules = GET("extra_rules", int);
 					room.info.start_lp = GET("start_lp", int);
