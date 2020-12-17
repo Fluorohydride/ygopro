@@ -730,19 +730,21 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		mainGame->dInfo.duel_field = mainGame->GetMasterRule(params, pkt.info.forbiddentypes, &rule);
 		if(mainGame->dInfo.compat_mode)
 			rule = pkt.info.duel_rule;
-		if((params & DUEL_MODE_SPEED) == params) {
-			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1258)));
-		} else if((params & DUEL_MODE_RUSH) == params) {
-			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1259)));
-		} else if((params & DUEL_MODE_GOAT) == params) {
-			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1248)));
-		} else if (rule == 6) {
-			uint64_t filter = 0x100;
-			for (int i = 0; filter && i < sizeofarr(mainGame->chkCustomRules); ++i, filter <<= 1)
-				if (params & filter) {
-					strR.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1631 + i)));
-				}
-			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1630)));
+		if (rule >= 6) {
+			if(params == DUEL_MODE_SPEED) {
+				str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1258)));
+			} else if(params == DUEL_MODE_RUSH) {
+				str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1259)));
+			} else if(params  == DUEL_MODE_GOAT) {
+				str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1248)));
+			} else {
+				uint64_t filter = 0x100;
+				for(int i = 0; filter && i < sizeofarr(mainGame->chkCustomRules); ++i, filter <<= 1)
+					if(params & filter) {
+						strR.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1631 + i)));
+					}
+				str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1630)));
+			}
 		} else if (rule != DEFAULT_DUEL_RULE) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1260 + rule - 1)));
 		}
