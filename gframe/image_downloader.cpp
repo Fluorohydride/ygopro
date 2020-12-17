@@ -111,7 +111,7 @@ void ImageDownloader::DownloadPic() {
 		if(type == imgType::THUMB)
 			type = imgType::ART;
 		const auto dest_folder = [type, &name, code]()->epro::path_string {
-			epro::path_char* dest = nullptr;
+			const epro::path_char* dest = nullptr;
 			switch(type) {
 				default:
 				case imgType::ART:
