@@ -140,9 +140,9 @@ bool CheckMd5(std::fstream& instream, uint8_t md5[MD5_DIGEST_LENGTH]) {
 
 void DeleteOld() {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT(".old"), ygo::Utils::GetExePath()));
+	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT("{}.old"), ygo::Utils::GetExePath()));
 #if !defined(__linux__)
-	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT(".old"), ygo::Utils::GetCorePath()));
+	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT("{}.old"), ygo::Utils::GetCorePath()));
 #endif
 #endif
 }
