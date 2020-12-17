@@ -20,12 +20,16 @@
 /*
 //can't use c runtime functions as the runtime might not have been loaded yet
 void ___write(const char* ch) {
-	DWORD dwCount, dwMsgLen;
-	static HANDLE hOut;
-	if(!hOut)
-		hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	WriteConsoleA(hOut, ch, strlen(ch), &dwCount, NULL);
-}*/
+	DWORD dwCount;
+	static HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	WriteConsoleA(hOut, ch, strlen(ch), &dwCount, nullptr);
+}
+void ___write(const wchar_t* ch) {
+	DWORD dwCount;
+	static HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	WriteConsoleW(hOut, ch, wcslen(ch), &dwCount, nullptr);
+}
+*/
 
 extern "C" void __stdcall handledfreeaddrinfo(addrinfo* ai) {
 	WspiapiFreeAddrInfo(ai);
@@ -39,6 +43,12 @@ extern "C" void __stdcall handledgetnameinfo(const sockaddr* sa, socklen_t salen
 	WspiapiGetNameInfo(sa, salen, host, hostlen, serv, servlen, flags);
 }
 
+static inline bool IsUnderKernelex() {
+	//ntdll.dll is loaded automatically in every windows nt process, but it seems it isn't in windows 9x
+	static bool kernelex = GetModuleHandle(__TEXT("ntdll.dll")) == nullptr;
+	return kernelex;
+}
+
 
 /*
 creates 2 functions, the stub function prefixed by handledxxx that is then exported via asm,
@@ -46,25 +56,59 @@ and internalimplxxx that is the fallback function called if the function isn't l
 on first call GetProcAddress is called, and if the function is found, then that will be called onwards
 otherwise fall back to the internal implementation
 */
-#define GETFUNC(funcname) (decltype(&handled##funcname))GetProcAddress(GetModuleHandleA(LIBNAME), #funcname)
+
+#define GETFUNC(funcname) (decltype(&handled##funcname))GetProcAddress(GetModuleHandle(LIBNAME), #funcname)
 #define MAKELOADER(funcname,ret,args,argnames)\
 ret __stdcall internalimpl##funcname args ;\
-extern "C" ret __stdcall handled##funcname args {\
-	static auto basefunc = GETFUNC(funcname);\
-	if(basefunc)\
-		return basefunc argnames ;\
-	return internalimpl##funcname argnames ;\
-}\
+extern "C" ret __stdcall handled##funcname args { \
+	static auto basefunc = [] { \
+		auto func = GETFUNC(funcname); \
+		return func ? func : internalimpl##funcname; \
+	}(); \
+	return basefunc argnames ; \
+} \
 ret __stdcall internalimpl##funcname args
 
-#define LIBNAME "Advapi32.dll"
+#define LIBNAME __TEXT("Advapi32.dll")
 
-MAKELOADER(IsWellKnownSid, PSLIST_ENTRY, (PSID pSid, WELL_KNOWN_SID_TYPE WellKnownSidType), (pSid, WellKnownSidType)) {
+MAKELOADER(IsWellKnownSid, BOOL, (PSID pSid, WELL_KNOWN_SID_TYPE WellKnownSidType), (pSid, WellKnownSidType)) {
 	return FALSE;
+}
+static CHAR* convert_from_wstring(const WCHAR* wstr) {
+	if(wstr == nullptr)
+		return nullptr;
+	const int wstr_len = (int)wcslen(wstr);
+	const int num_chars = WideCharToMultiByte(CP_UTF8, 0, wstr, wstr_len, nullptr, 0, nullptr, nullptr);
+	CHAR* strTo = (CHAR*)malloc((num_chars + 1) * sizeof(CHAR));
+	if(strTo) {
+		WideCharToMultiByte(CP_UTF8, 0, wstr, wstr_len, strTo, num_chars, nullptr, nullptr);
+		strTo[num_chars] = '\0';
+	}
+	return strTo;
+}
+extern "C" BOOL __stdcall handledCryptAcquireContextW(HCRYPTPROV *phProv, LPCWSTR pszContainer, LPCWSTR pszProvider, DWORD dwProvType, DWORD dwFlags) {
+	static auto basefunc = []()->decltype(&handledCryptAcquireContextW) {
+		if(IsUnderKernelex()) {
+			return [](HCRYPTPROV *phProv, LPCWSTR pszContainer, LPCWSTR pszProvider, DWORD dwProvType, DWORD dwFlags)->BOOL {
+				static auto basefunc = (decltype(&CryptAcquireContextA))GetProcAddress(GetModuleHandle(LIBNAME), "CryptAcquireContextA");
+				auto container = convert_from_wstring(pszContainer);
+				auto provider = convert_from_wstring(pszProvider);
+				auto res = basefunc(phProv, container, provider, dwProvType, dwFlags);
+				if(res == FALSE && GetLastError() == NTE_BAD_FLAGS)
+					res = basefunc(phProv, container, provider, dwProvType, dwFlags & ~CRYPT_SILENT);
+				free(container);
+				free(provider);
+				return res;
+			};
+		} else {
+			return GETFUNC(CryptAcquireContextW);
+		}
+	}();
+	return basefunc(phProv, pszContainer, pszProvider, dwProvType, dwFlags);
 }
 
 #undef LIBNAME
-#define LIBNAME "kernel32.dll"
+#define LIBNAME __TEXT("kernel32.dll")
 
 typedef struct _LDR_MODULE {
 	LIST_ENTRY InLoadOrderModuleList;
@@ -156,7 +200,7 @@ static PLDR_MODULE __stdcall GetLdrModule(LPCVOID address) {
 	return nullptr;
 }
 
-static VOID LoaderLock(BOOL lock) {
+static void LoaderLock(BOOL lock) {
 	if(lock)
 		EnterCriticalSection(NtCurrentPeb()->LoaderLock);
 	else
@@ -176,7 +220,7 @@ static HMODULE GetModuleHandleFromPtr(LPCVOID p) {
 }
 
 BYTE slist_lock[0x100];
-void SListLock(PSLIST_HEADER ListHead) {
+static void SListLock(PSLIST_HEADER ListHead) {
 	DWORD index = (((DWORD)ListHead) >> MEMORY_ALLOCATION_ALIGNMENT) & 0xFF;
 
 	__asm {
@@ -189,7 +233,7 @@ void SListLock(PSLIST_HEADER ListHead) {
 	return;
 }
 
-void SListUnlock(PSLIST_HEADER ListHead) {
+static void SListUnlock(PSLIST_HEADER ListHead) {
 	DWORD index = (((DWORD)ListHead) >> MEMORY_ALLOCATION_ALIGNMENT) & 0xFF;
 	slist_lock[index] = 0;
 }
@@ -209,7 +253,7 @@ MAKELOADER(InterlockedPopEntrySList, PSLIST_ENTRY, (PSLIST_HEADER ListHead), (Li
 	return ret;
 }
 
-MAKELOADER(InterlockedPushEntrySList, PSLIST_ENTRY, (PSLIST_HEADER ListHead, PSLIST_ENTRY ListEntry),(ListHead, ListEntry)) {
+MAKELOADER(InterlockedPushEntrySList, PSLIST_ENTRY, (PSLIST_HEADER ListHead, PSLIST_ENTRY ListEntry), (ListHead, ListEntry)) {
 	PSLIST_ENTRY ret;
 	SListLock(ListHead);
 	ret = ListHead->Next.Next;
@@ -245,7 +289,7 @@ on first load this will be called when setting up the crt, calling GetProcAddres
 at that moment will make the program crash.
 */
 extern "C" void __stdcall handledInitializeSListHead(PSLIST_HEADER ListHead) {
-	static decltype(&internalimplInitializeSListHead) basefunc = nullptr;
+	static decltype(&handledInitializeSListHead) basefunc = nullptr;
 	static int firstrun = 0;
 	if(firstrun == 1) {
 		firstrun++;
@@ -270,7 +314,7 @@ MAKELOADER(QueryDepthSList, USHORT, (PSLIST_HEADER ListHead), (ListHead)) {
 	return depth;
 }
 
-MAKELOADER(ConvertFiberToThread, BOOL,(),()) {
+MAKELOADER(ConvertFiberToThread, BOOL, (), ()) {
 	PVOID Fiber;
 	if(NtCurrentTeb2k()->HasFiberData) {
 		NtCurrentTeb2k()->HasFiberData = FALSE;
@@ -291,13 +335,10 @@ MAKELOADER(GetNumaHighestNodeNumber, BOOL, (PULONG HighestNodeNumber), (HighestN
 	return TRUE;
 }
 
-static BOOL IncLoadCount(HMODULE hMod) {
+static void IncLoadCount(HMODULE hMod) {
 	WCHAR path[MAX_PATH];
-	DWORD c = GetModuleFileNameW(hMod, path, MAX_PATH);
-	if(c != MAX_PATH) {
-		return LoadLibraryW(path) != nullptr;
-	}
-	return FALSE;
+	if(GetModuleFileNameW(hMod, path, sizeof(path)) != sizeof(path))
+		LoadLibraryW(path);
 }
 
 MAKELOADER(GetModuleHandleExW, BOOL, (DWORD dwFlags, LPCWSTR lpModuleName, HMODULE* phModule), (dwFlags, lpModuleName, phModule)) {
@@ -321,27 +362,79 @@ MAKELOADER(GetModuleHandleExW, BOOL, (DWORD dwFlags, LPCWSTR lpModuleName, HMODU
 	return TRUE;
 }
 
+extern "C" BOOL __stdcall handledGetVersionExW(LPOSVERSIONINFOW lpVersionInfo);
+BOOL GetRealOSVersion(LPOSVERSIONINFOW lpVersionInfo) {
+	auto GetWin9xProductInfo = [lpVersionInfo] {
+		WCHAR data[80];
+		HKEY hKey;
+		auto GetRegEntry = [&data, &hKey](const WCHAR* name) {
+			DWORD dwRetFlag, dwBufLen{ sizeof(data) };
+			return (RegQueryValueExW(hKey, name, nullptr, &dwRetFlag, (LPBYTE)data, &dwBufLen) == ERROR_SUCCESS)
+				&& (dwRetFlag & REG_SZ) != 0;
+		};
+		if(RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion", 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
+			return false;
+		if(GetRegEntry(L"VersionNumber") && data[0] == L'4') {
+			lpVersionInfo->dwPlatformId = VER_PLATFORM_WIN32_WINDOWS;
+			lpVersionInfo->dwMajorVersion = 4;
+			if(data[2] == L'9') {
+				lpVersionInfo->dwMinorVersion = 90;
+			} else {
+				lpVersionInfo->dwMinorVersion = data[2] == L'0' ? 0 : 10;
+				if(GetRegEntry(L"SubVersionNumber"))
+					lpVersionInfo->szCSDVersion[1] = data[1];
+			}
+			RegCloseKey(hKey);
+			return true;
+		}
+		RegCloseKey(hKey);
+		return false;
+	};
+	if(!IsUnderKernelex())
+		return (GETFUNC(GetVersionExW))(lpVersionInfo);
+	return GetWin9xProductInfo();
+}
 /*
 first call will be from irrlicht, no overwrite, 2nd will be from the crt,
 if not spoofed, the runtime will abort as windows 2k isn't supported
 */
 extern "C" BOOL __stdcall handledGetVersionExW(LPOSVERSIONINFOW lpVersionInfo) {
-	static auto basefunc = GETFUNC(GetVersionExW);;
 	static int firstrun = 0;
-	constexpr static OSVERSIONINFOW winxp{ sizeof(OSVERSIONINFOW), 5, 1 };
-	if(!basefunc) {
-		*lpVersionInfo = winxp;
-		return TRUE;
-	}
-	auto ret = basefunc(lpVersionInfo);
+	constexpr static OSVERSIONINFOW winxp{ sizeof(winxp), 5, 1 };
+	constexpr static OSVERSIONINFOEXW winxpex{ sizeof(winxpex), 5, 1 };
+	auto osinfo = [] {
+		const static auto ret = [] {
+			OSVERSIONINFOW ret{ sizeof(ret) };
+			if(!GetRealOSVersion(&ret))
+				ret = winxp;
+			return ret;
+		}();
+		return ret;
+	};
+	auto osinfoex = [] {
+		const static auto ret = [] {
+			OSVERSIONINFOEXW ret{ sizeof(ret) };
+			if(!GetRealOSVersion((LPOSVERSIONINFOW)&ret))
+				ret = winxpex;
+			return ret;
+		}();
+		return ret;
+	};
+	if(lpVersionInfo->dwOSVersionInfoSize == sizeof(OSVERSIONINFOW))
+		*lpVersionInfo = osinfo();
+	else
+		*(LPOSVERSIONINFOEXW)lpVersionInfo = osinfoex();
 	//spoof win2k to the c runtime
 	if(firstrun == 1 && (lpVersionInfo->dwMajorVersion <= 5 || (lpVersionInfo->dwMajorVersion == 5 && lpVersionInfo->dwMinorVersion == 0))) {
 		firstrun++;
-		*lpVersionInfo = winxp;
+		if(lpVersionInfo->dwOSVersionInfoSize == sizeof(OSVERSIONINFOW))
+			*lpVersionInfo = winxp;
+		else
+			*(LPOSVERSIONINFOEXW)lpVersionInfo = winxpex;
 		return TRUE;
 	} else if(firstrun == 0)
 		firstrun++;
-	return ret;
+	return TRUE;
 }
 
 MAKELOADER(GetModuleHandleExA, BOOL, (DWORD dwFlags, LPCSTR lpModuleName, HMODULE* phModule), (dwFlags, lpModuleName, phModule)) {

@@ -1,5 +1,8 @@
 .model flat
 
+;windows 9x under kernelex
+handledCryptAcquireContextW  PROTO STDCALL :DWORD,:DWORD,:DWORD,:DWORD,:DWORD
+
 ;windows 2000 no service pack
 handledIsWellKnownSid PROTO STDCALL :DWORD,:DWORD
 
@@ -20,7 +23,7 @@ handledGetVersionExW  PROTO STDCALL :DWORD
 handledEncodePointer PROTO STDCALL :DWORD
 handledDecodePointer PROTO STDCALL :DWORD
 
-;windows xp sp3
+;windows xp sp 3
 handledfreeaddrinfo PROTO STDCALL :DWORD
 handledgetaddrinfo PROTO STDCALL :DWORD,:DWORD,:DWORD,:DWORD
 handledgetnameinfo PROTO STDCALL :DWORD,:DWORD,:DWORD,:DWORD,:DWORD,:DWORD,:DWORD
@@ -43,6 +46,7 @@ __imp__getaddrinfo@16 dd handledgetaddrinfo
 __imp__getnameinfo@28 dd handledgetnameinfo
 __imp__GetVersionExW@4 dd handledGetVersionExW
 __imp__IsWellKnownSid@8 dd handledIsWellKnownSid
+__imp__CryptAcquireContextW@20 dd handledCryptAcquireContextW
 
 EXTERNDEF __imp__EncodePointer@4 : DWORD
 EXTERNDEF __imp__DecodePointer@4 : DWORD
@@ -61,5 +65,6 @@ EXTERNDEF __imp__getaddrinfo@16 : DWORD
 EXTERNDEF __imp__getnameinfo@28 : DWORD
 EXTERNDEF __imp__GetVersionExW@4 : DWORD
 EXTERNDEF __imp__IsWellKnownSid@8 : DWORD
+EXTERNDEF __imp__CryptAcquireContextW@20 : DWORD
 
 end
