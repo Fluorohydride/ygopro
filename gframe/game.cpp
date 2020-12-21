@@ -304,8 +304,6 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(tmpptr, 1237);
 	ebTimeLimit = env->addEditBox(WStr(gGameConfig->timeLimit), Scale(140, 115, 220, 140), true, wCreateHost, EDITBOX_NUMERIC);
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1228).data(), Scale(20, 150, 320, 170), false, false, wCreateHost);
-	defaultStrings.emplace_back(tmpptr, 1228);
 	btnRuleCards = env->addButton(Scale(260, 325, 370, 350), wCreateHost, BUTTON_RULE_CARDS, gDataManager->GetSysString(1625).data());
 	defaultStrings.emplace_back(btnRuleCards, 1625);
 	wRules = env->addWindow(Scale(630, 100, 1000, 310), false, L"");
