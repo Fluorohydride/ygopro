@@ -158,6 +158,7 @@ void ImageDownloader::DownloadPic() {
 		} else
 			map[code].status = DOWNLOAD_ERROR;
 	}
+	curl_easy_cleanup(curl);
 }
 void ImageDownloader::AddToDownloadQueue(uint32_t code, imgType type) {
 	if(type == imgType::THUMB)
