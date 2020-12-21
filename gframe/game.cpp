@@ -319,12 +319,12 @@ bool Game::Initialize() {
 	}
 	extra_rules = gGameConfig->lastExtraRules;
 	UpdateExtraRules(true);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1236).data(), Scale(20, 180, 220, 200), false, false, wCreateHost);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1236).data(), Scale(20, 150, 220, 170), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1236);
-	cbDuelRule = AddComboBox(env, Scale(140, 175, 300, 200), wCreateHost, COMBOBOX_DUEL_RULE);
+	cbDuelRule = AddComboBox(env, Scale(140, 145, 300, 170), wCreateHost, COMBOBOX_DUEL_RULE);
 	duel_param = gGameConfig->lastDuelParam;
 	forbiddentypes = gGameConfig->lastDuelForbidden;
-	btnCustomRule = env->addButton(Scale(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, gDataManager->GetSysString(1626).data());
+	btnCustomRule = env->addButton(Scale(305, 145, 370, 170), wCreateHost, BUTTON_CUSTOM_RULE, gDataManager->GetSysString(1626).data());
 	defaultStrings.emplace_back(btnCustomRule, 1626);
 
 	wCustomRules = env->addWindow(Scale(0, 0, 450, 330), false, gDataManager->GetSysString(1630).data());
@@ -375,15 +375,20 @@ bool Game::Initialize() {
 	TYPECHK(4, 1076);
 #undef TYPECHK
 
-	UpdateDuelParam();
 	btnCustomRulesOK = env->addButton(Scale(175, 290, 275, 315), wCustomRules, BUTTON_CUSTOM_RULE_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnCustomRulesOK, 1211);
 
 
-	chkNoCheckDeck = env->addCheckBox(gGameConfig->noCheckDeck, Scale(20, 210, 170, 230), wCreateHost, -1, gDataManager->GetSysString(1229).data());
+	chkNoCheckDeck = env->addCheckBox(gGameConfig->noCheckDeck, Scale(20, 180, 170, 200), wCreateHost, -1, gDataManager->GetSysString(1229).data());
 	defaultStrings.emplace_back(chkNoCheckDeck, 1229);
-	chkNoShuffleDeck = env->addCheckBox(gGameConfig->noShuffleDeck, Scale(180, 210, 360, 230), wCreateHost, -1, gDataManager->GetSysString(1230).data());
+	chkNoShuffleDeck = env->addCheckBox(gGameConfig->noShuffleDeck, Scale(180, 180, 360, 200), wCreateHost, -1, gDataManager->GetSysString(1230).data());
 	defaultStrings.emplace_back(chkNoShuffleDeck, 1230);
+
+	chkTcgRulings = env->addCheckBox(duel_param & DUEL_TCG_SEGOC_NONPUBLIC, Scale(20, 210, 170, 230), wCreateHost, TCG_SEGOC_NONPUBLIC, gDataManager->GetSysString(1239).data());
+	defaultStrings.emplace_back(chkTcgRulings, 1239);
+
+	UpdateDuelParam();
+
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1231).data(), Scale(20, 240, 320, 260), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1231);
 	ebStartLP = env->addEditBox(WStr(gGameConfig->startLP), Scale(140, 235, 220, 260), true, wCreateHost, EDITBOX_NUMERIC);
@@ -2474,8 +2479,8 @@ uint8_t Game::LocalPlayer(uint8_t player) {
 void Game::UpdateDuelParam() {
 	ReloadCBDuelRule();
 	uint64_t flag = 0;
-	for (int i = 0; i < sizeofarr(chkCustomRules); ++i)
-		if (chkCustomRules[i]->isChecked()) {
+	for(int i = 0; i < sizeofarr(chkCustomRules); ++i) {
+		if(chkCustomRules[i]->isChecked()) {
 			if(i == 19)
 				flag |= DUEL_USE_TRAPS_IN_NEW_CHAIN;
 			else if(i == 20)
@@ -2487,6 +2492,7 @@ void Game::UpdateDuelParam() {
 			else
 				flag |= 0x100ULL << i;
 		}
+	}
 	constexpr uint32_t limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 	uint32_t flag2 = 0;
 	for (int i = 0; i < sizeofarr(chkTypeLimit); ++i) {
@@ -2513,19 +2519,23 @@ void Game::UpdateDuelParam() {
 			cbDuelRule->removeItem(8);
 		break;
 	}
-// NOTE: intentional case fallthrough
-#define CHECK(MR) case DUEL_MODE_MR##MR:{ cbDuelRule->setSelected(MR - 1); if (flag2 == DUEL_MODE_MR##MR##_FORB) { cbDuelRule->removeItem(8); break; } }
-	CHECK(1)
-	CHECK(2)
-	CHECK(3)
-	CHECK(4)
-	CHECK(5)
-#undef CHECK
-	default: {
-		cbDuelRule->addItem(gDataManager->GetSysString(1630).data());
-		cbDuelRule->setSelected(8);
+	default:
+		switch(flag & ~DUEL_TCG_SEGOC_NONPUBLIC) {
+	// NOTE: intentional case fallthrough
+	#define CHECK(MR) case DUEL_MODE_MR##MR:{ cbDuelRule->setSelected(MR - 1); if (flag2 == DUEL_MODE_MR##MR##_FORB) { cbDuelRule->removeItem(8); break; } }
+		CHECK(1)
+		CHECK(2)
+		CHECK(3)
+		CHECK(4)
+		CHECK(5)
+	#undef CHECK
+		default: {
+			cbDuelRule->addItem(gDataManager->GetSysString(1630).data());
+			cbDuelRule->setSelected(8);
+			break;
+		}
+		}
 		break;
-	}
 	}
 	duel_param = flag;
 	forbiddentypes = flag2;
