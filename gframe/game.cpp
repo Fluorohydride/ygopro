@@ -2011,10 +2011,10 @@ void Game::RefreshAiDecks() {
 					if (!obj["name"].is_string() || !obj["deck"].is_string() || !obj["difficulty"].is_number() || !obj["masterRules"].is_array())
 						continue;
 					WindBot bot;
-					bot.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
-					bot.deck = BufferIO::DecodeUTF8s(obj["deck"].get<std::string>());
+					bot.name = BufferIO::DecodeUTF8s(obj["name"].get_ref<std::string&>());
+					bot.deck = BufferIO::DecodeUTF8s(obj["deck"].get_ref<std::string&>());
 					bot.difficulty = obj["difficulty"].get<int>();
-					for (auto& masterRule : obj["masterRules"].get<std::vector<nlohmann::json>>()) {
+					for (auto& masterRule : obj["masterRules"]) {
 						if (masterRule.is_number()) {
 							bot.masterRules.insert(masterRule.get<int>());
 						}
@@ -2218,7 +2218,7 @@ void Game::LoadServers() {
 		try {
 			if(config.size() && config.at("servers").is_array()) {
 				try {
-					for(auto& obj : config["servers"].get<std::vector<nlohmann::json>>()) {
+					for(auto& obj : config["servers"]) {
 						ServerInfo tmp_server;
 						tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
 						tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get<std::string>());
