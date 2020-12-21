@@ -341,7 +341,7 @@ namespace ygo {
 				CFRelease(bundle_base_url);
 				/*
 				#ifdef MAC_OS_DISCORD_LAUNCHER
-					system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
+					system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).data());
 				#endif
 				*/
 				epro::path_string res = CFStringGetCStringPtr(path, kCFStringEncodingUTF8);

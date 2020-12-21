@@ -424,7 +424,7 @@ std::wstring DataManager::FormatType(uint32_t type) {
 	return res;
 }
 std::wstring DataManager::FormatScope(uint32_t scope, bool hideOCGTCG) {
-	static const std::map<int, int> SCOPES = {
+	static constexpr std::pair<int, int> SCOPES[] = {
 		{SCOPE_OCG, 1900},
 		{SCOPE_TCG, 1901},
 		{SCOPE_ANIME, 1265},

@@ -85,7 +85,7 @@ CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 0L);
 	if(ygo::gGameConfig->ssl_certificate_path.size()
 	   && ygo::Utils::FileExists(ygo::Utils::ToPathString(ygo::gGameConfig->ssl_certificate_path)))
-		curl_easy_setopt(curl_handle, CURLOPT_CAINFO, ygo::gGameConfig->ssl_certificate_path.c_str());
+		curl_easy_setopt(curl_handle, CURLOPT_CAINFO, ygo::gGameConfig->ssl_certificate_path.data());
 #ifdef _WIN32
 	else
 		curl_easy_setopt(curl_handle, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
@@ -101,7 +101,7 @@ void Reboot() {
 	PROCESS_INFORMATION pi{};
 	auto pathstring = fmt::format(EPRO_TEXT("{} show_changelog"), ygo::Utils::GetExePath());
 	CreateProcess(nullptr,
-		(TCHAR*)pathstring.c_str(),
+		(TCHAR*)pathstring.data(),
 				  nullptr,
 				  nullptr,
 				  false,
@@ -236,7 +236,7 @@ void ClientUpdater::Unzip(epro::path_string src, void* payload, unzip_callback c
 	for(auto& file : update_urls) {
 		uzpl.cur = i++;
 		auto name = src + ygo::Utils::ToPathString(file.name);
-		uzpl.filename = name.c_str();
+		uzpl.filename = name.data();
 		ygo::Utils::UnzipArchive(name, callback, &cbpayload);
 	}
 	Reboot();
@@ -284,7 +284,7 @@ void ClientUpdater::DownloadUpdate(epro::path_string dest_path, void* payload, u
 		MD5_CTX context{};
 		wpayload.md5context = &context;
 		MD5_Init(wpayload.md5context);
-		if(curlPerform(file.url.c_str(), &wpayload, &cbpayload) != CURLE_OK)
+		if(curlPerform(file.url.data(), &wpayload, &cbpayload) != CURLE_OK)
 			continue;
 		uint8_t md5[MD5_DIGEST_LENGTH]{};
 		MD5_Final(md5, &context);

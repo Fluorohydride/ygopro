@@ -49,10 +49,12 @@ public:
 	bool should_update{true};
 	bool has_core{false};
 	bool ready{false};
-	bool internal_ready{false};
 	bool is_language{false};
 	CommitHistory history;
 	bool Sanitize();
+	friend class RepoManager;
+private:
+	bool internal_ready{ false };
 };
 
 class RepoManager {
