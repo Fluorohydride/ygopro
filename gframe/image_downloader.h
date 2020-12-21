@@ -6,7 +6,7 @@
 #include <vector>
 #include <thread>
 #include <atomic>
-#include <queue>
+#include <deque>
 #include <map>
 #include "text_types.h"
 
@@ -49,7 +49,7 @@ public:
 private:
 	void DownloadPic();
 	downloading_map downloading_images[3];
-	std::queue<downloadParam> to_download;
+	std::deque<downloadParam> to_download;
 	std::vector<downloadParam> downloading;
 	std::pair<std::atomic<int>, std::atomic<int>> sizes[3];
 	std::mutex pic_download;

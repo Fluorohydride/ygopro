@@ -411,10 +411,10 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 	irr::video::IImage* img = nullptr;
 	int width = _width;
 	int height = _height;
-	if(status == ImageDownloader::DOWNLOADED) {
 	if(type == imgType::THUMB)
 		type = imgType::ART;
 	auto status = gImageDownloader->GetDownloadStatus(code, type);
+	if(status == ImageDownloader::downloadStatus::DOWNLOADED) {
 		if(timestamp_id != source_timestamp_id.load())
 			return std::make_pair(nullptr, EPRO_TEXT("fail"));
 		if(width != _width || height != _height) {
@@ -531,8 +531,8 @@ irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, 
 		return ret_unk;
 	auto tit = map.find(code);
 	if(tit == map.end()) {
-		if(status == ImageDownloader::DOWNLOADING) {
 		auto status = gImageDownloader->GetDownloadStatus(code, type);
+		if(status == ImageDownloader::downloadStatus::DOWNLOADING) {
 			if(chk)
 				*chk = 2;
 			return ret_unk;
@@ -542,7 +542,7 @@ irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, 
 			map[code] = driver->getTexture(gImageDownloader->GetDownloadPath(code, type).data());
 			return map[code] ? map[code] : ret_unk;
 		}*/
-		if(status == ImageDownloader::DOWNLOAD_ERROR) {
+		if(status == ImageDownloader::downloadStatus::DOWNLOAD_ERROR) {
 			map[code] = nullptr;
 			return ret_unk;
 		}
@@ -578,11 +578,11 @@ irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 		return nullptr;
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
-		bool should_download = status == ImageDownloader::NONE;
 		auto status = gImageDownloader->GetDownloadStatus(code, imgType::FIELD);
+		bool should_download = status == ImageDownloader::downloadStatus::NONE;
 		irr::video::ITexture* img = nullptr;
 		if(!should_download) {
-			if(status == ImageDownloader::DOWNLOADED) {
+			if(status == ImageDownloader::downloadStatus::DOWNLOADED) {
 				img = driver->getTexture(gImageDownloader->GetDownloadPath(code, imgType::FIELD).data());
 			} else
 				return nullptr;

@@ -101,10 +101,10 @@ void ImageDownloader::DownloadPic() {
 			}
 		}
 		auto file = std::move(to_download.front());
-		to_download.pop();
+		to_download.pop_front();
 		auto type = file.type;
 		auto code = file.code;
-		downloading_images[type][file.code].status = DOWNLOADING;
+		downloading_images[type][file.code].status = downloadStatus::DOWNLOADING;
 		downloading.push_back(std::move(file));
 		lck.unlock();
 		auto name = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
@@ -133,7 +133,7 @@ void ImageDownloader::DownloadPic() {
 			return fmt::format(dest, code);
 		}();
 		auto& map = downloading_images[type];
-		epro::path_string ext;
+		const epro::path_char* ext = nullptr;
 		for(auto& src : pic_urls) {
 			if(src.type != type)
 				continue;
@@ -152,11 +152,11 @@ void ImageDownloader::DownloadPic() {
 			}
 		}
 		lck.lock();
-		if(ext.size()) {
-			map[code].status = DOWNLOADED;
+		if(ext) {
+			map[code].status = downloadStatus::DOWNLOADED;
 			map[code].path = dest_folder + ext;
 		} else
-			map[code].status = DOWNLOAD_ERROR;
+			map[code].status = downloadStatus::DOWNLOAD_ERROR;
 	}
 	curl_easy_cleanup(curl);
 }
