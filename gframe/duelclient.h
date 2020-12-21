@@ -37,7 +37,7 @@ private:
 	static uint64_t select_hint;
 	static std::wstring event_string;
 	static bool is_swapping;
-	static std::atomic<bool> stop_threads;
+	bool stop_threads;
 	static std::deque<std::vector<uint8_t>> to_analyze;
 	static std::mutex analyzeMutex;
 	static std::mutex to_analyze_mutex;

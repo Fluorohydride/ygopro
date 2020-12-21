@@ -48,7 +48,7 @@ randengine DuelClient::rnd;
 ReplayStream DuelClient::replay_stream;
 Replay DuelClient::last_replay;
 bool DuelClient::is_swapping = false;
-std::atomic<bool> DuelClient::stop_threads{ true };
+bool DuelClient::stop_threads{ true };
 std::deque<std::vector<uint8_t>> DuelClient::to_analyze;
 std::mutex DuelClient::analyzeMutex;
 std::mutex DuelClient::to_analyze_mutex;
@@ -260,6 +260,7 @@ catch(...) { what = def; }
 			to_analyze_mutex.lock();
 			to_analyze.push_back(std::move(tmp));
 			to_analyze_mutex.unlock();
+			cv.notify_all();
 		}
 		event_base_loopexit(client_base, 0);
 	}
@@ -284,7 +285,7 @@ int DuelClient::ClientThread() {
 
 void DuelClient::ParserThread() {
 	Utils::SetThreadName("ParserThread");
-	while(!stop_threads) {
+	while(true) {
 		std::unique_lock<std::mutex> lck(to_analyze_mutex);
 		while(to_analyze.empty()) {
 			cv.wait(lck);
