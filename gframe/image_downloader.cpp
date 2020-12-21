@@ -14,18 +14,18 @@ struct curl_payload {
 	int header_written;
 };
 
-ImageDownloader::ImageDownloader() {
-	stop_threads = false;
+ImageDownloader::ImageDownloader() : stop_threads(false) {
 	for(auto& thread : download_threads) {
 		thread = std::thread(&ImageDownloader::DownloadPic, this);
 	}
 }
 ImageDownloader::~ImageDownloader() {
+	std::unique_lock<std::mutex> lck(pic_download);
 	stop_threads = true;
 	cv.notify_all();
-	for(auto& thread : download_threads) {
+	lck.unlock();
+	for(auto& thread : download_threads)
 		thread.join();
-	}
 }
 void ImageDownloader::AddDownloadResource(PicSource src) {
 	pic_urls.push_back(src);
@@ -91,8 +91,12 @@ void ImageDownloader::DownloadPic() {
 		payload.header_written = 0;
 		curl_easy_setopt(curl, CURLOPT_URL, url.data());
 	};
-	while(!stop_threads) {
+	while(true) {
 		std::unique_lock<std::mutex> lck(pic_download);
+		if(stop_threads) {
+			curl_easy_cleanup(curl);
+			return;
+		}
 		while(to_download.empty()) {
 			cv.wait(lck);
 			if(stop_threads) {
@@ -158,7 +162,6 @@ void ImageDownloader::DownloadPic() {
 		} else
 			map[code].status = downloadStatus::DOWNLOAD_ERROR;
 	}
-	curl_easy_cleanup(curl);
 }
 void ImageDownloader::AddToDownloadQueue(uint32_t code, imgType type) {
 	if(type == imgType::THUMB)

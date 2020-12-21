@@ -54,7 +54,7 @@ private:
 	std::pair<std::atomic<int>, std::atomic<int>> sizes[3];
 	std::mutex pic_download;
 	std::condition_variable cv;
-	std::atomic<bool> stop_threads;
+	bool stop_threads;
 	std::vector<PicSource> pic_urls;
 	std::thread download_threads[8];
 };
