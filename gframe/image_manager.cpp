@@ -367,20 +367,12 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *d
 		}
 	return true;
 }
-irr::video::IImage* ImageManager::GetTextureImageFromFile(const irr::io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::video::IImage* archivefile) {
-	irr::video::IImage* srcimg = nullptr;
-	if(archivefile) {
-		archivefile->grab();
-		srcimg = archivefile;
-	} else
-		srcimg = driver->createImageFromFile(file);
-	if(!srcimg || timestamp_id != source_timestamp_id.load()) {
-		if(srcimg)
-			srcimg->drop();
+irr::video::IImage* ImageManager::GetScaledImage(irr::video::IImage* srcimg, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
+	if(!srcimg || timestamp_id != source_timestamp_id.load())
 		return nullptr;
-	}
 	const irr::core::dimension2d<irr::u32> dim(width, height);
 	if(srcimg->getDimension() == dim) {
+		srcimg->grab();
 		return srcimg;
 	} else {
 		irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), dim);
@@ -388,12 +380,11 @@ irr::video::IImage* ImageManager::GetTextureImageFromFile(const irr::io::path& f
 			destimg->drop();
 			destimg = nullptr;
 		}
-		srcimg->drop();
 		return destimg;
 	}
 }
 irr::video::ITexture* ImageManager::GetTextureFromFile(const irr::io::path& file, int width, int height) {
-	auto img = GetTextureImageFromFile(file, width, height, timestamp_id.load(), std::ref(timestamp_id));
+	auto img = GetScaledImageFromFile(file, width, height);
 	if(img) {
 		auto texture = driver->addTexture(file, img);
 		img->drop();
@@ -403,44 +394,55 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const irr::io::path& file
 	return driver->getTexture(file);
 }
 ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType type, std::atomic<irr::s32>& _width, std::atomic<irr::s32>& _height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
-	irr::video::IImage* img = nullptr;
+	static constexpr auto fail = std::make_pair(nullptr, EPRO_TEXT("fail"));
+	static constexpr auto waitdownload = std::make_pair(nullptr, EPRO_TEXT("wait for download"));
 	int width = _width;
 	int height = _height;
 	if(type == imgType::THUMB)
 		type = imgType::ART;
-	auto status = gImageDownloader->GetDownloadStatus(code, type);
-	if(status == ImageDownloader::downloadStatus::DOWNLOADED) {
-		if(timestamp_id != source_timestamp_id.load())
-			return std::make_pair(nullptr, EPRO_TEXT("fail"));
+
+	auto LoadImg = [&](irr::video::IImage* base_img)->irr::video::IImage* {
+		if(!base_img)
+			return nullptr;
 		if(width != _width || height != _height) {
 			width = _width;
 			height = _height;
 		}
-		auto file = gImageDownloader->GetDownloadPath(code, type);
-		while(true) {
-			if((img = GetTextureImageFromFile(file.data(), width, height, timestamp_id, std::ref(source_timestamp_id), nullptr))) {
-				if(timestamp_id != source_timestamp_id.load()) {
-					img->drop();
-					return std::make_pair(nullptr, EPRO_TEXT("fail"));
-				}
-				if(width != _width || height != _height) {
-					img->drop();
-					width = _width;
-					height = _height;
-					continue;
-				}
-				return std::make_pair(img, file);
+		while(const auto img = GetScaledImage(base_img, width, height, timestamp_id, std::ref(source_timestamp_id))) {
+			if(timestamp_id != source_timestamp_id.load()) {
+				img->drop();
+				base_img->drop();
+				return nullptr;
 			}
-			break;
+			if(width != _width || height != _height) {
+				img->drop();
+				width = _width;
+				height = _height;
+				continue;
+			}
+			base_img->drop();
+			return img;
 		}
+		base_img->drop();
+		return nullptr;
+	};
+
+	irr::video::IImage* img;
+
+	auto status = gImageDownloader->GetDownloadStatus(code, type);
+	if(status == ImageDownloader::downloadStatus::DOWNLOADED) {
 		if(timestamp_id != source_timestamp_id.load())
-			return std::make_pair(nullptr, EPRO_TEXT("fail"));
-	} else {
+			return fail;
+		const auto file = gImageDownloader->GetDownloadPath(code, type);
+		if((img = LoadImg(driver->createImageFromFile({ file.data(), file.size() }))) != nullptr)
+			return std::make_pair(img, file);
+		return fail;
+	} else if(status == ImageDownloader::downloadStatus::NONE) {
 		for(auto& path : (type == imgType::ART) ? mainGame->pic_dirs : mainGame->cover_dirs) {
 			for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
 				if(timestamp_id != source_timestamp_id.load())
-					return std::make_pair(nullptr, EPRO_TEXT("fail"));
-				irr::video::IImage* readerimg = nullptr;
+					return fail;
+				irr::video::IImage* base_img = nullptr;
 				epro::path_string file;
 				if(path == EPRO_TEXT("archives")) {
 					auto lockedIrrFile = Utils::FindFileInArchives(
@@ -448,49 +450,21 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 						fmt::format(EPRO_TEXT("{}{}"), code, extension));
 					if(!lockedIrrFile)
 						continue;
-					file = lockedIrrFile.reader->getFileName().c_str();
-					readerimg = driver->createImageFromFile(lockedIrrFile.reader);
+					const auto& name = lockedIrrFile.reader->getFileName();
+					file = { name.c_str(), name.size() };
+					base_img = driver->createImageFromFile(lockedIrrFile.reader);
 				} else {
 					file = fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension);
+					base_img = driver->createImageFromFile({ file.data(), file.size() });
 				}
-				if(width != _width || height != _height) {
-					width = _width;
-					height = _height;
-				}
-				while(true) {
-					if((img = GetTextureImageFromFile(file.data(), width, height, timestamp_id, std::ref(source_timestamp_id), readerimg))) {
-						if(timestamp_id != source_timestamp_id.load()) {
-							img->drop();
-							if(readerimg)
-								readerimg->drop();
-							return std::make_pair(nullptr, EPRO_TEXT("fail"));
-						}
-						if(width != _width || height != _height) {
-							img->drop();
-							width = _width;
-							height = _height;
-							continue;
-						}
-						if(readerimg)
-							readerimg->drop();
-						return std::make_pair(img, file);
-					}
-					break;
-				}
-				if(timestamp_id != source_timestamp_id.load()) {
-					if(readerimg)
-						readerimg->drop();
-					return std::make_pair(nullptr, EPRO_TEXT("fail"));
-				}
-				if(readerimg)
-					readerimg->drop();
+				if((img = LoadImg(base_img)) != nullptr)
+					return std::make_pair(img, file);
 			}
 		}
-	}
-	if(status == ImageDownloader::downloadStatus::NONE) {
 		gImageDownloader->AddToDownloadQueue(code, type);
+		return waitdownload;
 	}
-	return std::make_pair(nullptr, EPRO_TEXT("wait for download"));
+	return fail;
 }
 irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, bool wait, bool fit, int* chk) {
 	//wait = true;
@@ -850,6 +824,24 @@ void ImageManager::draw2DImageFilterScaled(irr::video::ITexture* txr,
 		: srcrect;
 
 	driver->draw2DImage(scaled, destrect, mysrcrect, cliprect, colors, usealpha);
+}
+irr::video::IImage* ImageManager::GetScaledImageFromFile(const irr::io::path& file, int width, int height) {
+	irr::video::IImage* srcimg = driver->createImageFromFile(file);
+	if(!srcimg) {
+		if(srcimg)
+			srcimg->drop();
+		return nullptr;
+	}
+	const irr::core::dimension2d<irr::u32> dim(width, height);
+	const auto srcdim = srcimg->getDimension();
+	if(srcdim == dim) {
+		return srcimg;
+	} else {
+		irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), dim);
+		imageScaleNNAAUnthreaded(srcimg, { 0, 0, (irr::s32)srcdim.Width, (irr::s32)srcdim.Height }, destimg);
+		srcimg->drop();
+		return destimg;
+	}
 }
 
 }
