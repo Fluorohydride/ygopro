@@ -381,16 +381,16 @@ void Game::DrawCard(ClientCard* pcard) {
 	driver->setTransform(irr::video::ETS_WORLD, pcard->mTransform);
 	auto m22 = pcard->mTransform(2, 2);
 	if(m22 > -0.99 || pcard->is_moving) {
-		matManager.mCard.setTexture(0, imageManager.GetTextureCard(pcard->code, ImageManager::ART));
+		matManager.mCard.setTexture(0, imageManager.GetTextureCard(pcard->code, imgType::ART));
 		driver->setMaterial(matManager.mCard);
 		driver->drawVertexPrimitiveList(matManager.vCardFront, 4, matManager.iRectangle, 2);
 	}
 	if(m22 < 0.99 || pcard->is_moving) {
-		auto txt = imageManager.GetTextureCard(pcard->cover, ImageManager::COVER);
+		auto txt = imageManager.GetTextureCard(pcard->cover, imgType::COVER);
 		if(txt == imageManager.tCover[0]) {
 			matManager.mCard.setTexture(0, imageManager.tCover[pcard->controler]);
 		} else {
-			matManager.mCard.setTexture(0, imageManager.GetTextureCard(pcard->cover, ImageManager::COVER));
+			matManager.mCard.setTexture(0, imageManager.GetTextureCard(pcard->cover, imgType::COVER));
 		}
 		driver->setMaterial(matManager.mCard);
 		driver->drawVertexPrimitiveList(matManager.vCardBack, 4, matManager.iRectangle, 2);
@@ -756,7 +756,7 @@ void Game::DrawGUI() {
 	if(imageLoading.size()) {
 		for(auto mit = imageLoading.begin(); mit != imageLoading.end();) {
 			int check = 0;
-			mit->first->setImage(imageManager.GetTextureCard(mit->second, ImageManager::ART, false, false, &check));
+			mit->first->setImage(imageManager.GetTextureCard(mit->second, imgType::ART, false, false, &check));
 			if(check != 2)
 				mit = imageLoading.erase(mit);
 			else
@@ -862,7 +862,7 @@ void Game::DrawSpec() {
 	if(showcard) {
 		switch(showcard) {
 		case 1: {
-			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, imgType::ART);
 			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
 			driver->draw2DImage(cardtxt, drawrect2, cardrect);
 			driver->draw2DImage(imageManager.tMask, ResizeWin(574, 150, 574 + (showcarddif > CARD_IMG_WIDTH ? CARD_IMG_WIDTH : showcarddif), 404),
@@ -875,7 +875,7 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 2: {
-			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, imgType::ART);
 			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
 			driver->draw2DImage(cardtxt, drawrect2, cardrect);
 			driver->draw2DImage(imageManager.tMask, ResizeWin(574 + showcarddif, 150, 751, 404), Scale(0, 0, CARD_IMG_WIDTH - showcarddif, 254), 0, 0, true);
@@ -886,7 +886,7 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 3: {
-			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, imgType::ART);
 			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
 			driver->draw2DImage(cardtxt, drawrect2, cardrect);
 			driver->draw2DImage(imageManager.tNegated, ResizeWin(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif), Scale(0, 0, 128, 128), 0, 0, true);
@@ -895,7 +895,7 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 4: {
-			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, imgType::ART);
 			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
 			matManager.c2d[0] = ((int)std::round(showcarddif) << 24) | 0xffffff;
 			matManager.c2d[1] = ((int)std::round(showcarddif) << 24) | 0xffffff;
@@ -907,7 +907,7 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 5: {
-			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, imgType::ART);
 			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
 			matManager.c2d[0] = ((int)std::round(showcarddif) << 25) | 0xffffff;
 			matManager.c2d[1] = ((int)std::round(showcarddif) << 25) | 0xffffff;
@@ -923,7 +923,7 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 6: {
-			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, imgType::ART);
 			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
 			driver->draw2DImage(cardtxt, drawrect2, cardrect);
 			driver->draw2DImage(imageManager.tNumber, ResizeWin(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif),
@@ -933,7 +933,7 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 7: {
-			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, imgType::ART);
 			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
 			irr::core::vector2di corner[4];
 			float y = sin(showcarddif * irr::core::PI / 180.0f) * CARD_IMG_HEIGHT;
@@ -1179,7 +1179,7 @@ void Game::DrawThumb(CardDataC* cp, irr::core::position2di pos, LFList* lflist, 
 			count = -1;
 	} else
 		count = flit->second;
-	irr::video::ITexture* img = load_image ? imageManager.GetTextureCard(code, ImageManager::THUMB) : imageManager.tUnknown;
+	irr::video::ITexture* img = load_image ? imageManager.GetTextureCard(code, imgType::THUMB) : imageManager.tUnknown;
 	if (!img)
 		return;
 	irr::core::dimension2du size = img->getOriginalSize();

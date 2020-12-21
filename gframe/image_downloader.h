@@ -11,16 +11,19 @@
 #include "text_types.h"
 
 namespace ygo {
+#ifndef IMGTYPE
+#define IMGTYPE
+enum imgType {
+	ART,
+	FIELD,
+	COVER,
+	THUMB
+};
+#endif
 
 class ImageDownloader {
 public:
-	enum imgType {
-		ART,
-		FIELD,
-		COVER,
-		THUMB
-	};
-	enum downloadStatus {
+	enum class downloadStatus {
 		DOWNLOADING,
 		DOWNLOAD_ERROR,
 		DOWNLOADED,

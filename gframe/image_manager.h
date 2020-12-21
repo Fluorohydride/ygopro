@@ -27,14 +27,17 @@ class SColor;
 
 namespace ygo {
 
+#ifndef IMGTYPE
+#define IMGTYPE
+enum imgType {
+	ART,
+	FIELD,
+	COVER,
+	THUMB
+};
+#endif
+
 class ImageManager {
-public:
-	enum imgType {
-		ART,
-		FIELD,
-		COVER,
-		THUMB
-	};
 private:
 	using image_path = std::pair<irr::video::IImage*, epro::path_string>;
 	using loading_map = std::map<int, std::future<image_path>>;

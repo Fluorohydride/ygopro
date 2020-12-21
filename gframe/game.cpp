@@ -2247,8 +2247,8 @@ void Game::LoadServers() {
 		catch(...) {}
 	}
 }
-void Game::ShowCardInfo(uint32_t code, bool resize, ImageManager::imgType type) {
-	static ImageManager::imgType prevtype = ImageManager::imgType::ART;
+void Game::ShowCardInfo(uint32_t code, bool resize, imgType type) {
+	static auto prevtype = imgType::ART;
 	if(code == 0) {
 		ClearCardInfo(0);
 		return;

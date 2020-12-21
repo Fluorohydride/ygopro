@@ -232,10 +232,10 @@ void ImageManager::RefreshCachedTextures() {
 			src[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id));
 		}
 	};
-	StartLoad(loading_pics[0], tMap[0], 0, ART);
-	StartLoad(loading_pics[1], tMap[1], 1, ART);
-	StartLoad(loading_pics[2], tThumb, 2, THUMB);
-	StartLoad(loading_pics[3], tCovers, 1, COVER);
+	StartLoad(loading_pics[0], tMap[0], 0, imgType::ART);
+	StartLoad(loading_pics[1], tMap[1], 1, imgType::ART);
+	StartLoad(loading_pics[2], tThumb, 2, imgType::THUMB);
+	StartLoad(loading_pics[3], tCovers, 1, imgType::COVER);
 }
 void ImageManager::ClearFutureObjects() {
 	Utils::SetThreadName("ImgObjsClear");
@@ -411,17 +411,17 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 	irr::video::IImage* img = nullptr;
 	int width = _width;
 	int height = _height;
-	if(type == THUMB)
-		type = ART;
-	auto status = gImageDownloader->GetDownloadStatus(code, static_cast<ImageDownloader::imgType>(type));
 	if(status == ImageDownloader::DOWNLOADED) {
+	if(type == imgType::THUMB)
+		type = imgType::ART;
+	auto status = gImageDownloader->GetDownloadStatus(code, type);
 		if(timestamp_id != source_timestamp_id.load())
 			return std::make_pair(nullptr, EPRO_TEXT("fail"));
 		if(width != _width || height != _height) {
 			width = _width;
 			height = _height;
 		}
-		auto file = gImageDownloader->GetDownloadPath(code, static_cast<ImageDownloader::imgType>(type));
+		auto file = gImageDownloader->GetDownloadPath(code, type);
 		while(true) {
 			if((img = GetTextureImageFromFile(file.data(), width, height, timestamp_id, std::ref(source_timestamp_id), nullptr))) {
 				if(timestamp_id != source_timestamp_id.load()) {
@@ -441,7 +441,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 		if(timestamp_id != source_timestamp_id.load())
 			return std::make_pair(nullptr, EPRO_TEXT("fail"));
 	} else {
-		for(auto& path : (type == ART) ? mainGame->pic_dirs : mainGame->cover_dirs) {
+		for(auto& path : (type == imgType::ART) ? mainGame->pic_dirs : mainGame->cover_dirs) {
 			for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
 				if(timestamp_id != source_timestamp_id.load())
 					return std::make_pair(nullptr, EPRO_TEXT("fail"));
@@ -449,7 +449,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 				epro::path_string file;
 				if(path == EPRO_TEXT("archives")) {
 					auto lockedIrrFile = Utils::FindFileInArchives(
-						(type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"),
+						(type == imgType::ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"),
 						fmt::format(EPRO_TEXT("{}{}"), code, extension));
 					if(!lockedIrrFile)
 						continue;
@@ -492,8 +492,8 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 			}
 		}
 	}
-	if(status == ImageDownloader::NONE) {
-		gImageDownloader->AddToDownloadQueue(code, static_cast<ImageDownloader::imgType>(type));
+	if(status == ImageDownloader::downloadStatus::NONE) {
+		gImageDownloader->AddToDownloadQueue(code, type);
 	}
 	return std::make_pair(nullptr, EPRO_TEXT("wait for download"));
 }
@@ -505,24 +505,24 @@ irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, 
 	int size_index;
 	auto& map = [&]()->texture_map& {
 		switch(type) {
-			case ART: {
+			case imgType::ART: {
 				index = fit ? 1 : 0;
 				size_index = index;
 				return tMap[fit ? 1 : 0];
 			}
-			case THUMB:	{
+			case imgType::THUMB: {
 				index = 2;
 				size_index = index;
 				return tThumb;
 			}
-			case COVER:	{
+			case imgType::COVER: {
 				ret_unk = tCover[0];
 				index = 3;
 				size_index = 0;
 				return tCovers;
 			}
 			// Should never come to these last cases
-			case FIELD:
+			case imgType::FIELD:
 			default:
 				return tMap[0];
 		}
@@ -531,15 +531,15 @@ irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, 
 		return ret_unk;
 	auto tit = map.find(code);
 	if(tit == map.end()) {
-		auto status = gImageDownloader->GetDownloadStatus(code, static_cast<ImageDownloader::imgType>(type));
 		if(status == ImageDownloader::DOWNLOADING) {
+		auto status = gImageDownloader->GetDownloadStatus(code, type);
 			if(chk)
 				*chk = 2;
 			return ret_unk;
 		}
 		//pic will be loaded below instead
 		/*if(status == ImageDownloader::DOWNLOADED) {
-			map[code] = driver->getTexture(gImageDownloader->GetDownloadPath(code, static_cast<ImageDownloader::imgType>(type)).data());
+			map[code] = driver->getTexture(gImageDownloader->GetDownloadPath(code, type).data());
 			return map[code] ? map[code] : ret_unk;
 		}*/
 		if(status == ImageDownloader::DOWNLOAD_ERROR) {
@@ -578,12 +578,12 @@ irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 		return nullptr;
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
-		auto status = gImageDownloader->GetDownloadStatus(code, ImageDownloader::FIELD);
 		bool should_download = status == ImageDownloader::NONE;
+		auto status = gImageDownloader->GetDownloadStatus(code, imgType::FIELD);
 		irr::video::ITexture* img = nullptr;
 		if(!should_download) {
 			if(status == ImageDownloader::DOWNLOADED) {
-				img = driver->getTexture(gImageDownloader->GetDownloadPath(code, ImageDownloader::FIELD).data());
+				img = driver->getTexture(gImageDownloader->GetDownloadPath(code, imgType::FIELD).data());
 			} else
 				return nullptr;
 		} else {
@@ -603,7 +603,7 @@ irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 			}
 		}
 		if(should_download && !img)
-			gImageDownloader->AddToDownloadQueue(code, ImageDownloader::FIELD);
+			gImageDownloader->AddToDownloadQueue(code, imgType::FIELD);
 		else
 			tFields[code] = img;
 		return img;

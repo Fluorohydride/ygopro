@@ -51,27 +51,27 @@ void DataHandler::LoadPicUrls() {
 						if(obj["url"].get<std::string>() == "default") {
 							if(type == "pic") {
 #ifdef DEFAULT_PIC_URL
-								imageDownloader->AddDownloadResource({ DEFAULT_PIC_URL, ImageDownloader::ART });
+								imageDownloader->AddDownloadResource({ DEFAULT_PIC_URL, imgType::ART });
 #else
 								continue;
 #endif
 							} else if(type == "field") {
 #ifdef DEFAULT_FIELD_URL
-								imageDownloader->AddDownloadResource({ DEFAULT_FIELD_URL, ImageDownloader::FIELD });
+								imageDownloader->AddDownloadResource({ DEFAULT_FIELD_URL, imgType::FIELD });
 #else
 								continue;
 #endif
 							} else if(type == "cover") {
 #ifdef DEFAULT_COVER_URL
-								imageDownloader->AddDownloadResource({ DEFAULT_COVER_URL, ImageDownloader::COVER });
+								imageDownloader->AddDownloadResource({ DEFAULT_COVER_URL, imgType::COVER });
 #else
 								continue;
 #endif
 							}
 						} else {
 							imageDownloader->AddDownloadResource({ obj["url"].get<std::string>(), type == "field" ?
-																	ImageDownloader::FIELD : (type == "pic") ?
-																	ImageDownloader::ART : ImageDownloader::COVER });
+																	imgType::FIELD : (type == "pic") ?
+																	imgType::ART : imgType::COVER });
 						}
 					}
 				}

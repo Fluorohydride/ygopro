@@ -156,7 +156,7 @@ public:
 	void LoadGithubRepositories();
 	void UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo);
 	void LoadServers();
-	void ShowCardInfo(uint32_t code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
+	void ShowCardInfo(uint32_t code, bool resize = false, imgType type = imgType::ART);
 	void RefreshCardInfoTextPositions();
 	void ClearCardInfo(int player = 0);
 	void AddChatMsg(epro::wstringview msg, int player, int type);

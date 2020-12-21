@@ -160,32 +160,31 @@ void ImageDownloader::DownloadPic() {
 	}
 }
 void ImageDownloader::AddToDownloadQueue(uint32_t code, imgType type) {
-	if(type == THUMB)
-		type = ART;
-	int index = static_cast<int>(type);
+	if(type == imgType::THUMB)
+		type = imgType::ART;
 	std::lock_guard<std::mutex> lck(pic_download);
-	if(downloading_images[index].find(code) == downloading_images[index].end()) {
-		downloading_images[index][code].status = DOWNLOADING;
-		to_download.push(downloadParam{ code, type, NONE, EPRO_TEXT("") });
+	if(downloading_images[type].find(code) == downloading_images[type].end()) {
+		downloading_images[type][code].status = downloadStatus::DOWNLOADING;
+		to_download.emplace_back(downloadParam{ code, type, downloadStatus::NONE, EPRO_TEXT("") });
+		cv.notify_one();
 	}
-	cv.notify_one();
 }
 ImageDownloader::downloadStatus ImageDownloader::GetDownloadStatus(uint32_t code, imgType type) {
-	if(type == THUMB)
-		type = ART;
-	int index = static_cast<int>(type);
+	if(type == imgType::THUMB)
+		type = imgType::ART;
 	std::lock_guard<std::mutex> lk(pic_download);
-	if(downloading_images[index].find(code) == downloading_images[index].end())
-		return NONE;
-	return downloading_images[index][code].status;
+	auto it = downloading_images[type].find(code);
+	if(it == downloading_images[type].end())
+		return downloadStatus::NONE;
+	return it->second.status;
 }
 epro::path_string ImageDownloader::GetDownloadPath(uint32_t code, imgType type) {
-	if(type == THUMB)
-		type = ART;
-	int index = static_cast<int>(type);
+	if(type == imgType::THUMB)
+		type = imgType::ART;
 	std::lock_guard<std::mutex> lk(pic_download);
-	if(downloading_images[index].find(code) == downloading_images[index].end())
+	auto it = downloading_images[type].find(code);
+	if(it == downloading_images[type].end())
 		return EPRO_TEXT("");
-	return downloading_images[index][code].path;
+	return it->second.path;
 }
 }
