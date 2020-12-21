@@ -924,7 +924,7 @@ void CGUICustomTable::draw() {
 
 			const auto lockTexture = driver->getTexture("textures/roombrowser/lock.png");
 			const auto text_size = irr::core::recti(0, 0, lockTexture->getOriginalSize().Width, lockTexture->getOriginalSize().Height);
-			const irr::core::rectf bg_sizef(0, 0, text_size.getWidth(), text_size.getHeight());
+			const irr::core::rectf bg_sizef(0, 0, (irr::f32)text_size.getWidth(), (irr::f32)text_size.getHeight());
 			for(u32 j = 0; j < Columns.size(); ++j) {
 				textRect.UpperLeftCorner.X = pos + CellWidthPadding;
 				textRect.LowerRightCorner.X = pos + Columns[j].Width - CellWidthPadding;
@@ -933,7 +933,7 @@ void CGUICustomTable::draw() {
 						auto temp = textRect;
 						temp.UpperLeftCorner += irr::core::vector2di(2, 2);
 						temp.LowerRightCorner -= irr::core::vector2di(2, 2);
-						const irr::core::rectf dest_sizef(temp.UpperLeftCorner.X, temp.UpperLeftCorner.Y, temp.LowerRightCorner.X, temp.LowerRightCorner.Y);
+						const irr::core::rectf dest_sizef((irr::f32)temp.UpperLeftCorner.X, (irr::f32)temp.UpperLeftCorner.Y, (irr::f32)temp.LowerRightCorner.X, (irr::f32)temp.LowerRightCorner.Y);
 						float width = ((bg_sizef.getWidth() / bg_sizef.getHeight()) * dest_sizef.getHeight()) - dest_sizef.getWidth();
 						float height = ((bg_sizef.getHeight() / bg_sizef.getWidth()) * dest_sizef.getWidth()) - dest_sizef.getHeight();
 						if(height > 0) {
