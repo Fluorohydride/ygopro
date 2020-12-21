@@ -295,57 +295,51 @@ void ImageManager::ClearCachedTextures(bool resize) {
 }
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
 bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest, irr::s32 width, irr::s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
-	double sx, sy, minsx, maxsx, minsy, maxsy, area, ra, ga, ba, aa, pw, ph, pa;
-	irr::u32 dy, dx;
-	irr::video::SColor pxl;
-
 	// Cache rectsngle boundaries.
-	double sw = src->getDimension().Width * 1.0;
-	double sh = src->getDimension().Height * 1.0;
+	const double sw = src->getDimension().Width;
+	const double sh = src->getDimension().Height;
 
 	// Walk each destination image pixel.
 	// Note: loop y around x for better cache locality.
-	irr::core::dimension2d<irr::u32> dim = dest->getDimension();
+	const auto dim = dest->getDimension();
 	if(timestamp_id != source_timestamp_id.load())
 		return false;
-	for(dy = 0; dy < dim.Height; dy++)
-		for(dx = 0; dx < dim.Width; dx++) {
+	for(irr::u32 dy = 0; dy < dim.Height; dy++)
+		for(irr::u32 dx = 0; dx < dim.Width; dx++) {
 			if(timestamp_id != source_timestamp_id.load())
 				return false;
 
 			// Calculate floating-point source rectangle bounds.
-			minsx = dx * sw / dim.Width;
-			maxsx = minsx + sw / dim.Width;
-			minsy = dy * sh / dim.Height;
-			maxsy = minsy + sh / dim.Height;
+			const double minsx = dx * sw / dim.Width;
+			const double maxsx = minsx + sw / dim.Width;
+			const double minsy = dy * sh / dim.Height;
+			const double maxsy = minsy + sh / dim.Height;
 
 			// Total area, and integral of r, g, b values over that area,
 			// initialized to zero, to be summed up in next loops.
-			area = 0;
-			ra = 0;
-			ga = 0;
-			ba = 0;
-			aa = 0;
-
+			double area = 0, ra = 0, ga = 0, ba = 0, aa = 0;
+			irr::video::SColor pxl;
+			const auto csy = floor(minsy);
+			const auto csx = floor(minsx);
 			// Loop over the integral pixel positions described by those bounds.
-			for(sy = floor(minsy); sy < maxsy; sy++)
-				for(sx = floor(minsx); sx < maxsx; sx++) {
+			for(irr::u32 sy = csy; sy < maxsy; sy++)
+				for(irr::u32 sx = csx; sx < maxsx; sx++) {
 					if(timestamp_id != source_timestamp_id.load())
 						return false;
 
 					// Calculate width, height, then area of dest pixel
 					// that's covered by this source pixel.
-					pw = 1;
+					double pw = 1;
 					if(minsx > sx)
 						pw += sx - minsx;
 					if(maxsx < (sx + 1))
 						pw += maxsx - sx - 1;
-					ph = 1;
+					double ph = 1;
 					if(minsy > sy)
 						ph += sy - minsy;
 					if(maxsy < (sy + 1))
 						ph += maxsy - sy - 1;
-					pa = pw * ph;
+					const double pa = pw * ph;
 
 					// Get source pixel and add it to totals, weighted
 					// by covered area and alpha.
@@ -380,15 +374,16 @@ irr::video::IImage* ImageManager::GetTextureImageFromFile(const irr::io::path& f
 		srcimg = archivefile;
 	} else
 		srcimg = driver->createImageFromFile(file);
-	if(srcimg == NULL || timestamp_id != source_timestamp_id.load()) {
+	if(!srcimg || timestamp_id != source_timestamp_id.load()) {
 		if(srcimg)
 			srcimg->drop();
-		return NULL;
+		return nullptr;
 	}
-	if(srcimg->getDimension() == irr::core::dimension2d<irr::u32>(width, height)) {
+	const irr::core::dimension2d<irr::u32> dim(width, height);
+	if(srcimg->getDimension() == dim) {
 		return srcimg;
 	} else {
-		irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
+		irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), dim);
 		if(timestamp_id != source_timestamp_id.load() || !imageScaleNNAA(srcimg, destimg, width, height, timestamp_id, std::ref(source_timestamp_id))) {
 			destimg->drop();
 			destimg = nullptr;
@@ -498,6 +493,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 	return std::make_pair(nullptr, EPRO_TEXT("wait for download"));
 }
 irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, bool wait, bool fit, int* chk) {
+	//wait = true;
 	if(chk)
 		*chk = 1;
 	irr::video::ITexture* ret_unk = tUnknown;
@@ -632,7 +628,7 @@ originally under LGPL2.1+
  * 2d where alpha is blended.
  */
 void imageCleanTransparent(irr::video::IImage *src, irr::u32 threshold) {
-	irr::core::dimension2d<irr::u32> dim = src->getDimension();
+	const auto dim = src->getDimension();
 
 	// Walk each pixel looking for fully transparent ones.
 	// Note: loop y around x for better cache locality.
@@ -640,7 +636,7 @@ void imageCleanTransparent(irr::video::IImage *src, irr::u32 threshold) {
 		for(irr::u32 ctrx = 0; ctrx < dim.Width; ctrx++) {
 
 			// Ignore opaque pixels.
-			irr::video::SColor c = src->getPixel(ctrx, ctry);
+			auto c = src->getPixel(ctrx, ctry);
 			if(c.getAlpha() > threshold)
 				continue;
 
@@ -654,12 +650,12 @@ void imageCleanTransparent(irr::video::IImage *src, irr::u32 threshold) {
 					sx <= (ctrx + 1) && sx < dim.Width; sx++) {
 
 				// Ignore transparent pixels.
-				irr::video::SColor d = src->getPixel(sx, sy);
+				const auto d = src->getPixel(sx, sy);
 				if(d.getAlpha() <= threshold)
 					continue;
 
 				// Add RGB values weighted by alpha.
-				irr::u32 a = d.getAlpha();
+				const auto a = d.getAlpha();
 				ss += a;
 				sr += a * d.getRed();
 				sg += a * d.getGreen();
@@ -685,63 +681,52 @@ void imageCleanTransparent(irr::video::IImage *src, irr::u32 threshold) {
  * and downscaling.
  */
 void imageScaleNNAAUnthreaded(irr::video::IImage *src, const irr::core::rect<irr::s32> &srcrect, irr::video::IImage *dest) {
-	double sx, sy, minsx, maxsx, minsy, maxsy, area, ra, ga, ba, aa, pw, ph, pa;
-	irr::u32 dy, dx;
-	irr::video::SColor pxl;
-
-	// Cache rectsngle boundaries.
-	double sox = srcrect.UpperLeftCorner.X * 1.0;
-	double soy = srcrect.UpperLeftCorner.Y * 1.0;
-	double sw = srcrect.getWidth() * 1.0;
-	double sh = srcrect.getHeight() * 1.0;
+	// Cache rectangle boundaries.
+	const double sox = srcrect.UpperLeftCorner.X;
+	const double soy = srcrect.UpperLeftCorner.Y;
+	const double sw = srcrect.getWidth();
+	const double sh = srcrect.getHeight();
 
 	// Walk each destination image pixel.
 	// Note: loop y around x for better cache locality.
-	irr::core::dimension2d<irr::u32> dim = dest->getDimension();
-	for(dy = 0; dy < dim.Height; dy++)
-		for(dx = 0; dx < dim.Width; dx++) {
+	const auto dim = dest->getDimension();
+	for(irr::u32 dy = 0; dy < dim.Height; dy++)
+		for(irr::u32 dx = 0; dx < dim.Width; dx++) {
 
 			// Calculate floating-point source rectangle bounds.
 			// Do some basic clipping, and for mirrored/flipped rects,
 			// make sure min/max are in the right order.
-			minsx = sox + (dx * sw / dim.Width);
-			minsx = std::min(std::max(minsx, 0.0), sw + sox);
-			maxsx = minsx + sw / dim.Width;
-			maxsx = std::min(std::max(maxsx, 0.0), sw + sox);
+			double minsx = std::min(std::max(sox + (dx * sw / dim.Width), 0.0), sw + sox);
+			double maxsx = std::min(std::max(minsx + sw / dim.Width, 0.0), sw + sox);
 			if(minsx > maxsx)
 				std::swap(minsx, maxsx);
-			minsy = soy + (dy * sh / dim.Height);
-			minsy = std::min(std::max(minsy, 0.0), sh + soy);
-			maxsy = minsy + sh / dim.Height;
-			maxsy = std::min(std::max(maxsy, 0.0), sh + soy);
+			double minsy = std::min(std::max(soy + (dy * sh / dim.Height), 0.0), sh + soy);
+			double maxsy = std::min(std::max(minsy + sh / dim.Height, 0.0), sh + soy);
 			if(minsy > maxsy)
 				std::swap(minsy, maxsy);
 
 			// Total area, and integral of r, g, b values over that area,
 			// initialized to zero, to be summed up in next loops.
-			area = 0;
-			ra = 0;
-			ga = 0;
-			ba = 0;
-			aa = 0;
+			double area = 0, ra = 0, ga = 0, ba = 0, aa = 0;
+			irr::video::SColor pxl;
 
 			// Loop over the integral pixel positions described by those bounds.
-			for(sy = floor(minsy); sy < maxsy; sy++)
-				for(sx = floor(minsx); sx < maxsx; sx++) {
-
+			for(double sy = floor(minsy); sy < maxsy; sy++)
+				for(double sx = floor(minsx); sx < maxsx; sx++) {
 					// Calculate width, height, then area of dest pixel
 					// that's covered by this source pixel.
-					pw = 1;
+
+					double pw = 1;
 					if(minsx > sx)
 						pw += sx - minsx;
 					if(maxsx < (sx + 1))
 						pw += maxsx - sx - 1;
-					ph = 1;
+					double ph = 1;
 					if(minsy > sy)
 						ph += sy - minsy;
 					if(maxsy < (sy + 1))
 						ph += maxsy - sy - 1;
-					pa = pw * ph;
+					const double pa = pw * ph;
 
 					// Get source pixel and add it to totals, weighted
 					// by covered area and alpha.
@@ -770,10 +755,9 @@ void imageScaleNNAAUnthreaded(irr::video::IImage *src, const irr::core::rect<irr
 }
 #ifdef __ANDROID__
 bool hasNPotSupport(irr::video::IVideoDriver* driver) {
-	auto check = [](auto driver)->bool {
+	static const auto supported = [driver] {
 		return driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT);
-	};
-	static const bool supported = check(driver);
+	}();
 	return supported;
 }
 // Compute next-higher power of 2 efficiently, e.g. for power-of-2 texture sizes.
@@ -794,19 +778,19 @@ inline irr::u32 npot2(irr::u32 orig) {
  */
 irr::video::ITexture* ImageManager::guiScalingResizeCached(irr::video::ITexture *src, const irr::core::rect<irr::s32> &srcrect,
 											const irr::core::rect<irr::s32> &destrect) {
-	if(src == NULL)
+	if(!src)
 		return src;
 
 	// Calculate scaled texture name.
-	irr::io::path rectstr = fmt::format(EPRO_TEXT("{}:{}:{}:{}:{}:{}"),
+	irr::io::path rectstr = fmt::format(EPRO_TEXT("@guiScalingFilter:{}:{}:{}:{}:{}:{}"),
 						 srcrect.UpperLeftCorner.X,
 						 srcrect.UpperLeftCorner.Y,
 						 srcrect.getWidth(),
 						 srcrect.getHeight(),
 						 destrect.getWidth(),
 						 destrect.getHeight()).data();
-	irr::io::path origname = src->getName().getPath();
-	irr::io::path scalename = origname + "@guiScalingFilter:" + rectstr;
+	auto& origname = src->getName().getPath();
+	irr::io::path scalename = origname + rectstr;
 
 	// Search for existing scaled texture.
 	irr::video::ITexture *scaled = g_txrCache[scalename];
@@ -816,7 +800,7 @@ irr::video::ITexture* ImageManager::guiScalingResizeCached(irr::video::ITexture 
 	// Try to find the texture converted to an image in the cache.
 	// If the image was not found, try to extract it from the texture.
 	irr::video::IImage* srcimg = g_imgCache[origname];
-	if(srcimg == NULL) {
+	if(!srcimg) {
 		srcimg = driver->createImageFromData(src->getColorFormat(),
 											 src->getSize(), src->lock(), false);
 		src->unlock();
@@ -857,11 +841,11 @@ void ImageManager::draw2DImageFilterScaled(irr::video::ITexture* txr,
 							 bool usealpha) {
 	// Attempt to pre-scale image in software in high quality.
 	irr::video::ITexture *scaled = guiScalingResizeCached(txr, srcrect, destrect);
-	if(scaled == NULL)
+	if(!scaled)
 		return;
 
 	// Correct source rect based on scaled image.
-	const irr::core::rect<irr::s32> mysrcrect = (scaled != txr)
+	const auto mysrcrect = (scaled != txr)
 		? irr::core::rect<irr::s32>(0, 0, destrect.getWidth(), destrect.getHeight())
 		: srcrect;
 
