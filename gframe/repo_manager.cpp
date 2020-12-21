@@ -114,58 +114,54 @@ std::map<std::string, int> RepoManager::GetRepoStatus() {
 }
 
 #define JSON_SET_IF_VALID(field, jsontype, cpptype) \
-	do {if(obj[#field].is_##jsontype()) \
-	tmp_repo.field = obj[#field].get<cpptype>();} while(0)
-void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
-	try {
-		if(configs.size() && configs.at("repos").is_array()) {
-			try {
-				for(auto& obj : configs["repos"].get<std::vector<nlohmann::json>>()) {
-					if(obj["should_read"].is_boolean() && !obj["should_read"].get<bool>())
-						continue;
-					GitRepo tmp_repo;
-					JSON_SET_IF_VALID(url, string, std::string);
-					JSON_SET_IF_VALID(should_update, boolean, bool);
-					if(tmp_repo.url == "default") {
+	do { auto it = obj.find(#field); if(it != obj.end() && it->is_##jsontype()) \
+	tmp_repo.field = it->get<cpptype>();} while(0)
+void RepoManager::LoadRepositoriesFromJson(const nlohmann::ordered_json& configs) {
+	auto cit = configs.find("repos");
+	if(cit != configs.end() && cit->is_array()) {
+		for(auto& obj : *cit) {
+			{
+				auto it = obj.find("should_read");
+				if(it != obj.end() && it->is_boolean() && !it->get<bool>())
+					continue;
+			}
+			GitRepo tmp_repo;
+			JSON_SET_IF_VALID(url, string, std::string);
+			JSON_SET_IF_VALID(should_update, boolean, bool);
+			if(tmp_repo.url == "default") {
 #ifdef DEFAULT_LIVE_URL
-						tmp_repo.url = DEFAULT_LIVE_URL;
+				tmp_repo.url = DEFAULT_LIVE_URL;
 #ifdef YGOPRO_BUILD_DLL
-						tmp_repo.has_core = true;
+				tmp_repo.has_core = true;
 #endif
 #else
-						continue;
+				continue;
 #endif //DEFAULT_LIVE_URL
-					} else if(tmp_repo.url == "default_anime") {
+			} else if(tmp_repo.url == "default_anime") {
 #ifdef DEFAULT_LIVEANIME_URL
-						tmp_repo.url = DEFAULT_LIVEANIME_URL;
+				tmp_repo.url = DEFAULT_LIVEANIME_URL;
 #else
-						continue;
+				continue;
 #endif //DEFAULT_LIVEANIME_URL
-					} else {
-						JSON_SET_IF_VALID(repo_path, string, std::string);
-						JSON_SET_IF_VALID(repo_name, string, std::string);
-						JSON_SET_IF_VALID(data_path, string, std::string);
-						JSON_SET_IF_VALID(lflist_path, string, std::string);
-						JSON_SET_IF_VALID(script_path, string, std::string);
-						JSON_SET_IF_VALID(pics_path, string, std::string);
-						JSON_SET_IF_VALID(is_language, boolean, bool);
-						if(tmp_repo.is_language)
-							JSON_SET_IF_VALID(language, string, std::string);
+			} else {
+				JSON_SET_IF_VALID(repo_path, string, std::string);
+				JSON_SET_IF_VALID(repo_name, string, std::string);
+				JSON_SET_IF_VALID(data_path, string, std::string);
+				JSON_SET_IF_VALID(lflist_path, string, std::string);
+				JSON_SET_IF_VALID(script_path, string, std::string);
+				JSON_SET_IF_VALID(pics_path, string, std::string);
+				JSON_SET_IF_VALID(is_language, boolean, bool);
+				if(tmp_repo.is_language)
+					JSON_SET_IF_VALID(language, string, std::string);
 #ifdef YGOPRO_BUILD_DLL
-						JSON_SET_IF_VALID(core_path, string, std::string);
-						JSON_SET_IF_VALID(has_core, boolean, bool);
+				JSON_SET_IF_VALID(core_path, string, std::string);
+				JSON_SET_IF_VALID(has_core, boolean, bool);
 #endif
-					}
-					if(tmp_repo.Sanitize())
-						AddRepo(std::move(tmp_repo));
-				}
 			}
-			catch(std::exception& e) {
-				ErrorLog(fmt::format("Exception occurred: {}", e.what()));
-			}
+			if(tmp_repo.Sanitize())
+				AddRepo(std::move(tmp_repo));
 		}
 	}
-	catch(...) {}
 }
 
 void RepoManager::TerminateThreads() {

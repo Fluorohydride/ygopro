@@ -1,6 +1,7 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+#include "ocgapi_types.h"
 #include "text_types.h"
 
 extern uint16_t PRO_VERSION;

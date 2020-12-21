@@ -2010,45 +2010,47 @@ void Game::RefreshLFLists() {
 void Game::RefreshAiDecks() {
 	gBot.bots.clear();
 	std::ifstream windbots("WindBot/bots.json");
-	if (windbots) {
+	if (windbots.good()) {
+		nlohmann::json j;
 		try {
-			nlohmann::json j;
 			windbots >> j;
-			if (j.size() && j.is_array()) {
-				for (auto& obj : j) {
-					if (!obj["name"].is_string() || !obj["deck"].is_string() || !obj["difficulty"].is_number() || !obj["masterRules"].is_array())
-						continue;
+		}
+		catch(std::exception& e) {
+			ErrorLog(fmt::format("Failed to load WindBot Ignite config json: {}", e.what()));
+		}
+		if(j.is_array()) {
+#ifdef _WIN32
+			WindBot::executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
+#else
+			{
+				auto it = gGameConfig->user_configs.find("posixPathExtension");
+				if(it != gGameConfig->user_configs.end() && it->is_string()) {
+					WindBot::executablePath = it->get<epro::path_string>();
+				} else if((it = gGameConfig->configs.find("posixPathExtension")) != gGameConfig->user_configs.end()
+						  && it->is_string()) {
+					WindBot::executablePath = it->get<epro::path_string>();
+				}
+			}
+#endif
+			for(auto& obj : j) {
+				try {
 					WindBot bot;
-					bot.name = BufferIO::DecodeUTF8s(obj["name"].get_ref<std::string&>());
-					bot.deck = BufferIO::DecodeUTF8s(obj["deck"].get_ref<std::string&>());
-					bot.difficulty = obj["difficulty"].get<int>();
-					for (auto& masterRule : obj["masterRules"].get<std::vector<nlohmann::json>>()) {
-						if (masterRule.is_number()) {
+					bot.name = BufferIO::DecodeUTF8s(obj.at("name").get_ref<std::string&>());
+					bot.deck = BufferIO::DecodeUTF8s(obj.at("deck").get_ref<std::string&>());
+					bot.difficulty = obj.at("difficulty").get<int>();
+					for(auto& masterRule : obj.at("masterRules")) {
+						if(masterRule.is_number()) {
 							bot.masterRules.insert(masterRule.get<int>());
 						}
 					}
-					bot.version = CLIENT_VERSION;
-#ifdef _WIN32
-					bot.executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
-#else
-					if(gGameConfig->user_configs.size() && gGameConfig->user_configs["posixPathExtension"].is_string()) {
-						bot.executablePath = gGameConfig->user_configs["posixPathExtension"].get<epro::path_string>();
-					} else if (gGameConfig->configs.size() && gGameConfig->configs["posixPathExtension"].is_string()) {
-						bot.executablePath = gGameConfig->configs["posixPathExtension"].get<epro::path_string>();
-					} else {
-						bot.executablePath = EPRO_TEXT("");
-					}
-#endif
 					gBot.bots.push_back(std::move(bot));
+				}
+				catch(std::exception& e) {
+					ErrorLog(fmt::format("Failed to parse WindBot Ignite config json entry: {}", e.what()));
 				}
 			}
 		}
-		catch (std::exception& e)
-		{
-			ErrorLog(fmt::format("Failed to load WindBot Ignite config json: {}", e.what()));
-		}
-	}
-	else {
+	} else {
 		ErrorLog("Failed to open WindBot Ignite config json!");
 	}
 }
@@ -2221,30 +2223,28 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 	}
 }
 void Game::LoadServers() {
-	for(auto& _config : { std::ref(gGameConfig->user_configs), std::ref(gGameConfig->configs) }) {
-		auto& config = _config.get();
-		try {
-			if(config.size() && config.at("servers").is_array()) {
+	for(auto& _config : { &gGameConfig->user_configs, &gGameConfig->configs }) {
+		auto& config = *_config;
+		auto it = config.find("servers");
+		if(it != config.end() && it->is_array()) {
+			for(auto& obj : *it) {
 				try {
-					for(auto& obj : config["servers"].get<std::vector<nlohmann::json>>()) {
-						ServerInfo tmp_server;
-						tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get_ref<std::string&>());
-						tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get_ref<std::string&>());
-						tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get_ref<std::string&>());
-						tmp_server.roomlistport = obj["roomlistport"].get<int>();
-						tmp_server.duelport = obj["duelport"].get<int>();
-						int i = serverChoice->addItem(tmp_server.name.data());
-						if(gGameConfig->lastServer == tmp_server.name)
-							serverChoice->setSelected(i);
-						ServerLobby::serversVector.push_back(std::move(tmp_server));
-					}
+					ServerInfo tmp_server;
+					tmp_server.name = BufferIO::DecodeUTF8s(obj.at("name").get_ref<std::string&>());
+					tmp_server.address = BufferIO::DecodeUTF8s(obj.at("address").get_ref<std::string&>());
+					tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj.at("roomaddress").get_ref<std::string&>());
+					tmp_server.roomlistport = obj.at("roomlistport").get<int>();
+					tmp_server.duelport = obj.at("duelport").get<int>();
+					int i = serverChoice->addItem(tmp_server.name.data());
+					if(gGameConfig->lastServer == tmp_server.name)
+						serverChoice->setSelected(i);
+					ServerLobby::serversVector.push_back(std::move(tmp_server));
 				}
 				catch(std::exception& e) {
-					ErrorLog(fmt::format("Exception occurred: {}", e.what()));
+					ErrorLog(fmt::format("Exception occurred while parsing server entry: {}", e.what()));
 				}
 			}
 		}
-		catch(...) {}
 	}
 }
 void Game::ShowCardInfo(uint32_t code, bool resize, imgType type) {

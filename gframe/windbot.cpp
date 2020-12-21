@@ -10,10 +10,14 @@
 #include "Android/porting_android.h"
 #endif
 #include <fmt/format.h>
+#include "config.h"
 #include "bufferio.h"
 #include "logging.h"
 
 namespace ygo {
+
+epro::path_string WindBot::executablePath{};
+uint32_t WindBot::version{ CLIENT_VERSION };
 
 #if defined(_WIN32) || defined(__ANDROID__)
 bool WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) const {

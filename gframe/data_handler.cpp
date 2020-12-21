@@ -41,38 +41,38 @@ void DataHandler::LoadArchivesDB() {
 }
 
 void DataHandler::LoadPicUrls() {
-	for(auto& _config : { std::ref(configs->user_configs), std::ref(configs->configs) }) {
-		auto& config = _config.get();
-		try {
-			if(config.size() && config.at("urls").is_array()) {
+	for(auto& _config : { &configs->user_configs, &configs->configs }) {
+		auto& config = *_config;
+		auto it = config.find("urls");
+		if(it != config.end() && it->is_array()) {
+			for(auto& obj : *it) {
 				try {
-					for(auto& obj : config["urls"].get<std::vector<nlohmann::json>>()) {
-						auto type = obj["type"].get<std::string>();
-						if(obj["url"].get<std::string>() == "default") {
-							if(type == "pic") {
+					const auto& type = obj.at("type").get_ref<std::string&>();
+					const auto& url = obj.at("url").get_ref<std::string&>();
+					if(url == "default") {
+						if(type == "pic") {
 #ifdef DEFAULT_PIC_URL
-								imageDownloader->AddDownloadResource({ DEFAULT_PIC_URL, imgType::ART });
+							imageDownloader->AddDownloadResource({ DEFAULT_PIC_URL, imgType::ART });
 #else
-								continue;
+							continue;
 #endif
-							} else if(type == "field") {
+						} else if(type == "field") {
 #ifdef DEFAULT_FIELD_URL
-								imageDownloader->AddDownloadResource({ DEFAULT_FIELD_URL, imgType::FIELD });
+							imageDownloader->AddDownloadResource({ DEFAULT_FIELD_URL, imgType::FIELD });
 #else
-								continue;
+							continue;
 #endif
-							} else if(type == "cover") {
+						} else if(type == "cover") {
 #ifdef DEFAULT_COVER_URL
-								imageDownloader->AddDownloadResource({ DEFAULT_COVER_URL, imgType::COVER });
+							imageDownloader->AddDownloadResource({ DEFAULT_COVER_URL, imgType::COVER });
 #else
-								continue;
+							continue;
 #endif
-							}
-						} else {
-							imageDownloader->AddDownloadResource({ obj["url"].get<std::string>(), type == "field" ?
-																	imgType::FIELD : (type == "pic") ?
-																	imgType::ART : imgType::COVER });
 						}
+					} else {
+						imageDownloader->AddDownloadResource({ url, type == "field" ?
+																imgType::FIELD : (type == "pic") ?
+																imgType::ART : imgType::COVER });
 					}
 				}
 				catch(std::exception& e) {
@@ -80,7 +80,6 @@ void DataHandler::LoadPicUrls() {
 				}
 			}
 		}
-		catch(...) {}
 	}
 }
 void DataHandler::LoadZipArchives() {
