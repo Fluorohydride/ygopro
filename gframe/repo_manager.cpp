@@ -120,7 +120,7 @@ void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
 	try {
 		if(configs.size() && configs.at("repos").is_array()) {
 			try {
-				for(auto& obj : configs["repos"]) {
+				for(auto& obj : configs["repos"].get<std::vector<nlohmann::json>>()) {
 					if(obj["should_read"].is_boolean() && !obj["should_read"].get<bool>())
 						continue;
 					GitRepo tmp_repo;

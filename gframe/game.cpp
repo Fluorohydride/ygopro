@@ -2022,7 +2022,7 @@ void Game::RefreshAiDecks() {
 					bot.name = BufferIO::DecodeUTF8s(obj["name"].get_ref<std::string&>());
 					bot.deck = BufferIO::DecodeUTF8s(obj["deck"].get_ref<std::string&>());
 					bot.difficulty = obj["difficulty"].get<int>();
-					for (auto& masterRule : obj["masterRules"]) {
+					for (auto& masterRule : obj["masterRules"].get<std::vector<nlohmann::json>>()) {
 						if (masterRule.is_number()) {
 							bot.masterRules.insert(masterRule.get<int>());
 						}
@@ -2226,11 +2226,11 @@ void Game::LoadServers() {
 		try {
 			if(config.size() && config.at("servers").is_array()) {
 				try {
-					for(auto& obj : config["servers"]) {
+					for(auto& obj : config["servers"].get<std::vector<nlohmann::json>>()) {
 						ServerInfo tmp_server;
-						tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
-						tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get<std::string>());
-						tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
+						tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get_ref<std::string&>());
+						tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get_ref<std::string&>());
+						tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get_ref<std::string&>());
 						tmp_server.roomlistport = obj["roomlistport"].get<int>();
 						tmp_server.duelport = obj["duelport"].get<int>();
 						int i = serverChoice->addItem(tmp_server.name.data());
