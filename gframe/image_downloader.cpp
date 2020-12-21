@@ -167,6 +167,8 @@ void ImageDownloader::AddToDownloadQueue(uint32_t code, imgType type) {
 	if(type == imgType::THUMB)
 		type = imgType::ART;
 	std::lock_guard<std::mutex> lck(pic_download);
+	if(stop_threads)
+		return;
 	if(downloading_images[type].find(code) == downloading_images[type].end()) {
 		downloading_images[type][code].status = downloadStatus::DOWNLOADING;
 		to_download.emplace_back(downloadParam{ code, type, downloadStatus::NONE, EPRO_TEXT("") });
