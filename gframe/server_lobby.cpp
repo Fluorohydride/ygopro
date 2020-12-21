@@ -35,7 +35,7 @@ static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, voi
 
 void ServerLobby::FillOnlineRooms() {
 	mainGame->roomListTable->clearRows();
-	std::vector<RoomInfo>& rooms = roomsVector;
+	auto& rooms = roomsVector;
 
 	std::wstring searchText(Utils::ToUpperNoAccents<std::wstring>(mainGame->ebRoomName->getText()));
 
@@ -44,21 +44,20 @@ void ServerLobby::FillOnlineRooms() {
 	int bestOf = 0;
 	int team1 = 0;
 	int team2 = 0;
-	try { bestOf = std::stoi(mainGame->ebOnlineBestOf->getText()); }
-	catch(...) {}
-	try { team1 = std::stoi(mainGame->ebOnlineTeam1->getText()); }
-	catch(...) {}
-	try { team2 = std::stoi(mainGame->ebOnlineTeam2->getText()); }
+	try {
+		bestOf = std::stoi(mainGame->ebOnlineBestOf->getText());
+		team1 = std::stoi(mainGame->ebOnlineTeam1->getText());
+		team2 = std::stoi(mainGame->ebOnlineTeam2->getText());
+	}
 	catch(...) {}
 
 	bool doFilter = searchText.size() || searchRules > 0 || searchBanlist > 0 || bestOf || team1 || team2 || mainGame->btnFilterRelayMode->isPressed();
 
-	irr::video::SColor normal_room = skin::ROOMLIST_NORMAL_ROOM_VAL;
-	irr::video::SColor custom_room = skin::ROOMLIST_CUSTOM_ROOM_VAL;
-	irr::video::SColor started_room = skin::ROOMLIST_STARTED_ROOM_VAL;
-	irr::video::SColor color;
-	bool show_password_checked = mainGame->chkShowPassword->isChecked();
-	bool show_started_checked = mainGame->chkShowActiveRooms->isChecked();
+	const auto& normal_room = skin::ROOMLIST_NORMAL_ROOM_VAL;
+	const auto& custom_room = skin::ROOMLIST_CUSTOM_ROOM_VAL;
+	const auto& started_room = skin::ROOMLIST_STARTED_ROOM_VAL;
+	const bool show_password_checked = mainGame->chkShowPassword->isChecked();
+	const bool show_started_checked = mainGame->chkShowActiveRooms->isChecked();
 	for(auto& room : rooms) {
 		if((room.locked && !show_password_checked) || (room.started && !show_started_checked)) {
 			continue;
@@ -108,14 +107,24 @@ void ServerLobby::FillOnlineRooms() {
 		roomListTable->setCellData(index, 1, &room);
 		roomListTable->setCellText(index, 1, gDataManager->GetSysString(room.info.rule + 1900).data());
 		roomListTable->setCellText(index, 2, fmt::format(L"[{}vs{}]{}{}", room.info.team1, room.info.team2,
-			(room.info.best_of > 1) ? fmt::format(L" (best of {})", room.info.best_of).data() : L"",
+			(room.info.best_of > 1) ? fmt::format(L" (best of {})", room.info.best_of) : L"",
 			(room.info.duel_flag_low & DUEL_RELAY) ? L" (Relay)" : L"").data());
 		int rule;
-		mainGame->GetMasterRule((((uint64_t)room.info.duel_flag_low) | ((uint64_t)room.info.duel_flag_high) << 32) & ~DUEL_RELAY, room.info.forbiddentypes, &rule);
-		if(rule == 6)
-			roomListTable->setCellText(index, 3, "Custom");
-		else
-			roomListTable->setCellText(index, 3, fmt::format(L"MR {}", (rule == 0) ? 3 : rule).data());
+		auto duel_flag = (((uint64_t)room.info.duel_flag_low) | ((uint64_t)room.info.duel_flag_high) << 32);
+		mainGame->GetMasterRule(duel_flag & ~(DUEL_RELAY | DUEL_TCG_SEGOC_NONPUBLIC), room.info.forbiddentypes, &rule);
+		if(rule == 6) {
+			if(duel_flag == DUEL_MODE_GOAT) {
+				roomListTable->setCellText(index, 3, "GOAT");
+			} else if(duel_flag == DUEL_MODE_RUSH) {
+				roomListTable->setCellText(index, 3, "Rush");
+			} else if(duel_flag == DUEL_MODE_SPEED) {
+				roomListTable->setCellText(index, 3, "Speed");
+			} else
+				roomListTable->setCellText(index, 3, "Custom");
+		} else
+			roomListTable->setCellText(index, 3, fmt::format(L"{}MR {}", 
+															 (duel_flag & DUEL_TCG_SEGOC_NONPUBLIC) ? L"TCG " : L"",
+															 (rule == 0) ? 3 : rule).data());
 		roomListTable->setCellText(index, 4, (banlist.size()) ? banlist.data() : L"???");
 		std::wstring players;
 		for(auto& player : room.players) {
@@ -127,7 +136,7 @@ void ServerLobby::FillOnlineRooms() {
 		roomListTable->setCellText(index, 6, room.description.data());
 		roomListTable->setCellText(index, 7, room.started ? gDataManager->GetSysString(1986).data() : gDataManager->GetSysString(1987).data());
 
-
+		irr::video::SColor color;
 		if(room.started)
 			color = started_room;
 		else if(rule == 5 && !room.info.no_check_deck && !room.info.no_shuffle_deck && room.info.start_lp == 8000 && room.info.start_hand == 5 && room.info.draw_count == 1)
@@ -156,16 +165,13 @@ int ServerLobby::GetRoomsThread() {
 	mainGame->serverChoice->setEnabled(false);
 	mainGame->roomListTable->setVisible(false);
 
-	CURL *curl_handle;
-	CURLcode res;
-
 	std::string retrieved_data;
-	curl_handle = curl_easy_init();
-	if(mainGame->chkShowActiveRooms->isChecked()) {
+	CURL* curl_handle = curl_easy_init();
+	//if(mainGame->chkShowActiveRooms->isChecked()) {
 		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8s(serverInfo.roomaddress), serverInfo.roomlistport).data());
-	} else {
+	/*} else {
 		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8s(serverInfo.roomaddress), serverInfo.roomlistport).data());
-	}
+	}*/
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 7L);
 	curl_easy_setopt(curl_handle, CURLOPT_TIMEOUT, 15L);
@@ -181,7 +187,7 @@ int ServerLobby::GetRoomsThread() {
 		curl_easy_setopt(curl_handle, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
 #endif
 
-	res = curl_easy_perform(curl_handle);
+	const auto res = curl_easy_perform(curl_handle);
 	curl_easy_cleanup(curl_handle);
 	if(res != CURLE_OK) {
 		//error
@@ -202,13 +208,13 @@ int ServerLobby::GetRoomsThread() {
 			nlohmann::json j = nlohmann::json::parse(retrieved_data);
 			if (j.size()) {
 #define GET(field, type) obj[field].get<type>()
-				for (auto& obj : j["rooms"].get<std::vector<nlohmann::json>>()) {
+				for (auto& obj : j["rooms"]) {
 					RoomInfo room;
 					room.id = GET("roomid", int);
-					room.name = BufferIO::DecodeUTF8s(GET("roomname", std::string));
-					room.description = BufferIO::DecodeUTF8s(GET("roomnotes", std::string));
+					room.name = BufferIO::DecodeUTF8s(obj["roomname"].get_ref<std::string&>());
+					room.description = BufferIO::DecodeUTF8s(obj["roomnotes"].get_ref<std::string&>());
 					room.locked = GET("needpass", bool);
-					room.started = GET("istart", std::string) == "start";
+					room.started = obj["istart"].get_ref<std::string&>() == "start";
 					room.info.mode = GET("roommode", int);
 					room.info.team1 = GET("team1", int);
 					room.info.team2 = GET("team2", int);
@@ -227,9 +233,9 @@ int ServerLobby::GetRoomsThread() {
 					room.info.no_shuffle_deck = GET("no_shuffle", bool);
 					room.info.lflist = GET("banlist_hash", int);
 #undef GET
-					for (auto& obj2 : obj["users"].get<std::vector<nlohmann::json>>()) {
-						room.players.push_back(BufferIO::DecodeUTF8s(obj2["name"].get<std::string>()));
-					}
+					for (auto& obj2 : obj["users"])
+						room.players.push_back(BufferIO::DecodeUTF8s(obj2["name"].get_ref<std::string&>()));
+
 					roomsVector.push_back(std::move(room));
 				}
 			}
@@ -262,37 +268,34 @@ void ServerLobby::JoinServer(bool host) {
 	mainGame->ebNickName->setText(mainGame->ebNickNameOnline->getText());
 	auto selected = mainGame->serverChoice->getSelected();
 	if (selected < 0) return;
-	const ServerInfo& server = serversVector[selected];
+	std::pair<uint32_t, uint16_t> serverinfo;
 	try {
-		auto serverinfo = DuelClient::ResolveServer(server.address, server.duelport);
-		if(host) {
-			if(!DuelClient::StartClient(serverinfo.first, serverinfo.second)) {
-				return;
-			}
-		} else {
-			//client
-			RoomInfo* room = static_cast<RoomInfo*>(mainGame->roomListTable->getCellData(mainGame->roomListTable->getSelected(), 1));
-			if(room->locked) {
-				if(!mainGame->wRoomPassword->isVisible()) {
-					mainGame->wRoomPassword->setVisible(true);
-					return;
-				} else {
-					if(wcslen(mainGame->ebRPName->getText()) == 0) {
-						return;
-					}
-				}
-				mainGame->wRoomPassword->setVisible(false);
-				mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(mainGame->ebRPName->getText());
-			} else {
-				mainGame->dInfo.secret.pass = "";
-			}
-			if(!DuelClient::StartClient(serverinfo.first, serverinfo.second, room->id, false)) {
-				return;
-			}
-		}
+		const ServerInfo& server = serversVector[selected];
+		serverinfo = DuelClient::ResolveServer(server.address, server.duelport);
 	}
-	catch(std::exception& e) {
-		ErrorLog(fmt::format("Exception occurred: {}", e.what()));
+	catch(std::exception& e) { ErrorLog(fmt::format("Exception occurred: {}", e.what())); }
+	if(host) {
+		if(!DuelClient::StartClient(serverinfo.first, serverinfo.second))
+			return;
+	} else {
+		//client
+		auto room = static_cast<RoomInfo*>(mainGame->roomListTable->getCellData(mainGame->roomListTable->getSelected(), 1));
+		if(!room)
+			return;
+		if(room->locked) {
+			if(!mainGame->wRoomPassword->isVisible()) {
+				mainGame->wRoomPassword->setVisible(true);
+				return;
+			}
+			auto text = mainGame->ebRPName->getText();
+			if(*text == L'0')
+				return;
+			mainGame->wRoomPassword->setVisible(false);
+			mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(text);
+		} else
+			mainGame->dInfo.secret.pass.clear();
+		if(!DuelClient::StartClient(serverinfo.first, serverinfo.second, room->id, false))
+			return;
 	}
 }
 
