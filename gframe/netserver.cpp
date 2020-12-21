@@ -184,12 +184,6 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 		users.erase(bit);
 	}
 }
-template<typename T>
-T getStruct(void* data, size_t len) {
-	T pkt{};
-	memcpy(&pkt, data, std::min<size_t>(sizeof(T), len));
-	return pkt;
-}
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, uint32_t len) {
 	static constexpr ClientVersion serverversion{ EXPAND_VERSION(CLIENT_VERSION) };
 	char* pdata = data;
@@ -224,26 +218,26 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, uint32_t len) {
 	case CTOS_HAND_RESULT: {
 		if(!dp->game)
 			return;
-		auto pkt = getStruct<CTOS_HandResult>(pdata, len - 1);
+		auto pkt = BufferIO::getStruct<CTOS_HandResult>(pdata, len - 1);
 		dp->game->HandResult(dp, pkt.res);
 		break;
 	}
 	case CTOS_TP_RESULT: {
 		if(!dp->game)
 			return;
-		auto pkt = getStruct<CTOS_TPResult>(pdata, len - 1);
+		auto pkt = BufferIO::getStruct<CTOS_TPResult>(pdata, len - 1);
 		dp->game->TPResult(dp, pkt.res);
 		break;
 	}
 	case CTOS_PLAYER_INFO: {
-		auto pkt = getStruct<CTOS_PlayerInfo>(pdata, len - 1);
+		auto pkt = BufferIO::getStruct<CTOS_PlayerInfo>(pdata, len - 1);
 		BufferIO::CopyWStr(pkt.name, dp->name, 20);
 		break;
 	}
 	case CTOS_CREATE_GAME: {
 		if(dp->game || duel_mode)
 			return;
-		auto pkt = getStruct<CTOS_CreateGame>(pdata, len - 1);
+		auto pkt = BufferIO::getStruct<CTOS_CreateGame>(pdata, len - 1);
 		if((pkt.info.handshake != SERVER_HANDSHAKE || pkt.info.version != serverversion)) {
 			VersionError vererr{ serverversion };
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, vererr);
@@ -272,7 +266,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, uint32_t len) {
 	case CTOS_JOIN_GAME: {
 		if(!duel_mode || ((len - 1) < sizeof(CTOS_JoinGame)))
 			break;
-		auto pkt = getStruct<CTOS_JoinGame>(pdata, len - 1);
+		auto pkt = BufferIO::getStruct<CTOS_JoinGame>(pdata, len - 1);
 		duel_mode->JoinGame(dp, &pkt, false);
 		break;
 	}
@@ -310,7 +304,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, uint32_t len) {
 	case CTOS_HS_KICK: {
 		if(!duel_mode || duel_mode->pduel)
 			break;
-		auto pkt = getStruct<CTOS_Kick>(pdata, len - 1);
+		auto pkt = BufferIO::getStruct<CTOS_Kick>(pdata, len - 1);
 		duel_mode->PlayerKick(dp, pkt.pos);
 		break;
 	}
@@ -323,7 +317,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, uint32_t len) {
 	case CTOS_REMATCH_RESPONSE:	{
 		if(!dp->game || !duel_mode || !duel_mode->seeking_rematch)
 			break;
-		auto pkt = getStruct<CTOS_RematchResponse>(pdata, len - 1);
+		auto pkt = BufferIO::getStruct<CTOS_RematchResponse>(pdata, len - 1);
 		duel_mode->RematchResult(dp, pkt.rematch);
 		break;
 	}

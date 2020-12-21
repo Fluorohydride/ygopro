@@ -152,6 +152,13 @@ public:
 			return ret;
 		return 0;
 	}
+
+	template<typename T>
+	static T getStruct(void* data, size_t len) {
+		T pkt{};
+		memcpy(&pkt, data, std::min<size_t>(sizeof(T), len));
+		return pkt;
+	}
 };
 
 #endif //BUFFERIO_H

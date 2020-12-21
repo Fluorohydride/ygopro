@@ -282,13 +282,6 @@ int DuelClient::ClientThread() {
 	return 0;
 }
 
-template<typename T>
-T getStruct(void* data, size_t len) {
-	T pkt{};
-	memcpy(&pkt, data, std::min<size_t>(sizeof(T), len));
-	return pkt;
-}
-
 void DuelClient::ParserThread() {
 	Utils::SetThreadName("ParserThread");
 	while(!stop_threads) {
@@ -324,7 +317,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, uint32_t len) {
 	char* pdata = data + 1;
 	switch(pktType) {
 		case STOC_CHAT: {
-			auto pkt = getStruct<STOC_Chat>(pdata, len);
+			auto pkt = BufferIO::getStruct<STOC_Chat>(pdata, len);
 			int player = pkt.player;
 			int type = -1;
 			if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2) {
@@ -446,10 +439,10 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		break;
 	}
 	case STOC_ERROR_MSG: {
-		auto _pkt = getStruct<STOC_ErrorMsg>(pdata, len);
+		auto _pkt = BufferIO::getStruct<STOC_ErrorMsg>(pdata, len);
 		switch(_pkt.type) {
 		case ERROR_TYPE::JOINERROR: {
-			auto pkt = getStruct<JoinError>(pdata, len);
+			auto pkt = BufferIO::getStruct<JoinError>(pdata, len);
 			temp_ver = 0;
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			if(mainGame->isHostingOnline) {
@@ -477,7 +470,7 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 			break;
 		}
 		case ERROR_TYPE::DECKERROR: {
-			auto pkt = getStruct<DeckError>(pdata, len);
+			auto pkt = BufferIO::getStruct<DeckError>(pdata, len);
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			int mainmin = 40, mainmax = 60, extramax = 15, sidemax = 15;
 			uint32_t code = 0, curcount = 0;
@@ -571,7 +564,7 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 				mainGame->btnHostConfirm->setEnabled(true);
 				mainGame->btnHostCancel->setEnabled(true);
 				if(_pkt.type == ERROR_TYPE::VERERROR2) {
-					auto version = getStruct<VersionError>(pdata, len).version;
+					auto version = BufferIO::getStruct<VersionError>(pdata, len).version;
 					mainGame->PopupMessage(fmt::format(gDataManager->GetSysString(1423).data(),
 													   version.client.major, version.client.minor,
 													   version.core.major, version.core.minor));
@@ -611,7 +604,7 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 	case STOC_HAND_RESULT: {
 		if(mainGame->dInfo.isCatchingUp)
 			break;
-		auto pkt = getStruct<STOC_HandResult>(pdata, len);
+		auto pkt = BufferIO::getStruct<STOC_HandResult>(pdata, len);
 		std::unique_lock<std::mutex> lock(mainGame->gMutex);
 		mainGame->stHintMsg->setVisible(false);
 		mainGame->showcardcode = (pkt.res1 - 1) + ((pkt.res2 - 1) << 16);
@@ -671,12 +664,12 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		break;
 	}
 	case STOC_CREATE_GAME: {
-		mainGame->dInfo.secret.game_id = getStruct<STOC_CreateGame>(pdata, len).gameid;
+		mainGame->dInfo.secret.game_id = BufferIO::getStruct<STOC_CreateGame>(pdata, len).gameid;
 		break;
 	}
 	case STOC_JOIN_GAME: {
 		temp_ver = 0;
-		auto pkt = getStruct<STOC_JoinGame>(pdata, len);
+		auto pkt = BufferIO::getStruct<STOC_JoinGame>(pdata, len);
 		mainGame->dInfo.isInLobby = true;
 		mainGame->dInfo.compat_mode = pkt.info.handshake != SERVER_HANDSHAKE;
 		if(mainGame->dInfo.compat_mode) {
@@ -854,7 +847,7 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		break;
 	}
 	case STOC_TYPE_CHANGE: {
-		auto pkt = getStruct<STOC_TypeChange>(pdata, len);
+		auto pkt = BufferIO::getStruct<STOC_TypeChange>(pdata, len);
 		selftype = pkt.type & 0xf;
 		is_host = ((pkt.type >> 4) & 0xf) != 0;
 		for(int i = 0; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
@@ -1006,7 +999,7 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		break;
 	}
 	case STOC_TIME_LIMIT: {
-		auto pkt = getStruct<STOC_TimeLimit>(pdata, len);
+		auto pkt = BufferIO::getStruct<STOC_TimeLimit>(pdata, len);
 		int lplayer = mainGame->LocalPlayer(pkt.player);
 		if(lplayer == 0)
 			DuelClient::SendPacketToServer(CTOS_TIME_CONFIRM);
@@ -1016,7 +1009,7 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 	}
 	case STOC_HS_PLAYER_ENTER: {
 		gSoundManager->PlaySoundEffect(SoundManager::SFX::PLAYER_ENTER);
-		auto pkt = getStruct<STOC_HS_PlayerEnter>(pdata, len);
+		auto pkt = BufferIO::getStruct<STOC_HS_PlayerEnter>(pdata, len);
 		if(pkt.pos > 5)
 			break;
 		wchar_t name[20];
@@ -1032,7 +1025,7 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		break;
 	}
 	case STOC_HS_PLAYER_CHANGE: {
-		auto pkt = getStruct<STOC_HS_PlayerChange>(pdata, len);
+		auto pkt = BufferIO::getStruct<STOC_HS_PlayerChange>(pdata, len);
 		uint8_t pos = (pkt.status >> 4) & 0xf;
 		uint8_t state = pkt.status & 0xf;
 		if(pos > 5)
@@ -1078,14 +1071,14 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		break;
 	}
 	case STOC_HS_WATCH_CHANGE: {
-		auto pkt = getStruct<STOC_HS_WatchChange>(pdata, len);
+		auto pkt = BufferIO::getStruct<STOC_HS_WatchChange>(pdata, len);
 		std::lock_guard<std::mutex> lock(mainGame->gMutex);
 		watching = pkt.watch_count;
 		mainGame->stHostPrepOB->setText(fmt::format(L"{} {}", gDataManager->GetSysString(1253), watching).data());
 		break;
 	}
 	case STOC_NEW_REPLAY: {
-		last_replay.pheader = getStruct<ReplayHeader>(pdata, len);
+		last_replay.pheader = BufferIO::getStruct<ReplayHeader>(pdata, len);
 		last_replay.comp_data.resize(len - sizeof(ReplayHeader) - 1);
 		memcpy(last_replay.comp_data.data(), pdata + sizeof(ReplayHeader), len - sizeof(ReplayHeader) - 1);
 		break;
@@ -4282,7 +4275,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 				tmp = fmt::format(L"MR {}", (rule == 0) ? 3 : rule);
 				return tmp;
 			};
-			auto GetIsCustom = [&]()-> epro::wstringview {
+			auto GetIsCustom = [&pHP,&rule] {
 				if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
 				   && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck
 				   && rule == DEFAULT_DUEL_RULE && pHP->host.extra_rules == 0)
