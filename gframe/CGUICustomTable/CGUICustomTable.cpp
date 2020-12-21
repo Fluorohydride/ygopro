@@ -14,6 +14,7 @@
 #include <IVideoDriver.h>
 #include <IGUIFont.h>
 #include <IGUIScrollBar.h>
+#include <irrMath.h>
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 #include "../IrrlichtCommonIncludes1.9/os.h"
 #else
@@ -921,17 +922,28 @@ void CGUICustomTable::draw() {
 			if((s32)i == Selected && DrawFlags & EGTDF_ACTIVE_ROW)
 				driver->draw2DRectangle(skin->getColor(EGDC_HIGH_LIGHT), rowRect, &clientClip);
 
+			const auto lockTexture = driver->getTexture("textures/roombrowser/lock.png");
+			const auto text_size = irr::core::recti(0, 0, lockTexture->getOriginalSize().Width, lockTexture->getOriginalSize().Height);
+			const irr::core::rectf bg_sizef(0, 0, text_size.getWidth(), text_size.getHeight());
 			for(u32 j = 0; j < Columns.size(); ++j) {
 				textRect.UpperLeftCorner.X = pos + CellWidthPadding;
 				textRect.LowerRightCorner.X = pos + Columns[j].Width - CellWidthPadding;
 				if((uintptr_t)Rows[i].Items[j].Data == 1) {
-					video::ITexture * lockTexture = driver->getTexture("textures/roombrowser/lock.png");
-					if(lockTexture != NULL) {
-						driver->draw2DImage(lockTexture, core::position2d<s32>(textRect.UpperLeftCorner.X + 2, textRect.UpperLeftCorner.Y + 4), irr::core::recti(0, 0, 14, 16), &clientClip, irr::video::SColor(255, 255, 255, 255), true);
-						textRect.UpperLeftCorner.X += lockTexture->getSize().Width + CellWidthPadding;
-						if(ItemHeight < (s32)lockTexture->getSize().Height) {
-							ItemHeight = lockTexture->getSize().Height;
+					if(lockTexture) {
+						auto temp = textRect;
+						temp.UpperLeftCorner += irr::core::vector2di(2, 2);
+						temp.LowerRightCorner -= irr::core::vector2di(2, 2);
+						const irr::core::rectf dest_sizef(temp.UpperLeftCorner.X, temp.UpperLeftCorner.Y, temp.LowerRightCorner.X, temp.LowerRightCorner.Y);
+						float width = ((bg_sizef.getWidth() / bg_sizef.getHeight()) * dest_sizef.getHeight()) - dest_sizef.getWidth();
+						float height = ((bg_sizef.getHeight() / bg_sizef.getWidth()) * dest_sizef.getWidth()) - dest_sizef.getHeight();
+						if(height > 0) {
+							int off = irr::core::ceil32(width * 0.5f);
+							temp = irr::core::recti({ temp.UpperLeftCorner.X - off, temp.UpperLeftCorner.Y, temp.LowerRightCorner.X + off, temp.LowerRightCorner.Y });
+						} else if(width > 0) {
+							int off = irr::core::ceil32(height * 0.5f);
+							temp = irr::core::recti({ temp.UpperLeftCorner.X, temp.UpperLeftCorner.Y  - off, temp.LowerRightCorner.X, temp.LowerRightCorner.Y + off });
 						}
+						driver->draw2DImage(lockTexture, temp, text_size, &clientClip, nullptr, true);
 					}
 				} else {
 					// draw item text
