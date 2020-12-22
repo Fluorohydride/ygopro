@@ -2185,7 +2185,7 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 	grepo->commit_history_full = BufferIO::DecodeUTF8s(text);
 	grepo->commit_history_partial.clear();
 	if(repo->history.partial_history.size()) {
-		if(repo->history.partial_history.front() == repo->history.partial_history.front() && repo->history.full_history.back() == repo->history.full_history.back()) {
+		if(repo->history.partial_history.front() == repo->history.full_history.front() && repo->history.partial_history.back() == repo->history.full_history.back()) {
 			grepo->commit_history_partial = grepo->commit_history_full;
 		} else {
 			text.clear();
