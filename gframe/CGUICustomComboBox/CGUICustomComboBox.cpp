@@ -14,6 +14,7 @@
 #include <IGUIFont.h>
 #include <IGUIButton.h>
 #include <CGUIListBox.h>
+#include <IGUIStaticText.h>
 #include "../IrrlichtCommonIncludes1.9/os.h"
 #include "../Android/porting_android.h"
 #include "../bufferio.h"
