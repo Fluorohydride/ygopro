@@ -3,6 +3,7 @@
 #include <ICursorControl.h>
 #include <fmt/chrono.h>
 #include <fmt/format.h>
+#include "utils.h"
 #include "game_config.h"
 #include "text_types.h"
 #ifdef _WIN32
