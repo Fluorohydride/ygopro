@@ -191,7 +191,7 @@ void CGUICustomContextMenu::setItemText(u32 idx, const wchar_t* text) {
 		return;
 
 	Items[idx].Text = text;
-	recalculateSize();
+	//recalculateSize();
 }
 
 //! should the element change the checked status on clicking
