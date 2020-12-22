@@ -10,6 +10,8 @@
 #include "utils.h"
 #include "libgit2.hpp"
 
+#define MAX_HISTORY_LENGTH 100
+
 namespace ygo {
 
 // GitRepo
@@ -224,11 +226,11 @@ void RepoManager::CloneOrUpdateTask() {
 			};
 			auto QueryFullHistory = [&](git_repository* repo, git_revwalk* walker) {
 				git_revwalk_reset(walker);
-				// git log HEAD~1500..HEAD
+				// git log HEAD~MAX_HISTORY_LENGTH..HEAD
 				Git::Check(git_revwalk_push_head(walker));
 				for(git_oid oid; git_revwalk_next(&oid, walker) == 0;) {
 					auto commit = Git::MakeUnique(git_commit_lookup, repo, &oid);
-					if(git_oid_iszero(&oid) || history.full_history.size() > 1500)
+					if(git_oid_iszero(&oid) || history.full_history.size() > MAX_HISTORY_LENGTH)
 						break;
 					AppendCommit(history.full_history, commit.get());
 				}
@@ -272,7 +274,13 @@ void RepoManager::CloneOrUpdateTask() {
 						ErrorLog(fmt::format("Warning occurred in repo {}: {}", url, e.what()));
 					}
 				}
-				QueryFullHistory(repo.get(), walker.get());
+				if(history.partial_history.size() >= MAX_HISTORY_LENGTH) {
+					history.full_history.swap(history.partial_history);
+					history.partial_history.clear();
+					history.partial_history.push_back(history.full_history.front());
+					history.partial_history.push_back(history.full_history.back());
+				} else
+					QueryFullHistory(repo.get(), walker.get());
 			} else {
 				Utils::DeleteDirectory(Utils::ToPathString(path + "/"));
 				// git clone <url> <path>
