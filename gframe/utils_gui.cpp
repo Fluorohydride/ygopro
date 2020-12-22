@@ -13,7 +13,6 @@
 #include "Base64.h"
 #include "IrrlichtCommonIncludes/CCursorControl.h"
 #elif defined(__ANDROID__)
-#include "Android/COSAndroidOperator.h"
 class android_app;
 namespace porting {
 extern android_app* app_global;

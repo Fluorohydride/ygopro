@@ -9,6 +9,7 @@
 #ifndef __ANDROID__
 #include "IrrlichtCommonIncludes/CFileSystem.h"
 #else
+#include "Android/COSAndroidOperator.h"
 #include "IrrlichtCommonIncludes1.9/CFileSystem.h"
 #include "Android/porting_android.h"
 #endif
