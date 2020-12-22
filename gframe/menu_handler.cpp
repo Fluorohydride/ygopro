@@ -564,7 +564,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					gClientUpdater->StartUpdate(Game::UpdateDownloadBar, mainGame);
 					mainGame->PopupElement(mainGame->updateWindow);
 				} else if (prev_operation == ACTION_SHOW_CHANGELOG) {
-					Utils::SystemOpen(EPRO_TEXT("https://github.com/edo9300/edopro/releases?referrer=") EDOPRO_USERAGENT);
+					Utils::SystemOpen(EPRO_TEXT("https://github.com/edo9300/edopro/releases"));
 				}
 				prev_operation = 0;
 				prev_sel = -1;

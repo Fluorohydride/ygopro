@@ -2112,7 +2112,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				auto focus = static_cast<irr::gui::IGUIListBox*>(mainGame->env->getFocus());
 				int sel = focus->getSelected();
 				if(sel != -1) {
-					mainGame->env->getOSOperator()->copyToClipboard(focus->getListItem(sel));
+					Utils::OSOperator->copyToClipboard(focus->getListItem(sel));
 					return true;
 				}
 			}
@@ -2271,7 +2271,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				if(path.size() && path != EPRO_TEXT("archives"))
 					Utils::SystemOpen(path, Utils::OPEN_FILE);
 			} else if(elem == mainGame->stPasscodeScope) {
-				mainGame->env->getOSOperator()->copyToClipboard(fmt::format(L"{}", mainGame->showingcard).data());
+				Utils::OSOperator->copyToClipboard(fmt::format(L"{}", mainGame->showingcard).data());
 			}
 		}
 		break;

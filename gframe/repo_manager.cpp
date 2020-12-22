@@ -64,6 +64,7 @@ RepoManager::RepoManager() {
 	else
 		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, "SYSTEM", "");
 #endif
+	git_libgit2_opts(GIT_OPT_SET_USER_AGENT, ygo::Utils::GetUserAgent().data());
 	for(int i = 0; i < 3; i++)
 		cloning_threads.emplace_back(&RepoManager::CloneOrUpdateTask, this);
 }

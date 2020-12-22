@@ -27,6 +27,8 @@ using Dirent = struct dirent;
 #include <IFileArchive.h>
 #include <IFileSystem.h>
 #include <fmt/format.h>
+#include <IOSOperator.h>
+#include "config.h"
 #include "bufferio.h"
 
 #if defined(_WIN32) && defined(_MSC_VER)
@@ -56,7 +58,8 @@ void NameThread(const char* threadName) {
 
 namespace ygo {
 	std::vector<SynchronizedIrrArchive> Utils::archives;
-	irr::io::IFileSystem* Utils::filesystem;
+	irr::io::IFileSystem* Utils::filesystem{ nullptr };
+	irr::IOSOperator* Utils::OSOperator{ nullptr };
 	epro::path_string Utils::working_dir;
 
 	void Utils::InternalSetThreadName(const char* name, const wchar_t* wname) {
@@ -267,6 +270,11 @@ namespace ygo {
 			archive.mutex->unlock();
 		}
 		return MutexLockedIrrArchivedFile(); // file not found
+	}
+	epro::stringview Utils::GetUserAgent() {
+		static std::string agent = fmt::format("EDOPro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)" {}",
+											   ygo::Utils::OSOperator->getOperatingSystemVersion().c_str());
+		return agent;
 	}
 	bool Utils::ContainsSubstring(epro::wstringview input, const std::vector<std::wstring>& tokens, bool convertInputCasing, bool convertTokenCasing) {
 		static std::vector<std::wstring> alttokens;

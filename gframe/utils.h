@@ -19,6 +19,7 @@ class IFileArchive;
 class IFileSystem;
 class IReadFile;
 }
+class IOSOperator;
 }
 
 struct unzip_payload {
@@ -77,6 +78,7 @@ namespace ygo {
 		
 		static std::vector<SynchronizedIrrArchive> archives;
 		static irr::io::IFileSystem* filesystem;
+		static irr::IOSOperator* OSOperator;
 		static epro::path_string working_dir;
 		static bool MakeDirectory(epro::path_stringview path);
 		static bool FileCopy(epro::path_stringview source, epro::path_stringview destination);
@@ -105,6 +107,8 @@ namespace ygo {
 		static T GetFilePath(T file);
 		template<typename T>
 		static T GetFileName(T file, bool keepextension = false);
+
+		static epro::stringview GetUserAgent();
 
 		template<typename T>
 		static inline std::vector<T> TokenizeString(const T& input, const T& token);

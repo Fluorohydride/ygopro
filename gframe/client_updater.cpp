@@ -76,7 +76,7 @@ CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteCallback);
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 5L);
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, payload);
-	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, EDOPRO_USERAGENT);
+	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, ygo::Utils::GetUserAgent().data());
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROXY, "*");
 	curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1);
 	curl_easy_setopt(curl_handle, CURLOPT_DNS_CACHE_TIMEOUT, 0);

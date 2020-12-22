@@ -27,6 +27,5 @@ extern bool show_changelog;
 #else
 #define OSSTRING "Android"
 #endif
-#define EDOPRO_USERAGENT "EDOPro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)
 
 #endif

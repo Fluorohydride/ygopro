@@ -97,7 +97,10 @@ DataHandler::DataHandler(epro::path_stringview working_dir) {
 	tmp_device = nullptr;
 #ifndef __ANDROID__
 	tmp_device = GUIUtils::CreateDevice(configs.get());
+	Utils::OSOperator = tmp_device->getGUIEnvironment()->getOSOperator();
+	Utils::OSOperator->grab();
 #else
+	Utils::OSOperator = new irr::COSAndroidOperator();
 	configs->ssl_certificate_path = fmt::format("{}/cacert.cer", porting::internal_storage);
 #endif
 	filesystem = new irr::io::CFileSystem();
@@ -123,6 +126,8 @@ DataHandler::DataHandler(epro::path_stringview working_dir) {
 DataHandler::~DataHandler() {
 	if(filesystem)
 		filesystem->drop();
+	if(Utils::OSOperator)
+		Utils::OSOperator->drop();
 }
 
 }

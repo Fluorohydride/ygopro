@@ -176,7 +176,7 @@ int ServerLobby::GetRoomsThread() {
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 7L);
 	curl_easy_setopt(curl_handle, CURLOPT_TIMEOUT, 15L);
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &retrieved_data);
-	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, EDOPRO_USERAGENT);
+	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, ygo::Utils::GetUserAgent().data());
 
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROXY, "*"); 
 	curl_easy_setopt(curl_handle, CURLOPT_DNS_CACHE_TIMEOUT, 0);
