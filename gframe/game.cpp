@@ -2021,12 +2021,12 @@ void Game::RefreshAiDecks() {
 		if(j.is_array()) {
 #ifdef _WIN32
 			WindBot::executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
-#else
+#elif !defined(__ANDROID__)
 			{
 				auto it = gGameConfig->user_configs.find("posixPathExtension");
 				if(it != gGameConfig->user_configs.end() && it->is_string()) {
 					WindBot::executablePath = it->get<epro::path_string>();
-				} else if((it = gGameConfig->configs.find("posixPathExtension")) != gGameConfig->user_configs.end()
+				} else if((it = gGameConfig->configs.find("posixPathExtension")) != gGameConfig->configs.end()
 						  && it->is_string()) {
 					WindBot::executablePath = it->get<epro::path_string>();
 				}
