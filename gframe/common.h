@@ -63,6 +63,7 @@
 #define TYPE_TUNER       0x1000
 #define TYPE_SYNCHRO     0x2000
 #define TYPE_TOKEN       0x4000
+#define TYPE_MAXIMUM     0x8000
 #define TYPE_QUICKPLAY   0x10000
 #define TYPE_CONTINUOUS  0x20000
 #define TYPE_EQUIP       0x40000
