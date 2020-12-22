@@ -116,7 +116,7 @@ std::map<std::string, int> RepoManager::GetRepoStatus() {
 #define JSON_SET_IF_VALID(field, jsontype, cpptype) \
 	do { auto it = obj.find(#field); if(it != obj.end() && it->is_##jsontype()) \
 	tmp_repo.field = it->get<cpptype>();} while(0)
-void RepoManager::LoadRepositoriesFromJson(const nlohmann::ordered_json& configs) {
+void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
 	auto cit = configs.find("repos");
 	if(cit != configs.end() && cit->is_array()) {
 		for(auto& obj : *cit) {
