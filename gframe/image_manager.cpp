@@ -370,6 +370,8 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *d
 	return true;
 }
 irr::video::IImage* ImageManager::GetScaledImage(irr::video::IImage* srcimg, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
+	if(width <= 0 || height <= 0)
+		return nullptr;
 	if(!srcimg || timestamp_id != source_timestamp_id.load())
 		return nullptr;
 	const irr::core::dimension2d<irr::u32> dim(width, height);
@@ -830,6 +832,8 @@ void ImageManager::draw2DImageFilterScaled(irr::video::ITexture* txr,
 	driver->draw2DImage(scaled, destrect, mysrcrect, cliprect, colors, usealpha);
 }
 irr::video::IImage* ImageManager::GetScaledImageFromFile(const irr::io::path& file, int width, int height) {
+	if(width <= 0 || height <= 0)
+		return nullptr;
 	irr::video::IImage* srcimg = driver->createImageFromFile(file);
 	if(!srcimg) {
 		if(srcimg)
