@@ -72,7 +72,7 @@ pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) c
 	}
 	pid_t pid = vfork();
 	if (pid == 0) {
-		execlp("mono", "WindBot.exe", "WindBot.exe",
+		execlp("mono", "WindBot.exe", "./WindBot/WindBot.exe",
 			   argPass.data(), argDeck.data(), argPort.data(), argVersion.data(), argName.data(), argChat.data(),
 			   "AssetPath=./WindBot", hand ? argHand.data() : nullptr, nullptr);
 		exit(EXIT_FAILURE);
