@@ -161,8 +161,11 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 	event_base_loopbreak(client_base);
 }
 void DuelClient::StopClient(bool is_exiting) {
-	if((connect_state & 0x7) == 0)
+	if((connect_state & 0x7) == 0) {
+		if(client_thread.joinable())
+			client_thread.join();
 		return;
+	}
 	is_closing = is_exiting || exit_on_return;
 	to_analyze_mutex.lock();
 	to_analyze.clear();
