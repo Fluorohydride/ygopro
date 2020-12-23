@@ -134,7 +134,8 @@ inline void Check(int error)
 {
 	if(error == 0)
 		return;
-	throw std::runtime_error(giterr_last()->message);
+	const auto err = giterr_last();
+	throw std::runtime_error(err ? err->message : "Undefined error");
 }
 
 // Helper function to create RAII-managed objects for libgit C objects
