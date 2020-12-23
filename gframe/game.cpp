@@ -1847,6 +1847,7 @@ bool Game::MainLoop() {
 	discord.UpdatePresence(DiscordWrapper::TERMINATE);
 	replaySignal.SetNoWait(true);
 	frameSignal.SetNoWait(true);
+	actionSignal.SetNoWait(true);
 	DuelClient::StopClient(true);
 	ClearTextures();
 	if(dInfo.isSingleMode)
