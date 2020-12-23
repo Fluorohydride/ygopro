@@ -47,7 +47,7 @@
 #define EnableMaterial2D(enable) ((void)0);
 #endif
 
-uint16_t PRO_VERSION = 0x1351;
+uint16_t PRO_VERSION = 0x1352;
 
 namespace ygo {
 
