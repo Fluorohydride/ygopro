@@ -205,7 +205,7 @@ void ImageManager::RefreshCachedTextures() {
 	auto StartLoad = [this](loading_map& src, texture_map& dest, int index, imgType type) {
 		std::vector<int> readd;
 		for (auto it = src.begin(); it != src.end();) {
-			if (it->second.wait_for(std::chrono::milliseconds(0)) == epro::future_status::ready) {
+			if (it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 				auto pair = it->second.get();
 				if (pair.first) {
 					if (pair.first->getDimension().Width != sizes[index].first || pair.first->getDimension().Height != sizes[index].second) {
