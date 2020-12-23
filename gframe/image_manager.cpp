@@ -114,7 +114,6 @@ void ImageManager::ChangeTextures(epro::path_stringview _path) {
 		return;
 	textures_path = { _path.data(), _path.size() };
 	const bool is_base = textures_path == BASE_PATH;
-	GET_TEXTURE_SIZED(tUnknown, "unknown", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	GET_TEXTURE(tAct, "act");
 	GET_TEXTURE(tAttack, "attack");
 	GET_TEXTURE(tChain, "chain");
@@ -178,9 +177,6 @@ void ImageManager::ClearTexture(bool resize) {
 		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
 		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * gGameConfig->dpi_scale;
 		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
-		const auto s1 = CARD_IMG_WIDTH * mainGame->window_scale.X;
-		const auto s2 = CARD_IMG_HEIGHT * mainGame->window_scale.Y;
-		GET_TEXTURE_SIZED(tUnknown, "unknown", s1, s2);
 		RefreshCovers();
 	}
 	if(!resize) {
@@ -209,7 +205,7 @@ void ImageManager::RefreshCachedTextures() {
 	auto StartLoad = [this](loading_map& src, texture_map& dest, int index, imgType type) {
 		std::vector<int> readd;
 		for (auto it = src.begin(); it != src.end();) {
-			if (it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
+			if (it->second.wait_for(std::chrono::milliseconds(0)) == epro::future_status::ready) {
 				auto pair = it->second.get();
 				if (pair.first) {
 					if (pair.first->getDimension().Width != sizes[index].first || pair.first->getDimension().Height != sizes[index].second) {
@@ -229,7 +225,7 @@ void ImageManager::RefreshCachedTextures() {
 			it++;
 		}
 		for (auto& code : readd) {
-			src[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id));
+			src.emplace(code, std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id)));
 		}
 	};
 	StartLoad(loading_pics[0], tMap[0], 0, imgType::ART);
@@ -266,6 +262,7 @@ void ImageManager::RefreshCovers() {
 										}
 	GET_TEXTURE_SIZED(tCover[0], "cover")
 	GET_TEXTURE_SIZED(tCover[1], "cover2")
+	GET_TEXTURE_SIZED(tUnknown, "unknown")
 #undef X
 #define X(x) (textures_path + EPRO_TEXT(x)).data()
 	if(textures_path != BASE_PATH) {
@@ -278,6 +275,11 @@ void ImageManager::RefreshCovers() {
 		if(tmp_cover){
 			driver->removeTexture(tCover[1]);
 			tCover[1] = tmp_cover;
+		}
+		GET(tmp_cover, GetTextureFromFile(X("unknown.png"), sizes[1].first, sizes[1].second), GetTextureFromFile(X("unknown.jpg"), sizes[1].first, sizes[1].second))
+		if(tmp_cover){
+			driver->removeTexture(tUnknown);
+			tUnknown = tmp_cover;
 		}
 	}
 #undef GET_TEXTURE_SIZED
@@ -467,7 +469,6 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 	return fail;
 }
 irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, bool wait, bool fit, int* chk) {
-	//wait = true;
 	if(chk)
 		*chk = 1;
 	irr::video::ITexture* ret_unk = tUnknown;
@@ -516,25 +517,27 @@ irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, 
 			map[code] = nullptr;
 			return ret_unk;
 		}
-		auto a = loading_pics[index].find(code);
+		auto& load_entry = loading_pics[index];
+		auto a = load_entry.find(code);
 		if(chk)
 			*chk = 2;
-		if(a == loading_pics[index].end()) {
+		if(a == load_entry.end()) {
 			if(wait) {
 				auto tmp_img = LoadCardTexture(code, type, std::ref(sizes[size_index].first), std::ref(sizes[size_index].second), timestamp_id.load(), std::ref(timestamp_id));
+				auto& rmap = map[code];
 				if(tmp_img.first) {
-					map[code] = driver->addTexture(tmp_img.second.data(), tmp_img.first);
+					rmap = driver->addTexture(tmp_img.second.data(), tmp_img.first);
 					tmp_img.first->drop();
 					if(chk)
 						*chk = 1;
 				} else {
-					map[code] = nullptr;
+					rmap = nullptr;
 					if(chk)
 						*chk = 0;
 				}
-				return (map[code]) ? map[code] : ret_unk;
+				return (rmap) ? rmap : ret_unk;
 			} else {
-				loading_pics[index][code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[size_index].first), std::ref(sizes[size_index].second), timestamp_id.load(), std::ref(timestamp_id));
+				load_entry.emplace(code, std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[size_index].first), std::ref(sizes[size_index].second), timestamp_id.load(), std::ref(timestamp_id)));
 			}
 		}
 		return ret_unk;
@@ -553,7 +556,8 @@ irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 		irr::video::ITexture* img = nullptr;
 		if(!should_download) {
 			if(status == ImageDownloader::downloadStatus::DOWNLOADED) {
-				img = driver->getTexture(gImageDownloader->GetDownloadPath(code, imgType::FIELD).data());
+				const auto path = gImageDownloader->GetDownloadPath(code, imgType::FIELD);
+				img = driver->getTexture({ path.data(), (irr::u32)path.size() });
 			} else
 				return nullptr;
 		} else {
