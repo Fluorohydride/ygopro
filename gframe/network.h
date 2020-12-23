@@ -167,6 +167,19 @@ struct STOC_Chat {
 	uint16_t player;
 	uint16_t msg[256];
 };
+struct STOC_Chat2 {
+	enum PLAYER_TYPE : uint8_t {
+		PTYPE_DUELIST,
+		PTYPE_OBS,
+		PTYPE_SYSTEM,
+		PTYPE_SYSTEM_ERROR,
+		PTYPE_SYSTEM_SHOUT
+	};
+	uint8_t type;
+	uint8_t is_team; // NOTE: check ONLY IF type==PTYPE_DUELIST
+	uint16_t client_name[20];
+	uint16_t msg[256];
+};
 struct STOC_HS_PlayerEnter {
 	uint16_t name[20];
 	uint8_t pos;
@@ -290,6 +303,7 @@ public:
 #define STOC_CATCHUP		0xf0
 #define STOC_REMATCH		0xf1
 #define STOC_WAITING_REMATCH	0xf2
+#define STOC_CHAT_2			0xf3
 
 #define STOC_NEW_REPLAY			0x30
 

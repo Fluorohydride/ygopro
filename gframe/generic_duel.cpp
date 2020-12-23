@@ -30,12 +30,24 @@ void GenericDuel::ResendToAll(DuelPlayer* except) {
 }
 
 void GenericDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
-	STOC_Chat scc;
-	scc.player = dp->type;
+	STOC_Chat2 scc;
+	memcpy(scc.client_name, dp->name, 40);
 	uint16_t* msg = (uint16_t*)pdata;
 	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
-	NetServer::SendBufferToPlayer(nullptr, STOC_CHAT, &scc, 4 + msglen * 2);
-	ResendToAll();
+	if(dp->type >= NETPLAYER_TYPE_OBSERVER) {
+		scc.type = STOC_Chat2::PTYPE_OBS;
+		NetServer::SendBufferToPlayer(nullptr, STOC_CHAT_2, &scc, 4 + 40 + (msglen * 2));
+		ResendToAll();
+		return;
+	}
+	scc.is_team = ((uint32_t)GetPos(dp)) < players.home_size;
+	scc.type = STOC_Chat2::PTYPE_DUELIST;
+	NetServer::SendBufferToPlayer(nullptr, STOC_CHAT_2, &scc, 4 + 40 + (msglen * 2));
+	Iter(players.home, NetServer::ReSendToPlayer);
+	scc.is_team = !scc.is_team;
+	NetServer::SendBufferToPlayer(nullptr, STOC_CHAT_2, &scc, 4 + 40 + (msglen * 2));
+	Iter(players.opposing, NetServer::ReSendToPlayer);
+	Iter(observers, NetServer::ReSendToPlayer);
 }
 bool GenericDuel::CheckReady() {
 	bool ready1 = true, ready2 = true;

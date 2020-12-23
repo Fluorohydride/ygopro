@@ -312,7 +312,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, uint32_t len) {
 	uint8_t pktType = static_cast<uint8_t>(data[0]);
 	if(pktType == STOC_DUEL_END)
 		connect_state |= 0x100;
-	if(pktType != STOC_CHAT) {
+	if(pktType != STOC_CHAT && pktType != STOC_CHAT_2) {
 		std::vector<uint8_t> tmpvec{};
 		tmpvec.resize(len);
 		memcpy(tmpvec.data(), data, len);
@@ -363,6 +363,20 @@ void DuelClient::HandleSTOCPacketLan(char* data, uint32_t len) {
 			BufferIO::CopyWStr(pkt.msg, msg, 256);
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			mainGame->AddChatMsg(msg, player, type);
+			break;
+		}
+		case STOC_CHAT_2: {
+			auto pkt = BufferIO::getStruct<STOC_Chat2>(pdata, len);
+			if(pkt.type == STOC_Chat2::PTYPE_DUELIST && (mainGame->dInfo.player_type >= 7 || !pkt.is_team) && mainGame->tabSettings.chkIgnoreOpponents->isChecked())
+				return;
+			if(pkt.type == STOC_Chat2::PTYPE_OBS && mainGame->tabSettings.chkIgnoreSpectators->isChecked())
+				return;
+			wchar_t name[20];
+			BufferIO::CopyWStr(pkt.client_name, name, 20);
+			wchar_t msg[256];
+			BufferIO::CopyWStr(pkt.msg, msg, 256);
+			std::lock_guard<std::mutex> lock(mainGame->gMutex);
+			mainGame->AddChatMsg(name, msg, pkt.type);
 			break;
 		}
 	}

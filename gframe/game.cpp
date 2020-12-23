@@ -2386,6 +2386,35 @@ void Game::AddChatMsg(epro::wstringview msg, int player, int type) {
 	chatMsg[0] = fmt::format(L"{}: {}", sender, msg);
 	lstChat->addItem(chatMsg[0].data());
 }
+void Game::AddChatMsg(epro::wstringview name, epro::wstringview msg, int type) {
+	for(int i = 7; i > 0; --i) {
+		chatMsg[i].swap(chatMsg[i - 1]);
+		chatTiming[i] = chatTiming[i - 1];
+		chatType[i] = chatType[i - 1];
+	}
+	chatTiming[0] = 1200.0f;
+	switch(type) {
+		case STOC_Chat2::PTYPE_DUELIST:
+			chatType[0] = 0;
+			break;
+		case STOC_Chat2::PTYPE_SYSTEM:
+			chatType[0] = 12;
+			break;
+		case STOC_Chat2::PTYPE_SYSTEM_SHOUT:
+			chatType[0] = 16;
+			break;
+		case STOC_Chat2::PTYPE_OBS:
+		case STOC_Chat2::PTYPE_SYSTEM_ERROR:
+		default:
+			chatType[0] = 11;
+	}
+	if(type == STOC_Chat2::PTYPE_DUELIST || type == STOC_Chat2::PTYPE_OBS)
+		chatMsg[0] = fmt::format(L"{}: {}", name, msg);
+	else
+		chatMsg[0] = fmt::format(L"System: {}", msg);
+	lstChat->addItem(chatMsg[0].data());
+	gSoundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
+}
 void Game::AddLog(epro::wstringview msg, int param) {
 	logParam.push_back(param);
 	lstLog->addItem(msg.data());

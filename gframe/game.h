@@ -160,6 +160,7 @@ public:
 	void RefreshCardInfoTextPositions();
 	void ClearCardInfo(int player = 0);
 	void AddChatMsg(epro::wstringview msg, int player, int type);
+	void AddChatMsg(epro::wstringview name, epro::wstringview msg, int type);
 	void AddLog(epro::wstringview msg, int param = 0);
 	void ClearChatMsg();
 	void AddDebugMsg(epro::stringview msg);
