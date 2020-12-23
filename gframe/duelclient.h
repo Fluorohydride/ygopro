@@ -42,6 +42,7 @@ private:
 	static std::mutex analyzeMutex;
 	static std::mutex to_analyze_mutex;
 	static std::thread parsing_thread;
+	static std::thread client_thread;
 	static std::condition_variable cv;
 public:
 	static randengine rnd;
