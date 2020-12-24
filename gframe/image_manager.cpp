@@ -85,12 +85,10 @@ bool ImageManager::Initial() {
 	GET_TEXTURE(tField[1][3], "fieldSP4");
 	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4");
 	GET_TEXTURE(tSettings, "settings");
-	sizes[0].first = CARD_IMG_WIDTH * gGameConfig->dpi_scale;
-	sizes[0].second = CARD_IMG_HEIGHT * gGameConfig->dpi_scale;
-	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * gGameConfig->dpi_scale;
-	sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
-	sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * gGameConfig->dpi_scale;
-	sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
+	sizes[0].first = sizes[1].first = CARD_IMG_WIDTH * gGameConfig->dpi_scale;
+	sizes[0].second = sizes[1].second = CARD_IMG_HEIGHT * gGameConfig->dpi_scale;
+	sizes[2].first = CARD_THUMB_WIDTH * gGameConfig->dpi_scale;
+	sizes[2].second = CARD_THUMB_HEIGHT * gGameConfig->dpi_scale;
 	return true;
 }
 
