@@ -272,7 +272,7 @@ namespace ygo {
 		return MutexLockedIrrArchivedFile(); // file not found
 	}
 	epro::stringview Utils::GetUserAgent() {
-		static std::string agent = fmt::format("EDOPro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)" {}",
+		static const std::string agent = fmt::format("EDOPro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)" {}",
 											   ygo::Utils::OSOperator->getOperatingSystemVersion().c_str());
 		return agent;
 	}
@@ -338,38 +338,21 @@ namespace ygo {
 				buff[len] = EPRO_TEXT('\0');
 			return buff;
 #elif defined(__APPLE__)
-			CFStringRef uti;
 			CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-			if(CFURLCopyResourcePropertyForKey(bundle_url, kCFURLTypeIdentifierKey, &uti, NULL) &&
-			   uti && UTTypeConformsTo(uti, kUTTypeApplicationBundle)) { //program is launched as a bundle
-				CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
-				CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
-				CFRelease(bundle_url);
-				CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
-				CFRelease(bundle_base_url);
-				/*
-				#ifdef MAC_OS_DISCORD_LAUNCHER
-					system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).data());
-				#endif
-				*/
-				epro::path_string res = CFStringGetCStringPtr(path, kCFStringEncodingUTF8);
-				CFRelease(path);
-				CFRelease(bundle_path);
-				return res;
-			} else { //program is launched standalone
-				auto FindRootFolder = [](const epro::path_string& path)->epro::path_string {//check if it's a binary launched from an app bundle
-					auto pos = path.find(EPRO_TEXT(".app/"));
-					if(pos != epro::path_string::npos) {
-						return GetFilePath(path.substr(0, pos + 4));
-					}
-					return path;
-				};
-				epro::path_char buff[PATH_MAX];
-				uint32_t bufsize = PATH_MAX;
-				if(_NSGetExecutablePath(buff, &bufsize) == 0)
-					return FindRootFolder(buff);
-				return EPRO_TEXT("./");
-			}
+			CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
+			CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
+			CFRelease(bundle_url);
+			CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
+			CFRelease(bundle_base_url);
+			/*
+			#ifdef MAC_OS_DISCORD_LAUNCHER
+				system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
+			#endif
+			*/
+			epro::path_string res = CFStringGetCStringPtr(path, kCFStringEncodingUTF8);
+			CFRelease(path);
+			CFRelease(bundle_path);
+			return res;
 #else
 			return EPRO_TEXT("");
 #endif
