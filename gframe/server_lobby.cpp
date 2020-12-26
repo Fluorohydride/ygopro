@@ -292,7 +292,7 @@ void ServerLobby::JoinServer(bool host) {
 				return;
 			}
 			auto text = mainGame->ebRPName->getText();
-			if(*text == L'0')
+			if(*text == L'\0')
 				return;
 			mainGame->wRoomPassword->setVisible(false);
 			mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(text);
