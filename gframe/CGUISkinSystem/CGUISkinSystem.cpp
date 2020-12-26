@@ -112,8 +112,7 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 
 	s32 i, x;
 	core::stringc tmp;
-	core::stringw wtmp;
-	core::stringc path = workingDir + "/./";
+	io::path path = workingDir + "/./";
 	path += skinname;
 	if(!registry->loadFile(SKINSYSTEM_SKINFILE, path.c_str())) {
 		return NULL;

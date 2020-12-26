@@ -29,10 +29,10 @@ class CXMLRegistry {
 public:
 	CXMLRegistry(irr::io::IFileSystem* fsys);
 	~CXMLRegistry();
-	bool loadFile(const irr::c8* fname, const irr::c8* path);
-	bool loadConfigFile(const irr::c8* fname);
-	bool writeFile(const irr::c8* fname, const irr::c8* path);
-	bool writeConfigFile(const irr::c8* fname);
+	bool loadFile(const irr::fschar_t* fname, const irr::fschar_t* path);
+	bool loadConfigFile(const irr::fschar_t* fname);
+	bool writeFile(const irr::fschar_t* fname, const irr::fschar_t* path);
+	bool writeConfigFile(const irr::fschar_t* fname);
 	const wchar_t* getValueAsCStr(const wchar_t* index, const wchar_t* context = 0);
 	// Dosnt work, just declare a stringc and assign the wchar_t to it	
 	//const irr::c8* getValueAsCharCStr(const wchar_t* index,const wchar_t* context = 0);
@@ -69,7 +69,7 @@ private:
 	const wchar_t* convertBoolToText(bool boolval);
 	bool convertTextToBool(const wchar_t* textval);
 	CXMLNode* resolveContext(const wchar_t* context);
-	const irr::c8* resolveConfigPath(const irr::c8* fname);
+	const irr::fschar_t* resolveConfigPath(const irr::fschar_t* fname);
 
 };
 #endif

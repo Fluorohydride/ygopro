@@ -163,17 +163,17 @@ irr::video::SColor CXMLRegistry::getValueAsColor(const wchar_t* context) {
 	if(tmp.size()) a = _wtoi(tmp.c_str());
 	return irr::video::SColor(a,r,g,b);
 }
-bool CXMLRegistry::writeFile(const irr::c8* fname,const c8* path) {
+bool CXMLRegistry::writeFile(const irr::fschar_t* fname, const irr::fschar_t* path) {
 	io::IXMLWriter* xml; 
 	CXMLNode* currentnode = 0;
     core::stringw wstmp;
-	core::stringc fileName;
+	core::string<fschar_t> fileName;
 	wstmp = fname;
 	currentnode = registry->findChildByName(wstmp.c_str());
 	if(!currentnode) return false;	
 	fileName = path;
 	fileName += fname;
-	fileName += ".xml";
+	fileName += _IRR_TEXT(".xml");
 	xml = fileSystem->createXMLWriter(fileName.c_str());
 	xml->writeXMLHeader();
 	currentnode->writeOut(xml);
@@ -185,42 +185,42 @@ bool CXMLRegistry::writeFile(const irr::c8* fname,const c8* path) {
 	return true;
 }
 // check current folder, if there isnt anything in current, use default
-const c8* CXMLRegistry::resolveConfigPath(const c8* fname) {
-	core::string <c8> filename;
+const fschar_t* CXMLRegistry::resolveConfigPath(const fschar_t* fname) {
+	core::string <fschar_t> filename;
 	bool useCurrent = true;
-	filename = "config/current/";
+	filename = _IRR_TEXT("config/current/");
 	filename += fname;
-	filename += ".xml";
+	filename += _IRR_TEXT(".xml");
 	if(!fileSystem->existFile(filename.c_str())) {
 		useCurrent = false;
 	}
-	return useCurrent?"config/current/":"config/defaults/";
+	return useCurrent? _IRR_TEXT("config/current/"): _IRR_TEXT("config/defaults/");
 }
 
-bool CXMLRegistry::loadConfigFile(const c8* fname) {	
+bool CXMLRegistry::loadConfigFile(const fschar_t* fname) {
 	return loadFile(fname, resolveConfigPath(fname));
 }
-bool CXMLRegistry::writeConfigFile(const c8* fname) {
-	return writeFile(fname,"config/current/");
+bool CXMLRegistry::writeConfigFile(const fschar_t* fname) {
+	return writeFile(fname,_IRR_TEXT("config/current/"));
 }
 
 
 // This is tricky, we have to keep track of which nodes are 'open'
-bool CXMLRegistry::loadFile(const c8* fname, const c8* path) {
+bool CXMLRegistry::loadFile(const fschar_t* fname, const fschar_t* path) {
 	io::IXMLReader* xml;
 	CXMLNode* currentNode = 0;
 	CXMLNode* topNode = 0;
 	CXMLNode* currentParent;
-	core::string <c8> filename;	
+	core::string <fschar_t> filename;
 	
 	filename = path;
 	filename += fname;
 	// If it dosnt end in .xml add it
 	
-	if(!filename.subString(filename.size()-4,4).equals_ignore_case(".xml"))
-		filename += ".xml";
+	if(!filename.subString(filename.size()-4,4).equals_ignore_case(_IRR_TEXT(".xml")))
+		filename += _IRR_TEXT(".xml");
 	
-	xml = fileSystem->createXMLReader(filename.c_str());
+	xml = fileSystem->createXMLReader(filename);
 	
 	if(!registry) {
 		registry = new CXMLNode;
