@@ -23,6 +23,7 @@ namespace ygo {
 std::vector<RoomInfo> ServerLobby::roomsVector;
 std::vector<ServerInfo> ServerLobby::serversVector;
 std::atomic_bool ServerLobby::is_refreshing{ false };
+std::atomic_bool ServerLobby::has_refreshed{ false };
 
 static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp) {
 	size_t realsize = size * nmemb;
@@ -153,11 +154,21 @@ void ServerLobby::FillOnlineRooms() {
 		roomListTable->setCellColor(index, 7, color);
 	}
 	mainGame->roomListTable->setActiveColumn(mainGame->roomListTable->getActiveColumn(), true);
+	if(!roomsVector.empty() && mainGame->chkShowActiveRooms->isChecked()) {
+		mainGame->roomListTable->setActiveColumn(7, true);
+		mainGame->roomListTable->orderRows(-1, irr::gui::EGOM_DESCENDING);
+	}
+
+	GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_NORMAL);
+	mainGame->btnLanRefresh2->setEnabled(true);
+	mainGame->serverChoice->setEnabled(true);
+	mainGame->roomListTable->setVisible(true);
+	has_refreshed = false;
 }
-int ServerLobby::GetRoomsThread() {
+void ServerLobby::GetRoomsThread() {
 	Utils::SetThreadName("RoomlistFetch");
 	auto selected = mainGame->serverChoice->getSelected();
-	if (selected < 0) return 0;
+	if (selected < 0) return;
 	ServerInfo serverInfo = serversVector[selected];
 
 	GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_WAIT);
@@ -197,7 +208,7 @@ int ServerLobby::GetRoomsThread() {
 		mainGame->serverChoice->setEnabled(true);
 		mainGame->roomListTable->setVisible(true);
 		is_refreshing = false;
-		return 0;
+		return;
 	}
 
 	if(retrieved_data == "[server busy]") {
@@ -244,18 +255,8 @@ int ServerLobby::GetRoomsThread() {
 			ErrorLog(fmt::format("Exception occurred parsing server rooms: {}", e.what()));
 		}
 	}
-	FillOnlineRooms();
-	if(!roomsVector.empty() && mainGame->chkShowActiveRooms->isChecked()) {
-		mainGame->roomListTable->setActiveColumn(7, true);
-		mainGame->roomListTable->orderRows(-1, irr::gui::EGOM_DESCENDING);
-	}
-
-	GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_NORMAL);
-	mainGame->btnLanRefresh2->setEnabled(true);
-	mainGame->serverChoice->setEnabled(true);
-	mainGame->roomListTable->setVisible(true);
+	has_refreshed = true;
 	is_refreshing = false;
-	return 0;
 }
 void ServerLobby::RefreshRooms() {
 	if(is_refreshing)
@@ -263,6 +264,9 @@ void ServerLobby::RefreshRooms() {
 	is_refreshing = true;
 	mainGame->roomListTable->clearRows();
 	std::thread(GetRoomsThread).detach();
+}
+bool ServerLobby::HasRefreshedRooms() {
+	return has_refreshed;
 }
 void ServerLobby::JoinServer(bool host) {
 	mainGame->ebNickName->setText(mainGame->ebNickNameOnline->getText());

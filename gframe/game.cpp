@@ -1602,6 +1602,8 @@ bool Game::MainLoop() {
 			if(gRepoManager->GetUpdatingReposNumber() == 0)
 				gdeckManager->StopDummyLoading();
 		}
+		if(ServerLobby::HasRefreshedRooms())
+			ServerLobby::FillOnlineRooms();
 #ifdef YGOPRO_BUILD_DLL
 		bool coreJustLoaded = false;
 		if(!dInfo.isStarted && cores_to_load.size() && gRepoManager->GetUpdatingReposNumber() == 0) {

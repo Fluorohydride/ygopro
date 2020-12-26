@@ -27,10 +27,12 @@ public:
 	static std::vector<RoomInfo> roomsVector;
 	static std::vector<ServerInfo> serversVector;
 	static void RefreshRooms();
-	static int GetRoomsThread();
+	static bool HasRefreshedRooms();
+	static void GetRoomsThread();
 	static void FillOnlineRooms();
 	static void JoinServer(bool host);
 	static std::atomic_bool is_refreshing;
+	static std::atomic_bool has_refreshed;
 };
 //extern ServerLobby serverLobby;
 }
