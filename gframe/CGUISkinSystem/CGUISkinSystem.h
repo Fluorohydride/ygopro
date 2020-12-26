@@ -4,8 +4,10 @@
 #include "CImageGUISkin.h"
 #include <path.h>
 #include <irrArray.h>
+#include "../text_types.h"
+#include <vector>
 
-#define SKINSYSTEM_SKINFILE "/skin.xml"
+#define SKINSYSTEM_SKINFILE _IRR_TEXT("/skin.xml")
 
 class CXMLRegistry;
 namespace irr {
@@ -27,7 +29,7 @@ private:
 	irr::io::IFileSystem* fs;
 	irr::io::path skinsPath;
 	irr::io::path workingDir;
-	irr::core::array<irr::io::path> skinsList;
+	std::vector<epro::path_string> skinsList;
 	irr::gui::IGUISkin* loaded_skin;
 
 	CXMLRegistry* registry;
@@ -45,7 +47,9 @@ public:
 	// dev = Irrlicht device
 	CGUISkinSystem(irr::io::path path, irr::IrrlichtDevice* dev);
 	~CGUISkinSystem();
-	irr::core::array<irr::io::path> listSkins();
+	const auto& listSkins() {
+		return skinsList;
+	};
 	bool loadSkinList();
 	bool applySkin(const irr::fschar_t* skinname);
 	irr::gui::CGUIProgressBar* addProgressBar(irr::gui::IGUIElement* parent, irr::core::recti rect, bool bindColorsToSkin = true);

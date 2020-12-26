@@ -2850,12 +2850,10 @@ void Game::ReloadCBRule() {
 		cbRule->addItem(gDataManager->GetSysString(i).data());
 }
 void Game::ReloadCBCurrentSkin() {
-	gSettings.cbCurrentSkin->clear();
 	int selectedSkin = gSettings.cbCurrentSkin->addItem(gDataManager->GetSysString(2065).data());
-	auto skins = skinSystem->listSkins();
-	for (int i = skins.size() - 1; i >= 0; i--) {
-		auto itemIndex = gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).data());
-		if (gGameConfig->skin == skins[i].c_str())
+	for(const auto& skin : skinSystem->listSkins()) {
+		auto itemIndex = gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skin).data());
+		if (gGameConfig->skin == skin)
 			selectedSkin = itemIndex;
 	}
 	gSettings.cbCurrentSkin->setSelected(selectedSkin);

@@ -6,6 +6,8 @@
 #include "../CXMLRegistry/CXMLRegistry.h"
 #include <map>
 #include <string>
+#include <set>
+#include "../utils.h"
 
 using namespace irr;
 
@@ -14,43 +16,23 @@ CGUISkinSystem::CGUISkinSystem(io::path path, IrrlichtDevice *dev) {
 	device = dev;
 	skinsPath = path;
 	fs = dev->getFileSystem();
-	this->loadSkinList();
+	loadSkinList();
 }
 
-core::array<io::path> CGUISkinSystem::listSkins() {
-	return skinsList;
-}
 // This is our version of the skinloader
 
 // Generate a list of all directory names in skinsPath that have a skin.xml in them
-// Don't rely on working directory going in.
-// Careful with changeworkingdirectoryto and relative paths,
-// remember that they are relative to the CURRENT working directory
-bool CGUISkinSystem::loadSkinList() {
-	io::IFileList *fileList;
-	int i;
-	io::path oldpath = fs->getWorkingDirectory();
-	fs->changeWorkingDirectoryTo(skinsPath);
-	fileList = fs->createFileList();
-	i = fileList->getFileCount();
-	io::path tmp;
-	while(i--) {
-		// Check only directories, skip . and ..
-		// Side effect, on linux this ignores hidden directories
-		if(fileList->isDirectory(i) && !fileList->getFileName(i).equalsn(".", 1)) {
-			if(fs->existFile(fileList->getFileName(i) + SKINSYSTEM_SKINFILE)) {
-				tmp = fileList->getFileName(i);
-				skinsList.push_back(tmp);
-			}
 
-		}
-	}
-	fileList->drop();
-	fs->changeWorkingDirectoryTo(oldpath);
-	if(skinsList.size() > 0)
-		return true;
-	else
-		return false;
+bool CGUISkinSystem::loadSkinList() {
+	epro::path_stringview skinpath{ skinsPath.c_str(), skinsPath.size() };
+	ygo::Utils::FindFiles(skinpath, [this, &skinpath](epro::path_stringview name, bool isdir) {
+		if(!isdir || name == EPRO_TEXT(".") || (name == EPRO_TEXT("..")))
+			return;
+		if(ygo::Utils::FileExists(fmt::format("{}/{}" SKINSYSTEM_SKINFILE, skinpath, name)))
+			skinsList.push_back({ name.data(), name.size() });
+	});
+	std::sort(skinsList.begin(), skinsList.end(), ygo::Utils::CompareIgnoreCase<epro::path_string>);
+	return !skinsList.empty();
 }
 gui::CGUIProgressBar *CGUISkinSystem::addProgressBar(gui::IGUIElement *parent, core::rect<s32> rect, bool bindColorsToSkin) {
 	/*
