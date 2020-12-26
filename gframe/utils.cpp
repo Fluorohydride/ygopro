@@ -349,7 +349,7 @@ namespace ygo {
 				system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
 			#endif
 			*/
-			epro::path_string res = CFStringGetCStringPtr(path, kCFStringEncodingUTF8);
+			epro::path_string res = CFStringGetCStringPtr(path, kCFStringEncodingUTF8) + "/";
 			CFRelease(path);
 			CFRelease(bundle_path);
 			return res;
