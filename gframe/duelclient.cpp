@@ -133,8 +133,10 @@ bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool c
 	mainGame->dInfo.secret.server_address = ip;
 	mainGame->dInfo.isCatchingUp = false;
 	mainGame->dInfo.checkRematch = false;
+	mainGame->frameSignal.SetNoWait(true);
 	if(client_thread.joinable())
 		client_thread.join();
+	mainGame->frameSignal.SetNoWait(false);
 	client_thread = std::thread(ClientThread);
 	stop_threads = false;
 	parsing_thread = std::thread(DuelClient::ParserThread);
@@ -161,6 +163,7 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 	event_base_loopbreak(client_base);
 }
 void DuelClient::StopClient(bool is_exiting) {
+	mainGame->frameSignal.SetNoWait(true);
 	if((connect_state & 0x7) == 0) {
 		if(client_thread.joinable())
 			client_thread.join();
