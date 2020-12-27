@@ -4,6 +4,8 @@
 #include <sfAudio/Sound.hpp>
 #include <sfAudio/SoundBuffer.hpp>
 
+using Status = sf::SoundSource::Status;
+
 SoundSFML::SoundSFML() :
 	music(), music_volume(0.0f), sound_volume(0.0f) {
 };
@@ -24,10 +26,15 @@ void SoundSFML::SetMusicVolume(double volume)
 
 bool SoundSFML::PlayMusic(const std::string& name, bool loop)
 {
-	if(music.getStatus() == sf::SoundSource::Status::Playing)
+	const auto status = music.getStatus();
+	if(status != Status::Stopped && cur_music == name)
+		return true;
+	if(status == Status::Playing)
 		music.stop();
 	if(!music.openFromFile(name))
 		return false;
+	cur_music = name;
+	music.setLoop(loop);
 	music.play();
 	return true;
 }
@@ -46,11 +53,11 @@ bool SoundSFML::PlaySound(const std::string& name)
 {
 	auto& buf = LookupSound(name);
 	if (buf.getSampleCount() == 0) return false;
-	auto sound = new sf::Sound(buf);
+	std::unique_ptr<sf::Sound> sound(new sf::Sound(buf));
 	if (!sound) return false;
 	sound->setVolume(sound_volume);
 	sound->play();
-	sounds.emplace_back(sound);
+	sounds.emplace_back(std::move(sound));
 	return true;
 }
 
@@ -73,13 +80,13 @@ void SoundSFML::PauseMusic(bool pause)
 
 bool SoundSFML::MusicPlaying()
 {
-	return music.getStatus() == sf::SoundSource::Status::Playing;
+	return music.getStatus() == Status::Playing;
 }
 
 void SoundSFML::Tick()
 {
 	for (auto it = sounds.begin(); it != sounds.end();) {
-		if ((*it)->getStatus() != sf::SoundSource::Status::Playing)
+		if ((*it)->getStatus() != Status::Playing)
 			it = sounds.erase(it);
 		else
 			it++;

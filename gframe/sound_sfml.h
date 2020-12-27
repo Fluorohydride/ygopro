@@ -1,3 +1,5 @@
+#ifndef SOUND_SFML_H
+#define SOUND_SFML_H
 #include "sound_backend.h"
 #include <vector>
 #include <memory>
@@ -24,9 +26,12 @@ public:
 	virtual bool MusicPlaying() override;
 	virtual void Tick() override;
 private:
+	std::string cur_music;
 	sf::Music music;
 	std::vector<std::unique_ptr<sf::Sound>> sounds;
 	float music_volume, sound_volume;
 	std::map<std::string, std::unique_ptr<sf::SoundBuffer>> buffers;
 	const sf::SoundBuffer& LookupSound(const std::string& name);
 };
+
+#endif //SOUND_SFML_H
