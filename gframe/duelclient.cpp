@@ -280,7 +280,6 @@ catch(...) { what = def; }
 int DuelClient::ClientThread() {
 	Utils::SetThreadName("ClientThread");
 	event_base_dispatch(client_base);
-	connect_state = 0;
 	to_analyze_mutex.lock();
 	stop_threads = true;
 	cv.notify_all();
@@ -288,6 +287,7 @@ int DuelClient::ClientThread() {
 	parsing_thread.join();
 	bufferevent_free(client_bev);
 	event_base_free(client_base);
+	connect_state = 0;
 	client_bev = 0;
 	client_base = 0;
 	return 0;
@@ -581,7 +581,6 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		}
 		case ERROR_TYPE::VERERROR:
 		case ERROR_TYPE::VERERROR2: {
-			connect_state |= 0x100;
 			if(temp_ver || (_pkt.type == ERROR_TYPE::VERERROR2)) {
 				temp_ver = 0;
 				std::lock_guard<std::mutex> lock(mainGame->gMutex);
@@ -598,7 +597,6 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 				} else {
 					mainGame->PopupMessage(fmt::sprintf(gDataManager->GetSysString(1411), _pkt.code >> 12, (_pkt.code >> 4) & 0xff, _pkt.code & 0xf));
 				}
-				event_base_loopbreak(client_base);
 				if(mainGame->isHostingOnline) {
 #define HIDE_AND_CHECK(obj) if(obj->isVisible()) mainGame->HideElement(obj);
 					HIDE_AND_CHECK(mainGame->wCreateHost);
@@ -610,10 +608,11 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				}
 			} else {
-				event_base_loopbreak(client_base);
 				temp_ver = _pkt.code;
 				try_needed = true;
 			}
+			connect_state |= 0x100;
+			event_base_loopbreak(client_base);
 			break;
 		}
 		}
