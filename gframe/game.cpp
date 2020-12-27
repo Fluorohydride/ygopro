@@ -2358,7 +2358,6 @@ void Game::AddChatMsg(epro::wstringview msg, int player, int type) {
 		chatTiming[i] = chatTiming[i - 1];
 		chatType[i] = chatType[i - 1];
 	}
-	chatMsg[0].clear();
 	chatTiming[0] = 1200.0f;
 	chatType[0] = player;
 	epro::wstringview sender = L"";
@@ -2851,6 +2850,7 @@ void Game::ReloadCBRule() {
 		cbRule->addItem(gDataManager->GetSysString(i).data());
 }
 void Game::ReloadCBCurrentSkin() {
+	gSettings.cbCurrentSkin->clear();
 	int selectedSkin = gSettings.cbCurrentSkin->addItem(gDataManager->GetSysString(2065).data());
 	for(const auto& skin : skinSystem->listSkins()) {
 		auto itemIndex = gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skin).data());
