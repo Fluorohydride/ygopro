@@ -51,6 +51,7 @@ public:
 	static uint16_t temp_ver;
 	static bool try_needed;
 	static bool is_local_host;
+	static std::atomic<bool> answered;
 
 	static std::pair<uint32_t, uint16_t> ResolveServer(epro::wstringview address, epro::wstringview port);
 	static std::pair<uint32_t, uint16_t> ResolveServer(epro::wstringview address, int port);

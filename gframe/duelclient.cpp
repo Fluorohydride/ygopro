@@ -36,6 +36,7 @@ uint32_t DuelClient::watching = 0;
 uint8_t DuelClient::selftype = 0;
 bool DuelClient::is_host = false;
 bool DuelClient::is_local_host = false;
+std::atomic<bool> DuelClient::answered = false;
 event_base* DuelClient::client_base = nullptr;
 bufferevent* DuelClient::client_bev = nullptr;
 std::vector<uint8_t> DuelClient::duel_client_read;
@@ -457,6 +458,7 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 	case STOC_GAME_MSG: {
 		analyzeMutex.lock();
 		ClientAnalyze(pdata, len - 1);
+		answered = false;
 		analyzeMutex.unlock();
 		break;
 	}
@@ -4127,6 +4129,9 @@ void DuelClient::SetResponseB(void* respB, uint32_t len) {
 	memcpy(response_buf.data(), respB, len);
 }
 void DuelClient::SendResponse() {
+	if(answered)
+		return;
+	answered = true;
 	auto& msg = mainGame->dInfo.curMsg;
 	switch(msg) {
 	case MSG_SELECT_BATTLECMD:

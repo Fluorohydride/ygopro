@@ -193,6 +193,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_YES: {
 				if(mainGame->dInfo.checkRematch) {
+					mainGame->dInfo.checkRematch = false;
 					mainGame->HideElement(mainGame->wQuery);
 					CTOS_RematchResponse crr;
 					crr.rematch = true;
@@ -230,6 +231,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_NO: {
 				if(mainGame->dInfo.checkRematch) {
+					mainGame->dInfo.checkRematch = false;
 					mainGame->HideElement(mainGame->wQuery);
 					CTOS_RematchResponse crr;
 					crr.rematch = false;
@@ -2846,6 +2848,7 @@ void ClientField::SetResponseSelectedOption() const {
 }
 void ClientField::CancelOrFinish() {
 	if(mainGame->dInfo.checkRematch) {
+		mainGame->dInfo.checkRematch = false;
 		mainGame->HideElement(mainGame->wQuery);
 		CTOS_RematchResponse crr;
 		crr.rematch = false;

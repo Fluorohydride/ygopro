@@ -337,6 +337,7 @@ restart:
 
 bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 	auto Analyze = [&packet]()->bool {
+		DuelClient::answered = false;
 		return DuelClient::ClientAnalyze((char*)packet.data.data(), packet.data.size());
 	};
 	auto Data = [&packet]()->char* {
