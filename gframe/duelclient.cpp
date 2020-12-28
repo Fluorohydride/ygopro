@@ -36,7 +36,7 @@ uint32_t DuelClient::watching = 0;
 uint8_t DuelClient::selftype = 0;
 bool DuelClient::is_host = false;
 bool DuelClient::is_local_host = false;
-std::atomic<bool> DuelClient::answered = false;
+std::atomic<bool> DuelClient::answered{ false };
 event_base* DuelClient::client_base = nullptr;
 bufferevent* DuelClient::client_bev = nullptr;
 std::vector<uint8_t> DuelClient::duel_client_read;
