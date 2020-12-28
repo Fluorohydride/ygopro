@@ -3195,32 +3195,33 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		const auto cs = CompatRead<uint8_t, uint32_t>(pbuf);
 		const auto desc = CompatRead<uint32_t, uint64_t>(pbuf);
 		/*const auto ct = */CompatRead<uint8_t, uint32_t>(pbuf);
-		if(mainGame->dInfo.isCatchingUp)
-			return true;
 		ClientCard* pcard = mainGame->dField.GetCard(mainGame->LocalPlayer(info.controler), info.location, info.sequence, info.position);
-		std::unique_lock<std::mutex> lock(mainGame->gMutex);
+		auto lock = LockIf();
 		if(pcard->code != code || (!pcard->is_public && !mainGame->dInfo.compat_mode)) {
 			pcard->is_public = mainGame->dInfo.compat_mode;
 			pcard->code = code;
-			mainGame->dField.MoveCard(pcard, 10);
+			if(!mainGame->dInfo.isCatchingUp)
+				mainGame->dField.MoveCard(pcard, 10);
 		}
-		mainGame->showcardcode = code;
-		mainGame->showcarddif = 0;
-		mainGame->showcard = 1;
-		pcard->is_highlighting = true;
-		if(pcard->location & 0x30) {
-			constexpr float milliseconds = 5.0f * 1000.0f / 60.0f;
-			float shift = -0.75f / milliseconds;
-			if(info.controler == 1) shift *= -1.0f;
-			pcard->dPos.set(shift, 0, 0);
-			pcard->dRot.set(0, 0, 0);
-			pcard->is_moving = true;
-			pcard->aniFrame = milliseconds;
-			mainGame->WaitFrameSignal(30, lock);
-			mainGame->dField.MoveCard(pcard, 5);
-		} else
-			mainGame->WaitFrameSignal(30, lock);
-		pcard->is_highlighting = false;
+		if(!mainGame->dInfo.isCatchingUp) {
+			mainGame->showcardcode = code;
+			mainGame->showcarddif = 0;
+			mainGame->showcard = 1;
+			pcard->is_highlighting = true;
+			if(pcard->location & 0x30) {
+				constexpr float milliseconds = 5.0f * 1000.0f / 60.0f;
+				float shift = -0.75f / milliseconds;
+				if(info.controler == 1) shift *= -1.0f;
+				pcard->dPos.set(shift, 0, 0);
+				pcard->dRot.set(0, 0, 0);
+				pcard->is_moving = true;
+				pcard->aniFrame = milliseconds;
+				mainGame->WaitFrameSignal(30, lock);
+				mainGame->dField.MoveCard(pcard, 5);
+			} else
+				mainGame->WaitFrameSignal(30, lock);
+			pcard->is_highlighting = false;
+		}
 		mainGame->dField.current_chain.chain_card = pcard;
 		mainGame->dField.current_chain.code = code;
 		mainGame->dField.current_chain.desc = desc;
@@ -3249,28 +3250,28 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 	}
 	case MSG_CHAINED: {
 		const auto ct = BufferIO::Read<uint8_t>(pbuf);
-		if(mainGame->dInfo.isCatchingUp)
-			return true;
+		auto lock = LockIf();
 		event_string = fmt::sprintf(gDataManager->GetSysString(1609), gDataManager->GetName(mainGame->dField.current_chain.code));
-		std::unique_lock<std::mutex> lock(mainGame->gMutex);
 		mainGame->dField.chains.push_back(mainGame->dField.current_chain);
-		if (ct > 1)
+		if (ct > 1 && !mainGame->dInfo.isCatchingUp)
 			mainGame->WaitFrameSignal(20, lock);
 		mainGame->dField.last_chain = true;
 		return true;
 	}
 	case MSG_CHAIN_SOLVING: {
 		const auto ct = BufferIO::Read<uint8_t>(pbuf);
-		if(mainGame->dInfo.isCatchingUp)
-			return true;
-		std::unique_lock<std::mutex> lock(mainGame->gMutex);
-		if(mainGame->dField.last_chain)
-			mainGame->WaitFrameSignal(11, lock);
-		for(int i = 0; i < 5; ++i) {
-			mainGame->dField.chains[ct - 1].solved = false;
-			mainGame->WaitFrameSignal(3, lock);
+		auto lock = LockIf();
+		if(!mainGame->dInfo.isCatchingUp) {
+			if(mainGame->dField.last_chain)
+				mainGame->WaitFrameSignal(11, lock);
+			for(int i = 0; i < 5; ++i) {
+				mainGame->dField.chains[ct - 1].solved = false;
+				mainGame->WaitFrameSignal(3, lock);
+				mainGame->dField.chains[ct - 1].solved = true;
+				mainGame->WaitFrameSignal(3, lock);
+			}
+		} else {
 			mainGame->dField.chains[ct - 1].solved = true;
-			mainGame->WaitFrameSignal(3, lock);
 		}
 		mainGame->dField.last_chain = false;
 		return true;
