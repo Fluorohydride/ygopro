@@ -300,8 +300,6 @@ void DuelClient::ParserThread() {
 			if(stop_threads)
 				return;
 			cv.wait(lck);
-			if(stop_threads)
-				return;
 		}
 		auto pkt = std::move(to_analyze.front());
 		to_analyze.pop_front();
