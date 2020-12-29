@@ -201,9 +201,16 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CLEAR_DECK: {
+#ifdef __ANDROID__
+				std::lock_guard<std::mutex> lock(mainGame->gMutex);
+				mainGame->stQMessage->setText(fmt::format(L"{}", gDataManager->GetSysString(2004)).data());
+				mainGame->PopupElement(mainGame->wQuery);
+				prev_operation = id;
+#else
 				gdeckManager->current_deck.main.clear();
 				gdeckManager->current_deck.extra.clear();
 				gdeckManager->current_deck.side.clear();
+#endif
 				break;
 			}
 			case BUTTON_SORT_DECK: {
@@ -343,7 +350,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wQuery);
 				if(!mainGame->is_building || mainGame->is_siding)
 					break;
-				if(prev_operation == BUTTON_DELETE_DECK) {
+				switch(prev_operation) {
+				case BUTTON_DELETE_DECK : {
 					int sel = mainGame->cbDBDecks->getSelected();
 					if(gdeckManager->DeleteDeck(gdeckManager->current_deck, Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)))) {
 						mainGame->cbDBDecks->removeItem(sel);
@@ -357,12 +365,22 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->PopupElement(mainGame->wACMessage, 20);
 						prev_deck = sel;
 					}
-				} else if(prev_operation == BUTTON_LEAVE_GAME) {
+					break;
+				}
+				case BUTTON_LEAVE_GAME: {
 					Terminate();
-				} else if(prev_operation == COMBOBOX_DBDECKS) {
+					break;
+				}
+				case COMBOBOX_DBDECKS: {
 					int sel = mainGame->cbDBDecks->getSelected();
 					gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)), nullptr, true);
 					prev_deck = sel;
+				}
+				case BUTTON_CLEAR_DECK: {
+					gdeckManager->current_deck.main.clear();
+					gdeckManager->current_deck.extra.clear();
+					gdeckManager->current_deck.side.clear();
+				}
 				}
 				prev_operation = 0;
 				break;
