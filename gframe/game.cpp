@@ -1049,9 +1049,9 @@ bool Game::Initialize() {
 	wHandTest->getCloseButton()->setVisible(false);
 	wHandTest->setVisible(false);
 	defaultStrings.emplace_back(wHandTest, 1297);
-	auto nextHandTestRow = [this](int leftRail, int rightRail, bool increment = true) {
-		static int offset = 0;
-		if (increment) offset += 35;
+	offset = 0;
+	auto nextHandTestRow = [&offset,this](int leftRail, int rightRail, bool increment = true) {
+		if(increment) offset += 35;
 		return Scale(leftRail, offset, rightRail, offset + 25);
 	};
 	chkHandTestNoOpponent = env->addCheckBox(true, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, -1, gDataManager->GetSysString(2081).data());
