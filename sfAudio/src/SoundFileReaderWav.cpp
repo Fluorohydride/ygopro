@@ -88,9 +88,23 @@ namespace
         return true;
     }
 
+    bool decode(sf::InputStream& stream, float& value)
+    {
+        unsigned char bytes[sizeof(value)];
+        if (stream.read(bytes, sizeof(bytes)) != sizeof(bytes))
+            return false;
+
+		int32_t tmpval = bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
+		memcpy(&value, &tmpval, sizeof(value));
+
+        return true;
+    }
+
     const uint64_t mainChunkSize = 12;
 
     const uint16_t waveFormatPcm = 1;
+
+    const uint16_t waveFormatIeeFloat = 3;
 
     const uint16_t waveFormatExtensible= 65534;
 
@@ -195,11 +209,16 @@ uint64_t SoundFileReaderWav::read(int16_t* samples, uint64_t maxCount)
 
             case 4:
             {
-                uint32_t sample = 0;
-                if (decode(*m_stream, sample))
-                    *samples++ = sample >> 16;
-                else
-                    return count;
+				uint32_t sample = 0;
+				if(m_isFloat) {
+					float fsample = 0.0f;
+					if(decode(*m_stream, fsample))
+						sample = static_cast<uint32_t>(fsample * INT_MAX + 0.5);
+					else
+						return count;
+				} else if(!decode(*m_stream, sample))
+					return count;
+				*samples++ = sample >> 16;
                 break;
             }
 
@@ -252,7 +271,7 @@ bool SoundFileReaderWav::parseHeader(Info& info)
             uint16_t format = 0;
             if (!decode(*m_stream, format))
                 return false;
-            if ((format != waveFormatPcm) && (format != waveFormatExtensible))
+            if ((format != waveFormatPcm) && (format != waveFormatExtensible) && !(m_isFloat = (format == waveFormatIeeFloat)))
                 return false;
 
             // Channel count
@@ -281,7 +300,7 @@ bool SoundFileReaderWav::parseHeader(Info& info)
             uint16_t bitsPerSample = 0;
             if (!decode(*m_stream, bitsPerSample))
                 return false;
-            if (bitsPerSample != 8 && bitsPerSample != 16 && bitsPerSample != 24 && bitsPerSample != 32)
+            if ((m_isFloat && bitsPerSample != 32) || (bitsPerSample != 8 && bitsPerSample != 16 && bitsPerSample != 24 && bitsPerSample != 32))
             {
                 std::cerr << "Unsupported sample size: " << bitsPerSample << " bit (Supported sample sizes are 8/16/24/32 bit)" << std::endl;
                 return false;

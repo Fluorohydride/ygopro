@@ -116,6 +116,7 @@ private:
     unsigned int m_bytesPerSample; //!< Size of a sample, in bytes
 	uint64_t       m_dataStart;      //!< Starting position of the audio data in the open file
 	uint64_t       m_dataEnd;        //!< Position one byte past the end of the audio data in the open file
+	bool           m_isFloat;        //!< If the stream is using 32 bit float
 };
 
 } // namespace priv
