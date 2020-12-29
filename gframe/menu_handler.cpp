@@ -587,7 +587,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					auto extension = Utils::GetFileExtension(oldname, false);
 					auto newname = Utils::ToPathString(mainGame->ebRSName->getText());
 					if (Utils::GetFileExtension(newname, false) != extension)
-						newname += extension;
+						newname.append(1, EPRO_TEXT('.')).append(extension);
 					if(Replay::RenameReplay(oldname, oldpath + newname))
 						mainGame->lstReplayList->refreshList();
 					else
