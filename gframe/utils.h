@@ -164,6 +164,7 @@ T Utils::NormalizePath(T path, bool trailing_slash) {
 	auto paths = TokenizeString(path, slash);
 	if(paths.empty())
 		return path;
+	bool is_absolute = path.size() && path[0] == slash;
 	T normalpath;
 	for(auto it = paths.begin(); it != paths.end();) {
 		if(it->empty() && it != paths.begin()) {
@@ -186,6 +187,8 @@ T Utils::NormalizePath(T path, bool trailing_slash) {
 	normalpath += paths.back();
 	if(trailing_slash)
 		normalpath += slash;
+	if(is_absolute)
+		normalpath = slash + normalpath;
 	return normalpath;
 }
 
