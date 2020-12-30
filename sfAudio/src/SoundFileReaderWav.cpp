@@ -135,7 +135,8 @@ SoundFileReaderWav::SoundFileReaderWav() :
 m_stream        (NULL),
 m_bytesPerSample(0),
 m_dataStart     (0),
-m_dataEnd       (0)
+m_dataEnd       (0),
+m_isFloat   (false)
 {
 }
 
@@ -270,6 +271,7 @@ bool SoundFileReaderWav::parseHeader(Info& info)
 
             // Audio format
             uint16_t format = 0;
+            m_isFloat = false;
             if (!decode(*m_stream, format))
                 return false;
             if ((format != waveFormatPcm) && (format != waveFormatExtensible) && !(m_isFloat = (format == waveFormatIeeFloat)))
