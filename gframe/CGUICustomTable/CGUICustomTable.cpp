@@ -923,7 +923,7 @@ void CGUICustomTable::draw() {
 				driver->draw2DRectangle(skin->getColor(EGDC_HIGH_LIGHT), rowRect, &clientClip);
 
 			const auto lockTexture = driver->getTexture("textures/roombrowser/lock.png");
-			const auto text_size = irr::core::recti(0, 0, lockTexture->getOriginalSize().Width, lockTexture->getOriginalSize().Height);
+			const auto text_size = lockTexture ? irr::core::recti(0, 0, lockTexture->getOriginalSize().Width, lockTexture->getOriginalSize().Height) : irr::core::recti(0, 0, 0, 0);
 			const irr::core::rectf bg_sizef(0, 0, (irr::f32)text_size.getWidth(), (irr::f32)text_size.getHeight());
 			for(u32 j = 0; j < Columns.size(); ++j) {
 				textRect.UpperLeftCorner.X = pos + CellWidthPadding;
