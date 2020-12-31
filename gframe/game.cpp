@@ -123,13 +123,12 @@ bool Game::Initialize() {
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.data(), Scale(48), {});
 	guiFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->textfont.data(), Scale(gGameConfig->textfontsize), {});
 	textFont = guiFont;
-	if(!numFont || !textFont || !adFont || !lpcFont || !guiFont) {
-		ErrorLog("Failed to load font(s)!");
-		return false;
-	}
-	if(!ApplySkin(gGameConfig->skin, false, true)) {
+	if(!textFont || !guiFont)
+		throw std::runtime_error("Failed to load text font");
+	if(!numFont || !adFont || !lpcFont)
+		throw std::runtime_error("Failed to load numbers font");
+	if(!ApplySkin(gGameConfig->skin, false, true))
 		gGameConfig->skin = NoSkinLabel();
-	}
 	smgr = device->getSceneManager();
 	wCommitsLog = env->addWindow(Scale(0, 0, 500 + 10, 400 + 35 + 35), false, gDataManager->GetSysString(1209).data());
 	defaultStrings.emplace_back(wCommitsLog, 1209);
