@@ -237,7 +237,7 @@ void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview messag
 	MessageBox(nullptr, Utils::ToPathString(message).data(), Utils::ToPathString(context).data(), MB_OK | MB_ICONERROR);
 #elif defined (__APPLE__)
 	CFStringRef header_ref = CFStringCreateWithCString(nullptr, context.data(), context.size());
-	CFStringRef message_ref = CFStringCreateWithCString(nullptr, message.data(), message.data());
+	CFStringRef message_ref = CFStringCreateWithCString(nullptr, message.data(), message.size());
 
 	CFOptionFlags result;  //result code from the message box
 
