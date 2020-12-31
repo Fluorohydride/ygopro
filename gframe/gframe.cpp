@@ -22,6 +22,7 @@
 #include "game.h"
 #include "log.h"
 #include "joystick_wrapper.h"
+#include "utils_gui.h"
 #ifdef __APPLE__
 #include "osx_menu.h"
 #endif
@@ -218,7 +219,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 		epro::stringview text(e.what());
 		ygo::ErrorLog(text);
 		fmt::print("{}\n", text);
-		ygo::Utils::ShowErrorWindow("Initialization fail", text);
+		ygo::GUIUtils::ShowErrorWindow("Initialization fail", text);
 		ThreadsCleanup();
 		return EXIT_FAILURE;
 	}
@@ -252,7 +253,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 			epro::stringview text(e.what());
 			ygo::ErrorLog(text);
 			fmt::print("{}\n", text);
-			ygo::Utils::ShowErrorWindow("Assets load fail", text);
+			ygo::GUIUtils::ShowErrorWindow("Assets load fail", text);
 			ThreadsCleanup();
 			return EXIT_FAILURE;
 		}

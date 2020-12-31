@@ -22,6 +22,7 @@ extern android_app* app_global;
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #elif defined(__APPLE__)
+#import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
 #endif
 
@@ -228,6 +229,36 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 #elif defined(__APPLE__)
 	(void)fullscreen;
 	EDOPRO_ToggleFullScreen();
+#endif
+}
+
+void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview message) {
+#ifdef _WIN32
+	MessageBox(nullptr, Utils::ToPathString(message).data(), Utils::ToPathString(context).data(), MB_OK | MB_ICONERROR);
+#elif defined (__APPLE__)
+	CFStringRef header_ref = CFStringCreateWithCString(nullptr, context.data(), context.size());
+	CFStringRef message_ref = CFStringCreateWithCString(nullptr, message.data(), message.data());
+
+	CFOptionFlags result;  //result code from the message box
+
+	//launch the message box
+	CFUserNotificationDisplayAlert(
+		0, // no timeout
+		kCFUserNotificationStopAlertLevel, //change it depending message_type flags ( MB_ICONASTERISK.... etc.)
+		nullptr, //icon url, use default, you can change it depending message_type flags
+		nullptr, //not used
+		nullptr, //localization of strings
+		header_ref, //header text 
+		message_ref, //message text
+		nullptr, //default "ok" text in button
+		nullptr, //alternate button title
+		nullptr, //other button title, null--> no other button
+		&result //response flags
+	);
+
+	//Clean up the strings
+	CFRelease(header_ref);
+	CFRelease(message_ref);
 #endif
 }
 

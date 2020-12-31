@@ -110,8 +110,6 @@ namespace ygo {
 
 		static epro::stringview GetUserAgent();
 
-		static void ShowErrorWindow(epro::stringview context, epro::stringview message);
-
 		template<typename T>
 		static inline std::vector<T> TokenizeString(const T& input, const T& token);
 		template<typename T>
