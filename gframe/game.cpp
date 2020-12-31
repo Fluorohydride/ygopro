@@ -65,14 +65,8 @@ __forceinline irr::gui::IGUIComboBox* AddComboBox(irr::gui::IGUIEnvironment* env
 
 bool Game::Initialize() {
 	dpi_scale = gGameConfig->dpi_scale;
-	if(!device) {
-		try {
-			device = GUIUtils::CreateDevice(gGameConfig);
-		} catch (std::exception e) {
-			ErrorLog(e.what());
-			return false;
-		}
-	}
+	if(!device)
+		device = GUIUtils::CreateDevice(gGameConfig);
 #ifndef __ANDROID__
 	device->enableDragDrop(true, [](irr::core::vector2di pos, bool isFile) ->bool {
 		if(isFile) {
@@ -110,15 +104,12 @@ bool Game::Initialize() {
 #endif
 	skinSystem = new CGUISkinSystem(fmt::format(EPRO_TEXT("{}/skin"), Utils::working_dir).data(), device);
 	if(!skinSystem)
-		ErrorLog("Couldn't create skin system");
+		throw std::runtime_error("Couldn't create skin system");
 	linePatternGL = 0x0f0f;
 	menuHandler.prev_sel = -1;
 	driver = device->getVideoDriver();
 	imageManager.SetDevice(device);
-	if(!imageManager.Initial()) {
-		ErrorLog("Failed to load textures!");
-		return false;
-	}
+	imageManager.Initial();
 	RefreshAiDecks();
 	auto discordinitialized = discord.Initialize();
 	if(!discordinitialized)

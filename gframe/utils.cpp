@@ -276,6 +276,11 @@ namespace ygo {
 											   ygo::Utils::OSOperator->getOperatingSystemVersion().c_str());
 		return agent;
 	}
+	void Utils::ShowErrorWindow(epro::stringview context, epro::stringview message) {
+#ifdef _WIN32
+		MessageBox(nullptr, ygo::Utils::ToPathString(message).data(), ygo::Utils::ToPathString(context).data(), MB_OK | MB_ICONERROR);
+#endif
+	}
 	bool Utils::ContainsSubstring(epro::wstringview input, const std::vector<std::wstring>& tokens, bool convertInputCasing, bool convertTokenCasing) {
 		static std::vector<std::wstring> alttokens;
 		static std::wstring casedinput;

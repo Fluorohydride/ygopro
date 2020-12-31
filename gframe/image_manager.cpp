@@ -21,7 +21,7 @@ namespace ygo {
 #define GTFF(path,ext,w,h) GetTextureFromFile(X(path ext), mainGame->Scale(w), mainGame->Scale(h))
 #define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GTFF(path,".png",w,h),GTFF(path,".jpg",w,h))
 #define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(X(path ".png")),driver->getTexture(X(path ".jpg")))
-#define CHECK_RETURN(what, name) do { if(!what) { ErrorLog("Couldn't load texture: " name); return false; }} while(0)
+#define CHECK_RETURN(what, name) do { if(!what) { throw std::runtime_error("Couldn't load texture: " name); }} while(0)
 ImageManager::ImageManager() {
 	stop_threads = false;
 	obj_clear_thread = std::thread(&ImageManager::ClearFutureObjects, this);
