@@ -35,7 +35,8 @@ public:
 		NEXT_TURN,
 		PHASE,
 		PLAYER_ENTER,
-		CHAT
+		CHAT,
+		SFX_TOTAL_SIZE
 	};
 	enum BGM {
 		ALL,
@@ -70,11 +71,13 @@ public:
 
 private:
 	std::vector<std::string> BGMList[8];
+	std::string SFXList[SFX::SFX_TOTAL_SIZE];
 	std::map<std::pair<CHANT, uint32_t>, std::string> ChantsList;
 	int bgm_scene = -1;
 	randengine rnd;
 	std::unique_ptr<SoundBackend> mixer;
-	void RefreshBGMDir(epro::path_string path, BGM scene);
+	void RefreshSoundsList();
+	void RefreshBGMDir(epro::path_stringview path, BGM scene);
 	bool soundsEnabled = false;
 	bool musicEnabled = false;
 	std::string working_dir = "./";

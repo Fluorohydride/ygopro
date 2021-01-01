@@ -39,6 +39,7 @@ SoundManager::SoundManager(double sounds_volume, double music_volume, bool sound
 	rnd.seed(time(0)&0xffffffff);
 	bgm_scene = -1;
 	RefreshBGMList();
+	RefreshSoundsList();
 	RefreshChantsList();
 	succesfully_initied = true;
 #else
@@ -60,9 +61,8 @@ void SoundManager::RefreshBGMList() {
 	Utils::MakeDirectory(EPRO_TEXT("./sound/BGM/disadvantage"));
 	Utils::MakeDirectory(EPRO_TEXT("./sound/BGM/win"));
 	Utils::MakeDirectory(EPRO_TEXT("./sound/BGM/lose"));
-	for (auto list : BGMList) {
+	for (auto& list : BGMList)
 		list.clear();
-	}
 	RefreshBGMDir(EPRO_TEXT(""), BGM::DUEL);
 	RefreshBGMDir(EPRO_TEXT("duel"), BGM::DUEL);
 	RefreshBGMDir(EPRO_TEXT("menu"), BGM::MENU);
@@ -73,9 +73,47 @@ void SoundManager::RefreshBGMList() {
 	RefreshBGMDir(EPRO_TEXT("lose"), BGM::LOSE);
 #endif
 }
-void SoundManager::RefreshBGMDir(epro::path_string path, BGM scene) {
+void SoundManager::RefreshSoundsList() {
+	static constexpr std::pair<SFX, epro::path_stringview> fx[] = {
+		{SUMMON, EPRO_TEXT("./sound/summon.{}")},
+		{SPECIAL_SUMMON, EPRO_TEXT("./sound/specialsummon.{}")},
+		{ACTIVATE, EPRO_TEXT("./sound/activate.{}")},
+		{SET, EPRO_TEXT("./sound/set.{}")},
+		{FLIP, EPRO_TEXT("./sound/flip.{}")},
+		{REVEAL, EPRO_TEXT("./sound/reveal.{}")},
+		{EQUIP, EPRO_TEXT("./sound/equip.{}")},
+		{DESTROYED, EPRO_TEXT("./sound/destroyed.{}")},
+		{BANISHED, EPRO_TEXT("./sound/banished.{}")},
+		{TOKEN, EPRO_TEXT("./sound/token.{}")},
+		{ATTACK, EPRO_TEXT("./sound/attack.{}")},
+		{DIRECT_ATTACK, EPRO_TEXT("./sound/directattack.{}")},
+		{DRAW, EPRO_TEXT("./sound/draw.{}")},
+		{SHUFFLE, EPRO_TEXT("./sound/shuffle.{}")},
+		{DAMAGE, EPRO_TEXT("./sound/damage.{}")},
+		{RECOVER, EPRO_TEXT("./sound/gainlp.{}")},
+		{COUNTER_ADD, EPRO_TEXT("./sound/addcounter.{}")},
+		{COUNTER_REMOVE, EPRO_TEXT("./sound/removecounter.{}")},
+		{COIN, EPRO_TEXT("./sound/coinflip.{}")},
+		{DICE, EPRO_TEXT("./sound/diceroll.{}")},
+		{NEXT_TURN, EPRO_TEXT("./sound/nextturn.{}")},
+		{PHASE, EPRO_TEXT("./sound/phase.{}")},
+		{PLAYER_ENTER, EPRO_TEXT("./sound/playerenter.{}")},
+		{CHAT, EPRO_TEXT("./sound/chatmessage.{}")}
+	};
+	const auto extensions = mixer->GetSupportedSoundExtensions();
+	for(const auto& sound : fx) {
+		for(const auto& ext : extensions) {
+			const auto filename = fmt::format(sound.second, ext);
+			if(Utils::FileExists(filename)) {
+				SFXList[sound.first] = Utils::ToUTF8IfNeeded(filename);
+				break;
+			}
+		}
+	}
+}
+void SoundManager::RefreshBGMDir(epro::path_stringview path, BGM scene) {
 #ifdef BACKEND
-	for(auto& file : Utils::FindFiles(fmt::format(EPRO_TEXT("./sound/BGM/{}"), path), { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
+	for(auto& file : Utils::FindFiles(fmt::format(EPRO_TEXT("./sound/BGM/{}"), path), mixer->GetSupportedMusicExtensions())) {
 		auto conv = Utils::ToUTF8IfNeeded(fmt::format(EPRO_TEXT("{}/{}"), path, file));
 		BGMList[BGM::ALL].push_back(conv);
 		BGMList[scene].push_back(std::move(conv));
@@ -84,16 +122,16 @@ void SoundManager::RefreshBGMDir(epro::path_string path, BGM scene) {
 }
 void SoundManager::RefreshChantsList() {
 #ifdef BACKEND
-	static const std::pair<CHANT, epro::path_string> types[] = {
+	static constexpr std::pair<CHANT, epro::path_stringview> types[] = {
 		{CHANT::SUMMON,    EPRO_TEXT("summon")},
 		{CHANT::ATTACK,    EPRO_TEXT("attack")},
 		{CHANT::ACTIVATE,  EPRO_TEXT("activate")}
 	};
 	ChantsList.clear();
 	for (const auto& chantType : types) {
-		const epro::path_string searchPath = EPRO_TEXT("./sound/") + chantType.second;
+		const epro::path_string searchPath = fmt::format(EPRO_TEXT("./sound/{}"), chantType.second);
 		Utils::MakeDirectory(searchPath);
-		for (auto& file : Utils::FindFiles(searchPath, { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
+		for (auto& file : Utils::FindFiles(searchPath, mixer->GetSupportedSoundExtensions())) {
 			const auto filepath = fmt::format(EPRO_TEXT("{}/{}"), searchPath, file);
 			auto scode = Utils::GetFileName(file);
 			try {
@@ -111,34 +149,10 @@ void SoundManager::RefreshChantsList() {
 }
 void SoundManager::PlaySoundEffect(SFX sound) {
 #ifdef BACKEND
-	static const std::map<SFX, const char*> fx = {
-		{SUMMON, "./sound/summon.wav"},
-		{SPECIAL_SUMMON, "./sound/specialsummon.wav"},
-		{ACTIVATE, "./sound/activate.wav"},
-		{SET, "./sound/set.wav"},
-		{FLIP, "./sound/flip.wav"},
-		{REVEAL, "./sound/reveal.wav"},
-		{EQUIP, "./sound/equip.wav"},
-		{DESTROYED, "./sound/destroyed.wav"},
-		{BANISHED, "./sound/banished.wav"},
-		{TOKEN, "./sound/token.wav"},
-		{ATTACK, "./sound/attack.wav"},
-		{DIRECT_ATTACK, "./sound/directattack.wav"},
-		{DRAW, "./sound/draw.wav"},
-		{SHUFFLE, "./sound/shuffle.wav"},
-		{DAMAGE, "./sound/damage.wav"},
-		{RECOVER, "./sound/gainlp.wav"},
-		{COUNTER_ADD, "./sound/addcounter.wav"},
-		{COUNTER_REMOVE, "./sound/removecounter.wav"},
-		{COIN, "./sound/coinflip.wav"},
-		{DICE, "./sound/diceroll.wav"},
-		{NEXT_TURN, "./sound/nextturn.wav"},
-		{PHASE, "./sound/phase.wav"},
-		{PLAYER_ENTER, "./sound/playerenter.wav"},
-		{CHAT, "./sound/chatmessage.wav"}
-	};
-	if (!soundsEnabled) return;
-	mixer->PlaySound(fmt::format("{}/{}", working_dir, fx.at(sound)));
+	if(!soundsEnabled) return;
+	if(sound >= SFX::SFX_TOTAL_SIZE) return;
+	if(SFXList[sound].empty()) return;
+	mixer->PlaySound(SFXList[sound]);
 #endif
 }
 void SoundManager::PlayBGM(BGM scene, bool loop) {
