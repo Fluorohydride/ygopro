@@ -1260,6 +1260,8 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		uint64_t data = CompatRead<uint32_t, uint64_t>(pbuf);
 		if(mainGame->dInfo.isCatchingUp && type < HINT_SKILL)
 			return true;
+		if(mainGame->dInfo.isReplay && (type == 1 || type == 2 || type == 3 || type == 5))
+			return true;
 		switch (type) {
 		case HINT_EVENT: {
 			event_string = gDataManager->GetDesc(data, mainGame->dInfo.compat_mode).data();
