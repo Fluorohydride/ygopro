@@ -553,8 +553,9 @@ uint32_t gzinflate(const std::vector<uint8_t>& in, uint8_t(&buffer)[N]) {
 	z.next_out = buffer;
 	z.avail_out = N;
 
-	if(inflate(&z, Z_FINISH) < 0 || inflateEnd(&z) != Z_OK)
+	if(inflate(&z, Z_SYNC_FLUSH) < 0 || inflateEnd(&z) != Z_OK)
 		return 0;
+
 	return N - z.avail_out;
 }
 
