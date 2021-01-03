@@ -71,17 +71,17 @@ public:
 	DeckError CheckDeck(Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes = 0);
 	int TypeCount(std::vector<CardDataC*> cards, uint32_t type);
 	uint32_t LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec, uint32_t mainc2 = 0, uint32_t sidec2 = 0);
-	uint32_t LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, cardlist_type* extralist = nullptr);
+	uint32_t LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, const cardlist_type* extralist = nullptr);
 	bool LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec);
-	bool LoadDeck(const epro::path_string& file, Deck* deck = nullptr, bool separated = false);
-	bool LoadDeckDouble(const epro::path_string& file, const epro::path_string& file2, Deck* deck = nullptr);
-	bool SaveDeck(Deck& deck, const epro::path_string& name);
-	bool SaveDeck(const epro::path_string& name, const cardlist_type& mainlist, const cardlist_type& extralist, const cardlist_type& sidelist);
-	const wchar_t* ExportDeckBase64(Deck& deck);
-	const wchar_t* ExportDeckCardNames(Deck deck);
+	bool LoadDeck(epro::path_stringview file, Deck* deck = nullptr, bool separated = false);
+	bool LoadDeckDouble(epro::path_stringview file, epro::path_stringview file2, Deck* deck = nullptr);
+	bool SaveDeck(Deck& deck, epro::path_stringview name);
+	bool SaveDeck(epro::path_stringview name, const cardlist_type& mainlist, const cardlist_type& extralist, const cardlist_type& sidelist);
+	static const wchar_t* ExportDeckBase64(Deck& deck);
+	static const wchar_t* ExportDeckCardNames(Deck deck);
 	void ImportDeckBase64(Deck& deck, const wchar_t* buffer);
-	bool DeleteDeck(Deck& deck, const epro::path_string& name);
-	bool RenameDeck(const epro::path_string& oldname, const epro::path_string& newname);
+	static bool DeleteDeck(Deck& deck, epro::path_stringview name);
+	static bool RenameDeck(epro::path_stringview oldname, epro::path_stringview newname);
 };
 
 extern DeckManager* gdeckManager;

@@ -768,6 +768,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					if(deck_string && wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0) {
 						gdeckManager->ImportDeckBase64(gdeckManager->current_deck, deck_string);
 					}
+					(void)gdeckManager->ImportDeckBase64Omega(gdeckManager->current_deck, event.DropEvent.Text);
 				}
 				break;
 			}
@@ -800,6 +801,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					gdeckManager->ImportDeckBase64(gdeckManager->current_deck, event.DropEvent.Text);
 					return true;
 				}
+				if(gdeckManager->ImportDeckBase64Omega(gdeckManager->current_deck, event.DropEvent.Text))
+					return true;
 				std::wstringstream ss(Utils::ToUpperNoAccents<std::wstring>(event.DropEvent.Text));
 				std::wstring to;
 				int firstcode = 0;
