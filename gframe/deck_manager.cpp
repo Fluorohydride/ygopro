@@ -9,6 +9,7 @@
 #include "Base64.h"
 #include "utils.h"
 #include "client_card.h"
+#include "zip_file.hpp"
 
 namespace ygo {
 CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) {
@@ -537,6 +538,44 @@ void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
 	const auto sidelist = BufferToCardlist(base64_decode(buffer + delimiters[1] + 1, delimiters[2] - delimiters[1]));
 	LoadDeck(deck, mainlist, sidelist, &extralist);
 }
+template<size_t N>
+uint32_t gzinflate(const std::vector<uint8_t>& in, uint8_t(&buffer)[N]) {
+	if(in.empty())
+		return 0;
+	z_stream z{};
+
+	if(inflateInit2(&z, -MAX_WBITS) != Z_OK)
+		return 0;
+
+	z.next_in = in.data();
+	z.avail_in = in.size();
+
+	z.next_out = buffer;
+	z.avail_out = N;
+
+	if(inflate(&z, Z_FINISH) < 0 || inflateEnd(&z) != Z_OK)
+		return 0;
+	return N - z.avail_out;
+}
+
+bool DeckManager::ImportDeckBase64Omega(Deck& deck, epro::wstringview buffer) {
+	constexpr int max_main = 60 + 15;
+	constexpr int max_side = 15;
+	constexpr int max_size = (2 * sizeof(uint8_t)) + ((max_main + max_side) * sizeof(uint32_t));
+	uint8_t out_buf[max_size];
+	const auto size = gzinflate(base64_decode(buffer, false, true), out_buf);
+	if(size < 6) //counts and at least 1 card
+		return false;
+	const uint8_t mainc = out_buf[0];
+	if(mainc > max_main)
+		return false;
+	const uint8_t sidec = out_buf[1];
+	if(sidec > max_side)
+		return false;
+	if(size < ((2 * sizeof(uint8_t)) + (mainc + sidec) * sizeof(uint32_t)))
+		return false;
+	LoadDeck(deck, reinterpret_cast<uint32_t*>(out_buf + 2), mainc, sidec);
+	return true;
 }
 bool DeckManager::DeleteDeck(Deck& deck, epro::path_stringview name) {
 	return Utils::FileDelete(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name));
