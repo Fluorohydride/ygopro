@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <fstream>
 #include <fmt/format.h>
+#include <zlib.h>
 #include "network.h"
 #include "deck_manager.h"
 #include "data_manager.h"
@@ -9,7 +10,6 @@
 #include "Base64.h"
 #include "utils.h"
 #include "client_card.h"
-#include "zip_file.hpp"
 
 namespace ygo {
 CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) {
@@ -547,7 +547,7 @@ uint32_t gzinflate(const std::vector<uint8_t>& in, uint8_t(&buffer)[N]) {
 	if(inflateInit2(&z, -MAX_WBITS) != Z_OK)
 		return 0;
 
-	z.next_in = in.data();
+	z.next_in = (decltype(z.next_in))in.data();
 	z.avail_in = in.size();
 
 	z.next_out = buffer;
