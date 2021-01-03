@@ -32,20 +32,27 @@ void ___write(const wchar_t* ch) {
 */
 
 extern "C" void __stdcall handledfreeaddrinfo(addrinfo* ai) {
-	WspiapiFreeAddrInfo(ai);
+	static const auto pfFreeAddrInfo = (WSPIAPI_PFREEADDRINFO)WspiapiLoad(2);
+	pfFreeAddrInfo(ai);
 }
 
-extern "C" void __stdcall handledgetaddrinfo(const char* nodename, const char* servname, const addrinfo* hints, addrinfo** res) {
-	WspiapiGetAddrInfo(nodename, servname, hints, res);
+extern "C" INT __stdcall handledgetaddrinfo(const char* nodename, const char* servname, const addrinfo* hints, addrinfo** res) {
+	static const auto pfGetAddrInfo = (WSPIAPI_PGETADDRINFO)WspiapiLoad(0);
+	auto iError = pfGetAddrInfo(nodename, servname, hints, res);
+	WSASetLastError(iError);
+	return iError;
 }
 
-extern "C" void __stdcall handledgetnameinfo(const sockaddr* sa, socklen_t salen, char* host, size_t hostlen, char* serv, size_t servlen, int flags) {
-	WspiapiGetNameInfo(sa, salen, host, hostlen, serv, servlen, flags);
+extern "C" INT __stdcall handledgetnameinfo(const sockaddr* sa, socklen_t salen, char* host, size_t hostlen, char* serv, size_t servlen, int flags) {
+	static const auto pfGetNameInfo = (WSPIAPI_PGETNAMEINFO)WspiapiLoad(1);
+	const auto iError = pfGetNameInfo(sa, salen, host, hostlen, serv, servlen, flags);
+	WSASetLastError(iError);
+	return iError;
 }
 
 static inline bool IsUnderKernelex() {
 	//ntdll.dll is loaded automatically in every windows nt process, but it seems it isn't in windows 9x
-	static bool kernelex = GetModuleHandle(__TEXT("ntdll.dll")) == nullptr;
+	static const bool kernelex = GetModuleHandle(__TEXT("ntdll.dll")) == nullptr;
 	return kernelex;
 }
 
@@ -390,9 +397,14 @@ BOOL GetRealOSVersion(LPOSVERSIONINFOW lpVersionInfo) {
 		RegCloseKey(hKey);
 		return false;
 	};
-	if(!IsUnderKernelex())
-		return (GETFUNC(GetVersionExW))(lpVersionInfo);
-	return GetWin9xProductInfo();
+	auto GetWindowsVersionNotCompatMode = [lpVersionInfo] {
+		using RtlGetVersionPtr = NTSTATUS(WINAPI*)(PRTL_OSVERSIONINFOW);
+		const auto func = (RtlGetVersionPtr)GetProcAddress(GetModuleHandle(TEXT("ntdll.dll")), "RtlGetVersion");
+		return (func && func(lpVersionInfo) == 0x00000000) || (GETFUNC(GetVersionExW))(lpVersionInfo);
+	};
+	if(IsUnderKernelex())
+		return GetWin9xProductInfo();
+	return GetWindowsVersionNotCompatMode();
 }
 /*
 first call will be from irrlicht, no overwrite, 2nd will be from the crt,
@@ -400,38 +412,17 @@ if not spoofed, the runtime will abort as windows 2k isn't supported
 */
 extern "C" BOOL __stdcall handledGetVersionExW(LPOSVERSIONINFOW lpVersionInfo) {
 	static int firstrun = 0;
-	constexpr static OSVERSIONINFOW winxp{ sizeof(winxp), 5, 1 };
-	constexpr static OSVERSIONINFOEXW winxpex{ sizeof(winxpex), 5, 1 };
-	auto osinfo = [] {
-		const static auto ret = [] {
-			OSVERSIONINFOW ret{ sizeof(ret) };
-			if(!GetRealOSVersion(&ret))
-				ret = winxp;
-			return ret;
-		}();
-		return ret;
-	};
-	auto osinfoex = [] {
-		const static auto ret = [] {
-			OSVERSIONINFOEXW ret{ sizeof(ret) };
-			if(!GetRealOSVersion((LPOSVERSIONINFOW)&ret))
-				ret = winxpex;
-			return ret;
-		}();
-		return ret;
-	};
-	if(lpVersionInfo->dwOSVersionInfoSize == sizeof(OSVERSIONINFOW))
-		*lpVersionInfo = osinfo();
-	else
-		*(LPOSVERSIONINFOEXW)lpVersionInfo = osinfoex();
+	if(!lpVersionInfo
+	   || (lpVersionInfo->dwOSVersionInfoSize != sizeof(OSVERSIONINFOEXW) && lpVersionInfo->dwOSVersionInfoSize != sizeof(OSVERSIONINFOW))
+	   || !GetRealOSVersion(lpVersionInfo)) {
+		SetLastError(ERROR_INVALID_PARAMETER);
+		return FALSE;
+	}
 	//spoof win2k to the c runtime
-	if(firstrun == 1 && (lpVersionInfo->dwMajorVersion <= 5 || (lpVersionInfo->dwMajorVersion == 5 && lpVersionInfo->dwMinorVersion == 0))) {
+	if(firstrun == 1 && lpVersionInfo->dwMajorVersion <= 5) {
 		firstrun++;
-		if(lpVersionInfo->dwOSVersionInfoSize == sizeof(OSVERSIONINFOW))
-			*lpVersionInfo = winxp;
-		else
-			*(LPOSVERSIONINFOEXW)lpVersionInfo = winxpex;
-		return TRUE;
+		lpVersionInfo->dwMajorVersion = 5; //windows xp
+		lpVersionInfo->dwMinorVersion = 1;
 	} else if(firstrun == 0)
 		firstrun++;
 	return TRUE;
