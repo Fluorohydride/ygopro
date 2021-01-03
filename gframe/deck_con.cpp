@@ -765,10 +765,12 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case irr::KEY_KEY_V: {
 				if(event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					const wchar_t* deck_string = Utils::OSOperator->getTextFromClipboard();
-					if(deck_string && wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0) {
-						gdeckManager->ImportDeckBase64(gdeckManager->current_deck, deck_string);
+					if(deck_string) {
+						if(wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0)
+							gdeckManager->ImportDeckBase64(gdeckManager->current_deck, deck_string);
+						else
+							(void)gdeckManager->ImportDeckBase64Omega(gdeckManager->current_deck, deck_string);
 					}
-					(void)gdeckManager->ImportDeckBase64Omega(gdeckManager->current_deck, event.DropEvent.Text);
 				}
 				break;
 			}
