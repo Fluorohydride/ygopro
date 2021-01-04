@@ -9,7 +9,7 @@ env:
   - DEPLOY_BRANCH=travis-$TRAVIS_OS_NAME
   - DEPLOY_DIR=deploy
   - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
-  - DEPENDENCIES_BASE_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20201226
+  - DEPENDENCIES_BASE_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20210104
 addons:
   apt:
     update: true
