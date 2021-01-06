@@ -7,8 +7,6 @@
 #include <android_native_app_glue.h>
 #include <jni.h>
 #include <irrlicht.h>
-#include <sys/stat.h>
-#include <fstream>
 #include <vector>
 #include <unistd.h>
 #include "../log.h"
@@ -34,52 +32,63 @@ std::rettype JstringtoC##type(JNIEnv* env, const jstring& jnistring) {\
 JstringtoC(W, wstring, = BufferIO::DecodeUTF8s)
 JstringtoC(A, string)
 
+std::mutex* queued_messages_mutex = nullptr;
+std::deque<std::function<void()>>* events = nullptr;
+
 extern "C" {
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_EpNativeActivity_putMessageBoxResult(
 		JNIEnv* env, jclass thiz, jstring textString, jboolean send_enter) {
 		if(porting::app_global->userData) {
-			auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
-			auto irrenv = device->getGUIEnvironment();
-			auto element = irrenv->getFocus();
-			if(element && element->getType() == irr::gui::EGUIET_EDIT_BOX) {
-				auto editbox = static_cast<irr::gui::IGUIEditBox*>(element);
-				editbox->setText(JstringtoCW(env, textString).c_str());
-				irrenv->removeFocus(editbox);
-				irrenv->setFocus(editbox->getParent());
-				irr::SEvent changeEvent;
-				changeEvent.EventType = irr::EET_GUI_EVENT;
-				changeEvent.GUIEvent.Caller = editbox;
-				changeEvent.GUIEvent.Element = 0;
-				changeEvent.GUIEvent.EventType = irr::gui::EGET_EDITBOX_CHANGED;
-				editbox->getParent()->OnEvent(changeEvent);
-				if(send_enter) {
-					irr::SEvent enterEvent;
-					enterEvent.EventType = irr::EET_GUI_EVENT;
-					enterEvent.GUIEvent.Caller = editbox;
-					enterEvent.GUIEvent.Element = 0;
-					enterEvent.GUIEvent.EventType = irr::gui::EGET_EDITBOX_ENTER;
-					editbox->getParent()->OnEvent(enterEvent);
+			queued_messages_mutex->lock();
+			events->emplace_back([send_enter,text=JstringtoCW(env, textString)](){
+				auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
+				auto irrenv = device->getGUIEnvironment();
+				auto element = irrenv->getFocus();
+				if(element && element->getType() == irr::gui::EGUIET_EDIT_BOX) {
+					auto editbox = static_cast<irr::gui::IGUIEditBox*>(element);
+					editbox->setText(text.data());
+					irrenv->removeFocus(editbox);
+					irrenv->setFocus(editbox->getParent());
+					irr::SEvent changeEvent;
+					changeEvent.EventType = irr::EET_GUI_EVENT;
+					changeEvent.GUIEvent.Caller = editbox;
+					changeEvent.GUIEvent.Element = 0;
+					changeEvent.GUIEvent.EventType = irr::gui::EGET_EDITBOX_CHANGED;
+					editbox->getParent()->OnEvent(changeEvent);
+					if(send_enter) {
+						irr::SEvent enterEvent;
+						enterEvent.EventType = irr::EET_GUI_EVENT;
+						enterEvent.GUIEvent.Caller = editbox;
+						enterEvent.GUIEvent.Element = 0;
+						enterEvent.GUIEvent.EventType = irr::gui::EGET_EDITBOX_ENTER;
+						editbox->getParent()->OnEvent(enterEvent);
+					}
 				}
-			}
+			});
+			queued_messages_mutex->unlock();
 		}
 	}
 
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_EpNativeActivity_putComboBoxResult(
 		JNIEnv* env, jclass thiz, jint index) {
 		if(porting::app_global->userData) {
-			auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
-			auto irrenv = device->getGUIEnvironment();
-			auto element = irrenv->getFocus();
-			if(element && element->getType() == irr::gui::EGUIET_COMBO_BOX) {
-				auto combobox = static_cast<irr::gui::IGUIComboBox*>(element);
-				combobox->setSelected(index);
-				irr::SEvent changeEvent;
-				changeEvent.EventType = irr::EET_GUI_EVENT;
-				changeEvent.GUIEvent.Caller = combobox;
-				changeEvent.GUIEvent.Element = 0;
-				changeEvent.GUIEvent.EventType = irr::gui::EGET_COMBO_BOX_CHANGED;
-				combobox->getParent()->OnEvent(changeEvent);
-			}
+			queued_messages_mutex->lock();
+			events->emplace_back([index](){
+				auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
+				auto irrenv = device->getGUIEnvironment();
+				auto element = irrenv->getFocus();
+				if(element && element->getType() == irr::gui::EGUIET_COMBO_BOX) {
+					auto combobox = static_cast<irr::gui::IGUIComboBox*>(element);
+					combobox->setSelected(index);
+					irr::SEvent changeEvent;
+					changeEvent.EventType = irr::EET_GUI_EVENT;
+					changeEvent.GUIEvent.Caller = combobox;
+					changeEvent.GUIEvent.Element = 0;
+					changeEvent.GUIEvent.EventType = irr::gui::EGET_COMBO_BOX_CHANGED;
+					combobox->getParent()->OnEvent(changeEvent);
+				}
+			});
+			queued_messages_mutex->unlock();
 		}
 	}
 }
@@ -463,6 +472,18 @@ const wchar_t* getTextFromClipboard() {
 	return text.c_str();
 }
 
+void dispatchQueuedMessages() {
+	auto& _events = *events;
+	std::unique_lock<std::mutex> lock(*queued_messages_mutex);
+	while(!_events.empty()) {
+		const auto event = _events.front();
+		_events.pop_front();
+		lock.unlock();
+		event();
+		lock.lock();
+	}
+}
+
 }
 
 extern int main(int argc, char *argv[]);
@@ -472,6 +493,10 @@ void android_main(android_app *app) {
 	porting::app_global = app;
 	porting::initAndroid();
 	porting::internal_storage = app->activity->internalDataPath;
+	std::mutex _queued_messages_mutex;
+	queued_messages_mutex = &_queued_messages_mutex;
+	std::deque<std::function<void()>> _events;
+	events=&_events;
 
 	auto strparams = porting::GetExtraParameters();
 	std::vector<const char*> params;

@@ -41,6 +41,9 @@
 
 #ifdef __ANDROID__
 #include "CGUICustomComboBox/CGUICustomComboBox.h"
+namespace porting {
+	void dispatchQueuedMessages();
+}
 
 #define EnableMaterial2D(enable) driver->enableMaterial2D(enable)
 #else
@@ -1540,6 +1543,9 @@ bool Game::MainLoop() {
 		GUIUtils::ToggleFullscreen(device, currentlyFullscreen);
 	}
 	while(!restart && device->run()) {
+#ifdef __ANDROID__
+		porting::dispatchQueuedMessages();
+#endif
 		if(should_reload_skin) {
 			should_reload_skin = false;
 			if(Utils::ToPathString(gSettings.cbCurrentSkin->getItem(gSettings.cbCurrentSkin->getSelected())) != gGameConfig->skin) {
