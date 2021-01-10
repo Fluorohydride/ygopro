@@ -147,7 +147,7 @@ namespace ygo {
 #else
 		DIR* dir = nullptr;
 		Dirent* dirp = nullptr;
-		auto _path = NormalizePath<epro::path_string>(path.data());
+		auto _path = NormalizePath<epro::path_string>({ path.data(), path.size() });
 		if((dir = opendir(_path.data())) != nullptr) {
 			while((dirp = readdir(dir)) != nullptr) {
 #ifdef _DIRENT_HAVE_D_TYPE //avoid call to format and stat
@@ -208,7 +208,7 @@ namespace ygo {
 					res.insert(res.end(), std::make_move_iterator(res2.begin()), std::make_move_iterator(res2.end()));
 				}
 			} else {
-				if(extensions.empty() || std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<epro::path_string>(name.data())) != extensions.end())
+				if(extensions.empty() || std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<epro::path_string>({ name.data(), name.size() })) != extensions.end())
 					res.emplace_back(name.data(), name.size());
 			}
 		});
@@ -245,7 +245,7 @@ namespace ygo {
 			epro::path_stringview name = list->getFullFileName(i).c_str();
 			if(std::count(name.begin(), name.end(), EPRO_TEXT('/')) > subdirectorylayers)
 				continue;
-			if(extensions.empty() || std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<epro::path_string>(name.data())) != extensions.end())
+			if(extensions.empty() || std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<epro::path_string>({ name.c_str(), name.size() })) != extensions.end())
 				res.push_back(i);
 		}
 		return res;
@@ -282,7 +282,7 @@ namespace ygo {
 		if (input.empty() || tokens.empty())
 			return false;
 		if(convertInputCasing) {
-			casedinput = ToUpperNoAccents<std::wstring>(input.data());
+			casedinput = ToUpperNoAccents<std::wstring>({ input.data(), input.size() });
 			input = casedinput;
 		}
 		if (convertTokenCasing) {
@@ -383,7 +383,7 @@ namespace ygo {
 			return false;
 		CreatePath(dest, EPRO_TEXT("./"));
 		irr::io::IFileArchive* archive = nullptr;
-		if(!filesystem->addFileArchive(input.data(), false, false, irr::io::EFAT_ZIP, "", &archive))
+		if(!filesystem->addFileArchive({ input.data(), (irr::u32)input.size() }, false, false, irr::io::EFAT_ZIP, "", &archive))
 			return false;
 
 		archive->grab();
