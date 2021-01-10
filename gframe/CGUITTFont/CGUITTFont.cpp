@@ -167,8 +167,8 @@ void SGUITTGlyph::preload(u32 char_index, FT_Face face, video::IVideoDriver* dri
 
 	glyph_page = parent->getLastGlyphPageIndex();
 	u32 texture_side_length = page->texture_size.Width - font_size;
-	u32 margin = font_size * 0.5;
-	u32 sprite_size = font_size * 1.5;
+	u32 margin = (u32)(font_size * 0.5);
+	u32 sprite_size = (u32)(font_size * 1.5);
 	core::vector2di page_position(
 		(s32)(page->used_slots % (s32)(texture_side_length / sprite_size)) * sprite_size + margin,
 		(s32)(page->used_slots / (s32)(texture_side_length / sprite_size)) * sprite_size + margin
