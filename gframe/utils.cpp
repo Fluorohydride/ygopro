@@ -242,8 +242,8 @@ namespace ygo {
 		for(irr::u32 i = 0; i < list->getFileCount(); i++) {
 			if(list->isDirectory(i))
 				continue;
-			epro::path_stringview name = list->getFullFileName(i).c_str();
-			if(std::count(name.begin(), name.end(), EPRO_TEXT('/')) > subdirectorylayers)
+			const auto name = list->getFullFileName(i);
+			if(std::count(name.c_str(), name.c_str() + name.size(), EPRO_TEXT('/')) > subdirectorylayers)
 				continue;
 			if(extensions.empty() || std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<epro::path_string>({ name.c_str(), name.size() })) != extensions.end())
 				res.push_back(i);
