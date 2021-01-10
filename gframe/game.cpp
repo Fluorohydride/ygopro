@@ -71,14 +71,71 @@ bool Game::Initialize() {
 	dataManager.LoadStrings("./expansions/strings.conf");
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	if(!numFont) {
+		myswprintf(gameConf.numfont, L"c:/windows/fonts/arialbd.ttf");
+		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	}
+	if(!numFont) {
+		myswprintf(gameConf.numfont, L"/System/Library/Fonts/SFNSTextCondensed-Bold.otf");
+		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	}
+	if(!numFont) {
+		myswprintf(gameConf.numfont, L"/System/Library/Fonts/SFNS.ttf");
+		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	}
+	if(!numFont) {
+		myswprintf(gameConf.numfont, L"./font/numFont.ttf");
+		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	}
+	if(!numFont) {
+		myswprintf(gameConf.numfont, L"./font/numFont.otf");
+		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	}
+	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	if(!textFont) {
+		myswprintf(gameConf.textfont, L"c:/windows/fonts/msyh.ttc");
+		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	}
+	if(!textFont) {
+		myswprintf(gameConf.textfont, L"c:/windows/fonts/msyh.ttf");
+		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	}
+	if(!textFont) {
+		myswprintf(gameConf.textfont, L"c:/windows/fonts/simsun.ttc");
+		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	}
+	if(!textFont) {
+		myswprintf(gameConf.textfont, L"./font/textFont.ttf");
+		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	}
+	if(!textFont) {
+		myswprintf(gameConf.textfont, L"./font/textFont.otf");
+		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	}
+	if(!numFont || !textFont) {
+		wchar_t fpath[1024];
+		fpath[0] = 0;
+		FileSystem::TraversalDir(L"./font", [&fpath](const wchar_t* name, bool isdir) {
+			if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".ttf", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ttc", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".otf", 4))) {
+				myswprintf(fpath, L"./font/%ls", name);
+			}
+		});
+		if(fpath[0] == 0) {
+			ErrorLog("Failed to load font(s)!");
+			return false;
+		}
+		if(!numFont) {
+			myswprintf(gameConf.numfont, fpath);
+			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+		}
+		if(!textFont) {
+			myswprintf(gameConf.textfont, fpath);
+			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+		}
+	}
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
 	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	if(!numFont || !textFont) {
-		ErrorLog("Failed to load font(s)!");
-		return false;
-	}
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"YGOPro");
 	device->setResizable(true);
@@ -762,7 +819,6 @@ bool Game::Initialize() {
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
-	LoadConfig();
 	if(!soundManager.Init()) {
 		chkEnableSound->setChecked(false);
 		chkEnableSound->setEnabled(false);
@@ -1080,7 +1136,7 @@ void Game::LoadConfig() {
 	gameConf.use_image_scale = 1;
 	gameConf.antialias = 0;
 	gameConf.serverport = 7911;
-	gameConf.textfontsize = 12;
+	gameConf.textfontsize = 14;
 	gameConf.nickname[0] = 0;
 	gameConf.gamename[0] = 0;
 	gameConf.lastdeck[0] = 0;
@@ -1133,7 +1189,7 @@ void Game::LoadConfig() {
 			enable_log = atoi(valbuf);
 		} else if(!strcmp(strbuf, "textfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
-			int textfontsize;
+			int textfontsize = gameConf.textfontsize;
 			sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &textfontsize);
 			gameConf.textfontsize = textfontsize;
 			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
