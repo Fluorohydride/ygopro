@@ -63,19 +63,21 @@ namespace ygo {
 	epro::path_string Utils::working_dir;
 
 	void Utils::InternalSetThreadName(const char* name, const wchar_t* wname) {
-		(void)wname;
 #if defined(_WIN32)
 		static const auto PSetThreadDescription = (HRESULT(WINAPI *)(HANDLE, PCWSTR))GetProcAddress(GetModuleHandle(EPRO_TEXT("kernel32.dll")), "SetThreadDescription");
-		if(PSetThreadDescription && SUCCEEDED(PSetThreadDescription(GetCurrentThread(), wname)))
-			return;
+		if(PSetThreadDescription)
+			PSetThreadDescription(GetCurrentThread(), wname);
 #if defined(_MSC_VER)
 		WindowsWeirdStuff::NameThread(name);
-#endif
-#elif defined(__linux__)
+#endif //_MSC_VER
+#else
+		(void)wname;
+#if defined(__linux__)
 		pthread_setname_np(pthread_self(), name);
 #elif defined(__APPLE__)
 		pthread_setname_np(name);
-#endif
+#endif //__linux__
+#endif //_WIN32
 	}
 
 	bool Utils::MakeDirectory(epro::path_stringview path) {
@@ -136,12 +138,12 @@ namespace ygo {
 
 	void Utils::FindFiles(epro::path_stringview path, const std::function<void(epro::path_stringview, bool)>& cb) {
 #ifdef _WIN32
-		WIN32_FIND_DATA fdataw;
-		HANDLE fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), NormalizePath<epro::path_string>(path.data())).data(), &fdataw);
+		WIN32_FIND_DATA fdata;
+		HANDLE fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), NormalizePath<epro::path_string>({ path.data(), path.size() })).data(), &fdata);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
-				cb(fdataw.cFileName, !!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
-			} while(FindNextFile(fh, &fdataw));
+				cb(fdata.cFileName, !!(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+			} while(FindNextFile(fh, &fdata));
 			FindClose(fh);
 		}
 #else
