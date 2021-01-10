@@ -377,7 +377,7 @@ namespace ygo {
 	}
 
 	bool Utils::UnzipArchive(epro::path_stringview input, unzip_callback callback, unzip_payload* payload, epro::path_stringview dest) {
-		thread_local char buff[0x40000];
+		thread_local char buff[0x2000];
 		constexpr int buff_size = sizeof(buff) / sizeof(*buff);
 		if(!filesystem)
 			return false;
