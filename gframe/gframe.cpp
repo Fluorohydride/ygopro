@@ -188,7 +188,7 @@ inline void ThreadsCleanup() {
 int _tmain(int argc, epro::path_char* argv[]) {
 	epro::path_stringview dest{};
 	int skipped = 0;
-	if(argc >= 2 && (argv[1] == EPRO_TEXT("from_discord"_sv) || argv[1] == EPRO_TEXT("-C"_sv))) {
+	if(argc > 2 && (argv[1] == EPRO_TEXT("from_discord"_sv) || argv[1] == EPRO_TEXT("-C"_sv))) {
 		dest = argv[2];
 		skipped = 2;
 	} else
