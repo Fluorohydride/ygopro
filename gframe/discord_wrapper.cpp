@@ -19,15 +19,22 @@
 #include "discord_wrapper.h"
 
 #ifdef _WIN32
-#define formatstr EPRO_TEXT("\\\"{0}\\\" from_discord \\\"{1}\\\"")
+#define formatstr EPRO_TEXT("\"{0}\" from_discord \"{1}\"")
+//The registry entry on windows seems to need the path with \ as separator rather than /
+epro::path_string Unescape(epro::path_stringview _path) {
+	epro::path_string path{ _path.data(), _path.size() };
+	std::replace(path.begin(), path.end(), EPRO_TEXT('/'), EPRO_TEXT('\\'));
+	return path;
+}
 #else
 #define formatstr EPRO_TEXT("bash -c \"cd \\\"{1}\\\"; \\\"{0}\\\" from_discord\"")
+#define Unescape(x) x
 #endif
 
 bool DiscordWrapper::Initialize() {
 #ifdef DISCORD_APP_ID
 #if defined(_WIN32) || defined(__linux__)
-	epro::path_string param = fmt::format(formatstr, ygo::Utils::GetExePath(), ygo::Utils::working_dir);
+	epro::path_string param = fmt::format(formatstr, Unescape(ygo::Utils::GetExePath()), ygo::Utils::working_dir);
 	Discord_Register(DISCORD_APP_ID, ygo::Utils::ToUTF8IfNeeded(param).data());
 #else
 	RegisterURL(DISCORD_APP_ID);
