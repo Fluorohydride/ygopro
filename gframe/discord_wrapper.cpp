@@ -27,7 +27,7 @@ epro::path_string Unescape(epro::path_stringview _path) {
 	return path;
 }
 #elif defined(__linux__) && !defined(__ANDROID__)
-#define formatstr EPRO_TEXT("bash -c \"\\\"{0}\\\" from_discord \\\"{1}\\\"\"")
+#define formatstr R"(bash -c "\\"{0}\\" from_discord \\"{1}\\"")"
 #define Unescape(x) x
 #endif
 
