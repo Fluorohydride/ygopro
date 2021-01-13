@@ -8,7 +8,7 @@
  *
  */
 
-#include "readonlymemvfs.h"
+#include "ireadfile_sqlite.h"
 #include <sqlite3.h>
 #include <string.h>
 #include <stdio.h>
