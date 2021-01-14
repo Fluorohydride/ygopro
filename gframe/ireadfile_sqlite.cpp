@@ -30,7 +30,7 @@ struct basefunc;
 template <int ret, typename R, typename ...A>
 struct basefunc<R(*)(A...), ret> {
 	using functype = R(*)(A...);
-	static R valueint(A...) {
+	static std::conditional_t<std::is_same<void,R>::value,int,R> valueint(A...) {
 		return ret;
 	}
 	static void valuevoid(A...) { }
