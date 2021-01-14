@@ -3,11 +3,13 @@
 
 #include <unordered_map>
 #include <cstdint>
+#include <memory>
 #include "text_types.h"
 #include "utils.h"
 
 struct sqlite3;
 struct sqlite3_stmt;
+struct sqlite3_vfs;
 
 namespace irr {
 namespace io {
@@ -92,7 +94,7 @@ public:
 class DataManager {
 public:
 	DataManager();
-	~DataManager() {}
+	~DataManager();
 	void ClearLocaleTexts();
 	bool LoadLocaleDB(const epro::path_string& file);
 	bool LoadDB(const epro::path_string& file);
@@ -130,6 +132,7 @@ public:
 	static bool deck_sort_def(CardDataC* l1, CardDataC* l2);
 	static bool deck_sort_name(CardDataC* l1, CardDataC* l2);
 private:
+	std::unique_ptr<sqlite3_vfs> irrvfs;
 	template<typename T1, typename T2 = T1>
 	using indexed_map = std::map<uint32_t, std::pair<T1, T2>>;
 

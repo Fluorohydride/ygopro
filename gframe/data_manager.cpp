@@ -2,9 +2,9 @@
 #include <fstream>
 #include <fmt/format.h>
 #include <IReadFile.h>
+#include <sqlite3.h>
 #include "ireadfile_sqlite.h"
 #include "bufferio.h"
-#include "sqlite3.h"
 #include "logging.h"
 #include "utils.h"
 #include "common.h"
@@ -15,10 +15,18 @@ const wchar_t* DataManager::unknown_string = L"???";
 
 std::string DataManager::cur_database = "";
 
-DataManager::DataManager() {
-	readonlymemvfs_init();
+DataManager::DataManager() : irrvfs(irrsqlite_createfilesystem()) {
+	if(sqlite3_threadsafe())
+		sqlite3_config(SQLITE_CONFIG_SINGLETHREAD);
+	sqlite3_initialize();
+	sqlite3_vfs_register(irrvfs.get(), 0);
 	cards.reserve(10000);
 	locales.reserve(10000);
+}
+
+DataManager::~DataManager() {
+	sqlite3_vfs_unregister(irrvfs.get());
+	sqlite3_shutdown();
 }
 
 void DataManager::ClearLocaleTexts() {
