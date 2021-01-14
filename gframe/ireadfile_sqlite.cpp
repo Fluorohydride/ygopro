@@ -28,7 +28,7 @@ template <typename, typename T, T ret>
 struct basefunc;
 
 template <typename T, T ret, typename R, typename ...A>
-struct basefunc<R(*)(A...), typename T, ret> {
+struct basefunc<R(*)(A...), T, ret> {
 private:
 	using functype = R(*)(A...);
 	static std::conditional_t<std::is_same<void,R>::value,int,R> valueint(A...) {
