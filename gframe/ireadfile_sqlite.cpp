@@ -24,20 +24,24 @@ struct spmemfile_t {
 	irr::io::IReadFile* file;
 };
 
-template <typename, int>
+template <typename, typename T, T ret>
 struct basefunc;
 
-template <int ret, typename R, typename ...A>
-struct basefunc<R(*)(A...), ret> {
+template <typename T, T ret, typename R, typename ...A>
+struct basefunc<R(*)(A...), typename T, ret> {
+private:
 	using functype = R(*)(A...);
 	static std::conditional_t<std::is_same<void,R>::value,int,R> valueint(A...) {
 		return ret;
 	}
 	static void valuevoid(A...) { }
+public:
 	static constexpr auto value = !std::is_same<R, void>::value ? (functype)valueint : (functype)valuevoid;
 };
 
-#define MAKEDEF(func, ret) basefunc<decltype(sqlite3_io_methods::func), ret>::value
+using base = sqlite3_io_methods;
+
+#define MAKEDEF(func, ret) basefunc<decltype(sqlite3_io_methods::func), decltype(ret), ret>::value
 
 static int spmemfileRead(sqlite3_file* file, void* buffer, int len, sqlite3_int64 offset) {
 	spmemfile_t* memfile = (spmemfile_t*)file;
@@ -71,7 +75,7 @@ static int spmemfileCheckReservedLock(sqlite3_file* file, int* result) {
 	return SQLITE_OK;
 }
 
-static sqlite3_io_methods g_spmemfile_io_memthods = {
+static const sqlite3_io_methods g_spmemfile_io_memthods = {
 	1,                                  /* iVersion */
 	MAKEDEF(xClose, SQLITE_OK),         /* xClose */
 	spmemfileRead,                      /* xRead */
@@ -121,7 +125,7 @@ static int spmemvfsFullPathname(sqlite3_vfs* vfs, const char* path, int len, cha
 	return SQLITE_OK;
 }
 
-#define MAKEDEF(func, ret) basefunc<decltype(sqlite3_vfs::func), ret>::value
+#define MAKEDEF(func, ret) basefunc<decltype(sqlite3_vfs::func), decltype(ret), ret>::value
 
 struct spmemvfs_t {
 	sqlite3_vfs base;
@@ -140,9 +144,9 @@ static spmemvfs_t g_spmemvfs = {
 		MAKEDEF(xDelete,SQLITE_OK),                  /* xDelete */
 		spmemvfsAccess,                              /* xAccess */
 		spmemvfsFullPathname,                        /* xFullPathname */
-		MAKEDEF(xDlOpen,0),                          /* xDlOpen */
+		MAKEDEF(xDlOpen,nullptr),                    /* xDlOpen */
 		MAKEDEF(xDlError,0),                         /* xDlError */
-		MAKEDEF(xDlSym,0),                           /* xDlSym */
+		MAKEDEF(xDlSym,nullptr),                     /* xDlSym */
 		MAKEDEF(xDlClose,0),                         /* xDlClose */
 		MAKEDEF(xRandomness,SQLITE_OK),              /* xRandomness */
 		MAKEDEF(xSleep,SQLITE_OK),                   /* xSleep */
@@ -157,7 +161,7 @@ static spmemvfs_t g_spmemvfs = {
 int readonlymemvfs_init() {
 	static const auto initted = [] {
 		g_spmemvfs.parent = sqlite3_vfs_find(0);
-		g_spmemvfs.base.mxPathname = g_spmemvfs.parent->mxPathname;
+		g_spmemvfs.base.mxPathname = 0x20;
 		g_spmemvfs.base.szOsFile = sizeof(spmemfile_t);
 		return sqlite3_vfs_register((sqlite3_vfs*)&g_spmemvfs, 0);
 	}();
