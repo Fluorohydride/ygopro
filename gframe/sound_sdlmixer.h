@@ -1,5 +1,6 @@
 #ifndef SOUND_SDL_MIXER_H
 #define SOUND_SDL_MIXER_H
+#include "sound_threaded_backend.h"
 #include "sound_backend.h"
 #include <map>
 #include <string>
@@ -7,10 +8,10 @@ struct _Mix_Music;
 typedef struct _Mix_Music Mix_Music;
 struct Mix_Chunk;
 
-class SoundMixer : public SoundBackend {
+class SoundMixerBase : public SoundBackend {
 public:
-	SoundMixer();
-	~SoundMixer();
+	SoundMixerBase();
+	~SoundMixerBase();
 	virtual void SetSoundVolume(double volume) override;
 	virtual void SetMusicVolume(double volume) override;
 	virtual bool PlayMusic(const std::string& name, bool loop) override;
@@ -26,5 +27,7 @@ private:
 	Mix_Music* music;
 	int sound_volume, music_volume;
 };
+
+using SoundMixer = SoundThreadedBackendHelper<SoundMixerBase>;
 
 #endif //SOUND_SDL_MIXER_H

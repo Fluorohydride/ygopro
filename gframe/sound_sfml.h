@@ -1,6 +1,6 @@
 #ifndef SOUND_SFML_H
 #define SOUND_SFML_H
-#include "sound_backend.h"
+#include "sound_threaded_backend.h"
 #include <vector>
 #include <memory>
 #include <map>
@@ -12,10 +12,10 @@ namespace sf {
 	class SoundBuffer;
 }
 
-class SoundSFML : public SoundBackend {
+class SoundSFMLBase : public SoundBackend {
 public:
-	SoundSFML();
-	~SoundSFML();
+	SoundSFMLBase();
+	~SoundSFMLBase();
 	virtual void SetSoundVolume(double volume) override;
 	virtual void SetMusicVolume(double volume) override;
 	virtual bool PlayMusic(const std::string& name, bool loop) override;
@@ -33,5 +33,7 @@ private:
 	std::map<std::string, std::unique_ptr<sf::SoundBuffer>> buffers;
 	const sf::SoundBuffer& LookupSound(const std::string& name);
 };
+
+using SoundSFML = SoundThreadedBackendHelper<SoundSFMLBase>;
 
 #endif //SOUND_SFML_H

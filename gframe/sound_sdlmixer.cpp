@@ -8,7 +8,7 @@
 #include <thread>
 #include <atomic>
 
-SoundMixer::SoundMixer() : music(nullptr), sound_volume(0), music_volume(0) {
+SoundMixerBase::SoundMixerBase() : music(nullptr), sound_volume(0), music_volume(0) {
 	SDL_SetMainReady();
 	if(SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 		throw std::runtime_error(fmt::format("Failed to init sdl audio device!\nSDL_InitSubSystem: {}\n", SDL_GetError()));
@@ -28,15 +28,15 @@ SoundMixer::SoundMixer() : music(nullptr), sound_volume(0), music_volume(0) {
 		throw std::runtime_error(fmt::format("Cannot open channels\nMix_OpenAudio: {}\n", SDL_GetError()));
 	}
 }
-void SoundMixer::SetSoundVolume(double volume) {
+void SoundMixerBase::SetSoundVolume(double volume) {
 	sound_volume = (int)(volume * 128);
 	Mix_Volume(-1, sound_volume);
 }
-void SoundMixer::SetMusicVolume(double volume) {
+void SoundMixerBase::SetMusicVolume(double volume) {
 	music_volume = (int)(volume * 128);
 	Mix_VolumeMusic(music_volume);
 }
-bool SoundMixer::PlayMusic(const std::string& name, bool loop) {
+bool SoundMixerBase::PlayMusic(const std::string& name, bool loop) {
 	if(music && cur_music == name)
 		return false;
 	if(music) {
@@ -56,7 +56,7 @@ bool SoundMixer::PlayMusic(const std::string& name, bool loop) {
 	}
 	return true;
 }
-bool SoundMixer::PlaySound(const std::string& name) {
+bool SoundMixerBase::PlaySound(const std::string& name) {
 	auto chunk = Mix_LoadWAV(name.data());
 	if(chunk) {
 		auto channel = Mix_PlayChannel(-1, chunk, 0);
@@ -71,26 +71,26 @@ bool SoundMixer::PlaySound(const std::string& name) {
 	}
 	return true;
 }
-void SoundMixer::StopSounds() {
+void SoundMixerBase::StopSounds() {
 	Mix_HaltChannel(-1);
 }
-void SoundMixer::StopMusic() {
+void SoundMixerBase::StopMusic() {
 	if(music) {
 		Mix_HaltMusic();
 		Mix_FreeMusic(music);
 		music = nullptr;
 	}
 }
-void SoundMixer::PauseMusic(bool pause) {
+void SoundMixerBase::PauseMusic(bool pause) {
 	if(pause)
 		Mix_PauseMusic();
 	else
 		Mix_ResumeMusic();
 }
-bool SoundMixer::MusicPlaying() {
+bool SoundMixerBase::MusicPlaying() {
 	return Mix_PlayingMusic();
 }
-void SoundMixer::Tick() {
+void SoundMixerBase::Tick() {
 	for(auto chunk = sounds.begin(); chunk != sounds.end();) {
 		if(Mix_Playing(chunk->first) == 0) {
 			Mix_FreeChunk(chunk->second);
@@ -104,7 +104,7 @@ void KillSwitch(std::atomic_bool& die) {
 	if(die)
 		exit(0);
 }
-SoundMixer::~SoundMixer() {
+SoundMixerBase::~SoundMixerBase() {
 	std::atomic_bool die{true};
 	std::thread(KillSwitch, std::ref(die)).detach();
 	Mix_HaltChannel(-1);

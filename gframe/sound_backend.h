@@ -16,10 +16,10 @@ public:
 	virtual bool MusicPlaying() = 0;
 	virtual void PauseMusic(bool pause) = 0;
 	virtual void Tick() {};
-	virtual std::vector<epro::path_stringview> GetSupportedSoundExtensions() {
+	virtual std::vector<epro::path_stringview> GetSupportedSoundExtensions() const {
 		return { EPRO_TEXT("wav"), EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("flac") };
 	};
-	virtual std::vector<epro::path_stringview> GetSupportedMusicExtensions() {
+	virtual std::vector<epro::path_stringview> GetSupportedMusicExtensions() const {
 		return { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") };
 	};
 };

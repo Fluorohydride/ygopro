@@ -6,25 +6,25 @@
 
 using Status = sf::SoundSource::Status;
 
-SoundSFML::SoundSFML() :
+SoundSFMLBase::SoundSFMLBase() :
 	music(), music_volume(0.0f), sound_volume(0.0f) {
 };
-SoundSFML::~SoundSFML() = default;
+SoundSFMLBase::~SoundSFMLBase() = default;
 
-void SoundSFML::SetSoundVolume(double volume)
+void SoundSFMLBase::SetSoundVolume(double volume)
 {
 	sound_volume = (float)(volume * 100);
 	for (auto& sound: sounds)
 		sound->setVolume(sound_volume);
 }
 
-void SoundSFML::SetMusicVolume(double volume)
+void SoundSFMLBase::SetMusicVolume(double volume)
 {
 	music_volume = (float)(volume * 100);
 	music.setVolume(music_volume);
 }
 
-bool SoundSFML::PlayMusic(const std::string& name, bool loop)
+bool SoundSFMLBase::PlayMusic(const std::string& name, bool loop)
 {
 	const auto status = music.getStatus();
 	if(status != Status::Stopped && cur_music == name)
@@ -38,7 +38,7 @@ bool SoundSFML::PlayMusic(const std::string& name, bool loop)
 	music.play();
 	return true;
 }
-const sf::SoundBuffer& SoundSFML::LookupSound(const std::string& name)
+const sf::SoundBuffer& SoundSFMLBase::LookupSound(const std::string& name)
 {
 	auto& buf = buffers[name];
 	if (!buf) {
@@ -49,7 +49,7 @@ const sf::SoundBuffer& SoundSFML::LookupSound(const std::string& name)
 	return *buf;
 }
 
-bool SoundSFML::PlaySound(const std::string& name)
+bool SoundSFMLBase::PlaySound(const std::string& name)
 {
 	auto& buf = LookupSound(name);
 	if (buf.getSampleCount() == 0) return false;
@@ -61,29 +61,29 @@ bool SoundSFML::PlaySound(const std::string& name)
 	return true;
 }
 
-void SoundSFML::StopSounds()
+void SoundSFMLBase::StopSounds()
 {
 	sounds.clear();
 	buffers.clear();
 }
 
-void SoundSFML::StopMusic()
+void SoundSFMLBase::StopMusic()
 {
 	music.stop();
 }
 
-void SoundSFML::PauseMusic(bool pause)
+void SoundSFMLBase::PauseMusic(bool pause)
 {
 	if (pause) music.pause();
 	else music.play();
 }
 
-bool SoundSFML::MusicPlaying()
+bool SoundSFMLBase::MusicPlaying()
 {
 	return music.getStatus() == Status::Playing;
 }
 
-void SoundSFML::Tick()
+void SoundSFMLBase::Tick()
 {
 	for (auto it = sounds.begin(); it != sounds.end();) {
 		if ((*it)->getStatus() != Status::Playing)
