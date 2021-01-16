@@ -3362,6 +3362,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 	case MSG_DRAW: {
 		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		const auto count = CompatRead<uint8_t, uint32_t>(pbuf);
+		auto lock = LockIf();
 		ClientCard* pcard;
 		for(uint32_t i = 0; i < count; ++i) {
 			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - i);
@@ -3376,7 +3377,6 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		for(uint32_t i = 0; i < count; ++i) {
 			Play(SoundManager::SFX::DRAW);
-			auto lock = LockIf();
 			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1);
 			mainGame->dField.deck[player].erase(mainGame->dField.deck[player].end() - 1);
 			mainGame->dField.AddCard(pcard, player, LOCATION_HAND, 0);
