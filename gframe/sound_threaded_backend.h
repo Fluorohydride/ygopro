@@ -25,7 +25,7 @@ public:
 		return m_BaseBackend->GetSupportedMusicExtensions();
 	}
 protected:
-	explicit SoundThreadedBackend(std::unique_ptr<SoundBackend>&);
+	explicit SoundThreadedBackend(std::unique_ptr<SoundBackend>&&);
 private:
 	enum class ActionType {
 		SET_SOUND_VOLUME,
@@ -71,7 +71,7 @@ private:
 template<typename T>
 class SoundThreadedBackendHelper : public SoundThreadedBackend {
 public:
-	SoundThreadedBackendHelper() : SoundThreadedBackend(std::unique_ptr<SoundBackend>(new T())) {}
+	SoundThreadedBackendHelper() : SoundThreadedBackend(std::move(std::unique_ptr<SoundBackend>(new T()))) {}
 	~SoundThreadedBackendHelper() = default;
 };
 
