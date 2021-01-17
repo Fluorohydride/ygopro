@@ -1839,8 +1839,8 @@ bool Game::MainLoop() {
 				if(dInfo.time_left[dInfo.time_player])
 					dInfo.time_left[dInfo.time_player]--;
 		}
-		if(gGameConfig->maxFPS != -1 || gGameConfig->vsync)
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		// if(gGameConfig->maxFPS != -1 || gGameConfig->vsync)
+			// std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 	discord.UpdatePresence(DiscordWrapper::TERMINATE);
 	replaySignal.SetNoWait(true);
