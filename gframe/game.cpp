@@ -72,81 +72,44 @@ bool Game::Initialize() {
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	if(!numFont) {
-		myswprintf(gameConf.numfont, L"C:/Windows/Fonts/arialbd.ttf");
-		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
-	}
-	if(!numFont) {
-		myswprintf(gameConf.numfont, L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf");
-		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
-	}
-	if(!numFont) {
-		myswprintf(gameConf.numfont, L"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc");
-		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
-	}
-	if(!numFont) {
-		myswprintf(gameConf.numfont, L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc");
-		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
-	}
-	if(!numFont) {
-		myswprintf(gameConf.numfont, L"/System/Library/Fonts/SFNSTextCondensed-Bold.otf");
-		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
-	}
-	if(!numFont) {
-		myswprintf(gameConf.numfont, L"/System/Library/Fonts/SFNS.ttf");
-		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
-	}
-	if(!numFont) {
-		myswprintf(gameConf.numfont, L"./fonts/numFont.ttf");
-		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
-	}
-	if(!numFont) {
-		myswprintf(gameConf.numfont, L"./fonts/numFont.ttc");
-		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
-	}
-	if(!numFont) {
-		myswprintf(gameConf.numfont, L"./fonts/numFont.otf");
-		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+		const wchar_t* numFontPaths[] = {
+			L"C:/Windows/Fonts/arialbd.ttf",
+			L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
+			L"/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Bold.ttc",
+			L"/System/Library/Fonts/SFNSTextCondensed-Bold.otf",
+			L"/System/Library/Fonts/SFNS.ttf",
+			L"./fonts/numFont.ttf",
+			L"./fonts/numFont.ttc",
+			L"./fonts/numFont.otf"
+		};
+		for(const wchar_t* path : numFontPaths) {
+			myswprintf(gameConf.numfont, path);
+			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+			if(numFont)
+				break;
+		}
 	}
 	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	if(!textFont) {
-		myswprintf(gameConf.textfont, L"C:/Windows/Fonts/msyh.ttc");
-		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	}
-	if(!textFont) {
-		myswprintf(gameConf.textfont, L"C:/Windows/Fonts/msyh.ttf");
-		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	}
-	if(!textFont) {
-		myswprintf(gameConf.textfont, L"C:/Windows/Fonts/simsun.ttc");
-		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	}
-	if(!textFont) {
-		myswprintf(gameConf.textfont, L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf");
-		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	}
-	if(!textFont) {
-		myswprintf(gameConf.textfont, L"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc");
-		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	}
-	if(!textFont) {
-		myswprintf(gameConf.textfont, L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc");
-		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	}
-	if(!textFont) {
-		myswprintf(gameConf.textfont, L"/System/Library/Fonts/PingFang.ttc");
-		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	}
-	if(!textFont) {
-		myswprintf(gameConf.textfont, L"./fonts/textFont.ttf");
-		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	}
-	if(!textFont) {
-		myswprintf(gameConf.textfont, L"./fonts/textFont.ttc");
-		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	}
-	if(!textFont) {
-		myswprintf(gameConf.textfont, L"./fonts/textFont.otf");
-		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+		const wchar_t* textFontPaths[] = {
+			L"C:/Windows/Fonts/msyh.ttc",
+			L"C:/Windows/Fonts/msyh.ttf",
+			L"C:/Windows/Fonts/simsun.ttc",
+			L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
+			L"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc",
+			L"/System/Library/Fonts/PingFang.ttc",
+			L"./fonts/textFont.ttf",
+			L"./fonts/textFont.ttc",
+			L"./fonts/textFont.otf"
+		};
+		for(const wchar_t* path : textFontPaths) {
+			myswprintf(gameConf.textfont, path);
+			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+			if(textFont)
+				break;
+		}
 	}
 	if(!numFont || !textFont) {
 		wchar_t fpath[1024];
