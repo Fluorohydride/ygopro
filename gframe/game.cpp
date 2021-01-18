@@ -72,7 +72,19 @@ bool Game::Initialize() {
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	if(!numFont) {
-		myswprintf(gameConf.numfont, L"c:/windows/fonts/arialbd.ttf");
+		myswprintf(gameConf.numfont, L"C:/Windows/Fonts/arialbd.ttf");
+		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	}
+	if(!numFont) {
+		myswprintf(gameConf.numfont, L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf");
+		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	}
+	if(!numFont) {
+		myswprintf(gameConf.numfont, L"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc");
+		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	}
+	if(!numFont) {
+		myswprintf(gameConf.numfont, L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc");
 		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	}
 	if(!numFont) {
@@ -84,40 +96,64 @@ bool Game::Initialize() {
 		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	}
 	if(!numFont) {
-		myswprintf(gameConf.numfont, L"./font/numFont.ttf");
+		myswprintf(gameConf.numfont, L"./fonts/numFont.ttf");
 		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	}
 	if(!numFont) {
-		myswprintf(gameConf.numfont, L"./font/numFont.otf");
+		myswprintf(gameConf.numfont, L"./fonts/numFont.ttc");
+		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	}
+	if(!numFont) {
+		myswprintf(gameConf.numfont, L"./fonts/numFont.otf");
 		numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	}
 	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	if(!textFont) {
-		myswprintf(gameConf.textfont, L"c:/windows/fonts/msyh.ttc");
+		myswprintf(gameConf.textfont, L"C:/Windows/Fonts/msyh.ttc");
 		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	}
 	if(!textFont) {
-		myswprintf(gameConf.textfont, L"c:/windows/fonts/msyh.ttf");
+		myswprintf(gameConf.textfont, L"C:/Windows/Fonts/msyh.ttf");
 		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	}
 	if(!textFont) {
-		myswprintf(gameConf.textfont, L"c:/windows/fonts/simsun.ttc");
+		myswprintf(gameConf.textfont, L"C:/Windows/Fonts/simsun.ttc");
 		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	}
 	if(!textFont) {
-		myswprintf(gameConf.textfont, L"./font/textFont.ttf");
+		myswprintf(gameConf.textfont, L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf");
 		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	}
 	if(!textFont) {
-		myswprintf(gameConf.textfont, L"./font/textFont.otf");
+		myswprintf(gameConf.textfont, L"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc");
+		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	}
+	if(!textFont) {
+		myswprintf(gameConf.textfont, L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc");
+		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	}
+	if(!textFont) {
+		myswprintf(gameConf.textfont, L"/System/Library/Fonts/PingFang.ttc");
+		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	}
+	if(!textFont) {
+		myswprintf(gameConf.textfont, L"./fonts/textFont.ttf");
+		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	}
+	if(!textFont) {
+		myswprintf(gameConf.textfont, L"./fonts/textFont.ttc");
+		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	}
+	if(!textFont) {
+		myswprintf(gameConf.textfont, L"./fonts/textFont.otf");
 		textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	}
 	if(!numFont || !textFont) {
 		wchar_t fpath[1024];
 		fpath[0] = 0;
-		FileSystem::TraversalDir(L"./font", [&fpath](const wchar_t* name, bool isdir) {
+		FileSystem::TraversalDir(L"./fonts", [&fpath](const wchar_t* name, bool isdir) {
 			if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".ttf", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ttc", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".otf", 4))) {
-				myswprintf(fpath, L"./font/%ls", name);
+				myswprintf(fpath, L"./fonts/%ls", name);
 			}
 		});
 		if(fpath[0] == 0) {
