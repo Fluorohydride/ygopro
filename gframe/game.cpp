@@ -1502,7 +1502,7 @@ static inline void BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f
 bool Game::MainLoop() {
 	irr::core::matrix4 mProjection;
 	auto RefreshHands = [&]() {
-		std::unique_lock<std::mutex>(gMutex);
+		std::unique_lock<std::mutex> lk(gMutex);
 		if(dInfo.isInDuel)
 			dField.RefreshHandHitboxes();
 	};
