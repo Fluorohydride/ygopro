@@ -15,7 +15,7 @@ struct ServerInfo {
 };
 struct RoomInfo {
 	std::wstring name;
-	int id;
+	uint32_t id;
 	bool started;
 	bool locked;
 	std::vector<std::wstring> players;
