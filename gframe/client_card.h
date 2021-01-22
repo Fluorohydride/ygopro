@@ -18,6 +18,7 @@ public:
 	irr::core::vector3df curRot;
 	irr::core::vector3df dPos;
 	irr::core::vector3df dRot;
+	irr::core::recti hand_collision;
 	irr::f32 curAlpha = 255;
 	irr::f32 dAlpha;
 	int32_t aniFrame;

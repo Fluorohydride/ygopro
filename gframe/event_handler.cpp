@@ -21,6 +21,12 @@
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
 #include "Base64.h"
+#include <SViewFrustum.h>
+#include <IrrlichtDevice.h>
+#include <ISceneManager.h>
+#include <ICameraSceneNode.h>
+#include <ISceneManager.h>
+#include <ISceneCollisionManager.h>
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
 #endif
@@ -711,7 +717,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if (selected_cards.size() > 0) {
 						SetResponseSelectedCards();
 						ShowCancelOrFinishButton(0);
-						mainGame->HideElement(mainGame->wCardSelect, true);}
+						mainGame->HideElement(mainGame->wCardSelect, true);
+					}
 					break;
 				}
 				case MSG_SELECT_SUM: {
@@ -1098,7 +1105,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->wCmdMenu->setVisible(false);
 			if(panel && panel->isVisible())
 				break;
-			GetHoverField(x, y);
+			GetHoverField(mousepos);
 			if(hovered_location & 0xe)
 				clicked_card = GetCard(hovered_controler, hovered_location, hovered_sequence);
 			else clicked_card = 0;
@@ -1492,7 +1499,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			ClientCard* mcard = 0;
 			uint8_t mplayer = 2;
 			if(!panel || !panel->isVisible() || !panel->getRelativePosition().isPointInside(mousepos)) {
-				GetHoverField(x, y);
+				GetHoverField(mousepos);
 				if(hovered_location & 0xe)
 					mcard = GetCard(hovered_controler, hovered_location, hovered_sequence);
 				else if(hovered_location == LOCATION_GRAVE) {
@@ -2373,77 +2380,56 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 	}
 	return false;
 }
-void ClientField::GetHoverField(int x, int y) {
-	static const irr::core::recti NormalSelfHand(430, 504, 875, 600);
-	static const irr::core::recti NormalOppoHand(531, 135, 800, 191);
-	static const irr::core::recti SpeedSelfHand(509, 504, 796, 600);
-	static const irr::core::recti SpeedOppoHand(531 + 46, 135, 800 - 46, 191);
+
+irr::core::vector3df MouseToPlane(const irr::core::vector2d<irr::s32>& mouse, const irr::core::plane3d<irr::f32>& plane) {
+	const auto collmanager = mainGame->smgr->getSceneCollisionManager();
+	irr::core::line3df line = collmanager->getRayFromScreenCoordinates(mouse);
+	irr::core::vector3d<irr::f32> startintersection;
+	plane.getIntersectionWithLimitedLine(line.start, line.end, startintersection);
+	return startintersection;
+}
+
+inline irr::core::vector3df MouseToField(irr::core::vector2d<irr::s32> mouse) {
+	return MouseToPlane(mouse, { matManager.vFieldExtra[0][0][0].Pos,
+								 matManager.vFieldExtra[0][0][1].Pos,
+								 matManager.vFieldExtra[0][0][2].Pos });
+}
+
+bool CheckHand(const irr::core::vector2d<irr::s32>& mouse, std::vector<ClientCard*>& hand) {
+	if(hand.empty()) return false;
+	irr::core::recti rect{ hand.front()->hand_collision.UpperLeftCorner, hand.back()->hand_collision.LowerRightCorner };
+	if(!rect.isValid())
+		rect = { hand.back()->hand_collision.UpperLeftCorner, hand.front()->hand_collision.LowerRightCorner };
+	return rect.isPointInside(mouse);
+}
+
+void ClientField::GetHoverField(irr::core::vector2d<irr::s32> mouse) {
 	const int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	const int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
-	const auto& sfRect = (speed) ? SpeedSelfHand : NormalSelfHand;
-	const auto& ofRect = (speed) ? SpeedOppoHand : NormalOppoHand;
-	const irr::core::vector2di pos(x, y);
-	if(sfRect.isPointInside(pos)) {
-		const int hc = hand[0].size();
-		constexpr int cardSize = 66;
-		constexpr int cardSpace = 10;
-		if(hc == 0)
-			hovered_location = 0;
-		else if(hc < 7 - speed * 2) {
-			int left = sfRect.UpperLeftCorner.X + (cardSize + cardSpace) * (6 - speed * 2 - hc) / 2;
-			if(x < left)
-				hovered_location = 0;
-			else {
-				int seq = (x - left) / (cardSize + cardSpace);
-				if(seq >= hc) seq = hc - 1;
-				if(x - left - (cardSize + cardSpace) * seq < cardSize) {
-					hovered_controler = 0;
-					hovered_location = LOCATION_HAND;
-					hovered_sequence = seq;
-				} else hovered_location = 0;
+	if(CheckHand(mouse, hand[0])) {
+		hovered_controler = 0;
+		hovered_location = LOCATION_HAND;
+		for(auto it = hand[0].rbegin(); it != hand[0].rend(); it++) {
+			if((*it)->hand_collision.isPointInside(mouse)) {
+				hovered_sequence = (*it)->sequence;
+				return;
 			}
-		} else {
-			hovered_controler = 0;
-			hovered_location = LOCATION_HAND;
-			if(x >= sfRect.UpperLeftCorner.X + (cardSize + cardSpace) * (5 - speed * 2))
-				hovered_sequence = hc - 1;
-			else
-				hovered_sequence = (x - sfRect.UpperLeftCorner.X) * (hc - 1) / ((cardSize + cardSpace) * (5 - speed * 2));
 		}
-	} else if(ofRect.isPointInside(pos)) {
-		const int hc = hand[1].size();
-		constexpr int cardSize = 39;
-		constexpr int cardSpace = 7;
-		if(hc == 0)
-			hovered_location = 0;
-		else if(hc < 7 - speed * 2) {
-			int left = ofRect.UpperLeftCorner.X + (cardSize + cardSpace) * (6 - speed * 2 - hc) / 2;
-			if(x < left)
-				hovered_location = 0;
-			else {
-				int seq = (x - left) / (cardSize + cardSpace);
-				if(seq >= hc) seq = hc - 1;
-				if(x - left - (cardSize + cardSpace) * seq < cardSize) {
-					hovered_controler = 1;
-					hovered_location = LOCATION_HAND;
-					hovered_sequence = hc - 1 - seq;
-				} else hovered_location = 0;
+		hovered_location = 0;
+	} else if(CheckHand(mouse, hand[1])) {
+		hovered_controler = 1;
+		hovered_location = LOCATION_HAND;
+		for(auto it = hand[1].begin(); it != hand[1].end(); it++) {
+			if((*it)->hand_collision.isPointInside(mouse)) {
+				hovered_sequence = (*it)->sequence;
+				return;
 			}
-		} else {
-			hovered_controler = 1;
-			hovered_location = LOCATION_HAND;
-			if(x >= ofRect.UpperLeftCorner.X + (cardSize + cardSpace) * (5 - speed * 2))
-				hovered_sequence = 0;
-			else
-				hovered_sequence = hc - 1 - (x - ofRect.UpperLeftCorner.X) * (hc - 1) / ((cardSize + cardSpace) * (5 - speed * 2));
 		}
+		hovered_location = 0;
 	} else {
-		const double screenx = x / 1024.0 * (CAMERA_RIGHT - CAMERA_LEFT) + CAMERA_LEFT;
-		const double screeny = y / 640.0 * (CAMERA_TOP - CAMERA_BOTTOM) + CAMERA_BOTTOM;
-		const double angle = FIELD_ANGLE - atan(screeny);
-		const double vlen = sqrt(1.0 + screeny * screeny);
-		const double boardx = FIELD_X + FIELD_Z * screenx / vlen / cos(angle);
-		const double boardy = FIELD_Y - FIELD_Z * tan(angle);
+		const auto coords = MouseToField(mouse);
+		const auto& boardx = coords.X;
+		const auto& boardy = coords.Y;
 		hovered_location = 0;
 		if(boardx >= matManager.vFieldExtra[0][speed][0].Pos.X && boardx <= matManager.vFieldExtra[0][speed][1].Pos.X) {
 			if(boardy >= matManager.vFieldExtra[0][speed][0].Pos.Y && boardy <= matManager.vFieldExtra[0][speed][2].Pos.Y) {

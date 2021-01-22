@@ -6,6 +6,7 @@
 #include <map>
 #include <IEventReceiver.h>
 #include <vector3d.h>
+#include <vector2d.h>
 
 namespace ygo {
 
@@ -104,6 +105,7 @@ public:
 	void ShowSelectOption(uint64_t select_hint = 0, bool should_lock = true);
 	void ReplaySwap();
 	void RefreshAllCards();
+	void RefreshHandHitboxes();
 
 	void GetChainDrawCoordinates(uint8_t controler, uint8_t location, uint32_t sequence, irr::core::vector3df* t);
 	void GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans = false);
@@ -135,7 +137,7 @@ public:
 
 	virtual bool OnEvent(const irr::SEvent& event);
 	virtual bool OnCommonEvent(const irr::SEvent& event, bool& stopPropagation);
-	void GetHoverField(int x, int y);
+	void GetHoverField(irr::core::vector2d<irr::s32> mouse);
 	void ShowMenu(int flag, int x, int y);
 	void UpdateChainButtons(irr::gui::IGUIElement* caller = nullptr);
 	void ShowCancelOrFinishButton(int buttonOp);

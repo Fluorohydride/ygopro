@@ -1494,19 +1494,26 @@ bool Game::Initialize() {
 	return true;
 }
 #undef WStr
-void BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f32 left, irr::f32 right, irr::f32 bottom, irr::f32 top, irr::f32 znear, irr::f32 zfar) {
+static inline void BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f32 left, irr::f32 right, irr::f32 bottom, irr::f32 top, irr::f32 znear, irr::f32 zfar) {
 	mProjection.buildProjectionMatrixPerspectiveLH(right - left, top - bottom, znear, zfar);
 	mProjection[8] = (left + right) / (left - right);
 	mProjection[9] = (top + bottom) / (bottom - top);
 }
 bool Game::MainLoop() {
-	camera = smgr->addCameraSceneNode(0);
 	irr::core::matrix4 mProjection;
+	auto RefreshHands = [&]() {
+		std::unique_lock<std::mutex>(gMutex);
+		if(dInfo.isInDuel)
+			dField.RefreshHandHitboxes();
+	};
+	camera = smgr->addCameraSceneNode(0);
 	BuildProjectionMatrix(mProjection, CAMERA_LEFT, CAMERA_RIGHT, CAMERA_BOTTOM, CAMERA_TOP, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
 
-	mProjection.buildCameraLookAtMatrixLH(irr::core::vector3df(FIELD_X, FIELD_Y, FIELD_Z), irr::core::vector3df(FIELD_X, 0, 0), irr::core::vector3df(0, 0, 1));
-	camera->setViewMatrixAffector(mProjection);
+	camera->setPosition(irr::core::vector3df(FIELD_X, FIELD_Y, FIELD_Z));
+	camera->setTarget(irr::core::vector3df(FIELD_X, 0, 0));
+	camera->setUpVector(irr::core::vector3df(0, 0, 1));
+
 	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
 #if defined (__linux__) && !defined(__ANDROID__)
@@ -1661,6 +1668,7 @@ bool Game::MainLoop() {
 			window_scale.X = (window_size.Width / 1024.0) / gGameConfig->dpi_scale;
 			window_scale.Y = (window_size.Height / 640.0) / gGameConfig->dpi_scale;
 			cardimagetextureloading = false;
+			RefreshHands();
 			OnResize();
 		}
 		frame_counter += (float)delta_time * 60.0f/1000.0f;
@@ -1754,7 +1762,7 @@ bool Game::MainLoop() {
 				frameSignal.Set();
 		}
 		if(waitFrame >= 0.0f) {
-			waitFrame += (float)delta_time * 60.0f / 1000.0f;;
+			waitFrame += (float)delta_time * 60.0f / 1000.0f;
 			if((int)std::round(waitFrame) % 90 == 0) {
 				stHintMsg->setText(gDataManager->GetSysString(1390).data());
 			} else if((int)std::round(waitFrame) % 90 == 30) {

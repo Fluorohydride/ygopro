@@ -4,16 +4,6 @@
 #include <S3DVertex.h>
 #include <SMaterial.h>
 
-extern const float FIELD_X;
-extern const float  FIELD_Y;
-extern const float  FIELD_Z;
-extern const float  FIELD_ANGLE;
-
-extern const float  CAMERA_LEFT;
-extern const float  CAMERA_RIGHT;
-extern const float  CAMERA_BOTTOM;
-extern const float  CAMERA_TOP;
-
 namespace ygo {
 
 class Materials {

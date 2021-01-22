@@ -7,6 +7,9 @@
 #include <IGUIScrollBar.h>
 #include <IGUIListBox.h>
 #include <IGUIEditBox.h>
+#include <IVideoDriver.h>
+#include <ICameraSceneNode.h>
+#include "game.h"
 #include "client_field.h"
 #include "client_card.h"
 #include "duelclient.h"
@@ -708,7 +711,7 @@ void ClientField::RefreshAllCards() {
 			pcard->is_moving = false;
 		}
 	};
-	auto refreshloc = [&refresh](std::vector<ClientCard*> zone) {
+	auto refreshloc = [&refresh](const auto& zone) {
 		for(auto& pcard : zone)
 			refresh(pcard);
 	};
@@ -722,8 +725,7 @@ void ClientField::RefreshAllCards() {
 		refreshloc(extra[p]);
 		refresh(skills[p]);
 	}
-	for(auto& pcard : overlay_cards)
-		refresh(pcard);
+	refreshloc(overlay_cards);
 }
 void ClientField::GetChainDrawCoordinates(uint8_t controler, uint8_t location, uint32_t sequence, irr::core::vector3df* t) {
 	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
@@ -774,6 +776,37 @@ void ClientField::GetChainDrawCoordinates(uint8_t controler, uint8_t location, u
 	}
 	t->X = (loc[0].Pos.X + loc[1].Pos.X) / 2;
 	t->Y = (loc[0].Pos.Y + loc[2].Pos.Y) / 2;
+}
+static void getCardScreenCoordinates(ClientCard* pcard) {
+	irr::core::matrix4 trans = mainGame->camera->getProjectionMatrix();
+	trans *= mainGame->camera->getViewMatrix();
+	trans *= pcard->mTransform;
+	auto transform = [&trans, dim = (mainGame->driver->getCurrentRenderTargetSize() / 2)](irr::core::vector3df vec) {
+		irr::f32 transformedPos[4] = { vec.X, vec.Y, vec.Z, 1.0f };
+
+		trans.multiplyWith1x4Matrix(transformedPos);
+
+		if(transformedPos[3] < 0)
+			return irr::core::vector2d<irr::s32>(-10000, -10000);
+
+		const irr::f32 zDiv = transformedPos[3] == 0.0f ? 1.0f :
+			irr::core::reciprocal(transformedPos[3]);
+
+		return irr::core::vector2d<irr::s32>(
+			dim.Width + irr::core::round32(dim.Width * (transformedPos[0] * zDiv)),
+			dim.Height - irr::core::round32(dim.Height * (transformedPos[1] * zDiv)));
+	};
+
+	const auto& frontmat = matManager.vCardFront;
+	const auto upperleft = transform(frontmat[0].Pos);
+	const auto lowerright = transform(frontmat[3].Pos);
+	pcard->hand_collision = { upperleft, lowerright };
+}
+void ClientField::RefreshHandHitboxes() {
+	for(const auto& pcard : hand[0])
+		getCardScreenCoordinates(pcard);
+	for(const auto& pcard : hand[1])
+		getCardScreenCoordinates(pcard);
 }
 void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans) {
 	static const irr::core::vector3df selfATK{ 0.0f, 0.0f, 0.0f };
@@ -885,6 +918,8 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 	if(setTrans) {
 		pcard->mTransform.setTranslation(*t);
 		pcard->mTransform.setRotationRadians(*r);
+		if(pcard->location == LOCATION_HAND && !pcard->is_hovered)
+			getCardScreenCoordinates(pcard);
 	}
 }
 void ClientField::MoveCard(ClientCard * pcard, float frame) {

@@ -1,15 +1,5 @@
 #include "materials.h"
 
-const float FIELD_X = 4.2f;
-const float FIELD_Y = 8.0f;
-const float FIELD_Z = 7.8f;
-const float FIELD_ANGLE = (float)atan(FIELD_Y / FIELD_Z);
-
-const float CAMERA_LEFT = -0.90f;
-const float CAMERA_RIGHT = 0.45f;
-const float CAMERA_BOTTOM = -0.42f;
-const float CAMERA_TOP = 0.42f;
-
 namespace ygo {
 
 Materials matManager;

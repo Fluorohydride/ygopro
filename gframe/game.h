@@ -737,4 +737,14 @@ irr::core::rect<T> Game::Scale(irr::core::rect<T> rect) {
 
 #define DECK_SEARCH_SCROLL_STEP		100
 
+constexpr float FIELD_X = 4.2f;
+constexpr float FIELD_Y = 8.0f;
+constexpr float FIELD_Z = 7.8f;
+constexpr float FIELD_ANGLE = 0.798055715f; //(std::atan(FIELD_Y / FIELD_Z))
+
+constexpr float CAMERA_LEFT = -0.90f;
+constexpr float CAMERA_RIGHT = 0.45f;
+constexpr float CAMERA_BOTTOM = -0.42f;
+constexpr float CAMERA_TOP = 0.42f;
+
 #endif // GAME_H
