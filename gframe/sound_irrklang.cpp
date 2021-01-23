@@ -3,18 +3,11 @@
 #include "irrklang_dynamic_loader.h"
 #include <stdexcept>
 #include <irrKlang.h>
-#ifdef IRRKLANG_STATIC
-#include "../ikpmp3/ikpMP3.h"
-#endif
 
 SoundIrrklang::SoundIrrklang() :
 	soundEngine(nullptr), soundBGM(nullptr), sfxVolume(0.0), bgmVolume(0.0) {
-	irrdyn::init();
-	if(!(soundEngine = irrdyn::createIrrKlangDevice()))
+	if(!(soundEngine = loader.createIrrKlangDevice()))
 		throw std::runtime_error("Failed to init irrklang device!");
-#ifdef IRRKLANG_STATIC
-	irrklang::ikpMP3Init(soundEngine);
-#endif
 }
 void SoundIrrklang::SetSoundVolume(double volume) {
 	sfxVolume = volume;
@@ -80,7 +73,6 @@ SoundIrrklang::~SoundIrrklang() {
 		soundBGM->drop();
 	if(soundEngine)
 		soundEngine->drop();
-	irrdyn::close();
 }
 
 #endif //YGOPRO_USE_IRRKLANG

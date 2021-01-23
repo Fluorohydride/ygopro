@@ -1,6 +1,7 @@
 #ifndef SOUND_IRRKLANG_H
 #define SOUND_IRRKLANG_H
 #include "sound_backend.h"
+#include "irrklang_dynamic_loader.h"
 #include <vector>
 #include <string>
 namespace irrklang {
@@ -22,6 +23,7 @@ public:
 	virtual bool MusicPlaying() override;
 	virtual void Tick() override;
 private:
+	KlangLoader loader;
 	irrklang::ISoundEngine* soundEngine;
 	irrklang::ISound* soundBGM;
 	std::vector<irrklang::ISound*> sounds;
