@@ -238,9 +238,10 @@ catch(...) { what = def; }
 			TOI(cscg.info.team2, mainGame->ebTeam2->getText(), 1);
 			TOI(cscg.info.best_of, mainGame->ebBestOf->getText(), 1);
 #undef TOI
-			if(mainGame->btnRelayMode->isPressed()) {
+			if(mainGame->btnRelayMode->isPressed())
 				cscg.info.duel_flag_low |= DUEL_RELAY;
-			}
+			if(cscg.info.no_shuffle_deck)
+				cscg.info.duel_flag_low |= DUEL_PSEUDO_SHUFFLE;
 			cscg.info.forbiddentypes = mainGame->forbiddentypes;
 			cscg.info.extra_rules = mainGame->extra_rules;
 			if(mainGame->ebHostNotes->isVisible()) {
