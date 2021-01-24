@@ -166,7 +166,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				open_file_name = EPRO_TEXT("hand-test-mode");
 				SingleMode::DuelOptions options;
 				options.handTestNoOpponent = mainGame->chkHandTestNoOpponent->isChecked();
-				options.handTestNoShuffle = mainGame->chkHandTestNoShuffle->isChecked();
 				try {
 					options.startingDrawCount = std::stoi(mainGame->ebHandTestStartHand->getText());
 				} catch(...) {}
@@ -191,6 +190,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				}
 #undef CHECK
+				options.duelFlags |= mainGame->chkHandTestNoShuffle->isChecked() ? DUEL_PSEUDO_SHUFFLE : 0;
 				SingleMode::singleSignal.SetNoWait(false);
 				SingleMode::StartPlay(options);
 				break;

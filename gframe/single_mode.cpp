@@ -115,9 +115,8 @@ restart:
 		script_name = "hand-test-mode";
 		InitReplay();
 		Deck playerdeck(gdeckManager->current_deck);
-		if (!duelOptions.handTestNoShuffle) {
+		if ((duelOptions.duelFlags & DUEL_PSEUDO_SHUFFLE) == 0)
 			std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), DuelClient::rnd);
-		}
 		auto LoadDeck = [&](uint8_t team) {
 			OCG_NewCardInfo card_info = { team, 0, 0, team, 0, 0, POS_FACEDOWN_DEFENSE };
 			card_info.loc = LOCATION_DECK;
