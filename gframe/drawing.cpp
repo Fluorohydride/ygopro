@@ -1272,7 +1272,7 @@ void Game::DrawDeckBd() {
 		for(size_t i = 0; i < gdeckManager->current_deck.main.size(); ++i) {
 			DrawThumb(gdeckManager->current_deck.main[i], irr::core::vector2di(314 + (i % lx) * dx, 164 + (i / lx) * 68), deckBuilder.filterList);
 			if(deckBuilder.hovered_pos == 1 && deckBuilder.hovered_seq == (int)i)
-				driver->draw2DRectangleOutline(Resize(313 + (i % lx) * dx, 163 + (i / lx) * 68, 359 + (i % lx) * dx, 228 + (i / lx) * 68));
+				driver->draw2DRectangleOutline(Resize(313 + (i % lx) * dx, 163 + (i / lx) * 68, 359 + (i % lx) * dx, 228 + (i / lx) * 68), skin::DECK_WINDOW_HOVERED_CARD_OUTLINE_VAL);
 		}
 	}
 	//extra deck
@@ -1306,7 +1306,7 @@ void Game::DrawDeckBd() {
 		for(size_t i = 0; i < gdeckManager->current_deck.extra.size(); ++i) {
 			DrawThumb(gdeckManager->current_deck.extra[i], irr::core::vector2di(314 + i * dx, 466), deckBuilder.filterList);
 			if(deckBuilder.hovered_pos == 2 && deckBuilder.hovered_seq == (int)i)
-				driver->draw2DRectangleOutline(Resize(313 + i * dx, 465, 359 + i * dx, 531));
+				driver->draw2DRectangleOutline(Resize(313 + i * dx, 465, 359 + i * dx, 531), skin::DECK_WINDOW_HOVERED_CARD_OUTLINE_VAL);
 		}
 	}
 	//side deck
@@ -1338,7 +1338,7 @@ void Game::DrawDeckBd() {
 		for(size_t i = 0; i < gdeckManager->current_deck.side.size(); ++i) {
 			DrawThumb(gdeckManager->current_deck.side[i], irr::core::vector2di(314 + i * dx, 564), deckBuilder.filterList);
 			if(deckBuilder.hovered_pos == 3 && deckBuilder.hovered_seq == (int)i)
-				driver->draw2DRectangleOutline(Resize(313 + i * dx, 563, 359 + i * dx, 629));
+				driver->draw2DRectangleOutline(Resize(313 + i * dx, 563, 359 + i * dx, 629), skin::DECK_WINDOW_HOVERED_CARD_OUTLINE_VAL);
 		}
 	}
 	//search result
