@@ -96,9 +96,15 @@ public:
 	DataManager();
 	~DataManager();
 	void ClearLocaleTexts();
-	bool LoadLocaleDB(const epro::path_string& file);
-	bool LoadDB(const epro::path_string& file);
-	bool LoadDB(irr::io::IReadFile* reader);
+	inline bool LoadLocaleDB(const epro::path_string& file) {
+		return ParseLocaleDB(OpenDb(file));
+	}
+	inline bool LoadDB(const epro::path_string& file) {
+		return ParseDB(OpenDb(file));
+	}
+	inline bool LoadDB(irr::io::IReadFile* reader) {
+		return ParseDB(OpenDb(reader));
+	}
 	bool LoadStrings(const epro::path_string& file);
 	bool LoadLocaleStrings(const epro::path_string& file);
 	void ClearLocaleStrings();
@@ -107,10 +113,18 @@ public:
 	epro::wstringview GetName(uint32_t code);
 	epro::wstringview GetText(uint32_t code);
 	epro::wstringview GetDesc(uint64_t strCode, bool compat);
-	epro::wstringview GetSysString(uint32_t code);
-	epro::wstringview GetVictoryString(int code);
-	epro::wstringview GetCounterName(uint32_t code);
-	epro::wstringview GetSetName(uint32_t code);
+	inline epro::wstringview GetSysString(uint32_t code) {
+		return _sysStrings.GetLocale(code);
+	}
+	inline epro::wstringview GetVictoryString(int code) {
+		return _victoryStrings.GetLocale(code);
+	}
+	inline epro::wstringview GetCounterName(uint32_t code) {
+		return _counterStrings.GetLocale(code);
+	}
+	inline epro::wstringview GetSetName(uint32_t code) {
+		return _setnameStrings.GetLocale(code, L"");
+	}
 	std::vector<uint32_t> GetSetCode(std::vector<std::wstring>& setname);
 	std::wstring GetNumString(int num, bool bracket = false);
 	epro::wstringview FormatLocation(uint32_t location, int sequence);
@@ -124,8 +138,7 @@ public:
 
 	std::unordered_map<uint32_t, CardDataM> cards;
 
-	static const wchar_t* unknown_string;
-	static std::string cur_database;
+	static constexpr wchar_t* unknown_string = L"???";
 	static void CardReader(void* payload, uint32_t code, OCG_CardData* data);
 	static bool deck_sort_lv(CardDataC* l1, CardDataC* l2);
 	static bool deck_sort_atk(CardDataC* l1, CardDataC* l2);
@@ -139,11 +152,11 @@ private:
 	class LocaleStringHelper {
 	public:
 		indexed_map<std::wstring> map{};
-		const wchar_t* GetLocale(uint32_t code) {
+		epro::wstringview GetLocale(uint32_t code, epro::wstringview ret = DataManager::unknown_string) {
 			auto search = map.find(code);
 			if(search == map.end() || search->second.first.empty())
-				return nullptr;
-			return search->second.second.size() ? search->second.second.data() : search->second.first.data();
+				return ret;
+			return search->second.second.size() ? search->second.second : search->second.first;
 		}
 		void ClearLocales() {
 			for(auto& elem : map)
@@ -167,6 +180,7 @@ private:
 	LocaleStringHelper _victoryStrings;
 	LocaleStringHelper _setnameStrings;
 	LocaleStringHelper _sysStrings;
+	std::string cur_database;
 };
 
 extern DataManager* gDataManager;

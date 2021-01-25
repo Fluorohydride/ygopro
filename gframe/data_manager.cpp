@@ -11,10 +11,6 @@
 
 namespace ygo {
 
-const wchar_t* DataManager::unknown_string = L"???";
-
-std::string DataManager::cur_database = "";
-
 DataManager::DataManager() : irrvfs(irrsqlite_createfilesystem()) {
 	if(sqlite3_threadsafe())
 		sqlite3_config(SQLITE_CONFIG_SINGLETHREAD);
@@ -38,7 +34,7 @@ void DataManager::ClearLocaleTexts() {
 	locales.clear();
 }
 
-inline sqlite3* DataManager::OpenDb(epro::path_stringview file) {
+sqlite3* DataManager::OpenDb(epro::path_stringview file) {
 	cur_database = Utils::ToUTF8IfNeeded(file);
 	sqlite3* pDB{ nullptr };
 	if(sqlite3_open_v2(cur_database.data(), &pDB, SQLITE_OPEN_READONLY, nullptr) != SQLITE_OK) {
@@ -59,16 +55,6 @@ sqlite3* DataManager::OpenDb(irr::io::IReadFile* reader) {
 	return pDB;
 }
 
-bool DataManager::LoadLocaleDB(const epro::path_string& file) {
-	return ParseLocaleDB(OpenDb(file));
-}
-
-bool DataManager::LoadDB(const epro::path_string& file) {
-	return ParseDB(OpenDb(file));
-}
-bool DataManager::LoadDB(irr::io::IReadFile* reader) {
-	return ParseDB(OpenDb(reader));
-}
 bool DataManager::ParseDB(sqlite3* pDB) {
 	if(pDB == nullptr)
 		return false;
@@ -322,30 +308,6 @@ epro::wstringview DataManager::GetDesc(uint64_t strCode, bool compat) {
 	if(csit == cards.end() || csit->second.GetStrings()->desc[stringid].empty())
 		return unknown_string;
 	return csit->second.GetStrings()->desc[stringid];
-}
-epro::wstringview DataManager::GetSysString(uint32_t code) {
-	auto csit = _sysStrings.GetLocale(code);
-	if(!csit)
-		return unknown_string;
-	return csit;
-}
-epro::wstringview DataManager::GetVictoryString(int code) {
-	auto csit = _victoryStrings.GetLocale(code);
-	if(!csit)
-		return unknown_string;
-	return csit;
-}
-epro::wstringview DataManager::GetCounterName(uint32_t code) {
-	auto csit = _counterStrings.GetLocale(code);
-	if(!csit)
-		return unknown_string;
-	return csit;
-}
-epro::wstringview DataManager::GetSetName(uint32_t code) {
-	auto csit = _setnameStrings.GetLocale(code);
-	if(!csit)
-		return L"";
-	return csit;
 }
 std::vector<uint32_t> DataManager::GetSetCode(std::vector<std::wstring>& setname) {
 	std::vector<uint32_t> res;
