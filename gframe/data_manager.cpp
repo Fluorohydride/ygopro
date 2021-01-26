@@ -11,6 +11,18 @@
 
 namespace ygo {
 
+static constexpr const char SELECT_STMT[] =
+R"(
+SELECT datas.id,datas.ot,datas.alias,datas.setcode,datas.type,datas.atk,datas.def,datas.level,datas.race,datas.attribute,datas.category,texts.name,texts.desc,texts.str1,texts.str2,texts.str3,texts.str4,texts.str5,texts.str6,texts.str7,texts.str8,texts.str9,texts.str10,texts.str11,texts.str12,texts.str13,texts.str14,texts.str15,texts.str16
+FROM datas,texts WHERE texts.id = datas.id;
+)";
+
+static constexpr const char SELECT_STMT_LOCALE[] =
+R"(
+SELECT id,name,desc,str1,str2,str3,str4,str5,str6,str7,str8,str9,str10,str11,str12,str13,str14,str15,str16
+FROM texts ORDER BY texts.id;
+)";
+
 DataManager::DataManager() : irrvfs(irrsqlite_createfilesystem()) {
 	if(sqlite3_threadsafe())
 		sqlite3_config(SQLITE_CONFIG_SINGLETHREAD);
@@ -59,8 +71,7 @@ bool DataManager::ParseDB(sqlite3* pDB) {
 	if(pDB == nullptr)
 		return false;
 	sqlite3_stmt* pStmt;
-	const char* sql = "select * from datas,texts where datas.id=texts.id ORDER BY texts.id";
-	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
+	if(sqlite3_prepare_v2(pDB, SELECT_STMT, sizeof(SELECT_STMT), &pStmt, 0) != SQLITE_OK)
 		return Error(pDB);
 	auto indexesiterator = indexes.begin();
 	int step = 0;
@@ -103,14 +114,14 @@ bool DataManager::ParseDB(sqlite3* pDB) {
 			cd.race = sqlite3_column_int(pStmt, 8);
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
-			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+			if(const char* text = (const char*)sqlite3_column_text(pStmt, 11)) {
 				cs.name = BufferIO::DecodeUTF8s(text);
 			}
-			if(const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
+			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 				cs.text = BufferIO::DecodeUTF8s(text);
 			}
 			for(int i = 0; i < 16; ++i) {
-				if(const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
+				if(const char* text = (const char*)sqlite3_column_text(pStmt, i + 13)) {
 					cs.desc[i] = BufferIO::DecodeUTF8s(text);
 				}
 			}
@@ -133,8 +144,7 @@ bool DataManager::ParseLocaleDB(sqlite3* pDB) {
 	if(pDB == nullptr)
 		return false;
 	sqlite3_stmt* pStmt;
-	const char* sql = "select * from texts ORDER BY texts.id";
-	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
+	if(sqlite3_prepare_v2(pDB, SELECT_STMT_LOCALE, sizeof(SELECT_STMT_LOCALE), &pStmt, 0) != SQLITE_OK)
 		return Error(pDB);
 	auto indexesiterator = indexes.begin();
 	int step = 0;
