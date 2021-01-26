@@ -20,9 +20,13 @@ using Dirent = struct dirent;
 #import <CoreFoundation/CoreFoundation.h>
 #include <mach-o/dyld.h>
 #include <CoreServices/CoreServices.h>
+#include <copyfile.h>
 #endif
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
+#endif
+#ifdef __linux__
+#include <sys/sendfile.h>
 #endif
 #include <IFileArchive.h>
 #include <IFileSystem.h>
@@ -92,6 +96,24 @@ namespace ygo {
 			return false;
 #ifdef _WIN32
 		return CopyFile(source.data(), destination.data(), false);
+#elif defined(__linux__)
+		int input, output;
+		if((input = open(source.data(), O_RDONLY)) == -1) {
+			return false;
+		}
+		if((output = creat(destination.data(), 0660)) == -1) {
+			close(input);
+			return false;
+		}
+		off_t bytesCopied = 0;
+		struct stat fileinfo = { 0 };
+		fstat(input, &fileinfo);
+		int result = sendfile(output, input, &bytesCopied, fileinfo.st_size);
+		close(input);
+		close(output);
+		return result != -1;
+#elif defined(__APPLE__)
+		return copyfile(source.data(), destination.data(), 0, COPYFILE_ALL) == 0;
 #else
 		std::ifstream src(source.data(), std::ios::binary);
 		if(!src.is_open())
