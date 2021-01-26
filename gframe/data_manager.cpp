@@ -14,7 +14,7 @@ namespace ygo {
 static constexpr const char SELECT_STMT[] =
 R"(
 SELECT datas.id,datas.ot,datas.alias,datas.setcode,datas.type,datas.atk,datas.def,datas.level,datas.race,datas.attribute,datas.category,texts.name,texts.desc,texts.str1,texts.str2,texts.str3,texts.str4,texts.str5,texts.str6,texts.str7,texts.str8,texts.str9,texts.str10,texts.str11,texts.str12,texts.str13,texts.str14,texts.str15,texts.str16
-FROM datas,texts WHERE texts.id = datas.id;
+FROM datas,texts WHERE texts.id = datas.id ORDER BY texts.id;
 )";
 
 static constexpr const char SELECT_STMT_LOCALE[] =
@@ -135,7 +135,11 @@ bool DataManager::ParseDB(sqlite3* pDB) {
 					localestring = indexesiterator->second.second;
 			}
 			auto ptr = &(cards[cd.code] = { std::move(cd), std::move(cs), localestring });
-			indexes[cd.code] = { ptr, localestring };
+			if(localestring) {
+				indexesiterator->second.first = ptr;
+			} else {
+				indexesiterator = indexes.emplace_hint(indexesiterator, cd.code, std::make_pair(ptr, localestring));
+			}
 		}
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
@@ -180,8 +184,10 @@ bool DataManager::ParseLocaleDB(sqlite3* pDB) {
 			auto ptr = &(locales[code] = std::move(cs));
 			if(card_data) {
 				card_data->_locale_strings = ptr;
+				indexesiterator->second.second = ptr;
+			} else {
+				indexesiterator = indexes.emplace_hint(indexesiterator, code, std::make_pair(card_data, ptr));
 			}
-			indexes[code] = { card_data,ptr };
 		}
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
