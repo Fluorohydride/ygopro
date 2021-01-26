@@ -1212,8 +1212,8 @@ bool DeckBuilder::CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std
 				return checkNeg(false);
 			return checkNeg(check_set_code(data->_data, set_code));
 		} else {
-			return checkNeg((set_code.size() && check_set_code(data->_data, set_code)) || Utils::ContainsSubstring(strings->name, tokens, true)
-					|| Utils::ContainsSubstring(strings->text, tokens, true));
+			return checkNeg((set_code.size() && check_set_code(data->_data, set_code)) || Utils::ContainsSubstring(strings->uppercase_name, tokens)
+					|| Utils::ContainsSubstring(strings->uppercase_text, tokens));
 		}
 	}
 	return true;

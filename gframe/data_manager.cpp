@@ -116,9 +116,11 @@ bool DataManager::ParseDB(sqlite3* pDB) {
 			cd.category = sqlite3_column_int(pStmt, 10);
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 11)) {
 				cs.name = BufferIO::DecodeUTF8s(text);
+				cs.uppercase_name = Utils::ToUpperNoAccents(cs.name);
 			}
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 				cs.text = BufferIO::DecodeUTF8s(text);
+				cs.uppercase_text = Utils::ToUpperNoAccents(cs.text);
 			}
 			for(int i = 0; i < 16; ++i) {
 				if(const char* text = (const char*)sqlite3_column_text(pStmt, i + 13)) {
@@ -157,9 +159,11 @@ bool DataManager::ParseLocaleDB(sqlite3* pDB) {
 			auto code = (uint32_t)sqlite3_column_int64(pStmt, 0);
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 1)) {
 				cs.name = BufferIO::DecodeUTF8s(text);
+				cs.uppercase_name = Utils::ToUpperNoAccents(cs.name);
 			}
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 2)) {
 				cs.text = BufferIO::DecodeUTF8s(text);
+				cs.uppercase_text = Utils::ToUpperNoAccents(cs.text);
 			}
 			for(int i = 0; i < 16; ++i) {
 				if(const char* text = (const char*)sqlite3_column_text(pStmt, i + 3)) {

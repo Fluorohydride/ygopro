@@ -73,6 +73,8 @@ struct CardDataC {
 struct CardString {
 	std::wstring name;
 	std::wstring text;
+	std::wstring uppercase_name;
+	std::wstring uppercase_text;
 	std::wstring desc[16];
 };
 
