@@ -27,6 +27,7 @@ using Dirent = struct dirent;
 #endif
 #ifdef __linux__
 #include <sys/sendfile.h>
+#include <fcntl.h>
 #endif
 #include <IFileArchive.h>
 #include <IFileSystem.h>
