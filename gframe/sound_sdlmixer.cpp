@@ -82,6 +82,8 @@ void SoundMixerBase::StopMusic() {
 	}
 }
 void SoundMixerBase::PauseMusic(bool pause) {
+	if(!music)
+		return;
 	if(pause)
 		Mix_PauseMusic();
 	else

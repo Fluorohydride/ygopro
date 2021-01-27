@@ -74,8 +74,12 @@ void SoundSFMLBase::StopMusic()
 
 void SoundSFMLBase::PauseMusic(bool pause)
 {
-	if (pause) music.pause();
-	else music.play();
+	if(music.getStatus() == Status::Stopped)
+		return;
+	if(pause)
+		music.pause();
+	else
+		music.play();
 }
 
 bool SoundSFMLBase::MusicPlaying()
