@@ -445,7 +445,8 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 						mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
 					if(selectable_cards[i]->overlayTarget->controler)
 						mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-					else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+					else
+						mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 				} else if(selectable_cards[i]->location == LOCATION_DECK || selectable_cards[i]->location == LOCATION_EXTRA || selectable_cards[i]->location == LOCATION_REMOVED) {
 					if(selectable_cards[i]->position & POS_FACEDOWN)
 						mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
@@ -465,7 +466,8 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 				wchar_t formatBuffer[2048];
 				myswprintf(formatBuffer, L"%d", sort_list[i]);
 				mainGame->stCardPos[i]->setText(formatBuffer);
-			} else mainGame->stCardPos[i]->setText(L"");
+			} else
+				mainGame->stCardPos[i]->setText(L"");
 			mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 		}
 		mainGame->stCardPos[i]->setVisible(true);
