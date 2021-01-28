@@ -71,14 +71,70 @@ bool Game::Initialize() {
 	dataManager.LoadStrings("./expansions/strings.conf");
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	if(!numFont) {
+		const wchar_t* numFontPaths[] = {
+			L"C:/Windows/Fonts/arialbd.ttf",
+			L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
+			L"/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Bold.ttc",
+			L"/System/Library/Fonts/SFNSTextCondensed-Bold.otf",
+			L"/System/Library/Fonts/SFNS.ttf",
+			L"./fonts/numFont.ttf",
+			L"./fonts/numFont.ttc",
+			L"./fonts/numFont.otf"
+		};
+		for(const wchar_t* path : numFontPaths) {
+			myswprintf(gameConf.numfont, path);
+			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+			if(numFont)
+				break;
+		}
+	}
+	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	if(!textFont) {
+		const wchar_t* textFontPaths[] = {
+			L"C:/Windows/Fonts/msyh.ttc",
+			L"C:/Windows/Fonts/msyh.ttf",
+			L"C:/Windows/Fonts/simsun.ttc",
+			L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
+			L"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc",
+			L"/System/Library/Fonts/PingFang.ttc",
+			L"./fonts/textFont.ttf",
+			L"./fonts/textFont.ttc",
+			L"./fonts/textFont.otf"
+		};
+		for(const wchar_t* path : textFontPaths) {
+			myswprintf(gameConf.textfont, path);
+			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+			if(textFont)
+				break;
+		}
+	}
+	if(!numFont || !textFont) {
+		wchar_t fpath[1024];
+		fpath[0] = 0;
+		FileSystem::TraversalDir(L"./fonts", [&fpath](const wchar_t* name, bool isdir) {
+			if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".ttf", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ttc", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".otf", 4))) {
+				myswprintf(fpath, L"./fonts/%ls", name);
+			}
+		});
+		if(fpath[0] == 0) {
+			ErrorLog("Failed to load font(s)!");
+			return false;
+		}
+		if(!numFont) {
+			myswprintf(gameConf.numfont, fpath);
+			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+		}
+		if(!textFont) {
+			myswprintf(gameConf.textfont, fpath);
+			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+		}
+	}
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
 	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	if(!numFont || !textFont) {
-		ErrorLog("Failed to load font(s)!");
-		return false;
-	}
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"YGOPro");
 	device->setResizable(true);
@@ -762,7 +818,6 @@ bool Game::Initialize() {
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
-	LoadConfig();
 	if(!soundManager.Init()) {
 		chkEnableSound->setChecked(false);
 		chkEnableSound->setEnabled(false);
@@ -1080,7 +1135,7 @@ void Game::LoadConfig() {
 	gameConf.use_image_scale = 1;
 	gameConf.antialias = 0;
 	gameConf.serverport = 7911;
-	gameConf.textfontsize = 12;
+	gameConf.textfontsize = 14;
 	gameConf.nickname[0] = 0;
 	gameConf.gamename[0] = 0;
 	gameConf.lastdeck[0] = 0;
@@ -1133,7 +1188,7 @@ void Game::LoadConfig() {
 			enable_log = atoi(valbuf);
 		} else if(!strcmp(strbuf, "textfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
-			int textfontsize;
+			int textfontsize = gameConf.textfontsize;
 			sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &textfontsize);
 			gameConf.textfontsize = textfontsize;
 			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
