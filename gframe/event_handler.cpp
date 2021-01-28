@@ -881,8 +881,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 					// text
 					wchar_t formatBuffer[2048];
-					if(sort_list.size()) {
-						if(sort_list[pos + i] > 0)
+					if(mainGame->dInfo.curMsg == MSG_SORT_CARD) {
+						if(sort_list[pos + i])
 							myswprintf(formatBuffer, L"%d", sort_list[pos + i]);
 						else
 							myswprintf(formatBuffer, L"");
@@ -2541,6 +2541,7 @@ void ClientField::CancelOrFinish() {
 		if(mainGame->wCardSelect->isVisible()) {
 			DuelClient::SetResponseI(-1);
 			mainGame->HideElement(mainGame->wCardSelect, true);
+			sort_list.clear();
 		}
 		break;
 	}
