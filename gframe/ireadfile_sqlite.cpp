@@ -19,14 +19,9 @@ struct basefunc;
 
 template <typename T, T ret, typename R, typename ...A>
 struct basefunc<R(*)(A...), T, ret> {
-private:
-	using functype = R(*)(A...);
-	static std::conditional_t<std::is_same<void, R>::value, int, R> valueint(A...) {
-		return ret;
+	static R value(A...) {
+		return (R)ret;
 	}
-	static void valuevoid(A...) {}
-public:
-	static constexpr auto value = !std::is_same<R, void>::value ? (functype)valueint : (functype)valuevoid;
 };
 
 struct sqlite3_vfs_t {
