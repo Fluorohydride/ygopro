@@ -797,7 +797,7 @@ static void getCardScreenCoordinates(ClientCard* pcard) {
 			dim.Height - irr::core::round32(dim.Height * (transformedPos[1] * zDiv)));
 	};
 
-	const auto& frontmat = matManager.vCardFront;
+	const auto& frontmat = (pcard->code && (!mainGame->dInfo.isReplay || !gGameConfig->hideHandsInReplays || pcard->is_public || pcard->is_hovered)) ? matManager.vCardFront : matManager.vCardBack;
 	const auto upperleft = transform(frontmat[0].Pos);
 	const auto lowerright = transform(frontmat[3].Pos);
 	pcard->hand_collision = { upperleft, lowerright };
