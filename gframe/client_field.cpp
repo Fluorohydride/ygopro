@@ -1209,7 +1209,7 @@ bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::se
 								stack.push(cd->val);\
 								break;\
 							}
-static bool is_declarable(CardDataC* cd, const std::vector<uint64_t>& opcodes) {
+static bool is_declarable(const CardDataC* cd, const std::vector<uint64_t>& opcodes) {
 	std::stack<uint64_t> stack;
 	bool alias = false, token = false;
 	for(auto& opcode : opcodes) {
@@ -1278,42 +1278,46 @@ static bool is_declarable(CardDataC* cd, const std::vector<uint64_t>& opcodes) {
 #undef UNARY_OP_OP
 #undef GET_OP
 void ClientField::UpdateDeclarableList(bool refresh) {
-	uint32_t trycode = BufferIO::GetVal(mainGame->ebANCard->getText());
-	auto cd = gDataManager->GetCardData(trycode);
-	if(cd && is_declarable(cd, declare_opcodes)) {
+	CardDataM* cd = nullptr;
+	auto check_code = [&, cards_end = gDataManager->cards.end()](uint32_t trycode) -> bool {
+		const auto it = gDataManager->cards.find(trycode);
+		cd = nullptr;
+		if(it != cards_end && is_declarable(&it->second._data, declare_opcodes))
+			cd = &it->second;
+		return cd;
+	};
+	auto ptext = mainGame->ebANCard->getText();
+	if(check_code(BufferIO::GetVal(ptext))) {
 		mainGame->lstANCard->clear();
-		ancard.clear();
-		mainGame->lstANCard->addItem(gDataManager->GetName(trycode).data());
-		ancard.push_back(trycode);
+		mainGame->lstANCard->addItem(cd->GetStrings()->name.data());
+		ancard = { cd->_data.code };
 		return;
 	}
-	const auto pname = Utils::ToUpperNoAccents<std::wstring>(mainGame->ebANCard->getText());
-	if(pname.empty() && !refresh) {
+	if(ptext[0] == 0 && !refresh) {
 		std::vector<uint32_t> cache;
 		cache.swap(ancard);
 		int sel = mainGame->lstANCard->getSelected();
 		int selcode = (sel == -1) ? 0 : cache[sel];
 		mainGame->lstANCard->clear();
 		for(const auto& trycode : cache) {
-			cd = gDataManager->GetCardData(trycode);
-			if(cd && is_declarable(cd, declare_opcodes)) {
+			if(check_code(trycode)) {
 				ancard.push_back(trycode);
-				auto name = gDataManager->GetName(trycode);
+				const auto& name = cd->GetStrings()->name;
 				mainGame->lstANCard->addItem(name.data());
 				if(trycode == selcode)
 					mainGame->lstANCard->setSelected(name.data());
 			}
 		}
-		if(!ancard.empty())
+		if(ancard.size() > 0)
 			return;
 	}
+	const auto pname = Utils::ToUpperNoAccents<std::wstring>(ptext);
 	mainGame->lstANCard->clear();
 	ancard.clear();
-	for(auto& card : gDataManager->cards) {
+	for(const auto& card : gDataManager->cards) {
 		const auto strings = card.second.GetStrings();
 		const auto& name = strings->uppercase_name;
 		if(Utils::ContainsSubstring(name, pname)) {
-			//datas.alias can be double card names or alias
 			if(is_declarable(&card.second._data, declare_opcodes)) {
 				if(pname == name) { //exact match
 					mainGame->lstANCard->insertItem(0, strings->name.data(), -1);
