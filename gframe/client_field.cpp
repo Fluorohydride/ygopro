@@ -1310,8 +1310,8 @@ void ClientField::UpdateDeclarableList(bool refresh) {
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto& card : gDataManager->cards) {
-		auto strings = card.second.GetStrings();
-		auto name = Utils::ToUpperNoAccents(strings->name);
+		const auto strings = card.second.GetStrings();
+		const auto& name = strings->uppercase_name;
 		if(Utils::ContainsSubstring(name, pname)) {
 			//datas.alias can be double card names or alias
 			if(is_declarable(&card.second._data, declare_opcodes)) {
