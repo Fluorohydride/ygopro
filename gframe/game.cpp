@@ -3252,12 +3252,14 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	}
 	return BufferIO::DecodeUTF8s(res);
 }
-epro::path_string Game::FindScript(epro::path_stringview name, MutexLockedIrrArchivedFile* retarchive) {
+epro::path_string Game::FindScript(epro::path_stringview name, irr::io::IReadFile** retarchive) {
 	for(auto& path : script_dirs) {
 		if(path == EPRO_TEXT("archives")) {
 			if(auto tmp = Utils::FindFileInArchives(EPRO_TEXT("script/"), name)) {
 				if(retarchive)
-					*retarchive = std::move(tmp);
+					*retarchive = tmp;
+				else
+					tmp->drop();
 				return path;
 			}
 		} else {
@@ -3271,15 +3273,18 @@ epro::path_string Game::FindScript(epro::path_stringview name, MutexLockedIrrArc
 	return EPRO_TEXT("");
 }
 std::vector<char> Game::LoadScript(epro::stringview _name) {
-	MutexLockedIrrArchivedFile tmp;
+	irr::io::IReadFile* tmp;
 	auto path = FindScript(Utils::ToPathString(_name), &tmp);
 	if(path.size()) {
 		std::vector<char> buffer;
 		if(path == EPRO_TEXT("archives")) {
 			if(tmp) {
-				buffer.resize(tmp.reader->getSize());
-				if(tmp.reader->read(buffer.data(), buffer.size()) == buffer.size())
+				buffer.resize(tmp->getSize());
+				if(tmp->read(buffer.data(), buffer.size()) == buffer.size()) {
+					tmp->drop();
 					return buffer;
+				}
+				tmp->drop();
 			}
 		} else {
 			std::ifstream script(path, std::ifstream::binary);

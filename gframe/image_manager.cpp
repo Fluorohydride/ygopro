@@ -490,14 +490,15 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 				irr::video::IImage* base_img = nullptr;
 				epro::path_string file;
 				if(path == EPRO_TEXT("archives")) {
-					auto lockedIrrFile = Utils::FindFileInArchives(
+					auto archiveFile = Utils::FindFileInArchives(
 						(type == imgType::ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"),
 						fmt::format(EPRO_TEXT("{}{}"), code, extension));
-					if(!lockedIrrFile)
+					if(!archiveFile)
 						continue;
-					const auto& name = lockedIrrFile.reader->getFileName();
+					const auto& name = archiveFile->getFileName();
 					file = { name.c_str(), name.size() };
-					base_img = driver->createImageFromFile(lockedIrrFile.reader);
+					base_img = driver->createImageFromFile(archiveFile);
+					archiveFile->drop();
 				} else {
 					file = fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension);
 					base_img = driver->createImageFromFile({ file.data(), (irr::u32)file.size() });
@@ -607,10 +608,12 @@ irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 			for(auto& path : mainGame->field_dirs) {
 				for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
 					if(path == EPRO_TEXT("archives")) {
-						auto lockedIrrFile = Utils::FindFileInArchives(EPRO_TEXT("pics/field/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
-						if (!lockedIrrFile)
+						auto archiveFile = Utils::FindFileInArchives(EPRO_TEXT("pics/field/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
+						if (!archiveFile)
 							continue;
-						if ((img = driver->getTexture(lockedIrrFile.reader)))
+						img = driver->getTexture(archiveFile);
+						archiveFile->drop();
+						if(img)
 							break;
 					} else {
 						if((img = driver->getTexture(fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension).data())))

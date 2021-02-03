@@ -275,26 +275,17 @@ namespace ygo {
 		}
 		return res;
 	}
-	MutexLockedIrrArchivedFile::~MutexLockedIrrArchivedFile() {
-		if (reader)
-			reader->drop();
-		if (mutex)
-			mutex->unlock();
-	}
-	MutexLockedIrrArchivedFile Utils::FindFileInArchives(epro::path_stringview path, epro::path_stringview name) {
+	irr::io::IReadFile* Utils::FindFileInArchives(epro::path_stringview path, epro::path_stringview name) {
 		for(auto& archive : archives) {
-			archive.mutex->lock();
-			int res = -1;
 			auto list = archive.archive->getFileList();
-			res = list->findFile(fmt::format(EPRO_TEXT("{}{}"), path, name).data());
+			int res = list->findFile(fmt::format(EPRO_TEXT("{}{}"), path, name).data());
 			if(res != -1) {
+				std::lock_guard<std::mutex> lk(*archive.mutex);
 				auto reader = archive.archive->createAndOpenFile(res);
-				if(reader)
-					return MutexLockedIrrArchivedFile(archive.mutex.get(), reader); // drops reader and unlocks when done
+				return reader;
 			}
-			archive.mutex->unlock();
 		}
-		return MutexLockedIrrArchivedFile(); // file not found
+		return nullptr;
 	}
 	epro::stringview Utils::GetUserAgent() {
 		static const std::string agent = fmt::format("EDOPro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)" {}",

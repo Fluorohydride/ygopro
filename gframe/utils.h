@@ -42,32 +42,6 @@ namespace ygo {
 		irr::io::IFileArchive* archive;
 		SynchronizedIrrArchive(irr::io::IFileArchive* archive) : mutex(std::make_unique<std::mutex>()), archive(archive) {}
 	};
-	// Mutex should already be locked if not nullptr and takes ownership of the IReadFile if not nullptr
-	// In C++17, use std::optional, since we have either file exists or not found (both nullptr)
-	class MutexLockedIrrArchivedFile {
-	public:
-		std::mutex* mutex; // from SynchronizedIrrArchive
-		irr::io::IReadFile* reader;
-		MutexLockedIrrArchivedFile(std::mutex* mutex = nullptr, irr::io::IReadFile* reader = nullptr) noexcept : mutex(mutex), reader(reader) {}
-		MutexLockedIrrArchivedFile(const MutexLockedIrrArchivedFile& copyFrom) = delete;
-		MutexLockedIrrArchivedFile(MutexLockedIrrArchivedFile&& moveFrom) noexcept {
-			mutex = moveFrom.mutex;
-			reader = moveFrom.reader;
-			moveFrom.mutex = nullptr;
-			moveFrom.reader = nullptr;
-		}
-		MutexLockedIrrArchivedFile& operator= (MutexLockedIrrArchivedFile&& moveFrom) noexcept {
-			mutex = moveFrom.mutex;
-			reader = moveFrom.reader;
-			moveFrom.mutex = nullptr;
-			moveFrom.reader = nullptr;
-			return *this;
-		}
-		~MutexLockedIrrArchivedFile(); // drops reader if not nullptr, then unlocks mutex if not nullptr
-		operator bool() const {
-			return reader;
-		}
-	};
 	class Utils {
 	public:
 		template<std::size_t N>
@@ -98,7 +72,7 @@ namespace ygo {
 		/** Returned subfolder names are prefixed by the provided path */
 		static std::vector<epro::path_string> FindSubfolders(epro::path_stringview path, int subdirectorylayers = 1, bool addparentpath = true);
 		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, epro::path_stringview path, const std::vector<epro::path_stringview>& extensions, int subdirectorylayers = 0);
-		static MutexLockedIrrArchivedFile FindFileInArchives(epro::path_stringview path, epro::path_stringview name);
+		static irr::io::IReadFile* FindFileInArchives(epro::path_stringview path, epro::path_stringview name);
 		template<typename T>
 		static T NormalizePath(T path, bool trailing_slash = true);
 		template<typename T>

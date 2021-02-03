@@ -220,7 +220,7 @@ public:
 	
 	std::wstring ReadPuzzleMessage(const std::wstring& script_name);
 	OCG_Duel SetupDuel(OCG_DuelOptions opts);
-	epro::path_string FindScript(epro::path_stringview script_name, MutexLockedIrrArchivedFile* retarchive = nullptr);
+	epro::path_string FindScript(epro::path_stringview script_name, irr::io::IReadFile** retarchive = nullptr);
 	std::vector<char> LoadScript(epro::stringview script_name);
 	bool LoadScript(OCG_Duel pduel, epro::stringview script_name);
 	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
