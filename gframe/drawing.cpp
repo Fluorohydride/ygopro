@@ -1354,7 +1354,7 @@ void Game::DrawDeckBd() {
 		DrawShadowText(numFont, deckBuilder.result_string, pos, Resize(0, 1, 0, 1), 0xffffffff, 0xff000000, false, true);
 
 		DRAWRECT(SEARCH_RESULT, 805, 160, 1020, 630);
-		DRAWOUTLINE(SEARCH_RESULT, 805, 160, 1020, 630);
+		DRAWOUTLINE(SEARCH_RESULT, 804, 159, 1020, 630);
 
 		const int prev_pos = deckBuilder.scroll_pos;
 		deckBuilder.scroll_pos = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
