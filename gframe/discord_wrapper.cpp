@@ -9,13 +9,13 @@
 #include <IGUIStaticText.h>
 #include <IGUITabControl.h>
 #include <IGUIWindow.h>
-#include "text_types.h"
 #include "discord_register.h"
 #include "discord_rpc.h"
 #include "game.h"
 #include "duelclient.h"
 #include "logging.h"
 #endif
+#include "text_types.h"
 #include "discord_wrapper.h"
 
 #ifdef _WIN32
