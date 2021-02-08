@@ -119,6 +119,15 @@ bool GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device)
 	return written;
 }
 
+#ifdef _WIN32
+//gcc on mingw can't convert lambda to __stdcall function
+static BOOL CALLBACK callback(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM pData) {
+	auto monitors = reinterpret_cast<std::vector<RECT>*>(pData);
+	monitors->push_back(*lprcMonitor);
+	return TRUE;
+}
+#endif
+
 void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 #ifdef _WIN32
 	static WINDOWPLACEMENT nonFullscreenSize;
@@ -126,11 +135,7 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	static constexpr LONG_PTR fullscreenStyle = WS_POPUP | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 	static const auto monitors = [] {
 		std::vector<RECT> ret;
-		EnumDisplayMonitors(0, 0, [](HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM pData) -> BOOL {
-			auto monitors = reinterpret_cast<std::vector<RECT>*>(pData);
-			monitors->push_back(*lprcMonitor);
-			return TRUE;
-		}, (LPARAM)&ret);
+		EnumDisplayMonitors(0, 0, callback, (LPARAM)&ret);
 		return ret;
 	}();
 	fullscreen = !fullscreen;
