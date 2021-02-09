@@ -26,10 +26,8 @@ jobs:
       DEPLOY_BRANCH: travis-windows
       TRAVIS_OS_NAME: windows
       DXSDK_DIR: /c/d3d9sdk/
+      VCPKG_CACHE_ZIP_URL: https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20210207-1/installed_x86-windows-static.zip
     steps:
-    - name: Set VCPKG_CACHE_ZIP_URL var
-      run: |
-        echo "VCPKG_CACHE_ZIP_URL=$DEPENDENCIES_BASE_URL/installed_x86-windows-static.zip" >> $GITHUB_ENV
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
     - uses: actions/checkout@v1
