@@ -1,5 +1,5 @@
 name: Build EDOPro
-on: push
+on: [push, pull_request]
 env:
   BUILD_CONFIG: release
   COVERS_URL: ${{ secrets.COVERS_URL }}
@@ -50,6 +50,7 @@ jobs:
       shell: bash
       run: ./travis/predeploy.sh
     - name: Deploy
+      if: ${{ github.event_name == 'push' }}
       shell: bash
       run: ./ocgcore/travis/deploy.sh
 
@@ -93,5 +94,6 @@ jobs:
       shell: bash
       run: ./travis/predeploy.sh
     - name: Deploy
+      if: ${{ github.event_name == 'push' }}
       shell: bash
       run: ./ocgcore/travis/deploy.sh
