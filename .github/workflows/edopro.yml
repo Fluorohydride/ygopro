@@ -53,7 +53,7 @@ jobs:
       shell: bash
       run: ./ocgcore/travis/deploy.sh
 
-  Linux gcc 7-5-0:
+  Linux-gcc-7-5-0:
     runs-on: ubuntu-latest
     if: >-
       !(
