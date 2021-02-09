@@ -10,8 +10,8 @@ UPDATE_URL=${UPDATE_URL:-""}
 
 if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     ./premake5 vs2017 --oldwindows=true --sound=sfml --no-joystick=true --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\" --covers=\"$COVERS_URL\" --discord=\"$DISCORD_APP_ID\" --update-url=\"$UPDATE_URL\"
-    "$MSBUILD_PATH/msbuild.exe" -m -p:Configuration=$BUILD_CONFIG ./build/ygo.sln -t:ygoprodll -verbosity:minimal -p:EchoOff=true
-	/C/ProgramData/chocolatey/bin/python.exe ./travis/patcher.py bin/$BUILD_CONFIG/ygoprodll.exe
+    msbuild.exe -m -p:Configuration=$BUILD_CONFIG ./build/ygo.sln -t:ygoprodll -verbosity:minimal -p:EchoOff=true
+    python.exe ./travis/patcher.py bin/$BUILD_CONFIG/ygoprodll.exe
 fi
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     ./premake5 gmake2 --vcpkg-root=$VCPKG_ROOT --sound=sfml --no-joystick=true --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\" --covers=\"$COVERS_URL\" --discord=\"$DISCORD_APP_ID\" --update-url=\"$UPDATE_URL\"

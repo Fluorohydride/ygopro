@@ -1,0 +1,53 @@
+name: Build EDOPro
+on: push
+env:
+  DEPENDENCIES_BASE_URL: https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20210207-1
+  BUILD_CONFIG: release
+  COVERS_URL: ${{ secrets.COVERS_URL }}
+  DEPLOY_DIR: deploy
+  DEPLOY_REPO: ${{ secrets.DEPLOY_REPO }}
+  DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+  DISCORD_APP_ID: ${{ secrets.DISCORD_APP_ID }}
+  FIELDS_URL: ${{ secrets.FIELDS_URL }}
+  PICS_URL: ${{ secrets.PICS_URL }}
+  UPDATE_URL: ${{ secrets.UPDATE_URL }}
+  VCPKG_ROOT: /c/vcpkg2
+jobs:
+  Windows:
+    runs-on: windows-2016
+    if: >-
+      !(
+        contains(github.event.head_commit.message, '[ci skip]') ||
+        contains(github.event.head_commit.message, '[skip ci]') ||
+        contains(github.event.head_commit.message, '[actions skip]') ||
+        contains(github.event.head_commit.message, '[skip actions]')
+      )
+    env:
+      DEPLOY_BRANCH: travis-windows
+      TRAVIS_OS_NAME: windows
+      DXSDK_DIR: /c/d3d9sdk/
+    steps:
+    - name: Set VCPKG_CACHE_ZIP_URL var
+      run: |
+        echo "VCPKG_CACHE_ZIP_URL=$VCPKG_CACHE_ZIP_URL/installed_x86-windows-static.zip" >> $GITHUB_ENV
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+        submodules: true
+    - name: Install premake
+      shell: bash
+      run: ./travis/install-premake5.sh
+    - name: Install dependencies
+      shell: bash
+      run: ./travis/dependencies.sh
+    - name: Build
+      shell: bash
+      run: ./travis/build.sh
+    - name: Predeploy
+      shell: bash
+      run: ./travis/predeploy.sh
+    - name: Deploy
+      shell: bash
+      run: ./ocgcore/travis/deploy.sh

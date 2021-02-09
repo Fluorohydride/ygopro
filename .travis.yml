@@ -29,14 +29,6 @@ addons:
     - nlohmann-json
 matrix:
   include:
-  - name: "Windows 10"
-    os: windows
-    env:
-    - VCPKG_ROOT=/c/vcpkg
-    - VCPKG_DEFAULT_TRIPLET=x86-windows-static
-    - VCPKG_LIBS="lua[cpp] libevent sqlite3 bzip2 libjpeg-turbo libpng zlib curl openssl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"
-    - VCPKG_CACHE_ZIP_URL=$DEPENDENCIES_BASE_URL/installed_x86-windows-static.zip
-    - DXSDK_DIR=/c/d3d9sdk/
   - name: "Bionic GCC7"
     os: linux
     compiler: gcc
