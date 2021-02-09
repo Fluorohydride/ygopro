@@ -29,7 +29,7 @@ jobs:
     steps:
     - name: Set VCPKG_CACHE_ZIP_URL var
       run: |
-        echo "VCPKG_CACHE_ZIP_URL=$VCPKG_CACHE_ZIP_URL/installed_x86-windows-static.zip" >> $GITHUB_ENV
+        echo "VCPKG_CACHE_ZIP_URL=$DEPENDENCIES_BASE_URL/installed_x86-windows-static.zip" >> $GITHUB_ENV
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
     - uses: actions/checkout@v1
