@@ -470,7 +470,7 @@ namespace ygo {
 #else
 			execl("/usr/bin/xdg-open", "xdg-open", url.data(), NULL);
 #endif
-			perror("Failed to open browser:");
+			_exit(EXIT_FAILURE);
 		} else if(pid < 0) {
 			perror("Failed to fork:");
 		}

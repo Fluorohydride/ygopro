@@ -75,7 +75,7 @@ pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) c
 		execlp("mono", "WindBot.exe", "./WindBot/WindBot.exe",
 			   argPass.data(), argDeck.data(), argPort.data(), argVersion.data(), argName.data(), argChat.data(),
 			   "AssetPath=./WindBot", hand ? argHand.data() : nullptr, nullptr);
-		exit(EXIT_FAILURE);
+		_exit(EXIT_FAILURE);
 	}
 	setenv("PATH", oldpath.data(), true);
 	return pid;
