@@ -29,13 +29,6 @@ addons:
     - nlohmann-json
 matrix:
   include:
-  - name: "Bionic GCC7"
-    os: linux
-    compiler: gcc
-    env:
-    - VCPKG_ROOT="$PWD/vcpkg"
-    - VCPKG_LIBS="freetype libevent sqlite3 irrlicht-rectclip curl openssl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"
-    - VCPKG_CACHE_7Z_URL=$DEPENDENCIES_BASE_URL/installed_x64-linux.7z
   - name: "Mojave"
     os: osx
     osx_image: xcode11.3
