@@ -17,7 +17,7 @@
 namespace ygo {
 
 void DataHandler::LoadDatabases() {
-	if(std::ifstream("cards.cdb").good())
+	if(Utils::FileExists(EPRO_TEXT("cards.cdb")) && std::ifstream(EPRO_TEXT("cards.cdb")).good())
 		dataManager->LoadDB(EPRO_TEXT("cards.cdb"));
 	for(auto& file : Utils::FindFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("cdb") }, 2))
 		dataManager->LoadDB(EPRO_TEXT("./expansions/") + file);
