@@ -11,6 +11,16 @@ inline fmt::basic_string_view<T> to_string_view(const nonstd::basic_string_view<
 }
 }
 }
+namespace irr {
+namespace core {
+template<typename T, typename TAlloc>
+class string;
+template<typename T, typename TAlloc>
+inline fmt::basic_string_view<T> to_string_view(const irr::core::string<T, TAlloc>& s) {
+	return { s.data(), s.size() };
+}
+}
+}
 // Double macro to convert the macro-defined int to a character literal
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
@@ -30,6 +40,8 @@ using path_string = std::basic_string<path_char>;
 using path_stringview = nonstd::basic_string_view<path_char>;
 using stringview = nonstd::basic_string_view<char>;
 using wstringview = nonstd::basic_string_view<wchar_t>;
+template<typename T>
+using basic_string_view = nonstd::basic_string_view<T>;
 }
 using namespace nonstd::literals;
 #endif /* TEXT_TYPES_H_ */
