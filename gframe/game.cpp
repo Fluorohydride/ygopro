@@ -47,7 +47,7 @@ namespace porting {
 
 #define EnableMaterial2D(enable) driver->enableMaterial2D(enable)
 #else
-#define EnableMaterial2D(enable) ((void)0);
+#define EnableMaterial2D(enable) ((void)0)
 #endif
 
 uint16_t PRO_VERSION = 0x1352;
