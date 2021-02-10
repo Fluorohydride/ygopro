@@ -15,20 +15,21 @@
 #include <pthread.h>
 using Stat = struct stat;
 using Dirent = struct dirent;
-#endif
+#ifdef __ANDROID__
+#include "Android/porting_android.h"
+#else
+#include <sys/wait.h>
 #ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
 #include <mach-o/dyld.h>
 #include <CoreServices/CoreServices.h>
 #include <copyfile.h>
-#endif
-#ifdef __ANDROID__
-#include "Android/porting_android.h"
-#endif
-#ifdef __linux__
+#elif defined(__linux__)
 #include <sys/sendfile.h>
 #include <fcntl.h>
-#endif
+#endif //__APPLE__
+#endif //__ANDROID__
+#endif //_WIN32
 #include <IFileArchive.h>
 #include <IFileSystem.h>
 #include <fmt/format.h>
@@ -471,9 +472,10 @@ namespace ygo {
 			execl("/usr/bin/xdg-open", "xdg-open", url.data(), NULL);
 #endif
 			_exit(EXIT_FAILURE);
-		} else if(pid < 0) {
+		} else if(pid < 0)
 			perror("Failed to fork:");
-		}
+		if(waitpid(pid, nullptr, WNOHANG) != 0)
+			perror("Failed to open url or file:");
 #else
 		if(type == OPEN_FILE)
 			porting::openFile(fmt::format("{}/{}", working_dir, url));
