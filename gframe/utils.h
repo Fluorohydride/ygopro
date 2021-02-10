@@ -45,7 +45,7 @@ namespace ygo {
 	class Utils {
 	public:
 		template<std::size_t N>
-		static constexpr void SetThreadName(char const (&s)[N], wchar_t const (&ws)[N]) {
+		static inline void SetThreadName(char const (&s)[N], wchar_t const (&ws)[N]) {
 			static_assert(N <= 16, "Thread name on posix can't be more than 16 bytes!");
 			InternalSetThreadName(s, ws);
 		}
