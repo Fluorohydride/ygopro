@@ -14,7 +14,6 @@
 #include <unistd.h>
 #include <pthread.h>
 using Stat = struct stat;
-using Dirent = struct dirent;
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
 #else
@@ -88,7 +87,7 @@ namespace ygo {
 
 	bool Utils::MakeDirectory(epro::path_stringview path) {
 #ifdef _WIN32
-		return CreateDirectory(path.data(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
+		return CreateDirectory(path.data(), nullptr) || ERROR_ALREADY_EXISTS == GetLastError();
 #else
 		return mkdir(path.data(), 0777) == 0 || errno == EEXIST;
 #endif
@@ -160,10 +159,11 @@ namespace ygo {
 #endif
 	}
 
-	void Utils::FindFiles(epro::path_stringview path, const std::function<void(epro::path_stringview, bool)>& cb) {
+	void Utils::FindFiles(epro::path_stringview _path, const std::function<void(epro::path_stringview, bool)>& cb) {
+		const auto path = Utils::NormalizePath(_path);
 #ifdef _WIN32
 		WIN32_FIND_DATA fdata;
-		HANDLE fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), NormalizePath<epro::path_string>({ path.data(), path.size() })).data(), &fdata);
+		auto fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), path).data(), &fdata);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
 				cb(fdata.cFileName, !!(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
@@ -171,11 +171,8 @@ namespace ygo {
 			FindClose(fh);
 		}
 #else
-		DIR* dir = nullptr;
-		Dirent* dirp = nullptr;
-		auto _path = NormalizePath<epro::path_string>({ path.data(), path.size() });
-		if((dir = opendir(_path.data())) != nullptr) {
-			while((dirp = readdir(dir)) != nullptr) {
+		if(auto dir = opendir(path.data())) {
+			while(auto dirp = readdir(dir)) {
 #ifdef _DIRENT_HAVE_D_TYPE //avoid call to format and stat
 				const bool isdir = dirp->d_type == DT_DIR;
 #else
@@ -234,7 +231,7 @@ namespace ygo {
 					res.insert(res.end(), std::make_move_iterator(res2.begin()), std::make_move_iterator(res2.end()));
 				}
 			} else {
-				if(extensions.empty() || std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<epro::path_string>({ name.data(), name.size() })) != extensions.end())
+				if(extensions.empty() || std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension(name)) != extensions.end())
 					res.emplace_back(name.data(), name.size());
 			}
 		});
@@ -269,9 +266,9 @@ namespace ygo {
 			if(list->isDirectory(i))
 				continue;
 			const auto name = list->getFullFileName(i);
-			if(std::count(name.c_str(), name.c_str() + name.size(), EPRO_TEXT('/')) > subdirectorylayers)
+			if(std::count(name.data(), name.data() + name.size(), EPRO_TEXT('/')) > subdirectorylayers)
 				continue;
-			if(extensions.empty() || std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<epro::path_string>({ name.c_str(), name.size() })) != extensions.end())
+			if(extensions.empty() || std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension(name)) != extensions.end())
 				res.push_back(i);
 		}
 		return res;
@@ -290,7 +287,7 @@ namespace ygo {
 	}
 	epro::stringview Utils::GetUserAgent() {
 		static const std::string agent = fmt::format("EDOPro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)" {}",
-											   ygo::Utils::OSOperator->getOperatingSystemVersion().c_str());
+											   ygo::Utils::OSOperator->getOperatingSystemVersion());
 		return agent;
 	}
 	bool Utils::ContainsSubstring(epro::wstringview input, const std::vector<std::wstring>& tokens, bool convertInputCasing, bool convertTokenCasing) {
@@ -346,8 +343,8 @@ namespace ygo {
 		static epro::path_string binarypath = []()->epro::path_string {
 #ifdef _WIN32
 			TCHAR exepath[MAX_PATH];
-			GetModuleFileName(NULL, exepath, MAX_PATH);
-			return Utils::NormalizePath<epro::path_string>(exepath, false);
+			GetModuleFileName(nullptr, exepath, MAX_PATH);
+			return Utils::NormalizePath(exepath, false);
 #elif defined(__linux__) && !defined(__ANDROID__)
 			epro::path_char buff[PATH_MAX];
 			ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
@@ -357,13 +354,13 @@ namespace ygo {
 #elif defined(__APPLE__)
 			CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 			CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
-			CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
+			CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(nullptr, bundle_url);
 			CFRelease(bundle_url);
 			CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
 			CFRelease(bundle_base_url);
 			/*
 			#ifdef MAC_OS_DISCORD_LAUNCHER
-				system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
+				system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).data());
 			#endif
 			*/
 			epro::path_string res = epro::path_string(CFStringGetCStringPtr(path, kCFStringEncodingUTF8)) + "/";
@@ -378,7 +375,7 @@ namespace ygo {
 	}
 
 	epro::path_stringview Utils::GetExeFolder() {
-		static epro::path_string binarypath = GetFilePath(GetExePath().to_string());
+		static epro::path_string binarypath = GetFilePath(GetExePath());
 		return binarypath;
 	}
 
@@ -417,12 +414,12 @@ namespace ygo {
 			payload->tot = count;
 
 		for(irr::u32 i = 0; i < count; i++) {
-			epro::path_stringview filename = filelist->getFullFileName(i).c_str();
+			auto filename = filelist->getFullFileName(i);
 			bool isdir = filelist->isDirectory(i);
 			if(isdir)
 				CreatePath(fmt::format(EPRO_TEXT("{}/"), filename), { dest.data(), dest.size() });
 			else
-				CreatePath(filename, { dest.data(), dest.size() });
+				CreatePath({ filename.data(), filename.size() }, { dest.data(), dest.size() });
 			if(!isdir) {
 				int percentage = 0;
 				auto reader = archive->createAndOpenFile(i);
@@ -462,14 +459,14 @@ namespace ygo {
 
 	void Utils::SystemOpen(epro::path_stringview url, OpenType type) {
 #ifdef _WIN32
-		ShellExecute(NULL, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), working_dir, url).data() : url.data(), NULL, NULL, SW_SHOWNORMAL);
+		ShellExecute(nullptr, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), working_dir, url).data() : url.data(), nullptr, nullptr, SW_SHOWNORMAL);
 #elif !defined(__ANDROID__)
 		auto pid = vfork();
 		if(pid == 0) {
 #ifdef __APPLE__
-			execl("/usr/bin/open", "open", url.data(), NULL);
+			execl("/usr/bin/open", "open", url.data(), nullptr);
 #else
-			execl("/usr/bin/xdg-open", "xdg-open", url.data(), NULL);
+			execl("/usr/bin/xdg-open", "xdg-open", url.data(), nullptr);
 #endif
 			_exit(EXIT_FAILURE);
 		} else if(pid < 0)
