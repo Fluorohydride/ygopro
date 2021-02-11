@@ -723,6 +723,8 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		mainGame->dInfo.duel_params = params;
 		mainGame->dInfo.isRelay = params & DUEL_RELAY;
 		params &= ~DUEL_RELAY;
+		pkt.info.no_shuffle_deck = pkt.info.no_shuffle_deck || ((params & DUEL_PSEUDO_SHUFFLE) != 0);
+		params &= ~DUEL_PSEUDO_SHUFFLE;
 		mainGame->dInfo.team1 = pkt.info.team1;
 		mainGame->dInfo.team2 = pkt.info.team2;
 		mainGame->dInfo.best_of = pkt.info.best_of;
@@ -4298,7 +4300,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 			auto GetRuleString = [&]()-> epro::wstringview {
 				static std::wstring tmp;
 				if(pHP->host.handshake == SERVER_HANDSHAKE) {
-					mainGame->GetMasterRule((pHP->host.duel_flag_low | ((uint64_t)pHP->host.duel_flag_high) << 32) & ~(DUEL_RELAY | DUEL_TCG_SEGOC_NONPUBLIC), pHP->host.forbiddentypes, &rule);
+					mainGame->GetMasterRule((pHP->host.duel_flag_low | ((uint64_t)pHP->host.duel_flag_high) << 32) & ~(DUEL_RELAY | DUEL_TCG_SEGOC_NONPUBLIC | DUEL_PSEUDO_SHUFFLE), pHP->host.forbiddentypes, &rule);
 				} else
 					rule = pHP->host.duel_rule;
 				if(rule == 6)
@@ -4309,6 +4311,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 			auto GetIsCustom = [&pHP,&rule] {
 				if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
 				   && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck
+				   && (pHP->host.duel_flag_low & DUEL_PSEUDO_SHUFFLE) == 0
 				   && rule == DEFAULT_DUEL_RULE && pHP->host.extra_rules == 0)
 					return gDataManager->GetSysString(1280);
 				return gDataManager->GetSysString(1281);
