@@ -54,7 +54,7 @@ uint16_t PRO_VERSION = 0x1352;
 
 namespace ygo {
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__forceinline)
 #define __forceinline __attribute__((always_inline)) inline
 #endif
 template<typename... Args>

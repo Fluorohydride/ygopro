@@ -449,7 +449,7 @@ inline void DrawShadowTextPos(irr::gui::CGUITTFont* font, const T& text, const i
 	font->drawustring(text, mainposition, color, hcenter, vcenter, clip);
 }
 //We don't want multiple function signatures per argument combination
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__forceinline)
 #define __forceinline __attribute__((always_inline)) inline
 #endif
 template<typename... Args>
