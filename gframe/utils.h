@@ -75,27 +75,27 @@ namespace ygo {
 		static irr::io::IReadFile* FindFileInArchives(epro::path_stringview path, epro::path_stringview name);
 		template<typename T, typename rettype = std::basic_string<typename T::value_type>>
 		static rettype NormalizePath(const T& path, bool trailing_slash = true);
-		template<typename T, typename value_type = std::remove_pointer_t<T>>
-		static inline std::basic_string<value_type> NormalizePath(const T* path, bool trailing_slash = true) {
-			return NormalizePath<epro::basic_string_view<value_type>>(path, trailing_slash);
+		template<typename T>
+		static inline std::basic_string<T> NormalizePath(const T* path, bool trailing_slash = true) {
+			return NormalizePath<epro::basic_string_view<T>>(path, trailing_slash);
 		}
 		template<typename T, typename rettype = std::basic_string<typename T::value_type>>
 		static rettype GetFileExtension(const T& file, bool convert_case = true);
-		template<typename T, typename value_type = std::remove_pointer_t<T>>
-		static inline std::basic_string<value_type> GetFileExtension(const T* path, bool convert_case = true) {
-			return GetFileExtension<epro::basic_string_view<value_type>>(path, convert_case);
+		template<typename T>
+		static inline std::basic_string<T> GetFileExtension(const T* path, bool convert_case = true) {
+			return GetFileExtension<epro::basic_string_view<T>>(path, convert_case);
 		}
 		template<typename T, typename rettype = std::basic_string<typename T::value_type>>
 		static rettype GetFilePath(const T& file);
-		template<typename T, typename value_type = std::remove_pointer_t<T>>
-		static inline std::basic_string<value_type> GetFilePath(const T* path) {
-			return GetFilePath<epro::basic_string_view<value_type>>(path);
+		template<typename T>
+		static inline std::basic_string<T> GetFilePath(const T* path) {
+			return GetFilePath<epro::basic_string_view<T>>(path);
 		}
 		template<typename T, typename rettype = std::basic_string<typename T::value_type>>
 		static rettype GetFileName(const T& _file, bool keepextension = false);
-		template<typename T, typename value_type = std::remove_pointer_t<T>>
-		static inline std::basic_string<value_type> GetFileName(const T* path, bool keepextension = false) {
-			return GetFileName<epro::basic_string_view<value_type>>(path, keepextension);
+		template<typename T>
+		static inline std::basic_string<T> GetFileName(const T* path, bool keepextension = false) {
+			return GetFileName<epro::basic_string_view<T>>(path, keepextension);
 		}
 
 		static epro::stringview GetUserAgent();
