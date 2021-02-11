@@ -30,7 +30,7 @@ function bundle_if_exists {
         mkdir -p deploy/$1.app/Contents/MacOS
         # Binary seems to be incorrectly named with the current premake
         cp bin/$BUILD_CONFIG/$1.app deploy/$1.app/Contents/MacOS/$1
-        dylibbundler -x deploy/$1.app/Contents/MacOS/$1 -b -d deploy/$1.app/Contents/Frameworks/ -p @executable_path/../Frameworks/ -cd
+        # dylibbundler -x deploy/$1.app/Contents/MacOS/$1 -b -d deploy/$1.app/Contents/Frameworks/ -p @executable_path/../Frameworks/ -cd
 
         mkdir -p deploy/$1.app/Contents/Resources
         cp gframe/ygopro.icns deploy/$1.app/Contents/Resources/edopro.icns

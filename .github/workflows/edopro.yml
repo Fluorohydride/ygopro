@@ -3,7 +3,7 @@ on: [push, pull_request]
 env:
   BUILD_CONFIG: release
   COVERS_URL: ${{ secrets.COVERS_URL }}
-  DEPENDENCIES_BASE_URL: https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20210210
+  DEPENDENCIES_BASE_URL: https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20210211
   DEPLOY_DIR: deploy
   DEPLOY_REPO: ${{ secrets.DEPLOY_REPO }}
   DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
@@ -119,10 +119,10 @@ jobs:
       shell: bash
       run: |
         echo "VCPKG_CACHE_7Z_URL=$DEPENDENCIES_BASE_URL/installed_x64-osx.7z" >> $GITHUB_ENV
-    - name: Update brew packages
-      shell: bash
-      run: |
-        brew install dylibbundler fmt nlohmann-json
+    # - name: Update brew packages
+      # shell: bash
+      # run: |
+        # brew install dylibbundler
     - uses: actions/checkout@v1
       with:
         fetch-depth: 1
