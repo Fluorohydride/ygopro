@@ -122,7 +122,6 @@ jobs:
     - name: Update brew packages
       shell: bash
       run: |
-        brew update-reset
         brew install dylibbundler fmt nlohmann-json
     - uses: actions/checkout@v1
       with:
