@@ -68,36 +68,27 @@ uint16_t DuelClient::temp_port = 0;
 uint16_t DuelClient::temp_ver = 0;
 bool DuelClient::try_needed = false;
 
-std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::wstringview address, epro::wstringview _port) {
-	char ip[20];
-	BufferIO::CopyWStr(address.data(), ip, 16);
-	uint32_t remote_addr = htonl(inet_addr(ip));
+std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address, epro::stringview port) {
+	uint32_t remote_addr = htonl(inet_addr(address.data()));
 	if(remote_addr == -1) {
-		char hostname[100];
-		char port[6];
-		BufferIO::CopyWStr(address.data(), hostname, 100);
-		BufferIO::CopyWStr(_port.data(), port, 6);
-		evutil_addrinfo hints;
-		evutil_addrinfo *answer = NULL;
-		memset(&hints, 0, sizeof(hints));
+		evutil_addrinfo hints{};
+		evutil_addrinfo *answer = nullptr;
 		hints.ai_family = AF_INET;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
 		hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
-		int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
-		if(status != 0) {
+		if(evutil_getaddrinfo(address.data(), port.data(), &hints, &answer) != 0)
 			throw std::runtime_error("Host not resolved");
-		} else {
-			sockaddr_in* sin = ((sockaddr_in*)answer->ai_addr);
-			evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
-			remote_addr = htonl(inet_addr(ip));
-		}
-	}
-	return { remote_addr, (uint16_t)std::stoi(_port.data()) };
-}
 
-std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::wstringview address, int port) {
-	return DuelClient::ResolveServer(address, fmt::to_wstring(port));
+		char ip[46];
+		auto& sin_addr = ((sockaddr_in*)answer->ai_addr)->sin_addr;
+		auto res = evutil_inet_ntop(AF_INET, &sin_addr, ip, sizeof(ip));
+		evutil_freeaddrinfo(answer);
+		if(res == nullptr)
+			throw std::runtime_error("Host not resolved");
+		remote_addr = htonl(inet_addr(ip));
+	}
+	return { remote_addr, static_cast<uint16_t>(std::stoi({port.data(), port.size()})) };
 }
 
 bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool create_game) {
