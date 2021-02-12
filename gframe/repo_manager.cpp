@@ -10,7 +10,7 @@
 #include "utils.h"
 #include "libgit2.hpp"
 
-#define MAX_HISTORY_LENGTH 100
+static constexpr int MAX_HISTORY_LENGTH = 100;
 
 namespace ygo {
 
@@ -21,32 +21,37 @@ namespace ygo {
 bool GitRepo::Sanitize() {
 	if(url.empty())
 		return false;
+
+	if(repo_path.size())
+		repo_path = fmt::format("./{}", repo_path);
+
 	if(repo_name.empty() && repo_path.empty()) {
 		repo_name = Utils::GetFileName(url);
-		repo_path = fmt::format("./repositories/{}", repo_name);
-		if(repo_name.empty() || repo_path.empty())
+		if(repo_name.empty())
 			return false;
-	}
-	if(repo_name.empty()) {
-		repo_name = Utils::GetFileName(repo_path);
-	}
-	if(repo_path.empty()) {
 		repo_path = fmt::format("./repositories/{}", repo_name);
-	}
-	repo_path = fmt::format("./{}", repo_path);
+	} else if(repo_name.empty())
+		repo_name = Utils::GetFileName(repo_path);
+	else if(repo_path.empty())
+		repo_path = fmt::format("./repositories/{}", repo_name);
+
 	data_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, data_path));
+
 	if(lflist_path.size())
 		lflist_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, lflist_path));
 	else
 		lflist_path = Utils::NormalizePath(fmt::format("{}/lflists/", repo_path));
+
 	if(script_path.size())
 		script_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, script_path));
 	else
 		script_path = Utils::NormalizePath(fmt::format("{}/script/", repo_path));
+
 	if(pics_path.size())
 		pics_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, pics_path));
 	else
 		pics_path = Utils::NormalizePath(fmt::format("{}/pics/", repo_path));
+
 	if(has_core || core_path.size()) {
 		has_core = true;
 		core_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, core_path));
@@ -117,9 +122,12 @@ std::map<std::string, int> RepoManager::GetRepoStatus() {
 }
 
 #define JSON_SET_IF_VALID(field, jsontype, cpptype) \
-	do { auto it = obj.find(#field); if(it != obj.end() && it->is_##jsontype()) \
-	tmp_repo.field = it->get<cpptype>();} while(0)
-void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
+	do { auto it = obj.find(#field); \
+		if(it != obj.end() && it->is_##jsontype()) \
+			tmp_repo.field = it->get<cpptype>(); \
+	} while(0)
+
+void RepoManager::LoadRepositoriesFromJson(const nlohmann::ordered_json& configs) {
 	auto cit = configs.find("repos");
 	if(cit != configs.end() && cit->is_array()) {
 		for(auto& obj : *cit) {
