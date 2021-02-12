@@ -37,7 +37,7 @@ bool NetServer::StartServer(uint16_t port) {
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	sin.sin_port = htons(port);
-	listener = evconnlistener_new_bind(net_evbase, ServerAccept, NULL,
+	listener = evconnlistener_new_bind(net_evbase, ServerAccept, nullptr,
 									   LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, (sockaddr*)&sin, sizeof(sin));
 	if(!listener) {
 		event_base_free(net_evbase);
@@ -63,8 +63,8 @@ bool NetServer::StartBroadcast() {
 		evutil_closesocket(udp);
 		return false;
 	}
-	broadcast_ev = event_new(net_evbase, udp, EV_READ | EV_PERSIST, BroadcastEvent, NULL);
-	event_add(broadcast_ev, NULL);
+	broadcast_ev = event_new(net_evbase, udp, EV_READ | EV_PERSIST, BroadcastEvent, nullptr);
+	event_add(broadcast_ev, nullptr);
 	return true;
 }
 void NetServer::StopServer() {
@@ -118,7 +118,7 @@ void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, socka
 	dp.type = 0xff;
 	dp.bev = bev;
 	users[bev] = dp;
-	bufferevent_setcb(bev, ServerEchoRead, NULL, ServerEchoEvent, NULL);
+	bufferevent_setcb(bev, ServerEchoRead, nullptr, ServerEchoEvent, nullptr);
 	bufferevent_enable(bev, EV_READ);
 }
 void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {

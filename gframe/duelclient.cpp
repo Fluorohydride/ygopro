@@ -94,16 +94,16 @@ std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address
 bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool create_game) {
 	if(connect_state)
 		return false;
-	sockaddr_in sin;
 	client_base = event_base_new();
 	if(!client_base)
 		return false;
+	sockaddr_in sin;
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = htonl(ip);
 	sin.sin_port = htons(port);
 	client_bev = bufferevent_socket_new(client_base, -1, BEV_OPT_CLOSE_ON_FREE);
-	bufferevent_setcb(client_bev, ClientRead, NULL, ClientEvent, (void*)create_game);
+	bufferevent_setcb(client_bev, ClientRead, nullptr, ClientEvent, (void*)create_game);
 	bufferevent_enable(client_bev, EV_READ);
 	temp_ip = ip;
 	temp_port = port;
