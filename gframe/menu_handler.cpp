@@ -487,10 +487,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_BOT_ADD: {
 				try {
 					int port = std::stoi(gGameConfig->serverport);
-					mainGame->gBot.LaunchSelected(port, BufferIO::DecodeUTF8s(mainGame->dInfo.secret.pass));
-				}
-				catch(...) {
-				}
+					if(mainGame->gBot.LaunchSelected(port, BufferIO::DecodeUTF8s(mainGame->dInfo.secret.pass)))
+						break;
+				} catch(...) {}
+				mainGame->PopupMessage(L"Failed to launch windbot");
 				break;
 			}
 			case BUTTON_EXPORT_DECK: {

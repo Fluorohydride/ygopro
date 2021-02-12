@@ -54,19 +54,16 @@ void WindBotPanel::UpdateDescription() {
 	deckProperties->setText(params.str().data());
 }
 
-bool WindBotPanel::LaunchSelected(int port, const std::wstring& pass) {
+bool WindBotPanel::LaunchSelected(int port, epro::wstringview pass) {
 	int index = CurrentIndex();
 	if (index < 0) return false;
 	// 1 = scissors, 2 = rock, 3 = paper
-#if defined(_WIN32) || defined(__ANDROID__)
-	return bots[index].Launch(port, pass, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
-#else
-	auto pid = bots[index].Launch(port, pass, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
-	if(pid > 0) {
-		windbotsPids.push_back(pid);
-	}
-	return pid > 0;
+	auto res = bots[index].Launch(port, pass, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
+#if !defined(_WIN32) && !defined(__ANDROID__)
+	if(res > 0)
+		windbotsPids.push_back(res);
 #endif
+	return res;
 }
 
 }

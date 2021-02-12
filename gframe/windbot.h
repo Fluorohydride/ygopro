@@ -18,13 +18,14 @@ struct WindBot {
 	std::set<int> masterRules;
 
 #if defined(_WIN32) || defined(__ANDROID__)
-	bool Launch(int port, const std::wstring& pass, bool chat = true, int hand = 0) const;
+	using launch_ret_t = bool;
 #else
-	pid_t Launch(int port, const std::wstring& pass, bool chat = true, int hand = 0) const;
+	using launch_ret_t = pid_t;
+	static epro::path_string executablePath;
 #endif
+	launch_ret_t Launch(int port, epro::wstringview pass, bool chat = true, int hand = 0) const;
 
 	static uint32_t version;
-	static epro::path_string executablePath;
 };
 
 }

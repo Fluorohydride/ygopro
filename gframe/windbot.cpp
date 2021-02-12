@@ -16,11 +16,12 @@
 
 namespace ygo {
 
+#if !defined(_WIN32) && !defined(__ANDROID__)
 epro::path_string WindBot::executablePath{};
+#endif
 uint32_t WindBot::version{ CLIENT_VERSION };
 
-#if defined(_WIN32) || defined(__ANDROID__)
-bool WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) const {
+WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool chat, int hand) const {
 #ifdef _WIN32
 	//Windows can modify this string
 	auto args = Utils::ToPathString(fmt::format(
@@ -43,7 +44,7 @@ bool WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) co
 	}
 	return false;
 #elif defined(__ANDROID__)
-	std::string param = BufferIO::EncodeUTF8s(fmt::format(
+	auto param = BufferIO::EncodeUTF8s(fmt::format(
 		L"HostInfo='{}' Deck='{}' Port={} Version={} Name='[AI] {}' Chat={} Hand={}",
 		pass,
 		deck,
@@ -54,10 +55,7 @@ bool WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) co
 		hand));
 	porting::launchWindbot(param);
 	return true;
-#endif
-}
 #else
-pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) const {
 	std::string argPass = fmt::format("HostInfo={}", BufferIO::EncodeUTF8s(pass));
 	std::string argDeck = fmt::format("Deck={}", BufferIO::EncodeUTF8s(deck));
 	std::string argPort = fmt::format("Port={}", port);
@@ -78,12 +76,12 @@ pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) c
 			   "AssetPath=./WindBot", hand ? argHand.data() : nullptr, nullptr);
 		_exit(EXIT_FAILURE);
 	}
-	if(waitpid(pid, nullptr, WNOHANG) != 0)
-		pid = 0;
 	if(executablePath.size())
 		setenv("PATH", oldpath.data(), true);
+	if(pid < 0 || waitpid(pid, nullptr, WNOHANG) != 0)
+		pid = 0;
 	return pid;
-}
 #endif
+}
 
 }
