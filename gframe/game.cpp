@@ -2026,9 +2026,7 @@ void Game::RefreshAiDecks() {
 			ErrorLog(fmt::format("Failed to load WindBot Ignite config json: {}", e.what()));
 		}
 		if(j.is_array()) {
-#ifdef _WIN32
-			WindBot::executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
-#elif !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(_WIN32)
 			{
 				auto it = gGameConfig->user_configs.find("posixPathExtension");
 				if(it != gGameConfig->user_configs.end() && it->is_string()) {

@@ -22,36 +22,36 @@ uint32_t WindBot::version{ CLIENT_VERSION };
 #if defined(_WIN32) || defined(__ANDROID__)
 bool WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) const {
 #ifdef _WIN32
+	//Windows can modify this string
 	auto args = Utils::ToPathString(fmt::format(
-		L"./WindBot/WindBot.exe HostInfo=\"{}\" Deck=\"{}\" Port={} Version={} name=\"[AI] {}\" Chat={}{}",
+		L"WindBot.exe HostInfo=\"{}\" Deck=\"{}\" Port={} Version={} name=\"[AI] {}\" Chat={} Hand={} AssetPath=./WindBot",
 		pass,
 		deck,
 		port,
 		version,
 		name,
 		chat,
-		hand ? fmt::format(L" Hand={}", hand) : L""));
-	STARTUPINFO si{};
+		hand));
+	STARTUPINFO si{ sizeof(si) };
 	PROCESS_INFORMATION pi{};
-	si.cb = sizeof(si);
 	si.dwFlags = STARTF_USESHOWWINDOW;
 	si.wShowWindow = SW_HIDE;
-	if(CreateProcess(nullptr, (TCHAR*)args.data(), nullptr, nullptr, FALSE, 0, nullptr, executablePath.data(), &si, &pi)) {
+	if(CreateProcess(L"./WindBot/WindBot.exe", &args[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi)) {
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 		return true;
 	}
 	return false;
 #elif defined(__ANDROID__)
-	std::string param = fmt::format(
-		"HostInfo='{}' Deck='{}' Port={} Version={} Name='[AI] {}' Chat={} Hand={}",
-		BufferIO::EncodeUTF8s(pass),
-		BufferIO::EncodeUTF8s(deck),
+	std::string param = BufferIO::EncodeUTF8s(fmt::format(
+		L"HostInfo='{}' Deck='{}' Port={} Version={} Name='[AI] {}' Chat={} Hand={}",
+		pass,
+		deck,
 		port,
 		version,
-		BufferIO::EncodeUTF8s(name),
+		name,
 		static_cast<int>(chat),
-		hand);
+		hand));
 	porting::launchWindbot(param);
 	return true;
 #endif
