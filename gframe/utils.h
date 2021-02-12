@@ -137,7 +137,7 @@ namespace ygo {
 			OPEN_FILE
 		};
 
-		static void SystemOpen(epro::path_stringview url, OpenType type = OPEN_URL);
+		static void SystemOpen(epro::path_stringview arg, OpenType type = OPEN_URL);
 
 	private:
 		static void InternalSetThreadName(const char* name, const wchar_t* wname);

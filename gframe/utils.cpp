@@ -457,27 +457,28 @@ namespace ygo {
 		return true;
 	}
 
-	void Utils::SystemOpen(epro::path_stringview url, OpenType type) {
+	void Utils::SystemOpen(epro::path_stringview arg, OpenType type) {
 #ifdef _WIN32
-		ShellExecute(nullptr, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), working_dir, url).data() : url.data(), nullptr, nullptr, SW_SHOWNORMAL);
+		ShellExecute(nullptr, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), working_dir, arg).data() : arg.data(), nullptr, nullptr, SW_SHOWNORMAL);
 #elif !defined(__ANDROID__)
+#ifdef __APPLE__
+#define OPEN "open"
+#else
+#define OPEN "xdg-open"
+#endif
 		auto pid = vfork();
 		if(pid == 0) {
-#ifdef __APPLE__
-			execl("/usr/bin/open", "open", url.data(), nullptr);
-#else
-			execl("/usr/bin/xdg-open", "xdg-open", url.data(), nullptr);
-#endif
+			execl("/usr/bin/" OPEN, OPEN, arg.data(), nullptr);
 			_exit(EXIT_FAILURE);
 		} else if(pid < 0)
 			perror("Failed to fork:");
 		if(waitpid(pid, nullptr, WNOHANG) != 0)
-			perror("Failed to open url or file:");
+			perror("Failed to open arg or file:");
 #else
 		if(type == OPEN_FILE)
-			porting::openFile(fmt::format("{}/{}", working_dir, url));
+			porting::openFile(fmt::format("{}/{}", working_dir, arg));
 		else
-			porting::openUrl(url);
+			porting::openUrl(arg);
 #endif
 	}
 }
