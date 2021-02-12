@@ -197,7 +197,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 		ygo::ErrorLog("failed to change directory");
 		fmt::print("failed to change directory\n");
 	}
-	if(argc >= 2 && argv[1] == EPRO_TEXT("show_changelog"_sv))
+	if(argc >= (2 + skipped) && argv[1 + skipped] == EPRO_TEXT("show_changelog"_sv))
 		show_changelog = true;
 	ThreadsStartup();
 #ifndef _WIN32
