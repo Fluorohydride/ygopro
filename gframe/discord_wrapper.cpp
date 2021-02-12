@@ -18,6 +18,7 @@
 #include "text_types.h"
 #include "discord_wrapper.h"
 
+#ifdef DISCORD_APP_ID
 #ifdef _WIN32
 #define formatstr EPRO_TEXT("\"{0}\" from_discord \"{1}\"")
 //The registry entry on windows seems to need the path with \ as separator rather than /
@@ -30,6 +31,7 @@ epro::path_string Unescape(epro::path_stringview _path) {
 #define formatstr R"(bash -c "\\"{0}\\" from_discord \\"{1}\\"")"
 #define Unescape(x) x
 #endif
+#endif //DISCORD_APP_ID
 
 bool DiscordWrapper::Initialize() {
 #ifdef DISCORD_APP_ID
@@ -48,10 +50,10 @@ bool DiscordWrapper::Initialize() {
 void DiscordWrapper::UpdatePresence(PresenceType type) {
 #ifdef DISCORD_APP_ID
 	auto CreateSecret = [&secret_buf=secret_buf](bool update) {
-		if(!update)
-			return secret_buf;
-		auto& secret = ygo::mainGame->dInfo.secret;
-		fmt::format_to_n(secret_buf, sizeof(secret_buf), "{{\"id\": {},\"addr\" : {},\"port\" : {},\"pass\" : \"{}\" }}", secret.game_id, secret.server_address, secret.server_port, secret.pass.data());
+		if(update) {
+			auto& secret = ygo::mainGame->dInfo.secret;
+			fmt::format_to_n(secret_buf, sizeof(secret_buf), "{{\"id\": {},\"addr\" : {},\"port\" : {},\"pass\" : \"{}\" }}", secret.game_id, secret.server_address, secret.server_port, secret.pass.data());
+		}
 		return secret_buf;
 	};
 	if(type == INITIALIZE && !running) {
@@ -78,7 +80,7 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 		Discord_ClearPresence();
 		return;
 	}
-	DiscordRichPresence discordPresence = {};
+	DiscordRichPresence discordPresence{};
 	std::string presenceState;
 	std::string partyid;
 	switch(presence) {
@@ -171,7 +173,7 @@ static void OnDisconnected(int errcode, const char* message, void* payload) {
 	static_cast<ygo::Game*>(payload)->discord.connected = false;
 }
 
-static void OnError(int errcode, const char * message, void* payload) {
+static void OnError(int errcode, const char* message, void* payload) {
 }
 
 static void OnJoin(const char* secret, void* payload) {
