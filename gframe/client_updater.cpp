@@ -7,6 +7,7 @@
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #endif // _WIN32
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
@@ -95,32 +96,34 @@ CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 	return res;
 }
 
-void Reboot() {
+static void Reboot() {
+	const auto path = ygo::Utils::GetExePath();
 #ifdef _WIN32
-	STARTUPINFO si{ sizeof(STARTUPINFO) };
+	STARTUPINFO si{ sizeof(si) };
 	PROCESS_INFORMATION pi{};
-	auto pathstring = fmt::format(EPRO_TEXT("{} show_changelog"), ygo::Utils::GetExePath());
-	CreateProcess(nullptr,
-		(TCHAR*)pathstring.data(),
-				  nullptr,
-				  nullptr,
-				  false,
-				  0,
-				  nullptr,
-				  EPRO_TEXT("./"),
-				  &si,
-				  &pi);
+	auto command = fmt::format(EPRO_TEXT("{} -C {} show_changelog"), ygo::Utils::GetFileName(path, true), ygo::Utils::working_dir);
+	ygo::Utils::working_dir;
+	if(!CreateProcess(path.data(), &command[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi))
+		return;
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
-#elif defined(__APPLE__)
-	system("open -b io.github.edo9300.ygoprodll --args show_changelog");
 #elif !defined(__ANDROID__)
+#ifdef __linux__
 	struct stat fileStat;
-	const char* path = ygo::Utils::GetExePath().data();
-	stat(path, &fileStat);
-	chmod(path, fileStat.st_mode | S_IXUSR | S_IXGRP | S_IXOTH);
-	execl(path, "show_changelog", nullptr);
-	exit(EXIT_FAILURE);
+	stat(path.data(), &fileStat);
+	chmod(path.data(), fileStat.st_mode | S_IXUSR | S_IXGRP | S_IXOTH);
+#endif
+	auto pid = vfork();
+	if(pid == 0) {
+#ifdef __linux__
+		execl(path.data(), path.data(), "-C", ygo::Utils::working_dir.data(), "show_changelog", nullptr);
+#else
+		execlp("open", "open", "-b", "io.github.edo9300.ygoprodll", "--args", "-C", ygo::Utils::working_dir.data(), "show_changelog", nullptr);
+#endif
+		_exit(EXIT_FAILURE);
+	}
+	if(pid < 0 || waitpid(pid, nullptr, WNOHANG) != 0)
+		return;
 #endif
 	exit(0);
 }
