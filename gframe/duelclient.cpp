@@ -3586,38 +3586,29 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
 		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
+		const bool is_direct = info2.location == 0;
 		info2.controler = mainGame->LocalPlayer(info2.controler);
 		std::unique_lock<std::mutex> lock(mainGame->gMutex);
 		float sy;
-		if (info2.location) {
+		float xa = mainGame->dField.attacker->curPos.X;
+		float ya = mainGame->dField.attacker->curPos.Y;
+		float xd, yd;
+		if (!is_direct) {
 			mainGame->dField.attack_target = mainGame->dField.GetCard(info2.controler, info2.location, info2.sequence);
 			event_string = fmt::format(gDataManager->GetSysString(1619), gDataManager->GetName(mainGame->dField.attacker->code),
 				gDataManager->GetName(mainGame->dField.attack_target->code));
-			float xa = mainGame->dField.attacker->curPos.X;
-			float ya = mainGame->dField.attacker->curPos.Y;
-			float xd = mainGame->dField.attack_target->curPos.X;
-			float yd = mainGame->dField.attack_target->curPos.Y;
-			sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-			mainGame->atk_t.set((xa + xd) / 2, (ya + yd) / 2, 0);
-			if (info1.controler == 0)
-				mainGame->atk_r.set(0, 0, -atan((xd - xa) / (yd - ya)));
-			else
-				mainGame->atk_r.set(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+			xd = mainGame->dField.attack_target->curPos.X;
+			yd = mainGame->dField.attack_target->curPos.Y;
 		} else {
 			event_string = fmt::format(gDataManager->GetSysString(1620), gDataManager->GetName(mainGame->dField.attacker->code));
-			float xa = mainGame->dField.attacker->curPos.X;
-			float ya = mainGame->dField.attacker->curPos.Y;
-			float xd = 3.95f;
-			float yd = 3.5f;
-			if (info1.controler == 0)
-				yd = -3.5f;
-			sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-			mainGame->atk_t.set((xa + xd) / 2, (ya + yd) / 2, 0);
-			if (info1.controler == 0)
-				mainGame->atk_r.set(0, 0, -atan((xd - xa) / (yd - ya)));
-			else
-				mainGame->atk_r.set(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+			xd = 3.95f;
+			yd = (info1.controler == 0) ? -3.5f : 3.5f;
 		}
+		sy = std::sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2.0f;
+		mainGame->atk_t.set((xa + xd) / 2, (ya + yd) / 2, 0);
+		mainGame->atk_r.set(0, 0, -std::atan((xd - xa) / (yd - ya)));
+		if(ya <= yd)
+			mainGame->atk_r.Z += irr::core::PI;
 		matManager.GenArrow(sy);
 		mainGame->attack_sv = 0.0f;
 		mainGame->is_attacking = true;
