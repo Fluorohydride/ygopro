@@ -40,8 +40,11 @@ bool SoundIrrklang::PlaySound(const std::string& name) {
 	return true;
 }
 void SoundIrrklang::StopSounds() {
-	for(auto& sound : sounds)
+	for(auto& sound : sounds) {
 		sound->stop();
+		sound->drop();
+	}
+	sounds.clear();
 }
 void SoundIrrklang::StopMusic() {
 	if(soundBGM) {
@@ -71,6 +74,7 @@ void SoundIrrklang::Tick() {
 SoundIrrklang::~SoundIrrklang() {
 	if(soundBGM)
 		soundBGM->drop();
+	StopSounds();
 	if(soundEngine)
 		soundEngine->drop();
 }

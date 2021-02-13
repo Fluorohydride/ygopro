@@ -73,6 +73,11 @@ bool SoundMixerBase::PlaySound(const std::string& name) {
 }
 void SoundMixerBase::StopSounds() {
 	Mix_HaltChannel(-1);
+	for(auto& chunk : sounds) {
+		if(chunk.second)
+			Mix_FreeChunk(chunk.second);
+	}
+	sounds.clear();
 }
 void SoundMixerBase::StopMusic() {
 	if(music) {
@@ -101,7 +106,8 @@ void SoundMixerBase::Tick() {
 			chunk++;
 	}
 }
-void KillSwitch(std::atomic_bool& die) {
+//In some occasions Mix_Quit can get stuck and never return, use this as failsafe
+static void KillSwitch(std::atomic_bool& die) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	if(die)
 		exit(0);
@@ -109,12 +115,9 @@ void KillSwitch(std::atomic_bool& die) {
 SoundMixerBase::~SoundMixerBase() {
 	std::atomic_bool die{true};
 	std::thread(KillSwitch, std::ref(die)).detach();
-	Mix_HaltChannel(-1);
 	Mix_HaltMusic();
-	for(auto& chunk : sounds) {
-		if(chunk.second)
-			Mix_FreeChunk(chunk.second);
-	}
+	Mix_HaltChannel(-1);
+	StopSounds();
 	if(music)
 		Mix_FreeMusic(music);
 	Mix_CloseAudio();
