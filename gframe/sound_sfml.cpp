@@ -84,7 +84,7 @@ void SoundSFMLBase::PauseMusic(bool pause)
 
 bool SoundSFMLBase::MusicPlaying()
 {
-	return music.getStatus() == Status::Playing;
+	return music.getStatus() != Status::Stopped;
 }
 
 void SoundSFMLBase::Tick()
