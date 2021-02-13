@@ -40,13 +40,14 @@ bool SoundSFMLBase::PlayMusic(const std::string& name, bool loop)
 }
 const sf::SoundBuffer& SoundSFMLBase::LookupSound(const std::string& name)
 {
-	auto& buf = buffers[name];
-	if (!buf) {
+	auto it = buffers.find(name);
+	if (it == buffers.end()) {
 		std::unique_ptr<sf::SoundBuffer> new_buf(new sf::SoundBuffer);
 		new_buf->loadFromFile(name);
-		buf.swap(new_buf);
+		const auto ret = buffers.emplace(name, std::move(new_buf));
+		it = ret.first;
 	}
-	return *buf;
+	return *it->second;
 }
 
 bool SoundSFMLBase::PlaySound(const std::string& name)
