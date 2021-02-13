@@ -1021,9 +1021,9 @@ void Game::DrawSpec() {
 		matk.setRotationRadians(atk_r);
 		driver->setTransform(irr::video::ETS_WORLD, matk);
 		driver->setMaterial(matManager.mATK);
-		driver->drawVertexPrimitiveList(&matManager.vArrow[(int)std::round(attack_sv)], 12, matManager.iArrow, 10, irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLE_STRIP);
-		attack_sv += (240 / 1000.0f) * delta_time;
-		if (attack_sv > 28)
+		driver->drawVertexPrimitiveList(&matManager.vArrow[std::min(static_cast<int>(attack_sv) * 4, 28)], 12, matManager.iArrow, 10, irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLE_STRIP);
+		attack_sv += (60.0f / 1000.0f) * delta_time;
+		if (static_cast<int>(attack_sv) > 9)
 			attack_sv = 0.0f;
 	}
 	bool showChat = true;
