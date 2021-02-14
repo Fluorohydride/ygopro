@@ -1,4 +1,5 @@
 #include "materials.h"
+#include "custom_skin_enum.h"
 
 namespace ygo {
 
