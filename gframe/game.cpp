@@ -159,7 +159,7 @@ bool Game::Initialize() {
 	stAbout = irr::gui::CGUICustomText::addCustomText(L"Project Ignis: EDOPro\n"
 											L"The bleeding-edge automatic duel simulator\n"
 											L"\n"
-											L"Copyright (C) 2020  Edoardo Lolletti (edo9300) and others\n"
+											L"Copyright (C) 2020-2021  Edoardo Lolletti (edo9300) and others\n"
 											L"Card scripts and supporting resources by Project Ignis.\n"
 											L"https://github.com/edo9300/edopro\n"
 											L"https://github.com/edo9300/ygopro-core\n"
