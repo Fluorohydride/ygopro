@@ -37,7 +37,7 @@ WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool cha
 	PROCESS_INFORMATION pi{};
 	si.dwFlags = STARTF_USESHOWWINDOW;
 	si.wShowWindow = SW_HIDE;
-	if(CreateProcess(L"./WindBot/WindBot.exe", &args[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi)) {
+	if(CreateProcess(EPRO_TEXT("./WindBot/WindBot.exe"), &args[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi)) {
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 		return true;
