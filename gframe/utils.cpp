@@ -179,7 +179,7 @@ namespace ygo {
 				const bool isdir = dirp->d_type == DT_DIR;
 #else
 				Stat fileStat;
-				stat(fmt::format("{}{}", _path, dirp->d_name).data(), &fileStat);
+				stat(fmt::format("{}{}", path, dirp->d_name).data(), &fileStat);
 				const bool isdir = !!S_ISDIR(fileStat.st_mode);
 #endif
 				cb(dirp->d_name, isdir);
