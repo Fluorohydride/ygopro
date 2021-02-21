@@ -5,6 +5,7 @@
 #include "replay.h"
 #include "mysignal.h"
 #include "core_utils.h"
+#include "text_types.h"
 
 namespace ygo {
 
@@ -22,10 +23,12 @@ public:
 		uint32_t drawCountPerTurn = 1;
 		uint64_t duelFlags = 0;
 		bool handTestNoOpponent = true;
+		std::string scriptName = "";
 		DuelOptions() {};
+		explicit DuelOptions(epro::stringview filename) : scriptName({ filename.data(), filename.size() }) {};
 	};
 
-	static bool StartPlay(const DuelOptions& duelOptions = DuelOptions());
+	static bool StartPlay(const DuelOptions& duelOptions);
 	static void StopPlay(bool is_exiting = false);
 	static void Restart();
 	static void SetResponse(void* resp, uint32_t len);

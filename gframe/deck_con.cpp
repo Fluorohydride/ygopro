@@ -162,9 +162,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HAND_TEST:
 			case BUTTON_HAND_TEST_START: {
 				Terminate(false);
-				open_file = true;
-				open_file_name = EPRO_TEXT("hand-test-mode");
-				SingleMode::DuelOptions options;
+				SingleMode::DuelOptions options("hand-test-mode");
 				options.handTestNoOpponent = mainGame->chkHandTestNoOpponent->isChecked();
 				try {
 					options.startingDrawCount = std::stoi(mainGame->ebHandTestStartHand->getText());

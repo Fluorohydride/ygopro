@@ -517,13 +517,18 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_SINGLEPLAY: {
-				if(mainGame->lstSinglePlayList->isDirectory(mainGame->lstSinglePlayList->getSelected()))
-					mainGame->lstSinglePlayList->enterDirectory(mainGame->lstSinglePlayList->getSelected());
+				const auto& list = mainGame->lstSinglePlayList;
+				const auto selected = list->getSelected();
+				if(list->isDirectory(selected))
+					list->enterDirectory(selected);
 				else {
-					if(!open_file && mainGame->lstSinglePlayList->getSelected() == -1)
+					if(!open_file && (selected == -1))
 						break;
 					SingleMode::singleSignal.SetNoWait(false);
-					SingleMode::StartPlay();
+					SingleMode::DuelOptions opts;
+					if(!open_file)
+						opts.scriptName = BufferIO::EncodeUTF8s(list->getListItem(selected, true));
+					SingleMode::StartPlay(opts);
 				}
 				break;
 			}
@@ -718,13 +723,16 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case LISTBOX_SINGLEPLAY_LIST: {
 				if(!mainGame->btnLoadSinglePlay->isEnabled())
 					break;
-				if(mainGame->lstSinglePlayList->isDirectory(mainGame->lstSinglePlayList->getSelected()))
-					mainGame->lstSinglePlayList->enterDirectory(mainGame->lstSinglePlayList->getSelected());
+				const auto& list = mainGame->lstSinglePlayList;
+				const auto selected = list->getSelected();
+				if(selected == -1)
+					break;
+				if(list->isDirectory(selected))
+					list->enterDirectory(selected);
 				else {
-					if(!open_file && (mainGame->lstSinglePlayList->getSelected() == -1))
-						break;
 					SingleMode::singleSignal.SetNoWait(false);
-					SingleMode::StartPlay();
+					SingleMode::DuelOptions opts(BufferIO::EncodeUTF8s(list->getListItem(selected, true)));
+					SingleMode::StartPlay(opts);
 				}
 				break;
 			}
