@@ -54,7 +54,7 @@ bool DeckManager::LoadLFListSingle(const epro::path_string& path) {
 		if(str[0] == '!') {
 			if(lflist.hash)
 				_lfList.push_back(lflist);
-			lflist.listName = BufferIO::DecodeUTF8s({ str.data() + 1, str.size() - 1 });
+			lflist.listName = BufferIO::DecodeUTF8({ str.data() + 1, str.size() - 1 });
 			lflist.content.clear();
 			lflist.hash = 0x7dfcee6a;
 			lflist.whitelist = false;
@@ -424,7 +424,7 @@ bool DeckManager::SaveDeck(Deck& deck, epro::path_stringview name) {
 	std::ofstream deckfile(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name), std::ofstream::out);
 	if(!deckfile.is_open())
 		return false;
-	deckfile << "#created by " << BufferIO::EncodeUTF8s(mainGame->ebNickName->getText()) << "\n#main\n";
+	deckfile << "#created by " << BufferIO::EncodeUTF8(mainGame->ebNickName->getText()) << "\n#main\n";
 	for(auto card : deck.main)
 		deckfile << fmt::to_string(card->code) << "\n";
 	deckfile << "#extra\n";
@@ -440,7 +440,7 @@ bool DeckManager::SaveDeck(epro::path_stringview name, const cardlist_type& main
 	std::ofstream deckfile(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name), std::ofstream::out);
 	if(!deckfile.is_open())
 		return false;
-	deckfile << "#created by " << BufferIO::EncodeUTF8s(mainGame->ebNickName->getText()) << "\n#main\n";
+	deckfile << "#created by " << BufferIO::EncodeUTF8(mainGame->ebNickName->getText()) << "\n#main\n";
 	for(auto card : mainlist)
 		deckfile << fmt::to_string(card) << "\n";
 	deckfile << "#extra\n";

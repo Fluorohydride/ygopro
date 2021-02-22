@@ -291,7 +291,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 			std::string namebuf;
 			namebuf.resize(len);
 			memcpy(&namebuf[0], begin, len + 1);
-			mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8s(namebuf);
+			mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8(namebuf);
 			return true;
 		}
 		case OLD_REPLAY_MODE:

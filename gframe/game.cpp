@@ -1594,7 +1594,7 @@ bool Game::MainLoop() {
 					} else {
 						Utils::MakeDirectory(EPRO_TEXT("./config/languages/") + langpath);
 						locales.emplace_back(std::move(langpath), std::vector<epro::path_string>{ std::move(data_path) });
-						gSettings.cbCurrentLocale->addItem(BufferIO::DecodeUTF8s(repo->language).data());
+						gSettings.cbCurrentLocale->addItem(BufferIO::DecodeUTF8(repo->language).data());
 					}
 				}
 			}
@@ -2040,8 +2040,8 @@ void Game::RefreshAiDecks() {
 			for(auto& obj : j) {
 				try {
 					WindBot bot;
-					bot.name = BufferIO::DecodeUTF8s(obj.at("name").get_ref<std::string&>());
-					bot.deck = BufferIO::DecodeUTF8s(obj.at("deck").get_ref<std::string&>());
+					bot.name = BufferIO::DecodeUTF8(obj.at("name").get_ref<std::string&>());
+					bot.deck = BufferIO::DecodeUTF8(obj.at("deck").get_ref<std::string&>());
 					bot.difficulty = obj.at("difficulty").get<int>();
 					for(auto& masterRule : obj.at("masterRules")) {
 						if(masterRule.is_number()) {
@@ -2111,7 +2111,7 @@ void Game::SaveConfig() {
 	gGameConfig->Save(EPRO_TEXT("./config/system.conf"));
 }
 Game::RepoGui* Game::AddGithubRepositoryStatusWindow(const GitRepo* repo) {
-	std::wstring name = BufferIO::DecodeUTF8s(repo->repo_name);
+	std::wstring name = BufferIO::DecodeUTF8(repo->repo_name);
 	auto a = env->addWindow(Scale(0, 0, 470, 55), false, L"", mRepositoriesInfo);
 	a->getCloseButton()->setVisible(false);
 	a->setDraggable(false);
@@ -2177,8 +2177,8 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 		defaultStrings.emplace_back(grepo->history_button2, 1434);
 		grepo->history_button2->setEnabled(true);
 		grepo->commit_history_full = fmt::format(L"{}\n{}",
-												fmt::format(gDataManager->GetSysString(1435), BufferIO::DecodeUTF8s(repo->url)),
-												fmt::format(gDataManager->GetSysString(1436), BufferIO::DecodeUTF8s(repo->history.error))
+												fmt::format(gDataManager->GetSysString(1435), BufferIO::DecodeUTF8(repo->url)),
+												fmt::format(gDataManager->GetSysString(1436), BufferIO::DecodeUTF8(repo->history.error))
 		);
 		grepo->commit_history_partial = grepo->commit_history_full;
 		return;
@@ -2187,7 +2187,7 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 	std::for_each(repo->history.full_history.begin(), repo->history.full_history.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
 	if(text.size())
 		text.erase(text.size() - 2, 2);
-	grepo->commit_history_full = BufferIO::DecodeUTF8s(text);
+	grepo->commit_history_full = BufferIO::DecodeUTF8(text);
 	grepo->commit_history_partial.clear();
 	if(repo->history.partial_history.size()) {
 		if(repo->history.partial_history.front() == repo->history.full_history.front() && repo->history.partial_history.back() == repo->history.full_history.back()) {
@@ -2197,7 +2197,7 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 			std::for_each(repo->history.partial_history.begin(), repo->history.partial_history.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
 			if(text.size())
 				text.erase(text.size() - 2, 2);
-			grepo->commit_history_partial = BufferIO::DecodeUTF8s(text);
+			grepo->commit_history_partial = BufferIO::DecodeUTF8(text);
 		}
 	} else {
 		if(repo->history.warning.size()) {
@@ -2205,7 +2205,7 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 			grepo->commit_history_partial = fmt::format(L"{}\n{}\n\n{}",
 				gDataManager->GetSysString(1449),
 				gDataManager->GetSysString(1450),
-				BufferIO::DecodeUTF8s(repo->history.warning));
+				BufferIO::DecodeUTF8(repo->history.warning));
 		} else {
 			grepo->commit_history_partial = gDataManager->GetSysString(1446).data();
 		}
@@ -2235,9 +2235,9 @@ void Game::LoadServers() {
 			for(auto& obj : *it) {
 				try {
 					ServerInfo tmp_server;
-					tmp_server.name = BufferIO::DecodeUTF8s(obj.at("name").get_ref<std::string&>());
-					tmp_server.address = BufferIO::DecodeUTF8s(obj.at("address").get_ref<std::string&>());
-					tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj.at("roomaddress").get_ref<std::string&>());
+					tmp_server.name = BufferIO::DecodeUTF8(obj.at("name").get_ref<std::string&>());
+					tmp_server.address = BufferIO::DecodeUTF8(obj.at("address").get_ref<std::string&>());
+					tmp_server.roomaddress = BufferIO::DecodeUTF8(obj.at("roomaddress").get_ref<std::string&>());
 					tmp_server.roomlistport = obj.at("roomlistport").get<int>();
 					tmp_server.duelport = obj.at("duelport").get<int>();
 					int i = serverChoice->addItem(tmp_server.name.data());
@@ -2432,9 +2432,9 @@ void Game::ClearChatMsg() {
 }
 void Game::AddDebugMsg(epro::stringview msg) {
 	if (gGameConfig->coreLogOutput & CORE_LOG_TO_CHAT)
-		AddChatMsg(BufferIO::DecodeUTF8s(msg), 9, 2);
+		AddChatMsg(BufferIO::DecodeUTF8(msg), 9, 2);
 	if (gGameConfig->coreLogOutput & CORE_LOG_TO_FILE)
-		ErrorLog(fmt::format("{}: {}", BufferIO::EncodeUTF8s(gDataManager->GetSysString(1440)), msg));
+		ErrorLog(fmt::format("{}: {}", BufferIO::EncodeUTF8(gDataManager->GetSysString(1440)), msg));
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
@@ -3248,7 +3248,7 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 			res += "\n";
 		res += str;
 	}
-	return BufferIO::DecodeUTF8s(res);
+	return BufferIO::DecodeUTF8(res);
 }
 epro::path_string Game::FindScript(epro::path_stringview name, irr::io::IReadFile** retarchive) {
 	for(auto& path : script_dirs) {
@@ -3334,7 +3334,7 @@ void Game::UpdateDownloadBar(int percentage, int cur, int tot, const char* filen
 	if(is_new)
 		game->updateProgressText->setText(
 			fmt::format(L"{}\n{}",
-				fmt::format(gDataManager->GetSysString(1462), BufferIO::DecodeUTF8s(filename)),
+				fmt::format(gDataManager->GetSysString(1462), BufferIO::DecodeUTF8(filename)),
 				fmt::format(gDataManager->GetSysString(1464), cur, tot)
 			).data());
 }

@@ -376,10 +376,10 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 				break;
 			pbuf[len] = 0;
 			if(packet.message == MSG_AI_NAME) {
-				mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8s(pbuf);
+				mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8(pbuf);
 			} else {
 				std::unique_lock<std::mutex> lock(mainGame->gMutex);
-				mainGame->stMessage->setText(BufferIO::DecodeUTF8s(pbuf).data());
+				mainGame->stMessage->setText(BufferIO::DecodeUTF8(pbuf).data());
 				mainGame->PopupElement(mainGame->wMessage);
 				mainGame->actionSignal.Wait(lock);
 			}

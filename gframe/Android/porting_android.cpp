@@ -29,7 +29,7 @@ std::rettype JstringtoC##type(JNIEnv* env, const jstring& jnistring) {\
 	return res;\
 }
 
-JstringtoC(W, wstring, = BufferIO::DecodeUTF8s)
+JstringtoC(W, wstring, = BufferIO::DecodeUTF8)
 JstringtoC(A, string)
 
 std::mutex* queued_messages_mutex = nullptr;
@@ -306,7 +306,7 @@ bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 						if(ygo::gGameConfig->native_keyboard) {
 							porting::displayKeyboard(true);
 						} else {
-							porting::showInputDialog(BufferIO::EncodeUTF8s(((irr::gui::IGUIEditBox *)hovered)->getText()));
+							porting::showInputDialog(BufferIO::EncodeUTF8(((irr::gui::IGUIEditBox *)hovered)->getText()));
 						}
 						stopPropagation = retval;
 						return retval;
@@ -457,7 +457,7 @@ void setTextToClipboard(epro::wstringview text) {
 	jmethodID setClip = jnienv->GetMethodID(nativeActivity, "setClipboard", JPARAMS(JSTRING)JVOID);
 	if(setClip == 0)
 		assert("porting::setTextToClipboard unable to find java setClipboard method" == 0);
-	jstring jargs = jnienv->NewStringUTF(BufferIO::EncodeUTF8s(text).data());
+	jstring jargs = jnienv->NewStringUTF(BufferIO::EncodeUTF8(text).data());
 
 	jnienv->CallVoidMethod(app_global->activity->clazz, setClip, jargs);
 }

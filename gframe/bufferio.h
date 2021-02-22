@@ -125,7 +125,7 @@ public:
 		*wp = 0;
 		return wp - wstr;
 	}
-	static std::string EncodeUTF8s(epro::wstringview source) {
+	static std::string EncodeUTF8(epro::wstringview source) {
 		thread_local std::vector<char> res;
 #if	WCHAR_MAX == 0xffff
 			res.reserve(source.size() * 2 + 1);
@@ -136,7 +136,7 @@ public:
 		return res.data();
 	}
 	// UTF-8 to UTF-16/UTF-32
-	static std::wstring DecodeUTF8s(epro::stringview source) {
+	static std::wstring DecodeUTF8(epro::stringview source) {
 		thread_local std::vector<wchar_t> res;
 		res.reserve(source.size() + 1);
 		DecodeUTF8(source.data(), const_cast<wchar_t*>(res.data()));

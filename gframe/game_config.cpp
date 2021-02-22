@@ -60,11 +60,11 @@ bool GameConfig::Load(const epro::path_char* filename)
 			else if (type == "fullscreen")
 				fullscreen = !!std::stoi(str);
 			else if (type == "nickname")
-				nickname = BufferIO::DecodeUTF8s(str);
+				nickname = BufferIO::DecodeUTF8(str);
 			else if (type == "gamename")
-				gamename = BufferIO::DecodeUTF8s(str);
+				gamename = BufferIO::DecodeUTF8(str);
 			else if (type == "lastdeck")
-				lastdeck = BufferIO::DecodeUTF8s(str);
+				lastdeck = BufferIO::DecodeUTF8(str);
 			else if (type == "lastExtraRules")
 				lastExtraRules = std::stoi(str);
 			else if (type == "lastDuelForbidden")
@@ -115,26 +115,26 @@ bool GameConfig::Load(const epro::path_char* filename)
 			else if (type == "botMute")
 				botMute = !!std::stoi(str);
 			else if (type == "lastServer")
-				lastServer = BufferIO::DecodeUTF8s(str);
+				lastServer = BufferIO::DecodeUTF8(str);
 			else if (type == "textfont") {
 				pos = str.find(L' ');
 				if (pos == std::wstring::npos) {
-					textfont = BufferIO::DecodeUTF8s(str);
+					textfont = BufferIO::DecodeUTF8(str);
 					continue;
 				}
-				textfont = BufferIO::DecodeUTF8s(str.substr(0, pos));
+				textfont = BufferIO::DecodeUTF8(str.substr(0, pos));
 				textfontsize = std::stoi(str.substr(pos));
 			}
 			else if (type == "numfont")
-				numfont = BufferIO::DecodeUTF8s(str);
+				numfont = BufferIO::DecodeUTF8(str);
 			else if (type == "serverport")
-				serverport = BufferIO::DecodeUTF8s(str);
+				serverport = BufferIO::DecodeUTF8(str);
 			else if (type == "lasthost")
-				lasthost = BufferIO::DecodeUTF8s(str);
+				lasthost = BufferIO::DecodeUTF8(str);
 			else if (type == "lastport")
-				lastport = BufferIO::DecodeUTF8s(str);
+				lastport = BufferIO::DecodeUTF8(str);
 			else if (type == "roompass")
-				roompass = BufferIO::DecodeUTF8s(str);
+				roompass = BufferIO::DecodeUTF8(str);
 			else if (type == "game_version") {
 				uint16_t version = static_cast<uint16_t>(std::stoul(str));
 				if (version) {
@@ -224,7 +224,7 @@ inline void Serialize(std::ofstream& conf_file, const char* name, float value) {
 }
 template<>
 inline void Serialize(std::ofstream& conf_file, const char* name, std::wstring value) {
-	conf_file << name << " = " << BufferIO::EncodeUTF8s(value) << "\n";
+	conf_file << name << " = " << BufferIO::EncodeUTF8(value) << "\n";
 }
 
 bool GameConfig::Save(const epro::path_char* filename)
@@ -243,9 +243,9 @@ bool GameConfig::Save(const epro::path_char* filename)
 	SERIALIZE(windowStruct);
 	conf_file << "antialias = "          << ((int)antialias) << "\n";
 	SERIALIZE(coreLogOutput);
-	conf_file << "nickname = "           << BufferIO::EncodeUTF8s(nickname) << "\n";
-	conf_file << "gamename = "           << BufferIO::EncodeUTF8s(gamename) << "\n";
-	conf_file << "lastdeck = "           << BufferIO::EncodeUTF8s(lastdeck) << "\n";
+	conf_file << "nickname = "           << BufferIO::EncodeUTF8(nickname) << "\n";
+	conf_file << "gamename = "           << BufferIO::EncodeUTF8(gamename) << "\n";
+	conf_file << "lastdeck = "           << BufferIO::EncodeUTF8(lastdeck) << "\n";
 	conf_file << "lastlflist = "         << lastlflist << "\n";
 	conf_file << "lastallowedcards = "   << lastallowedcards << "\n";
 	SERIALIZE(lastDuelParam);
@@ -262,15 +262,15 @@ bool GameConfig::Save(const epro::path_char* filename)
 	SERIALIZE(noShuffleDeck);
 	SERIALIZE(noCheckDeck);
 	SERIALIZE(hideHandsInReplays);
-	conf_file << "textfont = "                 << BufferIO::EncodeUTF8s(textfont) << " " << std::to_string(textfontsize) << "\n";
-	conf_file << "numfont = "                  << BufferIO::EncodeUTF8s(numfont) << "\n";
-	conf_file << "serverport = "               << BufferIO::EncodeUTF8s(serverport) << "\n";
-	conf_file << "lasthost = "                 << BufferIO::EncodeUTF8s(lasthost) << "\n";
-	conf_file << "lastport = "                 << BufferIO::EncodeUTF8s(lastport) << "\n";
+	conf_file << "textfont = "                 << BufferIO::EncodeUTF8(textfont) << " " << std::to_string(textfontsize) << "\n";
+	conf_file << "numfont = "                  << BufferIO::EncodeUTF8(numfont) << "\n";
+	conf_file << "serverport = "               << BufferIO::EncodeUTF8(serverport) << "\n";
+	conf_file << "lasthost = "                 << BufferIO::EncodeUTF8(lasthost) << "\n";
+	conf_file << "lastport = "                 << BufferIO::EncodeUTF8(lastport) << "\n";
 	conf_file << "botThrowRock = "             << botThrowRock << "\n";
 	conf_file << "botMute = "                  << botMute << "\n";
 	SERIALIZE(lastBot);
-	conf_file << "lastServer = "               << BufferIO::EncodeUTF8s(lastServer) << "\n";
+	conf_file << "lastServer = "               << BufferIO::EncodeUTF8(lastServer) << "\n";
 	conf_file << "game_version = "             << game_version << "\n";
 	conf_file << "automonsterpos = "           << chkMAutoPos << "\n";
 	conf_file << "autospellpos = "             << chkSTAutoPos << "\n";

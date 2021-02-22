@@ -283,7 +283,7 @@ void Replay::ParseStream() {
 			if((len + 1) != p.data.size() - sizeof(uint16_t))
 				break;
 			pbuf[len] = 0;
-			players[1] = BufferIO::DecodeUTF8s(pbuf);
+			players[1] = BufferIO::DecodeUTF8(pbuf);
 			continue;
 		}
 		if(p.message == MSG_NEW_TURN) {

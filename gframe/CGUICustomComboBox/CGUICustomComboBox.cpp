@@ -281,7 +281,7 @@ void CGUICustomComboBox::draw() {
 void CGUICustomComboBox::openCloseMenu() {
 	std::vector<std::string> parameters;
 	for(int i = 0; i < Items.size(); i++) {
-		parameters.push_back(BufferIO::EncodeUTF8s(Items[i].Name.c_str()));
+		parameters.push_back(BufferIO::EncodeUTF8(Items[i].Name.c_str()));
 	}
 	porting::showComboBox(parameters);
 }

@@ -314,19 +314,19 @@ epro::path_string Utils::ToPathString(epro::wstringview input) {
 #ifdef UNICODE
 	return { input.data(), input.size() };
 #else
-	return BufferIO::EncodeUTF8s(input);
+	return BufferIO::EncodeUTF8(input);
 #endif
 }
 epro::path_string Utils::ToPathString(epro::stringview input) {
 #ifdef UNICODE
-	return BufferIO::DecodeUTF8s(input);
+	return BufferIO::DecodeUTF8(input);
 #else
 	return { input.data(), input.size() };
 #endif
 }
 std::string Utils::ToUTF8IfNeeded(epro::path_stringview input) {
 #ifdef UNICODE
-	return BufferIO::EncodeUTF8s(input);
+	return BufferIO::EncodeUTF8(input);
 #else
 	return { input.data(), input.size() };
 #endif
@@ -335,7 +335,7 @@ std::wstring Utils::ToUnicodeIfNeeded(epro::path_stringview input) {
 #ifdef UNICODE
 	return { input.data(), input.size() };
 #else
-	return BufferIO::DecodeUTF8s(input);
+	return BufferIO::DecodeUTF8(input);
 #endif
 }
 

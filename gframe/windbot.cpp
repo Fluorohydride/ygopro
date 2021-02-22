@@ -44,7 +44,7 @@ WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool cha
 	}
 	return false;
 #elif defined(__ANDROID__)
-	auto param = BufferIO::EncodeUTF8s(fmt::format(
+	auto param = BufferIO::EncodeUTF8(fmt::format(
 		L"HostInfo='{}' Deck='{}' Port={} Version={} Name='[AI] {}' Chat={} Hand={}",
 		pass,
 		deck,
@@ -56,11 +56,11 @@ WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool cha
 	porting::launchWindbot(param);
 	return true;
 #else
-	std::string argPass = fmt::format("HostInfo={}", BufferIO::EncodeUTF8s(pass));
-	std::string argDeck = fmt::format("Deck={}", BufferIO::EncodeUTF8s(deck));
+	std::string argPass = fmt::format("HostInfo={}", BufferIO::EncodeUTF8(pass));
+	std::string argDeck = fmt::format("Deck={}", BufferIO::EncodeUTF8(deck));
 	std::string argPort = fmt::format("Port={}", port);
 	std::string argVersion = fmt::format("Version={}", version);
-	std::string argName = fmt::format("name=[AI] {}", BufferIO::EncodeUTF8s(name));
+	std::string argName = fmt::format("name=[AI] {}", BufferIO::EncodeUTF8(name));
 	std::string argChat = fmt::format("Chat={}", chat);
 	std::string argHand = fmt::format("Hand={}", hand);
 	std::string oldpath;

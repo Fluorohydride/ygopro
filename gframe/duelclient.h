@@ -55,11 +55,11 @@ public:
 	static std::atomic<bool> answered;
 
 	static inline std::pair<uint32_t, uint16_t> ResolveServer(epro::wstringview address, epro::wstringview port) {
-		return ResolveServer(BufferIO::EncodeUTF8s(address), BufferIO::EncodeUTF8s(port));
+		return ResolveServer(BufferIO::EncodeUTF8(address), BufferIO::EncodeUTF8(port));
 	}
 	static std::pair<uint32_t, uint16_t> ResolveServer(epro::stringview address, epro::stringview port);
 	static inline std::pair<uint32_t, uint16_t> ResolveServer(epro::wstringview address, int port) {
-		return ResolveServer(BufferIO::EncodeUTF8s(address), fmt::to_string(port));
+		return ResolveServer(BufferIO::EncodeUTF8(address), fmt::to_string(port));
 	}
 	static bool StartClient(uint32_t ip, uint16_t port, uint32_t gameid = 0, bool create_game = true);
 	static void ConnectTimeout(evutil_socket_t fd, short events, void* arg);

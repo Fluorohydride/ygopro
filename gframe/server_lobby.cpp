@@ -179,9 +179,9 @@ void ServerLobby::GetRoomsThread() {
 	std::string retrieved_data;
 	CURL* curl_handle = curl_easy_init();
 	//if(mainGame->chkShowActiveRooms->isChecked()) {
-		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8s(serverInfo.roomaddress), serverInfo.roomlistport).data());
+		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8(serverInfo.roomaddress), serverInfo.roomlistport).data());
 	/*} else {
-		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8s(serverInfo.roomaddress), serverInfo.roomlistport).data());
+		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8(serverInfo.roomaddress), serverInfo.roomlistport).data());
 	}*/
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 7L);
@@ -222,8 +222,8 @@ void ServerLobby::GetRoomsThread() {
 				for (auto& obj : j["rooms"]) {
 					RoomInfo room;
 					room.id = GET("roomid", int);
-					room.name = BufferIO::DecodeUTF8s(obj["roomname"].get_ref<std::string&>());
-					room.description = BufferIO::DecodeUTF8s(obj["roomnotes"].get_ref<std::string&>());
+					room.name = BufferIO::DecodeUTF8(obj["roomname"].get_ref<std::string&>());
+					room.description = BufferIO::DecodeUTF8(obj["roomnotes"].get_ref<std::string&>());
 					room.locked = GET("needpass", bool);
 					room.started = obj["istart"].get_ref<std::string&>() == "start";
 					room.info.mode = GET("roommode", int);
@@ -245,7 +245,7 @@ void ServerLobby::GetRoomsThread() {
 					room.info.lflist = GET("banlist_hash", int);
 #undef GET
 					for (auto& obj2 : obj["users"])
-						room.players.push_back(BufferIO::DecodeUTF8s(obj2["name"].get_ref<std::string&>()));
+						room.players.push_back(BufferIO::DecodeUTF8(obj2["name"].get_ref<std::string&>()));
 
 					roomsVector.push_back(std::move(room));
 				}
@@ -295,7 +295,7 @@ void ServerLobby::JoinServer(bool host) {
 			if(*text == L'\0')
 				return;
 			mainGame->wRoomPassword->setVisible(false);
-			mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(text);
+			mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8(text);
 		} else
 			mainGame->dInfo.secret.pass.clear();
 		if(!DuelClient::StartClient(serverinfo.first, serverinfo.second, room->id, false))

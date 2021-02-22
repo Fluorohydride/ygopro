@@ -210,7 +210,7 @@ catch(...) { what = def; }
 			mainGame->dInfo.secret.game_id = 0;
 			BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
 			BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
-			mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(mainGame->ebServerPass->getText());
+			mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8(mainGame->ebServerPass->getText());
 			cscg.info.rule = mainGame->cbRule->getSelected();
 			cscg.info.mode = 0;
 			TOI(cscg.info.start_hand, mainGame->ebStartHand->getText(), 5);
@@ -236,7 +236,7 @@ catch(...) { what = def; }
 			cscg.info.forbiddentypes = mainGame->forbiddentypes;
 			cscg.info.extra_rules = mainGame->extra_rules;
 			if(mainGame->ebHostNotes->isVisible()) {
-				BufferIO::CopyWStr(BufferIO::EncodeUTF8s(mainGame->ebHostNotes->getText()).data(), cscg.notes, 200);
+				BufferIO::CopyWStr(BufferIO::EncodeUTF8(mainGame->ebHostNotes->getText()).data(), cscg.notes, 200);
 			}
 			SendPacketToServer(CTOS_CREATE_GAME, cscg);
 		} else {
@@ -248,7 +248,7 @@ catch(...) { what = def; }
 				csjg.version2 = { EXPAND_VERSION(CLIENT_VERSION) };
 			}
 			csjg.gameid = mainGame->dInfo.secret.game_id;
-			BufferIO::CopyWStr(BufferIO::DecodeUTF8s(mainGame->dInfo.secret.pass).data(), csjg.pass, 20);
+			BufferIO::CopyWStr(BufferIO::DecodeUTF8(mainGame->dInfo.secret.pass).data(), csjg.pass, 20);
 			SendPacketToServer(CTOS_JOIN_GAME, csjg);
 		}
 		connect_state |= 0x2;
