@@ -58,14 +58,14 @@ private:
 		Argument arg;
 	};
 	void BaseLoop();
-	std::unique_ptr<SoundBackend> m_BaseBackend{ nullptr };
-	std::thread m_BaseThread{};
+	std::unique_ptr<SoundBackend> m_BaseBackend;
 	std::mutex m_ActionMutex;
 	std::condition_variable m_ActionCondVar;
 	std::mutex m_ResponseMutex;
 	std::condition_variable m_ResponseCondVar;
 	std::queue<Action> m_Actions;
 	bool response;
+	std::thread m_BaseThread;
 };
 
 template<typename T>
