@@ -120,6 +120,12 @@ namespace ygo {
 			});
 		};
 		template<typename T>
+		static inline bool EqualIgnoreCaseFirst(const T& a, const T& b) {
+			return std::equal(a.begin(), a.end(), b.begin(), b.end(), [](const typename T::value_type& _a, const typename T::value_type& _b) {
+				return _a == ToUpperChar(_b);
+			});
+		};
+		template<typename T>
 		static inline bool CompareIgnoreCase(const T& a, const T& b) {
 			return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), [](const typename T::value_type& _a, const typename T::value_type& _b) {
 				return ToUpperChar(_a) < ToUpperChar(_b);

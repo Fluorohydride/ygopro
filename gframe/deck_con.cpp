@@ -234,22 +234,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SAVE_DECK_AS: {
-				const wchar_t* dname = mainGame->ebDeckname->getText();
-				if(*dname == 0)
+				epro::wstringview dname(mainGame->ebDeckname->getText());
+				if(dname.empty())
 					break;
 				int sel = -1;
-				for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
-					if(!wcscmp(dname, mainGame->cbDBDecks->getItem(i))) {
-						sel = i;
-						break;
+				{
+					const auto upper = Utils::ToUpperNoAccents<std::wstring>({ dname.data(), dname.size() });
+					for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
+						if(Utils::EqualIgnoreCaseFirst<epro::wstringview>(upper, mainGame->cbDBDecks->getItem(i))) {
+							sel = i;
+							break;
+						}
 					}
 				}
 				if(sel >= 0) {
 					mainGame->stACMessage->setText(gDataManager->GetSysString(1339).data());
-					mainGame->PopupElement(mainGame->wACMessage, 30);
+					mainGame->PopupElement(mainGame->wACMessage, 40);
 					break;
 				} else {
-					mainGame->cbDBDecks->addItem(dname);
+					mainGame->cbDBDecks->addItem(dname.data());
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
 				if(gdeckManager->SaveDeck(gdeckManager->current_deck, Utils::ToPathString(dname))) {
