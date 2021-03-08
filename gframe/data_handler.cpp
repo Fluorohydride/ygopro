@@ -72,7 +72,7 @@ void DataHandler::LoadPicUrls() {
 																imgType::ART : imgType::COVER });
 					}
 				}
-				catch(std::exception& e) {
+				catch(const std::exception& e) {
 					ErrorLog(fmt::format("Exception occurred: {}", e.what()));
 				}
 			}

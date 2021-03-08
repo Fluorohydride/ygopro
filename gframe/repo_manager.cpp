@@ -276,7 +276,7 @@ void RepoManager::CloneOrUpdateTask() {
 						Git::Check(git_reset(repo.get(), reinterpret_cast<git_object*>(commit.get()),
 											 GIT_RESET_HARD, nullptr));
 					}
-					catch(std::exception& e) {
+					catch(const std::exception& e) {
 						history.partial_history.clear();
 						history.warning = e.what();
 						ErrorLog(fmt::format("Warning occurred in repo {}: {}", url, e.what()));
@@ -302,7 +302,7 @@ void RepoManager::CloneOrUpdateTask() {
 			}
 			SetRepoPercentage(path, 100);
 		}
-		catch(std::exception& e) {
+		catch(const std::exception& e) {
 			history.error = e.what();
 			ErrorLog(fmt::format("Exception occurred in repo {}: {}", _repo.url, e.what()));
 		}

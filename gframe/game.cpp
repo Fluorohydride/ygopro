@@ -2022,7 +2022,7 @@ void Game::RefreshAiDecks() {
 		try {
 			windbots >> j;
 		}
-		catch(std::exception& e) {
+		catch(const std::exception& e) {
 			ErrorLog(fmt::format("Failed to load WindBot Ignite config json: {}", e.what()));
 		}
 		if(j.is_array()) {
@@ -2050,7 +2050,7 @@ void Game::RefreshAiDecks() {
 					}
 					gBot.bots.push_back(std::move(bot));
 				}
-				catch(std::exception& e) {
+				catch(const std::exception& e) {
 					ErrorLog(fmt::format("Failed to parse WindBot Ignite config json entry: {}", e.what()));
 				}
 			}
@@ -2245,7 +2245,7 @@ void Game::LoadServers() {
 						serverChoice->setSelected(i);
 					ServerLobby::serversVector.push_back(std::move(tmp_server));
 				}
-				catch(std::exception& e) {
+				catch(const std::exception& e) {
 					ErrorLog(fmt::format("Exception occurred while parsing server entry: {}", e.what()));
 				}
 			}

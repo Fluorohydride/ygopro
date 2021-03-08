@@ -189,7 +189,7 @@ static void OnJoin(const char* secret, void* payload) {
 		host.server_port = json["port"].get<int>();
 		host.pass = json["pass"].get<std::string>();
 	}
-	catch(std::exception& e) {
+	catch(const std::exception& e) {
 		ygo::ErrorLog(fmt::format("Exception occurred: {}", e.what()));
 		return;
 	}

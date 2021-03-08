@@ -277,7 +277,7 @@ void ServerLobby::JoinServer(bool host) {
 		const ServerInfo& server = serversVector[selected];
 		serverinfo = DuelClient::ResolveServer(server.address, server.duelport);
 	}
-	catch(std::exception& e) { ErrorLog(fmt::format("Exception occurred: {}", e.what())); }
+	catch(const std::exception& e) { ErrorLog(fmt::format("Exception occurred: {}", e.what())); }
 	if(host) {
 		if(!DuelClient::StartClient(serverinfo.first, serverinfo.second))
 			return;
