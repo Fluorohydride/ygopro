@@ -409,9 +409,6 @@ void Game::DrawCard(ClientCard* pcard) {
 		else
 			DrawSelectionLine(matManager.vCardOutliner, true, 2, outline_color);
 	}
-	irr::core::matrix4 im;
-	im.setTranslation(pcard->curPos);
-	driver->setTransform(irr::video::ETS_WORLD, im);
 	if(pcard->is_showequip) {
 		matManager.mTexture.setTexture(0, imageManager.tEquip);
 		driver->setMaterial(matManager.mTexture);
