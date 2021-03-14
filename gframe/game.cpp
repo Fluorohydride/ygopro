@@ -1301,9 +1301,6 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "roompass")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
-		} else if(!strcmp(strbuf, "bot_deck_path")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.bot_deck_path, 64);
 		} else if(!strcmp(strbuf, "automonsterpos")) {
 			gameConf.chkMAutoPos = atoi(valbuf);
 		} else if(!strcmp(strbuf, "autospellpos")) {
@@ -1388,6 +1385,9 @@ void Game::LoadConfig() {
 			} else if (!strcmp(strbuf, "lastdeck")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
+			} else if(!strcmp(strbuf, "bot_deck_path")) {
+				BufferIO::DecodeUTF8(valbuf, wstr);
+				BufferIO::CopyWStr(wstr, gameConf.bot_deck_path, 64);
 			}
 		}
 	}
