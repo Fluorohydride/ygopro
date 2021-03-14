@@ -1692,7 +1692,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_SELECT_PLACE:
 	case MSG_SELECT_DISFIELD: {
 		int selecting_player = BufferIO::ReadInt8(pbuf);
-		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_min = count > 0 ? count : 1;
+		mainGame->dField.select_ready = false;
+		mainGame->dField.select_cancelable = count == 0;
 		mainGame->dField.selectable_field = ~BufferIO::ReadInt32(pbuf);
 		if(selecting_player == mainGame->LocalPlayer(1))
 			mainGame->dField.selectable_field = (mainGame->dField.selectable_field >> 16) | (mainGame->dField.selectable_field << 16);
@@ -1767,6 +1770,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			DuelClient::SendResponse();
 			return true;
 		}
+		if(mainGame->dField.select_cancelable) {
+			mainGame->dField.ShowCancelOrFinishButton(1);
+		}
 		return false;
 	}
 	case MSG_SELECT_POSITION: {
@@ -1820,6 +1826,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int count = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.selectable_cards.clear();
 		mainGame->dField.selected_cards.clear();
+		mainGame->dField.selectsum_all.clear();
+		mainGame->dField.selectsum_cards.clear();
 		mainGame->dField.select_panalmode = false;
 		int c, l, s, t;
 		unsigned int code;
@@ -1835,10 +1843,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if (code && pcard->code != code)
 				pcard->SetCode(code);
 			mainGame->dField.selectable_cards.push_back(pcard);
-			pcard->opParam = t;
+			mainGame->dField.selectsum_all.push_back(pcard);
+			pcard->opParam = t << 16 | 1;
 			pcard->select_seq = i;
 			pcard->is_selectable = true;
 		}
+		mainGame->dField.CheckSelectTribute();
 		if(select_hint)
 			myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetDesc(select_hint),
 			           mainGame->dField.select_min, mainGame->dField.select_max);
@@ -3617,7 +3627,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int chtype = BufferIO::ReadInt8(pbuf);
 		int value = BufferIO::ReadInt32(pbuf);
 		auto& player_desc_hints = mainGame->dField.player_desc_hints[player];
-		if(chtype == PHINT_DESC_ADD) {
+		if(value == CARD_QUESTION && player == 0) {
+			if(chtype == PHINT_DESC_ADD) {
+				mainGame->dField.cant_check_grave = true;
+			} else if(chtype == PHINT_DESC_REMOVE) {
+				mainGame->dField.cant_check_grave = false;
+			}
+		}
+		else if(chtype == PHINT_DESC_ADD) {
 			player_desc_hints[value]++;
 		} else if(chtype == PHINT_DESC_REMOVE) {
 			player_desc_hints[value]--;

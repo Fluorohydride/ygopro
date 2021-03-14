@@ -144,8 +144,8 @@ inline void ShowBigCard(int code, float zoom) {
 inline void ZoomBigCard(s32 centerx = -1, s32 centery = -1) {
 	if(mainGame->deckBuilder.bigcard_zoom >= 4)
 		mainGame->deckBuilder.bigcard_zoom = 4;
-	if(mainGame->deckBuilder.bigcard_zoom <= 0.2)
-		mainGame->deckBuilder.bigcard_zoom = 0.2;
+	if(mainGame->deckBuilder.bigcard_zoom <= 0.2f)
+		mainGame->deckBuilder.bigcard_zoom = 0.2f;
 	ITexture* img = imageManager.GetBigPicture(mainGame->deckBuilder.bigcard_code, mainGame->deckBuilder.bigcard_zoom);
 	mainGame->imgBigCard->setImage(img);
 	auto size = img->getSize();
@@ -769,12 +769,12 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_BIG_CARD_ZOOM_IN: {
-				bigcard_zoom += 0.2;
+				bigcard_zoom += 0.2f;
 				ZoomBigCard();
 				break;
 			}
 			case BUTTON_BIG_CARD_ZOOM_OUT: {
-				bigcard_zoom -= 0.2;
+				bigcard_zoom -= 0.2f;
 				ZoomBigCard();
 				break;
 			}

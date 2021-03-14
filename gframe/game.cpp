@@ -10,7 +10,7 @@
 #include "netserver.h"
 #include "single_mode.h"
 
-const unsigned short PRO_VERSION = 0x1351;
+const unsigned short PRO_VERSION = 0x1352;
 
 namespace ygo {
 
@@ -71,14 +71,70 @@ bool Game::Initialize() {
 	dataManager.LoadStrings("./expansions/strings.conf");
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	if(!numFont) {
+		const wchar_t* numFontPaths[] = {
+			L"C:/Windows/Fonts/arialbd.ttf",
+			L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
+			L"/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Bold.ttc",
+			L"/System/Library/Fonts/SFNSTextCondensed-Bold.otf",
+			L"/System/Library/Fonts/SFNS.ttf",
+			L"./fonts/numFont.ttf",
+			L"./fonts/numFont.ttc",
+			L"./fonts/numFont.otf"
+		};
+		for(const wchar_t* path : numFontPaths) {
+			myswprintf(gameConf.numfont, path);
+			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+			if(numFont)
+				break;
+		}
+	}
+	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	if(!textFont) {
+		const wchar_t* textFontPaths[] = {
+			L"C:/Windows/Fonts/msyh.ttc",
+			L"C:/Windows/Fonts/msyh.ttf",
+			L"C:/Windows/Fonts/simsun.ttc",
+			L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
+			L"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc",
+			L"/System/Library/Fonts/PingFang.ttc",
+			L"./fonts/textFont.ttf",
+			L"./fonts/textFont.ttc",
+			L"./fonts/textFont.otf"
+		};
+		for(const wchar_t* path : textFontPaths) {
+			myswprintf(gameConf.textfont, path);
+			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+			if(textFont)
+				break;
+		}
+	}
+	if(!numFont || !textFont) {
+		wchar_t fpath[1024];
+		fpath[0] = 0;
+		FileSystem::TraversalDir(L"./fonts", [&fpath](const wchar_t* name, bool isdir) {
+			if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".ttf", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ttc", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".otf", 4))) {
+				myswprintf(fpath, L"./fonts/%ls", name);
+			}
+		});
+		if(fpath[0] == 0) {
+			ErrorLog("Failed to load font(s)!");
+			return false;
+		}
+		if(!numFont) {
+			myswprintf(gameConf.numfont, fpath);
+			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+		}
+		if(!textFont) {
+			myswprintf(gameConf.textfont, fpath);
+			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+		}
+	}
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
 	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	if(!numFont || !textFont) {
-		ErrorLog("Failed to load font(s)!");
-		return false;
-	}
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"YGOPro");
 	device->setResizable(true);
@@ -710,6 +766,9 @@ bool Game::Initialize() {
 		btnBotCancel = env->addButton(rect<s32>(459, 331, 569, 356), tabBot, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
 		env->addStaticText(dataManager.GetSysString(1382), rect<s32>(360, 10, 550, 30), false, true, tabBot);
 		stBotInfo = env->addStaticText(L"", rect<s32>(360, 40, 560, 160), false, true, tabBot);
+		cbBotDeck = env->addComboBox(rect<s32>(360, 130, 560, 155), tabBot);
+		cbBotDeck->setMaxSelectionRows(6);
+		cbBotDeck->setVisible(false);
 		cbBotRule = env->addComboBox(rect<s32>(360, 165, 560, 190), tabBot, COMBOBOX_BOT_RULE);
 		cbBotRule->addItem(dataManager.GetSysString(1262));
 		cbBotRule->addItem(dataManager.GetSysString(1263));
@@ -806,7 +865,6 @@ bool Game::Initialize() {
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
-	LoadConfig();
 	if(!soundManager.Init()) {
 		chkEnableSound->setChecked(false);
 		chkEnableSound->setEnabled(false);
@@ -1123,6 +1181,7 @@ void Game::RefreshBot() {
 				newinfo.support_master_rule_3 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_3");
 				newinfo.support_new_master_rule = !!strstr(linebuf, "SUPPORT_NEW_MASTER_RULE");
 				newinfo.support_master_rule_2020 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_2020");
+				newinfo.select_deckfile = !!strstr(linebuf, "SELECT_DECKFILE");
 				int rule = cbBotRule->getSelected() + 3;
 				if((rule == 3 && newinfo.support_master_rule_3)
 					|| (rule == 4 && newinfo.support_new_master_rule)
@@ -1138,8 +1197,23 @@ void Game::RefreshBot() {
 	for(unsigned int i = 0; i < botInfo.size(); ++i) {
 		lstBotList->addItem(botInfo[i].name);
 	}
-	if(botInfo.size() == 0)
+	if(botInfo.size() == 0) {
 		SetStaticText(stBotInfo, 200, guiFont, dataManager.GetSysString(1385));
+	}
+	else {
+		cbBotDeck->clear();
+		cbBotDeck->setVisible(false);
+		irr::gui::IGUIComboBox* cbDeck = cbBotDeck;
+		FileSystem::TraversalDir(gameConf.bot_deck_path, [cbDeck](const wchar_t* name, bool isdir) {
+			if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
+				size_t len = wcslen(name);
+				wchar_t deckname[256];
+				wcsncpy(deckname, name, len - 4);
+				deckname[len - 4] = 0;
+				cbDeck->addItem(deckname);
+			}
+		});
+	}
 }
 void Game::LoadConfig() {
 	FILE* fp = fopen("system.conf", "r");
@@ -1153,7 +1227,7 @@ void Game::LoadConfig() {
 	gameConf.use_image_scale = 1;
 	gameConf.antialias = 0;
 	gameConf.serverport = 7911;
-	gameConf.textfontsize = 12;
+	gameConf.textfontsize = 14;
 	gameConf.nickname[0] = 0;
 	gameConf.gamename[0] = 0;
 	gameConf.bot_deck_path[0] = 0;
@@ -1164,6 +1238,7 @@ void Game::LoadConfig() {
 	gameConf.lasthost[0] = 0;
 	gameConf.lastport[0] = 0;
 	gameConf.roompass[0] = 0;
+	gameConf.bot_deck_path[0] = 0;
 	//settings
 	gameConf.chkMAutoPos = 0;
 	gameConf.chkSTAutoPos = 1;
@@ -1208,7 +1283,7 @@ void Game::LoadConfig() {
 			enable_log = atoi(valbuf);
 		} else if(!strcmp(strbuf, "textfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
-			int textfontsize;
+			int textfontsize = gameConf.textfontsize;
 			sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &textfontsize);
 			gameConf.textfontsize = textfontsize;
 			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
@@ -1226,6 +1301,9 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "roompass")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
+		} else if(!strcmp(strbuf, "bot_deck_path")) {
+			BufferIO::DecodeUTF8(valbuf, wstr);
+			BufferIO::CopyWStr(wstr, gameConf.bot_deck_path, 64);
 		} else if(!strcmp(strbuf, "automonsterpos")) {
 			gameConf.chkMAutoPos = atoi(valbuf);
 		} else if(!strcmp(strbuf, "autospellpos")) {
