@@ -1230,7 +1230,6 @@ void Game::LoadConfig() {
 	gameConf.textfontsize = 14;
 	gameConf.nickname[0] = 0;
 	gameConf.gamename[0] = 0;
-	gameConf.bot_deck_path[0] = 0;
 	gameConf.lastcategory[0] = 0;
 	gameConf.lastdeck[0] = 0;
 	gameConf.numfont[0] = 0;
@@ -1376,9 +1375,6 @@ void Game::LoadConfig() {
 			} else if (!strcmp(strbuf, "gamename")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.gamename, 20);
-			} else if (!strcmp(strbuf, "bot_deck_path")) {
-				BufferIO::DecodeUTF8(valbuf, wstr);
-				BufferIO::CopyWStr(wstr, gameConf.bot_deck_path, 64);
 			} else if (!strcmp(strbuf, "lastcategory")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.lastcategory, 64);
