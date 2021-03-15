@@ -768,9 +768,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					const wchar_t* deck_string = Utils::OSOperator->getTextFromClipboard();
 					if(deck_string) {
 						if(wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0)
-							gdeckManager->ImportDeckBase64(gdeckManager->current_deck, deck_string);
+							DeckManager::ImportDeckBase64(gdeckManager->current_deck, deck_string);
 						else
-							(void)gdeckManager->ImportDeckBase64Omega(gdeckManager->current_deck, deck_string);
+							(void)DeckManager::ImportDeckBase64Omega(gdeckManager->current_deck, deck_string);
 					}
 				}
 				break;

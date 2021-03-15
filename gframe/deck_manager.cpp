@@ -285,7 +285,7 @@ uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const 
 				errorcode = code;
 				continue;
 			}
-			cd = GetDummyOrMappedCardData(code);
+			cd = gdeckManager->GetDummyOrMappedCardData(code);
 		}
 		if(!cd || cd->type & TYPE_TOKEN)
 			continue;
@@ -302,7 +302,7 @@ uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const 
 					errorcode = code;
 					continue;
 				}
-				cd = GetDummyOrMappedCardData(code);
+				cd = gdeckManager->GetDummyOrMappedCardData(code);
 			}
 			if(!cd || cd->type & TYPE_TOKEN)
 				continue;
@@ -315,7 +315,7 @@ uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const 
 				errorcode = code;
 				continue;
 			}
-			cd = GetDummyOrMappedCardData(code);
+			cd = gdeckManager->GetDummyOrMappedCardData(code);
 		}
 		if(!cd || cd->type & TYPE_TOKEN)
 			continue;
