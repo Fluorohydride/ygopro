@@ -766,6 +766,9 @@ bool Game::Initialize() {
 		btnBotCancel = env->addButton(rect<s32>(459, 331, 569, 356), tabBot, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
 		env->addStaticText(dataManager.GetSysString(1382), rect<s32>(360, 10, 550, 30), false, true, tabBot);
 		stBotInfo = env->addStaticText(L"", rect<s32>(360, 40, 560, 160), false, true, tabBot);
+		cbBotDeckCategory = env->addComboBox(rect<s32>(360, 95, 560, 120), tabBot, COMBOBOX_BOT_DECKCATEGORY);
+		cbBotDeckCategory->setMaxSelectionRows(6);
+		cbBotDeckCategory->setVisible(false);
 		cbBotDeck = env->addComboBox(rect<s32>(360, 130, 560, 155), tabBot);
 		cbBotDeck->setMaxSelectionRows(6);
 		cbBotDeck->setVisible(false);
@@ -1194,6 +1197,8 @@ void Game::RefreshBot() {
 	}
 	lstBotList->clear();
 	stBotInfo->setText(L"");
+	cbBotDeckCategory->setVisible(false);
+	cbBotDeck->setVisible(false);
 	for(unsigned int i = 0; i < botInfo.size(); ++i) {
 		lstBotList->addItem(botInfo[i].name);
 	}
@@ -1201,18 +1206,7 @@ void Game::RefreshBot() {
 		SetStaticText(stBotInfo, 200, guiFont, dataManager.GetSysString(1385));
 	}
 	else {
-		cbBotDeck->clear();
-		cbBotDeck->setVisible(false);
-		irr::gui::IGUIComboBox* cbDeck = cbBotDeck;
-		FileSystem::TraversalDir(gameConf.bot_deck_path, [cbDeck](const wchar_t* name, bool isdir) {
-			if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
-				size_t len = wcslen(name);
-				wchar_t deckname[256];
-				wcsncpy(deckname, name, len - 4);
-				deckname[len - 4] = 0;
-				cbDeck->addItem(deckname);
-			}
-		});
+		RefreshCategoryDeck(cbBotDeckCategory, cbBotDeck);
 	}
 }
 void Game::LoadConfig() {

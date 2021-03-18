@@ -375,6 +375,7 @@ public:
 	irr::gui::IGUIStaticText* stBotInfo;
 	irr::gui::IGUIButton* btnStartBot;
 	irr::gui::IGUIButton* btnBotCancel;
+	irr::gui::IGUIComboBox* cbBotDeckCategory;
 	irr::gui::IGUIComboBox* cbBotDeck;
 	irr::gui::IGUIComboBox* cbBotRule;
 	irr::gui::IGUICheckBox* chkBotHand;
@@ -646,6 +647,7 @@ extern Game* mainGame;
 #define LISTBOX_BOT_LIST			153
 #define BUTTON_BOT_START			154
 #define COMBOBOX_BOT_RULE			155
+#define COMBOBOX_BOT_DECKCATEGORY	156
 #define EDITBOX_CHAT				199
 
 #define BUTTON_MSG_OK				200
