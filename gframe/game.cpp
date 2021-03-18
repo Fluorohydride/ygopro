@@ -722,6 +722,9 @@ bool Game::Initialize() {
 		btnBotCancel = env->addButton(rect<s32>(459, 331, 569, 356), tabBot, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
 		env->addStaticText(dataManager.GetSysString(1382), rect<s32>(360, 10, 550, 30), false, true, tabBot);
 		stBotInfo = env->addStaticText(L"", rect<s32>(360, 40, 560, 160), false, true, tabBot);
+		cbBotDeck = env->addComboBox(rect<s32>(360, 130, 560, 155), tabBot);
+		cbBotDeck->setMaxSelectionRows(6);
+		cbBotDeck->setVisible(false);
 		cbBotRule = env->addComboBox(rect<s32>(360, 165, 560, 190), tabBot, COMBOBOX_BOT_RULE);
 		cbBotRule->addItem(dataManager.GetSysString(1262));
 		cbBotRule->addItem(dataManager.GetSysString(1263));
@@ -1105,6 +1108,7 @@ void Game::RefreshBot() {
 				newinfo.support_master_rule_3 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_3");
 				newinfo.support_new_master_rule = !!strstr(linebuf, "SUPPORT_NEW_MASTER_RULE");
 				newinfo.support_master_rule_2020 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_2020");
+				newinfo.select_deckfile = !!strstr(linebuf, "SELECT_DECKFILE");
 				int rule = cbBotRule->getSelected() + 3;
 				if((rule == 3 && newinfo.support_master_rule_3)
 					|| (rule == 4 && newinfo.support_new_master_rule)
@@ -1120,8 +1124,23 @@ void Game::RefreshBot() {
 	for(unsigned int i = 0; i < botInfo.size(); ++i) {
 		lstBotList->addItem(botInfo[i].name);
 	}
-	if(botInfo.size() == 0)
+	if(botInfo.size() == 0) {
 		SetStaticText(stBotInfo, 200, guiFont, dataManager.GetSysString(1385));
+	}
+	else {
+		cbBotDeck->clear();
+		cbBotDeck->setVisible(false);
+		irr::gui::IGUIComboBox* cbDeck = cbBotDeck;
+		FileSystem::TraversalDir(gameConf.bot_deck_path, [cbDeck](const wchar_t* name, bool isdir) {
+			if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
+				size_t len = wcslen(name);
+				wchar_t deckname[256];
+				wcsncpy(deckname, name, len - 4);
+				deckname[len - 4] = 0;
+				cbDeck->addItem(deckname);
+			}
+		});
+	}
 }
 void Game::LoadConfig() {
 	FILE* fp = fopen("system.conf", "r");
@@ -1144,6 +1163,7 @@ void Game::LoadConfig() {
 	gameConf.lasthost[0] = 0;
 	gameConf.lastport[0] = 0;
 	gameConf.roompass[0] = 0;
+	gameConf.bot_deck_path[0] = 0;
 	//settings
 	gameConf.chkMAutoPos = 0;
 	gameConf.chkSTAutoPos = 1;
@@ -1284,6 +1304,9 @@ void Game::LoadConfig() {
 			} else if (!strcmp(strbuf, "lastdeck")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
+			} else if(!strcmp(strbuf, "bot_deck_path")) {
+				BufferIO::DecodeUTF8(valbuf, wstr);
+				BufferIO::CopyWStr(wstr, gameConf.bot_deck_path, 64);
 			}
 		}
 	}
@@ -1335,6 +1358,8 @@ void Game::SaveConfig() {
 	fprintf(fp, "ignore_deck_changes = %d\n", (chkIgnoreDeckChanges->isChecked() ? 1 : 0));
 	fprintf(fp, "default_ot = %d\n", gameConf.defaultOT);
 	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
+	BufferIO::EncodeUTF8(gameConf.bot_deck_path, linebuf);
+	fprintf(fp, "bot_deck_path = %s\n", linebuf);
 	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
 	fprintf(fp, "draw_single_chain = %d\n", gameConf.draw_single_chain);
