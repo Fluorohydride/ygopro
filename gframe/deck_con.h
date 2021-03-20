@@ -21,6 +21,14 @@ public:
 	void ClearSearch();
 	void SortList();
 
+	void RefreshDeckList();
+	void RefreshReadonly(int catesel);
+	void ChangeCategory(int catesel);
+	void ShowDeckManage();
+	void ShowBigCard(int code, float zoom);
+	void ZoomBigCard(s32 centerx = -1, s32 centery = -1);
+	void CloseBigCard();
+
 	bool CardNameContains(const wchar_t *haystack, const wchar_t *needle);
 
 	bool push_main(code_pointer pointer, int seq = -1);
