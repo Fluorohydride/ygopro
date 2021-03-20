@@ -242,7 +242,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) ||
 			(mainGame->wLinkMarks->isVisible() && id != BUTTON_MARKERS_OK) ||
 			(mainGame->wDMQuery->isVisible() && id != BUTTON_DM_OK && id != BUTTON_DM_CANCEL) ||
-			(mainGame->wDeckManage->isVisible() && !(id >= WINDOW_DECK_MANAGE && id <= LISTBOX_DECKS)))
+			(mainGame->wDeckManage->isVisible() && !(id >= WINDOW_DECK_MANAGE && id < COMBOBOX_LFLIST)))
 			&& event.GUIEvent.EventType != irr::gui::EGET_LISTBOX_CHANGED
 			&& event.GUIEvent.EventType != irr::gui::EGET_COMBO_BOX_CHANGED) {
 			if(mainGame->wDMQuery->isVisible())
