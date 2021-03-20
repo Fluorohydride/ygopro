@@ -37,16 +37,16 @@ public:
 #ifdef YGOPRO_SERVER_MODE
 	void RefreshMzone(int player, int flag = 0x881fff, int use_cache = 1, DuelPlayer* dp = 0);
 	void RefreshSzone(int player, int flag = 0x681fff, int use_cache = 1, DuelPlayer* dp = 0);
-	void RefreshHand(int player, int flag = 0x781fff, int use_cache = 1, DuelPlayer* dp = 0);
+	void RefreshHand(int player, int flag = 0x681fff, int use_cache = 1, DuelPlayer* dp = 0);
 	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1, DuelPlayer* dp = 0);
-	void RefreshExtra(int player, int flag = 0x81fff, int use_cache = 1, DuelPlayer* dp = 0);
+	void RefreshExtra(int player, int flag = 0xe81fff, int use_cache = 1, DuelPlayer* dp = 0);
 	void RefreshRemoved(int player, int flag = 0x81fff, int use_cache = 1, DuelPlayer* dp = 0);
 #else
 	void RefreshMzone(int player, int flag = 0x881fff, int use_cache = 1);
 	void RefreshSzone(int player, int flag = 0x681fff, int use_cache = 1);
-	void RefreshHand(int player, int flag = 0x781fff, int use_cache = 1);
+	void RefreshHand(int player, int flag = 0x681fff, int use_cache = 1);
 	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1);
-	void RefreshExtra(int player, int flag = 0x81fff, int use_cache = 1);
+	void RefreshExtra(int player, int flag = 0xe81fff, int use_cache = 1);
 #endif
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 
