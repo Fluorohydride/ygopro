@@ -143,7 +143,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
 				cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 				cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
-				cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
+				cscg.info.lflist = mainGame->cbHostLFlist->getItemData(mainGame->cbHostLFlist->getSelected());
 				cscg.info.duel_rule = mainGame->cbDuelRule->getSelected() + 1;
 				cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 				cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();

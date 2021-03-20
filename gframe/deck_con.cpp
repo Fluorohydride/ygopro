@@ -183,8 +183,7 @@ void DeckBuilder::Initialize() {
 	mainGame->btnSideShuffle->setVisible(false);
 	mainGame->btnSideSort->setVisible(false);
 	mainGame->btnSideReload->setVisible(false);
-	filterList = &deckManager._lfList[0].content;
-	mainGame->cbLFList->setSelected(0);
+	filterList = &deckManager._lfList[mainGame->gameConf.use_lflist ? mainGame->gameConf.default_lflist : deckManager._lfList.size() - 1].content;
 	ClearSearch();
 	mouse_pos.set(0, 0);
 	hovered_code = 0;
@@ -243,7 +242,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) ||
 			(mainGame->wLinkMarks->isVisible() && id != BUTTON_MARKERS_OK) ||
 			(mainGame->wDMQuery->isVisible() && id != BUTTON_DM_OK && id != BUTTON_DM_CANCEL) ||
-			(mainGame->wDeckManage->isVisible() && !(id >= WINDOW_DECK_MANAGE && id <= COMBOBOX_LFLIST)))
+			(mainGame->wDeckManage->isVisible() && !(id >= WINDOW_DECK_MANAGE && id <= LISTBOX_DECKS)))
 			&& event.GUIEvent.EventType != irr::gui::EGET_LISTBOX_CHANGED
 			&& event.GUIEvent.EventType != irr::gui::EGET_COMBO_BOX_CHANGED) {
 			if(mainGame->wDMQuery->isVisible())
@@ -901,10 +900,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
-			case COMBOBOX_LFLIST: {
-				filterList = &deckManager._lfList[mainGame->cbLFList->getSelected()].content;
-				break;
-			}
 			case COMBOBOX_DBCATEGORY: {
 				if(havePopupWindow()) {
 					mainGame->cbDBCategory->setSelected(prev_category);

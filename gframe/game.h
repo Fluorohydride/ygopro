@@ -35,6 +35,8 @@ struct Config {
 	int chkWaitChain;
 	int chkIgnore1;
 	int chkIgnore2;
+	int use_lflist;
+	int default_lflist;
 	int default_rule;
 	int hide_setname;
 	int hide_hint_button;
@@ -298,6 +300,8 @@ public:
 	irr::gui::IGUICheckBox* chkAutoSearch;
 	irr::gui::IGUICheckBox* chkMultiKeywords;
 	irr::gui::IGUICheckBox* chkPreferExpansionScript;
+	irr::gui::IGUICheckBox* chkLFlist;
+	irr::gui::IGUIComboBox* cbLFlist;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIScrollBar* scrSoundVolume;
@@ -328,7 +332,7 @@ public:
 	irr::gui::IGUIButton* btnCreateHost;
 	//create host
 	irr::gui::IGUIWindow* wCreateHost;
-	irr::gui::IGUIComboBox* cbLFlist;
+	irr::gui::IGUIComboBox* cbHostLFlist;
 	irr::gui::IGUIComboBox* cbMatchMode;
 	irr::gui::IGUIComboBox* cbRule;
 	irr::gui::IGUIEditBox* ebTimeLimit;
@@ -519,7 +523,6 @@ public:
 	irr::gui::IGUIComboBox* cbDMCategory;
 	irr::gui::IGUIButton* btnDMOK;
 	irr::gui::IGUIButton* btnDMCancel;
-	irr::gui::IGUIComboBox* cbLFList;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
 	irr::gui::IGUIScrollBar* scrFilter;
@@ -782,6 +785,7 @@ extern Game* mainGame;
 #define CHECKBOX_MULTI_KEYWORDS		372
 #define CHECKBOX_PREFER_EXPANSION	373
 #define CHECKBOX_DRAW_SINGLE_CHAIN	374
+#define CHECKBOX_LFLIST				375
 #define BUTTON_BIG_CARD_CLOSE		380
 #define BUTTON_BIG_CARD_ZOOM_IN		381
 #define BUTTON_BIG_CARD_ZOOM_OUT	382
