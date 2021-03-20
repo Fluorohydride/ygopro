@@ -429,7 +429,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1471));
 				mainGame->ebDMName->setVisible(true);
-				mainGame->ebDMName->setText(L"");
+				mainGame->ebDMName->setText(mainGame->lstDecks->getListItem(mainGame->lstDecks->getSelected()));
 				mainGame->PopupElement(mainGame->wDMQuery);
 				mainGame->gMutex.unlock();
 				prev_operation = id;
