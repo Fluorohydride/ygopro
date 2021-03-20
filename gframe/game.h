@@ -143,9 +143,6 @@ public:
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
 	void WaitFrameSignal(int frame);
 	void DrawThumb(code_pointer cp, position2di pos, const std::unordered_map<int,int>* lflist, bool drag = false);
-	void DrawDeck();
-	void DrawPack();
-	void DrawSearchResults();
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();

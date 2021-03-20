@@ -271,34 +271,6 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 	LoadDeck(current_deck, cardlist, mainc, sidec);
 	return true;
 }
-bool DeckManager::LoadPack(const wchar_t* file) {
-	pack.clear();
-	//for(int i=1;i<=80;i++)
-	//pack.push_back(dataManager.GetCodePointer(102380));
-	int code;
-	FILE* fp = OpenDeckFile(file, "r");
-	if(!fp) {
-		wchar_t localfile[64];
-		myswprintf(localfile, L"./deck/%ls.ydk", file);
-		fp = OpenDeckFile(localfile, "r");
-	}
-	if(!fp)
-		return false;
-	char linebuf[256];
-	while(fgets(linebuf, 256, fp)) {
-		if(linebuf[0] == '!') {
-			continue;
-		}
-		if(linebuf[0] < '0' || linebuf[0] > '9')
-			continue;
-		code = atoi(linebuf);
-		pack.push_back(dataManager.GetCodePointer(code));
-		//pack.push_back(dataManager.GetCodePointer(code));
-	}
-	fclose(fp);
-
-	return true;
-}
 bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
 	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
 		return false;
