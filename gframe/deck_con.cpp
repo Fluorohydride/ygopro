@@ -346,7 +346,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				int catesel = mainGame->lstCategories->getSelected();
 				if(catesel != 2)
 					mainGame->cbDMCategory->addItem(dataManager.GetSysString(1452));
-				for(int i = 4;i < mainGame->lstCategories->getItemCount();i++) {
+				for(int i = 4; i < mainGame->lstCategories->getItemCount(); i++) {
 					if(i != catesel)
 						mainGame->cbDMCategory->addItem(mainGame->lstCategories->getListItem(i));
 				}
@@ -363,7 +363,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				int catesel = mainGame->lstCategories->getSelected();
 				if(catesel != 2)
 					mainGame->cbDMCategory->addItem(dataManager.GetSysString(1452));
-				for(int i = 4;i < mainGame->lstCategories->getItemCount();i++) {
+				for(int i = 4; i < mainGame->lstCategories->getItemCount(); i++) {
 					if(i != catesel)
 						mainGame->cbDMCategory->addItem(mainGame->lstCategories->getListItem(i));
 				}
@@ -381,9 +381,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDBCategory->addItem(catename);
 						mainGame->lstCategories->addItem(catename);
 						catesel = mainGame->lstCategories->getItemCount() - 1;
-					}
-					else {
-						for(int i = 3;i < mainGame->lstCategories->getItemCount();i++) {
+					} else {
+						for(int i = 3; i < mainGame->lstCategories->getItemCount(); i++) {
 							if(!mywcsncasecmp(mainGame->lstCategories->getListItem(i), catename, 256)) {
 								catesel = i;
 								mainGame->stACMessage->setText(dataManager.GetSysString(1474));
@@ -413,7 +412,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						catesel = mainGame->lstCategories->getItemCount() - 1;
 					} else {
 						catesel = 0;
-						for(int i = 3;i < mainGame->lstCategories->getItemCount();i++) {
+						for(int i = 3; i < mainGame->lstCategories->getItemCount(); i++) {
 							if(!mywcsncasecmp(mainGame->lstCategories->getListItem(i), newcatename, 256)) {
 								catesel = i;
 								mainGame->stACMessage->setText(dataManager.GetSysString(1474));
@@ -444,8 +443,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDBCategory->setSelected(catesel);
 						ChangeCategory(catesel);
 					} else {
-							mainGame->stACMessage->setText(dataManager.GetSysString(1476));
-							mainGame->PopupElement(mainGame->wACMessage, 20);
+						mainGame->stACMessage->setText(dataManager.GetSysString(1476));
+						mainGame->PopupElement(mainGame->wACMessage, 20);
 					}
 					break;
 				}
@@ -464,7 +463,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						RefreshDeckList();
 						ChangeCategory(mainGame->lstCategories->getSelected());
 					}
-					for(int i = 0;i < mainGame->lstDecks->getItemCount();i++) {
+					for(int i = 0; i < mainGame->lstDecks->getItemCount(); i++) {
 						if(!mywcsncasecmp(mainGame->lstDecks->getListItem(i), deckname, 256)) {
 							deckManager.LoadDeck(filepath);
 							prev_deck = i;
@@ -498,7 +497,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					}
 					RefreshDeckList();
 					ChangeCategory(catesel);
-					for(int i = 0;i < mainGame->lstDecks->getItemCount();i++) {
+					for(int i = 0; i < mainGame->lstDecks->getItemCount(); i++) {
 						if(!mywcsncasecmp(mainGame->lstDecks->getListItem(i), newdeckname, 256)) {
 							deckManager.LoadDeck(newfilepath);
 							prev_deck = i;
@@ -562,7 +561,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					RefreshDeckList();
 					mainGame->cbDBCategory->setSelected(catesel);
 					ChangeCategory(catesel);
-					for(int i = 0;i < mainGame->lstDecks->getItemCount();i++) {
+					for(int i = 0; i < mainGame->lstDecks->getItemCount(); i++) {
 						if(!mywcsncasecmp(mainGame->lstDecks->getListItem(i), deckname, 256)) {
 							deckManager.LoadDeck(newfilepath);
 							prev_deck = i;
@@ -600,7 +599,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					RefreshDeckList();
 					mainGame->cbDBCategory->setSelected(catesel);
 					ChangeCategory(catesel);
-					for(int i = 0;i < mainGame->lstDecks->getItemCount();i++) {
+					for(int i = 0; i < mainGame->lstDecks->getItemCount(); i++) {
 						if(!mywcsncasecmp(mainGame->lstDecks->getListItem(i), deckname, 256)) {
 							deckManager.LoadDeck(newfilepath);
 							prev_deck = i;
@@ -633,8 +632,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SIDE_OK: {
-				if(deckManager.current_deck.main.size() != pre_mainc || deckManager.current_deck.extra.size() != pre_extrac
-				        || deckManager.current_deck.side.size() != pre_sidec) {
+				if(deckManager.current_deck.main.size() != pre_mainc
+					|| deckManager.current_deck.extra.size() != pre_extrac
+					|| deckManager.current_deck.side.size() != pre_sidec) {
 					soundManager.PlaySoundEffect(SOUND_INFO);
 					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1410));
 					break;
@@ -727,8 +727,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wQuery);
 				if(prev_operation == COMBOBOX_DBCATEGORY) {
 					mainGame->cbDBCategory->setSelected(prev_category);
-				}
-				else if(prev_operation == COMBOBOX_DBDECKS) {
+				} else if(prev_operation == COMBOBOX_DBDECKS) {
 					mainGame->cbDBDecks->setSelected(prev_deck);
 				}
 				prev_operation = 0;
@@ -1436,7 +1435,7 @@ void DeckBuilder::FilterCards() {
 		}
 		if(filter_effect && !(data.category & filter_effect))
 			continue;
-		if(filter_marks && (data.link_marker & filter_marks)!= filter_marks)
+		if(filter_marks && (data.link_marker & filter_marks) != filter_marks)
 			continue;
 		if(filter_lm) {
 			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList).at(ptr->first) != filter_lm - 1))
@@ -1682,22 +1681,21 @@ static inline wchar_t NormalizeChar(wchar_t c) {
 	}
 	return c;
 }
-bool DeckBuilder::CardNameContains(const wchar_t *haystack, const wchar_t *needle)
-{
-	if (!needle[0]) {
+bool DeckBuilder::CardNameContains(const wchar_t* haystack, const wchar_t* needle) {
+	if(!needle[0]) {
 		return true;
 	}
-	if (!haystack) {
+	if(!haystack) {
 		return false;
 	}
 	int i = 0;
 	int j = 0;
-	while (haystack[i]) {
+	while(haystack[i]) {
 		wchar_t ca = NormalizeChar(haystack[i]);
 		wchar_t cb = NormalizeChar(needle[j]);
-		if (ca == cb) {
+		if(ca == cb) {
 			j++;
-			if (!needle[j]) {
+			if(!needle[j]) {
 				return true;
 			}
 		} else {
