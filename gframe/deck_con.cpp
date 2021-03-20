@@ -58,52 +58,6 @@ static bool check_set_code(const CardDataC& data, int set_code) {
 	return res;
 }
 
-inline void ShowBigCard(int code, float zoom) {
-	mainGame->deckBuilder.bigcard_code = code;
-	mainGame->deckBuilder.bigcard_zoom = zoom;
-	ITexture* img = imageManager.GetBigPicture(code, zoom);
-	mainGame->imgBigCard->setImage(img);
-	auto size = img->getSize();
-	s32 left = mainGame->window_size.Width / 2 - size.Width / 2;
-	s32 top = mainGame->window_size.Height / 2 - size.Height / 2;
-	mainGame->imgBigCard->setRelativePosition(recti(0, 0, size.Width, size.Height));
-	mainGame->wBigCard->setRelativePosition(recti(left, top, left + size.Width, top + size.Height));
-	mainGame->gMutex.lock();
-	mainGame->btnBigCardOriginalSize->setVisible(true);
-	mainGame->btnBigCardZoomIn->setVisible(true);
-	mainGame->btnBigCardZoomOut->setVisible(true);
-	mainGame->btnBigCardClose->setVisible(true);
-	mainGame->ShowElement(mainGame->wBigCard);
-	mainGame->env->getRootGUIElement()->bringToFront(mainGame->wBigCard);
-	mainGame->gMutex.unlock();
-}
-inline void ZoomBigCard(s32 centerx = -1, s32 centery = -1) {
-	if(mainGame->deckBuilder.bigcard_zoom >= 4)
-		mainGame->deckBuilder.bigcard_zoom = 4;
-	if(mainGame->deckBuilder.bigcard_zoom <= 0.2f)
-		mainGame->deckBuilder.bigcard_zoom = 0.2f;
-	ITexture* img = imageManager.GetBigPicture(mainGame->deckBuilder.bigcard_code, mainGame->deckBuilder.bigcard_zoom);
-	mainGame->imgBigCard->setImage(img);
-	auto size = img->getSize();
-	auto pos = mainGame->wBigCard->getRelativePosition();
-	if(centerx == -1) {
-		centerx = pos.UpperLeftCorner.X + pos.getWidth() / 2;
-		centery = pos.UpperLeftCorner.Y + pos.getHeight() * 0.444f;
-	}
-	float posx = (float)(centerx - pos.UpperLeftCorner.X) / pos.getWidth();
-	float posy = (float)(centery - pos.UpperLeftCorner.Y) / pos.getHeight();
-	s32 left = centerx - size.Width * posx;
-	s32 top = centery - size.Height * posy;
-	mainGame->imgBigCard->setRelativePosition(recti(0, 0, size.Width, size.Height));
-	mainGame->wBigCard->setRelativePosition(recti(left, top, left + size.Width, top + size.Height));
-}
-inline void CloseBigCard() {
-	mainGame->HideElement(mainGame->wBigCard);
-	mainGame->btnBigCardOriginalSize->setVisible(false);
-	mainGame->btnBigCardZoomIn->setVisible(false);
-	mainGame->btnBigCardZoomOut->setVisible(false);
-	mainGame->btnBigCardClose->setVisible(false);
-}
 void DeckBuilder::Initialize() {
 	mainGame->is_building = true;
 	mainGame->is_siding = false;
@@ -1126,6 +1080,54 @@ void DeckBuilder::SortList() {
 		break;
 	}
 }
+
+void DeckBuilder::ShowBigCard(int code, float zoom) {
+	bigcard_code = code;
+	bigcard_zoom = zoom;
+	ITexture* img = imageManager.GetBigPicture(code, zoom);
+	mainGame->imgBigCard->setImage(img);
+	auto size = img->getSize();
+	s32 left = mainGame->window_size.Width / 2 - size.Width / 2;
+	s32 top = mainGame->window_size.Height / 2 - size.Height / 2;
+	mainGame->imgBigCard->setRelativePosition(recti(0, 0, size.Width, size.Height));
+	mainGame->wBigCard->setRelativePosition(recti(left, top, left + size.Width, top + size.Height));
+	mainGame->gMutex.lock();
+	mainGame->btnBigCardOriginalSize->setVisible(true);
+	mainGame->btnBigCardZoomIn->setVisible(true);
+	mainGame->btnBigCardZoomOut->setVisible(true);
+	mainGame->btnBigCardClose->setVisible(true);
+	mainGame->ShowElement(mainGame->wBigCard);
+	mainGame->env->getRootGUIElement()->bringToFront(mainGame->wBigCard);
+	mainGame->gMutex.unlock();
+}
+void DeckBuilder::ZoomBigCard(s32 centerx, s32 centery) {
+	if(bigcard_zoom >= 4)
+		bigcard_zoom = 4;
+	if(bigcard_zoom <= 0.2f)
+		bigcard_zoom = 0.2f;
+	ITexture* img = imageManager.GetBigPicture(bigcard_code, bigcard_zoom);
+	mainGame->imgBigCard->setImage(img);
+	auto size = img->getSize();
+	auto pos = mainGame->wBigCard->getRelativePosition();
+	if(centerx == -1) {
+		centerx = pos.UpperLeftCorner.X + pos.getWidth() / 2;
+		centery = pos.UpperLeftCorner.Y + pos.getHeight() * 0.444f;
+	}
+	float posx = (float)(centerx - pos.UpperLeftCorner.X) / pos.getWidth();
+	float posy = (float)(centery - pos.UpperLeftCorner.Y) / pos.getHeight();
+	s32 left = centerx - size.Width * posx;
+	s32 top = centery - size.Height * posy;
+	mainGame->imgBigCard->setRelativePosition(recti(0, 0, size.Width, size.Height));
+	mainGame->wBigCard->setRelativePosition(recti(left, top, left + size.Width, top + size.Height));
+}
+void DeckBuilder::CloseBigCard() {
+	mainGame->HideElement(mainGame->wBigCard);
+	mainGame->btnBigCardOriginalSize->setVisible(false);
+	mainGame->btnBigCardZoomIn->setVisible(false);
+	mainGame->btnBigCardZoomOut->setVisible(false);
+	mainGame->btnBigCardClose->setVisible(false);
+}
+
 static inline wchar_t NormalizeChar(wchar_t c) {
 	/*
 	// Convert all symbols and punctuations to space.
