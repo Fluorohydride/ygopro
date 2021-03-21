@@ -21,6 +21,14 @@ public:
 	void ClearSearch();
 	void SortList();
 
+	void RefreshDeckList();
+	void RefreshReadonly(int catesel);
+	void ChangeCategory(int catesel);
+	void ShowDeckManage();
+	void ShowBigCard(int code, float zoom);
+	void ZoomBigCard(s32 centerx = -1, s32 centery = -1);
+	void CloseBigCard();
+
 	bool CardNameContains(const wchar_t *haystack, const wchar_t *needle);
 
 	bool push_main(code_pointer pointer, int seq = -1);
@@ -62,10 +70,12 @@ public:
 	size_t pre_extrac;
 	size_t pre_sidec;
 	code_pointer draging_pointer;
+	int prev_category;
 	int prev_deck;
 	s32 prev_operation;
 	int prev_sel;
 	bool is_modified;
+	bool readonly;
 
 	const std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;
