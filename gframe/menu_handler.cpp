@@ -374,10 +374,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						wcsncpy(deck_name, dash + 1, dot - dash - 1);
 						deck_name[dot - dash - 1] = L'\0';
 						mainGame->ebDeckname->setText(deck_name);
+						mainGame->cbDBCategory->setSelected(-1);
 						mainGame->cbDBDecks->setSelected(-1);
+						mainGame->btnManageDeck->setEnabled(false);
+						mainGame->cbDBCategory->setEnabled(false);
+						mainGame->cbDBDecks->setEnabled(false);
 					} else {
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 							if(!wcscmp(mainGame->cbDBDecks->getItem(i), open_file_name)) {
+								wcscpy(mainGame->gameConf.lastdeck, open_file_name);
 								mainGame->cbDBDecks->setSelected(i);
 								break;
 							}
