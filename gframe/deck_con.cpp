@@ -1573,6 +1573,7 @@ void DeckBuilder::RefreshReadonly(int catesel) {
 	bool hasDeck = mainGame->cbDBDecks->getItemCount() != 0;
 	readonly = catesel < 2;
 	mainGame->btnSaveDeck->setEnabled(!readonly);
+	mainGame->btnSaveDeckAs->setEnabled(!readonly);
 	mainGame->btnDeleteDeck->setEnabled(hasDeck && !readonly);
 	mainGame->btnRenameCategory->setEnabled(catesel > 3);
 	mainGame->btnDeleteCategory->setEnabled(catesel > 3);
