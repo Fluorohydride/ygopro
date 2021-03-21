@@ -42,10 +42,16 @@ public:
 	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
+	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
+	void GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	bool LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
 	FILE* OpenDeckFile(const wchar_t * file, const char * mode);
 	bool LoadDeck(const wchar_t* file);
-	bool SaveDeck(Deck& deck, const wchar_t* name);
-	bool DeleteDeck(Deck& deck, const wchar_t* name);
+	bool SaveDeck(Deck& deck, const wchar_t* file);
+	bool DeleteDeck(const wchar_t* file);
+	bool CreateCategory(const wchar_t* name);
+	bool RenameCategory(const wchar_t* oldname, const wchar_t* newname);
+	bool DeleteCategory(const wchar_t* name);
 };
 
 extern DeckManager deckManager;

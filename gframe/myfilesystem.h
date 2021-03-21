@@ -50,6 +50,37 @@ public:
 		return MakeDir(wdir);
 	}
 
+	static bool Rename(const wchar_t* woldname, const wchar_t* wnewname) {
+		return MoveFileW(woldname, wnewname);
+	}
+
+	static bool Rename(const char* oldname, const char* newname) {
+		wchar_t woldname[1024];
+		wchar_t wnewname[1024];
+		BufferIO::DecodeUTF8(oldname, woldname);
+		BufferIO::DecodeUTF8(newname, wnewname);
+		return Rename(woldname, wnewname);
+	}
+
+	static bool DeleteDir(const wchar_t* wdir) {
+		wchar_t pdir[256];
+		BufferIO::CopyWStr(wdir, pdir, 256);
+		pdir[wcslen(wdir) + 1] = 0;
+		SHFILEOPSTRUCTW lpFileOp;
+		lpFileOp.hwnd = NULL;
+		lpFileOp.wFunc = FO_DELETE;
+		lpFileOp.pFrom = pdir;
+		lpFileOp.pTo = 0;
+		lpFileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
+		return SHFileOperationW(&lpFileOp) == 0;
+	}
+
+	static bool DeleteDir(const char* dir) {
+		wchar_t wdir[1024];
+		BufferIO::DecodeUTF8(dir, wdir);
+		return DeleteDir(wdir);
+	}
+
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
 		wcscpy(findstr, wpath);
@@ -59,7 +90,8 @@ public:
 		if(fh == INVALID_HANDLE_VALUE)
 			return;
 		do {
-			cb(fdataw.cFileName, (fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+			if(mywcsncasecmp(fdataw.cFileName, L".", 1) && mywcsncasecmp(fdataw.cFileName, L"..", 2))
+				cb(fdataw.cFileName, (fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
 	}
@@ -111,6 +143,45 @@ public:
 		return MakeDir(dir);
 	}
 
+	static bool Rename(const wchar_t* woldname, const wchar_t* wnewname) {
+		char oldname[1024];
+		char newname[1024];
+		BufferIO::EncodeUTF8(woldname, oldname);
+		BufferIO::EncodeUTF8(wnewname, newname);
+		return Rename(oldname, newname);
+	}
+
+	static bool Rename(const char* oldname, const char* newname) {
+		return rename(oldname, newname) == 0;
+	}
+
+	static bool DeleteDir(const wchar_t* wdir) {
+		char dir[1024];
+		BufferIO::EncodeUTF8(wdir, dir);
+		return DeleteDir(dir);
+	}
+
+	static bool DeleteDir(const char* dir) {
+		bool success = true;
+		TraversalDir(dir, [dir, &success](const char *name, bool isdir) {
+			char full_path[256];
+			sprintf(full_path, "%s/%s", dir, name);
+			if (isdir)
+			{
+				if(!DeleteDir(full_path))
+					success = false;
+			}
+			else
+			{
+				if(unlink(full_path) != 0)
+					success = false;
+			}
+		});
+		if (rmdir(dir) != 0)
+			success = false;
+		return success;
+	}
+
 	struct file_unit {
 		std::string filename;
 		bool is_dir;
@@ -132,6 +203,8 @@ public:
 			stat(fname, &fileStat);
 			funit.filename = std::string(dirp->d_name);
 			funit.is_dir = S_ISDIR(fileStat.st_mode);
+			if(funit.is_dir && (strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0))
+				continue;
 			file_list.push_back(funit);
 		}
 		closedir(dir);

@@ -111,6 +111,7 @@ int main(int argc, char* argv[]) {
 			keep_on_return = true;
 		} else if(!wcscmp(wargv[i], L"-d")) { // Deck
 			++i;
+			ygo::mainGame->gameConf.lastcategory[0] = 0;
 			if(i + 1 < wargc) { // select deck
 				wcscpy(ygo::mainGame->gameConf.lastdeck, wargv[i]);
 				continue;
