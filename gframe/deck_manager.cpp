@@ -192,6 +192,7 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	deck = ndeck;
 	return true;
 }
+#ifndef YGOPRO_SERVER_MODE
 void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) {
 	wchar_t catepath[256];
 	switch(index) {
@@ -229,6 +230,7 @@ bool DeckManager::LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUICom
 	GetDeckFile(filepath, cbCategory, cbDeck);
 	return LoadDeck(filepath);
 }
+#endif
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 #ifdef WIN32
 	FILE* fp = _wfopen(file, (wchar_t*)mode);
