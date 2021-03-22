@@ -130,9 +130,9 @@ bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool c
 	if(client_thread.joinable())
 		client_thread.join();
 	mainGame->frameSignal.SetNoWait(false);
-	client_thread = std::thread(ClientThread);
 	stop_threads = false;
-	parsing_thread = std::thread(DuelClient::ParserThread);
+	parsing_thread = std::thread(ParserThread);
+	client_thread = std::thread(ClientThread);
 	return true;
 }
 void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
