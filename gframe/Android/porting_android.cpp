@@ -169,98 +169,71 @@ void cleanupAndroid() {
 	jvm->DetachCurrentThread();
 }
 
-void displayKeyboard(bool pShow) {
-	// Attaches the current thread to the JVM.
-	jint lResult;
-	jint lFlags = 0;
-
-	JavaVM* lJavaVM = app_global->activity->vm;
-	JNIEnv* lJNIEnv = app_global->activity->env;
-
-	JavaVMAttachArgs lJavaVMAttachArgs;
-	lJavaVMAttachArgs.version = JNI_VERSION_1_6;
-	lJavaVMAttachArgs.name = "NativeThread";
-	lJavaVMAttachArgs.group = nullptr;
-
-	lResult = lJavaVM->AttachCurrentThread(&lJNIEnv, &lJavaVMAttachArgs);
-	if(lResult == JNI_ERR) {
-		return;
-	}
-
+void displayKeyboard(bool pShow) {	
 	// Retrieves NativeActivity.
 	jobject lNativeActivity = app_global->activity->clazz;
-	jclass ClassNativeActivity = lJNIEnv->GetObjectClass(lNativeActivity);
+	jclass ClassNativeActivity = jnienv->GetObjectClass(lNativeActivity);
 
 	// Retrieves Context.INPUT_METHOD_SERVICE.
-	jclass ClassContext = lJNIEnv->FindClass("android/content/Context");
+	jclass ClassContext = jnienv->FindClass("android/content/Context");
 	jfieldID FieldINPUT_METHOD_SERVICE =
-		lJNIEnv->GetStaticFieldID(ClassContext,
+		jnienv->GetStaticFieldID(ClassContext,
 								  "INPUT_METHOD_SERVICE", "Ljava/lang/String;");
 	jobject INPUT_METHOD_SERVICE =
-		lJNIEnv->GetStaticObjectField(ClassContext,
+		jnienv->GetStaticObjectField(ClassContext,
 									  FieldINPUT_METHOD_SERVICE);
 
 	// Runs getSystemService(Context.INPUT_METHOD_SERVICE).
-	jclass ClassInputMethodManager = lJNIEnv->FindClass(
+	jclass ClassInputMethodManager = jnienv->FindClass(
 		"android/view/inputmethod/InputMethodManager");
-	jmethodID MethodGetSystemService = lJNIEnv->GetMethodID(
+	jmethodID MethodGetSystemService = jnienv->GetMethodID(
 		ClassNativeActivity, "getSystemService",
 		"(Ljava/lang/String;)Ljava/lang/Object;");
-	jobject lInputMethodManager = lJNIEnv->CallObjectMethod(
+	jobject lInputMethodManager = jnienv->CallObjectMethod(
 		lNativeActivity, MethodGetSystemService,
 		INPUT_METHOD_SERVICE);
 
 	// Runs getWindow().getDecorView().
-	jmethodID MethodGetWindow = lJNIEnv->GetMethodID(
+	jmethodID MethodGetWindow = jnienv->GetMethodID(
 		ClassNativeActivity, "getWindow",
 		"()Landroid/view/Window;");
-	jobject lWindow = lJNIEnv->CallObjectMethod(lNativeActivity,
+	jobject lWindow = jnienv->CallObjectMethod(lNativeActivity,
 												MethodGetWindow);
-	jclass ClassWindow = lJNIEnv->FindClass(
+	jclass ClassWindow = jnienv->FindClass(
 		"android/view/Window");
-	jmethodID MethodGetDecorView = lJNIEnv->GetMethodID(
+	jmethodID MethodGetDecorView = jnienv->GetMethodID(
 		ClassWindow, "getDecorView", "()Landroid/view/View;");
-	jobject lDecorView = lJNIEnv->CallObjectMethod(lWindow,
+	jobject lDecorView = jnienv->CallObjectMethod(lWindow,
 												   MethodGetDecorView);
 
+	jint lFlags = 0;
 	if(pShow) {
 		// Runs lInputMethodManager.showSoftInput(...).
-		jmethodID MethodShowSoftInput = lJNIEnv->GetMethodID(
+		jmethodID MethodShowSoftInput = jnienv->GetMethodID(
 			ClassInputMethodManager, "showSoftInput",
 			"(Landroid/view/View;I)Z");
-		jboolean lResult = lJNIEnv->CallBooleanMethod(
+		jboolean lResult = jnienv->CallBooleanMethod(
 			lInputMethodManager, MethodShowSoftInput,
 			lDecorView, lFlags);
 	} else {
 		// Runs lWindow.getViewToken()
-		jclass ClassView = lJNIEnv->FindClass(
+		jclass ClassView = jnienv->FindClass(
 			"android/view/View");
-		jmethodID MethodGetWindowToken = lJNIEnv->GetMethodID(
+		jmethodID MethodGetWindowToken = jnienv->GetMethodID(
 			ClassView, "getWindowToken", "()Landroid/os/IBinder;");
-		jobject lBinder = lJNIEnv->CallObjectMethod(lDecorView,
+		jobject lBinder = jnienv->CallObjectMethod(lDecorView,
 													MethodGetWindowToken);
 
 		// lInputMethodManager.hideSoftInput(...).
-		jmethodID MethodHideSoftInput = lJNIEnv->GetMethodID(
+		jmethodID MethodHideSoftInput = jnienv->GetMethodID(
 			ClassInputMethodManager, "hideSoftInputFromWindow",
 			"(Landroid/os/IBinder;I)Z");
-		jboolean lRes = lJNIEnv->CallBooleanMethod(
+		jboolean lRes = jnienv->CallBooleanMethod(
 			lInputMethodManager, MethodHideSoftInput,
 			lBinder, lFlags);
 	}
-
-	// Finished with the JVM.
-	lJavaVM->DetachCurrentThread();
 }
 
-/**
- * show text input dialog in java
- * @param acceptButton text to display on accept button
- * @param hint hint to show
- * @param current initial value to display
- * @param editType type of texfield
- * (1==multiline text input; 2==single line text input; 3=password field)
- */
 void showInputDialog(epro::path_stringview current) {
 	jmethodID showdialog = jnienv->GetMethodID(nativeActivity, "showDialog", JPARAMS(JSTRING)JVOID);
 
