@@ -134,8 +134,7 @@ public:
 	std::wstring FormatRace(uint32_t race, bool isSkill = false);
 	std::wstring FormatType(uint32_t type);
 	std::wstring FormatScope(uint32_t scope, bool hideOCGTCG = false);
-	std::wstring FormatSetName(uint64_t setcode);
-	std::wstring FormatSetName(std::vector<uint16_t> setcodes);
+	std::wstring FormatSetName(const std::vector<uint16_t>& setcodes);
 	std::wstring FormatLinkMarker(uint32_t link_marker);
 
 	std::unordered_map<uint32_t, CardDataM> cards;

@@ -59,8 +59,7 @@ sqlite3* DataManager::OpenDb(epro::path_stringview file) {
 }
 
 sqlite3* DataManager::OpenDb(irr::io::IReadFile* reader) {
-	const irr::core::stringc tmp(reader->getFileName());
-	cur_database = { tmp.c_str(), tmp.size() };
+	cur_database = fmt::to_string(irr::core::stringc{ reader->getFileName() });
 	sqlite3* pDB{ nullptr };
 	if(irrdb_open(reader, &pDB, SQLITE_OPEN_READONLY) != SQLITE_OK) {
 		Error(pDB);
@@ -338,7 +337,7 @@ std::vector<uint32_t> DataManager::GetSetCode(std::vector<std::wstring>& setname
 			continue;
 		const auto str = Utils::ToUpperNoAccents(string.second.second.size() ? string.second.second : string.second.first);
 		if(str.find(L'|') != std::wstring::npos){
-			for(auto& name : Utils::TokenizeString<std::wstring>(str, L"|")) {
+			for(auto& name : Utils::TokenizeString<std::wstring>(str, L'|')) {
 				if(Utils::ContainsSubstring(name, setname)) {
 					res.push_back(string.first);
 					break;
@@ -356,6 +355,11 @@ std::wstring DataManager::GetNumString(int num, bool bracket) {
 		return fmt::to_wstring(num);
 	return fmt::format(L"({})", num);
 }
+template<typename T1, typename T2>
+static inline void appendstring(T1& to, const T2& what) {
+	to.append(what.data(), what.size());
+}
+
 epro::wstringview DataManager::FormatLocation(uint32_t location, int sequence) {
 	if(location == 0x8) {
 		if(sequence < 5)
@@ -381,8 +385,8 @@ std::wstring DataManager::FormatAttribute(uint32_t attribute) {
 	for(; filter != 0x80; filter <<= 1, ++i) {
 		if(attribute & filter) {
 			if(!res.empty())
-				res += L"|";
-			res += GetSysString(i).data();
+				res += L'|';
+			appendstring(res, GetSysString(i));
 		}
 	}
 	if(res.empty())
@@ -395,8 +399,8 @@ std::wstring DataManager::FormatRace(uint32_t race, bool isSkill) {
 	for(int i = isSkill ? 2100 : 1020; filter != 0x2000000; filter <<= 1, ++i) {
 		if(race & filter) {
 			if(!res.empty())
-				res += L"|";
-			res += GetSysString(i).data();
+				res += L'|';
+			appendstring(res, GetSysString(i));
 		}
 	}
 	if(res.empty())
@@ -406,18 +410,18 @@ std::wstring DataManager::FormatRace(uint32_t race, bool isSkill) {
 std::wstring DataManager::FormatType(uint32_t type) {
 	std::wstring res;
 	if(type & TYPE_SKILL)
-		res += GetSysString(1077).data();
+		appendstring(res, GetSysString(1077));
 	if(type & TYPE_ACTION) {
 		if (!res.empty())
-			res += L"|";
-		res += GetSysString(1078).data();
+			res += L'|';
+		appendstring(res, GetSysString(1078));
 	}
 	int i = 1050;
 	for(uint32_t filter = 1; filter != TYPE_SKILL; filter <<= 1, ++i) {
 		if(type & filter) {
 			if(!res.empty())
-				res += L"|";
-			res += GetSysString(i).data();
+				res += L'|';
+			appendstring(res, GetSysString(i));
 		}
 	}
 	if(res.empty())
@@ -443,70 +447,52 @@ std::wstring DataManager::FormatScope(uint32_t scope, bool hideOCGTCG) {
 			if (!buffer.empty()) {
 				buffer += L'/';
 			}
-			buffer += GetSysString(tuple.second).data();
+			appendstring(buffer, GetSysString(tuple.second));
 		}
 	}
 	return buffer;
 }
-std::wstring DataManager::FormatSetName(uint64_t setcode) {
-	std::wstring res;
-	for(int i = 0; i < 4; ++i) {
-		auto name = GetSetName((setcode >> i * 16) & 0xffff);
-		if(!res.empty() && !name.empty())
-			res += L"|";
-		res += name.data();
-	}
-	if(res.empty())
-		return unknown_string;
-	return res;
-}
-std::wstring DataManager::FormatSetName(std::vector<uint16_t> setcodes) {
+std::wstring DataManager::FormatSetName(const std::vector<uint16_t>& setcodes) {
 	std::wstring res;
 	for(auto& setcode : setcodes) {
+		if(!setcode)
+			break;
 		auto name = GetSetName(setcode);
-		if(!res.empty() && !name.empty())
-			res += L"|";
-		res += name.data();
+		if(!res.empty())
+			res += L'|';
+		if(name.empty())
+			res.append(unknown_string);
+		else
+			appendstring(res, name);
 	}
-	if(res.empty())
-		return unknown_string;
 	return res;
 }
 std::wstring DataManager::FormatLinkMarker(uint32_t link_marker) {
-	std::wstring res;
-	if(link_marker & LINK_MARKER_TOP_LEFT)
-		res += L"[\u2196]";
-	if(link_marker & LINK_MARKER_TOP)
-		res += L"[\u2191]";
-	if(link_marker & LINK_MARKER_TOP_RIGHT)
-		res += L"[\u2197]";
-	if(link_marker & LINK_MARKER_LEFT)
-		res += L"[\u2190]";
-	if(link_marker & LINK_MARKER_RIGHT)
-		res += L"[\u2192]";
-	if(link_marker & LINK_MARKER_BOTTOM_LEFT)
-		res += L"[\u2199]";
-	if(link_marker & LINK_MARKER_BOTTOM)
-		res += L"[\u2193]";
-	if(link_marker & LINK_MARKER_BOTTOM_RIGHT)
-		res += L"[\u2198]";
-	return res;
+	return fmt::format(L"{}{}{}{}{}{}{}{}",
+					   (link_marker & LINK_MARKER_TOP_LEFT)		? L"[\u2196]" : L"",
+					   (link_marker & LINK_MARKER_TOP)			? L"[\u2191]" : L"",
+					   (link_marker & LINK_MARKER_TOP_RIGHT)	? L"[\u2197]" : L"",
+					   (link_marker & LINK_MARKER_LEFT)			? L"[\u2190]" : L"",
+					   (link_marker & LINK_MARKER_RIGHT)		? L"[\u2192]" : L"",
+					   (link_marker & LINK_MARKER_BOTTOM_LEFT)	? L"[\u2199]" : L"",
+					   (link_marker & LINK_MARKER_BOTTOM)		? L"[\u2193]" : L"",
+					   (link_marker & LINK_MARKER_BOTTOM_RIGHT)	? L"[\u2198]" : L"");
 }
 void DataManager::CardReader(void* payload, uint32_t code, OCG_CardData* data) {
 	auto carddata = static_cast<DataManager*>(payload)->GetCardData(code);
 	if(carddata != nullptr)
 		memcpy(data, carddata, sizeof(CardData));
 }
-bool is_skill(uint32_t type) {
+inline bool is_skill(uint32_t type) {
 	return (type & (TYPE_SKILL | TYPE_ACTION));
 }
-bool check_both_skills(uint32_t type1, uint32_t type2) {
+inline bool check_both_skills(uint32_t type1, uint32_t type2) {
 	return is_skill(type1) && is_skill(type2);
 }
-bool check_either_skills(uint32_t type1, uint32_t type2) {
+inline bool check_either_skills(uint32_t type1, uint32_t type2) {
 	return is_skill(type1) || is_skill(type2);
 }
-bool check_skills(CardDataC* p1, CardDataC* p2) {
+inline bool check_skills(CardDataC* p1, CardDataC* p2) {
 	if(check_both_skills(p1->type, p2->type)) {
 		if((p1->type & 0xfffffff8) == (p2->type & 0xfffffff8)) {
 			return p1->code < p2->code;
