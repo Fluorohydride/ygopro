@@ -4114,9 +4114,8 @@ void DuelClient::SetResponseB(void* respB, uint32_t len) {
 	memcpy(response_buf.data(), respB, len);
 }
 void DuelClient::SendResponse() {
-	if(answered)
+	if(answered.exchange(true))
 		return;
-	answered = true;
 	auto& msg = mainGame->dInfo.curMsg;
 	switch(msg) {
 	case MSG_SELECT_BATTLECMD:
