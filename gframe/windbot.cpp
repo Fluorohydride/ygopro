@@ -26,33 +26,20 @@ WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool cha
 	//Windows can modify this string
 	auto args = Utils::ToPathString(fmt::format(
 		L"WindBot.exe HostInfo=\"{}\" Deck=\"{}\" Port={} Version={} name=\"[AI] {}\" Chat={} Hand={} AssetPath=./WindBot",
-		pass,
-		deck,
-		port,
-		version,
-		name,
-		chat,
-		hand));
+		pass, deck, port, version, name, chat, hand));
 	STARTUPINFO si{ sizeof(si) };
-	PROCESS_INFORMATION pi{};
 	si.dwFlags = STARTF_USESHOWWINDOW;
 	si.wShowWindow = SW_HIDE;
-	if(CreateProcess(EPRO_TEXT("./WindBot/WindBot.exe"), &args[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi)) {
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-		return true;
-	}
-	return false;
+	PROCESS_INFORMATION pi;
+	if(!CreateProcess(L"./WindBot/WindBot.exe", &args[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi))
+		return false;
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+	return true;
 #elif defined(__ANDROID__)
 	auto param = BufferIO::EncodeUTF8(fmt::format(
 		L"HostInfo='{}' Deck='{}' Port={} Version={} Name='[AI] {}' Chat={} Hand={}",
-		pass,
-		deck,
-		port,
-		version,
-		name,
-		static_cast<int>(chat),
-		hand));
+		pass, deck, port, version, name, static_cast<int>(chat), hand));
 	porting::launchWindbot(param);
 	return true;
 #else
