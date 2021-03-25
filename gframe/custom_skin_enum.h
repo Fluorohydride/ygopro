@@ -9,7 +9,6 @@ enum CustomSkinElements {
 #define DECLR(what,val) what,
 #include "custom_skin_enum.inl"
 #undef DECLR
-	LAST_PLACEHOLDER
 };
 
 #define DECLR(what,val) extern irr::video::SColor what##_VAL;
