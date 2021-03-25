@@ -130,11 +130,6 @@ struct VersionError {
 	char : 8; //padding to keep the client version in
 	char : 8; //the same place as the other error codes
 	char : 8;
-	enum JERR_TYPE : uint32_t {
-		JERR_UNABLE,
-		JERR_PASSWORD,
-		JERR_REFUSED
-	};
 	ClientVersion version;
 	VersionError(ClientVersion _version) :version(_version) {};
 	VersionError() {};
