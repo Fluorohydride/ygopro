@@ -24,7 +24,7 @@ CGUISkinSystem::CGUISkinSystem(io::path path, IrrlichtDevice *dev) {
 // Generate a list of all directory names in skinsPath that have a skin.xml in them
 
 bool CGUISkinSystem::loadSkinList() {
-	epro::path_stringview skinpath{ skinsPath.c_str(), skinsPath.size() };
+	epro::path_stringview skinpath{ skinsPath.data(), skinsPath.size() };
 	ygo::Utils::FindFiles(skinpath, [this, &skinpath](epro::path_stringview name, bool isdir) {
 		if(!isdir || name == EPRO_TEXT(".") || (name == EPRO_TEXT("..")))
 			return;
@@ -51,7 +51,7 @@ bool CGUISkinSystem::populateTreeView(gui::IGUITreeView *control, const core::st
 	io::path oldpath = fs->getWorkingDirectory();
 	fs->changeWorkingDirectoryTo(skinsPath);
 	registry = new CXMLRegistry(fs);
-	if(!registry->loadFile(SKINSYSTEM_SKINFILE,skinname.c_str())) {
+	if(!registry->loadFile(SKINSYSTEM_SKINFILE,skinname.data())) {
 		fs->changeWorkingDirectoryTo(oldpath);
 		return ret;
 	}
@@ -70,29 +70,29 @@ void CGUISkinSystem::ParseGUIElementStyle(gui::SImageGUIElementStyle& elem, cons
 	context += name;
 	core::rect<u32> box;
 	video::SColor col;
-	ctmp = registry->getValueAsCStr(L"texture", context.c_str());
+	ctmp = registry->getValueAsCStr(L"texture", context.data());
 	if(!ctmp.size())
 		err += "Could not load texture property from skin file";
 
 	elem.Texture = device->getVideoDriver()->getTexture(workingDir + "/" + ctmp);
 
-	box = registry->getValueAsRect((context + "/SrcBorder").c_str());
+	box = registry->getValueAsRect((context + "/SrcBorder").data());
 	elem.SrcBorder.Top = box.UpperLeftCorner.X;
 	elem.SrcBorder.Left = box.UpperLeftCorner.Y;
 	elem.SrcBorder.Bottom = box.LowerRightCorner.X;
 	elem.SrcBorder.Right = box.LowerRightCorner.Y;
 
-	box = registry->getValueAsRect((context + "/DstBorder").c_str());
+	box = registry->getValueAsRect((context + "/DstBorder").data());
 	elem.DstBorder.Top = box.UpperLeftCorner.X;
 	elem.DstBorder.Left = box.UpperLeftCorner.Y;
 	elem.DstBorder.Bottom = box.LowerRightCorner.X;
 	elem.DstBorder.Right = box.LowerRightCorner.Y;
 	if(nullcolors) elem.Color = { 0 };
-	col = registry->getValueAsColor((context + "/Color").c_str());
+	col = registry->getValueAsColor((context + "/Color").data());
 	if(col.color)
 		elem.Color = col;
 	else {
-		col = registry->getValueAsColor((context + "/Colour").c_str());
+		col = registry->getValueAsColor((context + "/Colour").data());
 		if(col.color)
 			elem.Color = col;
 	}
@@ -114,7 +114,7 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 	core::stringc tmp;
 	io::path path = workingDir + "/./";
 	path += skinname;
-	if(!registry->loadFile(SKINSYSTEM_SKINFILE, path.c_str())) {
+	if(!registry->loadFile(SKINSYSTEM_SKINFILE, path.data())) {
 		return NULL;
 	}
 	// Easiest way to see if an xml is loading correctly
@@ -136,7 +136,7 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 
 	skin = new gui::CImageGUISkin(device->getVideoDriver(), device->getGUIEnvironment()->getSkin());
 	workingDir = path;
-	//fs->changeWorkingDirectoryTo(path.c_str());
+	//fs->changeWorkingDirectoryTo(path.data());
 	ParseGUIElementStyle(skinConfig.Button, "Button");
 	ParseGUIElementStyle(skinConfig.ButtonPressed, "Button/Pressed");
 	ParseGUIElementStyle(skinConfig.ButtonDisabled, "Button/ButtonDisabled");
@@ -175,7 +175,7 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 	skin->loadConfig(skinConfig);
 
 	/*tmp = registry->getValueAsCStr(L"texture",L"Skin/Properties/Font");
-	gui::IGUIFont *font = device->getGUIEnvironment()->getFont(tmp.c_str());
+	gui::IGUIFont *font = device->getGUIEnvironment()->getFont(tmp.data());
 	if(font !=0) {
 		device->getGUIEnvironment()->getSkin()->setFont(font, gui::EGDF_DEFAULT);
 		device->getGUIEnvironment()->getSkin()->setFont(font, gui::EGDF_WINDOW);
@@ -344,7 +344,7 @@ bool CGUISkinSystem::checkSkinText(gui::EGUI_DEFAULT_TEXT textToSet, const wchar
 bool CGUISkinSystem::loadProperty(core::stringw key, gui::CImageGUISkin *skin) {
 	core::stringw wtmp = "Skin/Properties/";
 	wtmp += key;
-	wtmp = registry->getValueAsCStr(L"data", wtmp.c_str());
+	wtmp = registry->getValueAsCStr(L"data", wtmp.data());
 	if(wtmp.size()) {
 		skin->setProperty(key, wtmp);
 		return true;
@@ -352,20 +352,19 @@ bool CGUISkinSystem::loadProperty(core::stringw key, gui::CImageGUISkin *skin) {
 	return false;
 }
 bool CGUISkinSystem::loadCustomColors(gui::CImageGUISkin * skin) {
-	static const std::map<std::wstring, ygo::skin::CustomSkinElements> alias = {
+	static const std::map<epro::wstringview, ygo::skin::CustomSkinElements> alias = {
 #define DECLR(what,val) { L""#what, ygo::skin::CustomSkinElements::what },
 #include "../custom_skin_enum.inl"
 #undef DECLR
-		{ L"LAST_PLACEHOLDER", ygo::skin::CustomSkinElements::LAST_PLACEHOLDER }
 	};
 	core::stringw wtmp = "Skin/Custom/";
-	core::array<const wchar_t*>* children = registry->listNodeChildren(L"", wtmp.c_str());
+	core::array<const wchar_t*>* children = registry->listNodeChildren(L"", wtmp.data());
 	if(!children) return false;
 	for(u32 i = 0; i < children->size(); i++) {
 		core::stringw tmpchild = (*children)[i];
-		video::SColor color = registry->getValueAsColor((wtmp + tmpchild).c_str());
+		video::SColor color = registry->getValueAsColor((wtmp + tmpchild).data());
 		if(color.color) {
-			auto found = alias.find(tmpchild.c_str());
+			auto found = alias.find({ tmpchild.data(), tmpchild.size() });
 			if(found != alias.end())
 				skin->setCustomColor(found->second, color);
 		}
