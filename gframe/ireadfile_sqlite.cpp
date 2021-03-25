@@ -1,4 +1,5 @@
 #include "ireadfile_sqlite.h"
+#include <limits>
 #include <cstdio>
 #include <cstring>
 #include <sqlite3.h>
@@ -130,8 +131,9 @@ std::unique_ptr<sqlite3_vfs> irrsqlite_createfilesystem() {
 }
 
 int irrdb_open(irr::io::IReadFile* reader, sqlite3 **ppDb, int flags) {
-	char buff[0x20]{};
-	std::snprintf(buff, sizeof(buff), "%p", &reader);
+	char buff[std::numeric_limits<uintptr_t>::digits / 2];
+	if(std::snprintf(buff, sizeof(buff), "%p", &reader) >= sizeof(buff))
+		return SQLITE_ERROR;
 	return sqlite3_open_v2(buff, ppDb, flags, IRR_VFS_NAME);
 }
 
