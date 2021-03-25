@@ -32,6 +32,14 @@ ImageManager::~ImageManager() {
 	cv.notify_all();
 	obj_clear_lock.unlock();
 	obj_clear_thread.join();
+	for(auto& it : g_imgCache) {
+		if(it.second)
+			it.second->drop();
+	}
+	for(auto& it : g_txrCache) {
+		if(it.second)
+			driver->removeTexture(it.second);
+	}
 }
 bool ImageManager::Initial() {
 	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
