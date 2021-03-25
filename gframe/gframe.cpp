@@ -264,8 +264,8 @@ int _tmain(int argc, epro::path_char* argv[]) {
 			CheckArguments(argc - skipped, argv + skipped);
 		}
 		reset = ygo::mainGame->MainLoop();
+		data->tmp_device = ygo::mainGame->device;
 		if(reset) {
-			data->tmp_device = ygo::mainGame->device;
 			data->tmp_device->setEventReceiver(nullptr);
 			/*the gles drivers have an additional cache, that isn't cleared when the textures are removed,
 			since it's not a big deal clearing them, as they'll be reused, they aren't cleared*/
@@ -276,6 +276,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 			data->tmp_device->getGUIEnvironment()->clear();
 		}
 	} while(reset);
+	data->tmp_device->drop();
 	ThreadsCleanup();
 	return EXIT_SUCCESS;
 }
