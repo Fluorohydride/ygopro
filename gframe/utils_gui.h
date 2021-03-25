@@ -18,6 +18,7 @@ void ChangeCursor(irr::IrrlichtDevice* device, /*irr::gui::ECURSOR_ICON*/ int ic
 bool TakeScreenshot(irr::IrrlichtDevice* device);
 void ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen);
 void ShowErrorWindow(epro::stringview context, epro::stringview message);
+std::string SerializeWindowPosition(irr::IrrlichtDevice* device);
 
 }
 

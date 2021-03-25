@@ -28,6 +28,22 @@ extern android_app* app_global;
 
 namespace ygo {
 
+#ifdef _WIN32
+static HWND GetWindowHandle(irr::video::IVideoDriver* driver) {
+	switch(driver->getDriverType()) {
+	case irr::video::EDT_DIRECT3D8:
+		return static_cast<HWND>(driver->getExposedVideoData().D3D8.HWnd);
+	case irr::video::EDT_DIRECT3D9:
+		return static_cast<HWND>(driver->getExposedVideoData().D3D8.HWnd);
+	case irr::video::EDT_OPENGL:
+		return static_cast<HWND>(driver->getExposedVideoData().OpenGLWin32.HWnd);
+	default:
+		break;
+	}
+	return nullptr;
+}
+#endif
+
 irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = configs->antialias;
@@ -78,16 +94,16 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	device->setWindowCaption(L"Project Ignis: EDOPro");
 	device->setResizable(true);
 #ifdef _WIN32
-	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(nullptr);
-	HICON hSmallIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-	HICON hBigIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
-	HWND hWnd = reinterpret_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
-	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
-	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
+	auto hInstance = static_cast<HINSTANCE>(GetModuleHandle(nullptr));
+	auto hSmallIcon = static_cast<HICON>(LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR));
+	auto hBigIcon = static_cast<HICON>(LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR));
+	auto hWnd = GetWindowHandle(driver);
+	SendMessage(hWnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hSmallIcon));
+	SendMessage(hWnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hBigIcon));
 	if(gGameConfig->windowStruct.size()) {
 		auto winstruct = base64_decode(gGameConfig->windowStruct);
 		if(winstruct.size() == sizeof(WINDOWPLACEMENT))
-			SetWindowPlacement(hWnd, (WINDOWPLACEMENT*)winstruct.data());
+			SetWindowPlacement(hWnd, reinterpret_cast<WINDOWPLACEMENT*>(winstruct.data()));
 	}
 #endif
 	device->getLogger()->setLogLevel(irr::ELL_ERROR);
@@ -110,7 +126,7 @@ bool GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device) {
 	if(!image)
 		return false;
 	const auto now = std::time(nullptr);
-	auto filename = fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now));
+	const auto filename = fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now));
 	auto written = driver->writeImageToFile(image, { filename.data(), static_cast<irr::u32>(filename.size()) });
 	if(!written)
 		device->getLogger()->log(L"Failed to take screenshot.", irr::ELL_WARNING);
@@ -134,12 +150,12 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	static constexpr LONG_PTR fullscreenStyle = WS_POPUP | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 	static const auto monitors = [] {
 		std::vector<RECT> ret;
-		EnumDisplayMonitors(0, 0, callback, (LPARAM)&ret);
+		EnumDisplayMonitors(0, 0, callback, reinterpret_cast<LPARAM>(&ret));
 		return ret;
 	}();
 	fullscreen = !fullscreen;
 	const auto driver = device->getVideoDriver();
-	HWND hWnd = reinterpret_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
+	auto hWnd = GetWindowHandle(driver);
 	if(fullscreen) {
 		GetWindowPlacement(hWnd, &nonFullscreenSize);
 		nonFullscreenStyle = GetWindowLongPtr(hWnd, GWL_STYLE);
@@ -263,6 +279,18 @@ void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview messag
 	//Clean up the strings
 	CFRelease(header_ref);
 	CFRelease(message_ref);
+#endif
+}
+
+std::string GUIUtils::SerializeWindowPosition(irr::IrrlichtDevice* device) {
+#ifdef _WIN32
+	auto hWnd = GetWindowHandle(device->getVideoDriver());
+	WINDOWPLACEMENT wp;
+	wp.length = sizeof(WINDOWPLACEMENT);
+	GetWindowPlacement(hWnd, &wp);
+	return base64_encode<std::string>(reinterpret_cast<uint8_t*>(&wp), sizeof(wp));
+#else
+	return std::string{};
 #endif
 }
 

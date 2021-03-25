@@ -2163,20 +2163,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			}
 			return true;
 		}
-#ifdef _WIN32
 		case irr::KEY_F10: {
-			if(event.KeyInput.Shift) {
-				gGameConfig->windowStruct = {};
-				break;
-			}
-			HWND hWnd = reinterpret_cast<HWND>(mainGame->driver->getExposedVideoData().D3D9.HWnd);
-			WINDOWPLACEMENT wp;
-			wp.length = sizeof(WINDOWPLACEMENT);
-			GetWindowPlacement(hWnd, &wp);
-			gGameConfig->windowStruct = base64_encode<std::string>(reinterpret_cast<uint8_t*>(&wp), sizeof(wp));
+			if(event.KeyInput.Shift)
+				gGameConfig->windowStruct.clear();
+			else
+				gGameConfig->windowStruct = GUIUtils::SerializeWindowPosition(mainGame->device);
 			return true;
 		}
-#endif
 		case irr::KEY_F11: {
 			if(!event.KeyInput.PressedDown) {
 				GUIUtils::ToggleFullscreen(mainGame->device, gGameConfig->fullscreen);
