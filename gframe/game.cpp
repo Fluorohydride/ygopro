@@ -73,6 +73,7 @@ Game::~Game() {
 	adFont->drop();
 	lpcFont->drop();
 	filesystem->drop();
+	delete skinSystem;
 }
 
 bool Game::Initialize() {
