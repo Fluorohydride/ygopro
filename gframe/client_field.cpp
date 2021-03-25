@@ -25,32 +25,27 @@
 namespace ygo {
 
 ClientField::ClientField() {
-	panel = 0;
-	hovered_card = 0;
-	clicked_card = 0;
-	highlighting_card = 0;
+	panel = nullptr;
+	hovered_card = nullptr;
+	clicked_card = nullptr;
+	highlighting_card = nullptr;
 	hovered_controler = 0;
 	hovered_location = 0;
 	hovered_sequence = 0;
 	selectable_field = 0;
 	selected_field = 0;
-	deck_act[0] = false;
-	deck_act[1] = false;
-	grave_act[0] = false;
-	grave_act[1] = false;
-	remove_act[0] = false;
-	remove_act[1] = false;
-	extra_act[0] = false;
-	extra_act[1] = false;
-	pzone_act[0] = false;
-	pzone_act[1] = false;
+	deck_act[0] = deck_act[1] = false;
+	grave_act[0] = grave_act[1] = false;
+	remove_act[0] = remove_act[1] = false;
+	extra_act[0] = extra_act[1] = false;
+	pzone_act[0] = pzone_act[1] = false;
 	conti_act = false;
 	deck_reversed = false;
 	conti_selecting = false;
 	for(int p = 0; p < 2; ++p) {
 		skills[p] = nullptr;
-		mzone[p].resize(7, 0);
-		szone[p].resize(8, 0);
+		mzone[p].resize(7, nullptr);
+		szone[p].resize(8, nullptr);
 	}
 }
 
@@ -63,8 +58,8 @@ void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
 		ClearVector(mzone[i]);
 		ClearVector(szone[i]);
-		mzone[i].resize(7, 0);
-		szone[i].resize(8, 0);
+		mzone[i].resize(7, nullptr);
+		szone[i].resize(8, nullptr);
 		ClearVector(deck[i]);
 		ClearVector(hand[i]);
 		ClearVector(grave[i]);
@@ -104,16 +99,11 @@ void ClientField::Clear() {
 	hovered_sequence = 0;
 	selectable_field = 0;
 	selected_field = 0;
-	deck_act[0] = false;
-	deck_act[1] = false;
-	grave_act[0] = false;
-	grave_act[1] = false;
-	remove_act[0] = false;
-	remove_act[1] = false;
-	extra_act[0] = false;
-	extra_act[1] = false;
-	pzone_act[0] = false;
-	pzone_act[1] = false;
+	deck_act[0] = deck_act[1] = false;
+	grave_act[0] = grave_act[1] = false;
+	remove_act[0] = remove_act[1] = false;
+	extra_act[0] = extra_act[1] = false;
+	pzone_act[0] = pzone_act[1] = false;
 	conti_act = false;
 	deck_reversed = false;
 }
@@ -349,24 +339,20 @@ void ClientField::UpdateFieldCard(uint8_t controler, uint8_t location, char* dat
 	}
 }
 void ClientField::ClearCommandFlag() {
-	for(auto& pcard : activatable_cards)  pcard->cmdFlag = 0;
-	for(auto& pcard : summonable_cards)   pcard->cmdFlag = 0;
-	for(auto& pcard : spsummonable_cards) pcard->cmdFlag = 0;
-	for(auto& pcard : msetable_cards)     pcard->cmdFlag = 0;
-	for(auto& pcard : ssetable_cards)     pcard->cmdFlag = 0;
-	for(auto& pcard : reposable_cards)    pcard->cmdFlag = 0;
-	for(auto& pcard : attackable_cards)   pcard->cmdFlag = 0;
+	auto ClearFlag = [](const std::vector<ClientCard*>& map) { for(auto& pcard : map) pcard->cmdFlag = 0; };
+	ClearFlag(activatable_cards);
+	ClearFlag(summonable_cards);
+	ClearFlag(spsummonable_cards);
+	ClearFlag(msetable_cards);
+	ClearFlag(ssetable_cards);
+	ClearFlag(reposable_cards);
+	ClearFlag(attackable_cards);
 	conti_cards.clear();
-	deck_act[0] = false;
-	deck_act[1] = false;
-	grave_act[0] = false;
-	grave_act[1] = false;
-	remove_act[0] = false;
-	remove_act[1] = false;
-	extra_act[0] = false;
-	extra_act[1] = false;
-	pzone_act[0] = false;
-	pzone_act[1] = false;
+	deck_act[0] = deck_act[1] = false;
+	grave_act[0] = grave_act[1] = false;
+	remove_act[0] = remove_act[1] = false;
+	extra_act[0] = extra_act[1] = false;
+	pzone_act[0] = pzone_act[1] = false;
 	conti_act = false;
 }
 void ClientField::ClearSelect() {
@@ -383,16 +369,11 @@ void ClientField::ClearChainSelect() {
 		pcard->is_selected = false;
 	}
 	conti_cards.clear();
-	deck_act[0] = false;
-	deck_act[1] = false;
-	grave_act[0] = false;
-	grave_act[1] = false;
-	remove_act[0] = false;
-	remove_act[1] = false;
-	extra_act[0] = false;
-	extra_act[1] = false;
-	pzone_act[0] = false;
-	pzone_act[1] = false;
+	deck_act[0] = deck_act[1] = false;
+	grave_act[0] = grave_act[1] = false;
+	remove_act[0] = remove_act[1] = false;
+	extra_act[0] = extra_act[1] = false;
+	pzone_act[0] = pzone_act[1] = false;
 	conti_act = false;
 }
 // needs to be synchronized with EGET_SCROLL_BAR_CHANGED
@@ -660,15 +641,15 @@ void ClientField::ShowSelectOption(uint64_t select_hint, bool should_lock) {
 	mainGame->PopupElement(mainGame->wOptions);
 }
 void ClientField::ReplaySwap() {
-	auto reset = [](ClientCard* pcard)->void {
+	auto reset = [](ClientCard* const& pcard)->void {
 		if(pcard) {
 			pcard->controler = 1 - pcard->controler;
 			pcard->UpdateDrawCoordinates(true);
 			pcard->is_moving = false;
 		}
 	};
-	auto resetloc = [&reset](std::vector<ClientCard*> zone)->void {
-		for(auto& pcard : zone)
+	auto resetloc = [&reset](const auto& zone)->void {
+		for(const auto& pcard : zone)
 			reset(pcard);
 	};
 	std::swap(deck[0], deck[1]);
@@ -690,8 +671,7 @@ void ClientField::ReplaySwap() {
 		resetloc(extra[p]);
 		reset(skills[p]);
 	}
-	for(auto& pcard : overlay_cards)
-		reset(pcard);
+	resetloc(overlay_cards);
 	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
 	mainGame->dInfo.isTeam1 = !mainGame->dInfo.isTeam1;
 	mainGame->dInfo.isReplaySwapped = !mainGame->dInfo.isReplaySwapped;
@@ -705,14 +685,14 @@ void ClientField::ReplaySwap() {
 	disabled_field = (disabled_field >> 16) | (disabled_field << 16);
 }
 void ClientField::RefreshAllCards() {
-	auto refresh = [](ClientCard* pcard) {
+	auto refresh = [](ClientCard* const& pcard) {
 		if(pcard) {
 			pcard->UpdateDrawCoordinates(true);
 			pcard->is_moving = false;
 		}
 	};
 	auto refreshloc = [&refresh](const auto& zone) {
-		for(auto& pcard : zone)
+		for(const auto& pcard : zone)
 			refresh(pcard);
 	};
 	for(int p = 0; p < 2; ++p) {
@@ -803,10 +783,9 @@ static void getCardScreenCoordinates(ClientCard* pcard) {
 	pcard->hand_collision = { upperleft, lowerright };
 }
 void ClientField::RefreshHandHitboxes() {
-	for(const auto& pcard : hand[0])
-		getCardScreenCoordinates(pcard);
-	for(const auto& pcard : hand[1])
-		getCardScreenCoordinates(pcard);
+	for(const auto& _hand : hand)
+		for(const auto& pcard : _hand)
+			getCardScreenCoordinates(pcard);
 }
 void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans) {
 	static const irr::core::vector3df selfATK{ 0.0f, 0.0f, 0.0f };
@@ -828,7 +807,7 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 	const int& location = pcard->location;
 	const int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
 	const int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
-	auto GetPos = [&location,&controler,&speed,&sequence,&field,&pcard]()->const irr::video::S3DVertex* {
+	auto GetPos = [&]()->const irr::video::S3DVertex* {
 		switch(location) {
 		case LOCATION_DECK:		return matManager.vFieldDeck[controler][speed];
 		case LOCATION_MZONE:	return matManager.vFieldMzone[controler][sequence];
@@ -922,7 +901,7 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 			getCardScreenCoordinates(pcard);
 	}
 }
-void ClientField::MoveCard(ClientCard * pcard, float frame) {
+void ClientField::MoveCard(ClientCard* pcard, float frame) {
 	float milliseconds = frame * 1000.0f / 60.0f;
 	irr::core::vector3df trans = pcard->curPos;
 	irr::core::vector3df rot = pcard->curRot;
@@ -954,7 +933,7 @@ void ClientField::MoveCard(ClientCard * pcard, float frame) {
 	pcard->refresh_on_stop = true;
 	pcard->aniFrame = milliseconds;
 }
-void ClientField::FadeCard(ClientCard * pcard, float alpha, float frame) {
+void ClientField::FadeCard(ClientCard* pcard, float alpha, float frame) {
 	float milliseconds = frame * 1000.0f / 60.0f;
 	pcard->dAlpha = (alpha - pcard->curAlpha) / milliseconds;
 	pcard->is_fading = true;
