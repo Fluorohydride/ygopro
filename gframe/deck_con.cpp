@@ -88,9 +88,7 @@ void DeckBuilder::Initialize() {
 	is_starting_dragging = false;
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_category = mainGame->cbDBCategory->getSelected();
-	readonly = prev_category < 2;
-	mainGame->btnSaveDeck->setEnabled(!readonly);
-	mainGame->btnDeleteDeck->setEnabled(!readonly);
+	RefreshReadonly(prev_category);
 	prev_operation = 0;
 	prev_sel = -1;
 	is_modified = false;
