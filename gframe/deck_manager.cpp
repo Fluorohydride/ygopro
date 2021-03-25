@@ -460,12 +460,9 @@ const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
 		for(size_t i = 0; i < src.size(); i++) {
 			cards[i] = src[i]->code;
 		}
-		res += base64_encode((uint8_t*)cards.data(), cards.size() * 4) + L'!';
+		return base64_encode((uint8_t*)cards.data(), cards.size() * sizeof(cardlist_type::value_type));
 	};
-	res = L"ydke://";
-	decktobuf(deck.main);
-	decktobuf(deck.extra);
-	decktobuf(deck.side);
+	res = fmt::format(L"ydke://{}!{}!{}!", decktobuf(deck.main), decktobuf(deck.extra), decktobuf(deck.side));
 	return res.data();
 }
 const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
