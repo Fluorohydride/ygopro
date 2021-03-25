@@ -295,7 +295,7 @@ void ServerLobby::JoinServer(bool host) {
 			if(*text == L'\0')
 				return;
 			mainGame->wRoomPassword->setVisible(false);
-			mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8(text);
+			mainGame->dInfo.secret.pass = text;
 		} else
 			mainGame->dInfo.secret.pass.clear();
 		if(!DuelClient::StartClient(serverinfo.first, serverinfo.second, room->id, false))

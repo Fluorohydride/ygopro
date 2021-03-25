@@ -107,7 +107,7 @@ void NetServer::BroadcastEvent(evutil_socket_t fd, short events, void* arg) {
 		hp.port = server_port;
 		hp.version = PRO_VERSION;
 		hp.host = duel_mode->host_info;
-		BufferIO::CopyWStr(duel_mode->name, hp.name, 20);
+		BufferIO::EncodeUTF16(duel_mode->name, hp.name, 20);
 		sendto(fd, (const char*)&hp, sizeof(HostPacket), 0, (sockaddr*)&sockTo, sizeof(sockTo));
 	}
 }
@@ -231,7 +231,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, uint32_t len) {
 	}
 	case CTOS_PLAYER_INFO: {
 		auto pkt = BufferIO::getStruct<CTOS_PlayerInfo>(pdata, len - 1);
-		BufferIO::CopyWStr(pkt.name, dp->name, 20);
+		BufferIO::CopyStr(pkt.name, dp->name, 20);
 		break;
 	}
 	case CTOS_CREATE_GAME: {
@@ -257,8 +257,8 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, uint32_t len) {
 		if(hash == 1)
 			pkt.info.lflist = gdeckManager->_lfList[0].hash;
 		duel_mode->host_info = pkt.info;
-		BufferIO::CopyWStr(pkt.name, duel_mode->name, 20);
-		BufferIO::CopyWStr(pkt.pass, duel_mode->pass, 20);
+		BufferIO::DecodeUTF16(pkt.name, duel_mode->name, 20);
+		BufferIO::DecodeUTF16(pkt.pass, duel_mode->pass, 20);
 		duel_mode->JoinGame(dp, 0, true);
 		StartBroadcast();
 		break;

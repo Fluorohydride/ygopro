@@ -193,7 +193,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					auto parsed = DuelClient::ResolveServer(mainGame->ebJoinHost->getText(), mainGame->ebJoinPort->getText());
 					gGameConfig->lasthost = mainGame->ebJoinHost->getText();
 					gGameConfig->lastport = mainGame->ebJoinPort->getText();
-					mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8(mainGame->ebJoinPass->getText());
+					mainGame->dInfo.secret.pass = mainGame->ebJoinPass->getText();
 					if(DuelClient::StartClient(parsed.first, parsed.second, 0, false)) {
 						mainGame->btnCreateHost->setEnabled(false);
 						mainGame->btnJoinHost->setEnabled(false);
@@ -488,7 +488,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_BOT_ADD: {
 				try {
 					int port = std::stoi(gGameConfig->serverport);
-					if(mainGame->gBot.LaunchSelected(port, BufferIO::DecodeUTF8(mainGame->dInfo.secret.pass)))
+					if(mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass))
 						break;
 				} catch(...) {}
 				mainGame->PopupMessage(L"Failed to launch windbot");
@@ -496,20 +496,20 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_EXPORT_DECK: {
 				auto sanitize = [](epro::path_string text) {
-					const wchar_t chars[] = L"<>:\"/\\|?*";
+					constexpr wchar_t chars[] = L"<>:\"/\\|?*";
 					for(auto& forbid : chars)
 						text.erase(std::remove(text.begin(), text.end(), forbid), text.end());
 					return text;
 				};
 				if(!ReplayMode::cur_replay.IsExportable())
 					break;
-				auto players = ReplayMode::cur_replay.GetPlayerNames();
+				const auto& players = ReplayMode::cur_replay.GetPlayerNames();
 				if(players.empty())
 					break;
-				auto decks = ReplayMode::cur_replay.GetPlayerDecks();
+				const auto& decks = ReplayMode::cur_replay.GetPlayerDecks();
 				if(players.size() > decks.size())
 					break;
-				auto replay_name = Utils::GetFileName(ReplayMode::cur_replay.GetReplayName());
+				const auto replay_name = Utils::GetFileName(ReplayMode::cur_replay.GetReplayName());
 				for(size_t i = 0; i < decks.size(); i++) {
 					gdeckManager->SaveDeck(fmt::format(EPRO_TEXT("{} player{:02} {}"), replay_name, i, sanitize(Utils::ToPathString(players[i]))), decks[i].main_deck, decks[i].extra_deck, cardlist_type());
 				}
@@ -701,7 +701,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					auto parsed = DuelClient::ResolveServer(mainGame->ebJoinHost->getText(), mainGame->ebJoinPort->getText());
 					gGameConfig->lasthost = mainGame->ebJoinHost->getText();
 					gGameConfig->lastport = mainGame->ebJoinPort->getText();
-					mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8(mainGame->ebJoinPass->getText());
+					mainGame->dInfo.secret.pass = mainGame->ebJoinPass->getText();
 					if(DuelClient::StartClient(parsed.first, parsed.second, 0, false)) {
 						mainGame->btnCreateHost->setEnabled(false);
 						mainGame->btnJoinHost->setEnabled(false);

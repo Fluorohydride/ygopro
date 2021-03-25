@@ -52,7 +52,8 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 	auto CreateSecret = [&secret_buf=secret_buf](bool update) {
 		if(update) {
 			auto& secret = ygo::mainGame->dInfo.secret;
-			fmt::format_to_n(secret_buf, sizeof(secret_buf), "{{\"id\": {},\"addr\" : {},\"port\" : {},\"pass\" : \"{}\" }}", secret.game_id, secret.server_address, secret.server_port, secret.pass.data());
+			fmt::format_to_n(secret_buf, sizeof(secret_buf), "{{\"id\": {},\"addr\" : {},\"port\" : {},\"pass\" : \"{}\" }}",
+							 secret.game_id, secret.server_address, secret.server_port, BufferIO::EncodeUTF8(secret.pass));
 		}
 		return secret_buf;
 	};
@@ -187,7 +188,7 @@ static void OnJoin(const char* secret, void* payload) {
 		host.game_id = json["id"].get<int>();
 		host.server_address = json["addr"].get<int>();
 		host.server_port = json["port"].get<int>();
-		host.pass = json["pass"].get<std::string>();
+		host.pass = BufferIO::DecodeUTF8(json["pass"].get_ref<const std::string&>());
 	}
 	catch(const std::exception& e) {
 		ygo::ErrorLog(fmt::format("Exception occurred: {}", e.what()));
@@ -195,22 +196,22 @@ static void OnJoin(const char* secret, void* payload) {
 	}
 	game->isHostingOnline = true;
 	if(ygo::DuelClient::StartClient(host.server_address, host.server_port, host.game_id, false)) {
-#define HIDE_AND_CHECK(obj) if(obj->isVisible()) game->HideElement(obj);
+#define HIDE_AND_CHECK(obj) do {if(obj->isVisible()) game->HideElement(obj);} while(0)
 		if(game->is_building)
 			game->deckBuilder.Terminate(false);
-		HIDE_AND_CHECK(game->wMainMenu)
-		HIDE_AND_CHECK(game->wLanWindow)
-		HIDE_AND_CHECK(game->wCreateHost)
-		HIDE_AND_CHECK(game->wReplay)
-		HIDE_AND_CHECK(game->wSinglePlay)
-		HIDE_AND_CHECK(game->wDeckEdit)
-		HIDE_AND_CHECK(game->wRules)
-		HIDE_AND_CHECK(game->wCustomRules)
-		HIDE_AND_CHECK(game->wRoomListPlaceholder)
-		HIDE_AND_CHECK(game->wCardImg)
-		HIDE_AND_CHECK(game->wInfos)
-		HIDE_AND_CHECK(game->btnLeaveGame)
-		HIDE_AND_CHECK(game->wReplaySave)
+		HIDE_AND_CHECK(game->wMainMenu);
+		HIDE_AND_CHECK(game->wLanWindow);
+		HIDE_AND_CHECK(game->wCreateHost);
+		HIDE_AND_CHECK(game->wReplay);
+		HIDE_AND_CHECK(game->wSinglePlay);
+		HIDE_AND_CHECK(game->wDeckEdit);
+		HIDE_AND_CHECK(game->wRules);
+		HIDE_AND_CHECK(game->wCustomRules);
+		HIDE_AND_CHECK(game->wRoomListPlaceholder);
+		HIDE_AND_CHECK(game->wCardImg);
+		HIDE_AND_CHECK(game->wInfos);
+		HIDE_AND_CHECK(game->btnLeaveGame);
+		HIDE_AND_CHECK(game->wReplaySave);
 		game->device->setEventReceiver(&game->menuHandler);
 #undef HIDE_AND_CHECK
 	}

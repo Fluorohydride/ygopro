@@ -59,10 +59,10 @@ int SingleMode::SinglePlayThread(DuelOptions duelOptions) {
 	std::string script_name = "";
 	auto InitReplay = [&]() {
 		uint16_t buffer[20];
-		BufferIO::CopyWStr(mainGame->dInfo.selfnames[0].data(), buffer, 20);
+		BufferIO::EncodeUTF16(mainGame->dInfo.selfnames[0].data(), buffer, 20);
 		last_replay.WriteData(buffer, 40, false);
 		new_replay.WriteData(buffer, 40, false);
-		BufferIO::CopyWStr(mainGame->dInfo.opponames[0].data(), buffer, 20);
+		BufferIO::EncodeUTF16(mainGame->dInfo.opponames[0].data(), buffer, 20);
 		last_replay.WriteData(buffer, 40, false);
 		new_replay.WriteData(buffer, 40, false);
 		last_replay.Write<uint32_t>(duelOptions.startingLP, false);

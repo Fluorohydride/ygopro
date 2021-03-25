@@ -33,7 +33,7 @@ void GenericDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 	STOC_Chat2 scc;
 	memcpy(scc.client_name, dp->name, 40);
 	uint16_t* msg = (uint16_t*)pdata;
-	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
+	int msglen = BufferIO::CopyStr(msg, scc.msg, 256);
 	if(dp->type >= NETPLAYER_TYPE_OBSERVER) {
 		scc.type = STOC_Chat2::PTYPE_OBS;
 		NetServer::SendBufferToPlayer(nullptr, STOC_CHAT_2, &scc, 4 + 40 + (msglen * 2));
@@ -174,7 +174,7 @@ void GenericDuel::JoinGame(DuelPlayer* dp, CTOS_JoinGame* pkt, bool is_creater) 
 			return;
 		}
 		wchar_t jpass[20];
-		BufferIO::CopyWStr(pkt->pass, jpass, 20);
+		BufferIO::DecodeUTF16(pkt->pass, jpass, 20);
 		if(wcscmp(jpass, pass)) {
 			JoinError scem{ JoinError::JERR_PASSWORD };
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
@@ -195,7 +195,7 @@ void GenericDuel::JoinGame(DuelPlayer* dp, CTOS_JoinGame* pkt, bool is_creater) 
 			std::swap(players.home, players.opposing);
 		IteratePlayers([this,&dp](DuelPlayer* dueler) {
 			STOC_HS_PlayerEnter scpe;
-			BufferIO::CopyWStr(dueler->name, scpe.name, 20);
+			BufferIO::CopyStr(dueler->name, scpe.name, 20);
 			scpe.pos = GetPos(dueler);
 			NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
 		});
@@ -216,7 +216,7 @@ void GenericDuel::JoinGame(DuelPlayer* dp, CTOS_JoinGame* pkt, bool is_creater) 
 	sctc.type = (host_player == dp) ? 0x10 : 0;
 	if(CheckFree(players.home) || CheckFree(players.opposing)) {
 		STOC_HS_PlayerEnter scpe;
-		BufferIO::CopyWStr(dp->name, scpe.name, 20);
+		BufferIO::CopyStr(dp->name, scpe.name, 20);
 		scpe.pos = GetFirstFree();
 		NetServer::SendPacketToPlayer(nullptr, STOC_HS_PLAYER_ENTER, scpe);
 		ResendToAll();
@@ -236,7 +236,7 @@ void GenericDuel::JoinGame(DuelPlayer* dp, CTOS_JoinGame* pkt, bool is_creater) 
 	NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
 	IteratePlayers([this,&dp](duelist& dueler) {
 		STOC_HS_PlayerEnter scpe;
-		BufferIO::CopyWStr(dueler.player->name, scpe.name, 20);
+		BufferIO::CopyStr(dueler.player->name, scpe.name, 20);
 		scpe.pos = GetPos(dueler);
 		NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
 		if(dueler.ready) {
@@ -321,7 +321,7 @@ void GenericDuel::ToDuelist(DuelPlayer* dp) {
 	if(dp->type == NETPLAYER_TYPE_OBSERVER) {
 		observers.erase(dp);
 		STOC_HS_PlayerEnter scpe;
-		BufferIO::CopyWStr(dp->name, scpe.name, 20);
+		BufferIO::CopyStr(dp->name, scpe.name, 20);
 		dp->type = pos;
 		scpe.pos = dp->type;
 		SetAtPos(dp, scpe.pos);
@@ -1304,7 +1304,7 @@ void GenericDuel::EndDuel() {
 }
 void GenericDuel::WaitforResponse(uint8_t playerid) {
 	last_response = playerid;
-	static const uint8_t msg = MSG_WAITING;
+	static constexpr uint8_t msg = MSG_WAITING;
 	NetServer::SendPacketToPlayer(nullptr, STOC_GAME_MSG, msg);
 	IteratePlayers([&player=cur_player[playerid]](DuelPlayer* dueler) {
 		if(dueler != player)

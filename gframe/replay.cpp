@@ -306,7 +306,7 @@ bool Replay::ReadName(wchar_t* data) {
 	uint16_t buffer[20];
 	if(!ReadData(buffer, 40))
 		return false;
-	BufferIO::CopyWStr(buffer, data, 20);
+	BufferIO::DecodeUTF16(buffer, data, 20);
 	return true;
 }
 void Replay::Reset() {
