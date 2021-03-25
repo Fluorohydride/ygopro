@@ -66,6 +66,15 @@ __forceinline irr::gui::IGUIComboBox* AddComboBox(irr::gui::IGUIEnvironment* env
 	return env->addComboBox(std::forward<Args>(args)...);
 }
 
+Game::~Game() {
+	guiFont->drop();
+	textFont->drop();
+	numFont->drop();
+	adFont->drop();
+	lpcFont->drop();
+	filesystem->drop();
+}
+
 bool Game::Initialize() {
 	dpi_scale = gGameConfig->dpi_scale;
 	if(!device)
@@ -100,6 +109,7 @@ bool Game::Initialize() {
 	});
 #endif
 	filesystem = device->getFileSystem();
+	filesystem->grab();
 	coreloaded = true;
 #ifdef YGOPRO_BUILD_DLL
 	if(!(ocgcore = LoadOCGcore(Utils::working_dir)) && !(ocgcore = LoadOCGcore(fmt::format(EPRO_TEXT("{}/expansions/"), Utils::working_dir))))
@@ -128,6 +138,7 @@ bool Game::Initialize() {
 	textFont = guiFont;
 	if(!textFont || !guiFont)
 		throw std::runtime_error("Failed to load text font");
+	textFont->grab();
 	if(!numFont || !adFont || !lpcFont)
 		throw std::runtime_error("Failed to load numbers font");
 	if(!ApplySkin(gGameConfig->skin, false, true))

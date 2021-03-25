@@ -115,6 +115,7 @@ struct FadingUnit {
 class Game {
 
 public:
+	~Game();
 	bool Initialize();
 	bool MainLoop();
 	epro::path_string NoSkinLabel();
