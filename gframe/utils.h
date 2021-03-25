@@ -31,7 +31,7 @@ struct unzip_payload {
 	void* payload;
 };
 
-using unzip_callback = std::function<void(unzip_payload* payload)>;
+using unzip_callback = void(*)(unzip_payload* payload);
 
 namespace ygo {
 	// Irrlicht has only one handle open per archive, which does not support concurrency and is not thread-safe.
@@ -316,28 +316,28 @@ inline bool Utils::KeepOnlyDigits(T& input, bool negative) {
 #undef CAST
 #undef CHAR_T
 
-epro::path_string Utils::ToPathString(epro::wstringview input) {
+inline epro::path_string Utils::ToPathString(epro::wstringview input) {
 #ifdef UNICODE
 	return { input.data(), input.size() };
 #else
 	return BufferIO::EncodeUTF8(input);
 #endif
 }
-epro::path_string Utils::ToPathString(epro::stringview input) {
+inline epro::path_string Utils::ToPathString(epro::stringview input) {
 #ifdef UNICODE
 	return BufferIO::DecodeUTF8(input);
 #else
 	return { input.data(), input.size() };
 #endif
 }
-std::string Utils::ToUTF8IfNeeded(epro::path_stringview input) {
+inline std::string Utils::ToUTF8IfNeeded(epro::path_stringview input) {
 #ifdef UNICODE
 	return BufferIO::EncodeUTF8(input);
 #else
 	return { input.data(), input.size() };
 #endif
 }
-std::wstring Utils::ToUnicodeIfNeeded(epro::path_stringview input) {
+inline std::wstring Utils::ToUnicodeIfNeeded(epro::path_stringview input) {
 #ifdef UNICODE
 	return { input.data(), input.size() };
 #else

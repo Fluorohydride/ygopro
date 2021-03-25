@@ -43,7 +43,7 @@ namespace WindowsWeirdStuff {
 
 //https://docs.microsoft.com/en-us/visualstudio/debugger/how-to-set-a-thread-name-in-native-code?view=vs-2015&redirectedfrom=MSDN
 
-constexpr DWORD MS_VC_EXCEPTION = 0x406D1388;
+static constexpr DWORD MS_VC_EXCEPTION = 0x406D1388;
 #pragma warning(push)
 #pragma warning(disable: 6320 6322)
 #pragma pack(push, 8)
@@ -54,7 +54,7 @@ struct THREADNAME_INFO {
 	DWORD dwFlags; // Reserved for future use, must be zero.
 };
 #pragma pack(pop)
-void NameThread(const char* threadName) {
+static inline void NameThread(const char* threadName) {
 	const THREADNAME_INFO info{ 0x1000, threadName, ((DWORD)-1), 0 };
 	__try {	RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info); }
 	__except(EXCEPTION_EXECUTE_HANDLER) {}
