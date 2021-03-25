@@ -16,7 +16,7 @@ GameConfig::GameConfig() {
 			try {
 				conf_file >> configs;
 			}
-			catch(std::exception& e) {
+			catch(const std::exception& e) {
 				ErrorLog(fmt::format("Exception occurred while loading configs.json: {}", e.what()));
 				//throw(e);
 			}
@@ -26,7 +26,7 @@ GameConfig::GameConfig() {
 			try {
 				user_conf_file >> user_configs;
 			}
-			catch(std::exception& e) {
+			catch(const std::exception& e) {
 				ErrorLog(fmt::format("Exception occurred while loading user_configs.json: {}", e.what()));
 				//throw(e);
 			}
