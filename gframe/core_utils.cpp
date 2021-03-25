@@ -318,13 +318,13 @@ loc_info ReadLocInfo(char*& p, bool compat) {
 		info.sequence = BufferIO::Read<uint8_t>(p);
 		info.position = BufferIO::Read<uint8_t>(p);
 	} else {
-		info.sequence = BufferIO::Read<int32_t>(p);
-		info.position = BufferIO::Read<int32_t>(p);
+		info.sequence = BufferIO::Read<uint32_t>(p);
+		info.position = BufferIO::Read<uint32_t>(p);
 	}
 	return info;
 }
 
-CoreUtils::PacketStream ParseMessages(OCG_Duel duel) {
+PacketStream ParseMessages(OCG_Duel duel) {
 	uint32_t message_len;
 	auto msg = OCG_DuelGetMessage(duel, &message_len);
 	if(message_len)
