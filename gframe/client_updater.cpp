@@ -22,6 +22,8 @@
 #endif
 #include "game_config.h"
 
+#define LOCKFILE EPRO_TEXT("./.edopro_lock")
+
 struct WritePayload {
 	std::vector<char>* outbuffer = nullptr;
 	std::fstream* outfstream = nullptr;
@@ -141,7 +143,7 @@ bool CheckMd5(std::fstream& instream, uint8_t md5[MD5_DIGEST_LENGTH]) {
 	return memcmp(result, md5, MD5_DIGEST_LENGTH) == 0;
 }
 
-void DeleteOld() {
+static inline void DeleteOld() {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
 	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT("{}.old"), ygo::Utils::GetExePath()));
 #if !defined(__linux__)
@@ -150,33 +152,26 @@ void DeleteOld() {
 #endif
 }
 
-ygo::ClientUpdater::lock_type GetLock() {
+static inline ygo::ClientUpdater::lock_type GetLock() {
+	ygo::ClientUpdater::lock_type file{};
 #ifdef _WIN32
-	HANDLE hFile = CreateFile(EPRO_TEXT("./.edopro_lock"),
-							  GENERIC_READ,
-							  0,
-							  nullptr,
-							  CREATE_ALWAYS,
-							  FILE_ATTRIBUTE_HIDDEN,
-							  nullptr);
-	if(!hFile || hFile == INVALID_HANDLE_VALUE)
+	file = CreateFile(LOCKFILE, GENERIC_READ,
+					  0, nullptr, CREATE_ALWAYS,
+					  FILE_ATTRIBUTE_HIDDEN, nullptr);
+	if(file == INVALID_HANDLE_VALUE)
 		return nullptr;
-	DeleteOld();
-	return hFile;
 #else
-	size_t file = open("./.edopro_lock", O_CREAT, S_IRWXU);
-	if(flock(file, LOCK_EX | LOCK_NB)) {
-		if(file)
-			close(file);
+	file = open(LOCKFILE, O_CREAT, S_IRWXU);
+	if(file < 0 || flock(file, LOCK_EX | LOCK_NB) != 0) {
+		close(file);
 		return 0;
 	}
+#endif
 	DeleteOld();
 	return file;
-#endif
-	return 0;
 }
 
-void FreeLock(ygo::ClientUpdater::lock_type lock) {
+static inline void FreeLock(ygo::ClientUpdater::lock_type lock) {
 	if(!lock)
 		return;
 #ifdef _WIN32
@@ -185,7 +180,7 @@ void FreeLock(ygo::ClientUpdater::lock_type lock) {
 	flock(lock, LOCK_UN);
 	close(lock);
 #endif
-	ygo::Utils::FileDelete(EPRO_TEXT("./.edopro_lock"));
+	ygo::Utils::FileDelete(LOCKFILE);
 }
 #endif
 namespace ygo {
@@ -222,10 +217,10 @@ bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const e
 void ClientUpdater::Unzip(epro::path_string src, void* payload, unzip_callback callback) {
 	Utils::SetThreadName("Unzip");
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	auto path = ygo::Utils::GetExePath();
+	const auto path = ygo::Utils::GetExePath();
 	ygo::Utils::FileMove(path, fmt::format(EPRO_TEXT("{}.old"), path));
 #if !defined(__linux__)
-	auto corepath = ygo::Utils::GetCorePath();
+	const auto corepath = ygo::Utils::GetCorePath();
 	ygo::Utils::FileMove(corepath, fmt::format(EPRO_TEXT("{}.old"), corepath));
 #endif
 #endif
@@ -308,19 +303,16 @@ void ClientUpdater::CheckUpdate() {
 	if(curlPerform(UPDATE_URL, &payload) != CURLE_OK)
 		return;
 	try {
-		nlohmann::json j = nlohmann::json::parse(retrieved_data);
+		const auto j = nlohmann::json::parse(retrieved_data);
 		if(!j.is_array())
 			return;
-		for(auto& asset : j) {
+		for(const auto& asset : j) {
 			try {
-				auto url = asset["url"].get<std::string>();
-				auto name = asset["name"].get<std::string>();
-				auto md5 = asset["md5"].get<std::string>();
-				update_urls.push_back(std::move(DownloadInfo{ std::move(name),
-										 std::move(url),
-										 std::move(md5) }));
-			}
-			catch(...) {}
+				const auto& url = asset.at("url").get_ref<const std::string&>();
+				const auto& name = asset.at("name").get_ref<const std::string&>();
+				const auto& md5 = asset.at("md5").get_ref<const std::string&>();
+				update_urls.emplace_back(DownloadInfo{ name, url, md5 });
+			} catch(...) {}
 		}
 	}
 	catch(...) { update_urls.clear(); }

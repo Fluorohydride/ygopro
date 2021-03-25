@@ -15,7 +15,7 @@ struct UnzipperPayload {
 	void* payload;
 };
 
-using update_callback = std::function<void(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload)>;
+using update_callback = void(*)(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload);
 
 namespace ygo {
 
