@@ -54,13 +54,13 @@ public:
 	void RemoveTexture(uint32_t code);
 	void RefreshCachedTextures();
 	void ClearCachedTextures(bool resize);
-	bool imageScaleNNAA(irr::video::IImage *src, irr::video::IImage* dest, irr::s32 width, irr::s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
+	bool imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, irr::s32 width, irr::s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
 	irr::video::IImage* GetScaledImage(irr::video::IImage* srcimg, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
 	irr::video::IImage* GetScaledImageFromFile(const irr::io::path& file, int width, int height);
 	irr::video::ITexture* GetTextureFromFile(const irr::io::path& file, int width, int height);
 	irr::video::ITexture* GetTextureCard(uint32_t code, imgType type, bool wait = false, bool fit = false, int* chk = nullptr);
 	irr::video::ITexture* GetTextureField(uint32_t code);
-	irr::video::ITexture* guiScalingResizeCached(irr::video::ITexture *src, const irr::core::rect<irr::s32> &srcrect,
+	irr::video::ITexture* guiScalingResizeCached(irr::video::ITexture* src, const irr::core::rect<irr::s32>& srcrect,
 												 const irr::core::rect<irr::s32> &destrect);
 	void draw2DImageFilterScaled(irr::video::ITexture* txr,
 								 const irr::core::rect<irr::s32>& destrect, const irr::core::rect<irr::s32>& srcrect,
@@ -73,7 +73,11 @@ public:
 	texture_map tCovers;
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
-#define A(what) irr::video::ITexture* what;
+#define A(what) \
+		public: \
+		irr::video::ITexture* what;\
+		private: \
+		irr::video::ITexture* def_##what;
 	A(tCover[2])
 	A(tUnknown)
 	A(tAct)
@@ -98,30 +102,6 @@ public:
 	A(tSettings)
 #undef A
 private:
-#define A(what) irr::video::ITexture* def_##what;
-	A(tCover[2])
-	A(tUnknown)
-	A(tAct)
-	A(tAttack)
-	A(tNegated)
-	A(tChain)
-	A(tNumber)
-	A(tLPFrame)
-	A(tLPBar)
-	A(tMask)
-	A(tEquip)
-	A(tTarget)
-	A(tChainTarget)
-	A(tLim)
-	A(tOT)
-	A(tHand[3])
-	A(tBackGround)
-	A(tBackGround_menu)
-	A(tBackGround_deck)
-	A(tField[2][4])
-	A(tFieldTransparent[2][4])
-	A(tSettings)
-#undef A
 	void ClearFutureObjects();
 	void RefreshCovers();
 	image_path LoadCardTexture(uint32_t code, imgType type, std::atomic<irr::s32>& width, std::atomic<irr::s32>& height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
