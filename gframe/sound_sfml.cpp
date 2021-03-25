@@ -29,8 +29,6 @@ bool SoundSFMLBase::PlayMusic(const std::string& name, bool loop)
 	const auto status = music.getStatus();
 	if(status != Status::Stopped && cur_music == name)
 		return true;
-	if(status == Status::Playing)
-		music.stop();
 	if(!music.openFromFile(name))
 		return false;
 	cur_music = name;
