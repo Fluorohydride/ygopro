@@ -265,12 +265,10 @@ restart:
 	if(saveReplay && !was_restarting) {
 		auto now = std::time(nullptr);
 		std::unique_lock<std::mutex> lock(mainGame->gMutex);
-		mainGame->ebRSName->setText(fmt::format(L"{:%Y-%m-%d %H-%M-%S}", *std::localtime(&now)).data());
-		mainGame->wReplaySave->setText(gDataManager->GetSysString(1340).data());
-		mainGame->PopupElement(mainGame->wReplaySave);
+		mainGame->PopupSaveWindow(gDataManager->GetSysString(1340), fmt::format(L"{:%Y-%m-%d %H-%M-%S}", *std::localtime(&now)), gDataManager->GetSysString(1342));
 		mainGame->replaySignal.Wait(lock);
 		if(mainGame->saveReplay)
-			new_replay.SaveReplay(Utils::ToPathString(mainGame->ebRSName->getText()));
+			new_replay.SaveReplay(Utils::ToPathString(mainGame->ebFileSaveName->getText()));
 	}
 	new_replay.Reset();
 	last_replay.Reset();

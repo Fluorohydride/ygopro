@@ -126,17 +126,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				ReplayMode::Undo();
 				break;
 			}
-			case BUTTON_REPLAY_SAVE: {
-				if(mainGame->ebRSName->getText()[0] == 0)
+			case BUTTON_FILE_SAVE: {
+				if(mainGame->ebFileSaveName->getText()[0] == 0)
 					break;
 				mainGame->saveReplay = true;
-				mainGame->HideElement(mainGame->wReplaySave);
+				mainGame->HideElement(mainGame->wFileSave);
 				mainGame->replaySignal.Set();
 				break;
 			}
-			case BUTTON_REPLAY_CANCEL: {
+			case BUTTON_FILE_CANCEL: {
 				mainGame->saveReplay = false;
-				mainGame->HideElement(mainGame->wReplaySave);
+				mainGame->HideElement(mainGame->wFileSave);
 				mainGame->replaySignal.Set();
 				break;
 			}
@@ -998,7 +998,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				UpdateDeclarableList();
 				break;
 			}
-			case EDITBOX_REPLAY_NAME: {
+			case EDITBOX_FILE_NAME: {
 				mainGame->ValidateName(event.GUIEvent.Caller);
 				break;
 			}
@@ -1809,7 +1809,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 		case irr::gui::EGET_ELEMENT_CLOSED: {
 			if(event.GUIEvent.Caller == mainGame->gSettings.window) {
 				stopPropagation = true;
-				mainGame->HideElement(mainGame->gSettings.window);
+				mainGame->HideElement(event.GUIEvent.Caller);
 				return true;
 			}
 			break;
@@ -2066,11 +2066,12 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			case EDITBOX_FPS_CAP: {
 				std::wstring tmp(event.GUIEvent.Caller->getText());
 				if(Utils::KeepOnlyDigits(tmp, true) || tmp.size() > 1) {
-					if(tmp.size()>1)
+					if(tmp.size() > 1) {
 						if(tmp[0] == L'-' && (tmp[1] != L'1' || tmp.size() != 2)) {
 							event.GUIEvent.Caller->setText(L"-");
 							break;
 						}
+					}
 					event.GUIEvent.Caller->setText(tmp.data());
 				}
 				break;

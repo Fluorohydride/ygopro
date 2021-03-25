@@ -168,6 +168,7 @@ public:
 	void ClearTextures();
 	void CloseDuelWindow();
 	void PopupMessage(epro::wstringview text, epro::wstringview caption = L"");
+	void PopupSaveWindow(epro::wstringview caption, epro::wstringview text, epro::wstringview hint);
 
 	uint8_t LocalPlayer(uint8_t player);
 	void UpdateDuelParam();
@@ -476,11 +477,14 @@ public:
 	irr::gui::IGUIButton* btnReplayCancel;
 	irr::gui::IGUIButton* btnExportDeck;
 	irr::gui::IGUIEditBox* ebRepStartTurn;
-	//single play
+	//puzzle mode
 	irr::gui::IGUIWindow* wSinglePlay;
 	irr::gui::CGUIFileSelectListBox* lstSinglePlayList;
 	irr::gui::IGUIStaticText* stSinglePlayInfo;
 	irr::gui::IGUIButton* btnLoadSinglePlay;
+	irr::gui::IGUIButton* btnDeleteSinglePlay;
+	irr::gui::IGUIButton* btnRenameSinglePlay;
+	irr::gui::IGUIButton* btnOpenSinglePlay;
 	irr::gui::IGUIButton* btnSinglePlayCancel;
 	//hand
 	irr::gui::IGUIWindow* wHand;
@@ -632,11 +636,12 @@ public:
 	//sort type
 	irr::gui::IGUIStaticText* wSort;
 	irr::gui::IGUIComboBox* cbSortType;
-	//replay save
-	irr::gui::IGUIWindow* wReplaySave;
-	irr::gui::IGUIEditBox* ebRSName;
-	irr::gui::IGUIButton* btnRSYes;
-	irr::gui::IGUIButton* btnRSNo;
+	//file save
+	irr::gui::IGUIWindow* wFileSave;
+	irr::gui::IGUIStaticText* stFileSaveHint;
+	irr::gui::IGUIEditBox* ebFileSaveName;
+	irr::gui::IGUIButton* btnFileSaveYes;
+	irr::gui::IGUIButton* btnFileSaveNo;
 	//replay control
 	irr::gui::IGUIStaticText* wReplayControl;
 	irr::gui::IGUIButton* btnReplayStart;

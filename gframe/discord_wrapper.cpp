@@ -211,7 +211,7 @@ static void OnJoin(const char* secret, void* payload) {
 		HIDE_AND_CHECK(game->wCardImg);
 		HIDE_AND_CHECK(game->wInfos);
 		HIDE_AND_CHECK(game->btnLeaveGame);
-		HIDE_AND_CHECK(game->wReplaySave);
+		HIDE_AND_CHECK(game->wFileSave);
 		game->device->setEventReceiver(&game->menuHandler);
 #undef HIDE_AND_CHECK
 	}

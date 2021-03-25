@@ -117,8 +117,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			mainGame->wQuery->getParent()->bringToFront(mainGame->wQuery);
 			break;
 		}
-		if(mainGame->wReplaySave->isVisible() && id != BUTTON_REPLAY_SAVE && id != BUTTON_REPLAY_CANCEL) {
-			mainGame->wReplaySave->getParent()->bringToFront(mainGame->wReplaySave);
+		if(mainGame->wFileSave->isVisible() && id != BUTTON_FILE_SAVE && id != BUTTON_FILE_CANCEL) {
+			mainGame->wFileSave->getParent()->bringToFront(mainGame->wFileSave);
 			break;
 		}
 		switch(event.GUIEvent.EventType) {
@@ -437,6 +437,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->stSinglePlayInfo->setText(L"");
 				mainGame->btnLoadSinglePlay->setEnabled(false);
+				mainGame->btnDeleteSinglePlay->setEnabled(false);
+				mainGame->btnRenameSinglePlay->setEnabled(false);
+				mainGame->btnOpenSinglePlay->setEnabled(false);
 				mainGame->ShowElement(mainGame->wSinglePlay);
 				mainGame->RefreshSingleplay();
 				break;
@@ -464,9 +467,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				std::lock_guard<std::mutex> lock(mainGame->gMutex);
-				mainGame->wReplaySave->setText(gDataManager->GetSysString(1362).data());
-				mainGame->ebRSName->setText(mainGame->lstReplayList->getListItem(sel));
-				mainGame->PopupElement(mainGame->wReplaySave);
+				mainGame->PopupSaveWindow(gDataManager->GetSysString(1362), mainGame->lstReplayList->getListItem(sel), gDataManager->GetSysString(1342));
+				prev_operation = id;
+				prev_sel = sel;
+				break;
+			}
+			case BUTTON_RENAME_SINGLEPLAY: {
+				int sel = mainGame->lstSinglePlayList->getSelected();
+				if(sel == -1)
+					break;
+				std::lock_guard<std::mutex> lock(mainGame->gMutex);
+				mainGame->PopupSaveWindow(gDataManager->GetSysString(1362), mainGame->lstSinglePlayList->getListItem(sel), gDataManager->GetSysString(1201));
 				prev_operation = id;
 				prev_sel = sel;
 				break;
@@ -515,6 +526,25 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				mainGame->stACMessage->setText(gDataManager->GetSysString(1367).data());
 				mainGame->PopupElement(mainGame->wACMessage, 20);
+				break;
+			}
+			case BUTTON_DELETE_SINGLEPLAY: {
+				int sel = mainGame->lstSinglePlayList->getSelected();
+				if(sel == -1)
+					break;
+				std::lock_guard<std::mutex> lock(mainGame->gMutex);
+				mainGame->stQMessage->setText(fmt::format(L"{}\n{}", mainGame->lstSinglePlayList->getListItem(sel), gDataManager->GetSysString(1363)).data());
+				mainGame->PopupElement(mainGame->wQuery);
+				prev_operation = id;
+				prev_sel = sel;
+				break;
+			}
+			case BUTTON_OPEN_SINGLEPLAY: {
+				const auto& list = mainGame->lstSinglePlayList;
+				const auto selected = list->getSelected();
+				if(selected != -1 && !list->isDirectory(selected)) {
+					Utils::SystemOpen(Utils::ToPathString(list->getListItem(selected, true)), Utils::OPEN_FILE);
+				}
 				break;
 			}
 			case BUTTON_LOAD_SINGLEPLAY: {
@@ -566,6 +596,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						mainGame->stReplayInfo->setText(L"");
 						mainGame->lstReplayList->refreshList();
 					}
+				} else if(prev_operation == BUTTON_DELETE_SINGLEPLAY) {
+					if(Utils::FileDelete(Utils::ToPathString(mainGame->lstSinglePlayList->getListItem(prev_sel, true)))) {
+						mainGame->stSinglePlayInfo->setText(L"");
+						mainGame->lstSinglePlayList->refreshList();
+					}
 				} else if(prev_operation == ACTION_UPDATE_PROMPT) {
 					gClientUpdater->StartUpdate(Game::UpdateDownloadBar, mainGame);
 					mainGame->PopupElement(mainGame->updateWindow);
@@ -585,13 +620,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				prev_sel = -1;
 				break;
 			}
-			case BUTTON_REPLAY_SAVE: {
-				mainGame->HideElement(mainGame->wReplaySave);
+			case BUTTON_FILE_SAVE: {
+				mainGame->HideElement(mainGame->wFileSave);
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
 					auto oldname = Utils::ToPathString(mainGame->lstReplayList->getListItem(prev_sel, true));
 					auto oldpath = Utils::GetFilePath(oldname);
 					auto extension = Utils::GetFileExtension(oldname, false);
-					auto newname = Utils::ToPathString(mainGame->ebRSName->getText());
+					auto newname = Utils::ToPathString(mainGame->ebFileSaveName->getText());
 					if (Utils::GetFileExtension(newname, false) != extension)
 						newname.append(1, EPRO_TEXT('.')).append(extension);
 					if(Replay::RenameReplay(oldname, oldpath + newname))
@@ -603,8 +638,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				prev_sel = -1;
 				break;
 			}
-			case BUTTON_REPLAY_CANCEL: {
-				mainGame->HideElement(mainGame->wReplaySave);
+			case BUTTON_FILE_CANCEL: {
+				mainGame->HideElement(mainGame->wFileSave);
 				prev_operation = 0;
 				prev_sel = -1;
 				break;
@@ -673,17 +708,23 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_SINGLEPLAY_LIST: {
 				mainGame->btnLoadSinglePlay->setEnabled(false);
+				mainGame->btnDeleteSinglePlay->setEnabled(false);
+				mainGame->btnRenameSinglePlay->setEnabled(false);
+				mainGame->btnOpenSinglePlay->setEnabled(false);
 				int sel = mainGame->lstSinglePlayList->getSelected();
 				mainGame->stSinglePlayInfo->setText(L"");
-				mainGame->btnLoadSinglePlay->setText(gDataManager->GetSysString(1357).data());
-				if(sel == -1)
-					break;
 				if(mainGame->lstSinglePlayList->isDirectory(sel)) {
 					mainGame->btnLoadSinglePlay->setText(gDataManager->GetSysString(1359).data());
 					mainGame->btnLoadSinglePlay->setEnabled(true);
 					break;
-				}
+				} else
+					mainGame->btnLoadSinglePlay->setText(gDataManager->GetSysString(1357).data());
+				if(sel == -1)
+					break;
 				mainGame->btnLoadSinglePlay->setEnabled(mainGame->coreloaded);
+				mainGame->btnDeleteSinglePlay->setEnabled(true);
+				mainGame->btnRenameSinglePlay->setEnabled(true);
+				mainGame->btnOpenSinglePlay->setEnabled(true);
 				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true);
 				mainGame->stSinglePlayInfo->setText(mainGame->ReadPuzzleMessage(name).data());
 				break;
