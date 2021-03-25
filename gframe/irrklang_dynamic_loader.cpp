@@ -23,20 +23,23 @@ KlangLoader::KlangLoader() {
 	library = dlopen("./libIrrKlang.dylib", RTLD_NOW);
 #elif defined(__linux__)
 	library = dlopen("./libIrrKlang.so", RTLD_NOW);
-#endif
+#endif //_WIN32
 	if(library == nullptr)
 		throw std::runtime_error("Failed to load irrklang library");
 #ifdef _WIN32
-	if(!(createdevice = (CreateDevice)GetProcAddress((HMODULE)library, CREATE_DEVICE_MSVC)))
-		createdevice = (CreateDevice)GetProcAddress((HMODULE)library, CREATE_DEVICE_GCC);
+#ifdef _MSC_VER
+	createdevice = (CreateDevice)GetProcAddress((HMODULE)library, CREATE_DEVICE_MSVC);
+#else
+	createdevice = (CreateDevice)GetProcAddress((HMODULE)library, CREATE_DEVICE_GCC);
+#endif //_MSC_VER
 #else
 	createdevice = (CreateDevice)dlsym(library, CREATE_DEVICE_GCC);
-#endif
+#endif //_WIN32
 	if(createdevice == nullptr)
 		throw std::runtime_error("Failed to load createIrrKlangDevice function");
 #else
 	createdevice = irrklang::createIrrKlangDevice;
-#endif
+#endif //IRRKLANG_STATIC
 }
 
 KlangLoader::~KlangLoader() {
