@@ -1,7 +1,6 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
-#include <direct.h> //_getcwd
-#include <Tchar.h> //_tgetcwd
+#include <Tchar.h> //_tmain
 #else
 #define _tmain main
 #include <unistd.h>
@@ -194,8 +193,9 @@ int _tmain(int argc, epro::path_char* argv[]) {
 	} else
 		dest = ygo::Utils::GetExeFolder();
 	if(!ygo::Utils::ChangeDirectory(dest)) {
-		ygo::ErrorLog("failed to change directory");
-		fmt::print("failed to change directory\n");
+		const auto err = fmt::format("failed to change directory to: {}", ygo::Utils::ToUTF8IfNeeded(dest));
+		ygo::ErrorLog(err);
+		fmt::print("{}\n", err);
 	}
 	if(argc >= (2 + skipped) && argv[1 + skipped] == EPRO_TEXT("show_changelog"_sv))
 		show_changelog = true;
@@ -205,7 +205,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 #endif //_WIN32
 	ygo::ClientUpdater updater;
 	ygo::gClientUpdater = &updater;
-	std::shared_ptr<ygo::DataHandler> data = nullptr;
+	std::shared_ptr<ygo::DataHandler> data{ nullptr };
 	try {
 		data = std::make_shared<ygo::DataHandler>(dest);
 		ygo::gImageDownloader = data->imageDownloader.get();
@@ -236,9 +236,9 @@ int _tmain(int argc, epro::path_char* argv[]) {
 	});
 #endif
 	srand(time(0));
-	std::unique_ptr<JWrapper> joystick;
-	bool reset = false;
+	std::unique_ptr<JWrapper> joystick{ nullptr };
 	bool firstlaunch = true;
+	bool reset = false;
 	do {
 		ygo::Game _game{};
 		ygo::mainGame = &_game;
