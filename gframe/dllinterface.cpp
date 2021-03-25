@@ -44,7 +44,7 @@
 #undef CREATE_CLONE
 
 #ifdef _WIN32
-void* OpenLibrary(epro::path_stringview path) {
+inline void* OpenLibrary(epro::path_stringview path) {
 	return LoadLibrary(fmt::format("{}" CORENAME, path).data());
 }
 #define CloseLibrary(core) FreeLibrary((HMODULE)core)
@@ -53,7 +53,7 @@ void* OpenLibrary(epro::path_stringview path) {
 
 #else
 
-void* OpenLibrary(epro::path_stringview path) {
+inline void* OpenLibrary(epro::path_stringview path) {
 #ifdef __ANDROID__
 	void* lib = nullptr;
 	const auto dest_dir = porting::internal_storage + "/libocgcore.so";
