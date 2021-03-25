@@ -1788,10 +1788,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 #endif
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
-		if(mainGame->fadingList.size()) {
-			stopPropagation = true;
-			return true;
-		}
 		irr::s32 id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_ELEMENT_HOVERED: {
@@ -1819,6 +1815,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			break;
 		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
+			if(mainGame->fadingList.size()) {
+				stopPropagation = true;
+				return true;
+			}
 			switch(id) {
 			case BUTTON_CLEAR_LOG: {
 				mainGame->lstLog->clear();
