@@ -48,67 +48,29 @@ using GetArg_t = typename GetArg<I, Sig>::type;
 template<typename T>
 struct DtorType;
 
-template<>
-struct DtorType<git_commit>
-{
-	using type = void(&)(git_commit*);
-	static constexpr type value = git_commit_free;
-};
+#define DESTRUCTOR(objtype) template<>\
+struct DtorType<objtype>\
+{\
+	using type = void(&)(objtype*);\
+	static constexpr type value = objtype##_free;\
+}
 
-template<>
-struct DtorType<git_diff>
-{
-	using type = void(&)(git_diff*);
-	static constexpr type value = git_diff_free;
-};
+DESTRUCTOR(git_commit);
+DESTRUCTOR(git_diff);
+DESTRUCTOR(git_index);
+DESTRUCTOR(git_object);
+DESTRUCTOR(git_remote);
+DESTRUCTOR(git_repository);
+DESTRUCTOR(git_revwalk);
+DESTRUCTOR(git_tree);
 
-template<>
-struct DtorType<git_index>
-{
-	using type = void(&)(git_index*);
-	static constexpr type value = git_index_free;
-};
-
-template<>
-struct DtorType<git_object>
-{
-	using type = void(&)(git_object*);
-	static constexpr type value = git_object_free;
-};
-
-template<>
-struct DtorType<git_remote>
-{
-	using type = void(&)(git_remote*);
-	static constexpr type value = git_remote_free;
-};
-
-template<>
-struct DtorType<git_repository>
-{
-	using type = void(&)(git_repository*);
-	static constexpr type value = git_repository_free;
-};
-
-template<>
-struct DtorType<git_revwalk>
-{
-	using type = void(&)(git_revwalk*);
-	static constexpr type value = git_revwalk_free;
-};
-
-template<>
-struct DtorType<git_tree>
-{
-	using type = void(&)(git_tree*);
-	static constexpr type value = git_tree_free;
-};
+#undef DESTRUCTOR
 
 template<typename T>
 using DtorType_t = typename DtorType<T>::type;
 
 template<typename T>
-constexpr DtorType_t<T> DtorType_v = DtorType<T>::value;
+constexpr auto& DtorType_v = DtorType<T>::value;
 
 // Template-based interface to deduce a git_otype enum value from T
 template<typename T>
@@ -119,7 +81,7 @@ struct TypeEnum<git_tree> : std::integral_constant<git_otype, GIT_OBJ_TREE>
 {};
 
 template<typename T>
-constexpr git_otype TypeEnum_v = TypeEnum<T>::value;
+constexpr auto TypeEnum_v = TypeEnum<T>::value;
 
 } // namespace Detail
 
