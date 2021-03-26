@@ -255,7 +255,7 @@ ClientCard* ClientField::RemoveCard(uint8_t controler, uint8_t location, uint32_
 			deck[controler][i]->curPos.Z -= 0.01f;
 			deck[controler][i]->mTransform.setTranslation(deck[controler][i]->curPos);
 		}
-		deck[controler].erase(deck[controler].end() - 1);
+		deck[controler].pop_back();
 		break;
 	}
 	case LOCATION_HAND: {
@@ -264,7 +264,7 @@ ClientCard* ClientField::RemoveCard(uint8_t controler, uint8_t location, uint32_
 			hand[controler][i] = hand[controler][i + 1];
 			hand[controler][i]->sequence--;
 		}
-		hand[controler].erase(hand[controler].end() - 1);
+		hand[controler].pop_back();
 		break;
 	}
 	case LOCATION_MZONE: {
@@ -285,7 +285,7 @@ ClientCard* ClientField::RemoveCard(uint8_t controler, uint8_t location, uint32_
 			grave[controler][i]->curPos.Z -= 0.01f;
 			grave[controler][i]->mTransform.setTranslation(grave[controler][i]->curPos);
 		}
-		grave[controler].erase(grave[controler].end() - 1);
+		grave[controler].pop_back();
 		break;
 	}
 	case LOCATION_REMOVED: {
@@ -296,7 +296,7 @@ ClientCard* ClientField::RemoveCard(uint8_t controler, uint8_t location, uint32_
 			remove[controler][i]->curPos.Z -= 0.01f;
 			remove[controler][i]->mTransform.setTranslation(remove[controler][i]->curPos);
 		}
-		remove[controler].erase(remove[controler].end() - 1);
+		remove[controler].pop_back();
 		break;
 	}
 	case LOCATION_EXTRA: {
@@ -307,7 +307,7 @@ ClientCard* ClientField::RemoveCard(uint8_t controler, uint8_t location, uint32_
 			extra[controler][i]->curPos.Z -= 0.01f;
 			extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
 		}
-		extra[controler].erase(extra[controler].end() - 1);
+		extra[controler].pop_back();
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]--;
 		break;

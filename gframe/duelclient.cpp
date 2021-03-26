@@ -3372,7 +3372,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		for(uint32_t i = 0; i < count; ++i) {
 			Play(SoundManager::SFX::DRAW);
 			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1);
-			mainGame->dField.deck[player].erase(mainGame->dField.deck[player].end() - 1);
+			mainGame->dField.deck[player].pop_back();
 			mainGame->dField.AddCard(pcard, player, LOCATION_HAND, 0);
 			if(!mainGame->dInfo.isCatchingUp) {
 				for(auto& pcard : mainGame->dField.hand[player])
