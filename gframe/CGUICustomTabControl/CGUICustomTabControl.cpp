@@ -110,7 +110,11 @@ void CGUICustomTabControl::refreshSprites() {
 
 //! Adds a tab
 IGUITab* CGUICustomTabControl::addTab(const wchar_t* caption, s32 id) {
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+	CGUITab* tab = new CGUITab(Environment, this, calcTabPos(), id);
+#else
 	CGUITab* tab = new CGUITab(Tabs.size(), Environment, this, calcTabPos(), id);
+#endif
 
 	tab->setText(caption);
 	tab->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
@@ -128,6 +132,8 @@ IGUITab* CGUICustomTabControl::addTab(const wchar_t* caption, s32 id) {
 }
 
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+#else
 //! adds a tab which has been created elsewhere
 void CGUICustomTabControl::addTab(CGUITab* tab) {
 	if(!tab)
@@ -161,13 +167,18 @@ void CGUICustomTabControl::addTab(CGUITab* tab) {
 		setActiveTab(ActiveTab);
 	}
 }
+#endif
 
 //! Insert the tab at the given index
 IGUITab* CGUICustomTabControl::insertTab(s32 idx, const wchar_t* caption, s32 id) {
 	if(idx < 0 || idx >(s32)Tabs.size())	// idx == Tabs.size() is indeed ok here as core::array can handle that
 		return NULL;
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+	CGUITab* tab = new CGUITab(Environment, this, calcTabPos(), id);
+#else
 	CGUITab* tab = new CGUITab(idx, Environment, this, calcTabPos(), id);
+#endif
 
 	tab->setText(caption);
 	tab->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
@@ -179,9 +190,11 @@ IGUITab* CGUICustomTabControl::insertTab(s32 idx, const wchar_t* caption, s32 id
 		tab->setVisible(true);
 	}
 
+#if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	for(u32 i = (u32)idx + 1; i < Tabs.size(); ++i) {
 		Tabs[i]->setNumber(i);
 	}
+#endif
 
 	recalculateScrollBar();
 
@@ -195,9 +208,11 @@ void CGUICustomTabControl::removeTab(s32 idx) {
 
 	Tabs[(u32)idx]->drop();
 	Tabs.erase((u32)idx);
+#if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	for(u32 i = (u32)idx; i < Tabs.size(); ++i) {
 		Tabs[i]->setNumber(i);
 	}
+#endif
 }
 
 //! Clears the tabcontrol removing all tabs
@@ -774,6 +789,17 @@ bool CGUICustomTabControl::setActiveTab(IGUITab *tab) {
 	return false;
 }
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+s32 CGUICustomTabControl::getTabIndex(const IGUIElement *tab) const
+{
+	for (u32 i=0; i<Tabs.size(); ++i)
+		if (Tabs[i] == tab)
+			return (s32)i;
+
+	return -1;
+}
+#endif
+
 
 //! Removes a child.
 void CGUICustomTabControl::removeChild(IGUIElement* child) {
@@ -790,12 +816,14 @@ void CGUICustomTabControl::removeChild(IGUIElement* child) {
 			++i;
 	}
 
+#if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	// reassign numbers
 	if(isTab) {
 		for(i = 0; i < Tabs.size(); ++i)
 			if(Tabs[i])
 				Tabs[i]->setNumber(i);
 	}
+#endif
 
 	// remove real element
 	IGUIElement::removeChild(child);

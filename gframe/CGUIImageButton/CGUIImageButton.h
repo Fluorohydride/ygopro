@@ -69,6 +69,9 @@ public:
 
 	//! Checks if an override color is enabled
 	virtual bool isOverrideColorEnabled(void) const  _IRR_OVERRIDE_ { return false; };
+	
+	//! Gets the currently used text color
+	virtual video::SColor getActiveColor() const _IRR_OVERRIDE_ { return 0; };
 
 	virtual bool getClickControlState() const _IRR_OVERRIDE_ {
 		return false;

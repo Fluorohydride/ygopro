@@ -9,10 +9,10 @@
 #ifdef _IRR_COMPILE_WITH_GUI_
 
 #include <IGUIScrollBar.h>
+#include <IGUIButton.h>
 
 namespace irr {
 namespace gui {
-class IGUIButton;
 
 class CGUIScrollBar : public IGUIScrollBar {
 public:
@@ -26,57 +26,57 @@ public:
 	virtual ~CGUIScrollBar();
 
 	//! called if an event happened.
-	virtual bool OnEvent(const SEvent& event);
+	virtual bool OnEvent(const SEvent& event) _IRR_OVERRIDE_;
 
 	//! draws the element and its children
-	virtual void draw();
+	virtual void draw() _IRR_OVERRIDE_;
 
-	virtual void OnPostRender(u32 timeMs);
+	virtual void OnPostRender(u32 timeMs) _IRR_OVERRIDE_;
 
 
 	//! gets the maximum value of the scrollbar.
-	virtual s32 getMax() const;
+	virtual s32 getMax() const _IRR_OVERRIDE_;
 
 	//! sets the maximum value of the scrollbar.
-	virtual void setMax(s32 max);
+	virtual void setMax(s32 max) _IRR_OVERRIDE_;
 
 	//! gets the minimum value of the scrollbar.
-	virtual s32 getMin() const;
+	virtual s32 getMin() const _IRR_OVERRIDE_;
 
 	//! sets the minimum value of the scrollbar.
-	virtual void setMin(s32 min);
+	virtual void setMin(s32 min) _IRR_OVERRIDE_;
 
 	//! gets the small step value
-	virtual s32 getSmallStep() const;
+	virtual s32 getSmallStep() const _IRR_OVERRIDE_;
 
 	//! sets the small step value
-	virtual void setSmallStep(s32 step);
+	virtual void setSmallStep(s32 step) _IRR_OVERRIDE_;
 
 	//! gets the large step value
-	virtual s32 getLargeStep() const;
+	virtual s32 getLargeStep() const _IRR_OVERRIDE_;
 
 	//! sets the large step value
-	virtual void setLargeStep(s32 step);
+	virtual void setLargeStep(s32 step) _IRR_OVERRIDE_;
 
 	//! gets the current position of the scrollbar
-	virtual s32 getPos() const;
+	virtual s32 getPos() const _IRR_OVERRIDE_;
 
 	//! sets the position of the scrollbar
-	virtual void setPos(s32 pos);
+	virtual void setPos(s32 pos) _IRR_OVERRIDE_;
 
 	//! updates the rectangle
-	virtual void updateAbsolutePosition();
+	virtual void updateAbsolutePosition() _IRR_OVERRIDE_;
 
 	//! Writes attributes of the element.
-	virtual void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const;
+	virtual void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const _IRR_OVERRIDE_;
 
 	//! Reads attributes of the element
-	virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
+	virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options) _IRR_OVERRIDE_;
 
 private:
 
 	void refreshControls();
-	s32 getPosFromMousePos(const core::position2di &p) const;
+	s32 getPosFromMousePos(const core::position2di& p) const;
 
 	IGUIButton* UpButton;
 	IGUIButton* DownButton;

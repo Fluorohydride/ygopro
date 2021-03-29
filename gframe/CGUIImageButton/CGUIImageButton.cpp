@@ -65,7 +65,11 @@ void Draw2DImageRotation(video::IVideoDriver* driver, video::ITexture* image, co
 		vertices[x].Color = color;
 	}
 	material.Lighting = false;
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+	material.ZWriteEnable = irr::video::E_ZWRITE::EZW_OFF;
+#else
 	material.ZWriteEnable = false;
+#endif
 	material.TextureLayer[0].Texture = image;
 	if(!hasNPotSupport(driver)) {
 		material.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
@@ -109,7 +113,11 @@ void Draw2DImageQuad(video::IVideoDriver* driver, video::ITexture* image, core::
 		vertices[x].Color = color;
 	}
 	material.Lighting = false;
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+	material.ZWriteEnable = irr::video::E_ZWRITE::EZW_OFF;
+#else
 	material.ZWriteEnable = false;
+#endif
 	material.TextureLayer[0].Texture = image;
 	if(!hasNPotSupport(driver)) {
 		material.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;

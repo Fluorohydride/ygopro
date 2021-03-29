@@ -188,7 +188,7 @@ void CGUICustomText::draw() {
 					frameRect.UpperLeftCorner.Y -= (s32)round((float)curFrame * animationStep);
 
 				font->draw(Text.c_str(), frameRect,
-						   OverrideColorEnabled ? OverrideColor : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT),
+						   getActiveColor(),
 						   HAlign == EGUIA_CENTER && !autoscrolling && hasHorizontalAutoscrolling(), VAlign == EGUIA_CENTER && !autoscrolling && hasVerticalAutoscrolling(), (RestrainTextInside ? &AbsoluteClippingRect : NULL));
 			} else {
 				if(font != LastBreakFont)
@@ -221,7 +221,7 @@ void CGUICustomText::draw() {
 							font->getDimension(BrokenText[i].c_str()).Width;
 					}
 					font->draw(BrokenText[i].c_str(), r,
-							   OverrideColorEnabled ? OverrideColor : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT),
+							   getActiveColor(),
 							   HAlign == EGUIA_CENTER, false, (RestrainTextInside ? &AbsoluteClippingRect : NULL));
 				}
 			}
@@ -328,6 +328,15 @@ video::SColor CGUICustomText::getOverrideColor() const {
 	return OverrideColor;
 }
 
+irr::video::SColor CGUICustomText::getActiveColor() const
+{
+	if ( OverrideColorEnabled )
+		return OverrideColor;
+	IGUISkin* skin = Environment->getSkin();
+	if (skin)
+		return OverrideColorEnabled ? OverrideColor : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT);
+	return OverrideColor;
+}
 
 //! Sets if the static text should use the overide color or the
 //! color in the gui skin.

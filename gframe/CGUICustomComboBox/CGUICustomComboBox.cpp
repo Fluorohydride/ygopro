@@ -13,7 +13,8 @@
 #include <IGUIEnvironment.h>
 #include <IGUIFont.h>
 #include <IGUIButton.h>
-#include <CGUIListBox.h>
+#include "../IrrlichtCommonIncludes1.9/CGUIListBox.h"
+#include <IGUIStaticText.h>
 #include "../IrrlichtCommonIncludes1.9/os.h"
 #include "../Android/porting_android.h"
 #include "../bufferio.h"
