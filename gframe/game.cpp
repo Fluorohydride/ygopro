@@ -1610,7 +1610,6 @@ bool Game::MainLoop() {
 					});
 					if(it != locales.end()) {
 						it->second.push_back(std::move(data_path));
-						ReloadElementsStrings();
 					} else {
 						Utils::MakeDirectory(EPRO_TEXT("./config/languages/") + langpath);
 						locales.emplace_back(std::move(langpath), std::vector<epro::path_string>{ std::move(data_path) });
@@ -1622,8 +1621,10 @@ bool Game::MainLoop() {
 				gdeckManager->RefreshDeck(gdeckManager->current_deck);
 			if(refresh_db && is_building && deckBuilder.results.size())
 				deckBuilder.StartFilter(true);
-			if(gRepoManager->GetUpdatingReposNumber() == 0)
+			if(gRepoManager->GetUpdatingReposNumber() == 0) {
 				gdeckManager->StopDummyLoading();
+				ReloadElementsStrings();
+			}
 		}
 		if(ServerLobby::HasRefreshedRooms())
 			ServerLobby::FillOnlineRooms();
