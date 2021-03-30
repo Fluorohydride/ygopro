@@ -166,10 +166,10 @@ private:
 					break;
 			}
 			auto cur = *source++;
-			if((cur - 0xd800) >= 0x800) {
+			if((cur - 0xd800u) >= 0x800u) {
 				*out++ = static_cast<wchar_t>(cur);
-			} else if((cur & 0xfffffc00) == 0xd800 && (*source & 0xfffffc00) == 0xdc00) {
-				*out++ = (cur << 10) + (*source++) - 0x35fdc00;
+			} else if((cur & 0xfffffc00) == 0xd800u && (*source & 0xfffffc00u) == 0xdc00u) {
+				*out++ = (cur << 10) + (*source++) - 0x35fdc00u;
 			}
 		}
 		*out = 0;
