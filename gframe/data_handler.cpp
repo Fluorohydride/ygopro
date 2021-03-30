@@ -6,11 +6,13 @@
 #include "deck_manager.h"
 #include "logging.h"
 #include "utils.h"
-#ifndef __ANDROID__
-#include "IrrlichtCommonIncludes/CFileSystem.h"
-#else
-#include "Android/COSAndroidOperator.h"
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 #include "IrrlichtCommonIncludes1.9/CFileSystem.h"
+#else
+#include "IrrlichtCommonIncludes/CFileSystem.h"
+#endif
+#ifdef __ANDROID__
+#include "Android/COSAndroidOperator.h"
 #include "Android/porting_android.h"
 #endif
 

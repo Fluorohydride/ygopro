@@ -12,7 +12,13 @@
 #include <vector>
 #include "logging.h"
 #include "Base64.h"
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+#include "IrrlichtCommonIncludes1.9/CCursorControl.h"
+using CCursorControl = irr::CIrrDeviceWin32::CCursorControl;
+#else
 #include "IrrlichtCommonIncludes/CCursorControl.h"
+using CCursorControl = irr::CCursorControl;
+#endif
 #elif defined(__ANDROID__)
 class android_app;
 namespace porting {
@@ -31,10 +37,12 @@ namespace ygo {
 #ifdef _WIN32
 static HWND GetWindowHandle(irr::video::IVideoDriver* driver) {
 	switch(driver->getDriverType()) {
+#if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	case irr::video::EDT_DIRECT3D8:
 		return static_cast<HWND>(driver->getExposedVideoData().D3D8.HWnd);
+#endif
 	case irr::video::EDT_DIRECT3D9:
-		return static_cast<HWND>(driver->getExposedVideoData().D3D8.HWnd);
+		return static_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
 	case irr::video::EDT_OPENGL:
 		return static_cast<HWND>(driver->getExposedVideoData().OpenGLWin32.HWnd);
 	default:
@@ -180,7 +188,7 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 		SetWindowLongPtr(hWnd, GWL_STYLE, nonFullscreenStyle);
 		SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
-	static_cast<irr::CCursorControl*>(device->getCursorControl())->updateBorderSize(fullscreen, true);
+	static_cast<CCursorControl*>(device->getCursorControl())->updateBorderSize(fullscreen, true);
 #elif defined(__linux__) && !defined(__ANDROID__)
 	struct {
 		unsigned long   flags;
