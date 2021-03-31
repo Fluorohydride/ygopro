@@ -55,16 +55,16 @@ if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     rm -rf upx-3.96-win64
     rm upx-3.96-win64.zip
 
-    curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/edo9300/irrlicht1-8-4/archive/master.zip
+    curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/edo9300/irrlicht1-8-4/archive/1.9-custom.zip
     echo Extracting irrlicht... this may take some time.
-    unzip -uo irrlicht1-8-4-master.zip > /dev/null
-    mv irrlicht1-8-4-master/include irrlicht/include
+    unzip -uo irrlicht1-8-4-1.9-custom.zip > /dev/null
+    mv irrlicht1-8-4-1.9-custom/include irrlicht/include
     # Technically, only code files need to be moved, and code files in lzma and aesGladman, but this is easier
-    mv irrlicht1-8-4-master/source/Irrlicht irrlicht/src
-    rm -rf irrlicht1-8-4-master
-    rm irrlicht1-8-4-master.zip
+    mv irrlicht1-8-4-1.9-custom/source/Irrlicht irrlicht/src
+    rm -rf irrlicht1-8-4-1.9-custom
+    rm irrlicht1-8-4-1.9-custom.zip
     # We will build against vcpkg-provided versions of these libs
-    rm -rf irrlicht/src/bzip2 irrlicht/src/jpeglib irrlicht/src/libpng irrlicht/src/zlib irrlicht/src/MacOSX
+    rm -rf irrlicht/src/bzip2 irrlicht/src/jpeglib irrlicht/src/libpng irrlicht/src/zlib
 fi
 
 
