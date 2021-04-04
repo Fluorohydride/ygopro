@@ -283,6 +283,9 @@ T Utils::ToUpperChar(T c) {
 	if(c == 209 || c == 241) {
 		return static_cast<T>('N');
 	}
+	if(c == 191) { //inverted question mark
+		return static_cast<T>('?');
+	}
 	if(std::is_same<T, wchar_t>::value)
 		return static_cast<T>(std::towupper(c));
 	else
