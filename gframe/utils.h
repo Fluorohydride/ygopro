@@ -262,33 +262,36 @@ inline std::vector<T> Utils::TokenizeString(const T& input, const typename T::va
 template<typename T>
 T Utils::ToUpperChar(T c) {
 #define IN_INTERVAL(start, end) (c >= start && c <= end)
-	if(IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)
-	   || c == 0x2c6f|| c == 0x250 //latin capital/small letter turned a
-	   || c == 0x2200) //for all
-	{
-		return static_cast<T>('A');
-	}
-	if(IN_INTERVAL(200, 203) || IN_INTERVAL(232, 235)) {
-		return static_cast<T>('E');
-	}
-	if(IN_INTERVAL(204, 207) || IN_INTERVAL(236, 239)) {
-		return static_cast<T>('I');
-	}
-	if(IN_INTERVAL(210, 214) || IN_INTERVAL(242, 246)) {
-		return static_cast<T>('O');
-	}
-	if(IN_INTERVAL(217, 220) || IN_INTERVAL(249, 252)) {
-		return static_cast<T>('U');
-	}
-	if(c == 209 || c == 241) {
-		return static_cast<T>('N');
-	}
-	if(c == 191) { //inverted question mark
-		return static_cast<T>('?');
-	}
-	if(std::is_same<T, wchar_t>::value)
+	if(std::is_same<T, wchar_t>::value) {
+		if(IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)
+		   || c == 0x2c6f || c == 0x250 //latin capital/small letter turned a
+		   || c == 0x2200) //for all
+		{
+			return static_cast<T>('A');
+		}
+		if(IN_INTERVAL(200, 203) || IN_INTERVAL(232, 235)) {
+			return static_cast<T>('E');
+		}
+		if(IN_INTERVAL(204, 207) || IN_INTERVAL(236, 239)) {
+			return static_cast<T>('I');
+		}
+		if(IN_INTERVAL(210, 214) || IN_INTERVAL(242, 246)) {
+			return static_cast<T>('O');
+		}
+		if(IN_INTERVAL(217, 220) || IN_INTERVAL(249, 252)) {
+			return static_cast<T>('U');
+		}
+		if(c == 209 || c == 241) {
+			return static_cast<T>('N');
+		}
+		if(c == 161) { //inverted exclamation mark
+			return static_cast<T>('!');
+		}
+		if(c == 191) { //inverted question mark
+			return static_cast<T>('?');
+		}
 		return static_cast<T>(std::towupper(c));
-	else
+	} else
 		return static_cast<T>(std::toupper(c));
 #undef IN_INTERVAL
 }
