@@ -75,6 +75,9 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	params.AntiAlias = 0;
 	params.WindowSize = irr::core::dimension2du(0, 0);
 #endif
+#if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	params.WindowResizable = true;
+#endif
 	irr::IrrlichtDevice* device = irr::createDeviceEx(params);
 	if(!device)
 		throw std::runtime_error("Failed to create Irrlicht Engine device!");
@@ -101,6 +104,9 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
 	device->setWindowCaption(L"Project Ignis: EDOPro");
 	device->setResizable(true);
+#if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	device->setResizable(true);
+#endif
 #ifdef _WIN32
 	auto hInstance = static_cast<HINSTANCE>(GetModuleHandle(nullptr));
 	auto hSmallIcon = static_cast<HICON>(LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR));
