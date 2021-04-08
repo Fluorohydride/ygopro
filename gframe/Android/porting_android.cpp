@@ -20,6 +20,7 @@
 #define JINT "I"
 #define JVOID "V"
 
+namespace {
 #define JstringtoC(type, rettype, ...)\
 std::rettype JstringtoC##type(JNIEnv* env, const jstring& jnistring) {\
 	const size_t len = env->GetStringUTFLength(jnistring);\
@@ -34,6 +35,8 @@ JstringtoC(A, string)
 
 std::mutex* queued_messages_mutex = nullptr;
 std::deque<std::function<void()>>* events = nullptr;
+std::unique_ptr<std::unique_lock<std::mutex>> mainGameMutex = nullptr;
+}
 
 extern "C" {
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_EpNativeActivity_putMessageBoxResult(
@@ -300,6 +303,8 @@ bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 				case APP_CMD_PAUSE: {
 					ygo::mainGame->SaveConfig();
 					ygo::gSoundManager->PauseMusic(true);
+					if(mainGameMutex == nullptr)
+						mainGameMutex = std::unique_ptr<std::unique_lock<std::mutex>>(new std::unique_lock<std::mutex>(ygo::mainGame->gMutex));
 					break;
 				}
 				case APP_CMD_GAINED_FOCUS:
@@ -309,6 +314,7 @@ bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 				}
 				case APP_CMD_RESUME: {
 					ygo::gSoundManager->PauseMusic(false);
+					mainGameMutex = nullptr;
 					break;
 				}
 				default: break;
