@@ -100,6 +100,8 @@ namespace ygo {
 
 		static epro::stringview GetUserAgent();
 
+		static epro::path_string GetAbsolutePath(epro::path_stringview path);
+
 		template<typename T>
 		static inline std::vector<T> TokenizeString(const T& input, const T& token);
 		template<typename T>

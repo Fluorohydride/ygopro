@@ -292,6 +292,20 @@ namespace ygo {
 											   ygo::Utils::OSOperator->getOperatingSystemVersion());
 		return agent;
 	}
+	epro::path_string Utils::GetAbsolutePath(epro::path_stringview path) {
+#ifdef _WIN32
+		epro::path_char fpath[MAX_PATH];
+		auto len = GetFullPathName(path.data(), MAX_PATH, fpath, nullptr);
+		epro::path_string ret{ fpath, len };
+		std::replace(ret.begin(), ret.end(), EPRO_TEXT('\\'), EPRO_TEXT('/'));
+		return ret;
+#else
+		epro::path_char* p = realpath(filename.c_str(), nullptr);
+		epro::path_string ret{ p };
+		free(p);
+		return ret;
+#endif
+	}
 	bool Utils::ContainsSubstring(epro::wstringview input, const std::vector<std::wstring>& tokens, bool convertInputCasing, bool convertTokenCasing) {
 		static std::vector<std::wstring> alttokens;
 		static std::wstring casedinput;

@@ -428,6 +428,7 @@ jnienv->CallVoidMethod(app_global->activity->clazz, name, jargs);\
 }
 
 JAVAVOIDSTRINGMETHOD(launchWindbot)
+JAVAVOIDSTRINGMETHOD(addWindbotDatabase)
 JAVAVOIDSTRINGMETHOD(installUpdate)
 JAVAVOIDSTRINGMETHOD(openUrl)
 JAVAVOIDSTRINGMETHOD(openFile)

@@ -6,6 +6,7 @@
 #include "deck_manager.h"
 #include "logging.h"
 #include "utils.h"
+#include "windbot.h"
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 #include "IrrlichtCommonIncludes1.9/CFileSystem.h"
 #else
@@ -19,10 +20,15 @@
 namespace ygo {
 
 void DataHandler::LoadDatabases() {
-	if(Utils::FileExists(EPRO_TEXT("cards.cdb")) && std::ifstream(EPRO_TEXT("cards.cdb")).good())
-		dataManager->LoadDB(EPRO_TEXT("cards.cdb"));
-	for(auto& file : Utils::FindFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("cdb") }, 2))
-		dataManager->LoadDB(EPRO_TEXT("./expansions/") + file);
+	if(Utils::FileExists(EPRO_TEXT("cards.cdb")) && std::ifstream(EPRO_TEXT("cards.cdb")).good()) {
+		if(dataManager->LoadDB(EPRO_TEXT("cards.cdb")))
+			WindBot::AddDatabase(EPRO_TEXT("cards.cdb"));
+	}
+	for(auto& file : Utils::FindFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("cdb") }, 2)) {
+		epro::path_string db = EPRO_TEXT("./expansions/") + file;
+		if(dataManager->LoadDB(db))
+			WindBot::AddDatabase(db);
+	}
 	LoadArchivesDB();
 }
 void DataHandler::LoadArchivesDB() {

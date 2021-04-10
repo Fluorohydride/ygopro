@@ -7,6 +7,9 @@
 #if !defined(_WIN32) && !defined(__ANDROID__)
 #include <sys/types.h>
 #endif
+#ifndef __ANDROID__
+#include <nlohmann/json.hpp>
+#endif
 #include "text_types.h"
 
 namespace ygo {
@@ -26,6 +29,14 @@ struct WindBot {
 	launch_ret_t Launch(int port, epro::wstringview pass, bool chat = true, int hand = 0) const;
 
 	static uint32_t version;
+
+#ifndef __ANDROID__
+	static nlohmann::ordered_json databases;
+	static bool serialized;
+	static epro::path_string serialized_databases;
+#endif
+
+	static void AddDatabase(epro::path_stringview database);
 };
 
 }

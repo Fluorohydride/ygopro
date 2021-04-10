@@ -26,6 +26,8 @@ int getLocalIP();
 
 void launchWindbot(epro::path_stringview args);
 
+void addWindbotDatabase(epro::path_stringview args);
+
 void installUpdate(epro::path_stringview args);
 
 void openUrl(epro::path_stringview url);
