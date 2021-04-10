@@ -300,7 +300,7 @@ namespace ygo {
 		std::replace(ret.begin(), ret.end(), EPRO_TEXT('\\'), EPRO_TEXT('/'));
 		return ret;
 #else
-		epro::path_char* p = realpath(filename.c_str(), nullptr);
+		epro::path_char* p = realpath(path.data(), nullptr);
 		epro::path_string ret{ p };
 		free(p);
 		return ret;
