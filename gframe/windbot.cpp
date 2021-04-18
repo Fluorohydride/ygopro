@@ -30,7 +30,7 @@ bool WindBot::serialized{ false };
 epro::path_string WindBot::serialized_databases{};
 #endif
 
-WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool chat, int hand) const {
+WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool chat, int hand, const wchar_t* overridedeck) const {
 #ifndef __ANDROID__
 	if(!serialized) {
 		serialized = true;
@@ -40,22 +40,31 @@ WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool cha
 #ifdef _WIN32
 	//Windows can modify this string
 	auto args = Utils::ToPathString(fmt::format(
-		L"WindBot.exe HostInfo=\"{}\" Deck=\"{}\" Port={} Version={} name=\"[AI] {}\" Chat={} Hand={} DbPaths={} AssetPath=./WindBot",
-		pass, deck, port, version, name, chat, hand, serialized_databases));
+		L"WindBot.exe HostInfo=\"{}\" Deck=\"{}\" Port={} Version={} name=\"[AI] {}\" Chat={} Hand={} DbPaths={}{} AssetPath=./WindBot",
+		pass, deck, port, version, name, chat, hand, serialized_databases, overridedeck ? fmt::format(L" DeckFile=\"{}\"", overridedeck) : L""));
 	STARTUPINFO si{ sizeof(si) };
 	si.dwFlags = STARTF_USESHOWWINDOW;
 	si.wShowWindow = SW_HIDE;
 	PROCESS_INFORMATION pi;
-	if(!CreateProcess(L"./WindBot/WindBot.exe", &args[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi))
+	if(!CreateProcess(EPRO_TEXT("./WindBot/WindBot.exe"), &args[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi))
 		return false;
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 	return true;
 #elif defined(__ANDROID__)
-	auto param = BufferIO::EncodeUTF8(fmt::format(
-		L"HostInfo='{}' Deck='{}' Port={} Version={} Name='[AI] {}' Chat={} Hand={}",
-		pass, deck, port, version, name, static_cast<int>(chat), hand));
-	porting::launchWindbot(param);
+	nlohmann::json param({
+							{"HostInfo", BufferIO::EncodeUTF8(pass)},
+							{"Deck", BufferIO::EncodeUTF8(deck)},
+							{"Port", fmt::to_string(port)},
+							{"Version", fmt::to_string(version)},
+							{"Name", BufferIO::EncodeUTF8(name)},
+							{"Chat", fmt::to_string(static_cast<int>(chat))},
+							{"Hand", fmt::to_string(hand)}
+						  });
+	if(overridedeck) {
+		param["DeckFile"] = BufferIO::EncodeUTF8(overridedeck);
+	}
+	porting::launchWindbot(param.dump());
 	return true;
 #else
 	std::string argPass = fmt::format("HostInfo={}", BufferIO::EncodeUTF8(pass));
@@ -66,6 +75,9 @@ WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool cha
 	std::string argChat = fmt::format("Chat={}", chat);
 	std::string argHand = fmt::format("Hand={}", hand);
 	std::string argDbPaths = fmt::format("DbPaths={}", serialized_databases);
+	std::string argDeckFile;
+	if(overridedeck)
+		argDeckFile = fmt::format("DeckFile={}", overridedeck);
 	std::string oldpath;
 	if(executablePath.size()) {
 		oldpath = getenv("PATH");
@@ -76,7 +88,7 @@ WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool cha
 	if(pid == 0) {
 		execlp("mono", "WindBot.exe", "./WindBot/WindBot.exe",
 			   argPass.data(), argDeck.data(), argPort.data(), argVersion.data(), argName.data(), argChat.data(),
-			   argDbPaths.data(), "AssetPath=./WindBot", hand ? argHand.data() : nullptr, nullptr);
+			   argDbPaths.data(), "AssetPath=./WindBot", argHand.data(), overridedeck ? argDeckFile.data() : nullptr, nullptr);
 		_exit(EXIT_FAILURE);
 	}
 	if(executablePath.size())

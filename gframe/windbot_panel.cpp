@@ -13,17 +13,34 @@ int WindBotPanel::CurrentIndex() {
 	return selected >= 0 ? cbBotDeck->getItemData(selected) : selected;
 }
 
+int WindBotPanel::CurrentEngine() {
+	int selected = cbBotEngine->getSelected();
+	return selected >= 0 ? cbBotEngine->getItemData(selected) : selected;
+}
+
 void WindBotPanel::Refresh(int filterMasterRule, int lastIndex) {
 	int oldIndex = CurrentIndex();
 	int lastBot = oldIndex >= 0 ? oldIndex : lastIndex;
 	cbBotDeck->clear();
-	for (size_t i = 0; i < bots.size(); i++) {
+	cbBotEngine->clear();
+	genericEngineIdx = -1;
+	size_t i = 0;
+	for (; i < bots.size(); i++) {
 		const auto& bot = bots[i];
 		if (filterMasterRule == 0 || bot.masterRules.find(filterMasterRule) != bot.masterRules.end()) {
 			int newIndex = cbBotDeck->addItem(bot.name.data(), i);
-			if (i == lastBot)
+			cbBotEngine->addItem(bot.name.data(), i);
+			if(genericEngine == &bot)
+				genericEngineIdx = newIndex;
+			if(i == lastBot) {
 				cbBotDeck->setSelected(newIndex);
+				cbBotEngine->setSelected(newIndex);
+			}
 		}
+	}
+	for(auto& file : Utils::FindFiles(EPRO_TEXT("./deck/"), { EPRO_TEXT("ydk") })) {
+		cbBotDeck->addItem(Utils::ToUnicodeIfNeeded(file.substr(0, file.size() - 4)).data(), i);
+		i++;
 	}
 	UpdateDescription();
 }
@@ -32,6 +49,10 @@ void WindBotPanel::UpdateDescription() {
 	int index = CurrentIndex();
 	if (index < 0) {
 		deckProperties->setText(L"");
+		return;
+	}
+	if (index >= (int)bots.size() || index != CurrentEngine()) {
+		deckProperties->setText(L"???");
 		return;
 	}
 	auto& bot = bots[index];
@@ -54,11 +75,35 @@ void WindBotPanel::UpdateDescription() {
 	deckProperties->setText(params.str().data());
 }
 
+void WindBotPanel::UpdateEngine() {
+	int index = CurrentIndex();
+	if(index >= (int)bots.size()) {
+		if(genericEngineIdx != -1)
+			cbBotEngine->setSelected(genericEngineIdx);
+		else
+			cbBotEngine->setSelected(0);
+	} else {
+		cbBotEngine->setSelected(cbBotDeck->getSelected());
+	}
+	UpdateDescription();
+}
+
 bool WindBotPanel::LaunchSelected(int port, epro::wstringview pass) {
 	int index = CurrentIndex();
-	if (index < 0) return false;
+	int engine = CurrentEngine();
+	if (index < 0 || engine < 0) return false;
+	const wchar_t* overridedeck = nullptr;
+	std::wstring tmpdeck{};
+	if(engine != index) {
+		if(index >= (int)bots.size()) {
+			tmpdeck = Utils::ToUnicodeIfNeeded(Utils::GetAbsolutePath(fmt::format(L"./deck/{}.ydk", cbBotDeck->getItem(cbBotDeck->getSelected()))));
+			overridedeck = tmpdeck.data();
+		} else {
+			overridedeck = bots[index].deckfile.data();
+		}
+	}
 	// 1 = scissors, 2 = rock, 3 = paper
-	auto res = bots[index].Launch(port, pass, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
+	auto res = bots[engine].Launch(port, pass, !chkMute->isChecked(), chkThrowRock->isChecked() * 2, overridedeck);
 #if !defined(_WIN32) && !defined(__ANDROID__)
 	if(res > 0)
 		windbotsPids.push_back(res);

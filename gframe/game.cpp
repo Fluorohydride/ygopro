@@ -468,7 +468,7 @@ bool Game::Initialize() {
 		chkHostPrepReady[i] = env->addCheckBox(false, Scale(250, 65 + i * 25, 270, 85 + i * 25), wHostPrepare, CHECKBOX_HP_READY, L"");
 		chkHostPrepReady[i]->setEnabled(false);
 	}
-	gBot.window = env->addWindow(Scale(750, 120, 960, 360), false, gDataManager->GetSysString(2051).data());
+	gBot.window = env->addWindow(Scale(750, 120, 960, 420), false, gDataManager->GetSysString(2051).data());
 	defaultStrings.emplace_back(gBot.window, 2051);
 	gBot.window->getCloseButton()->setVisible(false);
 	gBot.window->setVisible(false);
@@ -478,7 +478,10 @@ bool Game::Initialize() {
 	gBot.chkMute = env->addCheckBox(gGameConfig->botMute, Scale(10, 135, 200, 160), gBot.window, -1, gDataManager->GetSysString(2053).data());
 	defaultStrings.emplace_back(gBot.chkMute, 2053);
 	gBot.cbBotDeck = AddComboBox(env, Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
-	gBot.btnAdd = env->addButton(Scale(10, 200, 200, 225), gBot.window, BUTTON_BOT_ADD, gDataManager->GetSysString(2054).data());
+	gBot.stBotEngine = env->addStaticText(gDataManager->GetSysString(2082).data(), Scale(10, 195, 200, 220), false, false, gBot.window);
+	defaultStrings.emplace_back(gBot.stBotEngine, 2082);
+	gBot.cbBotEngine = AddComboBox(env, Scale(10, 225, 200, 250), gBot.window, COMBOBOX_BOT_ENGINE);
+	gBot.btnAdd = env->addButton(Scale(10, 260, 200, 285), gBot.window, BUTTON_BOT_ADD, gDataManager->GetSysString(2054).data());
 	defaultStrings.emplace_back(gBot.btnAdd, 2054);
 	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, gDataManager->GetSysString(1252).data());
 	defaultStrings.emplace_back(btnHostPrepOB, 1252);
@@ -1591,8 +1594,13 @@ bool Game::MainLoop() {
 				auto data_path = Utils::ToPathString(repo->data_path);
 				auto files = Utils::FindFiles(data_path, { EPRO_TEXT("cdb") }, 0);
 				if(!repo->is_language) {
-					for(auto& file : files)
-						refresh_db = gDataManager->LoadDB(data_path + file) || refresh_db;
+					for(auto& file : files) {
+						const auto db_path = data_path + file;
+						bool db_loaded = gDataManager->LoadDB(db_path);
+						if(db_loaded)
+							WindBot::AddDatabase(db_path);
+						refresh_db = db_loaded || refresh_db;
+					}
 					gDataManager->LoadStrings(data_path + EPRO_TEXT("strings.conf"));
 				} else {
 					if(Utils::ToUTF8IfNeeded(gGameConfig->locale) == repo->language) {
@@ -2058,11 +2066,16 @@ void Game::RefreshAiDecks() {
 				}
 			}
 #endif
+			int genericEngineIdx = -1;
 			for(auto& obj : j) {
 				try {
 					WindBot bot;
 					bot.name = BufferIO::DecodeUTF8(obj.at("name").get_ref<std::string&>());
 					bot.deck = BufferIO::DecodeUTF8(obj.at("deck").get_ref<std::string&>());
+					bot.deckfile = fmt::format(L"AI_{}", bot.deck);
+					if(bot.deck == L"Lucky" ) {
+						genericEngineIdx = (int)gBot.bots.size();
+					}
 					bot.difficulty = obj.at("difficulty").get<int>();
 					for(auto& masterRule : obj.at("masterRules")) {
 						if(masterRule.is_number()) {
@@ -2075,6 +2088,8 @@ void Game::RefreshAiDecks() {
 					ErrorLog(fmt::format("Failed to parse WindBot Ignite config json entry: {}", e.what()));
 				}
 			}
+			if(genericEngineIdx != -1)
+				gBot.genericEngine = &gBot.bots[genericEngineIdx];
 		}
 	} else {
 		ErrorLog("Failed to open WindBot Ignite config json!");

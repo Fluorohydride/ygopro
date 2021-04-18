@@ -17,6 +17,7 @@ namespace ygo {
 struct WindBot {
 	std::wstring name;
 	std::wstring deck;
+	std::wstring deckfile;
 	int difficulty;
 	std::set<int> masterRules;
 
@@ -26,7 +27,7 @@ struct WindBot {
 	using launch_ret_t = pid_t;
 	static epro::path_string executablePath;
 #endif
-	launch_ret_t Launch(int port, epro::wstringview pass, bool chat = true, int hand = 0) const;
+	launch_ret_t Launch(int port, epro::wstringview pass, bool chat, int hand, const wchar_t* overridedeck) const;
 
 	static uint32_t version;
 
