@@ -109,6 +109,11 @@ DataHandler::DataHandler(epro::path_stringview working_dir) {
 	configs->ssl_certificate_path = fmt::format("{}/cacert.cer", porting::internal_storage);
 #endif
 	filesystem = new irr::io::CFileSystem();
+	dataManager = std::unique_ptr<DataManager>(new DataManager());
+	auto strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./config/strings.conf"));
+	strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./expansions/strings.conf")) || strings_loaded;
+	if(!strings_loaded)
+		throw std::runtime_error("Failed to load strings!");
 	Utils::filesystem = filesystem;
 	Utils::working_dir = Utils::NormalizePath(working_dir);
 	LoadZipArchives();
@@ -117,16 +122,10 @@ DataHandler::DataHandler(epro::path_stringview working_dir) {
 	sounds = std::unique_ptr<SoundManager>(new SoundManager(configs->soundVolume / 100.0, configs->musicVolume / 100.0, configs->enablesound, configs->enablemusic, Utils::working_dir));
 	gitManager->LoadRepositoriesFromJson(configs->user_configs);
 	gitManager->LoadRepositoriesFromJson(configs->configs);
-	dataManager = std::unique_ptr<DataManager>(new DataManager());
 	imageDownloader = std::unique_ptr<ImageDownloader>(new ImageDownloader());
 	LoadDatabases();
 	LoadPicUrls();
 	deckManager->LoadLFList();
-	auto strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./config/strings.conf"));
-	strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./expansions/strings.conf")) || strings_loaded;
-	if(!strings_loaded) {
-		throw std::runtime_error("Failed to load strings!");
-	}
 }
 DataHandler::~DataHandler() {
 	if(filesystem)
