@@ -5,6 +5,7 @@
 #include <Windows.h>
 #elif defined(__ANDROID__)
 #include "Android/porting_android.h"
+#include <nlohmann/json.hpp>
 #else
 #include <sys/wait.h>
 #include <unistd.h>
