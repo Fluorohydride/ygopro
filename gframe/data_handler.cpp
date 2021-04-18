@@ -7,6 +7,7 @@
 #include "logging.h"
 #include "utils.h"
 #include "windbot.h"
+#include "windbot_panel.h"
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 #include "IrrlichtCommonIncludes1.9/CFileSystem.h"
 #else
@@ -126,6 +127,7 @@ DataHandler::DataHandler(epro::path_stringview working_dir) {
 	LoadDatabases();
 	LoadPicUrls();
 	deckManager->LoadLFList();
+	WindBotPanel::absolute_deck_path = Utils::ToUnicodeIfNeeded(Utils::GetAbsolutePath(EPRO_TEXT("./deck")));
 }
 DataHandler::~DataHandler() {
 	if(filesystem)

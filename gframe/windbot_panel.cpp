@@ -8,6 +8,8 @@
 
 namespace ygo {
 
+std::wstring WindBotPanel::absolute_deck_path{};
+
 int WindBotPanel::CurrentIndex() {
 	int selected = cbBotDeck->getSelected();
 	return selected >= 0 ? cbBotDeck->getItemData(selected) : selected;
@@ -97,7 +99,7 @@ bool WindBotPanel::LaunchSelected(int port, epro::wstringview pass) {
 	std::wstring tmpdeck{};
 	if(engine != index) {
 		if(index >= (int)bots.size()) {
-			tmpdeck = Utils::ToUnicodeIfNeeded(Utils::GetAbsolutePath(fmt::format(EPRO_TEXT("./deck/{}.ydk"), Utils::ToPathString(cbBotDeck->getItem(cbBotDeck->getSelected())))));
+			tmpdeck = fmt::format(L"{}/{}.ydk", absolute_deck_path, cbBotDeck->getItem(cbBotDeck->getSelected()));
 			overridedeck = tmpdeck.data();
 		} else {
 			overridedeck = bots[index].deckfile.data();
