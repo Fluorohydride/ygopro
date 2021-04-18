@@ -62,9 +62,8 @@ WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool cha
 							{"Chat", fmt::to_string(static_cast<int>(chat))},
 							{"Hand", fmt::to_string(hand)}
 						  });
-	if(overridedeck) {
+	if(overridedeck)
 		param["DeckFile"] = BufferIO::EncodeUTF8(overridedeck);
-	}
 	porting::launchWindbot(param.dump());
 	return true;
 #else
@@ -78,7 +77,7 @@ WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool cha
 	std::string argDbPaths = fmt::format("DbPaths={}", serialized_databases);
 	std::string argDeckFile;
 	if(overridedeck)
-		argDeckFile = fmt::format("DeckFile={}", overridedeck);
+		argDeckFile = fmt::format("DeckFile={}", BufferIO::EncodeUTF8(overridedeck));
 	std::string oldpath;
 	if(executablePath.size()) {
 		oldpath = getenv("PATH");
