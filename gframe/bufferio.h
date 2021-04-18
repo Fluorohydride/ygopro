@@ -154,6 +154,7 @@ private:
 				*out = static_cast<wchar_t>((unicode & 0x3ff) | 0xdc00);
 			}
 		}
+		*out = 0;
 		return out - pstr;
 	}
 	template<bool check = false>
