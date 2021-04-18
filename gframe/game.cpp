@@ -2014,7 +2014,8 @@ bool Game::ApplySkin(const epro::path_string& skinname, bool reload, bool firstr
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 	for(auto& file : Utils::FindFiles(EPRO_TEXT("./deck/"), { EPRO_TEXT("ydk") })) {
-		cbDeck->addItem(Utils::ToUnicodeIfNeeded(file.substr(0, file.size() - 4)).data());
+		file.erase(file.size() - 4);
+		cbDeck->addItem(Utils::ToUnicodeIfNeeded(file).data());
 	}
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(gGameConfig->lastdeck == cbDeck->getItem(i)) {

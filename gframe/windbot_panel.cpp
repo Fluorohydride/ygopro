@@ -39,7 +39,8 @@ void WindBotPanel::Refresh(int filterMasterRule, int lastIndex) {
 		}
 	}
 	for(auto& file : Utils::FindFiles(EPRO_TEXT("./deck/"), { EPRO_TEXT("ydk") })) {
-		cbBotDeck->addItem(Utils::ToUnicodeIfNeeded(file.substr(0, file.size() - 4)).data(), i);
+		file.erase(file.size() - 4);
+		cbBotDeck->addItem(Utils::ToUnicodeIfNeeded(file).data(), i);
 		i++;
 	}
 	UpdateDescription();
