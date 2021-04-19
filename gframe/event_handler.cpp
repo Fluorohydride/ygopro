@@ -147,6 +147,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				if(mainGame->dInfo.player_type == 7) {
+					if(mainGame->wFileSave->isVisible()) {
+						mainGame->saveReplay = false;
+						mainGame->HideElement(mainGame->wFileSave);
+						mainGame->replaySignal.Set();
+					}
 					DuelClient::StopClient();
 					mainGame->dInfo.isInDuel = false;
 					mainGame->dInfo.isStarted = false;
