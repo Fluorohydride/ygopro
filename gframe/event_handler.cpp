@@ -1983,9 +1983,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			}
 			case CHECKBOX_VSYNC: {
 				gGameConfig->vsync = mainGame->gSettings.chkVSync->isChecked();
-#ifndef __ANDROID__
 				mainGame->driver->setVsync(gGameConfig->vsync);
-#endif
 				return true;
 			}
 			case CHECKBOX_SHOW_FPS: {

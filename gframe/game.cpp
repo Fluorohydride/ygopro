@@ -1848,7 +1848,6 @@ bool Game::MainLoop() {
 			unzip_started = true;
 			gClientUpdater->StartUnzipper(Game::UpdateUnzipBar, mainGame);
 		}
-#ifndef __ANDROID__
 #ifdef __APPLE__
 		// Recent versions of macOS break OpenGL vsync while offscreen, resulting in
 		// astronomical FPS and CPU usage. As a workaround, while the game window is
@@ -1867,7 +1866,6 @@ bool Game::MainLoop() {
 				}
 			}
 		}
-#endif
 		while(cur_time >= 1000) {
 			fpsCounter->setText(fmt::format(gDataManager->GetSysString(1444), fps).data());
 			fps = 0;
