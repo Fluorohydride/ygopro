@@ -1498,6 +1498,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		if(mainGame->dInfo.compat_mode)
 			/*duel_rule = */BufferIO::Read<uint8_t>(pbuf);
 		auto lock = LockIf();
+		mainGame->wPhase->setVisible(true);
 		if(!mainGame->dInfo.isCatchingUp) {
 			mainGame->showcardcode = 11;
 			mainGame->showcarddif = 30;
