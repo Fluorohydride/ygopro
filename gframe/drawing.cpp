@@ -155,7 +155,7 @@ void Game::DrawBackGround() {
 		}
 	}
 	auto setAlpha = [](irr::video::SMaterial& material, const irr::video::SColor& color) {
-		int endalpha = std::round(color.getAlpha() * (selFieldAlpha - 5.0) * (0.005));
+		uint32_t endalpha = std::round(color.getAlpha() * (selFieldAlpha - 5.0) * (0.005));
 		material.DiffuseColor = endalpha << 24;
 		material.AmbientColor = color;
 	};
