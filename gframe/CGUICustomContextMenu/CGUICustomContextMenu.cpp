@@ -86,7 +86,7 @@ u32 CGUICustomContextMenu::addItem(IGUIElement * element, s32 commandid) {
 }
 
 u32 CGUICustomContextMenu::insertItem(u32 idx, IGUIElement* element, s32 commandid) {
-	SItem s;
+	SItem s{};
 	s.IsCustom = true;
 	s.CommandId = commandid;
 	s.Element = element;
@@ -109,7 +109,7 @@ u32 CGUICustomContextMenu::insertItem(u32 idx, IGUIElement* element, s32 command
 //! Insert a menu item at specified position.
 u32 CGUICustomContextMenu::insertItem(u32 idx, const wchar_t* text, s32 commandId, bool enabled,
 									  bool hasSubMenu, bool checked, bool autoChecking) {
-	SItem s;
+	SItem s{};
 	s.IsCustom = false;
 	s.Enabled = enabled;
 	s.Checked = checked;
