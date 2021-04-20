@@ -265,8 +265,10 @@ uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint3
 	cardlist_type mainvect(mainc + mainc2);
 	cardlist_type sidevect(sidec + sidec2);
 	auto copy = [&dbuf](uint32_t* vec, uint32_t count) {
-		memcpy(vec, dbuf, count * sizeof(uint32_t));
-		dbuf += count;
+		if(count > 0) {
+			memcpy(vec, dbuf, count * sizeof(uint32_t));
+			dbuf += count;
+		}
 	};
 	copy(mainvect.data(), mainc);
 	copy(sidevect.data(), sidec);
