@@ -37,13 +37,13 @@ public:
 	}
 	template<typename T>
 	inline static int CopyStr(const T* src, T* pstr, int bufsize) {
-		int l = 0;
-		while(src[l] && l < bufsize - 1) {
-			pstr[l] = src[l];
-			l++;
+		auto p = (const uint8_t*)(src);
+		for(const auto* tg = p + (bufsize * sizeof(T)); p <= tg; p += sizeof(T), pstr++) {
+			std::memcpy(pstr, p, sizeof(T));
+			if(!*pstr)
+				break;
 		}
-		pstr[l] = 0;
-		return l;
+		return (const T*)p - src;
 	}
 private:
 	template<bool check = false>
