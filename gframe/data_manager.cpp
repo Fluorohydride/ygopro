@@ -5,7 +5,6 @@
 namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
-wchar_t DataManager::strBuffer[4096];
 byte DataManager::scriptBuffer[0x20000];
 #ifndef YGOPRO_SERVER_MODE
 IFileSystem* DataManager::FileSystem;
@@ -14,6 +13,7 @@ DataManager dataManager;
 
 bool DataManager::LoadDB(const wchar_t* wfile) {
 	char file[256];
+	wchar_t strBuffer[4096];
 	BufferIO::EncodeUTF8(wfile, file);
 #ifdef YGOPRO_SERVER_MODE
 	sqlite3* pDB;
@@ -146,6 +146,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 		return;
 	char strbuf[256];
 	int value;
+	wchar_t strBuffer[4096];
 	sscanf(linebuf, "!%s", strbuf);
 	if(!strcmp(strbuf, "system")) {
 		sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf);
@@ -175,6 +176,7 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 }
 #else
 bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
+	wchar_t strBuffer[4096];
 	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB->handle), strBuffer);
 	if(pStmt)
 		sqlite3_finalize(pStmt);

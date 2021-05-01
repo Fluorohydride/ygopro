@@ -364,22 +364,23 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->wCmdMenu->setVisible(false);
 				ShowCancelOrFinishButton(0);
 				if(!list_command) {
-					int index = -1;
 					select_options.clear();
+					select_options_index.clear();
 					for (size_t i = 0; i < activatable_cards.size(); ++i) {
 						if (activatable_cards[i] == clicked_card) {
 							if(activatable_descs[i].second == EDESC_OPERATION)
 								continue;
-							if(activatable_descs[i].second == EDESC_RESET) {
+							else if(activatable_descs[i].second == EDESC_RESET) {
 								if(id == BUTTON_CMD_ACTIVATE) continue;
 							} else {
 								if(id == BUTTON_CMD_RESET) continue;
 							}
 							select_options.push_back(activatable_descs[i].first);
-							if (index == -1) index = i;
+							select_options_index.push_back(i);
 						}
 					}
 					if (select_options.size() == 1) {
+						int index = select_options_index[0];
 						if (mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
 							DuelClient::SetResponseI((index << 16) + 5);
 						} else if (mainGame->dInfo.curMsg == MSG_SELECT_BATTLECMD) {
@@ -648,9 +649,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					}
 					if(list_command == COMMAND_ACTIVATE || list_command == COMMAND_OPERATION) {
-						int index = -1;
 						command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
 						select_options.clear();
+						select_options_index.clear();
 						for (size_t i = 0; i < activatable_cards.size(); ++i) {
 							if (activatable_cards[i] == command_card) {
 								if(activatable_descs[i].second == EDESC_OPERATION) {
@@ -659,10 +660,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									if(list_command == COMMAND_OPERATION) continue;
 								}
 								select_options.push_back(activatable_descs[i].first);
-								if (index == -1) index = i;
+								select_options_index.push_back(i);
 							}
 						}
 						if (select_options.size() == 1) {
+							int index = select_options_index[0];
 							if (mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
 								DuelClient::SetResponseI((index << 16) + 5);
 							} else if (mainGame->dInfo.curMsg == MSG_SELECT_BATTLECMD) {
@@ -2412,8 +2414,7 @@ void ClientField::SetResponseSelectedOption() const {
 	if(mainGame->dInfo.curMsg == MSG_SELECT_OPTION) {
 		DuelClient::SetResponseI(selected_option);
 	} else {
-		int index = 0;
-		while(activatable_cards[index] != command_card || activatable_descs[index].first != select_options[selected_option]) index++;
+		int index = select_options_index[selected_option];
 		if(mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
 			DuelClient::SetResponseI((index << 16) + 5);
 		} else if(mainGame->dInfo.curMsg == MSG_SELECT_BATTLECMD) {
