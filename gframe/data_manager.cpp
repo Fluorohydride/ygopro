@@ -168,6 +168,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 }
 #ifdef YGOPRO_SERVER_MODE
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
+	wchar_t strBuffer[4096];
 	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB), strBuffer);
 	if(pStmt)
 		sqlite3_finalize(pStmt);
