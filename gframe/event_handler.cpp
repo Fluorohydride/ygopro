@@ -306,11 +306,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				int step = mainGame->scrOption->isVisible() ? mainGame->scrOption->getPos() : 0;
 				selected_option = id - BUTTON_OPTION_0 + step;
 				SetResponseSelectedOption();
+				ShowCancelOrFinishButton(0);
 				break;
 			}
 			case BUTTON_OPTION_OK: {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				SetResponseSelectedOption();
+				ShowCancelOrFinishButton(0);
 				break;
 			}
 			case BUTTON_ANNUMBER_1:
@@ -392,6 +394,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					} else {
 						command_card = clicked_card;
 						ShowSelectOption();
+						ShowCancelOrFinishButton(1);
 					}
 				} else {
 					selectable_cards.clear();
