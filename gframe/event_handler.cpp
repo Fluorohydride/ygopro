@@ -366,10 +366,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->wCmdMenu->setVisible(false);
 				ShowCancelOrFinishButton(0);
 				if(!list_command) {
+					if(!menu_card)
+						break;
 					select_options.clear();
 					select_options_index.clear();
 					for (size_t i = 0; i < activatable_cards.size(); ++i) {
-						if (activatable_cards[i] == clicked_card) {
+						if (activatable_cards[i] == menu_card) {
 							if(activatable_descs[i].second == EDESC_OPERATION)
 								continue;
 							else if(activatable_descs[i].second == EDESC_RESET) {
@@ -392,7 +394,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 						DuelClient::SendResponse();
 					} else {
-						command_card = clicked_card;
+						command_card = menu_card;
 						ShowSelectOption();
 						ShowCancelOrFinishButton(1);
 					}
@@ -447,10 +449,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CMD_SUMMON: {
 				mainGame->wCmdMenu->setVisible(false);
-				if(!clicked_card)
+				if(!menu_card)
 					break;
 				for(size_t i = 0; i < summonable_cards.size(); ++i) {
-					if(summonable_cards[i] == clicked_card) {
+					if(summonable_cards[i] == menu_card) {
 						ClearCommandFlag();
 						DuelClient::SetResponseI(i << 16);
 						DuelClient::SendResponse();
@@ -462,10 +464,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CMD_SPSUMMON: {
 				mainGame->wCmdMenu->setVisible(false);
 				if(!list_command) {
-					if(!clicked_card)
+					if(!menu_card)
 						break;
 					for(size_t i = 0; i < spsummonable_cards.size(); ++i) {
-						if(spsummonable_cards[i] == clicked_card) {
+						if(spsummonable_cards[i] == menu_card) {
 							ClearCommandFlag();
 							DuelClient::SetResponseI((i << 16) + 1);
 							DuelClient::SendResponse();
@@ -504,10 +506,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CMD_MSET: {
 				mainGame->wCmdMenu->setVisible(false);
-				if(!clicked_card)
+				if(!menu_card)
 					break;
 				for(size_t i = 0; i < msetable_cards.size(); ++i) {
-					if(msetable_cards[i] == clicked_card) {
+					if(msetable_cards[i] == menu_card) {
 						DuelClient::SetResponseI((i << 16) + 3);
 						DuelClient::SendResponse();
 						break;
@@ -517,10 +519,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CMD_SSET: {
 				mainGame->wCmdMenu->setVisible(false);
-				if(!clicked_card)
+				if(!menu_card)
 					break;
 				for(size_t i = 0; i < ssetable_cards.size(); ++i) {
-					if(ssetable_cards[i] == clicked_card) {
+					if(ssetable_cards[i] == menu_card) {
 						DuelClient::SetResponseI((i << 16) + 4);
 						DuelClient::SendResponse();
 						break;
@@ -530,10 +532,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CMD_REPOS: {
 				mainGame->wCmdMenu->setVisible(false);
-				if(!clicked_card)
+				if(!menu_card)
 					break;
 				for(size_t i = 0; i < reposable_cards.size(); ++i) {
-					if(reposable_cards[i] == clicked_card) {
+					if(reposable_cards[i] == menu_card) {
 						DuelClient::SetResponseI((i << 16) + 2);
 						DuelClient::SendResponse();
 						break;
@@ -543,10 +545,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CMD_ATTACK: {
 				mainGame->wCmdMenu->setVisible(false);
-				if(!clicked_card)
+				if(!menu_card)
 					break;
 				for(size_t i = 0; i < attackable_cards.size(); ++i) {
-					if(attackable_cards[i] == clicked_card) {
+					if(attackable_cards[i] == menu_card) {
 						DuelClient::SetResponseI((i << 16) + 1);
 						DuelClient::SendResponse();
 						break;
@@ -1559,7 +1561,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					SetShowMark(hovered_card, false);
 				}
 				if(mcard) {
-					if(mcard != clicked_card)
+					if(mcard != menu_card)
 						mainGame->wCmdMenu->setVisible(false);
 					if(hovered_location == LOCATION_HAND) {
 						mcard->is_hovered = true;
@@ -2248,6 +2250,7 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 		mainGame->wCmdMenu->setVisible(false);
 		return;
 	}
+	menu_card = clicked_card;
 	int height = 1;
 	int offset = mainGame->gameConf.resize_popup_menu ? ((mainGame->yScale >= 0.666) ? 21 * mainGame->yScale : 14) : 21;
 	if(flag & COMMAND_ACTIVATE) {

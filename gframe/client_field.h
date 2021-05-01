@@ -132,6 +132,7 @@ public:
 	ClientCard* clicked_card;
 	ClientCard* command_card;
 	ClientCard* highlighting_card;
+	ClientCard* menu_card;
 	int list_command;
 
 	virtual bool OnEvent(const irr::SEvent& event);
