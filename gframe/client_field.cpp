@@ -15,6 +15,7 @@ ClientField::ClientField() {
 	hovered_card = 0;
 	clicked_card = 0;
 	highlighting_card = 0;
+	menu_card = 0;
 	hovered_controler = 0;
 	hovered_location = 0;
 	hovered_sequence = 0;
@@ -83,6 +84,7 @@ void ClientField::Clear() {
 	hovered_card = 0;
 	clicked_card = 0;
 	highlighting_card = 0;
+	menu_card = 0;
 	hovered_controler = 0;
 	hovered_location = 0;
 	hovered_sequence = 0;
