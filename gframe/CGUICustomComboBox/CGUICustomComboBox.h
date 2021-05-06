@@ -68,7 +68,7 @@ public:
 	//! Set the maximal number of rows for the selection listbox
 	virtual void setMaxSelectionRows(u32 max) _IRR_OVERRIDE_;
 
-	//! Get the maximimal number of rows for the selection listbox
+	//! Get the maximal number of rows for the selection listbox
 	virtual u32 getMaxSelectionRows() const _IRR_OVERRIDE_;
 
 	//! called if an event happened.
@@ -87,15 +87,16 @@ private:
 
 	void openCloseMenu();
 	void sendSelectionChangedEvent();
+	void updateListButtonWidth(s32 width);
 
 	IGUIButton* ListButton;
 	IGUIStaticText* SelectedText;
 	IGUIListBox* ListBox;
-	IGUIElement *LastFocus;
+	IGUIElement* LastFocus;
 
 
 	struct SComboData {
-		SComboData(const wchar_t * text, u32 data)
+		SComboData(const wchar_t* text, u32 data)
 			: Name(text), Data(data) {
 		}
 
@@ -108,6 +109,7 @@ private:
 	EGUI_ALIGNMENT HAlign, VAlign;
 	u32 MaxSelectionRows;
 	bool HasFocus;
+	IGUIFont* ActiveFont;
 };
 
 
@@ -117,3 +119,4 @@ private:
 #endif // _IRR_COMPILE_WITH_GUI_
 
 #endif // __C_GUI_CUSTOM_COMBO_BOX_H_INCLUDED__
+
