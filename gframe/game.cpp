@@ -2284,21 +2284,26 @@ void Game::ShowCardInfo(uint32_t code, bool resize, imgType type) {
 		ClearCardInfo(0);
 		return;
 	}
-	if (showingcard == code && !resize && !cardimagetextureloading)
-		return;
-	auto cd = gDataManager->GetCardData(code);
-	if(!cd) {
-		ClearCardInfo(0);
+	bool only_texture = false;
+	if(showingcard == code) {
+		if(!resize && !cardimagetextureloading)
+			return;
+		only_texture = !resize;
 	}
-	showingcard = code;
 	int shouldrefresh = -1;
 	auto img = imageManager.GetTextureCard(code, resize ? prevtype : type, false, true, &shouldrefresh);
 	cardimagetextureloading = false;
 	if(shouldrefresh == 2)
 		cardimagetextureloading = true;
 	imgCard->setImage(img);
-	if(!cd)
+	showingcard = code;
+	if(only_texture)
 		return;
+	auto cd = gDataManager->GetCardData(code);
+	if(!cd) {
+		ClearCardInfo(0);
+		return;
+	}
 	auto tmp_code = code;
 	if(cd->alias && (cd->alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		tmp_code = cd->alias;
