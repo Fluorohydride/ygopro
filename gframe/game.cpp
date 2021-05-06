@@ -2284,11 +2284,14 @@ void Game::ShowCardInfo(uint32_t code, bool resize, imgType type) {
 		ClearCardInfo(0);
 		return;
 	}
-	bool only_texture = false;
+	auto cd = gDataManager->GetCardData(code);
+	if(!cd)
+		ClearCardInfo(0);
+	bool only_texture = !cd;
 	if(showingcard == code) {
 		if(!resize && !cardimagetextureloading)
 			return;
-		only_texture = !resize;
+		only_texture = only_texture || !resize;
 	}
 	int shouldrefresh = -1;
 	auto img = imageManager.GetTextureCard(code, resize ? prevtype : type, false, true, &shouldrefresh);
@@ -2299,11 +2302,6 @@ void Game::ShowCardInfo(uint32_t code, bool resize, imgType type) {
 	showingcard = code;
 	if(only_texture)
 		return;
-	auto cd = gDataManager->GetCardData(code);
-	if(!cd) {
-		ClearCardInfo(0);
-		return;
-	}
 	auto tmp_code = code;
 	if(cd->alias && (cd->alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		tmp_code = cd->alias;
