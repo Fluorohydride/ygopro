@@ -151,8 +151,6 @@ public:
 	virtual bool hasVerticalAutoscrolling() const;
 
 	virtual bool hasHorizontalAutoscrolling() const;
-
-	virtual void setTouchControl(bool touch) { TouchControl = touch; breakText(); }
 	
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 	//! Gets the currently used text color
@@ -175,7 +173,6 @@ private:
 	bool Background;
 	bool RestrainTextInside;
 	bool RightToLeft;
-	bool TouchControl;
 	bool was_pressed;
 	core::position2di prev_position;
 

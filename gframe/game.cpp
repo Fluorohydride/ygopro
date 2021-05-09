@@ -147,9 +147,6 @@ bool Game::Initialize() {
 	stCommitLog = irr::gui::CGUICustomText::addCustomText(L"", false, env, wCommitsLog, -1, Scale(5, 30, 505, 430));
 	stCommitLog->setWordWrap(true);
 	((irr::gui::CGUICustomText*)stCommitLog)->enableScrollBar();
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stCommitLog)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	btnCommitLogExit = env->addButton(Scale(215, 435, 285, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXIT, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnCommitLogExit, 1211);
 	chkCommitLogExpand = env->addCheckBox(false, Scale(295, 435, 500, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXPAND, gDataManager->GetSysString(1447).data());
@@ -440,15 +437,9 @@ bool Game::Initialize() {
 	stHostPrepRuleR = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareR, -1, wHostPrepareRrect);
 	((irr::gui::CGUICustomText*)stHostPrepRuleR)->enableScrollBar();
 	stHostPrepRuleR->setWordWrap(true);
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stHostPrepRuleR)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	stHostPrepRuleL = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareL, -1, wHostPrepareRrect);
 	((irr::gui::CGUICustomText*)stHostPrepRuleL)->enableScrollBar();
 	stHostPrepRuleL->setWordWrap(true);
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stHostPrepRuleL)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	btnHostPrepDuelist = env->addButton(Scale(10, 30, 110, 55), wHostPrepare, BUTTON_HP_DUELIST, gDataManager->GetSysString(1251).data());
 	defaultStrings.emplace_back(btnHostPrepDuelist, 1251);
 	btnHostPrepWindBot = env->addButton(Scale(170, 30, 270, 55), wHostPrepare, BUTTON_HP_AI_TOGGLE, gDataManager->GetSysString(2050).data());
@@ -479,9 +470,6 @@ bool Game::Initialize() {
 	stHostPrepOB = env->addStaticText(fmt::format(L"{} 0", gDataManager->GetSysString(1253)).data(), Scale(10, 210, 270, 230), false, false, wHostPrepare);
 	defaultStrings.emplace_back(stHostPrepOB, 1253);
 	stHostPrepRule = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare, -1, Scale(280, 30, 460, 270));
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stHostPrepRule)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	stHostPrepRule->setWordWrap(true);
 	stDeckSelect = env->addStaticText(gDataManager->GetSysString(1254).data(), Scale(10, 235, 110, 255), false, false, wHostPrepare);
 	defaultStrings.emplace_back(stDeckSelect, 1254);
@@ -537,39 +525,21 @@ bool Game::Initialize() {
 	stName = irr::gui::CGUICustomText::addCustomText(L"", true, env, tabInfo, -1, Scale(10, 10, 287, 32));
 	stName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	((irr::gui::CGUICustomText*)stName)->setTextAutoScrolling(irr::gui::CGUICustomText::LEFT_TO_RIGHT_BOUNCING, 0, 1.0f, 0, 120, 300);
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stName)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	stInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 37, 287, 60));
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stInfo)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	stInfo->setWordWrap(true);
 	stInfo->setOverrideColor(skin::CARDINFO_TYPES_COLOR_VAL);
 	stDataInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 60, 287, 83));
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stDataInfo)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	stDataInfo->setWordWrap(true);
 	stDataInfo->setOverrideColor(skin::CARDINFO_STATS_COLOR_VAL);
 	stSetName = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 83, 287, 106));
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stSetName)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	stSetName->setWordWrap(true);
 	stSetName->setOverrideColor(skin::CARDINFO_ARCHETYPE_TEXT_COLOR_VAL);
 	stSetName->setVisible(!gGameConfig->chkHideSetname);
 	stPasscodeScope = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 129));
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stPasscodeScope)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	stPasscodeScope->setWordWrap(true);
 	stPasscodeScope->setOverrideColor(skin::CARDINFO_PASSCODE_SCOPE_TEXT_COLOR_VAL);
 	stPasscodeScope->setVisible(!gGameConfig->hidePasscodeScope);
 	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 129, 287, 324));
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stText)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	((irr::gui::CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
 	//log
@@ -812,9 +782,6 @@ bool Game::Initialize() {
 	wMessage->setVisible(false);
 	stMessage = irr::gui::CGUICustomText::addCustomText(L"", false, env, wMessage, -1, Scale(20, 20, 350, 100));
 	stMessage->setWordWrap(true);
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stMessage)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	stMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	btnMsgOK = env->addButton(Scale(130, 105, 220, 130), wMessage, BUTTON_MSG_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnMsgOK, 1211);
@@ -825,9 +792,6 @@ bool Game::Initialize() {
 	wACMessage->setDrawBackground(false);
 	stACMessage = irr::gui::CGUICustomText::addCustomText(L"", true, env, wACMessage, -1, Scale(0, 0, 350, 60), true);
 	stACMessage->setWordWrap(true);
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stACMessage)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	stACMessage->setBackgroundColor(skin::DUELFIELD_ANNOUNCE_TEXT_BACKGROUND_COLOR_VAL);
 	auto tmp_color = skin::DUELFIELD_ANNOUNCE_TEXT_COLOR_VAL;
 	if(tmp_color != 0)
@@ -840,9 +804,6 @@ bool Game::Initialize() {
 	wQuery->setVisible(false);
 	stQMessage = irr::gui::CGUICustomText::addCustomText(L"", false, env, wQuery, -1, Scale(20, 20, 350, 100));
 	stQMessage->setWordWrap(true);
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stQMessage)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	stQMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	btnYes = env->addButton(Scale(100, 105, 150, 130), wQuery, BUTTON_YES, gDataManager->GetSysString(1213).data());
 	defaultStrings.emplace_back(btnYes, 1213);
@@ -854,9 +815,6 @@ bool Game::Initialize() {
 	wOptions->setVisible(false);
 	stOptions = irr::gui::CGUICustomText::addCustomText(L"", false, env, wOptions, -1, Scale(20, 20, 350, 100));
 	stOptions->setWordWrap(true);
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stOptions)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	stOptions->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	btnOptionOK = env->addButton(Scale(130, 105, 220, 130), wOptions, BUTTON_OPTION_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnOptionOK, 1211);
@@ -1189,9 +1147,6 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(tmpptr, 1349);
 	stReplayInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, wReplay, -1, Scale(360, 60, 570, 350));
 	stReplayInfo->setWordWrap(true);
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stReplayInfo)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	btnExportDeck = env->addButton(Scale(470, 325, 570, 350), wReplay, BUTTON_EXPORT_DECK, gDataManager->GetSysString(1358).data());
 	defaultStrings.emplace_back(btnExportDeck, 1358);
 	btnExportDeck->setEnabled(false);
@@ -1229,9 +1184,6 @@ bool Game::Initialize() {
 	stSinglePlayInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, wSinglePlay, -1, Scale(350, 60, 570, 320));
 	((irr::gui::CGUICustomText*)stSinglePlayInfo)->enableScrollBar();
 	stSinglePlayInfo->setWordWrap(true);
-#ifdef __ANDROID__
-	((irr::gui::CGUICustomText*)stSinglePlayInfo)->setTouchControl(!gGameConfig->native_mouse);
-#endif
 	//replay save
 	wFileSave = env->addWindow(Scale(510, 200, 820, 320), false, gDataManager->GetSysString(1340).data());
 	defaultStrings.emplace_back(wFileSave, 1340);

@@ -15,6 +15,7 @@
 #endif
 #include <algorithm>
 #include <cmath>
+#include "../game_config.h"
 
 namespace irr {
 namespace gui {
@@ -29,7 +30,7 @@ CGUICustomText::CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment
 	OverrideColor(video::SColor(101, 255, 255, 255)), BGColor(video::SColor(101, 210, 210, 210)), animationWaitStart(0),
 	OverrideFont(nullptr), LastBreakFont(nullptr), scrText(nullptr), prev_time(0), scrolling(NO_SCROLLING), maxFrame(0), curFrame(0.0f),
 	frameTimer(0.0f), forcedSteps(0), forcedStepsRatio(0.0f), animationStep(0), animationWaitEnd(0), increasingFrame(false),
-	waitingEndFrame(false), ScrollWidth(0), ScrollRatio(0.0f), TouchControl(false), was_pressed(false), prev_position(core::position2di(0, 0)) {
+	waitingEndFrame(false), ScrollWidth(0), ScrollRatio(0.0f), was_pressed(false), prev_position(core::position2di(0, 0)) {
 #ifdef _DEBUG
 	setDebugName("CGUICustomText");
 #endif
@@ -383,7 +384,10 @@ void CGUICustomText::breakText() {
 		scrText->setEnabled(false);
 		if(getTextHeight() > RelativeRect.getHeight()) {
 			scrText->setEnabled(true);
-			if(!TouchControl) {
+#ifdef __ANDROID__
+			if(ygo::gGameConfig->native_mouse)
+#endif
+			{
 				scrText->setVisible(true);
 				breakText(true);
 			}
