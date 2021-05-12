@@ -33,6 +33,9 @@ public:
 	bool UpdateDownloaded() {
 		return downloaded;
 	}
+	bool UpdateFailed() {
+		return failed;
+	}
 #ifdef _WIN32
 	using lock_type = void*;
 #else
@@ -51,6 +54,7 @@ private:
 	lock_type Lock{ 0 };
 	std::atomic<bool> has_update{ false };
 	std::atomic<bool> downloaded{ false };
+	std::atomic<bool> failed{ false };
 	std::atomic<bool> downloading{ false };
 #else
 	bool HasUpdate() {

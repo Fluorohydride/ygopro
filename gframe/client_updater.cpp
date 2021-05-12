@@ -240,6 +240,12 @@ void ClientUpdater::Unzip(epro::path_string src, void* payload, unzip_callback c
 	Reboot();
 }
 
+#ifdef __ANDROID__
+#define formatstr EPRO_TEXT("{}/{}.apk")
+#else
+#define formatstr EPRO_TEXT("{}/{}")
+#endif
+
 void ClientUpdater::DownloadUpdate(epro::path_string dest_path, void* payload, update_callback callback) {
 	Utils::SetThreadName("Updater");
 	downloading = true;
@@ -249,20 +255,16 @@ void ClientUpdater::DownloadUpdate(epro::path_string dest_path, void* payload, u
 	cbpayload.payload = payload;
 	int i = 1;
 	for(auto& file : update_urls) {
-		auto name = fmt::format(EPRO_TEXT("{}/{}{}"), dest_path, ygo::Utils::ToPathString(file.name),
-#ifdef __ANDROID__
-								".apk"
-#else
-								EPRO_TEXT("")
-#endif
-		);
+		auto name = fmt::format(formatstr, dest_path, ygo::Utils::ToPathString(file.name));
 		cbpayload.current = i++;
 		cbpayload.filename = file.name.data();
 		cbpayload.is_new = true;
 		cbpayload.previous_percent = -1;
 		std::array<uint8_t, MD5_DIGEST_LENGTH> binmd5;
-		if(file.md5.size() != binmd5.size() * 2)
+		if(file.md5.size() != binmd5.size() * 2) {
+			failed = true;
 			continue;
+		}
 		for(size_t i = 0; i < binmd5.size(); i ++) {
 			uint8_t b = static_cast<uint8_t>(std::stoul(file.md5.substr(i * 2, 2), nullptr, 16));
 			binmd5[i] = b;
@@ -272,23 +274,30 @@ void ClientUpdater::DownloadUpdate(epro::path_string dest_path, void* payload, u
 		if(stream.good() && CheckMd5(stream, binmd5.data()))
 			continue;
 		stream.close();
-		if(!ygo::Utils::CreatePath(name))
+		if(!ygo::Utils::CreatePath(name)) {
+			failed = true;
 			continue;
+		}
 		stream.open(name, std::fstream::out | std::fstream::trunc | std::ofstream::binary);
-		if(!stream.good())
+		if(!stream.good()) {
+			failed = true;
 			continue;
+		}
 		WritePayload wpayload;
 		wpayload.outfstream = &stream;
 		MD5_CTX context{};
 		wpayload.md5context = &context;
 		MD5_Init(wpayload.md5context);
-		if(curlPerform(file.url.data(), &wpayload, &cbpayload) != CURLE_OK)
+		if(curlPerform(file.url.data(), &wpayload, &cbpayload) != CURLE_OK) {
+			failed = true;
 			continue;
+		}
 		uint8_t md5[MD5_DIGEST_LENGTH]{};
 		MD5_Final(md5, &context);
 		if(memcmp(md5, binmd5.data(), MD5_DIGEST_LENGTH) != 0) {
 			stream.close();
 			Utils::FileDelete(name);
+			failed = true;
 			continue;
 		}
 	}
