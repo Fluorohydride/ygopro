@@ -3213,7 +3213,7 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 	if(text.size() != wcslen(obj->getText()))
 		obj->setText(text.data());
 }
-std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
+std::wstring Game::ReadPuzzleMessage(epro::wstringview script_name) {
 	std::ifstream infile(Utils::ToPathString(script_name), std::ifstream::in);
 	std::string str;
 	std::string res = "";
