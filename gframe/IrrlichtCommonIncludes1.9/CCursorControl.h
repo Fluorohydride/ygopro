@@ -8,6 +8,8 @@
 #include <IrrCompileConfig.h>
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
 
+class edoproDropper;
+
 #include "CIrrDeviceStub.h"
 #include <IrrlichtDevice.h>
 #include "IImagePresenter.h"
@@ -396,6 +398,14 @@ private:
 	DEVMODE DesktopMode;
 
 	SJoystickWin32Control* JoyControl;
+
+	edoproDropper* dropper;
+
+	bool has_charevent;
+
+	irr::SEvent key_event;
+
+	static bool is_vista_or_greater;
 };
 
 } // end namespace irr
