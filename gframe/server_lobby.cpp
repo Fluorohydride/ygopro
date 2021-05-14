@@ -178,9 +178,9 @@ void ServerLobby::GetRoomsThread() {
 	std::string retrieved_data;
 	CURL* curl_handle = curl_easy_init();
 	//if(mainGame->chkShowActiveRooms->isChecked()) {
-		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8(serverInfo.roomaddress), serverInfo.roomlistport).data());
+		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", serverInfo.roomaddress, serverInfo.roomlistport).data());
 	/*} else {
-		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8(serverInfo.roomaddress), serverInfo.roomlistport).data());
+		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", serverInfo.roomaddress, serverInfo.roomlistport).data());
 	}*/
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 7L);
@@ -276,7 +276,10 @@ void ServerLobby::JoinServer(bool host) {
 		const ServerInfo& server = serversVector[selected];
 		serverinfo = DuelClient::ResolveServer(server.address, server.duelport);
 	}
-	catch(const std::exception& e) { ErrorLog(fmt::format("Exception occurred: {}", e.what())); }
+	catch(const std::exception& e) {
+		ErrorLog(fmt::format("Exception occurred: {}", e.what()));
+		return;
+	}
 	if(host) {
 		if(!DuelClient::StartClient(serverinfo.first, serverinfo.second))
 			return;

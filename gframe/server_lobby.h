@@ -8,8 +8,8 @@
 namespace ygo {
 struct ServerInfo {
 	std::wstring name;
-	std::wstring address;
-	std::wstring roomaddress;
+	std::string address;
+	std::string roomaddress;
 	int duelport;
 	int roomlistport;
 };

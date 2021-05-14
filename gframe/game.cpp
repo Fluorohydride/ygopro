@@ -2221,8 +2221,8 @@ void Game::LoadServers() {
 				try {
 					ServerInfo tmp_server;
 					tmp_server.name = BufferIO::DecodeUTF8(obj.at("name").get_ref<std::string&>());
-					tmp_server.address = BufferIO::DecodeUTF8(obj.at("address").get_ref<std::string&>());
-					tmp_server.roomaddress = BufferIO::DecodeUTF8(obj.at("roomaddress").get_ref<std::string&>());
+					tmp_server.address = obj.at("address").get<std::string>();
+					tmp_server.roomaddress = obj.at("roomaddress").get<std::string>();
 					tmp_server.roomlistport = obj.at("roomlistport").get<int>();
 					tmp_server.duelport = obj.at("duelport").get<int>();
 					int i = serverChoice->addItem(tmp_server.name.data());

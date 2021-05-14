@@ -68,7 +68,7 @@ uint16_t DuelClient::temp_port = 0;
 uint16_t DuelClient::temp_ver = 0;
 bool DuelClient::try_needed = false;
 
-std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address, epro::stringview port) {
+std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address, int port) {
 	uint32_t remote_addr = htonl(inet_addr(address.data()));
 	if(remote_addr == -1) {
 		evutil_addrinfo hints{};
@@ -77,7 +77,7 @@ std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
 		hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
-		if(evutil_getaddrinfo(address.data(), port.data(), &hints, &answer) != 0)
+		if(evutil_getaddrinfo(address.data(), fmt::to_string(port).data(), &hints, &answer) != 0)
 			throw std::runtime_error("Host not resolved");
 
 		char ip[46];
@@ -88,7 +88,7 @@ std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address
 			throw std::runtime_error("Host not resolved");
 		remote_addr = htonl(inet_addr(ip));
 	}
-	return { remote_addr, static_cast<uint16_t>(std::stoi({port.data(), port.size()})) };
+	return { remote_addr, static_cast<uint16_t>(port) };
 }
 
 bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool create_game) {
