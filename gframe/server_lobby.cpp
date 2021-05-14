@@ -170,7 +170,6 @@ void ServerLobby::GetRoomsThread() {
 	if (selected < 0) return;
 	ServerInfo serverInfo = serversVector[selected];
 
-	GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_WAIT);
 	mainGame->btnLanRefresh2->setEnabled(false);
 	mainGame->serverChoice->setEnabled(false);
 	mainGame->roomListTable->setVisible(false);
@@ -202,11 +201,11 @@ void ServerLobby::GetRoomsThread() {
 	if(res != CURLE_OK) {
 		//error
 		mainGame->PopupMessage(gDataManager->GetSysString(2037));
-		GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_NORMAL);
 		mainGame->btnLanRefresh2->setEnabled(true);
 		mainGame->serverChoice->setEnabled(true);
 		mainGame->roomListTable->setVisible(true);
 		is_refreshing = false;
+		has_refreshed = true;
 		return;
 	}
 
@@ -262,6 +261,7 @@ void ServerLobby::RefreshRooms() {
 		return;
 	is_refreshing = true;
 	mainGame->roomListTable->clearRows();
+	GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_WAIT);
 	std::thread(GetRoomsThread).detach();
 }
 bool ServerLobby::HasRefreshedRooms() {
