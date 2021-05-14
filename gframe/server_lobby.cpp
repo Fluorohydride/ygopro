@@ -112,7 +112,7 @@ void ServerLobby::FillOnlineRooms() {
 			(room.info.duel_flag_low & DUEL_RELAY) ? L" (Relay)" : L"").data());
 		int rule;
 		auto duel_flag = (((uint64_t)room.info.duel_flag_low) | ((uint64_t)room.info.duel_flag_high) << 32);
-		mainGame->GetMasterRule(duel_flag & ~(DUEL_RELAY | DUEL_TCG_SEGOC_NONPUBLIC), room.info.forbiddentypes, &rule);
+		mainGame->GetMasterRule(duel_flag & ~(DUEL_RELAY | DUEL_TCG_SEGOC_NONPUBLIC | DUEL_PSEUDO_SHUFFLE), room.info.forbiddentypes, &rule);
 		if(rule == 6) {
 			if(duel_flag == DUEL_MODE_GOAT) {
 				roomListTable->setCellText(index, 3, "GOAT");
@@ -240,7 +240,7 @@ void ServerLobby::GetRoomsThread() {
 					room.info.time_limit = GET("time_limit", int);
 					room.info.rule = GET("rule", int);
 					room.info.no_check_deck = GET("no_check", bool);
-					room.info.no_shuffle_deck = GET("no_shuffle", bool);
+					room.info.no_shuffle_deck = GET("no_shuffle", bool) || (flag & DUEL_PSEUDO_SHUFFLE);
 					room.info.lflist = GET("banlist_hash", int);
 #undef GET
 					for (auto& obj2 : obj["users"])
