@@ -111,8 +111,7 @@ namespace ygo {
 		template<typename T>
 		static T ToUpperNoAccents(T input);
 		/** Returns true if and only if all tokens are contained in the input. */
-		static bool ContainsSubstring(epro::wstringview input, const std::vector<std::wstring>& tokens, bool convertInputCasing = false, bool convertTokenCasing = false);
-		static bool ContainsSubstring(epro::wstringview input, epro::wstringview token, bool convertInputCasing = false, bool convertTokenCasing = false);
+		static bool ContainsSubstring(epro::wstringview input, const std::vector<std::wstring>& tokens);
 		template<typename T>
 		static bool KeepOnlyDigits(T& input, bool negative = false);
 		template<typename T>

@@ -306,38 +306,16 @@ namespace ygo {
 		return ret;
 #endif
 	}
-	bool Utils::ContainsSubstring(epro::wstringview input, const std::vector<std::wstring>& tokens, bool convertInputCasing, bool convertTokenCasing) {
-		static std::vector<std::wstring> alttokens;
-		static std::wstring casedinput;
+	bool Utils::ContainsSubstring(epro::wstringview input, const std::vector<std::wstring>& tokens) {
 		if (input.empty() || tokens.empty())
 			return false;
-		if(convertInputCasing) {
-			casedinput = ToUpperNoAccents<std::wstring>({ input.data(), input.size() });
-			input = casedinput;
-		}
-		if (convertTokenCasing) {
-			alttokens.clear();
-			for (const auto& token : tokens)
-				alttokens.push_back(ToUpperNoAccents(token));
-		}
 		std::size_t pos1, pos2 = 0;
-		for (auto& token : convertTokenCasing ? alttokens : tokens) {
-			if ((pos1 = input.find(token, pos2)) == epro::wstringview::npos)
+		for (const auto& token : tokens) {
+			if((pos1 = input.find(token, pos2)) == epro::wstringview::npos)
 				return false;
 			pos2 = pos1 + token.size();
 		}
 		return true;
-	}
-	bool Utils::ContainsSubstring(epro::wstringview input, epro::wstringview token, bool convertInputCasing, bool convertTokenCasing) {
-		if (input.empty() && !token.empty())
-			return false;
-		if (token.empty())
-			return true;
-		if(convertInputCasing) {
-			return ToUpperNoAccents<std::wstring>(input.data()).find(convertTokenCasing ? ToUpperNoAccents<std::wstring>(token.data()).data() : token.data()) != std::wstring::npos;
-		} else {
-			return input.find(convertTokenCasing ? ToUpperNoAccents<std::wstring>(token.data()).data() : token.data()) != epro::wstringview::npos;
-		}
 	}
 	bool Utils::CreatePath(epro::path_stringview path, epro::path_string workingdir) {
 		const bool wasempty = workingdir.empty();

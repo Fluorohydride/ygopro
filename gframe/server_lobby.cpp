@@ -65,11 +65,10 @@ void ServerLobby::FillOnlineRooms() {
 		}
 		if(doFilter) {
 			if(searchText.size()) {
-				bool res = Utils::ContainsSubstring(room.description, searchText, true);
-				for(auto& name : room.players) {
-					res = res || Utils::ContainsSubstring(name, searchText, true);
-				}
-				if(!res)
+				auto res = Utils::ToUpperNoAccents(room.description).find(searchText);
+				for(auto it = room.players.cbegin(); res == std::wstring::npos && it != room.players.cend(); it++)
+					res = Utils::ToUpperNoAccents(*it).find(searchText);
+				if(res == std::wstring::npos)
 					continue;
 			}
 			if(bestOf && room.info.best_of != bestOf)
@@ -91,7 +90,8 @@ void ServerLobby::FillOnlineRooms() {
 			if(mainGame->btnFilterRelayMode->isPressed() && !(room.info.duel_flag_low & DUEL_RELAY))
 				continue;
 		}
-		std::wstring banlist;
+
+		epro::wstringview banlist = L"???";
 
 		for(auto& list : gdeckManager->_lfList) {
 			if(list.hash == room.info.lflist) {
@@ -126,13 +126,12 @@ void ServerLobby::FillOnlineRooms() {
 			roomListTable->setCellText(index, 3, fmt::format(L"{}MR {}", 
 															 (duel_flag & DUEL_TCG_SEGOC_NONPUBLIC) ? L"TCG " : L"",
 															 (rule == 0) ? 3 : rule).data());
-		roomListTable->setCellText(index, 4, (banlist.size()) ? banlist.data() : L"???");
+		roomListTable->setCellText(index, 4, banlist.data());
 		std::wstring players;
-		for(auto& player : room.players) {
+		for(const auto& player : room.players)
 			players.append(player).append(L", ");
-		}
 		if(players.size())
-			players.resize(players.size() - 2);
+			players.erase(players.size() - 2);
 		roomListTable->setCellText(index, 5, players.data());
 		roomListTable->setCellText(index, 6, room.description.data());
 		roomListTable->setCellText(index, 7, room.started ? gDataManager->GetSysString(1986).data() : gDataManager->GetSysString(1987).data());
