@@ -1296,7 +1296,7 @@ void ClientField::UpdateDeclarableList(bool refresh) {
 	for(const auto& card : gDataManager->cards) {
 		const auto strings = card.second.GetStrings();
 		const auto& name = strings->uppercase_name;
-		if(Utils::ContainsSubstring(name, pname)) {
+		if(name.find(pname) != std::wstring::npos) {
 			if(is_declarable(&card.second._data, declare_opcodes)) {
 				if(pname == name) { //exact match
 					mainGame->lstANCard->insertItem(0, strings->name.data(), -1);
