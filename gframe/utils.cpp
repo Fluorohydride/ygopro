@@ -177,7 +177,7 @@ namespace ygo {
 			while(auto dirp = readdir(dir)) {
 #ifdef _DIRENT_HAVE_D_TYPE //avoid call to format and stat
 				bool isdir = false;
-				if(dirp->d_type != DT_LINK && dirp->d_type != DT_UNKNOWN) {
+				if(dirp->d_type != DT_LNK && dirp->d_type != DT_UNKNOWN) {
 					isdir = dirp->d_type == DT_DIR;
 					if(!isdir && dirp->d_type != DT_REG) //not a folder nor file, skip
 						continue;
