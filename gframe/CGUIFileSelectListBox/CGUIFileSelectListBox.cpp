@@ -321,6 +321,7 @@ bool CGUIFileSelectListBox::OnEvent(const SEvent& event) {
 							if(Items[current].text.size() >= KeyBuffer.size()) {
 								if(ygo::Utils::EqualIgnoreCase(KeyBuffer, Items[current].text.substr(0, KeyBuffer.size()))) {
 									if(Parent && Selected != current && !Selecting && !MoveOverSelect) {
+										Selected = current;
 										SEvent e;
 										e.EventType = EET_GUI_EVENT;
 										e.GUIEvent.Caller = this;
