@@ -175,11 +175,11 @@ namespace ygo {
 #else
 		if(auto dir = opendir(path.data())) {
 			while(auto dirp = readdir(dir)) {
-#ifdef _DIRENT_HAVE_D_TYPE //avoid call to format and stat
 				bool isdir = false;
+#ifdef _DIRENT_HAVE_D_TYPE //avoid call to format and stat
 				if(dirp->d_type != DT_LNK && dirp->d_type != DT_UNKNOWN) {
 					isdir = dirp->d_type == DT_DIR;
-					if(!isdir && dirp->d_type != DT_REG) //not a folder nor file, skip
+					if(!isdir && dirp->d_type != DT_REG) //not a folder or file, skip
 						continue;
 				} else
 #endif
@@ -187,7 +187,7 @@ namespace ygo {
 					Stat fileStat;
 					stat(fmt::format("{}{}", path, dirp->d_name).data(), &fileStat);
 					isdir = !!S_ISDIR(fileStat.st_mode);
-					if(!isdir && !S_ISREG(fileStat.st_mode)) //not a folder nor file, skip
+					if(!isdir && !S_ISREG(fileStat.st_mode)) //not a folder or file, skip
 						continue;
 				}
 				cb(dirp->d_name, isdir);
