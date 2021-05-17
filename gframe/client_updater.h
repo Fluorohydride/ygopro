@@ -63,6 +63,9 @@ private:
 	bool UpdateDownloaded() {
 		return false;
 	}
+	bool UpdateFailed() {
+		return false;
+	}
 #endif
 };
 
