@@ -190,7 +190,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 #undef CHECK
 				options.duelFlags |= mainGame->chkHandTestNoShuffle->isChecked() ? DUEL_PSEUDO_SHUFFLE : 0;
 				SingleMode::singleSignal.SetNoWait(false);
-				SingleMode::StartPlay(options);
+				SingleMode::StartPlay(std::move(options));
 				break;
 			}
 			case BUTTON_HAND_TEST_CANCEL: {

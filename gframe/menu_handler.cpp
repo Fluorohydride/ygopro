@@ -559,7 +559,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					SingleMode::DuelOptions opts;
 					if(!open_file)
 						opts.scriptName = BufferIO::EncodeUTF8(list->getListItem(selected, true));
-					SingleMode::StartPlay(opts);
+					SingleMode::StartPlay(std::move(opts));
 				}
 				break;
 			}
@@ -774,7 +774,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				else {
 					SingleMode::singleSignal.SetNoWait(false);
 					SingleMode::DuelOptions opts(BufferIO::EncodeUTF8(list->getListItem(selected, true)));
-					SingleMode::StartPlay(opts);
+					SingleMode::StartPlay(std::move(opts));
 				}
 				break;
 			}

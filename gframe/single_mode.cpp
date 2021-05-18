@@ -26,10 +26,10 @@ Replay SingleMode::new_replay;
 ReplayStream SingleMode::replay_stream;
 Signal SingleMode::singleSignal;
 
-bool SingleMode::StartPlay(const DuelOptions& duelOptions) {
+bool SingleMode::StartPlay(DuelOptions&& duelOptions) {
 	if(mainGame->dInfo.isSingleMode)
 		return false;
-	std::thread(SinglePlayThread, duelOptions).detach();
+	std::thread(SinglePlayThread, std::move(duelOptions)).detach();
 	return true;
 }
 void SingleMode::StopPlay(bool is_exiting) {
@@ -53,7 +53,7 @@ void SingleMode::SetResponse(void* resp, uint32_t len) {
 	last_replay.WriteData(resp, len);
 	OCG_DuelSetResponse(pduel, resp, len);
 }
-int SingleMode::SinglePlayThread(DuelOptions duelOptions) {
+int SingleMode::SinglePlayThread(DuelOptions&& duelOptions) {
 	Utils::SetThreadName("SinglePlay");
 	uint64_t opt = duelOptions.duelFlags;
 	std::string script_name = "";
