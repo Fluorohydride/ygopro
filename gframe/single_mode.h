@@ -25,7 +25,7 @@ public:
 		bool handTestNoOpponent = true;
 		std::string scriptName = "";
 		DuelOptions() {};
-		explicit DuelOptions(epro::stringview filename) : scriptName({ filename.data(), filename.size() }) {};
+		explicit DuelOptions(epro::stringview filename) : scriptName(filename.data(), filename.size()) {};
 	};
 
 	static bool StartPlay(const DuelOptions& duelOptions);
