@@ -11,7 +11,7 @@
 
 namespace ygo {
 
-constexpr wchar_t DataManager::unknown_string[];
+constexpr wchar_t const* DataManager::unknown_string;
 
 static constexpr const char SELECT_STMT[] =
 R"(
