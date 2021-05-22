@@ -51,8 +51,8 @@ struct DtorType;
 #define DESTRUCTOR(objtype) template<>\
 struct DtorType<objtype>\
 {\
-	using type = void(&)(objtype*);\
-	static constexpr type value = objtype##_free;\
+	static constexpr auto value = objtype##_free;\
+	using type = decltype(value);\
 }
 
 DESTRUCTOR(git_commit);
