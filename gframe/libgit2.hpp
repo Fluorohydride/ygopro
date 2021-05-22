@@ -104,7 +104,7 @@ inline void Check(int error)
 template<typename Ctor,
 	typename T = Detail::RemoveAllPointers_t<Detail::GetArg_t<0, Ctor>>,
 	typename... Args>
-decltype(auto) MakeUnique(Ctor ctor, Args&& ...args)
+UniqueObj<T> MakeUnique(Ctor ctor, Args&& ...args)
 {
 	T* obj;
 	Check(ctor(&obj, std::forward<Args>(args)...));
