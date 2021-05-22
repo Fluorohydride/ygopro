@@ -73,30 +73,28 @@ namespace ygo {
 		static std::vector<epro::path_string> FindSubfolders(epro::path_stringview path, int subdirectorylayers = 1, bool addparentpath = true);
 		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, epro::path_stringview path, const std::vector<epro::path_stringview>& extensions, int subdirectorylayers = 0);
 		static irr::io::IReadFile* FindFileInArchives(epro::path_stringview path, epro::path_stringview name);
-		template<typename T, typename rettype = std::basic_string<typename T::value_type>>
-		static rettype NormalizePath(const T& path, bool trailing_slash = true);
-		template<typename T>
-		static inline std::basic_string<T> NormalizePath(const T* path, bool trailing_slash = true) {
-			return NormalizePath<epro::basic_string_view<T>>(path, trailing_slash);
+
+#define DECLARE_STRING_VIEWED(funcname) \
+		template<typename T, typename... Args>\
+		static inline auto funcname(const T& _arg, Args&&... args) {\
+			const epro::basic_string_view<typename T::value_type> arg{ _arg.data(), _arg.size() };\
+			return funcname##Impl(arg, std::forward<Args>(args)...);\
+		}\
+		template<typename T, typename... Args>\
+		static inline auto funcname(const T* _arg, Args&&... args) {\
+			const epro::basic_string_view<T> arg{ _arg };\
+			return funcname##Impl(arg, std::forward<Args>(args)...);\
 		}
-		template<typename T, typename rettype = std::basic_string<typename T::value_type>>
-		static rettype GetFileExtension(const T& file, bool convert_case = true);
-		template<typename T>
-		static inline std::basic_string<T> GetFileExtension(const T* path, bool convert_case = true) {
-			return GetFileExtension<epro::basic_string_view<T>>(path, convert_case);
-		}
-		template<typename T, typename rettype = std::basic_string<typename T::value_type>>
-		static rettype GetFilePath(const T& file);
-		template<typename T>
-		static inline std::basic_string<T> GetFilePath(const T* path) {
-			return GetFilePath<epro::basic_string_view<T>>(path);
-		}
-		template<typename T, typename rettype = std::basic_string<typename T::value_type>>
-		static rettype GetFileName(const T& _file, bool keepextension = false);
-		template<typename T>
-		static inline std::basic_string<T> GetFileName(const T* path, bool keepextension = false) {
-			return GetFileName<epro::basic_string_view<T>>(path, keepextension);
-		}
+
+		DECLARE_STRING_VIEWED(NormalizePath)
+
+		DECLARE_STRING_VIEWED(GetFileExtension)
+
+		DECLARE_STRING_VIEWED(GetFilePath)
+
+		DECLARE_STRING_VIEWED(GetFileName)
+
+#undef DECLARE_STRING_VIEWED
 
 		static epro::stringview GetUserAgent();
 
@@ -148,16 +146,24 @@ namespace ygo {
 
 	private:
 		static void InternalSetThreadName(const char* name, const wchar_t* wname);
+		template<typename T>
+		static auto NormalizePathImpl(const epro::basic_string_view<T>& path, bool trailing_slash = true);
+		template<typename T>
+		static auto GetFileExtensionImpl(const epro::basic_string_view<T>& file, bool convert_case = true);
+		template<typename T>
+		static auto GetFilePathImpl(const epro::basic_string_view<T>& file);
+		template<typename T>
+		static auto GetFileNameImpl(const epro::basic_string_view<T>& file, bool keepextension = false);
 	};
-
-#define CHAR_T typename T::value_type
-#define CAST(c) static_cast<CHAR_T>(c)
-template<typename T, typename rettype>
-rettype Utils::NormalizePath(const T& _path, bool trailing_slash) {
-	rettype path{ _path.data(), _path.size() };
-	static const rettype prev{ CAST('.'), CAST('.') };
-	static const rettype cur{ CAST('.') };
-	constexpr auto slash = CAST('/');
+	
+#define CHAR_T_STRING(text) epro::basic_string_view<T>{ std::is_same<T, wchar_t>::value ? reinterpret_cast<const T*>(L ##text) : reinterpret_cast<const T*>(text) }
+#define CAST(c) static_cast<T>(c)
+template<typename T>
+auto Utils::NormalizePathImpl(const epro::basic_string_view<T>& _path, bool trailing_slash) {
+	std::basic_string<T> path{ _path.data(), _path.size() };
+	static const auto cur = CHAR_T_STRING(".");
+	static const auto prev = CHAR_T_STRING("..");
+	static constexpr auto slash = CAST('/');
 	std::replace(path.begin(), path.end(), CAST('\\'), slash);
 	auto paths = TokenizeString(path, slash);
 	if(paths.empty())
@@ -188,49 +194,54 @@ rettype Utils::NormalizePath(const T& _path, bool trailing_slash) {
 		path = slash + path;
 	return path;
 }
+#undef CHAR_T_STRING
 
-template<typename T, typename rettype>
-rettype Utils::GetFileExtension(const T& _file, bool convert_case) {
-	rettype file{ _file.data(), _file.size() };
+template<typename T>
+auto Utils::GetFileExtensionImpl(const epro::basic_string_view<T>& file, bool convert_case) {
+	using rettype = std::basic_string<T>;
 	size_t dotpos = file.find_last_of(CAST('.'));
-	if(dotpos == rettype::npos)
+	if(dotpos == file.npos)
 		return rettype();
-	file.erase(0, dotpos + 1);
+	rettype ret(file.substr(dotpos + 1));
 	if(convert_case)
-		std::transform(file.begin(), file.end(), file.begin(), ::towlower);
-	return file;
+		std::transform(ret.begin(), ret.end(), ret.begin(), ::towlower);
+	return ret;
 }
 
-template<typename T, typename rettype>
-rettype Utils::GetFilePath(const T& _file) {
+template<typename T>
+auto Utils::GetFilePathImpl(const epro::basic_string_view<T>& _file) {
+	using rettype = std::basic_string<T>;
+	static const rettype current{ CAST('.'),CAST('/') };
 	rettype file{ _file.data(), _file.size() };
 	std::replace(file.begin(), file.end(), CAST('\\'), CAST('/'));
 	size_t slashpos = file.find_last_of(CAST('/'));
-	if(slashpos == rettype::npos)
-		return rettype{ CAST('.'),CAST('/') };
+	if(slashpos == file.npos)
+		return current;
 	file.erase(slashpos + 1);
 	return file;
 }
 
-template<typename T, typename rettype>
-rettype Utils::GetFileName(const T& _file, bool keepextension) {
+template<typename T>
+auto Utils::GetFileNameImpl(const epro::basic_string_view<T>& _file, bool keepextension) {
+	using rettype = std::basic_string<T>;
 	rettype file{ _file.data(), _file.size() };
 	std::replace(file.begin(), file.end(), CAST('\\'), CAST('/'));
 	size_t dashpos = file.find_last_of(CAST('/'));
-	if(dashpos == rettype::npos)
+	if(dashpos == file.npos)
 		dashpos = 0;
 	else
 		dashpos++;
 	size_t dotpos = file.size();
 	if(!keepextension) {
-		dotpos = file.find_last_of(CAST('.'));
-		if(dotpos == rettype::npos)
-			dotpos = file.size();
+		auto _dotpos = file.find_last_of(CAST('.'));
+		if(_dotpos != file.npos)
+			dotpos = _dotpos;
 	}
 	file.erase(dotpos);
 	file.erase(0, dashpos);
 	return file;
 }
+#undef CAST
 
 template<typename T>
 inline std::vector<T> Utils::TokenizeString(const T& input, const T& token) {
@@ -299,7 +310,7 @@ T Utils::ToUpperChar(T c) {
 
 template<typename T>
 inline T Utils::ToUpperNoAccents(T input) {
-	std::transform(input.begin(), input.end(), input.begin(), ToUpperChar<CHAR_T>);
+	std::transform(input.begin(), input.end(), input.begin(), ToUpperChar<typename T::value_type>);
 	return input;
 }
 
@@ -307,11 +318,11 @@ template<typename T>
 inline bool Utils::KeepOnlyDigits(T& input, bool negative) {
 	bool changed = false;
 	for (auto it = input.begin(); it != input.end();) {
-		if(*it == CAST('-') && negative && it == input.begin()) {
+		if(*it == static_cast<typename T::value_type>('-') && negative && it == input.begin()) {
 			it++;
 			continue;
 		}
-		if ((uint32_t)(*it - CAST('0')) > 9) {
+		if ((uint32_t)(*it - static_cast<typename T::value_type>('0')) > 9) {
 			it = input.erase(it);
 			changed = true;
 			continue;
@@ -320,8 +331,6 @@ inline bool Utils::KeepOnlyDigits(T& input, bool negative) {
 	}
 	return changed;
 }
-#undef CAST
-#undef CHAR_T
 
 inline epro::path_string Utils::ToPathString(epro::wstringview input) {
 #ifdef UNICODE
