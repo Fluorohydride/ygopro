@@ -74,7 +74,11 @@ void SoundManager::RefreshBGMList() {
 #endif
 }
 void SoundManager::RefreshSoundsList() {
+#if defined(_MSC_VER) && _MSC_VER == 1900
+	static const std::pair<SFX, epro::path_stringview> fx[] = {
+#else
 	static constexpr std::pair<SFX, epro::path_stringview> fx[] = {
+#endif
 		{SUMMON, EPRO_TEXT("./sound/summon.{}")},
 		{SPECIAL_SUMMON, EPRO_TEXT("./sound/specialsummon.{}")},
 		{ACTIVATE, EPRO_TEXT("./sound/activate.{}")},

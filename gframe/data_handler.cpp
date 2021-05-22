@@ -98,7 +98,11 @@ void DataHandler::LoadZipArchives() {
 	}
 }
 static void DeleteOutdatedDbs() {
+#if defined(_MSC_VER) && _MSC_VER == 1900
+	static const epro::path_stringview dbs[] = {
+#else
 	static constexpr epro::path_stringview dbs[] = {
+#endif
 		EPRO_TEXT("./expansions/BLVO-release.cdb"),
 		EPRO_TEXT("./expansions/cards-rush-prerelease.cdb"),
 		EPRO_TEXT("./expansions/cards-unofficial-new.cdb"),
