@@ -67,7 +67,9 @@ workspace "ygo"
 	startproject "ygopro"
 	staticruntime "on"
 	if _OPTIONS["oldwindows"] then
-		filter "action:vs*"
+		filter "action:vs2015"
+			toolset "v140_xp"
+		filter { "action:vs*", "action:not vs2015" }
 			toolset "v141_xp"
 		filter {}
 	end
