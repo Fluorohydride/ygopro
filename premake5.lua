@@ -22,6 +22,7 @@ newoption {
 }
 newoption {
 	trigger = "no-joystick",
+	default = "true",
 	description = "Add base joystick compatibility (Requires SDL2)"
 }
 newoption {

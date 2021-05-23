@@ -32,7 +32,7 @@ local ygopro_config=function(static_core)
 	filter "system:macosx"
 		links { "iconv" }
 	filter {}
-	if not _OPTIONS["no-joystick"] then
+	if _OPTIONS["no-joystick"]=="false" then
 		defines "YGOPRO_USE_JOYSTICK"
 		filter { "system:not windows", "configurations:Debug" }
 			links { "SDL2d" }
