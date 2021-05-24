@@ -706,6 +706,7 @@ void ClientField::RefreshAllCards() {
 		refresh(skills[p]);
 	}
 	refreshloc(overlay_cards);
+	mainGame->should_refresh_hands = true;
 }
 void ClientField::GetChainDrawCoordinates(uint8_t controler, uint8_t location, uint32_t sequence, irr::core::vector3df* t) {
 	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;

@@ -316,6 +316,7 @@ public:
 	std::wstring queued_msg;
 	std::wstring queued_caption;
 	bool should_reload_skin;
+	bool should_refresh_hands;
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;

@@ -1467,11 +1467,6 @@ static inline void BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f
 }
 bool Game::MainLoop() {
 	irr::core::matrix4 mProjection;
-	auto RefreshHands = [&]() {
-		std::unique_lock<std::mutex> lk(gMutex);
-		if(dInfo.isInDuel)
-			dField.RefreshHandHitboxes();
-	};
 	camera = smgr->addCameraSceneNode(0);
 	BuildProjectionMatrix(mProjection, CAMERA_LEFT, CAMERA_RIGHT, CAMERA_BOTTOM, CAMERA_TOP, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
@@ -1640,7 +1635,7 @@ bool Game::MainLoop() {
 			window_scale.X = (window_size.Width / 1024.0) / gGameConfig->dpi_scale;
 			window_scale.Y = (window_size.Height / 640.0) / gGameConfig->dpi_scale;
 			cardimagetextureloading = false;
-			RefreshHands();
+			should_refresh_hands = true;
 			OnResize();
 		}
 		frame_counter += (float)delta_time * 60.0f/1000.0f;
@@ -1655,6 +1650,8 @@ bool Game::MainLoop() {
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
 		gMutex.lock();
+		if(should_refresh_hands && dInfo.isInDuel)
+			dField.RefreshHandHitboxes();
 		if(dInfo.isInDuel) {
 			if(dInfo.isReplay)
 				discord.UpdatePresence(DiscordWrapper::REPLAY);
