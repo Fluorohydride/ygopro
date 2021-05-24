@@ -650,6 +650,18 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		mainGame->btnSideShuffle->setVisible(true);
 		mainGame->btnSideSort->setVisible(true);
 		mainGame->btnSideReload->setVisible(true);
+		if(mainGame->wQuery->isVisible())
+			mainGame->HideElement(mainGame->wQuery);
+		if(mainGame->wPosSelect->isVisible())
+			mainGame->HideElement(mainGame->wPosSelect);
+		if(mainGame->wCardSelect->isVisible())
+			mainGame->HideElement(mainGame->wCardSelect);
+		if(mainGame->wCardDisplay->isVisible())
+			mainGame->HideElement(mainGame->wCardDisplay);
+		if(mainGame->wANNumber->isVisible())
+			mainGame->HideElement(mainGame->wANNumber);
+		if(mainGame->wANCard->isVisible())
+			mainGame->HideElement(mainGame->wANCard);
 		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
 		mainGame->btnSpectatorSwap->setVisible(false);
@@ -982,6 +994,16 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 			mainGame->btnCancelOrFinish->setVisible(false);
 			if(mainGame->wQuery->isVisible())
 				mainGame->HideElement(mainGame->wQuery);
+			if(mainGame->wPosSelect->isVisible())
+				mainGame->HideElement(mainGame->wPosSelect);
+			if(mainGame->wCardSelect->isVisible())
+				mainGame->HideElement(mainGame->wCardSelect);
+			if(mainGame->wCardDisplay->isVisible())
+				mainGame->HideElement(mainGame->wCardDisplay);
+			if(mainGame->wANNumber->isVisible())
+				mainGame->HideElement(mainGame->wANNumber);
+			if(mainGame->wANCard->isVisible())
+				mainGame->HideElement(mainGame->wANCard);
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->actionSignal.Wait(lock);
 			mainGame->closeDuelWindow = true;
@@ -1112,6 +1134,18 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 	case STOC_REMATCH: {
 		std::lock_guard<std::mutex> lock(mainGame->gMutex);
 		mainGame->dInfo.checkRematch = true;
+		if(mainGame->wQuery->isVisible())
+			mainGame->HideElement(mainGame->wQuery);
+		if(mainGame->wPosSelect->isVisible())
+			mainGame->HideElement(mainGame->wPosSelect);
+		if(mainGame->wCardSelect->isVisible())
+			mainGame->HideElement(mainGame->wCardSelect);
+		if(mainGame->wCardDisplay->isVisible())
+			mainGame->HideElement(mainGame->wCardDisplay);
+		if(mainGame->wANNumber->isVisible())
+			mainGame->HideElement(mainGame->wANNumber);
+		if(mainGame->wANCard->isVisible())
+			mainGame->HideElement(mainGame->wANCard);
 		mainGame->stQMessage->setText(gDataManager->GetSysString(1989).data());
 		mainGame->PopupElement(mainGame->wQuery);
 		break;
