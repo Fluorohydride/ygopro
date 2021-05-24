@@ -27,6 +27,7 @@ extern android_app* app_global;
 #elif defined(__linux__)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#include <unistd.h>
 #elif defined(__APPLE__)
 #import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
@@ -293,6 +294,14 @@ void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview messag
 	//Clean up the strings
 	CFRelease(header_ref);
 	CFRelease(message_ref);
+#elif !defined(__ANDROID__)
+	auto pid = vfork();
+	if(pid == 0) {
+		execl("/usr/bin/kdialog", "kdialog", "--title", context.data(), "--error", message.data());
+		execl("/usr/bin/zenity", "zenity", "--title", context.data(), "--error", message.data());
+		_exit(EXIT_FAILURE);
+	} else if(pid > 0)
+		(void)waitpid(pid, nullptr, WNOHANG);
 #endif
 }
 
