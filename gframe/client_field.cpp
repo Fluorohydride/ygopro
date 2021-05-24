@@ -371,6 +371,18 @@ void ClientField::ClearSelect() {
 		(*cit)->is_selectable = false;
 		(*cit)->is_selected = false;
 	}
+	for(auto cit = selected_cards.begin(); cit != selected_cards.end(); ++cit) {
+		(*cit)->is_selectable = false;
+		(*cit)->is_selected = false;
+	}
+	for(auto cit = selectsum_all.begin(); cit != selectsum_all.end(); ++cit) {
+		(*cit)->is_selectable = false;
+		(*cit)->is_selected = false;
+	}
+	for(auto cit = selectsum_cards.begin(); cit != selectsum_cards.end(); ++cit) {
+		(*cit)->is_selectable = false;
+		(*cit)->is_selected = false;
+	}
 }
 void ClientField::ClearChainSelect() {
 	for(auto cit = activatable_cards.begin(); cit != activatable_cards.end(); ++cit) {
