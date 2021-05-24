@@ -28,6 +28,7 @@ extern android_app* app_global;
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #elif defined(__APPLE__)
 #import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
