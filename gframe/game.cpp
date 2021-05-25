@@ -1650,8 +1650,10 @@ bool Game::MainLoop() {
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
 		gMutex.lock();
-		if(should_refresh_hands && dInfo.isInDuel)
+		if(should_refresh_hands && dInfo.isInDuel) {
+			should_refresh_hands = false;
 			dField.RefreshHandHitboxes();
+		}
 		if(dInfo.isInDuel) {
 			if(dInfo.isReplay)
 				discord.UpdatePresence(DiscordWrapper::REPLAY);
