@@ -3,7 +3,7 @@ on: [push, pull_request]
 env:
   BUILD_CONFIG: release
   COVERS_URL: ${{ secrets.COVERS_URL }}
-  DEPENDENCIES_BASE_URL: https://github.com/edo9300/edopro-vcpkg-cache/releases/download/20210523
+  DEPENDENCIES_BASE_URL: https://github.com/edo9300/edopro-vcpkg-cache/releases/download/20210525
   DEPLOY_DIR: deploy
   DEPLOY_REPO: ${{ secrets.DEPLOY_REPO }}
   DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
