@@ -302,7 +302,7 @@ void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview messag
 		execl("/usr/bin/zenity", "zenity", "--title", context.data(), "--error", message.data());
 		_exit(EXIT_FAILURE);
 	} else if(pid > 0)
-		(void)waitpid(pid, nullptr, WNOHANG);
+		(void)waitpid(pid, nullptr, 0);
 #endif
 }
 
