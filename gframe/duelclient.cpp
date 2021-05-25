@@ -3902,30 +3902,15 @@ void DuelClient::SendResponse() {
 		break;
 	}
 	case MSG_SELECT_CARD:
-	case MSG_SELECT_UNSELECT_CARD: {
+	case MSG_SELECT_UNSELECT_CARD:
+	case MSG_SELECT_TRIBUTE:
+	case MSG_SELECT_SUM:
+	case MSG_SELECT_COUNTER: {
 		mainGame->dField.ClearSelect();
 		break;
 	}
 	case MSG_SELECT_CHAIN: {
 		mainGame->dField.ClearChainSelect();
-		break;
-	}
-	case MSG_SELECT_TRIBUTE: {
-		mainGame->dField.ClearSelect();
-		break;
-	}
-	case MSG_SELECT_COUNTER: {
-		mainGame->dField.ClearSelect();
-		break;
-	}
-	case MSG_SELECT_SUM: {
-		for(int i = 0; i < mainGame->dField.must_select_count; ++i) {
-			mainGame->dField.selected_cards[i]->is_selected = false;
-		}
-		for(size_t i = 0; i < mainGame->dField.selectsum_all.size(); ++i) {
-			mainGame->dField.selectsum_all[i]->is_selectable = false;
-			mainGame->dField.selectsum_all[i]->is_selected = false;
-		}
 		break;
 	}
 	}
