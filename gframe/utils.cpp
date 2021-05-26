@@ -341,8 +341,8 @@ namespace ygo {
 		return true;
 	}
 
-	epro::path_stringview Utils::GetExePath() {
-		static epro::path_string binarypath = []()->epro::path_string {
+	const epro::path_string& Utils::GetExePath() {
+		static const epro::path_string binarypath = []()->epro::path_string {
 #ifdef _WIN32
 			TCHAR exepath[MAX_PATH];
 			GetModuleFileName(nullptr, exepath, MAX_PATH);
@@ -376,13 +376,13 @@ namespace ygo {
 		return binarypath;
 	}
 
-	epro::path_stringview Utils::GetExeFolder() {
-		static epro::path_string binarypath = GetFilePath(GetExePath());
+	const epro::path_string& Utils::GetExeFolder() {
+		static const epro::path_string binarypath = GetFilePath(GetExePath());
 		return binarypath;
 	}
 
-	epro::path_stringview Utils::GetCorePath() {
-		static epro::path_string binarypath = [] {
+	const epro::path_string& Utils::GetCorePath() {
+		static const epro::path_string binarypath = [] {
 #ifdef _WIN32
 			return fmt::format(EPRO_TEXT("{}/ocgcore.dll"), GetExeFolder());
 #else

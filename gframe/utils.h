@@ -132,9 +132,9 @@ namespace ygo {
 			//return Utils::ToUpperNoAccents(a) < Utils::ToUpperNoAccents(b);
 		};
 		static bool CreatePath(epro::path_stringview path, epro::path_string workingdir = EPRO_TEXT("./"));
-		static epro::path_stringview GetExePath();
-		static epro::path_stringview GetExeFolder();
-		static epro::path_stringview GetCorePath();
+		static const epro::path_string& GetExePath();
+		static const epro::path_string& GetExeFolder();
+		static const epro::path_string& GetCorePath();
 		static bool UnzipArchive(epro::path_stringview input, unzip_callback callback = nullptr, unzip_payload* payload = nullptr, epro::path_stringview dest = EPRO_TEXT("./"));
 
 		enum OpenType {

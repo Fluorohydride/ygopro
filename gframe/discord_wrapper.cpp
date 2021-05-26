@@ -22,8 +22,7 @@
 #ifdef _WIN32
 #define formatstr EPRO_TEXT("\"{0}\" from_discord \"{1}\"")
 //The registry entry on windows seems to need the path with \ as separator rather than /
-epro::path_string Unescape(epro::path_stringview _path) {
-	epro::path_string path{ _path.data(), _path.size() };
+epro::path_string Unescape(epro::path_string path) {
 	std::replace(path.begin(), path.end(), EPRO_TEXT('/'), EPRO_TEXT('\\'));
 	return path;
 }

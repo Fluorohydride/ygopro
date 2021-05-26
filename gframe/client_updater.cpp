@@ -99,7 +99,7 @@ CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 }
 
 static void Reboot() {
-	const auto path = ygo::Utils::GetExePath();
+	const auto& path = ygo::Utils::GetExePath();
 #ifdef _WIN32
 	STARTUPINFO si{ sizeof(si) };
 	PROCESS_INFORMATION pi{};
@@ -216,10 +216,10 @@ bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const e
 void ClientUpdater::Unzip(epro::path_string src, void* payload, unzip_callback callback) {
 	Utils::SetThreadName("Unzip");
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	const auto path = ygo::Utils::GetExePath();
+	const auto& path = ygo::Utils::GetExePath();
 	ygo::Utils::FileMove(path, fmt::format(EPRO_TEXT("{}.old"), path));
 #if !defined(__linux__)
-	const auto corepath = ygo::Utils::GetCorePath();
+	const auto& corepath = ygo::Utils::GetCorePath();
 	ygo::Utils::FileMove(corepath, fmt::format(EPRO_TEXT("{}.old"), corepath));
 #endif
 #endif
