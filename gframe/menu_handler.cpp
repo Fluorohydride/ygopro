@@ -622,15 +622,20 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_FILE_SAVE: {
 				mainGame->HideElement(mainGame->wFileSave);
-				if(prev_operation == BUTTON_RENAME_REPLAY) {
-					auto oldname = Utils::ToPathString(mainGame->lstReplayList->getListItem(prev_sel, true));
+				irr::gui::CGUIFileSelectListBox* list = nullptr;
+				if(prev_operation == BUTTON_RENAME_REPLAY)
+					list = mainGame->lstReplayList;
+				else if(prev_operation == BUTTON_RENAME_SINGLEPLAY)
+					list = mainGame->lstSinglePlayList;
+				if(list) {
+					auto oldname = Utils::ToPathString(list->getListItem(prev_sel, true));
 					auto oldpath = Utils::GetFilePath(oldname);
 					auto extension = Utils::GetFileExtension(oldname, false);
 					auto newname = Utils::ToPathString(mainGame->ebFileSaveName->getText());
-					if (Utils::GetFileExtension(newname, false) != extension)
+					if(Utils::GetFileExtension(newname, false) != extension)
 						newname.append(1, EPRO_TEXT('.')).append(extension);
-					if(Replay::RenameReplay(oldname, oldpath + newname))
-						mainGame->lstReplayList->refreshList();
+					if(Utils::FileMove(oldname, oldpath + newname))
+						list->refreshList();
 					else
 						mainGame->PopupMessage(gDataManager->GetSysString(1365));
 				}
