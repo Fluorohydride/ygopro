@@ -8,6 +8,8 @@
 #ifndef _WIN32
 #include <arpa/inet.h>
 #include <unistd.h>
+#else
+#include <ws2tcpip.h>
 #endif
 #include "game_config.h"
 #include <irrlicht.h>
