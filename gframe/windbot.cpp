@@ -28,14 +28,18 @@ uint32_t WindBot::version{ CLIENT_VERSION };
 #ifndef __ANDROID__
 nlohmann::ordered_json WindBot::databases{};
 bool WindBot::serialized{ false };
-epro::path_string WindBot::serialized_databases{};
+#ifdef _WIN32
+std::wstring WindBot::serialized_databases{};
+#else
+std::string WindBot::serialized_databases{};
+#endif
 #endif
 
 WindBot::launch_ret_t WindBot::Launch(int port, epro::wstringview pass, bool chat, int hand, const wchar_t* overridedeck) const {
 #ifndef __ANDROID__
 	if(!serialized) {
 		serialized = true;
-		serialized_databases = base64_encode<epro::path_string>(databases.dump(-1, ' ', false, nlohmann::detail::error_handler_t::replace));
+		serialized_databases = base64_encode<decltype(serialized_databases)>(databases.dump(-1, ' ', false, nlohmann::detail::error_handler_t::replace));
 	}
 #endif
 #ifdef _WIN32

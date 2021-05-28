@@ -34,7 +34,11 @@ struct WindBot {
 #ifndef __ANDROID__
 	static nlohmann::ordered_json databases;
 	static bool serialized;
-	static epro::path_string serialized_databases;
+#ifdef _WIN32
+	static std::wstring serialized_databases;
+#else
+	static std::string serialized_databases;
+#endif
 #endif
 
 	static void AddDatabase(epro::path_stringview database);
