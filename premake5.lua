@@ -98,6 +98,15 @@ workspace "ygo"
 
 		filter { "system:macosx", "configurations:Release" }
 			libdirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-osx/lib" }
+			
+		filter { "action:not vs*", "system:windows" }
+			includedirs { _OPTIONS["vcpkg-root"] .. "/installed/x86-mingw-static/include" }
+
+		filter { "action:not vs*", "system:windows", "configurations:Debug" }
+			libdirs { _OPTIONS["vcpkg-root"] .. "/installed/x86-mingw-static/debug/lib" }
+
+		filter { "action:not vs*", "system:windows", "configurations:Release" }
+			libdirs { _OPTIONS["vcpkg-root"] .. "/installed/x86-mingw-static/lib" }
 	end
 
 	filter "system:macosx"
@@ -114,7 +123,8 @@ workspace "ygo"
 		buildoptions { "-fno-strict-aliasing", "-Wno-multichar" }
 
 	filter { "action:not vs*", "system:windows" }
-	  buildoptions { "-static-libgcc" }
+	  linkoptions { "-mthreads", "-municode", "-static-libgcc", "-static-libstdc++", "-static", "-lpthread" }
+	  defines { "UNICODE", "_UNICODE" }
 
 	filter "configurations:Debug"
 		symbols "On"
