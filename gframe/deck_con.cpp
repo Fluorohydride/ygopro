@@ -325,17 +325,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				mainGame->ClearCardInfo();
-				char deckbuf[1024];
+				const auto& deck = gdeckManager->current_deck;
+				char deckbuf[0xf000];
 				char* pdeck = deckbuf;
-				BufferIO::Write<uint32_t>(pdeck, gdeckManager->current_deck.main.size() + gdeckManager->current_deck.extra.size());
-				BufferIO::Write<uint32_t>(pdeck, gdeckManager->current_deck.side.size());
-				for(size_t i = 0; i < gdeckManager->current_deck.main.size(); ++i)
-					BufferIO::Write<uint32_t>(pdeck, gdeckManager->current_deck.main[i]->code);
-				for(size_t i = 0; i < gdeckManager->current_deck.extra.size(); ++i)
-					BufferIO::Write<uint32_t>(pdeck, gdeckManager->current_deck.extra[i]->code);
-				for(size_t i = 0; i < gdeckManager->current_deck.side.size(); ++i)
-					BufferIO::Write<uint32_t>(pdeck, gdeckManager->current_deck.side[i]->code);
+				static constexpr auto max_deck_size = sizeof(deckbuf) / sizeof(uint32_t) - 2;
+				const auto totsize = deck.main.size() + deck.extra.size() + deck.side.size();
+				if(totsize > max_deck_size) {
+					mainGame->PopupMessage(gDataManager->GetSysString(1410));
+					break;
+				}
+				BufferIO::Write<uint32_t>(pdeck, deck.main.size() + deck.extra.size());
+				BufferIO::Write<uint32_t>(pdeck, deck.side.size());
+				for(const auto& pcard : deck.main)
+					BufferIO::Write<uint32_t>(pdeck, pcard->code);
+				for(const auto& pcard : deck.extra)
+					BufferIO::Write<uint32_t>(pdeck, pcard->code);
+				for(const auto& pcard : deck.side)
+					BufferIO::Write<uint32_t>(pdeck, pcard->code);
 				DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
+				gdeckManager->sent_deck = gdeckManager->current_deck;
 				break;
 			}
 			case BUTTON_SIDE_RELOAD: {

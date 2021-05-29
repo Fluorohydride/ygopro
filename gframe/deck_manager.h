@@ -52,6 +52,7 @@ private:
 	std::map<uint32_t, uint32_t> mapped_ids;
 public:
 	Deck current_deck;
+	Deck sent_deck;
 	Deck pre_deck;
 	std::vector<LFList> _lfList;
 	~DeckManager() {

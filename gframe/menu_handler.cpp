@@ -33,8 +33,9 @@ static void UpdateDeck() {
 	const auto& deck = gdeckManager->current_deck;
 	char deckbuf[0xf000];
 	char* pdeck = deckbuf;
+	static constexpr auto max_deck_size = sizeof(deckbuf) / sizeof(uint32_t) - 2;
 	const auto totsize = deck.main.size() + deck.extra.size() + deck.side.size();
-	if((totsize * sizeof(uint32_t)) > (sizeof(deckbuf) - 2 * sizeof(uint32_t)))
+	if(totsize > max_deck_size)
 		return;
 	BufferIO::Write<uint32_t>(pdeck, deck.main.size() + deck.extra.size());
 	BufferIO::Write<uint32_t>(pdeck, deck.side.size());
@@ -45,6 +46,7 @@ static void UpdateDeck() {
 	for(const auto& pcard : deck.side)
 		BufferIO::Write<uint32_t>(pdeck, pcard->code);
 	DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
+	gdeckManager->sent_deck = gdeckManager->current_deck;
 }
 static void LoadReplay() {
 	auto& replay = ReplayMode::cur_replay;
