@@ -1787,7 +1787,7 @@ bool Game::MainLoop() {
 		} else if (show_changelog) {
 			std::lock_guard<std::mutex> lock(gMutex);
 			menuHandler.prev_operation = ACTION_SHOW_CHANGELOG;
-			stQMessage->setText(gDataManager->GetSysString(1443).data());
+			stQMessage->setText(gDataManager->GetSysString(1451).data());
 			SetCentered(wQuery);
 			PopupElement(wQuery);
 			show_changelog = false;
