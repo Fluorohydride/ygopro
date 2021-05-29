@@ -76,6 +76,7 @@ jobs:
       shell: bash
       run: |
         sudo apt remove libsqlite3-dev
+        sudo apt update
         sudo apt install libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libxxf86vm-dev
     - uses: actions/checkout@v1
       with:
