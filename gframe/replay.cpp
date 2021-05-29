@@ -278,8 +278,6 @@ void Replay::ParseStream() {
 		if(p.message == MSG_AI_NAME) {
 			char* pbuf = (char*)p.data.data();
 			int len = BufferIO::Read<uint16_t>(pbuf);
-			if(!can_read)
-				break;
 			if((len + 1) != p.data.size() - sizeof(uint16_t))
 				break;
 			pbuf[len] = 0;
