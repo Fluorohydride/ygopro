@@ -5,6 +5,16 @@
 #include "lzma/LzmaLib.h"
 #include "common.h"
 #include "utils.h"
+#if defined(__MINGW32__) && defined(UNICODE)
+#include <fcntl.h>
+#include <ext/stdio_filebuf.h>
+#endif
+
+#ifdef UNICODE
+#define fileopen(file, mode) _wfopen(file, L##mode)
+#else
+#define fileopen(file, mode) fopen(file, mode)
+#endif
 
 namespace ygo {
 ReplayPacket::ReplayPacket(const CoreUtils::Packet& packet) {
@@ -27,16 +37,13 @@ void ReplayPacket::Set(uint8_t msg, char* buf, uint32_t len) {
 }
 void Replay::BeginRecord(bool write, epro::path_string name) {
 	Reset();
-	if(fp.is_open())
-		fp.close();
-	is_recording = false;
-	if(write) {
-		fp.open(name, std::ofstream::binary);
-		if(!fp.is_open()) {
-			return;
-		}
+	if(fp != nullptr) {
+		fclose(fp);
+		fp = nullptr;
 	}
-	is_recording = true;
+	if(write)
+		fp = fileopen(name.data(), "wb");
+	is_recording = fp != nullptr;
 }
 void Replay::WritePacket(const ReplayPacket& p) {
 	Write<uint8_t>(p.message, false);
@@ -51,10 +58,11 @@ void Replay::WriteStream(const ReplayStream& stream) {
 		WritePacket(packet);
 }
 void Replay::WritetoFile(const void* data, size_t size, bool flush){
-	if(!fp.is_open()) return;
-	fp.write((char*)data, size);
+	if(fp == nullptr)
+		return;
+	fwrite(data, 1, size, fp);
 	if(flush)
-		fp.flush();
+		fflush(fp);
 }
 void Replay::WriteHeader(ReplayHeader& header) {
 	pheader = header;
@@ -71,17 +79,17 @@ void Replay::WriteData(const void* data, size_t length, bool flush) {
 	WritetoFile(data, length, flush);
 }
 void Replay::Flush() {
-	if(!is_recording)
+	if(!is_recording || fp == nullptr)
 		return;
-	if(!fp.is_open())
-		return;
-	fp.flush();
+	fflush(fp);
 }
 void Replay::EndRecord(size_t size) {
 	if(!is_recording)
 		return;
-	if(fp.is_open())
-		fp.close();
+	if(fp != nullptr) {
+		fclose(fp);
+		fp = nullptr;
+	}
 	pheader.datasize = replay_data.size() - sizeof(ReplayHeader);
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
@@ -92,12 +100,12 @@ void Replay::EndRecord(size_t size) {
 	is_recording = false;
 }
 void Replay::SaveReplay(const epro::path_string& name) {
-	std::ofstream replay_file(fmt::format(EPRO_TEXT("./replay/{}.yrpX"), name), std::ofstream::binary);
-	if(!replay_file.is_open())
+	auto replay_file = fileopen(fmt::format(EPRO_TEXT("./replay/{}.yrpX"), name).data(), "wb");
+	if(replay_file == nullptr)
 		return;
-	replay_file.write((char*)&pheader, sizeof(pheader));
-	replay_file.write((char*)comp_data.data(), comp_data.size());
-	replay_file.close();
+	fwrite(&pheader, 1, sizeof(pheader), replay_file);
+	fwrite(comp_data.data(), 1, comp_data.size(), replay_file);
+	fclose(replay_file);
 }
 static inline bool IsReplayValid(uint32_t id) {
 	return id == REPLAY_YRP1 || id == REPLAY_YRPX;
@@ -144,16 +152,28 @@ bool Replay::OpenReplay(const epro::path_string& name) {
 		return true;
 	}
 	Reset();
-	std::ifstream replay_file(name, std::ifstream::binary);
-	if(!replay_file.is_open()) {
-		replay_file.open(EPRO_TEXT("./replay/") + name, std::ifstream::binary);
-		if(!replay_file.is_open()) {
+#if defined(__MINGW32__) && defined(UNICODE)
+	auto fd = _wopen(name.data(), _O_RDONLY | _O_BINARY);
+	if(fd == -1) {
+		auto fd = _wopen((EPRO_TEXT("./replay/") + name).data(), _O_RDONLY | _O_BINARY);
+		if(fd == -1) {
 			replay_name.clear();
 			return false;
 		}
 	}
+	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
+	std::istream replay_file(&b);
+#else
+	std::ifstream replay_file(name, std::ifstream::binary);
+	if(replay_file.fail()) {
+		replay_file.open(EPRO_TEXT("./replay/") + name, std::ifstream::binary);
+		if(replay_file.fail()) {
+			replay_name.clear();
+			return false;
+		}
+	}
+#endif
 	std::vector<uint8_t> contents((std::istreambuf_iterator<char>(replay_file)), std::istreambuf_iterator<char>());
-	replay_file.close();
 	if (OpenReplayFromBuffer(std::move(contents))){
 		replay_name = name;
 		return true;

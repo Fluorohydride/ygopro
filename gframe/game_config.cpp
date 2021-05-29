@@ -5,39 +5,73 @@
 #include "utils.h"
 #include "config.h"
 #include "logging.h"
+#if defined(__MINGW32__) && defined(UNICODE)
+#include <fcntl.h>
+#include <ext/stdio_filebuf.h>
+#endif
 
 namespace ygo {
 
 GameConfig::GameConfig() {
 	Load(EPRO_TEXT("./config/system.conf"));
 	if(configs.empty()) {
-		std::ifstream conf_file(EPRO_TEXT("./config/configs.json"), std::ifstream::in);
-		if(conf_file.good()) {
-			try {
-				conf_file >> configs;
-			}
-			catch(const std::exception& e) {
-				ErrorLog(fmt::format("Exception occurred while loading configs.json: {}", e.what()));
-				//throw(e);
+		{
+#if defined(__MINGW32__) && defined(UNICODE)
+			auto fd = _wopen(EPRO_TEXT("./config/configs.json"), _O_RDONLY);
+			if(fd == -1)
+				goto load_user_conf;
+			__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
+			std::istream conf_file(&b);
+#else
+			std::ifstream conf_file(EPRO_TEXT("./config/configs.json"));
+#endif
+			if(!conf_file.fail()) {
+				try {
+					conf_file >> configs;
+				}
+				catch(const std::exception& e) {
+					ErrorLog(fmt::format("Exception occurred while loading configs.json: {}", e.what()));
+					//throw(e);
+				}
 			}
 		}
-		std::ifstream user_conf_file(EPRO_TEXT("./config/user_configs.json"), std::ifstream::in);
-		if(user_conf_file.good()) {
-			try {
-				user_conf_file >> user_configs;
-			}
-			catch(const std::exception& e) {
-				ErrorLog(fmt::format("Exception occurred while loading user_configs.json: {}", e.what()));
-				//throw(e);
+#if defined(__MINGW32__) && defined(UNICODE)
+		load_user_conf:
+#endif
+		{
+#if defined(__MINGW32__) && defined(UNICODE)
+			auto fd = _wopen(EPRO_TEXT("./config/user_configs.json"), _O_RDONLY);
+			if(fd == -1)
+				return;
+			__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
+			std::istream user_conf_file(&b);
+#else
+			std::ifstream user_conf_file(EPRO_TEXT("./config/user_configs.json"));
+#endif
+			if(!user_conf_file.fail()) {
+				try {
+					user_conf_file >> user_configs;
+				}
+				catch(const std::exception& e) {
+					ErrorLog(fmt::format("Exception occurred while loading user_configs.json: {}", e.what()));
+					//throw(e);
+				}
 			}
 		}
 	}
 }
 
-bool GameConfig::Load(const epro::path_char* filename)
-{
-	std::ifstream conf_file(filename, std::ifstream::in);
-	if(!conf_file.is_open())
+bool GameConfig::Load(const epro::path_char* filename) {
+#if defined(__MINGW32__) && defined(UNICODE)
+	auto fd = _wopen(filename, _O_RDONLY);
+	if(fd == -1)
+		return false;
+	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
+	std::istream conf_file(&b);
+#else
+	std::ifstream conf_file(filename);
+#endif
+	if(conf_file.fail())
 		return false;
 	std::string str;
 	while (std::getline(conf_file, str)) {
@@ -215,22 +249,29 @@ bool GameConfig::Load(const epro::path_char* filename)
 #undef DESERIALIZE_BOOL
 
 template<typename T>
-inline void Serialize(std::ofstream& conf_file, const char* name, T value) {
+inline void Serialize(std::ostream& conf_file, const char* name, T value) {
 	conf_file << name << " = " << value << "\n";
 }
 template<>
-inline void Serialize(std::ofstream& conf_file, const char* name, float value) {
+inline void Serialize(std::ostream& conf_file, const char* name, float value) {
 	conf_file << name << " = " << fmt::to_string(value) << "\n"; // Forces float to show decimals
 }
 template<>
-inline void Serialize(std::ofstream& conf_file, const char* name, std::wstring value) {
+inline void Serialize(std::ostream& conf_file, const char* name, std::wstring value) {
 	conf_file << name << " = " << BufferIO::EncodeUTF8(value) << "\n";
 }
 
-bool GameConfig::Save(const epro::path_char* filename)
-{
-	std::ofstream conf_file(filename, std::ofstream::out);
-	if (!conf_file.is_open())
+bool GameConfig::Save(const epro::path_char* filename) {
+#if defined(__MINGW32__) && defined(UNICODE)
+	auto fd = _wopen(filename, _O_WRONLY);
+	if(fd == -1)
+		return false;
+	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::out);
+	std::ostream conf_file(&b);
+#else
+	std::ofstream conf_file(filename);
+#endif
+	if(conf_file.fail())
 		return false;
 	conf_file << "# Project Ignis: EDOPro system.conf\n";
 	conf_file << "# Overwritten on normal game exit\n";

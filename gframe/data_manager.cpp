@@ -8,6 +8,10 @@
 #include "logging.h"
 #include "utils.h"
 #include "common.h"
+#if defined(__MINGW32__) && defined(UNICODE)
+#include <fcntl.h>
+#include <ext/stdio_filebuf.h>
+#endif
 
 namespace ygo {
 
@@ -196,8 +200,16 @@ bool DataManager::ParseLocaleDB(sqlite3* pDB) {
 	return true;
 }
 bool DataManager::LoadStrings(const epro::path_string& file) {
-	std::ifstream string_file(file, std::ifstream::in);
-	if(!string_file.is_open())
+#if defined(__MINGW32__) && defined(UNICODE)
+	auto fd = _wopen(file.data(), _O_RDONLY);
+	if(fd == -1)
+		return false;
+	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
+	std::istream string_file(&b);
+#else
+	std::ifstream string_file(file);
+#endif
+	if(string_file.fail())
 		return false;
 	std::string str;
 	while(std::getline(string_file, str)) {
@@ -229,12 +241,19 @@ bool DataManager::LoadStrings(const epro::path_string& file) {
 		}
 		catch(...) {}
 	}
-	string_file.close();
 	return true;
 }
 bool DataManager::LoadLocaleStrings(const epro::path_string& file) {
-	std::ifstream string_file(file, std::ifstream::in);
-	if(!string_file.is_open())
+#if defined(__MINGW32__) && defined(UNICODE)
+	auto fd = _wopen(file.data(), _O_RDONLY);
+	if(fd == -1)
+		return false;
+	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
+	std::istream string_file(&b);
+#else
+	std::ifstream string_file(file);
+#endif
+	if(string_file.fail())
 		return false;
 	std::string str;
 	while(std::getline(string_file, str)) {
@@ -267,7 +286,6 @@ bool DataManager::LoadLocaleStrings(const epro::path_string& file) {
 		}
 		catch(...) {}
 	}
-	string_file.close();
 	return true;
 }
 void DataManager::ClearLocaleStrings() {

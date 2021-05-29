@@ -6,10 +6,16 @@
 #include "utils.h"
 #include "game_config.h"
 
+#ifdef UNICODE
+#define fileopen(file, mode) _wfopen(file, L##mode)
+#else
+#define fileopen(file, mode) fopen(file, mode)
+#endif
+
 namespace ygo {
 
 struct curl_payload {
-	std::ofstream* stream;
+	FILE* stream;
 	char header[8];
 	int header_written;
 };
@@ -51,9 +57,9 @@ size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
 		if(data->header_written == sizeof(data->header) && !CheckImageHeader(data->header))
 			return -1;
 	}
-	std::ofstream* out = data->stream;
+	FILE* out = data->stream;
 	size_t nbytes = size * nmemb;
-	out->write(ptr, nbytes);
+	fwrite(ptr, 1, nbytes, out);
 	return nbytes;
 }
 const epro::path_char* GetExtension(char* header) {
@@ -85,7 +91,7 @@ void ImageDownloader::DownloadPic() {
 		ErrorLog("Failed to start downloader thread");
 		return;
 	}
-	auto SetPayloadAndUrl = [&payload,&curl](epro::stringview url, std::ofstream* stream) {
+	auto SetPayloadAndUrl = [&payload,&curl](epro::stringview url, FILE* stream) {
 		payload.stream = stream;
 		memset(&payload.header, 0, sizeof(payload.header));
 		payload.header_written = 0;
@@ -141,11 +147,11 @@ void ImageDownloader::DownloadPic() {
 		for(auto& src : pic_urls) {
 			if(src.type != type)
 				continue;
-			std::ofstream fp(name, std::ofstream::binary);
-			if(fp.is_open()) {
-				SetPayloadAndUrl(fmt::format(src.url, code), &fp);
+			auto fp = fileopen(name.data(), "wb");
+			if(fp != nullptr) {
+				SetPayloadAndUrl(fmt::format(src.url, code), fp);
 				CURLcode res = curl_easy_perform(curl);
-				fp.close();
+				fclose(fp);
 				if(res == CURLE_OK) {
 					ext = GetExtension(payload.header);
 					if(!Utils::FileMove(name, dest_folder + ext))

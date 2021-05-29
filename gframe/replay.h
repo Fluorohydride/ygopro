@@ -110,7 +110,7 @@ private:
 	bool ReadNextResponse(ReplayResponse* res);
 	bool ReadName(wchar_t* data);
 	bool ReadNextPacket(ReplayPacket* packet);
-	std::ofstream fp;
+	FILE* fp;
 	size_t data_position;
 	void ParseNames();
 	void ParseParams();
