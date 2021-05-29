@@ -21,7 +21,7 @@
 namespace ygo {
 
 void DataHandler::LoadDatabases() {
-	if(Utils::FileExists(EPRO_TEXT("cards.cdb")) && std::ifstream(EPRO_TEXT("cards.cdb")).good()) {
+	if(Utils::FileExists(EPRO_TEXT("cards.cdb"))) {
 		if(dataManager->LoadDB(EPRO_TEXT("cards.cdb")))
 			WindBot::AddDatabase(EPRO_TEXT("cards.cdb"));
 	}
