@@ -24,14 +24,40 @@ class android_app;
 namespace porting {
 extern android_app* app_global;
 }
+#elif defined(__APPLE__)
+#import <CoreFoundation/CoreFoundation.h>
+#include "osx_menu.h"
 #elif defined(__linux__)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#elif defined(__APPLE__)
-#import <CoreFoundation/CoreFoundation.h>
-#include "osx_menu.h"
+#include <dlfcn.h>
+#include <memory>
+namespace {
+using Bool_v = int;
+using Atom_v = unsigned long;
+using Display_v = void;
+using Window_v = unsigned long;
+using Status_v = int;
+using XEvent_v = void;
+struct X11Helper {
+	X11Helper();
+	~X11Helper();
+	void* LibX11{ nullptr };
+	Display_v* (*XOpenDisplay)(const char*) { nullptr };
+	int (*XGetInputFocus)(Display_v*, Window_v*, int*) { nullptr };
+	Atom_v(*XInternAtom)(Display_v*, const char*, Bool_v) { nullptr };
+	int (*XGetWindowProperty)(Display_v*, Window_v, Atom_v, long, long, Bool_v, Atom_v, Atom_v*, int*, unsigned long*, unsigned long*, unsigned char**) { nullptr };
+	int (*XFree)(void*) { nullptr };
+	Status_v(*XSendEvent)(Display_v*, Window_v, Bool_v, long, XEvent_v*) { nullptr };
+	int (*XChangeProperty)(Display_v*, Window_v, Atom_v, Atom_v, int, int, const unsigned char*, int) { nullptr };
+	int (*XMapWindow)(Display_v*, Window_v) { nullptr };
+	int (*XFlush)(Display_v*) { nullptr };
+};
+}
+
+static std::unique_ptr<X11Helper> X11{ nullptr };
 #endif
 
 namespace ygo {
@@ -123,6 +149,9 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	}
 #endif
 	device->getLogger()->setLogLevel(irr::ELL_ERROR);
+#if defined(__linux__) && !defined(__ANDROID__)
+	X11 = std::make_unique<X11Helper>();
+#endif
 	return device;
 }
 
@@ -198,6 +227,8 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	}
 	static_cast<CCursorControl*>(device->getCursorControl())->updateBorderSize(fullscreen, true);
 #elif defined(__linux__) && !defined(__ANDROID__)
+	if(!X11->LibX11)
+		return;
 	struct {
 		unsigned long   flags;
 		unsigned long   functions;
@@ -205,36 +236,38 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 		long			inputMode;
 		unsigned long   status;
 	} hints{};
-	Display* display = XOpenDisplay(nullptr);
+	auto display = X11->XOpenDisplay(nullptr);
 	Window window;
 	static bool wasHorizontalMaximized = false, wasVerticalMaximized = false;
 	int revert;
 	fullscreen = !fullscreen;
-	XGetInputFocus(display, &window, &revert);
+	X11->XGetInputFocus(display, &window, &revert);
 
-	Atom wm_state = XInternAtom(display, "_NET_WM_STATE", false);
-	Atom max_horz = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", false);
-	Atom max_vert = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", false);
+	Atom wm_state = X11->XInternAtom(display, "_NET_WM_STATE", false);
+	Atom max_horz = X11->XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", false);
+	Atom max_vert = X11->XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", false);
 
 	auto checkMaximized = [&]() {
-		long maxLength = 1024;
+		const long maxLength = 1024;
 		Atom actualType;
 		int actualFormat;
-		unsigned long i, numItems, bytesAfter;
-		unsigned char *propertyValue = nullptr;
-		if(XGetWindowProperty(display, window, wm_state,
+		unsigned long numItems, bytesAfter;
+		unsigned char* propertyValue = nullptr;
+		wasVerticalMaximized = false;
+		wasHorizontalMaximized = false;
+		if(X11->XGetWindowProperty(display, window, wm_state,
 							  0l, maxLength, false, XA_ATOM, &actualType,
 							  &actualFormat, &numItems, &bytesAfter,
 							  &propertyValue) == Success) {
-			Atom* atoms = (Atom *)propertyValue;
-			for(i = 0; i < numItems; ++i) {
+			Atom* atoms = (Atom*)propertyValue;
+			for(unsigned long i = 0; i < numItems; ++i) {
 				if(atoms[i] == max_vert) {
 					wasVerticalMaximized = true;
 				} else if(atoms[i] == max_horz) {
 					wasHorizontalMaximized = true;
 				}
 			}
-			XFree(propertyValue);
+			X11->XFree(propertyValue);
 		}
 	};
 	if(fullscreen)
@@ -253,15 +286,15 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 			xev.xclient.data.l[i++] = max_vert;
 		if(i == 2)
 			xev.xclient.data.l[i] = 0;
-		XSendEvent(display, DefaultRootWindow(display), False, SubstructureNotifyMask, &xev);
+		X11->XSendEvent(display, DefaultRootWindow(display), False, SubstructureNotifyMask, &xev);
 	}
 
-	Atom property = XInternAtom(display, "_MOTIF_WM_HINTS", true);
+	Atom property = X11->XInternAtom(display, "_MOTIF_WM_HINTS", true);
 	hints.flags = 2;
 	hints.decorations = fullscreen ? 0 : 1;
-	XChangeProperty(display, window, property, property, 32, PropModeReplace, (unsigned char*)&hints, 5);
-	XMapWindow(display, window);
-	XFlush(display);
+	X11->XChangeProperty(display, window, property, property, 32, PropModeReplace, (unsigned char*)&hints, 5);
+	X11->XMapWindow(display, window);
+	X11->XFlush(display);
 #elif defined(__APPLE__)
 	(void)fullscreen;
 	EDOPRO_ToggleFullScreen();
@@ -319,3 +352,36 @@ std::string GUIUtils::SerializeWindowPosition(irr::IrrlichtDevice* device) {
 }
 
 }
+
+#if defined(__linux__) && ! defined(__ANDROID__)
+#define LOAD_LIBRARY(name) do {\
+name = (decltype(name))dlsym(LibX11, #name);\
+if(!name){\
+	dlclose(LibX11);\
+	LibX11=nullptr;\
+	return;\
+}\
+} while(0)
+
+X11Helper::X11Helper() {
+	LibX11 = dlopen("libX11.so", RTLD_LAZY); //libx11 has almost 2000 exported symbols
+											 //there's no point in using RTDL_NOW
+	if(!LibX11)
+		LibX11 = dlopen("libX11.so.6", RTLD_LAZY);
+	LOAD_LIBRARY(XOpenDisplay);
+	LOAD_LIBRARY(XGetInputFocus);
+	LOAD_LIBRARY(XInternAtom);
+	LOAD_LIBRARY(XGetWindowProperty);
+	LOAD_LIBRARY(XFree);
+	LOAD_LIBRARY(XSendEvent);
+	LOAD_LIBRARY(XChangeProperty);
+	LOAD_LIBRARY(XMapWindow);
+	LOAD_LIBRARY(XFlush);
+}
+#undef LOAD_LIBRARY
+
+X11Helper::~X11Helper() {
+	if(LibX11)
+		dlclose(LibX11);
+}
+#endif
