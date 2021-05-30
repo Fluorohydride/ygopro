@@ -148,12 +148,11 @@ local ygopro_config=function(static_core)
 			includedirs "/usr/include/irrlicht"
 		end
 		linkoptions { "-Wl,-rpath=./" }
-		links { "GL", "X11" }
 		if static_core then
 			links  "lua:static"
 		end
 		if _OPTIONS["vcpkg-root"] then
-			links { "ssl", "crypto", "z", "jpeg", "Xxf86vm" }
+			links { "ssl", "crypto", "z", "jpeg" }
 		end
 		
 		
