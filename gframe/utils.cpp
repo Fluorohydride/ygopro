@@ -22,8 +22,6 @@ using Stat = struct stat;
 #if defined(__linux__)
 #include <sys/sendfile.h>
 #include <fcntl.h>
-#include <sys/sendfile.h>
-#include <fcntl.h>
 #elif defined(__APPLE__)
 #import <CoreFoundation/CoreFoundation.h>
 #include <mach-o/dyld.h>
