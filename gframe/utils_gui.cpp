@@ -147,6 +147,9 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 		if(winstruct.size() == sizeof(WINDOWPLACEMENT))
 			SetWindowPlacement(hWnd, reinterpret_cast<WINDOWPLACEMENT*>(winstruct.data()));
 	}
+#elif defined(__APPLE__)
+	if(gGameConfig->windowStruct.size())
+		EDOPRO_SetWindowRect(driver->getExposedVideoData().OpenGLOSX.Window, gGameConfig->windowStruct.data());
 #endif
 	device->getLogger()->setLogLevel(irr::ELL_ERROR);
 #if defined(__linux__) && !defined(__ANDROID__)
@@ -346,6 +349,8 @@ std::string GUIUtils::SerializeWindowPosition(irr::IrrlichtDevice* device) {
 	wp.length = sizeof(WINDOWPLACEMENT);
 	GetWindowPlacement(hWnd, &wp);
 	return base64_encode<std::string>(reinterpret_cast<uint8_t*>(&wp), sizeof(wp));
+#elif defined (__APPLE__)
+	return EDOPRO_GetWindowRect(device->getVideoDriver()->getExposedVideoData().OpenGLOSX.Window);
 #else
 	return std::string{};
 #endif

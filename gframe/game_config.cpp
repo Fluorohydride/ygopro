@@ -141,6 +141,8 @@ bool GameConfig::Load(const epro::path_char* filename) {
 			DESERIALIZE_BOOL(alternative_phase_layout)
 #ifdef WIN32
 			DESERIALIZE_BOOL(showConsole)
+#endif
+#ifndef __linux__
 			else if (type == "windowStruct")
 				windowStruct = str;
 #endif

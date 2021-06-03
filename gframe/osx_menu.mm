@@ -59,3 +59,17 @@ void EDOPRO_SetupMenuBar(void (*callback)(void)) {
 void EDOPRO_ToggleFullScreen() {
 	[handler toggle];
 }
+
+std::string EDOPRO_GetWindowRect(void* _window) {
+	NSWindow* Window = (NSWindow*)_window;
+	NSString* str = NSStringFromRect(Window.frame);
+	return [str UTF8String];
+}
+
+void EDOPRO_SetWindowRect(void* _window, const char* rect_string) {
+	NSWindow* Window = (NSWindow*)_window;
+	NSString* str = [NSString stringWithUTF8String : rect_string];
+	NSRect frame = NSRectFromString(str);
+	if(frame.size.width && frame.size.height)
+		[Window setFrame : frame display : YES];
+}

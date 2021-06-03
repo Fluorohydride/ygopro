@@ -115,7 +115,7 @@ local ygopro_config=function(static_core)
 		links { "sqlite3", "event", "git2" }
 
 	filter "system:macosx"
-		files "*.m"
+		files { "*.m", "*.mm" }
 		defines "LUA_USE_MACOSX"
 		includedirs { "/usr/local/include/irrlicht" }
 		linkoptions { "-Wl,-rpath ./" }
