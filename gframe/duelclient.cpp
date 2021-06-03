@@ -2577,6 +2577,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					pcard->SetCode(code);
 				pcard->counters.clear();
 				pcard->ClearTarget();
+				if(pcard->equipTarget) {
+					pcard->equipTarget->is_showequip = false;
+					pcard->equipTarget->equipped.erase(pcard);
+					pcard->equipTarget = 0;
+				}
+				pcard->is_showequip = false;
 				pcard->is_showtarget = false;
 				pcard->is_showchaintarget = false;
 				ClientCard* olcard = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
