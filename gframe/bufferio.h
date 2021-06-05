@@ -204,7 +204,8 @@ public:
 	// UTF-16 to UTF-16/UTF-32
 	static inline int DecodeUTF16(const uint16_t* source, wchar_t* out, size_t size) {
 		if(sizeof(wchar_t) == sizeof(uint16_t)) {
-			wcsncpy(out, (const wchar_t*)source, size);
+			wcsncpy(out, (const wchar_t*)source, size - 1);
+			out[size - 1] = L'\0';
 			return wcslen(out) + 1;
 		} else {
 			return DecodeUTF16internal<true>(source, out, size) + 1;
@@ -221,7 +222,8 @@ public:
 	// UTF-16/UTF-32 to UTF-16
 	static inline int EncodeUTF16(const wchar_t* source, uint16_t* out, size_t size) {
 		if(sizeof(wchar_t) == sizeof(uint16_t)) {
-			wcsncpy((wchar_t*)out, source, size);
+			wcsncpy((wchar_t*)out, source, size - 1);
+			out[size - 1] = L'\0';
 			return wcslen((wchar_t*)out) + 1;
 		} else {
 			return EncodeUTF16internal<true>(source, out, size) + 1;
