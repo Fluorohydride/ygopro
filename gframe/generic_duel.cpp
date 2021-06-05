@@ -303,7 +303,7 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 					wbuf[2] = 0x4;
 					NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
 					ResendToAll();
-					replay_stream.emplace_back((char*)wbuf, 3);
+					replay_stream.emplace_back((char*)wbuf, 2);
 					EndDuel();
 				}
 				NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
@@ -787,7 +787,7 @@ void GenericDuel::Surrender(DuelPlayer* dp) {
 		wbuf[2] = 0;
 		NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
 		ResendToAll();
-		replay_stream.emplace_back((char*)wbuf, 3);
+		replay_stream.emplace_back((char*)wbuf, 2);
 		match_result.push_back(1 - player);
 		DuelEndProc();
 		event_del(etimer);
@@ -1434,7 +1434,7 @@ void GenericDuel::GenericTimer(evutil_socket_t fd, short events, void* arg) {
 			wbuf[2] = 0x3;
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
 			sd->IteratePlayers(NetServer::ReSendToPlayer);
-			sd->replay_stream.emplace_back((char*)wbuf, 3);
+			sd->replay_stream.emplace_back((char*)wbuf, 2);
 			sd->match_result.push_back(1 - player);
 			sd->DuelEndProc();
 		}
