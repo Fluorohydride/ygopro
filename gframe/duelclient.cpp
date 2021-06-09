@@ -2577,6 +2577,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					pcard->SetCode(code);
 				pcard->counters.clear();
 				pcard->ClearTarget();
+				if(pcard->equipTarget) {
+					pcard->equipTarget->is_showequip = false;
+					pcard->equipTarget->equipped.erase(pcard);
+					pcard->equipTarget = 0;
+				}
+				pcard->is_showequip = false;
 				pcard->is_showtarget = false;
 				pcard->is_showchaintarget = false;
 				ClientCard* olcard = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
@@ -3827,47 +3833,45 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.extra_p_count[p] = val;
 		}
 		mainGame->dField.RefreshAllCards();
-		val = BufferIO::ReadInt8(pbuf); //chains, always 0 in single mode
-		if(!mainGame->dInfo.isSingleMode) {
-			for(int i = 0; i < val; ++i) {
-				unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
-				int pcc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				int pcl = BufferIO::ReadInt8(pbuf);
-				int pcs = BufferIO::ReadInt8(pbuf);
-				int subs = BufferIO::ReadInt8(pbuf);
-				int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				int cl = BufferIO::ReadInt8(pbuf);
-				int cs = BufferIO::ReadInt8(pbuf);
-				int desc = BufferIO::ReadInt32(pbuf);
-				ClientCard* pcard = mainGame->dField.GetCard(pcc, pcl, pcs, subs);
-				mainGame->dField.current_chain.chain_card = pcard;
-				mainGame->dField.current_chain.code = code;
-				mainGame->dField.current_chain.desc = desc;
-				mainGame->dField.current_chain.controler = cc;
-				mainGame->dField.current_chain.location = cl;
-				mainGame->dField.current_chain.sequence = cs;
-				mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
-				mainGame->dField.current_chain.solved = false;
-				int chc = 0;
-				for(auto chit = mainGame->dField.chains.begin(); chit != mainGame->dField.chains.end(); ++chit) {
-					if(cl == 0x10 || cl == 0x20) {
-						if(chit->controler == cc && chit->location == cl)
-							chc++;
-					} else {
-						if(chit->controler == cc && chit->location == cl && chit->sequence == cs)
-							chc++;
-					}
+		val = BufferIO::ReadInt8(pbuf); //chains
+		for(int i = 0; i < val; ++i) {
+			unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
+			int pcc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			int pcl = BufferIO::ReadInt8(pbuf);
+			int pcs = BufferIO::ReadInt8(pbuf);
+			int subs = BufferIO::ReadInt8(pbuf);
+			int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			int cl = BufferIO::ReadInt8(pbuf);
+			int cs = BufferIO::ReadInt8(pbuf);
+			int desc = BufferIO::ReadInt32(pbuf);
+			ClientCard* pcard = mainGame->dField.GetCard(pcc, pcl, pcs, subs);
+			mainGame->dField.current_chain.chain_card = pcard;
+			mainGame->dField.current_chain.code = code;
+			mainGame->dField.current_chain.desc = desc;
+			mainGame->dField.current_chain.controler = cc;
+			mainGame->dField.current_chain.location = cl;
+			mainGame->dField.current_chain.sequence = cs;
+			mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
+			mainGame->dField.current_chain.solved = false;
+			int chc = 0;
+			for(auto chit = mainGame->dField.chains.begin(); chit != mainGame->dField.chains.end(); ++chit) {
+				if(cl == 0x10 || cl == 0x20) {
+					if(chit->controler == cc && chit->location == cl)
+						chc++;
+				} else {
+					if(chit->controler == cc && chit->location == cl && chit->sequence == cs)
+						chc++;
 				}
-				if(cl == LOCATION_HAND)
-					mainGame->dField.current_chain.chain_pos.X += 0.35f;
-				else
-					mainGame->dField.current_chain.chain_pos.Y += chc * 0.25f;
-				mainGame->dField.chains.push_back(mainGame->dField.current_chain);
 			}
-			if(val) {
-				myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
-				mainGame->dField.last_chain = true;
-			}
+			if(cl == LOCATION_HAND)
+				mainGame->dField.current_chain.chain_pos.X += 0.35f;
+			else
+				mainGame->dField.current_chain.chain_pos.Y += chc * 0.25f;
+			mainGame->dField.chains.push_back(mainGame->dField.current_chain);
+		}
+		if(val) {
+			myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
+			mainGame->dField.last_chain = true;
 		}
 		mainGame->gMutex.unlock();
 		break;
