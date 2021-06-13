@@ -27,18 +27,21 @@ void WindBotPanel::Refresh(int filterMasterRule, int lastIndex) {
 	cbBotEngine->clear();
 	genericEngineIdx = -1;
 	size_t i = 0;
-	for (; i < bots.size(); i++) {
-		const auto& bot = bots[i];
+	for (const auto& bot : bots) {
+		if(genericEngine == &bot)
+			continue;
 		if (filterMasterRule == 0 || bot.masterRules.find(filterMasterRule) != bot.masterRules.end()) {
 			int newIndex = cbBotDeck->addItem(bot.name.data(), i);
 			cbBotEngine->addItem(bot.name.data(), i);
-			if(genericEngine == &bot)
-				genericEngineIdx = newIndex;
 			if(i == lastBot) {
 				cbBotDeck->setSelected(newIndex);
 				cbBotEngine->setSelected(newIndex);
 			}
 		}
+		i++;
+	}
+	if(genericEngine) {
+		genericEngineIdx = cbBotEngine->addItem(genericEngine->name.data(), i);
 	}
 	for(auto& file : Utils::FindFiles(EPRO_TEXT("./deck/"), { EPRO_TEXT("ydk") })) {
 		file.erase(file.size() - 4);
@@ -54,7 +57,7 @@ void WindBotPanel::UpdateDescription() {
 		deckProperties->setText(L"");
 		return;
 	}
-	if (index >= (int)bots.size() || index != CurrentEngine()) {
+	if (index >= (int)(bots.size() - (genericEngine != nullptr)) || index != CurrentEngine()) {
 		deckProperties->setText(L"???");
 		return;
 	}

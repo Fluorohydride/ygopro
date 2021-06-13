@@ -2020,30 +2020,33 @@ void Game::RefreshAiDecks() {
 				}
 			}
 #endif
-			int genericEngineIdx = -1;
+			WindBot generic_engine_bot;
 			for(auto& obj : j) {
 				try {
 					WindBot bot;
 					bot.name = BufferIO::DecodeUTF8(obj.at("name").get_ref<std::string&>());
 					bot.deck = BufferIO::DecodeUTF8(obj.at("deck").get_ref<std::string&>());
 					bot.deckfile = fmt::format(L"AI_{}", bot.deck);
-					if(bot.deck == L"Lucky" ) {
-						genericEngineIdx = (int)gBot.bots.size();
-					}
 					bot.difficulty = obj.at("difficulty").get<int>();
 					for(auto& masterRule : obj.at("masterRules")) {
 						if(masterRule.is_number()) {
 							bot.masterRules.insert(masterRule.get<int>());
 						}
 					}
-					gBot.bots.push_back(std::move(bot));
+					bool is_generic_engine = bot.deck == L"Lucky";
+					if(is_generic_engine)
+						generic_engine_bot = bot;
+					else
+						gBot.bots.push_back(std::move(bot));
 				}
 				catch(const std::exception& e) {
 					ErrorLog(fmt::format("Failed to parse WindBot Ignite config json entry: {}", e.what()));
 				}
 			}
-			if(genericEngineIdx != -1)
-				gBot.genericEngine = &gBot.bots[genericEngineIdx];
+			if(generic_engine_bot.deck.size()) {
+				gBot.bots.push_back(std::move(generic_engine_bot));
+				gBot.genericEngine = &gBot.bots.back();
+			}
 		}
 	} else {
 		ErrorLog("Failed to open WindBot Ignite config json!");
