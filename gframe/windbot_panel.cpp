@@ -59,23 +59,22 @@ void WindBotPanel::UpdateDescription() {
 		return;
 	}
 	auto& bot = bots[index];
-	std::wstringstream params;
-	if (bot.difficulty != 0)
-		params << fmt::format(gDataManager->GetSysString(2055), bot.difficulty);
-	else
-		params << gDataManager->GetSysString(2056);
-	params << L"\n";
+	std::wstring params = [&bot] {
+		if(bot.difficulty != 0)
+			return fmt::format(gDataManager->GetSysString(2055), bot.difficulty);
+		return std::wstring{ gDataManager->GetSysString(2056) };
+	}();
+	params.push_back(L'\n');
 	if (bot.masterRules.size()) {
-		std::wstring mr; // Due to short string optimization, a stream is not needed
+		std::wstring mr;
 		for (auto rule : bot.masterRules) {
 			if (mr.size())
-				mr.append(L",");
+				mr.push_back(L',');
 			mr.append(fmt::to_wstring(rule));
 		}
-		params << fmt::format(gDataManager->GetSysString(2057), mr);
-		params << L"\n";
+		params.append(fmt::format(gDataManager->GetSysString(2057), mr)).push_back(L'\n');
 	}
-	deckProperties->setText(params.str().data());
+	deckProperties->setText(params.data());
 }
 
 void WindBotPanel::UpdateEngine() {
