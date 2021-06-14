@@ -142,6 +142,7 @@ bool CheckMd5(std::fstream& instream, uint8_t md5[MD5_DIGEST_LENGTH]) {
 	return memcmp(result, md5, MD5_DIGEST_LENGTH) == 0;
 }
 
+#ifndef __ANDROID__
 static inline void DeleteOld() {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
 	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT("{}.old"), ygo::Utils::GetExePath()));
@@ -181,7 +182,9 @@ static inline void FreeLock(ygo::ClientUpdater::lock_type lock) {
 #endif
 	ygo::Utils::FileDelete(LOCKFILE);
 }
-#endif
+#endif //__ANDROID__
+#endif //UPDATE_URL
+
 namespace ygo {
 
 void ClientUpdater::StartUnzipper(unzip_callback callback, void* payload, const epro::path_string& src) {
@@ -329,13 +332,13 @@ void ClientUpdater::CheckUpdate() {
 #endif
 
 ClientUpdater::ClientUpdater() {
-#ifdef UPDATE_URL
+#if defined(UPDATE_URL) && !defined(__ANDROID__)
 	Lock = GetLock();
 #endif
 }
 
 ClientUpdater::~ClientUpdater() {
-#ifdef UPDATE_URL
+#if defined(UPDATE_URL) && !defined(__ANDROID__)
 	FreeLock(Lock);
 #endif
 }
