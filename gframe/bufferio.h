@@ -185,7 +185,7 @@ public:
 		return EncodeUTF8internal<false>(wsrc, out);
 	}
 	static std::string EncodeUTF8(epro::wstringview source) {
-		std::string res(source.size() * sizeof(wchar_t) + 1, L'\0');
+		std::string res(source.size() * 4 + 1, L'\0');
 		res.resize(EncodeUTF8(source.data(), &res[0]));
 		return res;
 	}
