@@ -4358,6 +4358,7 @@ void DuelClient::ReplayPrompt(bool local_stream) {
 		if(!mainGame->dInfo.compat_mode)
 			pheader.flag = REPLAY_LUA64;
 		pheader.flag |= REPLAY_NEWREPLAY | REPLAY_64BIT_DUELFLAG;
+		pheader.seed = static_cast<uint32_t>(time(0));
 		last_replay.BeginRecord(false);
 		last_replay.WriteHeader(pheader);
 		last_replay.Write<uint32_t>(mainGame->dInfo.selfnames.size(), false);
