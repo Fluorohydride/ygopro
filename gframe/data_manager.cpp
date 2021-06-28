@@ -348,8 +348,8 @@ epro::wstringview DataManager::GetDesc(uint64_t strCode, bool compat) {
 		return unknown_string;
 	return csit->second.GetStrings()->desc[stringid];
 }
-std::vector<uint32_t> DataManager::GetSetCode(std::vector<std::wstring>& setname) {
-	std::vector<uint32_t> res;
+std::vector<uint16_t> DataManager::GetSetCode(std::vector<std::wstring>& setname) {
+	std::vector<uint16_t> res;
 	for(auto& string : _setnameStrings.map) {
 		if(string.second.first.empty())
 			continue;
@@ -357,13 +357,13 @@ std::vector<uint32_t> DataManager::GetSetCode(std::vector<std::wstring>& setname
 		if(str.find(L'|') != std::wstring::npos){
 			for(auto& name : Utils::TokenizeString<std::wstring>(str, L'|')) {
 				if(Utils::ContainsSubstring(name, setname)) {
-					res.push_back(string.first);
+					res.push_back(static_cast<uint16_t>(string.first));
 					break;
 				}
 			}
 		} else {
 			if(Utils::ContainsSubstring(str, setname))
-				res.push_back(string.first);
+				res.push_back(static_cast<uint16_t>(string.first));
 		}
 	}
 	return res;

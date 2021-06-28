@@ -127,7 +127,7 @@ public:
 	inline epro::wstringview GetSetName(uint32_t code) {
 		return _setnameStrings.GetLocale(code, L"");
 	}
-	std::vector<uint32_t> GetSetCode(std::vector<std::wstring>& setname);
+	std::vector<uint16_t> GetSetCode(std::vector<std::wstring>& setname);
 	std::wstring GetNumString(int num, bool bracket = false);
 	epro::wstringview FormatLocation(uint32_t location, int sequence);
 	std::wstring FormatAttribute(uint32_t attribute);
