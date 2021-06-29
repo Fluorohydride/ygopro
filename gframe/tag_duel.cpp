@@ -65,10 +65,12 @@ void TagDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			is_recorder = true;
 			cache_recorder = dp;
 		}
+#ifndef YGOPRO_SERVER_MODE_DISABLE_CLOUD_REPLAY
 		if(!wcscmp(jpass, L"Marshtomp") && !replay_recorder) {
 			is_recorder = true;
 			replay_recorder = dp;
 		}
+#endif //YGOPRO_SERVER_MODE_DISABLE_CLOUD_REPLAY
 #else
 		if(wcscmp(jpass, pass)) {
 			STOC_ErrorMsg scem;
