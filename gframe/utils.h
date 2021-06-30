@@ -108,6 +108,8 @@ namespace ygo {
 		static T ToUpperChar(T c);
 		template<typename T>
 		static T ToUpperNoAccents(T input);
+		template<typename T>
+		static T& ToUpperNoAccentsSelf(T& input);
 		/** Returns true if and only if all tokens are contained in the input. */
 		static bool ContainsSubstring(epro::wstringview input, const std::vector<std::wstring>& tokens);
 		template<typename T>
@@ -310,6 +312,12 @@ T Utils::ToUpperChar(T c) {
 
 template<typename T>
 inline T Utils::ToUpperNoAccents(T input) {
+	std::transform(input.begin(), input.end(), input.begin(), ToUpperChar<typename T::value_type>);
+	return input;
+}
+
+template<typename T>
+inline T& Utils::ToUpperNoAccentsSelf(T& input) {
 	std::transform(input.begin(), input.end(), input.begin(), ToUpperChar<typename T::value_type>);
 	return input;
 }
