@@ -61,6 +61,42 @@ GameConfig::GameConfig() {
 	}
 }
 
+static epro::stringview getDriverName(irr::video::E_DRIVER_TYPE driver) {
+	switch(driver) {
+	case irr::video::EDT_OPENGL:
+		return "opengl";
+	case irr::video::EDT_DIRECT3D9:
+		return "d3d9";
+#if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	case irr::video::EDT_OGLES1:
+		return "ogles1";
+	case irr::video::EDT_OGLES2:
+		return "ogles2";
+#endif
+	default:
+		return "";
+	}
+}
+
+static irr::video::E_DRIVER_TYPE getDriverType(std::string& value) {
+	Utils::ToUpperNoAccentsSelf(value);
+#ifndef __ANDROID__
+	if(value == "OPENGL")
+		return irr::video::EDT_OPENGL;
+#ifdef _WIN32
+	if(value == "D3D9")
+		return irr::video::EDT_DIRECT3D9;
+#endif
+#endif
+#ifndef __APPLE__
+	if(value == "OGLES1")
+		return irr::video::EDT_OGLES1;
+	if(value == "OGLES2")
+		return irr::video::EDT_OGLES2;
+#endif
+	return irr::video::EDT_NULL;
+}
+
 bool GameConfig::Load(const epro::path_char* filename) {
 #if defined(__MINGW32__) && defined(UNICODE)
 	auto fd = _wopen(filename, _O_RDONLY);
@@ -87,29 +123,28 @@ bool GameConfig::Load(const epro::path_char* filename) {
 		auto type = str.substr(0, pos - 1);
 		str.erase(0, pos + 2);
 		try {
-			if (type == "antialias")
+			if(type == "antialias")
 				antialias = std::stoi(str);
-			else if (type == "use_d3d")
+			else if(type == "use_d3d")
 				use_d3d = !!std::stoi(str);
-			else if (type == "fullscreen")
+			else if(type == "fullscreen")
 				fullscreen = !!std::stoi(str);
-			else if (type == "nickname")
+			else if(type == "nickname")
 				nickname = BufferIO::DecodeUTF8(str);
-			else if (type == "gamename")
+			else if(type == "gamename")
 				gamename = BufferIO::DecodeUTF8(str);
-			else if (type == "lastdeck")
+			else if(type == "lastdeck")
 				lastdeck = BufferIO::DecodeUTF8(str);
-			else if (type == "lastExtraRules")
+			else if(type == "lastExtraRules")
 				lastExtraRules = std::stoi(str);
-			else if (type == "lastDuelForbidden")
+			else if(type == "lastDuelForbidden")
 				lastDuelForbidden = std::stoi(str);
-			else if (type == "maxFPS") {
+			else if(type == "maxFPS") {
 				int val = static_cast<int32_t>(std::stol(str));
 				if(val < 0 && val != -1)
 					val = static_cast<uint32_t>(std::stoul(str));
 				maxFPS = val;
-			}
-			else if (type == "lastDuelParam") {
+			} else if(type == "lastDuelParam") {
 				lastDuelParam = static_cast<uint64_t>(std::stoull(str));
 			}
 #define DESERIALIZE_UNSIGNED(name) \
@@ -143,104 +178,102 @@ bool GameConfig::Load(const epro::path_char* filename) {
 			DESERIALIZE_BOOL(showConsole)
 #endif
 #ifndef __linux__
-			else if (type == "windowStruct")
+			else if(type == "windowStruct")
 				windowStruct = str;
 #endif
-			else if (type == "botThrowRock")
+			else if(type == "botThrowRock")
 				botThrowRock = !!std::stoi(str);
-			else if (type == "botMute")
+			else if(type == "botMute")
 				botMute = !!std::stoi(str);
-			else if (type == "lastServer")
+			else if(type == "lastServer")
 				lastServer = BufferIO::DecodeUTF8(str);
-			else if (type == "textfont") {
+			else if(type == "textfont") {
 				pos = str.find(L' ');
-				if (pos == std::wstring::npos) {
+				if(pos == std::wstring::npos) {
 					textfont = BufferIO::DecodeUTF8(str);
 					continue;
 				}
 				textfont = BufferIO::DecodeUTF8(str.substr(0, pos));
 				textfontsize = std::stoi(str.substr(pos));
-			}
-			else if (type == "numfont")
+			} else if(type == "numfont")
 				numfont = BufferIO::DecodeUTF8(str);
-			else if (type == "serverport")
+			else if(type == "serverport")
 				serverport = BufferIO::DecodeUTF8(str);
-			else if (type == "lasthost")
+			else if(type == "lasthost")
 				lasthost = BufferIO::DecodeUTF8(str);
-			else if (type == "lastport")
+			else if(type == "lastport")
 				lastport = BufferIO::DecodeUTF8(str);
-			else if (type == "roompass")
+			else if(type == "roompass")
 				roompass = BufferIO::DecodeUTF8(str);
-			else if (type == "game_version") {
+			else if(type == "game_version") {
 				uint16_t version = static_cast<uint16_t>(std::stoul(str));
-				if (version) {
+				if(version) {
 					PRO_VERSION = version;
 					game_version = PRO_VERSION;
 				}
-			}
-			else if (type == "automonsterpos")
+			} else if(type == "automonsterpos")
 				chkMAutoPos = !!std::stoi(str);
-			else if (type == "autospellpos")
+			else if(type == "autospellpos")
 				chkSTAutoPos = !!std::stoi(str);
-			else if (type == "randompos")
+			else if(type == "randompos")
 				chkRandomPos = !!std::stoi(str);
-			else if (type == "autochain")
+			else if(type == "autochain")
 				chkAutoChain = !!std::stoi(str);
-			else if (type == "waitchain")
+			else if(type == "waitchain")
 				chkWaitChain = !!std::stoi(str);
-			else if (type == "mute_opponent")
+			else if(type == "mute_opponent")
 				chkIgnore1 = !!std::stoi(str);
-			else if (type == "mute_spectators")
+			else if(type == "mute_spectators")
 				chkIgnore2 = !!std::stoi(str);
-			else if (type == "hide_setname")
+			else if(type == "hide_setname")
 				chkHideSetname = !!std::stoi(str);
-			else if (type == "hide_hint_button")
+			else if(type == "hide_hint_button")
 				chkHideHintButton = !!std::stoi(str);
-			else if (type == "draw_field_spell")
+			else if(type == "draw_field_spell")
 				draw_field_spell = !!std::stoi(str);
-			else if (type == "quick_animation")
+			else if(type == "quick_animation")
 				quick_animation = !!std::stoi(str);
-			else if (type == "show_unofficial")
+			else if(type == "show_unofficial")
 				chkAnime = !!std::stoi(str);
-			else if (type == "showFPS")
+			else if(type == "showFPS")
 				showFPS = !!std::stoi(str);
-			else if (type == "hidePasscodeScope")
+			else if(type == "hidePasscodeScope")
 				hidePasscodeScope = !!std::stoi(str);
-			else if (type == "filterBot")
+			else if(type == "filterBot")
 				filterBot = !!std::stoi(str);
-			else if (type == "dpi_scale")
+			else if(type == "dpi_scale")
 				dpi_scale = std::stof(str);
-			else if (type == "skin")
+			else if(type == "skin")
 				skin = Utils::ToPathString(str);
-			else if (type == "ssl_certificate_path")
-			ssl_certificate_path = str;
-			else if (type == "language")
+			else if(type == "ssl_certificate_path")
+				ssl_certificate_path = str;
+			else if(type == "language")
 				locale = Utils::ToPathString(str);
-			else if (type == "scale_background")
+			else if(type == "scale_background")
 				scale_background = !!std::stoi(str);
 #ifndef __ANDROID__
-			else if (type == "dotted_lines")
+			else if(type == "dotted_lines")
 				dotted_lines = !!std::stoi(str);
-			else if (type == "accurate_bg_resize")
+			else if(type == "accurate_bg_resize")
 				accurate_bg_resize = !!std::stoi(str);
 #endif
-			else if (type == "ctrlClickIsRMB")
+			else if(type == "ctrlClickIsRMB")
 				ctrlClickIsRMB = !!std::stoi(str);
-			else if (type == "enable_music")
+			else if(type == "enable_music")
 				enablemusic = !!std::stoi(str);
-			else if (type == "enable_sound")
+			else if(type == "enable_sound")
 				enablesound = !!std::stoi(str);
-			else if (type == "music_volume")
+			else if(type == "music_volume")
 				musicVolume = std::min(std::max(std::stoi(str), 0), 100);
-			else if (type == "sound_volume")
+			else if(type == "sound_volume")
 				soundVolume = std::min(std::max(std::stoi(str), 0), 100);
 #ifdef __ANDROID__
-			else if (type == "native_keyboard")
+			else if(type == "native_keyboard")
 				native_keyboard = !!std::stoi(str);
-			else if (type == "native_mouse")
+			else if(type == "native_mouse")
 				native_mouse = !!std::stoi(str);
 #endif
-			else if (type == "controller_input")
+			else if(type == "controller_input")
 				controller_input = !!std::stoi(str);
 		}
 		catch (...) {}
