@@ -196,6 +196,8 @@ int _tmain(int argc, epro::path_char* argv[]) {
 		const auto err = fmt::format("failed to change directory to: {}", ygo::Utils::ToUTF8IfNeeded(dest));
 		ygo::ErrorLog(err);
 		fmt::print("{}\n", err);
+		ygo::GUIUtils::ShowErrorWindow("Initialization fail", err);
+		return EXIT_FAILURE;
 	}
 	if(argc >= (2 + skipped) && argv[1 + skipped] == EPRO_TEXT("show_changelog"_sv))
 		show_changelog = true;
