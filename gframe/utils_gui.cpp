@@ -93,6 +93,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 		params.DriverType = irr::video::EDT_OPENGL;
 	params.WindowSize = irr::core::dimension2d<irr::u32>((irr::u32)(1024 * configs->dpi_scale), (irr::u32)(640 * configs->dpi_scale));
 #else
+	params.OGLES2ShaderPath = EPRO_TEXT("BUNDLED");
 	if(gGameConfig->use_d3d)
 		params.DriverType = irr::video::EDT_OGLES2;
 	else
