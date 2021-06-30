@@ -125,9 +125,18 @@ bool GameConfig::Load(const epro::path_char* filename) {
 		try {
 			if(type == "antialias")
 				antialias = std::stoi(str);
-			else if(type == "use_d3d")
-				use_d3d = !!std::stoi(str);
-			else if(type == "fullscreen")
+			else if(type == "use_d3d") {
+#ifdef _WIN32
+				driver_type = std::stoi(str) ? irr::video::EDT_DIRECT3D9 : irr::video::EDT_OPENGL;
+#elif defined(__ANDROID__)
+				driver_type = std::stoi(str) ? irr::video::EDT_OGLES2 : irr::video::EDT_OGLES1;
+#endif
+			}
+			else if(type == "driver_type") {
+				auto new_type = getDriverType(str);
+				if(new_type != irr::video::EDT_NULL)
+					driver_type = new_type;
+			} else if(type == "fullscreen")
 				fullscreen = !!std::stoi(str);
 			else if(type == "nickname")
 				nickname = BufferIO::DecodeUTF8(str);
@@ -311,7 +320,7 @@ bool GameConfig::Save(const epro::path_char* filename) {
 	conf_file << "# Project Ignis: EDOPro system.conf\n";
 	conf_file << "# Overwritten on normal game exit\n";
 #define SERIALIZE(name) Serialize(conf_file, #name, name)
-	SERIALIZE(use_d3d);
+	conf_file << "driver_type = " << getDriverName(driver_type) << "\n";
 	SERIALIZE(vsync);
 	SERIALIZE(maxFPS);
 	SERIALIZE(fullscreen);

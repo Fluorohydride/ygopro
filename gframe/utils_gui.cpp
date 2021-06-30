@@ -72,6 +72,10 @@ static HWND GetWindowHandle(irr::video::IVideoDriver* driver) {
 	case irr::video::EDT_DIRECT3D9:
 		return static_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
 	case irr::video::EDT_OPENGL:
+#if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	case irr::video::EDT_OGLES1:
+	case irr::video::EDT_OGLES2:
+#endif
 		return static_cast<HWND>(driver->getExposedVideoData().OpenGLWin32.HWnd);
 	default:
 		break;
@@ -84,28 +88,19 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = configs->antialias;
 	params.Vsync = configs->vsync;
-#ifndef __ANDROID__
-#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
-	if(configs->use_d3d)
-		params.DriverType = irr::video::EDT_DIRECT3D9;
-	else
+	params.DriverType = configs->driver_type;
+#if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	params.OGLES2ShaderPath = EPRO_TEXT("BUNDLED");
+	params.WindowResizable = true;
 #endif
-		params.DriverType = irr::video::EDT_OPENGL;
+#ifndef __ANDROID__
 	params.WindowSize = irr::core::dimension2d<irr::u32>((irr::u32)(1024 * configs->dpi_scale), (irr::u32)(640 * configs->dpi_scale));
 #else
-	params.OGLES2ShaderPath = EPRO_TEXT("BUNDLED");
-	if(gGameConfig->use_d3d)
-		params.DriverType = irr::video::EDT_OGLES2;
-	else
-		params.DriverType = irr::video::EDT_OGLES1;
 	params.PrivateData = porting::app_global;
 	params.Bits = 24;
 	params.ZBufferBits = 16;
 	params.AntiAlias = 0;
 	params.WindowSize = irr::core::dimension2du(0, 0);
-#endif
-#if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
-	params.WindowResizable = true;
 #endif
 	irr::IrrlichtDevice* device = irr::createDeviceEx(params);
 	if(!device)
@@ -132,7 +127,6 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
 	device->setWindowCaption(L"Project Ignis: EDOPro");
-	device->setResizable(true);
 #if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	device->setResizable(true);
 #endif

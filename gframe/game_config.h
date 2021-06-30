@@ -2,6 +2,7 @@
 #define GAME_CONFIG_H
 
 #include <nlohmann/json.hpp>
+#include <EDriverTypes.h>
 #include "text_types.h"
 
 namespace ygo {
@@ -18,7 +19,11 @@ struct GameConfig
 	bool Load(const epro::path_char* filename);
 	bool Save(const epro::path_char* filename);
 
-	bool use_d3d{ true };
+#ifdef __ANDROID__
+	irr::video::E_DRIVER_TYPE driver_type{ irr::video::EDT_OGLES1 };
+#else
+	irr::video::E_DRIVER_TYPE driver_type{ irr::video::EDT_OPENGL };
+#endif
 	bool vsync{ true };
 	std::string windowStruct;
 	float dpi_scale{ 1.0f };
