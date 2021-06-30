@@ -297,7 +297,7 @@ namespace ygo {
 		}
 		return nullptr;
 	}
-	epro::stringview Utils::GetUserAgent() {
+	const std::string& Utils::GetUserAgent() {
 		static const std::string agent = fmt::format("EDOPro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)" {}",
 											   ygo::Utils::OSOperator->getOperatingSystemVersion());
 		return agent;

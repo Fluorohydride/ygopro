@@ -96,7 +96,7 @@ namespace ygo {
 
 #undef DECLARE_STRING_VIEWED
 
-		static epro::stringview GetUserAgent();
+		static const std::string& GetUserAgent();
 
 		static epro::path_string GetAbsolutePath(epro::path_stringview path);
 
