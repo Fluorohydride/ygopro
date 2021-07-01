@@ -99,8 +99,9 @@ bool WindBotPanel::LaunchSelected(int port, epro::wstringview pass) {
 	if (index < 0 || engine < 0) return false;
 	const wchar_t* overridedeck = nullptr;
 	std::wstring tmpdeck{};
-	if(engine != index) {
-		if(index >= (int)bots.size()) {
+	const auto maxsize = (int)(bots.size() - (genericEngine != nullptr));
+	if(engine != index || index >= maxsize) {
+		if(index >= maxsize) {
 			tmpdeck = fmt::format(L"{}/{}.ydk", absolute_deck_path, cbBotDeck->getItem(cbBotDeck->getSelected()));
 			overridedeck = tmpdeck.data();
 		} else {
