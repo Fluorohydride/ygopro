@@ -24,17 +24,57 @@
 #define JBOOL "Z"
 
 namespace {
-#define JstringtoC(type, rettype, ...)\
-std::rettype JstringtoC##type(JNIEnv* env, const jstring& jnistring) {\
-	const size_t len = env->GetStringUTFLength(jnistring);\
-	const char* text = env->GetStringUTFChars(jnistring, nullptr);\
-	std::rettype res __VA_ARGS__({text, len});\
-	env->ReleaseStringUTFChars(jnistring, text);\
-	return res;\
+
+std::string JstringtoCA(JNIEnv* env, const jstring& jnistring) {
+	if(!jnistring)
+		return "";
+
+	const auto stringClass = env->GetObjectClass(jnistring);
+	const auto getBytes = env->GetMethodID(stringClass, "getBytes", JPARAMS(JSTRING)JARRAY(JBYTE));
+	jstring UTF8_STRING = env->NewStringUTF("UTF-8");
+	const auto stringJbytes = static_cast<jbyteArray>(env->CallObjectMethod(jnistring, getBytes, UTF8_STRING));
+
+	size_t length = (size_t)env->GetArrayLength(stringJbytes);
+	jbyte* pBytes = env->GetByteArrayElements(stringJbytes, nullptr);
+
+	std::string ret{ (char*)pBytes, length };
+	env->ReleaseByteArrayElements(stringJbytes, pBytes, JNI_ABORT);
+
+	env->DeleteLocalRef(stringJbytes);
+	env->DeleteLocalRef(stringClass);
+	env->DeleteLocalRef(UTF8_STRING);
+	return ret;
 }
 
-JstringtoC(W, wstring, = BufferIO::DecodeUTF8)
-JstringtoC(A, string)
+inline std::wstring JstringtoCW(JNIEnv* env, const jstring& jnistring) {
+	return BufferIO::DecodeUTF8(JstringtoCA(env, jnistring));
+}
+
+//calls: Charset.forName("UTF-8").decode(bb).toString()
+jstring NewJavaString(JNIEnv* env, epro::stringview string) {
+	jobject bb = env->NewDirectByteBuffer((void*)string.data(), string.size());
+
+	jclass cls_Charset = env->FindClass("java/nio/charset/Charset");
+	jmethodID mid_Charset_forName = env->GetStaticMethodID(cls_Charset, "forName", JPARAMS(JSTRING)"Ljava/nio/charset/Charset;");
+	jstring UTF8_STRING = env->NewStringUTF("UTF-8");
+	jobject charset = env->CallStaticObjectMethod(cls_Charset, mid_Charset_forName, UTF8_STRING);
+
+	jmethodID mid_Charset_decode = env->GetMethodID(cls_Charset, "decode", JPARAMS("Ljava/nio/ByteBuffer;")"Ljava/nio/CharBuffer;");
+	jobject cb = env->CallObjectMethod(charset, mid_Charset_decode, bb);
+
+	jclass cls_CharBuffer = env->FindClass("java/nio/CharBuffer");
+	jmethodID mid_CharBuffer_toString = env->GetMethodID(cls_CharBuffer, "toString", JPARAMS()JSTRING);
+	jstring ret = static_cast<jstring>(env->CallObjectMethod(cb, mid_CharBuffer_toString));
+
+	env->DeleteLocalRef(cls_Charset);
+	env->DeleteLocalRef(cls_CharBuffer);
+	env->DeleteLocalRef(charset);
+	env->DeleteLocalRef(cb);
+	env->DeleteLocalRef(bb);
+	env->DeleteLocalRef(UTF8_STRING);
+
+	return ret;
+}
 
 std::mutex* queued_messages_mutex = nullptr;
 std::deque<std::function<void()>>* events = nullptr;
@@ -272,7 +312,7 @@ void showInputDialog(epro::path_stringview current) {
 		assert("porting::showInputDialog unable to find java show dialog method" == 0);
 	}
 
-	jstring jcurrent = jnienv->NewStringUTF(current.data());
+	jstring jcurrent = NewJavaString(jnienv, current);
 
 	jnienv->CallVoidMethod(app_global->activity->clazz, showdialog, jcurrent);
 
@@ -282,13 +322,13 @@ void showInputDialog(epro::path_stringview current) {
 void showComboBox(const std::vector<std::string>& list) {
 	jmethodID showbox = jnienv->GetMethodID(nativeActivity, "showComboBox", JPARAMS(JARRAY(JSTRING))JVOID);
 
-	jstring str;
 	jsize len = list.size();
 	jobjectArray jlist = jnienv->NewObjectArray(len, jnienv->FindClass("java/lang/String"), 0);
 
 	for(int i = 0; i < list.size(); i++) {
-		str = jnienv->NewStringUTF(list[i].c_str());
-		jnienv->SetObjectArrayElement(jlist, i, str);
+		auto jstring = NewJavaString(jnienv, list[i]);
+		jnienv->SetObjectArrayElement(jlist, i, jstring);
+		jnienv->DeleteLocalRef(jstring);
 	}
 
 	jnienv->CallVoidMethod(app_global->activity->clazz, showbox, jlist);
@@ -452,7 +492,7 @@ int getLocalIP() {
 void name(epro::path_stringview arg) {\
 jmethodID name = jnienv->GetMethodID(nativeActivity, #name, JPARAMS(JSTRING)JVOID);\
 if(name == 0) assert("porting::" #name " unable to find java " #name " method" == 0);\
-jstring jargs = jnienv->NewStringUTF(arg.data());\
+jstring jargs = NewJavaString(jnienv, arg);\
 jnienv->CallVoidMethod(app_global->activity->clazz, name, jargs);\
 jnienv->DeleteLocalRef(jargs);\
 }
@@ -467,7 +507,7 @@ void setTextToClipboard(epro::wstringview text) {
 	jmethodID setClip = jnienv->GetMethodID(nativeActivity, "setClipboard", JPARAMS(JSTRING)JVOID);
 	if(setClip == 0)
 		assert("porting::setTextToClipboard unable to find java setClipboard method" == 0);
-	jstring jargs = jnienv->NewStringUTF(BufferIO::EncodeUTF8(text).data());
+	jstring jargs = NewJavaString(jnienv, BufferIO::EncodeUTF8(text));
 
 	jnienv->CallVoidMethod(app_global->activity->clazz, setClip, jargs);
 
