@@ -1820,7 +1820,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			break;
 		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
-			if(mainGame->fadingList.size()) {
+			if(mainGame->fadingList.size() || !event.GUIEvent.Caller->isTrulyVisible()) {
 				stopPropagation = true;
 				return true;
 			}
