@@ -20,10 +20,7 @@ using CCursorControl = irr::CIrrDeviceWin32::CCursorControl;
 using CCursorControl = irr::CCursorControl;
 #endif
 #elif defined(__ANDROID__)
-class android_app;
-namespace porting {
-extern android_app* app_global;
-}
+#include "Android/porting_android.h"
 #elif defined(__APPLE__)
 #import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
@@ -326,7 +323,9 @@ void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview messag
 	//Clean up the strings
 	CFRelease(header_ref);
 	CFRelease(message_ref);
-#elif !defined(__ANDROID__)
+#elif defined(__ANDROID__)
+	porting::showErrorDialog(context, message);
+#else
 	auto pid = vfork();
 	if(pid == 0) {
 		execl("/usr/bin/kdialog", "kdialog", "--title", context.data(), "--error", message.data());
