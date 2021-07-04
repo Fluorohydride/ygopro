@@ -65,13 +65,20 @@ namespace ygo {
 #endif
 
 Game::~Game() {
-	guiFont->drop();
-	textFont->drop();
-	numFont->drop();
-	adFont->drop();
-	lpcFont->drop();
-	filesystem->drop();
-	delete skinSystem;
+	if(guiFont)
+		guiFont->drop();
+	if(textFont)
+		textFont->drop();
+	if(numFont)
+		numFont->drop();
+	if(adFont)
+		adFont->drop();
+	if(lpcFont)
+		lpcFont->drop();
+	if(filesystem)
+		filesystem->drop();
+	if(skinSystem)
+		delete skinSystem;
 }
 
 bool Game::Initialize() {
@@ -130,14 +137,14 @@ bool Game::Initialize() {
 		discord.UpdatePresence(DiscordWrapper::INITIALIZE);
 	PopulateResourcesDirectories();
 	env = device->getGUIEnvironment();
+	guiFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->textfont.data(), Scale(gGameConfig->textfontsize), {});
+	if(!guiFont)
+		throw std::runtime_error("Failed to load text font");
+	textFont = guiFont;
+	textFont->grab();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.data(), Scale(16), {});
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.data(), Scale(12), {});
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.data(), Scale(48), {});
-	guiFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->textfont.data(), Scale(gGameConfig->textfontsize), {});
-	textFont = guiFont;
-	if(!textFont || !guiFont)
-		throw std::runtime_error("Failed to load text font");
-	textFont->grab();
 	if(!numFont || !adFont || !lpcFont)
 		throw std::runtime_error("Failed to load numbers font");
 	if(!ApplySkin(gGameConfig->skin, false, true))
