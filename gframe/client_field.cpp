@@ -678,6 +678,7 @@ void ClientField::ReplaySwap() {
 	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
 	std::swap(mainGame->dInfo.strLP[0], mainGame->dInfo.strLP[1]);
 	std::swap(mainGame->dInfo.current_player[0], mainGame->dInfo.current_player[1]);
+	std::swap(player_desc_hints[0], player_desc_hints[1]);
 	for(auto& chit : chains) {
 		chit.controler = 1 - chit.controler;
 		chit.UpdateDrawCoordinates();
