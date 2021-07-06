@@ -2006,7 +2006,7 @@ void Game::RefreshLFLists() {
 }
 void Game::RefreshAiDecks() {
 	gBot.bots.clear();
-	std::ifstream windbots("WindBot/bots.json");
+	std::ifstream windbots("./WindBot/bots.json");
 	if (windbots.good()) {
 		nlohmann::json j;
 		try {

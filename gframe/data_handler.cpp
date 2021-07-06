@@ -21,9 +21,9 @@
 namespace ygo {
 
 void DataHandler::LoadDatabases() {
-	if(Utils::FileExists(EPRO_TEXT("cards.cdb"))) {
-		if(dataManager->LoadDB(EPRO_TEXT("cards.cdb")))
-			WindBot::AddDatabase(EPRO_TEXT("cards.cdb"));
+	if(Utils::FileExists(EPRO_TEXT("./cards.cdb"))) {
+		if(dataManager->LoadDB(EPRO_TEXT("./cards.cdb")))
+			WindBot::AddDatabase(EPRO_TEXT("./cards.cdb"));
 	}
 	for(auto& file : Utils::FindFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("cdb") }, 2)) {
 		epro::path_string db = EPRO_TEXT("./expansions/") + file;
