@@ -34,7 +34,7 @@
 #include "ocgcore_functions.inl"
 #undef X
 
-#define CREATE_CLONE(x) auto x##_copy = x;
+#define CREATE_CLONE(x) static auto x##_copy = x;
 #define STORE_CLONE(x) x##_copy = x;
 #define CLEAR_CLONE(x) x##_copy = nullptr;
 
