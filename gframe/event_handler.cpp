@@ -1783,6 +1783,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	}
 	return false;
 }
+static bool IsTrulyVisible(const irr::gui::IGUIElement* elem) {
+	while(elem->isVisible()) {
+		elem = elem->getParent();
+		if(!elem)
+			return true;
+	}
+	return false;
+};
 bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation) {
 	static irr::u32 buttonstates = 0;
 	static uint8_t resizestate = gGameConfig->fullscreen ? 2 : 0;
@@ -1820,7 +1828,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			break;
 		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
-			if(mainGame->fadingList.size() || !event.GUIEvent.Caller->isTrulyVisible()) {
+			if(mainGame->fadingList.size() || !IsTrulyVisible(event.GUIEvent.Caller)) {
 				stopPropagation = true;
 				return true;
 			}
