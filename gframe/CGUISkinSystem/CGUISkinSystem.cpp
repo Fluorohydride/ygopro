@@ -29,7 +29,7 @@ bool CGUISkinSystem::loadSkinList() {
 		if(!isdir || name == EPRO_TEXT(".") || (name == EPRO_TEXT("..")))
 			return;
 		if(ygo::Utils::FileExists(fmt::format("{}/{}" SKINSYSTEM_SKINFILE, skinpath, name)))
-			skinsList.push_back({ name.data(), name.size() });
+			skinsList.emplace_back(name.data(), name.size());
 	});
 	std::sort(skinsList.begin(), skinsList.end(), ygo::Utils::CompareIgnoreCase<epro::path_string>);
 	return !skinsList.empty();
