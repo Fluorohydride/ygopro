@@ -833,7 +833,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					CardDataC* pointer = nullptr;
 					if(!code || !(pointer = gDataManager->GetCardData(code))) {
 						for(auto& card : gDataManager->cards) {
-							auto name = Utils::ToUpperNoAccents<std::wstring>(card.second.GetStrings()->name);
+							const auto& name = card.second.GetStrings()->uppercase_name;
 							if(name == to) {
 								pointer = &card.second._data;
 								break;
