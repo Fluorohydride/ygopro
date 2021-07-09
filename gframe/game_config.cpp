@@ -88,7 +88,7 @@ static irr::video::E_DRIVER_TYPE getDriverType(std::string& value) {
 		return irr::video::EDT_DIRECT3D9;
 #endif
 #endif
-#ifndef __APPLE__
+#if !defined(__APPLE__) && IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 	if(value == "OGLES1")
 		return irr::video::EDT_OGLES1;
 	if(value == "OGLES2")
