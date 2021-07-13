@@ -3702,6 +3702,8 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		return true;
 	}
 	case MSG_MISSED_EFFECT: {
+		if(mainGame->dInfo.isCatchingUp)
+			return true;
 		CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		uint32_t code = BufferIO::Read<uint32_t>(pbuf);
 		std::unique_lock<std::mutex> lock(mainGame->gMutex);
