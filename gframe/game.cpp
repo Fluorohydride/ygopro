@@ -801,6 +801,7 @@ bool Game::Initialize() {
 	wACMessage->getCloseButton()->setVisible(false);
 	wACMessage->setVisible(false);
 	wACMessage->setDrawBackground(false);
+	wACMessage->setDraggable(false);
 	stACMessage = irr::gui::CGUICustomText::addCustomText(L"", true, env, wACMessage, -1, Scale(0, 0, 350, 60), true);
 	stACMessage->setWordWrap(true);
 	stACMessage->setBackgroundColor(skin::DUELFIELD_ANNOUNCE_TEXT_BACKGROUND_COLOR_VAL);
