@@ -58,14 +58,16 @@ bool DeckManager::LoadLFListSingle(const epro::path_string& path) {
 	lflist.hash = 0;
 	std::string str;
 	while(std::getline(infile, str)) {
-		auto pos = str.find('\r');
-		if(str.size() && pos != std::string::npos)
-			str.erase(pos);
+		{
+			auto pos = str.find('\r');
+			if(pos != std::string::npos)
+				str.erase(pos);
+		}
 		if(str.empty() || str[0] == '#')
 			continue;
 		if(str[0] == '!') {
 			if(lflist.hash)
-				_lfList.push_back(lflist);
+				_lfList.push_back(std::move(lflist));
 			lflist.listName = BufferIO::DecodeUTF8({ str.data() + 1, str.size() - 1 });
 			lflist.content.clear();
 			lflist.hash = 0x7dfcee6a;
@@ -73,28 +75,27 @@ bool DeckManager::LoadLFListSingle(const epro::path_string& path) {
 			loaded = true;
 			continue;
 		}
-		if(str.rfind(key, 0) == 0)
+		if(str.rfind(key, 0) == 0) {
 			lflist.whitelist = true;
+			continue;
+		}
 		if(!lflist.hash)
 			continue;
-		pos = str.find(" ");
-		if(pos == std::string::npos)
+		auto p = str.find(' ');
+		if(p == std::string::npos)
 			continue;
-		uint32_t code = 0;
-		try { code = std::stoul(str.substr(0, pos)); }
+		auto c = str.find_first_not_of("-0123456789", p + 1);
+		if(c != std::string::npos)
+			c -= p;
+		try {
+			auto code = static_cast<uint32_t>(std::stoul(str.substr(0, p)));
+			if(code == 0)
+				continue;
+			auto count = static_cast<int32_t>(std::stol(str.substr(p, c)));
+			lflist.content[code] = count;
+			lflist.hash = lflist.hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
+		}
 		catch(...){}
-		if(!code)
-			continue;
-		str.erase(0, pos + 1);
-		str.erase(0, str.find_first_not_of(" \t\n\r\f\v"));
-		pos = str.find(" ");
-		if(pos == std::string::npos)
-			continue;
-		int count = 0;
-		try { count = std::stoi(str.substr(0, pos)); }
-		catch(...) { continue; }
-		lflist.content[code] = count;
-		lflist.hash = lflist.hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 	}
 	if(lflist.hash)
 		_lfList.push_back(lflist);
