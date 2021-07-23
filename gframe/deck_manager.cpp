@@ -71,7 +71,24 @@ const std::unordered_map<int, int>* DeckManager::GetLFListContent(int lfhash) {
 		return &lit->content;
 	return nullptr;
 }
-int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg) {
+int DeckManager::IsGameRuleDisallowed(unsigned char hostInfoRule, unsigned int cardOt) {
+	bool allow_ocg = hostInfoRule == 0 || hostInfoRule == 2; // OCG can be used in OCG and OT duels
+	bool allow_tcg = hostInfoRule == 1 || hostInfoRule == 2; // TCG can be used in TCG and OT duels
+	bool allow_ccg = hostInfoRule == 0 || hostInfoRule == 4 || hostInfoRule == 2; // CCG can be used in OCG, CCG and OT duels
+	if(!allow_ocg && (cardOt & 0x3 == 0x1))
+		return DECKERROR_OCGONLY;
+	if(!allow_tcg && (cardOt & 0x3 == 0x2))
+		return DECKERROR_TCGONLY;
+	if(hostInfoRule == 4 && !(cardOt & 0x8) && (cardOt & 0x3)) { // in CCG duels, cards labeled with ither OCG or TCG, but not CCG, would not be allowed.
+		if(cardOt & 0x3 == 0x2) {
+			return DECKERROR_TCGONLY;
+		} else {
+			return DECKERROR_OCGONLY;
+		}
+	}
+	return 0;
+}
+int DeckManager::CheckDeck(Deck& deck, int lfhash, unsigned char hostInfoRule) {
 	std::unordered_map<int, int> ccount;
 	auto list = GetLFListContent(lfhash);
 	if(!list)
@@ -86,10 +103,9 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 
 	for(size_t i = 0; i < deck.main.size(); ++i) {
 		code_pointer cit = deck.main[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
+		const int gameruleDeckError = IsGameRuleDisallowed(hostInfoRule, cit->second.ot);
+		if(gameruleDeckError)
+			return (gameruleDeckError << 28) + cit->first;
 		if(cit->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_TOKEN | TYPE_LINK))
 			return (DECKERROR_EXTRACOUNT << 28);
 		int code = cit->second.alias ? cit->second.alias : cit->first;
@@ -103,10 +119,9 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 	}
 	for(size_t i = 0; i < deck.extra.size(); ++i) {
 		code_pointer cit = deck.extra[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
+		const int gameruleDeckError = IsGameRuleDisallowed(hostInfoRule, cit->second.ot);
+		if(gameruleDeckError)
+			return (gameruleDeckError << 28) + cit->first;
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];
@@ -118,10 +133,9 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 	}
 	for(size_t i = 0; i < deck.side.size(); ++i) {
 		code_pointer cit = deck.side[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
+		const int gameruleDeckError = IsGameRuleDisallowed(hostInfoRule, cit->second.ot);
+		if(gameruleDeckError)
+			return (gameruleDeckError << 28) + cit->first;
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];

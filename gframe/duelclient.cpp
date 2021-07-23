@@ -421,7 +421,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		wchar_t msgbuf[256];
 		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1226), deckManager.GetLFListName(pkt->info.lflist));
 		str.append(msgbuf);
-		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1225), dataManager.GetSysString(1240 + pkt->info.rule));
+		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1225), dataManager.GetSysString(pkt->info.rule == 4 ? 1249 : 1240 + pkt->info.rule));
 		str.append(msgbuf);
 		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1227), dataManager.GetSysString(1244 + pkt->info.mode));
 		str.append(msgbuf);
