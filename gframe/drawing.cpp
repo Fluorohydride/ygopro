@@ -1105,24 +1105,17 @@ void Game::DrawThumb(code_pointer cp, position2di pos, const std::unordered_map<
 			break;
 		}
 	}
-	if(cbLimit->getSelected() >= 4 && (cp->second.ot & gameConf.defaultOT)) {
-		switch(cp->second.ot) {
-		case 1:
-			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 128, 128, 192), 0, 0, true);
-			break;
-		case 2:
-			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 192, 128, 256), 0, 0, true);
-			break;
+	if(cbLimit->getSelected() >= 4 && ((cp->second.ot & 0x8) || cp->second.ot & 0x3 && (cp->second.ot & 0x3) != 0x3)) {
+		int xOffset = 0, yOffset = 0;
+		if(cp->second.ot & 0x8)
+			xOffset += 128;
+		else if((cp->second.ot & 0x3)== 0x2) {
+			yOffset += 64;
 		}
-	} else if(cbLimit->getSelected() >= 4 || !(cp->second.ot & gameConf.defaultOT)) {
-		switch(cp->second.ot) {
-		case 1:
-			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 0, 128, 64), 0, 0, true);
-			break;
-		case 2:
-			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 64, 128, 128), 0, 0, true);
-			break;
+		if(!deckManager.IsGameRuleDisallowed(gameConf.defaultOT, cp->second.ot)) {
+			yOffset += 128;
 		}
+		driver->draw2DImage(imageManager.tOT, otloc, recti(xOffset, yOffset, 128 + xOffset, 64 + yOffset), 0, 0, true);
 	}
 }
 void Game::DrawDeckBd() {

@@ -39,7 +39,8 @@ public:
 	void LoadLFList();
 	const wchar_t* GetLFListName(int lfhash);
 	const std::unordered_map<int, int>* GetLFListContent(int lfhash);
-	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg);
+	int IsGameRuleDisallowed(unsigned char hostInfoRule, unsigned int cardOt);
+	int CheckDeck(Deck &deck, int lfhash, unsigned char hostInfoRule);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 #ifndef YGOPRO_SERVER_MODE

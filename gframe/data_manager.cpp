@@ -224,10 +224,10 @@ const wchar_t* DataManager::GetText(int code) {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetDesc(int strCode) {
-	if(strCode < 10000)
+	if((unsigned int)strCode < 10000u)
 		return GetSysString(strCode);
-	int code = strCode >> 4;
-	int offset = strCode & 0xf;
+	unsigned int code = strCode >> 4;
+	unsigned int offset = strCode & 0xf;
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
