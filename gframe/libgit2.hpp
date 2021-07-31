@@ -51,7 +51,7 @@ struct DtorType;
 #define DESTRUCTOR(objtype) template<>\
 struct DtorType<objtype>\
 {\
-	static constexpr auto value = objtype##_free;\
+	static constexpr auto& value = objtype##_free;\
 	using type = decltype(value);\
 }
 
