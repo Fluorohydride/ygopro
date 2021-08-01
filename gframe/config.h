@@ -21,10 +21,10 @@ extern bool show_changelog;
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
-#if defined(TARGET_OS_MAC)
-#define EDOPRO_MACOS
-#else
+#if defined(TARGET_OS_IOS)
 #define EDOPRO_IOS
+#else
+#define EDOPRO_MACOS
 #endif
 #endif
 
