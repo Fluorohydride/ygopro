@@ -119,13 +119,19 @@ local ygopro_config=function(static_core)
 		defines "LUA_USE_MACOSX"
 		includedirs { "/usr/local/include/irrlicht" }
 		linkoptions { "-Wl,-rpath ./" }
-		links { "fmt", "curl", "Cocoa.framework", "IOKit.framework", "OpenGL.framework", "Security.framework" }
+		links { "curl", "Cocoa.framework", "IOKit.framework", "OpenGL.framework", "Security.framework" }
 		if _OPTIONS["update-url"] then
 			links "crypto"
 		end
 		if static_core then
 			links "lua"
 		end
+
+	filter { "system:macosx", "configurations:Debug" }
+		links "fmtd"
+
+	filter { "system:macosx", "configurations:Release" }
+		links "fmt"
 
 	filter { "system:linux or windows", "action:not vs*", "configurations:Debug" }
 		if _OPTIONS["vcpkg-root"] then
