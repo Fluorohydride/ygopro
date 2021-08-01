@@ -14,7 +14,7 @@
 
 #ifdef _WIN32
 #define CORENAME EPRO_TEXT("ocgcore.dll")
-#elif defined(__APPLE__)
+#elif defined(EDOPRO_MACOS)
 #define CORENAME EPRO_TEXT("libocgcore.dylib")
 #elif defined(__ANDROID__)
 #if defined(__arm__)

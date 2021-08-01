@@ -90,7 +90,7 @@ struct GameConfig
 #endif
 	bool hideHandsInReplays{ false };
 	bool chkAnime{ false };
-#ifdef __APPLE__
+#ifdef EDOPRO_MACOS
 	bool ctrlClickIsRMB{ true };
 #else
 	bool ctrlClickIsRMB{ false };

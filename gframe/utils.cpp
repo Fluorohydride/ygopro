@@ -355,7 +355,7 @@ namespace ygo {
 			if(len != -1)
 				buff[len] = EPRO_TEXT('\0');
 			return buff;
-#elif defined(__APPLE__)
+#elif defined(EDOPRO_MACOS)
 			CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 			CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
 			CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(nullptr, bundle_url);
@@ -471,8 +471,13 @@ namespace ygo {
 	void Utils::SystemOpen(epro::path_stringview arg, OpenType type) {
 #ifdef _WIN32
 		ShellExecute(nullptr, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), working_dir, arg).data() : arg.data(), nullptr, nullptr, SW_SHOWNORMAL);
-#elif !defined(__ANDROID__)
-#ifdef __APPLE__
+#elif defined(__ANDROID__)
+		if(type == OPEN_FILE)
+			porting::openFile(fmt::format("{}/{}", working_dir, arg));
+		else
+			porting::openUrl(arg);
+#elif defined(EDOPRO_MACOS) || defined(__linux__)
+#ifdef EDOPRO_MACOS
 #define OPEN "open"
 #else
 #define OPEN "xdg-open"
@@ -485,11 +490,6 @@ namespace ygo {
 			perror("Failed to fork:");
 		if(waitpid(pid, nullptr, WNOHANG) != 0)
 			perror("Failed to open arg or file:");
-#else
-		if(type == OPEN_FILE)
-			porting::openFile(fmt::format("{}/{}", working_dir, arg));
-		else
-			porting::openUrl(arg);
 #endif
 	}
 }

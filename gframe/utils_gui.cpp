@@ -21,7 +21,7 @@ using CCursorControl = irr::CCursorControl;
 #endif
 #elif defined(__ANDROID__)
 #include "Android/porting_android.h"
-#elif defined(__APPLE__)
+#elif defined(EDOPRO_MACOS)
 #import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
 #elif defined(__linux__)
@@ -139,7 +139,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 		if(winstruct.size() == sizeof(WINDOWPLACEMENT))
 			SetWindowPlacement(hWnd, reinterpret_cast<WINDOWPLACEMENT*>(winstruct.data()));
 	}
-#elif defined(__APPLE__)
+#elif defined(EDOPRO_MACOS)
 	if(gGameConfig->windowStruct.size())
 		EDOPRO_SetWindowRect(driver->getExposedVideoData().OpenGLOSX.Window, gGameConfig->windowStruct.data());
 #endif
@@ -184,6 +184,7 @@ static BOOL CALLBACK callback(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM
 #endif
 
 void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
+    (void)fullscreen;
 #ifdef _WIN32
 	static WINDOWPLACEMENT nonFullscreenSize;
 	static LONG_PTR nonFullscreenStyle;
@@ -290,8 +291,7 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	X11->XChangeProperty(display, window, property, property, 32, PropModeReplace, (unsigned char*)&hints, 5);
 	X11->XMapWindow(display, window);
 	X11->XFlush(display);
-#elif defined(__APPLE__)
-	(void)fullscreen;
+#elif defined(EDOPRO_MACOS)
 	EDOPRO_ToggleFullScreen();
 #endif
 }
@@ -299,7 +299,7 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview message) {
 #ifdef _WIN32
 	MessageBox(nullptr, Utils::ToPathString(message).data(), Utils::ToPathString(context).data(), MB_OK | MB_ICONERROR);
-#elif defined (__APPLE__)
+#elif defined (EDOPRO_MACOS)
 	CFStringRef header_ref = CFStringCreateWithCString(nullptr, context.data(), context.size());
 	CFStringRef message_ref = CFStringCreateWithCString(nullptr, message.data(), message.size());
 
@@ -325,7 +325,7 @@ void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview messag
 	CFRelease(message_ref);
 #elif defined(__ANDROID__)
 	porting::showErrorDialog(context, message);
-#else
+#elif defined(__linux__)
 	auto pid = vfork();
 	if(pid == 0) {
 		execl("/usr/bin/kdialog", "kdialog", "--title", context.data(), "--error", message.data());
@@ -343,7 +343,7 @@ std::string GUIUtils::SerializeWindowPosition(irr::IrrlichtDevice* device) {
 	wp.length = sizeof(WINDOWPLACEMENT);
 	GetWindowPlacement(hWnd, &wp);
 	return base64_encode<std::string>(reinterpret_cast<uint8_t*>(&wp), sizeof(wp));
-#elif defined (__APPLE__)
+#elif defined (EDOPRO_MACOS)
 	return EDOPRO_GetWindowRect(device->getVideoDriver()->getExposedVideoData().OpenGLOSX.Window);
 #else
 	return std::string{};

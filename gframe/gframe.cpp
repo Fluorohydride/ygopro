@@ -22,7 +22,7 @@
 #include "log.h"
 #include "joystick_wrapper.h"
 #include "utils_gui.h"
-#ifdef __APPLE__
+#ifdef EDOPRO_MACOS
 #include "osx_menu.h"
 #endif
 
@@ -248,7 +248,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 	if(!data->configs->showConsole)
 		FreeConsole();
 #endif
-#ifdef __APPLE__
+#ifdef EDOPRO_MACOS
 	EDOPRO_SetupMenuBar([]() {
 		ygo::gGameConfig->fullscreen = !ygo::gGameConfig->fullscreen;
 		ygo::mainGame->gSettings.chkFullscreen->setChecked(ygo::gGameConfig->fullscreen);
@@ -295,7 +295,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 			data->tmp_device->getSceneManager()->clear();
 			data->tmp_device->getGUIEnvironment()->clear();
 		}
-	DESTRUCTGAME();
+		DESTRUCTGAME();
 	} while(reset);
 	data->tmp_device->drop();
 	ThreadsCleanup();
