@@ -184,6 +184,23 @@ inline void ThreadsCleanup() {
 #endif
 }
 
+//clang below version 11 (llvm version 8) has a bug with brace class initialization
+//where it can't properly deduce the destructors of its members
+//https://reviews.llvm.org/D45898
+//https://bugs.llvm.org/show_bug.cgi?id=28280
+//add a workaround to construct the game object manually still on the stack by using
+//a buffer and using in place new
+#if defined(__clang_major__) && __clang_major__ <= 10
+#define GAMEBUF() char game_buf[sizeof(ygo::Game)]
+#define ALLOCGAME() ygo::mainGame = new (game_buf) ygo::Game()
+#define DESTRUCTGAME() ygo::mainGame->~Game()
+#else
+#define GAMEBUF() (void)0
+#define ALLOCGAME() ygo::Game _game{};\
+                    ygo::mainGame = &_game
+#define DESTRUCTGAME() (void)0
+#endif
+
 int _tmain(int argc, epro::path_char* argv[]) {
 	epro::path_stringview dest{};
 	int skipped = 0;
@@ -241,9 +258,9 @@ int _tmain(int argc, epro::path_char* argv[]) {
 	std::unique_ptr<JWrapper> joystick{ nullptr };
 	bool firstlaunch = true;
 	bool reset = false;
+	GAMEBUF();
 	do {
-		ygo::Game _game{};
-		ygo::mainGame = &_game;
+		ALLOCGAME();
 		if(data->tmp_device) {
 			ygo::mainGame->device = data->tmp_device;
 			data->tmp_device = nullptr;
@@ -257,6 +274,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 			fmt::print("{}\n", text);
 			ygo::GUIUtils::ShowErrorWindow("Assets load fail", text);
 			ThreadsCleanup();
+			DESTRUCTGAME();
 			return EXIT_FAILURE;
 		}
 		if(firstlaunch) {
@@ -277,6 +295,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 			data->tmp_device->getSceneManager()->clear();
 			data->tmp_device->getGUIEnvironment()->clear();
 		}
+	DESTRUCTGAME();
 	} while(reset);
 	data->tmp_device->drop();
 	ThreadsCleanup();
