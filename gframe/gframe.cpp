@@ -191,14 +191,16 @@ inline void ThreadsCleanup() {
 //add a workaround to construct the game object manually still on the stack by using
 //a buffer and using in place new
 #if defined(__clang_major__) && __clang_major__ <= 10
-#define GAMEBUF() char game_buf[sizeof(ygo::Game)]
-#define ALLOCGAME() ygo::mainGame = new (game_buf) ygo::Game()
-#define DESTRUCTGAME() ygo::mainGame->~Game()
+class StackGame {
+	typename std::aligned_storage<sizeof(ygo::Game), alignof(ygo::Game)>::type game_buf[1];
+	ygo::Game* get() { return reinterpret_cast<ygo::Game*>(&game_buf[0]); }
+public:
+	StackGame() { new (&game_buf[0]) ygo::Game(); }
+	~StackGame() { get()->~Game(); }
+	ygo::Game* operator&() { return get(); }
+};
 #else
-#define GAMEBUF() (void)0
-#define ALLOCGAME() ygo::Game _game{};\
-                    ygo::mainGame = &_game
-#define DESTRUCTGAME() (void)0
+using StackGame = ygo::Game;
 #endif
 
 int _tmain(int argc, epro::path_char* argv[]) {
@@ -258,9 +260,9 @@ int _tmain(int argc, epro::path_char* argv[]) {
 	std::unique_ptr<JWrapper> joystick{ nullptr };
 	bool firstlaunch = true;
 	bool reset = false;
-	GAMEBUF();
 	do {
-		ALLOCGAME();
+		StackGame _game;
+		ygo::mainGame = &_game;
 		if(data->tmp_device) {
 			ygo::mainGame->device = data->tmp_device;
 			data->tmp_device = nullptr;
@@ -274,7 +276,6 @@ int _tmain(int argc, epro::path_char* argv[]) {
 			fmt::print("{}\n", text);
 			ygo::GUIUtils::ShowErrorWindow("Assets load fail", text);
 			ThreadsCleanup();
-			DESTRUCTGAME();
 			return EXIT_FAILURE;
 		}
 		if(firstlaunch) {
@@ -295,7 +296,6 @@ int _tmain(int argc, epro::path_char* argv[]) {
 			data->tmp_device->getSceneManager()->clear();
 			data->tmp_device->getGUIEnvironment()->clear();
 		}
-		DESTRUCTGAME();
 	} while(reset);
 	data->tmp_device->drop();
 	ThreadsCleanup();
