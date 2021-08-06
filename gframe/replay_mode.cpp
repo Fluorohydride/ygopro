@@ -138,6 +138,17 @@ int ReplayMode::ReplayThread() {
 		mainGame->gMutex.unlock();
 	}
 	EndDuel();
+	pduel = 0;
+	is_continuing = true;
+	is_closing = false;
+	is_pausing = false;
+	is_paused = false;
+	is_swaping = false;
+	is_restarting = false;
+	exit_pending = false;
+	skip_turn = 0;
+	current_step = 0;
+	skip_step = 0;
 	return 0;
 }
 bool ReplayMode::StartDuel() {
