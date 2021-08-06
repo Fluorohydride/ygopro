@@ -261,7 +261,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 	bool firstlaunch = true;
 	bool reset = false;
 	do {
-		StackGame _game;
+		StackGame _game{};
 		ygo::mainGame = &_game;
 		if(data->tmp_device) {
 			ygo::mainGame->device = data->tmp_device;
