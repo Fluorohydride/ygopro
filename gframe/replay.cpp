@@ -183,22 +183,33 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	}
 	if(!fp)
 		return false;
+
+	pdata = replay_data;
+	is_recording = false;
+	is_replaying = false;
+	replay_size = 0;
+	comp_size = 0;
 	if(fread(&pheader, sizeof(pheader), 1, fp) < 1) {
 		fclose(fp);
 		return false;
 	}
 	if(pheader.flag & REPLAY_COMPRESSED) {
-		comp_size = fread(comp_data, 1, 0x1000, fp);
+		comp_size = fread(comp_data, 1, MAX_COMP_SIZE, fp);
 		fclose(fp);
-		replay_size = pheader.datasize;
-		if(LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.props, 5) != SZ_OK)
+		if ((int)pheader.datasize < 0 && (int)pheader.datasize > MAX_REPLAY_SIZE)
 			return false;
+		replay_size = pheader.datasize;
+		if (LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.props, 5) != SZ_OK)
+			return false;
+		if (replay_size != pheader.datasize) {
+			replay_size = 0;
+			return false;
+		}
 	} else {
-		comp_size = fread(replay_data, 1, 0x20000, fp);
+		replay_size = fread(replay_data, 1, MAX_REPLAY_SIZE, fp);
 		fclose(fp);
-		replay_size = comp_size;
+		comp_size = 0;
 	}
-	pdata = replay_data;
 	is_replaying = true;
 	return true;
 }
