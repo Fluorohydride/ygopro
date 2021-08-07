@@ -9,10 +9,11 @@
 #endif
 #include <dlfcn.h>
 #endif
+#include "config.h"
 #include "dllinterface.h"
 #include "utils.h"
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #define CORENAME EPRO_TEXT("ocgcore.dll")
 #elif defined(EDOPRO_MACOS)
 #define CORENAME EPRO_TEXT("libocgcore.dylib")
@@ -25,10 +26,10 @@
 #define CORENAME EPRO_TEXT("libocgcorev8.so")
 #elif defined(__x86_64__)
 #define CORENAME EPRO_TEXT("libocgcorex64.so")
-#endif
-#else
+#endif //__arm__
+#elif defined(__linux__)
 #define CORENAME EPRO_TEXT("libocgcore.so")
-#endif
+#endif //_WIN32
 
 #define X(type,name,...) type(*name)(__VA_ARGS__) = nullptr;
 #include "ocgcore_functions.inl"
