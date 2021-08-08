@@ -21,7 +21,7 @@ extern bool show_changelog;
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
-#if defined(TARGET_OS_IOS)
+#if TARGET_OS_IOS
 #define EDOPRO_IOS
 #else
 #define EDOPRO_MACOS
