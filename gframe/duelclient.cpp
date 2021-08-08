@@ -4,6 +4,8 @@
 #if !defined(_WIN32) && !defined(__ANDROID__)
 #include <sys/types.h>
 #include <signal.h>
+#include <ifaddrs.h>
+#include <net/if.h>
 #endif
 #ifndef _WIN32
 #include <arpa/inet.h>
@@ -4234,17 +4236,42 @@ void DuelClient::BeginRefreshHost() {
 #ifdef __ANDROID__
 	addresses[0] = porting::getLocalIP();
 	if(addresses[0] == -1) {
+		mainGame->btnLanRefresh->setEnabled(true);
+		is_refreshing = false;
 		return;
 	}
-#else
+#elif defined(_WIN32)
 	char hname[256];
 	gethostname(hname, 256);
 	hostent* host = gethostbyname(hname);
-	if(!host || host->h_addrtype != AF_INET)
+	if(!host || host->h_addrtype != AF_INET) {
+		mainGame->btnLanRefresh->setEnabled(true);
+		is_refreshing = false;
 		return;
+	}
 	auto list = reinterpret_cast<in_addr**>(host->h_addr_list);
 	for(int i = 0; i < 8 && list[i] != 0; ++i)
 		addresses[i] = list[i]->s_addr;
+#else
+	ifaddrs *allInterfaces;
+	// Get list of all interfaces on the local machine:
+	if (getifaddrs(&allInterfaces) == 0) {
+		int i = 0;
+		// For each interface ...
+		for (ifaddrs* interface = allInterfaces; interface != nullptr && i < 8; interface = interface->ifa_next) {
+			unsigned int flags = interface->ifa_flags;
+			sockaddr *addr = interface->ifa_addr;
+			// Check for running IPv4 interfaces.
+			if ((flags & (IFF_UP|IFF_RUNNING)) == (IFF_UP|IFF_RUNNING)) {
+				if (addr->sa_family == AF_INET) {
+					auto addr_in = reinterpret_cast<sockaddr_in*>(addr);
+					if(addr_in->sin_addr.s_addr != 0)
+						addresses[i++] = addr_in->sin_addr.s_addr;
+				}
+			}
+		}
+		freeifaddrs(allInterfaces);
+	}
 #endif
 	evutil_socket_t reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	sockaddr_in reply_addr;
@@ -4254,6 +4281,8 @@ void DuelClient::BeginRefreshHost() {
 	reply_addr.sin_addr.s_addr = 0;
 	if(bind(reply, (sockaddr*)&reply_addr, sizeof(reply_addr)) == -1) {
 		evutil_closesocket(reply);
+		mainGame->btnLanRefresh->setEnabled(true);
+		is_refreshing = false;
 		return;
 	}
 	timeval timeout = { 3, 0 };
