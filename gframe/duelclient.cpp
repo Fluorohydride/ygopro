@@ -73,7 +73,7 @@ uint16_t DuelClient::temp_ver = 0;
 bool DuelClient::try_needed = false;
 
 std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address, int port) {
-	uint32_t remote_addr = htonl(inet_addr(address.data()));
+	uint32_t remote_addr = inet_addr(address.data());
 	if(remote_addr == -1) {
 		evutil_addrinfo hints{};
 		evutil_addrinfo *answer = nullptr;
@@ -83,14 +83,9 @@ std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address
 		hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
 		if(evutil_getaddrinfo(address.data(), fmt::to_string(port).data(), &hints, &answer) != 0)
 			throw std::runtime_error("Host not resolved");
-
-		char ip[46];
-		auto& sin_addr = ((sockaddr_in*)answer->ai_addr)->sin_addr;
-		auto res = evutil_inet_ntop(AF_INET, &sin_addr, ip, sizeof(ip));
+		auto* in_answer = reinterpret_cast<sockaddr_in*>(answer->ai_addr);
+		remote_addr = in_answer->sin_addr.s_addr;
 		evutil_freeaddrinfo(answer);
-		if(res == nullptr)
-			throw std::runtime_error("Host not resolved");
-		remote_addr = htonl(inet_addr(ip));
 	}
 	return { remote_addr, static_cast<uint16_t>(port) };
 }
@@ -104,7 +99,7 @@ bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool c
 	sockaddr_in sin;
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
-	sin.sin_addr.s_addr = htonl(ip);
+	sin.sin_addr.s_addr = ip;
 	sin.sin_port = htons(port);
 	client_bev = bufferevent_socket_new(client_base, -1, BEV_OPT_CLOSE_ON_FREE);
 	bufferevent_setcb(client_bev, ClientRead, nullptr, ClientEvent, (void*)create_game);
@@ -4279,7 +4274,7 @@ void DuelClient::BeginRefreshHost() {
 	reply_addr.sin_family = AF_INET;
 	reply_addr.sin_port = htons(7921);
 	reply_addr.sin_addr.s_addr = 0;
-	if(bind(reply, (sockaddr*)&reply_addr, sizeof(reply_addr)) == -1) {
+	if(bind(reply, reinterpret_cast<sockaddr*>(&reply_addr), sizeof(reply_addr)) == -1) {
 		evutil_closesocket(reply);
 		mainGame->btnLanRefresh->setEnabled(true);
 		is_refreshing = false;
@@ -4309,12 +4304,12 @@ void DuelClient::BeginRefreshHost() {
 		ev_socklen_t opt = true;
 		setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt,
 				   sizeof(ev_socklen_t));
-		if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == -1) {
+		if(bind(sSend, reinterpret_cast<sockaddr*>(&local), sizeof(local)) == -1) {
 			evutil_closesocket(sSend);
 			continue;
 		}
-		sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0,
-			(sockaddr*)&sockTo, sizeof(sockaddr));
+		sendto(sSend, reinterpret_cast<const char*>(&hReq), sizeof(HostRequest), 0,
+			   reinterpret_cast<sockaddr*>(&sockTo), sizeof(sockTo));
 		evutil_closesocket(sSend);
 	}
 }

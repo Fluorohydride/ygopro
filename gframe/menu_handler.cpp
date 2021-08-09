@@ -323,7 +323,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					gGameConfig->serverport = mainGame->ebHostPort->getText();
 					if(!NetServer::StartServer(host_port))
 						break;
-					if(!DuelClient::StartClient(0x7f000001, host_port)) {
+					if(!DuelClient::StartClient(0x100007F /*127.0.0.1 in network byte order*/, host_port)) {
 						NetServer::StopServer();
 						break;
 					}
