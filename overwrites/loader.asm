@@ -27,6 +27,7 @@ handledDecodePointer PROTO STDCALL :DWORD
 handledfreeaddrinfo PROTO STDCALL :DWORD
 handledgetaddrinfo PROTO STDCALL :DWORD,:DWORD,:DWORD,:DWORD
 handledgetnameinfo PROTO STDCALL :DWORD,:DWORD,:DWORD,:DWORD,:DWORD,:DWORD,:DWORD
+handledif_nametoindex PROTO STDCALL :DWORD
 
 .data
 __imp__EncodePointer@4 dd handledEncodePointer
@@ -44,6 +45,7 @@ __imp__GetLogicalProcessorInformation@8 dd handledGetLogicalProcessorInformation
 __imp__freeaddrinfo@4 dd handledfreeaddrinfo
 __imp__getaddrinfo@16 dd handledgetaddrinfo
 __imp__getnameinfo@28 dd handledgetnameinfo
+__imp__if_nametoindex@4 dd handledif_nametoindex
 __imp__GetVersionExW@4 dd handledGetVersionExW
 __imp__IsWellKnownSid@8 dd handledIsWellKnownSid
 __imp__CryptAcquireContextW@20 dd handledCryptAcquireContextW
@@ -63,6 +65,7 @@ EXTERNDEF __imp__GetLogicalProcessorInformation@8 : DWORD
 EXTERNDEF __imp__freeaddrinfo@4 : DWORD
 EXTERNDEF __imp__getaddrinfo@16 : DWORD
 EXTERNDEF __imp__getnameinfo@28 : DWORD
+EXTERNDEF __imp__if_nametoindex@4 : DWORD
 EXTERNDEF __imp__GetVersionExW@4 : DWORD
 EXTERNDEF __imp__IsWellKnownSid@8 : DWORD
 EXTERNDEF __imp__CryptAcquireContextW@20 : DWORD
