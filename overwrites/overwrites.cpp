@@ -464,3 +464,7 @@ MAKELOADER(DecodePointer, PVOID, (PVOID ptr), (ptr)) {
 extern "C" ULONG __stdcall handledif_nametoindex(PCSTR* InterfaceName) {
 	return 0;
 }
+
+extern "C" ULONG __stdcall if_nametoindex(PCSTR * InterfaceName) {
+	return 0;
+}
