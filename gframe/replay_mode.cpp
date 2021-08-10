@@ -225,7 +225,10 @@ bool ReplayMode::StartDuel() {
 		}
 	} else {
 		char filename[256];
-		size_t slen = cur_replay.ReadInt16();
+		int slen = cur_replay.ReadInt16();
+		if (slen < 0 || slen > 255) {
+			return false;
+		}
 		cur_replay.ReadData(filename, slen);
 		filename[slen] = 0;
 		if(!preload_script(pduel, filename, 0)) {
