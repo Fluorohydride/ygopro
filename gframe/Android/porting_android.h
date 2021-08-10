@@ -39,6 +39,8 @@ void setTextToClipboard(epro::wstringview text);
 const wchar_t* getTextFromClipboard();
 
 void dispatchQueuedMessages();
+
+void showErrorDialog(epro::stringview context, epro::stringview message);
 }
 
 #endif //PORTING_ANDROID_H
