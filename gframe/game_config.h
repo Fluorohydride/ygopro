@@ -103,6 +103,7 @@ struct GameConfig
 	int soundVolume{ 20 };
 	bool loopMusic{ true };
 	bool noClientUpdates{ false };
+	bool logDownloadErrors{ false };
 	bool controller_input{ false };
 	epro::path_string skin{ EPRO_TEXT("none") };
 	epro::path_string locale{ EPRO_TEXT("English") };

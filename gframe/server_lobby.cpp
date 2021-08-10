@@ -175,7 +175,10 @@ void ServerLobby::GetRoomsThread() {
 	mainGame->roomListTable->setVisible(false);
 
 	std::string retrieved_data;
+	char curl_error_buffer[CURL_ERROR_SIZE];
 	CURL* curl_handle = curl_easy_init();
+	curl_easy_setopt(curl_handle, CURLOPT_ERRORBUFFER, curl_error_buffer);
+	curl_easy_setopt(curl_handle, CURLOPT_FAILONERROR, 1);
 	//if(mainGame->chkShowActiveRooms->isChecked()) {
 		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", serverInfo.roomaddress, serverInfo.roomlistport).data());
 	/*} else {
@@ -199,6 +202,9 @@ void ServerLobby::GetRoomsThread() {
 	const auto res = curl_easy_perform(curl_handle);
 	curl_easy_cleanup(curl_handle);
 	if(res != CURLE_OK) {
+		if(gGameConfig->logDownloadErrors)
+			ErrorLog("Error updating the room list:");
+			ErrorLog(fmt::format("Curl error: ({}) {} ({})", res, curl_easy_strerror(res), curl_error_buffer));
 		//error
 		mainGame->PopupMessage(gDataManager->GetSysString(2037));
 		mainGame->btnLanRefresh2->setEnabled(true);

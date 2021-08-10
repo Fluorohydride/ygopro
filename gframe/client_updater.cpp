@@ -15,6 +15,7 @@
 #include <fstream>
 #include <atomic>
 #include <openssl/md5.h>
+#include "logging.h"
 #include "config.h"
 #include "utils.h"
 #ifdef __ANDROID__
@@ -74,7 +75,10 @@ size_t WriteCallback(char *contents, size_t size, size_t nmemb, void *userp) {
 }
 
 CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
+	char curl_error_buffer[CURL_ERROR_SIZE];
 	CURL* curl_handle = curl_easy_init();
+	curl_easy_setopt(curl_handle, CURLOPT_ERRORBUFFER, curl_error_buffer);
+	curl_easy_setopt(curl_handle, CURLOPT_FAILONERROR, 1);
 	curl_easy_setopt(curl_handle, CURLOPT_URL, url);
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteCallback);
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 5L);
@@ -95,6 +99,8 @@ CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 #endif
 	CURLcode res = curl_easy_perform(curl_handle);
 	curl_easy_cleanup(curl_handle);
+	if(res != CURLE_OK && ygo::gGameConfig->logDownloadErrors)
+		ygo::ErrorLog(fmt::format("Curl error: ({}) {} ({})", res, curl_easy_strerror(res), curl_error_buffer));
 	return res;
 }
 
@@ -161,7 +167,7 @@ static inline ygo::ClientUpdater::lock_type GetLock() {
 	if(file == INVALID_HANDLE_VALUE)
 		return nullptr;
 #else
-	file = open(LOCKFILE, O_CREAT, S_IRWXU);
+	file = open(LOCKFILE, O_CREAT | O_CLOEXEC, S_IRWXU);
 	if(file < 0 || flock(file, LOCK_EX | LOCK_NB) != 0) {
 		close(file);
 		return 0;
