@@ -11,6 +11,7 @@ namespace ygo {
 #define REPLAY_TAG			0x2
 #define REPLAY_DECODED		0x4
 #define REPLAY_SINGLE_MODE	0x8
+#define REPLAY_UNIFORM		0x10
 
 // max size
 #define MAX_REPLAY_SIZE	0x20000
@@ -22,11 +23,11 @@ struct ReplayHeader {
 	unsigned int flag;
 	unsigned int seed;
 	unsigned int datasize;
-	unsigned int hash;
+	unsigned int start_time;
 	unsigned char props[8];
 
 	ReplayHeader()
-		: id(0), version(0), flag(0), seed(0), datasize(0), hash(0), props{ 0 } {}
+		: id(0), version(0), flag(0), seed(0), datasize(0), start_time(0), props{ 0 } {}
 };
 
 class Replay {

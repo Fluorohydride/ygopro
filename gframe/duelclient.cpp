@@ -681,7 +681,12 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		char* prep = pdata;
 		Replay new_replay;
 		memcpy(&new_replay.pheader, prep, sizeof(ReplayHeader));
-		time_t starttime = new_replay.pheader.seed;
+		time_t starttime;
+		if (new_replay.pheader.flag & REPLAY_UNIFORM)
+			starttime = new_replay.pheader.start_time;
+		else
+			starttime = new_replay.pheader.seed;
+		
 		tm* localedtime = localtime(&starttime);
 		wchar_t timetext[40];
 		wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
