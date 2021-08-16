@@ -398,9 +398,7 @@ epro::wstringview DataManager::FormatLocation(uint32_t location, int sequence) {
 }
 std::wstring DataManager::FormatAttribute(uint32_t attribute) {
 	std::wstring res;
-	uint32_t filter = 1;
-	int i = 1010;
-	for(; filter != 0x80; filter <<= 1, ++i) {
+	for(uint32_t i = 1010, filter = 1; filter <= ATTRIBUTE_DIVINE; filter <<= 1, ++i) {
 		if(attribute & filter) {
 			if(!res.empty())
 				res += L'|';
@@ -413,8 +411,7 @@ std::wstring DataManager::FormatAttribute(uint32_t attribute) {
 }
 std::wstring DataManager::FormatRace(uint32_t race, bool isSkill) {
 	std::wstring res;
-	uint32_t filter = 1;
-	for(uint32_t i = isSkill ? 2100 : 1020; filter <= RACE_MAX; filter <<= 1, ++i) {
+	for(uint32_t i = isSkill ? 2100 : 1020, filter = 1; filter <= RACE_MAX; filter <<= 1, ++i) {
 		if(race & filter) {
 			if(!res.empty())
 				res += L'|';
@@ -434,8 +431,7 @@ std::wstring DataManager::FormatType(uint32_t type) {
 			res += L'|';
 		appendstring(res, GetSysString(1078));
 	}
-	int i = 1050;
-	for(uint32_t filter = 1; filter != TYPE_SKILL; filter <<= 1, ++i) {
+	for(uint32_t i = 1050, filter = 1; filter != TYPE_SKILL; filter <<= 1, ++i) {
 		if(type & filter) {
 			if(!res.empty())
 				res += L'|';
