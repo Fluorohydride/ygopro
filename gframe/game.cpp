@@ -2749,12 +2749,14 @@ void Game::ReloadCBCardType() {
 	cbCardType->addItem(gDataManager->GetSysString(1312).data());
 	cbCardType->addItem(gDataManager->GetSysString(1313).data());
 	cbCardType->addItem(gDataManager->GetSysString(1314).data());
+	cbCardType->addItem(gDataManager->GetSysString(1077).data());
 }
 void Game::ReloadCBCardType2() {
 	cbCardType2->clear();
 	cbCardType2->setEnabled(true);
 	switch (cbCardType->getSelected()) {
 	case 0:
+	case 4:
 		cbCardType2->setEnabled(false);
 		cbCardType2->addItem(gDataManager->GetSysString(1310).data(), 0);
 		break;

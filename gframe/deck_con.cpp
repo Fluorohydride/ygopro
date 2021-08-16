@@ -496,7 +496,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->ebStar->setText(L"");
 				mainGame->ebScale->setText(L"");
 				switch(mainGame->cbCardType->getSelected()) {
-				case 0: {
+				case 0:
+				case 4: {
 					mainGame->cbRace->setEnabled(false);
 					mainGame->cbAttribute->setEnabled(false);
 					mainGame->ebAttack->setEnabled(false);
@@ -1133,6 +1134,11 @@ bool DeckBuilder::CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std
 		if(!(data->_data.type & TYPE_TRAP))
 			return false;
 		if(filter_type2 && data->_data.type != filter_type2)
+			return false;
+		break;
+	}
+	case 4: {
+		if(!(data->_data.type & TYPE_SKILL))
 			return false;
 		break;
 	}
