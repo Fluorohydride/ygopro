@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 #include "client_card.h"
+#include "../ocgcore/mtrandom.h"
 
 namespace ygo {
 
@@ -76,6 +77,7 @@ public:
 	int prev_sel;
 	bool is_modified;
 	bool readonly;
+	mt19937 rnd;
 
 	const std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;
