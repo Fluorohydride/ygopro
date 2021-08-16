@@ -414,7 +414,7 @@ std::wstring DataManager::FormatAttribute(uint32_t attribute) {
 std::wstring DataManager::FormatRace(uint32_t race, bool isSkill) {
 	std::wstring res;
 	uint32_t filter = 1;
-	for(int i = isSkill ? 2100 : 1020; filter != 0x2000000; filter <<= 1, ++i) {
+	for(uint32_t i = isSkill ? 2100 : 1020; filter <= RACE_MAX; filter <<= 1, ++i) {
 		if(race & filter) {
 			if(!res.empty())
 				res += L'|';

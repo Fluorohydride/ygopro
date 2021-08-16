@@ -2828,14 +2828,14 @@ void Game::ReloadCBLimit() {
 void Game::ReloadCBAttribute() {
 	cbAttribute->clear();
 	cbAttribute->addItem(gDataManager->GetSysString(1310).data(), 0);
-	for (int filter = 0x1; filter != 0x80; filter <<= 1)
-		cbAttribute->addItem(gDataManager->FormatAttribute(filter).data(), filter);
+	for (uint32_t filter = 0x1, i = 1010; filter <= ATTRIBUTE_DIVINE; filter <<= 1, i++)
+		cbAttribute->addItem(gDataManager->GetSysString(i).data(), filter);
 }
 void Game::ReloadCBRace() {
 	cbRace->clear();
 	cbRace->addItem(gDataManager->GetSysString(1310).data(), 0);
-	for (int filter = 0x1; filter != 0x2000000; filter <<= 1)
-		cbRace->addItem(gDataManager->FormatRace(filter).data(), filter);
+	for(uint32_t filter = 0x1, i = 1020; filter <= RACE_MAX; i++, filter <<= 1)
+		cbRace->addItem(gDataManager->GetSysString(i).data(), filter);
 }
 void Game::ReloadCBFilterRule() {
 	cbFilterRule->clear();
