@@ -4257,7 +4257,7 @@ void DuelClient::BeginRefreshHost() {
 			unsigned int flags = interface->ifa_flags;
 			sockaddr* addr = interface->ifa_addr;
 			// Check for running IPv4 interfaces.
-			if((flags & (IFF_UP | IFF_RUNNING)) == (IFF_UP | IFF_RUNNING)) {
+			if((flags & (IFF_UP | IFF_RUNNING | IFF_LOOPBACK)) == (IFF_UP | IFF_RUNNING)) {
 				if(addr->sa_family == AF_INET) {
 					auto addr_in = reinterpret_cast<sockaddr_in*>(addr);
 					if(addr_in->sin_addr.s_addr != 0)
