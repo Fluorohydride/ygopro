@@ -73,6 +73,8 @@ static epro::stringview getDriverName(irr::video::E_DRIVER_TYPE driver) {
 	case irr::video::EDT_OGLES2:
 		return "ogles2";
 #endif
+	case irr::video::EDT_COUNT:
+		return "default";
 	default:
 		return "";
 	}
@@ -127,9 +129,9 @@ bool GameConfig::Load(const epro::path_char* filename) {
 				antialias = std::stoi(str);
 			else if(type == "use_d3d") {
 #ifdef _WIN32
-				driver_type = std::stoi(str) ? irr::video::EDT_DIRECT3D9 : irr::video::EDT_OPENGL;
+				driver_type = std::stoi(str) ? irr::video::EDT_COUNT : irr::video::EDT_OPENGL;
 #elif defined(__ANDROID__)
-				driver_type = std::stoi(str) ? irr::video::EDT_OGLES2 : irr::video::EDT_OGLES1;
+				driver_type = std::stoi(str) ? irr::video::EDT_COUNT : irr::video::EDT_OGLES1;
 #endif
 			}
 			else if(type == "driver_type") {
@@ -176,6 +178,9 @@ bool GameConfig::Load(const epro::path_char* filename) {
 			DESERIALIZE_BOOL(noCheckDeck)
 			DESERIALIZE_BOOL(hideHandsInReplays)
 			DESERIALIZE_BOOL(noShuffleDeck)
+#if defined(__linux__) && !defined(__ANDROID__)
+			DESERIALIZE_BOOL(useWayland)
+#endif
 			DESERIALIZE_BOOL(vsync)
 			DESERIALIZE_BOOL(showScopeLabel)
 			DESERIALIZE_BOOL(saveHandTest)
@@ -322,6 +327,9 @@ bool GameConfig::Save(const epro::path_char* filename) {
 	conf_file << "# Overwritten on normal game exit\n";
 #define SERIALIZE(name) Serialize(conf_file, #name, name)
 	conf_file << "driver_type = " << getDriverName(driver_type) << "\n";
+#if defined(__linux__) && !defined(__ANDROID__)
+	SERIALIZE(useWayland)
+#endif
 	SERIALIZE(vsync);
 	SERIALIZE(maxFPS);
 	SERIALIZE(fullscreen);

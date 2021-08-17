@@ -19,10 +19,9 @@ struct GameConfig
 	bool Load(const epro::path_char* filename);
 	bool Save(const epro::path_char* filename);
 
-#ifdef __ANDROID__
-	irr::video::E_DRIVER_TYPE driver_type{ irr::video::EDT_OGLES1 };
-#else
-	irr::video::E_DRIVER_TYPE driver_type{ irr::video::EDT_OPENGL };
+	irr::video::E_DRIVER_TYPE driver_type{ irr::video::EDT_COUNT };
+#if defined(__linux__) && !defined(__ANDROID__)
+	bool useWayland{ false };
 #endif
 	bool vsync{ true };
 	std::string windowStruct;

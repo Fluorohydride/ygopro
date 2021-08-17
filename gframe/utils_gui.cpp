@@ -81,10 +81,34 @@ static HWND GetWindowHandle(irr::video::IVideoDriver* driver) {
 }
 #endif
 
+static inline irr::video::E_DRIVER_TYPE getDefaultDriver(irr::E_DEVICE_TYPE device_type) {
+#ifdef _WIN32
+	return irr::video::EDT_DIRECT3D9;
+#elif defined(__ANDROID__)
+	return irr::video::EDT_OGLES2;
+#elif defined(__linux__)
+#if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	if(device_type == irr::E_DEVICE_TYPE::EIDT_WAYLAND)
+		return irr::video::EDT_OGLES2;
+#endif
+	return irr::video::EDT_OPENGL;
+#elif defined(EDOPRO_MACOS)
+	return irr::video::EDT_OPENGL;
+#endif
+}
+
 irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = configs->antialias;
+#if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	if(configs->useWayland)
+		params.DeviceType = irr::E_DEVICE_TYPE::EIDT_WAYLAND;
+#endif
 	params.Vsync = configs->vsync;
+	if(configs->driver_type == irr::video::EDT_COUNT)
+		params.DriverType = getDefaultDriver(params.DeviceType);
+	else
+		params.DriverType = configs->driver_type;
 	params.DriverType = configs->driver_type;
 #if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	params.OGLES2ShaderPath = EPRO_TEXT("BUNDLED");
