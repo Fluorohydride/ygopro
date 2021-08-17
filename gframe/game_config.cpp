@@ -328,7 +328,7 @@ bool GameConfig::Save(const epro::path_char* filename) {
 #define SERIALIZE(name) Serialize(conf_file, #name, name)
 	conf_file << "driver_type = " << getDriverName(driver_type) << "\n";
 #if defined(__linux__) && !defined(__ANDROID__)
-	SERIALIZE(useWayland)
+	SERIALIZE(useWayland);
 #endif
 	SERIALIZE(vsync);
 	SERIALIZE(maxFPS);
