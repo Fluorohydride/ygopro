@@ -62,7 +62,11 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.race = sqlite3_column_int(pStmt, 8);
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
-			_datas.insert(std::make_pair(cd.code, cd));
+			auto it = _datas.find(cd.code);
+			if(it != _datas.end())
+				it->second = cd;
+			else
+				_datas.insert(std::make_pair(cd.code, cd));
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.name = strBuffer;

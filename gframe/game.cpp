@@ -59,7 +59,6 @@ bool Game::Initialize() {
 		return false;
 	}
 	dataManager.FileSystem = device->getFileSystem();
-	LoadExpansions();
 	if(!dataManager.LoadDB(L"cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");
 		return false;
@@ -68,7 +67,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load strings!");
 		return false;
 	}
-	dataManager.LoadStrings("./expansions/strings.conf");
+	LoadExpansions();
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	if(!numFont) {
@@ -1070,14 +1069,17 @@ std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth,
 }
 void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
+		wchar_t fpath[1024];
+		myswprintf(fpath, L"./expansions/%ls", name);
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
-			wchar_t fpath[1024];
-			myswprintf(fpath, L"./expansions/%ls", name);
 			dataManager.LoadDB(fpath);
 		}
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".conf", 5)) {
+			char upath[1024];
+			BufferIO::EncodeUTF8(fpath, upath);
+			dataManager.LoadStrings(upath);
+		}
 		if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ypk", 4))) {
-			wchar_t fpath[1024];
-			myswprintf(fpath, L"./expansions/%ls", name);
 #ifdef _WIN32
 			dataManager.FileSystem->addFileArchive(fpath, true, false, EFAT_ZIP);
 #else
