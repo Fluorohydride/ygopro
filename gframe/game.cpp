@@ -1602,7 +1602,6 @@ bool Game::MainLoop() {
 						btnHandTest->setEnabled(true);
 						btnHandTestSettings->setEnabled(true);
 						stHandTestSettings->setEnabled(true);
-						lstReplayList->addFilteredExtensions({ L"yrp", L"yrpx" });
 					}
 					break;
 				}
