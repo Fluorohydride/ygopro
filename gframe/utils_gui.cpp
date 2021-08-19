@@ -109,7 +109,6 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 		params.DriverType = getDefaultDriver(params.DeviceType);
 	else
 		params.DriverType = configs->driver_type;
-	params.DriverType = configs->driver_type;
 #if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	params.OGLES2ShaderPath = EPRO_TEXT("BUNDLED");
 	params.WindowResizable = true;
