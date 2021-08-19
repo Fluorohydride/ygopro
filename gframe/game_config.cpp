@@ -96,6 +96,8 @@ static irr::video::E_DRIVER_TYPE getDriverType(std::string& value) {
 	if(value == "OGLES2")
 		return irr::video::EDT_OGLES2;
 #endif
+	if(value == "DEFAULT")
+		return irr::video::EDT_COUNT;
 	return irr::video::EDT_NULL;
 }
 
