@@ -101,7 +101,7 @@ public:
 	inline bool LoadLocaleDB(const epro::path_string& file) {
 		return ParseLocaleDB(OpenDb(file));
 	}
-	inline bool LoadDB(const epro::path_string& file) {
+	inline bool LoadDB(epro::path_stringview file) {
 		return ParseDB(OpenDb(file));
 	}
 	inline bool LoadDB(irr::io::IReadFile* reader) {
@@ -114,6 +114,8 @@ public:
 	bool GetString(uint32_t code, CardString* pStr);
 	epro::wstringview GetName(uint32_t code);
 	epro::wstringview GetText(uint32_t code);
+	epro::wstringview GetUppercaseName(uint32_t code);
+	epro::wstringview GetUppercaseText(uint32_t code);
 	epro::wstringview GetDesc(uint64_t strCode, bool compat);
 	inline epro::wstringview GetSysString(uint32_t code) {
 		return _sysStrings.GetLocale(code);
@@ -163,11 +165,11 @@ private:
 			for(auto& elem : map)
 				elem.second.second.clear();
 		}
-		void SetMain(uint32_t code, const std::wstring& val) {
-			map[code].first = val;
+		void SetMain(uint32_t code, std::wstring&& val) {
+			map[code].first = std::move(val);
 		}
-		void SetLocale(uint32_t code, const std::wstring& val) {
-			map[code].second = val;
+		void SetLocale(uint32_t code, std::wstring&& val) {
+			map[code].second = std::move(val);
 		}
 	};
 	sqlite3* OpenDb(epro::path_stringview file);

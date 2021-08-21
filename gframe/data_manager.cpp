@@ -329,6 +329,18 @@ epro::wstringview DataManager::GetText(uint32_t code) {
 		return unknown_string;
 	return csit->second.GetStrings()->text;
 }
+epro::wstringview DataManager::GetUppercaseName(uint32_t code) {
+	auto csit = cards.find(code);
+	if(csit == cards.end() || csit->second.GetStrings()->name.empty())
+		return unknown_string;
+	return csit->second.GetStrings()->uppercase_name;
+}
+epro::wstringview DataManager::GetUppercaseText(uint32_t code) {
+	auto csit = cards.find(code);
+	if(csit == cards.end() || csit->second.GetStrings()->text.empty())
+		return unknown_string;
+	return csit->second.GetStrings()->uppercase_text;
+}
 epro::wstringview DataManager::GetDesc(uint64_t strCode, bool compat) {
 	uint32_t code = 0;
 	uint32_t stringid = 0;
