@@ -33,9 +33,9 @@ int SingleMode::SinglePlayThread() {
 	const int start_hand = 5;
 	const int draw_count = 1;
 	const int opt = 0;
-	mtrandom rnd;
-	time_t seed = time(0);
-	rnd.reset(seed);
+	std::random_device rd;
+	unsigned int seed = rd();
+	mt19937 rnd(seed);
 	set_script_reader((script_reader)DataManager::ScriptReaderEx);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
@@ -77,8 +77,9 @@ int SingleMode::SinglePlayThread() {
 	ReplayHeader rh;
 	rh.id = 0x31707279;
 	rh.version = PRO_VERSION;
-	rh.flag = REPLAY_SINGLE_MODE;
+	rh.flag = REPLAY_UNIFORM | REPLAY_SINGLE_MODE;
 	rh.seed = seed;
+	rh.start_time = (unsigned int)time(nullptr);
 	mainGame->gMutex.lock();
 	mainGame->HideElement(mainGame->wSinglePlay);
 	mainGame->ClearCardInfo();
