@@ -872,6 +872,7 @@ void Game::DrawGUI() {
 				HideElement(fu.guiFading);
 		} else {
 			fu.guiFading->setEnabled(fu.wasEnabled);
+			fu.guiFading->setRelativePosition(fu.fadingSize);
 			fit = fadingList.erase(fthis);
 		}
 	}
