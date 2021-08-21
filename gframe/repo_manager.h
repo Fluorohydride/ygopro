@@ -82,7 +82,7 @@ private:
 	// Initialized with GIT_OK (0), changed to cancel fetching
 	std::atomic<int> fetchReturnValue{0};
 
-	void AddRepo(GitRepo repo);
+	void AddRepo(GitRepo&& repo);
 	void SetRepoPercentage(const std::string& path, int percent);
 	
 	// Will be started on a new thread

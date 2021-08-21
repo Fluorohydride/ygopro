@@ -98,7 +98,7 @@ static inline irr::video::E_DRIVER_TYPE getDefaultDriver(irr::E_DEVICE_TYPE devi
 }
 
 irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
-	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
+	irr::SIrrlichtCreationParameters params{};
 	params.AntiAlias = configs->antialias;
 #if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	if(configs->useWayland)
@@ -207,7 +207,7 @@ static BOOL CALLBACK callback(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM
 #endif
 
 void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
-    (void)fullscreen;
+	(void)fullscreen;
 #ifdef _WIN32
 	static WINDOWPLACEMENT nonFullscreenSize;
 	static LONG_PTR nonFullscreenStyle;

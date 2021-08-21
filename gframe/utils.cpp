@@ -311,6 +311,8 @@ namespace ygo {
 		return ret;
 #else
 		epro::path_char* p = realpath(path.data(), nullptr);
+		if(!p)
+			return { path.data(), path.size() };
 		epro::path_string ret{ p };
 		free(p);
 		return ret;

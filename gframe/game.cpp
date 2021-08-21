@@ -1550,10 +1550,10 @@ bool Game::MainLoop() {
 				if(!repo->is_language) {
 					for(auto& file : files) {
 						const auto db_path = data_path + file;
-						bool db_loaded = gDataManager->LoadDB(db_path);
-						if(db_loaded)
+						if(gDataManager->LoadDB(db_path)) {
 							WindBot::AddDatabase(db_path);
-						refresh_db = db_loaded || refresh_db;
+							refresh_db = true;
+						}
 					}
 					gDataManager->LoadStrings(data_path + EPRO_TEXT("strings.conf"));
 				} else {
@@ -1565,11 +1565,9 @@ bool Game::MainLoop() {
 					auto langpath = Utils::ToPathString(repo->language);
 					auto lang = Utils::ToUpperNoAccents(langpath);
 					auto it = std::find_if(locales.begin(), locales.end(),
-										   [&lang]
-					(const std::pair<epro::path_string, std::vector<epro::path_string>>& locale)->bool
-					{
-						return Utils::ToUpperNoAccents(locale.first) == lang;
-					});
+										   [&lang](const auto& locale) {
+											   return Utils::ToUpperNoAccents(locale.first) == lang;
+										   });
 					if(it != locales.end()) {
 						it->second.push_back(std::move(data_path));
 					} else {

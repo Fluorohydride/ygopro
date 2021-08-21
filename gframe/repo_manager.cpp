@@ -188,14 +188,15 @@ void RepoManager::TerminateThreads() {
 
 // private
 
-void RepoManager::AddRepo(GitRepo repo) {
+void RepoManager::AddRepo(GitRepo&& repo) {
 	std::unique_lock<std::mutex> lck(syncing_mutex);
 	if(repos_status.find(repo.repo_path) != repos_status.end())
 		return;
 	repos_status.emplace(repo.repo_path, 0);
-	all_repos.emplace_front(std::move(repo));
-	available_repos.push_back(&all_repos.front());
-	to_sync.push(&all_repos.front());
+	all_repos.push_front(std::move(repo));
+	auto* _repo = &all_repos.front();
+	available_repos.push_back(_repo);
+	to_sync.push(_repo);
 	cv.notify_all();
 }
 
