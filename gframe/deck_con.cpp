@@ -355,7 +355,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				int catesel = mainGame->lstCategories->getSelected();
 				if(catesel != 2)
 					mainGame->cbDMCategory->addItem(dataManager.GetSysString(1452));
-				for(int i = 4; i < mainGame->lstCategories->getItemCount(); i++) {
+				for(int i = 4; i < (int)mainGame->lstCategories->getItemCount(); i++) {
 					if(i != catesel)
 						mainGame->cbDMCategory->addItem(mainGame->lstCategories->getListItem(i));
 				}
@@ -372,7 +372,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				int catesel = mainGame->lstCategories->getSelected();
 				if(catesel != 2)
 					mainGame->cbDMCategory->addItem(dataManager.GetSysString(1452));
-				for(int i = 4; i < mainGame->lstCategories->getItemCount(); i++) {
+				for(int i = 4; i < (int)mainGame->lstCategories->getItemCount(); i++) {
 					if(i != catesel)
 						mainGame->cbDMCategory->addItem(mainGame->lstCategories->getListItem(i));
 				}
@@ -391,7 +391,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->lstCategories->addItem(catename);
 						catesel = mainGame->lstCategories->getItemCount() - 1;
 					} else {
-						for(int i = 3; i < mainGame->lstCategories->getItemCount(); i++) {
+						for(int i = 3; i < (int)mainGame->lstCategories->getItemCount(); i++) {
 							if(!mywcsncasecmp(mainGame->lstCategories->getListItem(i), catename, 256)) {
 								catesel = i;
 								mainGame->stACMessage->setText(dataManager.GetSysString(1474));
@@ -421,7 +421,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						catesel = mainGame->lstCategories->getItemCount() - 1;
 					} else {
 						catesel = 0;
-						for(int i = 3; i < mainGame->lstCategories->getItemCount(); i++) {
+						for(int i = 3; i < (int)mainGame->lstCategories->getItemCount(); i++) {
 							if(!mywcsncasecmp(mainGame->lstCategories->getListItem(i), newcatename, 256)) {
 								catesel = i;
 								mainGame->stACMessage->setText(dataManager.GetSysString(1474));
@@ -472,7 +472,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						RefreshDeckList();
 						ChangeCategory(mainGame->lstCategories->getSelected());
 					}
-					for(int i = 0; i < mainGame->lstDecks->getItemCount(); i++) {
+					for(int i = 0; i < (int)mainGame->lstDecks->getItemCount(); i++) {
 						if(!mywcsncasecmp(mainGame->lstDecks->getListItem(i), deckname, 256)) {
 							deckManager.LoadDeck(filepath);
 							prev_deck = i;
@@ -506,7 +506,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					}
 					RefreshDeckList();
 					ChangeCategory(catesel);
-					for(int i = 0; i < mainGame->lstDecks->getItemCount(); i++) {
+					for(int i = 0; i < (int)mainGame->lstDecks->getItemCount(); i++) {
 						if(!mywcsncasecmp(mainGame->lstDecks->getListItem(i), newdeckname, 256)) {
 							deckManager.LoadDeck(newfilepath);
 							prev_deck = i;
@@ -570,7 +570,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					RefreshDeckList();
 					mainGame->cbDBCategory->setSelected(catesel);
 					ChangeCategory(catesel);
-					for(int i = 0; i < mainGame->lstDecks->getItemCount(); i++) {
+					for(int i = 0; i < (int)mainGame->lstDecks->getItemCount(); i++) {
 						if(!mywcsncasecmp(mainGame->lstDecks->getListItem(i), deckname, 256)) {
 							deckManager.LoadDeck(newfilepath);
 							prev_deck = i;
@@ -608,7 +608,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					RefreshDeckList();
 					mainGame->cbDBCategory->setSelected(catesel);
 					ChangeCategory(catesel);
-					for(int i = 0; i < mainGame->lstDecks->getItemCount(); i++) {
+					for(int i = 0; i < (int)mainGame->lstDecks->getItemCount(); i++) {
 						if(!mywcsncasecmp(mainGame->lstDecks->getListItem(i), deckname, 256)) {
 							deckManager.LoadDeck(newfilepath);
 							prev_deck = i;
@@ -1500,7 +1500,7 @@ void DeckBuilder::FilterCards() {
 	SortList();
 }
 void DeckBuilder::InstantSearch() {
-	if(mainGame->gameConf.auto_search_limit >= 0 && (wcslen(mainGame->ebCardName->getText()) >= mainGame->gameConf.auto_search_limit))
+	if(mainGame->gameConf.auto_search_limit >= 0 && ((int)wcslen(mainGame->ebCardName->getText()) >= mainGame->gameConf.auto_search_limit))
 		StartFilter();
 }
 void DeckBuilder::ClearSearch() {
