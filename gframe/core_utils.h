@@ -3,6 +3,9 @@
 #include <vector>
 #include <cstdint>
 #include "bufferio.h"
+namespace ygo {
+class ClientCard;
+}
 namespace CoreUtils {
 class Packet {
 public:
@@ -28,7 +31,7 @@ class PacketStream {
 public:
 	std::vector<Packet> packets;
 	PacketStream() {}
-	PacketStream(char* buf, int len);
+	PacketStream(char* buf, uint32_t len);
 };
 struct loc_info {
 	uint8_t controler;
@@ -39,10 +42,16 @@ struct loc_info {
 loc_info ReadLocInfo(char*& p, bool compat);
 class Query {
 public:
-	Query() {};
-	Query(char*& buff, bool compat = false, int len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
+	friend class QueryStream;
+	friend class ygo::ClientCard;
+	Query() = delete;
+	Query(char* buff, bool compat = false, uint32_t len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
+	void GenerateBuffer(std::vector<uint8_t>& len, bool is_public, bool check_hidden);
+	struct Token {};
+	Query(Token, char*& buff) { Parse(buff); };
+private:
 	void Parse(char*& buff);
-	void ParseCompat(char* buff, int len);
+	void ParseCompat(char* buff, uint32_t len);
 	bool onfield_skipped = false;
 	uint32_t flag;
 	uint32_t code;
@@ -72,20 +81,21 @@ public:
 	std::vector<loc_info> target_cards;
 	std::vector<uint32_t> overlay_cards;
 	std::vector<uint32_t> counters;
-	void GenerateBuffer(std::vector<uint8_t>& len, bool is_public, bool check_hidden);
 	bool IsPublicQuery(uint32_t flag);
 	uint32_t GetSize(uint32_t flag);
 	uint32_t GetSize();
 };
 class QueryStream {
 public:
-	std::vector<Query> queries;
-	QueryStream() {};
-	QueryStream(char*& buff, bool compat = false, int len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
-	void Parse(char*& buff);
-	void ParseCompat(char*& buff, int len);
+	QueryStream() = delete;
+	QueryStream(char* buff, bool compat = false, uint32_t len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
 	void GenerateBuffer(std::vector<uint8_t>& buffer, bool check_hidden);
 	void GeneratePublicBuffer(std::vector<uint8_t>& buffer);
+	std::vector<Query>& GetQueries() { return queries; }
+private:
+	std::vector<Query> queries;
+	void Parse(char* buff);
+	void ParseCompat(char* buff, uint32_t len);
 };
 using OCG_Duel = void*;
 PacketStream ParseMessages(OCG_Duel duel);

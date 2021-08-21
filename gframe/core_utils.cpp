@@ -14,12 +14,12 @@ void Query::Parse(char*& current) {
 	//char* current = buff;
 	flag = 0;
 	for(;;) {
-		uint16_t size = BufferIO::Read<uint16_t>(current);
+		auto size = BufferIO::Read<uint16_t>(current);
 		if(size == 0) {
 			onfield_skipped = true;
 			return;
 		}
-		uint32_t _flag = BufferIO::Read<uint32_t>(current);
+		auto _flag = BufferIO::Read<uint32_t>(current);
 		flag |= _flag;
 		switch(_flag) {
 			PARSE_SINGLE(QUERY_CODE,code)
@@ -51,19 +51,19 @@ void Query::Parse(char*& current) {
 				break;
 			}
 			case QUERY_TARGET_CARD: {
-				uint32_t count = BufferIO::Read<uint32_t>(current);
+				auto count = BufferIO::Read<uint32_t>(current);
 				for(uint32_t i = 0; i < count; i++)
 					target_cards.push_back(ReadLocInfo(current, false));
 				break;
 			}
 			case QUERY_OVERLAY_CARD: {
-				uint32_t count = BufferIO::Read<uint32_t>(current);
+				auto count = BufferIO::Read<uint32_t>(current);
 				for(uint32_t i = 0; i < count; i++)
 					overlay_cards.push_back(BufferIO::Read<uint32_t>(current));
 				break;
 			}
 			case QUERY_COUNTERS: {
-				uint32_t count = BufferIO::Read<uint32_t>(current);
+				auto count = BufferIO::Read<uint32_t>(current);
 				for(uint32_t i = 0; i < count; i++)
 					counters.push_back(BufferIO::Read<uint32_t>(current));
 				break;
@@ -88,7 +88,7 @@ void Query::Parse(char*& current) {
 value = BufferIO::Read<uint32_t>(current);\
 }
 
-void Query::ParseCompat(char* current, int len) {
+void Query::ParseCompat(char* current, uint32_t len) {
 	if(len <= 8) {
 		onfield_skipped = true;
 		return;
@@ -113,17 +113,17 @@ void Query::ParseCompat(char* current, int len) {
 	if(flag &  QUERY_EQUIP_CARD)
 		equip_card = ReadLocInfo(current, true);
 	if(flag & QUERY_TARGET_CARD) {
-		uint32_t count = BufferIO::Read<uint32_t>(current);
+		auto count = BufferIO::Read<uint32_t>(current);
 		for(uint32_t i = 0; i < count; i++)
 			target_cards.push_back(ReadLocInfo(current, true));
 	}
 	if(flag & QUERY_OVERLAY_CARD) {
-		uint32_t count = BufferIO::Read<uint32_t>(current);
+		auto count = BufferIO::Read<uint32_t>(current);
 		for(uint32_t i = 0; i < count; i++)
 			overlay_cards.push_back(BufferIO::Read<uint32_t>(current));
 	}
 	if(flag & QUERY_COUNTERS) {
-		uint32_t count = BufferIO::Read<uint32_t>(current);
+		auto count = BufferIO::Read<uint32_t>(current);
 		for(uint32_t i = 0; i < count; i++)
 			counters.push_back(BufferIO::Read<uint32_t>(current));
 	}
@@ -326,24 +326,22 @@ loc_info ReadLocInfo(char*& p, bool compat) {
 
 PacketStream ParseMessages(OCG_Duel duel) {
 	uint32_t message_len;
-	auto msg = OCG_DuelGetMessage(duel, &message_len);
+	auto msg = static_cast<char*>(OCG_DuelGetMessage(duel, &message_len));
 	if(message_len)
-		return PacketStream((char*)msg, message_len);
-	else
-		return PacketStream();
+		return { msg, message_len };
+	return {};
 }
 
-void QueryStream::Parse(char*& buff) {
-	uint32_t size = BufferIO::Read<uint32_t>(buff);
+void QueryStream::Parse(char* buff) {
+	auto size = BufferIO::Read<uint32_t>(buff);
 	char* current = buff;
-	while((uint32_t)(current - buff) < size) {
-		queries.emplace_back(current);
-	}
+	while(static_cast<uint32_t>(current - buff) < size)
+		queries.emplace_back(Query::Token{}, current);
 }
 
-void QueryStream::ParseCompat(char*& buff, int len) {
+void QueryStream::ParseCompat(char* buff, uint32_t len) {
 	char* start = buff;
-	while((buff - start) < len) {
+	while(static_cast<uint32_t>(buff - start) < len) {
 		int size = BufferIO::Read<int32_t>(buff);
 		queries.emplace_back(buff, true, size);
 		buff += size - 4;
@@ -351,26 +349,26 @@ void QueryStream::ParseCompat(char*& buff, int len) {
 }
 
 void QueryStream::GenerateBuffer(std::vector<uint8_t>& buffer, bool check_hidden) {
-	std::vector<uint8_t> tmp_buffer;
-	for(auto& query : queries) {
-		query.GenerateBuffer(tmp_buffer, false, check_hidden);
-	}
-	insert_value<uint32_t>(buffer, tmp_buffer.size());
-	buffer.insert(buffer.end(), tmp_buffer.begin(), tmp_buffer.end());
+	auto prev_size = buffer.size();
+	buffer.resize(prev_size + sizeof(uint32_t));
+	for(auto& query : queries)
+		query.GenerateBuffer(buffer, false, check_hidden);
+	uint32_t written_size = (buffer.size() - prev_size) - sizeof(uint32_t);
+	memcpy(&buffer[prev_size], &written_size, sizeof(uint32_t));
 }
 
 void QueryStream::GeneratePublicBuffer(std::vector<uint8_t>& buffer) {
-	std::vector<uint8_t> tmp_buffer;
-	for(auto& query : queries) {
-		query.GenerateBuffer(tmp_buffer, true, true);
-	}
-	insert_value<uint32_t>(buffer, tmp_buffer.size());
-	buffer.insert(buffer.end(), tmp_buffer.begin(), tmp_buffer.end());
+	auto prev_size = buffer.size();
+	buffer.resize(prev_size + sizeof(uint32_t));
+	for(auto& query : queries)
+		query.GenerateBuffer(buffer, true, true);
+	uint32_t written_size = (buffer.size() - prev_size) - sizeof(uint32_t);
+	memcpy(&buffer[prev_size], &written_size, sizeof(uint32_t));
 }
 
-PacketStream::PacketStream(char* buff, int len) {
+PacketStream::PacketStream(char* buff, uint32_t len) {
 	char* current = buff;
-	while((current - buff) < len) {
+	while(static_cast<uint32_t>(current - buff) < len) {
 		uint32_t size = BufferIO::Read<uint32_t>(current);
 		packets.emplace_back(current, size - sizeof(uint8_t));
 		current += size;
