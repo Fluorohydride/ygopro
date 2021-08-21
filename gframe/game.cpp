@@ -64,6 +64,10 @@ namespace ygo {
 #define AddComboBox(env, ...) env->addComboBox(__VA_ARGS__)
 #endif
 
+static inline epro::path_string NoSkinLabel() {
+	return Utils::ToPathString(gDataManager->GetSysString(2065));
+}
+
 Game::~Game() {
 	if(guiFont)
 		guiFont->drop();
@@ -1857,9 +1861,6 @@ bool Game::MainLoop() {
 #endif //YGOPRO_BUILD_DLL
 	//device->drop();
 	return restart;
-}
-epro::path_string Game::NoSkinLabel() {
-	return Utils::ToPathString(gDataManager->GetSysString(2065));
 }
 bool Game::ApplySkin(const epro::path_string& skinname, bool reload, bool firstrun) {
 	static epro::path_string prev_skin = EPRO_TEXT("");

@@ -118,7 +118,6 @@ public:
 	~Game();
 	bool Initialize();
 	bool MainLoop();
-	epro::path_string NoSkinLabel();
 	bool ApplySkin(const epro::path_string& skin, bool reload = false, bool firstrun = false);
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshLFLists();
