@@ -58,16 +58,19 @@ inline void SetCheckbox(irr::gui::IGUICheckBox* chk, bool state) {
 	TriggerEvent(chk, irr::gui::EGET_CHECKBOX_CHANGED);
 }
 
-#define PARAM_CHECK(x) ((wchar_t)argv[i][1] == (wchar_t)x)
+#define PARAM_CHECK(x) (parameter[1] == EPRO_TEXT(x))
 #define RUN_IF(x,expr) (PARAM_CHECK(x)) {i++; if(i < argc) {expr;} continue;}
-#define SET_TXT(elem) ygo::mainGame->elem->setText(ygo::Utils::ToUnicodeIfNeeded(argv[i]).data())
+#define SET_TXT(elem) ygo::mainGame->elem->setText(ygo::Utils::ToUnicodeIfNeeded(parameter).data())
 
 void CheckArguments(int argc, epro::path_char* argv[]) {
 	bool keep_on_return = false;
 	for(int i = 1; i < argc; ++i) {
-		if((wchar_t)argv[i][0] == '-' && argv[i][1]) {
+		epro::path_stringview parameter = argv[i];
+		if(parameter.size() < 2)
+			continue;
+		if(parameter[0] == EPRO_TEXT('-')) {
 			// Extra database
-			if RUN_IF('e', ygo::gDataManager->LoadDB(argv[i]))
+			if RUN_IF('e', if(ygo::gDataManager->LoadDB(parameter)) ygo::WindBot::AddDatabase(parameter) )
 				// Nickname
 			else if RUN_IF('n', SET_TXT(ebNickName))
 				// Host address
@@ -129,12 +132,11 @@ void CheckArguments(int argc, epro::path_char* argv[]) {
 					ClickButton(ygo::mainGame->btnLoadSinglePlay);
 				break;
 			}
-		} else if(argc == 2 && argv[1][0] && argv[1][1] && argv[1][2] && argv[1][3]) {
-			epro::path_string parameter = argv[1];
-			auto extension = ygo::Utils::GetFileExtension(parameter);
+		} else if(argc == 2 && parameter.size() >= 4) {
+			const auto extension = ygo::Utils::GetFileExtension(parameter);
 			if(extension == EPRO_TEXT("ydk")) {
 				open_file = true;
-				open_file_name = std::move(parameter);
+				open_file_name = epro::path_string{ parameter };
 				keep_on_return = true;
 				exit_on_return = false;
 				ClickButton(ygo::mainGame->btnDeckEdit);
@@ -142,7 +144,7 @@ void CheckArguments(int argc, epro::path_char* argv[]) {
 			}
 			if(extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx")) {
 				open_file = true;
-				open_file_name = std::move(parameter);
+				open_file_name = epro::path_string{ parameter };
 				keep_on_return = true;
 				exit_on_return = false;
 				ClickButton(ygo::mainGame->btnReplayMode);
@@ -151,7 +153,7 @@ void CheckArguments(int argc, epro::path_char* argv[]) {
 			}
 			if(extension == EPRO_TEXT("lua")) {
 				open_file = true;
-				open_file_name = std::move(parameter);
+				open_file_name = epro::path_string{ parameter };
 				keep_on_return = true;
 				exit_on_return = false;
 				ClickButton(ygo::mainGame->btnSingleMode);
@@ -192,7 +194,7 @@ inline void ThreadsCleanup() {
 //a buffer and using in place new
 #if defined(__clang_major__) && __clang_major__ <= 10
 class StackGame {
-	typename std::aligned_storage<sizeof(ygo::Game), alignof(ygo::Game)>::type game_buf[1];
+	std::aligned_storage_t<sizeof(ygo::Game), alignof(ygo::Game)> game_buf[1];
 	ygo::Game* get() { return reinterpret_cast<ygo::Game*>(&game_buf[0]); }
 public:
 	StackGame() { new (&game_buf[0]) ygo::Game(); }
@@ -204,7 +206,7 @@ using StackGame = ygo::Game;
 #endif
 
 int _tmain(int argc, epro::path_char* argv[]) {
-	epro::path_stringview dest{};
+	epro::path_stringview dest;
 	int skipped = 0;
 	if(argc > 2 && (argv[1] == EPRO_TEXT("from_discord"_sv) || argv[1] == EPRO_TEXT("-C"_sv))) {
 		dest = argv[2];
