@@ -57,7 +57,7 @@ bool CGUISkinSystem::populateTreeView(gui::IGUITreeView *control, const core::st
 	}
 	ret = registry->populateTreeView(control);
 	delete registry;
-	registry = NULL;
+	registry = nullptr;
 	fs->changeWorkingDirectoryTo(oldpath);
 	return ret;*/
 	return false;
@@ -110,13 +110,11 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 	gui::EGUI_SKIN_TYPE fallbackType;
 	gui::IGUISkin *fallbackSkin;
 
-	s32 i, x;
 	core::stringc tmp;
 	io::path path = workingDir + "/./";
 	path += skinname;
-	if(!registry->loadFile(SKINSYSTEM_SKINFILE, path.data())) {
-		return NULL;
-	}
+	if(!registry->loadFile(SKINSYSTEM_SKINFILE, path.data()))
+		return nullptr;
 	// Easiest way to see if an xml is loading correctly
 	// is to make the registry write out the root node and see what comes out.
 	//registry->writeFile("Skin",".");
@@ -164,11 +162,11 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 		skinConfig.ProgressBarFilled.Color = video::SColor(255, 255, 0, 0);
 
 	// Load in the Info
-	loadProperty((core::stringw)L"Name", skin);
-	loadProperty((core::stringw)L"Author", skin);
-	loadProperty((core::stringw)L"Version", skin);
-	loadProperty((core::stringw)L"Date", skin);
-	loadProperty((core::stringw)L"Desc", skin);
+	loadProperty(L"Name", skin);
+	loadProperty(L"Author", skin);
+	loadProperty(L"Version", skin);
+	loadProperty(L"Date", skin);
+	loadProperty(L"Desc", skin);
 
 	loadCustomColors(skin);
 
@@ -183,117 +181,114 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 	// Get and set global alpha, problem with this, you can't set it to 0
 	// He does this to make ALL the default stuff completly transparent
 	// This has the downside that it whipes out things like checkbox and window button colors
-	video::SColor newCol = video::SColor();
-	video::SColor oldCol = newCol;
-	x = registry->getValueAsInt(L"guialpha", L"Skin/Global/");
-	if(x) {
-		i = gui::EGDC_COUNT;
+	auto guialpha = registry->getValueAsInt(L"guialpha", L"Skin/Global/");
+	if(guialpha) {
+		s32 i = gui::EGDC_COUNT;
 		while(i--) {
-			oldCol = skin->getColor((gui::EGUI_DEFAULT_COLOR)i);
+			auto col = skin->getColor((gui::EGUI_DEFAULT_COLOR)i);
 
-			newCol = oldCol;
-			newCol.setAlpha(x);
+			col.setAlpha(guialpha);
 
-			skin->setColor((gui::EGUI_DEFAULT_COLOR)i, newCol);
+			skin->setColor((gui::EGUI_DEFAULT_COLOR)i, col);
 		}
 	}
-#define CHECKCOLOR(elem) checkSkinColor(gui::elem,L"Skin/Global/"#elem,skin);
-	CHECKCOLOR(EGDC_3D_DARK_SHADOW)
-		CHECKCOLOR(EGDC_3D_SHADOW)
-		CHECKCOLOR(EGDC_3D_FACE)
-		CHECKCOLOR(EGDC_3D_HIGH_LIGHT)
-		CHECKCOLOR(EGDC_3D_LIGHT)
-		CHECKCOLOR(EGDC_ACTIVE_BORDER)
-		CHECKCOLOR(EGDC_ACTIVE_CAPTION)
-		CHECKCOLOR(EGDC_APP_WORKSPACE)
-		CHECKCOLOR(EGDC_BUTTON_TEXT)
-		CHECKCOLOR(EGDC_GRAY_TEXT)
-		CHECKCOLOR(EGDC_HIGH_LIGHT)
-		CHECKCOLOR(EGDC_HIGH_LIGHT_TEXT)
-		CHECKCOLOR(EGDC_INACTIVE_BORDER)
-		CHECKCOLOR(EGDC_INACTIVE_CAPTION)
-		CHECKCOLOR(EGDC_TOOLTIP)
-		CHECKCOLOR(EGDC_TOOLTIP_BACKGROUND)
-		CHECKCOLOR(EGDC_SCROLLBAR)
-		CHECKCOLOR(EGDC_WINDOW)
-		CHECKCOLOR(EGDC_WINDOW_SYMBOL)
-		CHECKCOLOR(EGDC_ICON)
-		CHECKCOLOR(EGDC_ICON_HIGH_LIGHT)
-		CHECKCOLOR(EGDC_GRAY_WINDOW_SYMBOL)
-		CHECKCOLOR(EGDC_EDITABLE)
-		CHECKCOLOR(EGDC_GRAY_EDITABLE)
-		CHECKCOLOR(EGDC_FOCUSED_EDITABLE)
+#define CHECKCOLOR(elem) do { checkSkinColor(gui::elem, L"Skin/Global/"#elem,skin); } while(0)
+	CHECKCOLOR(EGDC_3D_DARK_SHADOW);
+	CHECKCOLOR(EGDC_3D_SHADOW);
+	CHECKCOLOR(EGDC_3D_FACE);
+	CHECKCOLOR(EGDC_3D_HIGH_LIGHT);
+	CHECKCOLOR(EGDC_3D_LIGHT);
+	CHECKCOLOR(EGDC_ACTIVE_BORDER);
+	CHECKCOLOR(EGDC_ACTIVE_CAPTION);
+	CHECKCOLOR(EGDC_APP_WORKSPACE);
+	CHECKCOLOR(EGDC_BUTTON_TEXT);
+	CHECKCOLOR(EGDC_GRAY_TEXT);
+	CHECKCOLOR(EGDC_HIGH_LIGHT);
+	CHECKCOLOR(EGDC_HIGH_LIGHT_TEXT);
+	CHECKCOLOR(EGDC_INACTIVE_BORDER);
+	CHECKCOLOR(EGDC_INACTIVE_CAPTION);
+	CHECKCOLOR(EGDC_TOOLTIP);
+	CHECKCOLOR(EGDC_TOOLTIP_BACKGROUND);
+	CHECKCOLOR(EGDC_SCROLLBAR);
+	CHECKCOLOR(EGDC_WINDOW);
+	CHECKCOLOR(EGDC_WINDOW_SYMBOL);
+	CHECKCOLOR(EGDC_ICON);
+	CHECKCOLOR(EGDC_ICON_HIGH_LIGHT);
+	CHECKCOLOR(EGDC_GRAY_WINDOW_SYMBOL);
+	CHECKCOLOR(EGDC_EDITABLE);
+	CHECKCOLOR(EGDC_GRAY_EDITABLE);
+	CHECKCOLOR(EGDC_FOCUSED_EDITABLE);
 #undef CHECKCOLOR
 
 
 
-		checkSkinSize(gui::EGDS_WINDOW_BUTTON_WIDTH, L"Skin/Global/WindowButton", L"width", skin);
+	checkSkinSize(gui::EGDS_WINDOW_BUTTON_WIDTH, L"Skin/Global/WindowButton", L"width", skin);
 	checkSkinSize(gui::EGDS_TITLEBARTEXT_DISTANCE_X, L"Skin/Global/Caption", L"tbardistancex", skin);
 	checkSkinSize(gui::EGDS_TITLEBARTEXT_DISTANCE_Y, L"Skin/Global/Caption", L"tbardistancey", skin);
 
-#define CHECKSIZE(elem) checkSkinSize(gui::elem, L"Skin/Global/"#elem,L"value",skin);
-	CHECKSIZE(EGDS_SCROLLBAR_SIZE)
-		CHECKSIZE(EGDS_MENU_HEIGHT)
-		CHECKSIZE(EGDS_WINDOW_BUTTON_WIDTH)
-		CHECKSIZE(EGDS_CHECK_BOX_WIDTH)
-		CHECKSIZE(EGDS_MESSAGE_BOX_WIDTH)
-		CHECKSIZE(EGDS_MESSAGE_BOX_HEIGHT)
-		CHECKSIZE(EGDS_BUTTON_WIDTH)
-		CHECKSIZE(EGDS_BUTTON_HEIGHT)
-		CHECKSIZE(EGDS_TEXT_DISTANCE_X)
-		CHECKSIZE(EGDS_TEXT_DISTANCE_Y)
-		CHECKSIZE(EGDS_TITLEBARTEXT_DISTANCE_X)
-		CHECKSIZE(EGDS_TITLEBARTEXT_DISTANCE_Y)
-		CHECKSIZE(EGDS_MESSAGE_BOX_GAP_SPACE)
-		CHECKSIZE(EGDS_MESSAGE_BOX_MIN_TEXT_WIDTH)
-		CHECKSIZE(EGDS_MESSAGE_BOX_MAX_TEXT_WIDTH)
-		CHECKSIZE(EGDS_MESSAGE_BOX_MIN_TEXT_HEIGHT)
-		CHECKSIZE(EGDS_MESSAGE_BOX_MAX_TEXT_HEIGHT)
-		CHECKSIZE(EGDS_BUTTON_PRESSED_IMAGE_OFFSET_X)
-		CHECKSIZE(EGDS_BUTTON_PRESSED_IMAGE_OFFSET_Y)
-		CHECKSIZE(EGDS_BUTTON_PRESSED_TEXT_OFFSET_X)
-		CHECKSIZE(EGDS_BUTTON_PRESSED_TEXT_OFFSET_Y)
+#define CHECKSIZE(elem) do { checkSkinSize(gui::elem, L"Skin/Global/"#elem,L"value",skin); } while(0)
+	CHECKSIZE(EGDS_SCROLLBAR_SIZE);
+	CHECKSIZE(EGDS_MENU_HEIGHT);
+	CHECKSIZE(EGDS_WINDOW_BUTTON_WIDTH);
+	CHECKSIZE(EGDS_CHECK_BOX_WIDTH);
+	CHECKSIZE(EGDS_MESSAGE_BOX_WIDTH);
+	CHECKSIZE(EGDS_MESSAGE_BOX_HEIGHT);
+	CHECKSIZE(EGDS_BUTTON_WIDTH);
+	CHECKSIZE(EGDS_BUTTON_HEIGHT);
+	CHECKSIZE(EGDS_TEXT_DISTANCE_X);
+	CHECKSIZE(EGDS_TEXT_DISTANCE_Y);
+	CHECKSIZE(EGDS_TITLEBARTEXT_DISTANCE_X);
+	CHECKSIZE(EGDS_TITLEBARTEXT_DISTANCE_Y);
+	CHECKSIZE(EGDS_MESSAGE_BOX_GAP_SPACE);
+	CHECKSIZE(EGDS_MESSAGE_BOX_MIN_TEXT_WIDTH);
+	CHECKSIZE(EGDS_MESSAGE_BOX_MAX_TEXT_WIDTH);
+	CHECKSIZE(EGDS_MESSAGE_BOX_MIN_TEXT_HEIGHT);
+	CHECKSIZE(EGDS_MESSAGE_BOX_MAX_TEXT_HEIGHT);
+	CHECKSIZE(EGDS_BUTTON_PRESSED_IMAGE_OFFSET_X);
+	CHECKSIZE(EGDS_BUTTON_PRESSED_IMAGE_OFFSET_Y);
+	CHECKSIZE(EGDS_BUTTON_PRESSED_TEXT_OFFSET_X);
+	CHECKSIZE(EGDS_BUTTON_PRESSED_TEXT_OFFSET_Y);
 #undef CHECKSIZE
 
-#define CHECKICON(elem) checkSkinIcon(gui::elem, L"Skin/Global/"#elem,skin);
-		CHECKICON(EGDI_WINDOW_MAXIMIZE)
-		CHECKICON(EGDI_WINDOW_RESTORE)
-		CHECKICON(EGDI_WINDOW_CLOSE)
-		CHECKICON(EGDI_WINDOW_MINIMIZE)
-		CHECKICON(EGDI_WINDOW_RESIZE)
-		CHECKICON(EGDI_CURSOR_UP)
-		CHECKICON(EGDI_CURSOR_DOWN)
-		CHECKICON(EGDI_CURSOR_LEFT)
-		CHECKICON(EGDI_CURSOR_RIGHT)
-		CHECKICON(EGDI_MENU_MORE)
-		CHECKICON(EGDI_CHECK_BOX_CHECKED)
-		CHECKICON(EGDI_DROP_DOWN)
-		CHECKICON(EGDI_SMALL_CURSOR_UP)
-		CHECKICON(EGDI_SMALL_CURSOR_DOWN)
-		CHECKICON(EGDI_RADIO_BUTTON_CHECKED)
-		CHECKICON(EGDI_MORE_LEFT)
-		CHECKICON(EGDI_MORE_RIGHT)
-		CHECKICON(EGDI_MORE_UP)
-		CHECKICON(EGDI_MORE_DOWN)
-		CHECKICON(EGDI_EXPAND)
-		CHECKICON(EGDI_COLLAPSE)
-		CHECKICON(EGDI_FILE)
-		CHECKICON(EGDI_DIRECTORY)
+#define CHECKICON(elem) do { checkSkinIcon(gui::elem, L"Skin/Global/"#elem,skin); } while(0)
+	CHECKICON(EGDI_WINDOW_MAXIMIZE);
+	CHECKICON(EGDI_WINDOW_RESTORE);
+	CHECKICON(EGDI_WINDOW_CLOSE);
+	CHECKICON(EGDI_WINDOW_MINIMIZE);
+	CHECKICON(EGDI_WINDOW_RESIZE);
+	CHECKICON(EGDI_CURSOR_UP);
+	CHECKICON(EGDI_CURSOR_DOWN);
+	CHECKICON(EGDI_CURSOR_LEFT);
+	CHECKICON(EGDI_CURSOR_RIGHT);
+	CHECKICON(EGDI_MENU_MORE);
+	CHECKICON(EGDI_CHECK_BOX_CHECKED);
+	CHECKICON(EGDI_DROP_DOWN);
+	CHECKICON(EGDI_SMALL_CURSOR_UP);
+	CHECKICON(EGDI_SMALL_CURSOR_DOWN);
+	CHECKICON(EGDI_RADIO_BUTTON_CHECKED);
+	CHECKICON(EGDI_MORE_LEFT);
+	CHECKICON(EGDI_MORE_RIGHT);
+	CHECKICON(EGDI_MORE_UP);
+	CHECKICON(EGDI_MORE_DOWN);
+	CHECKICON(EGDI_EXPAND);
+	CHECKICON(EGDI_COLLAPSE);
+	CHECKICON(EGDI_FILE);
+	CHECKICON(EGDI_DIRECTORY);
 #undef CHECKICON
 
 
-#define CHECKTEXT(elem) checkSkinText(gui::elem, L"Skin/Global/"#elem,skin);
-		CHECKTEXT(EGDT_MSG_BOX_OK)
-		CHECKTEXT(EGDT_MSG_BOX_CANCEL)
-		CHECKTEXT(EGDT_MSG_BOX_YES)
-		CHECKTEXT(EGDT_MSG_BOX_NO)
-		CHECKTEXT(EGDT_WINDOW_CLOSE)
-		CHECKTEXT(EGDT_WINDOW_MAXIMIZE)
-		CHECKTEXT(EGDT_WINDOW_MINIMIZE)
-		CHECKTEXT(EGDT_WINDOW_RESTORE)
+#define CHECKTEXT(elem) do { checkSkinText(gui::elem, L"Skin/Global/"#elem,skin); } while(0)
+	CHECKTEXT(EGDT_MSG_BOX_OK);
+	CHECKTEXT(EGDT_MSG_BOX_CANCEL);
+	CHECKTEXT(EGDT_MSG_BOX_YES);
+	CHECKTEXT(EGDT_MSG_BOX_NO);
+	CHECKTEXT(EGDT_WINDOW_CLOSE);
+	CHECKTEXT(EGDT_WINDOW_MAXIMIZE);
+	CHECKTEXT(EGDT_WINDOW_MINIMIZE);
+	CHECKTEXT(EGDT_WINDOW_RESTORE);
 #undef CHECKTEXT
 
-		return skin;
+	return skin;
 }
 core::stringw CGUISkinSystem::getProperty(core::stringw key) {
 	gui::CImageGUISkin* skin = (gui::CImageGUISkin*)device->getGUIEnvironment()->getSkin();
@@ -334,7 +329,7 @@ bool CGUISkinSystem::checkSkinIcon(gui::EGUI_DEFAULT_ICON iconToSet, const wchar
 
 bool CGUISkinSystem::checkSkinText(gui::EGUI_DEFAULT_TEXT textToSet, const wchar_t * context, gui::CImageGUISkin * skin) {
 	auto txt = registry->getValueAsCStr(L"text", context);
-	if(txt != NULL) {
+	if(txt != nullptr) {
 		skin->setDefaultText(textToSet, txt);
 		return true;
 	}
@@ -351,25 +346,26 @@ bool CGUISkinSystem::loadProperty(core::stringw key, gui::CImageGUISkin *skin) {
 	}
 	return false;
 }
-bool CGUISkinSystem::loadCustomColors(gui::CImageGUISkin * skin) {
+void CGUISkinSystem::loadCustomColors(gui::CImageGUISkin * skin) {
 	static const std::map<epro::wstringview, ygo::skin::CustomSkinElements> alias = {
 #define DECLR(what,val) { L""#what, ygo::skin::CustomSkinElements::what },
 #include "../custom_skin_enum.inl"
 #undef DECLR
 	};
-	core::stringw wtmp = "Skin/Custom/";
-	core::array<const wchar_t*>* children = registry->listNodeChildren(L"", wtmp.data());
-	if(!children) return false;
+	constexpr epro::wstringview wtmp = L"Skin/Custom/";
+	auto* children = registry->listNodeChildren(L"", wtmp.data());
+	if(!children)
+		return;
 	for(u32 i = 0; i < children->size(); i++) {
-		core::stringw tmpchild = (*children)[i];
-		video::SColor color = registry->getValueAsColor((wtmp + tmpchild).data());
+		epro::wstringview tmpchild = (*children)[i];
+		video::SColor color = registry->getValueAsColor(fmt::format(L"{}{}", wtmp, tmpchild).data());
 		if(color.color) {
-			auto found = alias.find({ tmpchild.data(), tmpchild.size() });
+			auto found = alias.find(tmpchild);
 			if(found != alias.end())
 				skin->setCustomColor(found->second, color);
 		}
 	}
-	return false;
+	delete children;
 }
 bool CGUISkinSystem::applySkin(const fschar_t *skinname) {
 	/*io::path oldpath = fs->getWorkingDirectory();
@@ -378,7 +374,7 @@ bool CGUISkinSystem::applySkin(const fschar_t *skinname) {
 	registry = new CXMLRegistry(fs);
 	loaded_skin = nullptr;
 	gui::CImageGUISkin* skin = loadSkinFromFile(skinname);
-	if(skin == NULL) {
+	if(skin == nullptr) {
 		return false;
 	}
 	device->getGUIEnvironment()->setSkin(skin);
@@ -386,11 +382,8 @@ bool CGUISkinSystem::applySkin(const fschar_t *skinname) {
 	// If we're going to switch skin we need to find all the progress bars and overwrite their colors	
 	skin->drop();
 	delete registry;
-	registry = NULL;
+	registry = nullptr;
 	//fs->changeWorkingDirectoryTo(oldpath);
 
 	return true;
-}
-CGUISkinSystem::~CGUISkinSystem() {
-	skinsList.clear();
 }

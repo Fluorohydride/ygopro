@@ -40,13 +40,13 @@ private:
 	bool checkSkinIcon(irr::gui::EGUI_DEFAULT_ICON iconToSet, const wchar_t* context, irr::gui::CImageGUISkin* skin);
 	bool checkSkinText(irr::gui::EGUI_DEFAULT_TEXT textToSet, const wchar_t* context, irr::gui::CImageGUISkin* skin);
 	bool loadProperty(irr::core::stringw key, irr::gui::CImageGUISkin* skin);
-	bool loadCustomColors(irr::gui::CImageGUISkin* skin);
+	void loadCustomColors(irr::gui::CImageGUISkin* skin);
 public:
 	// Constructor
 	// path = Path to skins
 	// dev = Irrlicht device
 	CGUISkinSystem(irr::io::path path, irr::IrrlichtDevice* dev);
-	~CGUISkinSystem();
+	~CGUISkinSystem() = default;
 	const auto& listSkins() {
 		return skinsList;
 	};
