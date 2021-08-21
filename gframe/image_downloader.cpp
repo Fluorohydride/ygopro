@@ -114,12 +114,13 @@ void ImageDownloader::DownloadPic() {
 				return;
 			}
 		}
-		auto file = std::move(to_download.front());
+		downloading.push_back(std::move(to_download.front()));
 		to_download.pop_front();
+		auto& file = downloading.back();
 		auto type = file.type;
 		auto code = file.code;
-		downloading_images[type][file.code].status = downloadStatus::DOWNLOADING;
-		downloading.push_back(std::move(file));
+		auto& map_elem = downloading_images[type][code];
+		map_elem.status = downloadStatus::DOWNLOADING;
 		lck.unlock();
 		auto name = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
 		if(type == imgType::THUMB)
@@ -146,7 +147,6 @@ void ImageDownloader::DownloadPic() {
 			}
 			return fmt::format(dest, code);
 		}();
-		auto& map = downloading_images[type];
 		const epro::path_char* ext = nullptr;
 		for(auto& src : pic_urls) {
 			if(src.type != type)
@@ -174,10 +174,10 @@ void ImageDownloader::DownloadPic() {
 		}
 		lck.lock();
 		if(ext) {
-			map[code].status = downloadStatus::DOWNLOADED;
-			map[code].path = dest_folder + ext;
+			map_elem.status = downloadStatus::DOWNLOADED;
+			map_elem.path = dest_folder + ext;
 		} else
-			map[code].status = downloadStatus::DOWNLOAD_ERROR;
+			map_elem.status = downloadStatus::DOWNLOAD_ERROR;
 	}
 }
 void ImageDownloader::AddToDownloadQueue(uint32_t code, imgType type) {
