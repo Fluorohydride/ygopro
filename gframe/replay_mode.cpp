@@ -153,9 +153,8 @@ int ReplayMode::ReplayThread() {
 }
 bool ReplayMode::StartDuel() {
 	const ReplayHeader& rh = cur_replay.pheader;
-	mtrandom rnd;
-	int seed = rh.seed;
-	rnd.reset(seed);
+	unsigned int seed = rh.seed;
+	std::mt19937 rnd(seed);
 	if(mainGame->dInfo.isTag) {
 		cur_replay.ReadName(mainGame->dInfo.hostname);
 		cur_replay.ReadName(mainGame->dInfo.hostname_tag);
@@ -165,7 +164,7 @@ bool ReplayMode::StartDuel() {
 		cur_replay.ReadName(mainGame->dInfo.hostname);
 		cur_replay.ReadName(mainGame->dInfo.clientname);
 	}
-	pduel = create_duel(rnd.rand());
+	pduel = create_duel(rnd());
 	int start_lp = cur_replay.ReadInt32();
 	int start_hand = cur_replay.ReadInt32();
 	int draw_count = cur_replay.ReadInt32();
@@ -225,13 +224,18 @@ bool ReplayMode::StartDuel() {
 		}
 	} else {
 		char filename[256];
-		size_t slen = cur_replay.ReadInt16();
+		int slen = cur_replay.ReadInt16();
+		if (slen < 0 || slen > 255) {
+			return false;
+		}
 		cur_replay.ReadData(filename, slen);
 		filename[slen] = 0;
 		if(!preload_script(pduel, filename, 0)) {
 			return false;
 		}
 	}
+	if (!(rh.flag & REPLAY_UNIFORM))
+		opt |= DUEL_OLD_REPLAY;
 	start_duel(pduel, opt);
 	return true;
 }

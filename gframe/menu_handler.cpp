@@ -465,7 +465,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				wchar_t infobuf[256];
 				std::wstring repinfo;
-				time_t curtime = ReplayMode::cur_replay.pheader.seed;
+				time_t curtime;
+				if(ReplayMode::cur_replay.pheader.flag & REPLAY_UNIFORM)
+					curtime = ReplayMode::cur_replay.pheader.start_time;
+				else
+					curtime = ReplayMode::cur_replay.pheader.seed;
 				tm* st = localtime(&curtime);
 				wcsftime(infobuf, 256, L"%Y/%m/%d %H:%M:%S\n", st);
 				repinfo.append(infobuf);
