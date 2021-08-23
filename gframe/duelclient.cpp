@@ -4218,6 +4218,45 @@ void DuelClient::SendResponse() {
 		SendBufferToServer(CTOS_RESPONSE, response_buf.data(), response_buf.size());
 	}
 }
+
+static bool getAddresses(uint32_t addresses[8]) {
+#ifdef __ANDROID__
+	return (addresses[0] = porting::getLocalIP()) != -1;
+#elif defined(_WIN32)
+	char hname[256];
+	gethostname(hname, 256);
+	hostent* host = gethostbyname(hname);
+	if(!host || host->h_addrtype != AF_INET)
+		return false;
+	auto list = reinterpret_cast<in_addr**>(host->h_addr_list);
+	int i = 0;
+	for(; i < 8 && list[i] != 0; ++i)
+		addresses[i] = list[i]->s_addr;
+	return i != 0;
+#else
+	ifaddrs* allInterfaces;
+	// Get list of all interfaces on the local machine:
+	if(getifaddrs(&allInterfaces) != 0)
+		return false;
+	int i = 0;
+	// For each interface ...
+	for(ifaddrs* interface = allInterfaces; interface != nullptr && i < 8; interface = interface->ifa_next) {
+		unsigned int flags = interface->ifa_flags;
+		sockaddr* addr = interface->ifa_addr;
+		// Check for running IPv4 interfaces.
+		if((flags & (IFF_UP | IFF_RUNNING | IFF_LOOPBACK)) == (IFF_UP | IFF_RUNNING)) {
+			if(addr->sa_family == AF_INET) {
+				auto addr_in = reinterpret_cast<sockaddr_in*>(addr);
+				if(addr_in->sin_addr.s_addr != 0)
+					addresses[i++] = addr_in->sin_addr.s_addr;
+			}
+		}
+	}
+	freeifaddrs(allInterfaces);
+	return i != 0;
+#endif
+}
+
 void DuelClient::BeginRefreshHost() {
 	if(is_refreshing)
 		return;
@@ -4227,47 +4266,12 @@ void DuelClient::BeginRefreshHost() {
 	remotes.clear();
 	hosts.clear();
 	event_base* broadev = event_base_new();
-	decltype(in_addr::s_addr) addresses[8]{};
-#ifdef __ANDROID__
-	addresses[0] = porting::getLocalIP();
-	if(addresses[0] == -1) {
+	uint32_t addresses[8]{};
+	if(!getAddresses(addresses)) {
 		mainGame->btnLanRefresh->setEnabled(true);
 		is_refreshing = false;
 		return;
 	}
-#elif defined(_WIN32)
-	char hname[256];
-	gethostname(hname, 256);
-	hostent* host = gethostbyname(hname);
-	if(!host || host->h_addrtype != AF_INET) {
-		mainGame->btnLanRefresh->setEnabled(true);
-		is_refreshing = false;
-		return;
-	}
-	auto list = reinterpret_cast<in_addr**>(host->h_addr_list);
-	for(int i = 0; i < 8 && list[i] != 0; ++i)
-		addresses[i] = list[i]->s_addr;
-#else
-	ifaddrs* allInterfaces;
-	// Get list of all interfaces on the local machine:
-	if(getifaddrs(&allInterfaces) == 0) {
-		int i = 0;
-		// For each interface ...
-		for(ifaddrs* interface = allInterfaces; interface != nullptr && i < 8; interface = interface->ifa_next) {
-			unsigned int flags = interface->ifa_flags;
-			sockaddr* addr = interface->ifa_addr;
-			// Check for running IPv4 interfaces.
-			if((flags & (IFF_UP | IFF_RUNNING | IFF_LOOPBACK)) == (IFF_UP | IFF_RUNNING)) {
-				if(addr->sa_family == AF_INET) {
-					auto addr_in = reinterpret_cast<sockaddr_in*>(addr);
-					if(addr_in->sin_addr.s_addr != 0)
-						addresses[i++] = addr_in->sin_addr.s_addr;
-				}
-			}
-		}
-		freeifaddrs(allInterfaces);
-	}
-#endif
 	evutil_socket_t reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	sockaddr_in reply_addr;
 	memset(&reply_addr, 0, sizeof(reply_addr));
