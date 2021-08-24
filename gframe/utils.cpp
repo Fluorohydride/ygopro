@@ -96,6 +96,15 @@ namespace ygo {
 		return mkdir(path.data(), 0777) == 0 || errno == EEXIST;
 #endif
 	}
+#ifdef __linux__
+	bool Utils::FileCopyFD(int source, int destination) {
+		off_t bytesCopied = 0;
+		struct stat fileinfo = { 0 };
+		fstat(source, &fileinfo);
+		int result = sendfile(destination, source, &bytesCopied, fileinfo.st_size);
+		return result != -1;
+	}
+#endif
 	bool Utils::FileCopy(epro::path_stringview source, epro::path_stringview destination) {
 		if(source == destination)
 			return false;
@@ -110,13 +119,10 @@ namespace ygo {
 			close(input);
 			return false;
 		}
-		off_t bytesCopied = 0;
-		struct stat fileinfo = { 0 };
-		fstat(input, &fileinfo);
-		int result = sendfile(output, input, &bytesCopied, fileinfo.st_size);
+		auto result = FileCopyFD(output, input);
 		close(input);
 		close(output);
-		return result != -1;
+		return result;
 #elif defined(__APPLE__)
 		return copyfile(source.data(), destination.data(), 0, COPYFILE_ALL) == 0;
 #else

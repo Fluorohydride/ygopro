@@ -18,6 +18,12 @@
 #elif defined(EDOPRO_MACOS)
 #define CORENAME EPRO_TEXT("libocgcore.dylib")
 #elif defined(__ANDROID__)
+#include <fcntl.h> //open()
+#include <unistd.h> //close()
+struct AndroidCore {
+	void* library;
+	int fd;
+};
 #if defined(__arm__)
 #define CORENAME EPRO_TEXT("libocgcorev7.so")
 #elif defined(__i386__)
@@ -45,26 +51,54 @@
 #undef CREATE_CLONE
 
 #ifdef _WIN32
-inline void* OpenLibrary(epro::path_stringview path) {
+static inline void* OpenLibrary(epro::path_stringview path) {
 	return LoadLibrary(fmt::format("{}" CORENAME, path).data());
 }
 #define CloseLibrary(core) FreeLibrary((HMODULE)core)
 
 #define GetFunction(core, x) (decltype(x))GetProcAddress((HMODULE)core, #x)
 
+#elif defined(__ANDROID__)
+
+static void* OpenLibrary(epro::path_stringview path) {
+	void* lib = nullptr;
+	auto dest_path = porting::internal_storage + "/libocgcoreXXXXXX.so";
+	auto output = mkstemps(&dest_path[0], 3);
+	if(output == -1)
+		return nullptr;
+	auto input = open(fmt::format("{}" CORENAME, path).data(), O_RDONLY);
+	if(input == -1) {
+		unlink(dest_path.data());
+		close(output);
+		return nullptr;
+	}
+	ygo::Utils::FileCopyFD(input, output);
+	lib = dlopen(dest_path.data(), RTLD_NOW);
+	unlink(dest_path.data());
+	if(!lib) {
+		close(output);
+		return nullptr;
+	}
+	close(input);
+	auto core = new AndroidCore;
+	core->library = lib;
+	core->fd = output;
+	return core;
+}
+
+static inline void CloseLibrary(void* core) {
+	AndroidCore* acore = static_cast<AndroidCore*>(core);
+	dlclose(acore->library);
+	close(acore->fd);
+	delete acore;
+}
+
+#define GetFunction(core, x) (decltype(x))dlsym(static_cast<AndroidCore*>(core)->library, #x)
+
 #else
 
-inline void* OpenLibrary(epro::path_stringview path) {
-#ifdef __ANDROID__
-	void* lib = nullptr;
-	const auto dest_dir = porting::internal_storage + "/libocgcore.so";
-	ygo::Utils::FileCopy(fmt::format("{}" CORENAME, path), dest_dir);
-	lib = dlopen(dest_dir.data(), RTLD_LAZY);
-	ygo::Utils::FileDelete(dest_dir);
-	return lib;
-#else
-	return dlopen(fmt::format("{}" CORENAME, path).data(), RTLD_LAZY);
-#endif
+static inline void* OpenLibrary(epro::path_stringview path) {
+	return dlopen(fmt::format("{}" CORENAME, path).data(), RTLD_NOW);
 }
 
 #define CloseLibrary(core) dlclose(core)
