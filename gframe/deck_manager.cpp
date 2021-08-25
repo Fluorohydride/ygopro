@@ -75,9 +75,9 @@ int DeckManager::IsGameRuleDisallowed(unsigned char hostInfoRule, unsigned int c
 	bool allow_ocg = hostInfoRule == 0 || hostInfoRule == 2; // OCG can be used in OCG and OT duels
 	bool allow_tcg = hostInfoRule == 1 || hostInfoRule == 2; // TCG can be used in TCG and OT duels
 	bool allow_ccg = hostInfoRule == 0 || hostInfoRule == 4 || hostInfoRule == 2; // CCG can be used in OCG, CCG and OT duels
-	if(!allow_ocg && (cardOt & 0x3 == 0x1))
+	if(!allow_ocg && ((cardOt & 0x3) == 0x1))
 		return DECKERROR_OCGONLY;
-	if(!allow_tcg && (cardOt & 0x3 == 0x2))
+	if(!allow_tcg && ((cardOt & 0x3) == 0x2))
 		return DECKERROR_TCGONLY;
 	if(hostInfoRule == 4 && !(cardOt & 0x8) && (cardOt & 0x3)) { // in CCG duels, cards labeled with ither OCG or TCG, but not CCG, would not be allowed.
 		if(cardOt & 0x3 == 0x2) {
