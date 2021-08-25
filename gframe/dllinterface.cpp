@@ -77,6 +77,7 @@ static void* OpenLibrary(epro::path_stringview path) {
 	unlink(dest_path.data());
 	if(!lib) {
 		close(output);
+		close(input);
 		return nullptr;
 	}
 	close(input);
