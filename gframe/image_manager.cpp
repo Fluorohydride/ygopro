@@ -604,41 +604,37 @@ irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 	if(code == 0)
 		return nullptr;
 	auto tit = tFields.find(code);
-	if(tit == tFields.end()) {
-		auto status = gImageDownloader->GetDownloadStatus(code, imgType::FIELD);
-		bool should_download = status == ImageDownloader::downloadStatus::NONE;
-		irr::video::ITexture* img = nullptr;
-		if(!should_download) {
-			if(status == ImageDownloader::downloadStatus::DOWNLOADED) {
-				const auto path = gImageDownloader->GetDownloadPath(code, imgType::FIELD);
-				img = driver->getTexture({ path.data(), (irr::u32)path.size() });
+	if(tit != tFields.end())
+		return tit->second;
+	auto status = gImageDownloader->GetDownloadStatus(code, imgType::FIELD);
+	if(status != ImageDownloader::downloadStatus::NONE) {
+		if(status == ImageDownloader::downloadStatus::DOWNLOADED) {
+			const auto path = gImageDownloader->GetDownloadPath(code, imgType::FIELD);
+			auto downloaded = driver->getTexture({ path.data(), (irr::u32)path.size() });
+			tFields.emplace(code, downloaded);
+			return downloaded;
+		}
+		return nullptr;
+	}
+	for(auto& path : mainGame->field_dirs) {
+		for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
+			irr::video::ITexture* img;
+			if(path == EPRO_TEXT("archives")) {
+				auto archiveFile = Utils::FindFileInArchives(EPRO_TEXT("pics/field/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
+				if(!archiveFile)
+					continue;
+				img = driver->getTexture(archiveFile);
+				archiveFile->drop();
 			} else
-				return nullptr;
-		} else {
-			for(auto& path : mainGame->field_dirs) {
-				for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
-					if(path == EPRO_TEXT("archives")) {
-						auto archiveFile = Utils::FindFileInArchives(EPRO_TEXT("pics/field/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
-						if (!archiveFile)
-							continue;
-						img = driver->getTexture(archiveFile);
-						archiveFile->drop();
-						if(img)
-							break;
-					} else {
-						if((img = driver->getTexture(fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension).data())))
-							break;
-					}
-				}
+				img = driver->getTexture(fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension).data());
+			if(img) {
+				tFields.emplace(code, img);
+				return img;
 			}
 		}
-		if(should_download && !img)
-			gImageDownloader->AddToDownloadQueue(code, imgType::FIELD);
-		else
-			tFields[code] = img;
-		return img;
 	}
-	return (tit->second) ? tit->second : nullptr;
+	gImageDownloader->AddToDownloadQueue(code, imgType::FIELD);
+	return nullptr;
 }
 
 
