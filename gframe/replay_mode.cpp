@@ -7,7 +7,7 @@
 
 namespace ygo {
 
-long ReplayMode::pduel = 0;
+duel* ReplayMode::pduel = 0;
 Replay ReplayMode::cur_replay;
 bool ReplayMode::is_continuing = true;
 bool ReplayMode::is_closing = false;
@@ -941,7 +941,7 @@ void ReplayMode::ReplayReload() {
 	/*len = */query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
 }
-int ReplayMode::MessageHandler(long fduel, int type) {
+int ReplayMode::MessageHandler(duel* fduel, int type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
