@@ -328,7 +328,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_ANNUMBER_11:
 			case BUTTON_ANNUMBER_12: {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
-				for(int i = 0; i < mainGame->cbANNumber->getItemCount(); ++i) {
+				for(int i = 0; i < (int)mainGame->cbANNumber->getItemCount(); ++i) {
 					if(id - BUTTON_ANNUMBER_1 + 1 == mainGame->cbANNumber->getItemData(i)) {
 						mainGame->cbANNumber->setSelected(i);
 						break;
@@ -1367,11 +1367,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					clicked_card->is_selected = true;
 					selected_cards.push_back(clicked_card);
 				}
-				if(selected_cards.size() >= select_max) {
+				if((int)selected_cards.size() >= select_max) {
 					SetResponseSelectedCards();
 					ShowCancelOrFinishButton(0);
 					DuelClient::SendResponse();
-				} else if(selected_cards.size() >= select_min) {
+				} else if((int)selected_cards.size() >= select_min) {
 					if(selected_cards.size() == selectable_cards.size()) {
 						SetResponseSelectedCards();
 						ShowCancelOrFinishButton(0);
