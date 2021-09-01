@@ -793,9 +793,9 @@ extern Game* mainGame;
 
 #define AVAIL_OCG					0x1
 #define AVAIL_TCG					0x2
-#define AVAIL_OCGTCG				0x3
 #define AVAIL_CUSTOM				0x4
 #define AVAIL_SC					0x8
+#define AVAIL_OCGTCG				(AVAIL_OCG|AVAIL_TCG)
 
 #define DEFAULT_DUEL_RULE			5
 
