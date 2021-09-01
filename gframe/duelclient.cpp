@@ -304,6 +304,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				myswprintf(msgbuf, dataManager.GetSysString(1419), code);
 				break;
 			}
+			case DECKERROR_NOTAVAIL: {
+				myswprintf(msgbuf, dataManager.GetSysString(1432), dataManager.GetName(code));
+				break;
+			}
 			default: {
 				myswprintf(msgbuf, dataManager.GetSysString(1406));
 				break;

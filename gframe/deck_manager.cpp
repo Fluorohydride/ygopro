@@ -78,7 +78,7 @@ static int checkAvail(int ot, int avail) {
 		return DECKERROR_OCGONLY;
 	if((ot & AVAIL_TCG) && !(avail == AVAIL_TCG))
 		return DECKERROR_TCGONLY;
-	return DECKERROR_UNKNOWNCARD;
+	return DECKERROR_NOTAVAIL;
 }
 int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 	std::unordered_map<int, int> ccount;
