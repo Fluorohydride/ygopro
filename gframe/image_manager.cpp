@@ -489,8 +489,8 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 		if(timestamp_id != source_timestamp_id.load())
 			return fail;
 		const auto file = gImageDownloader->GetDownloadPath(code, type);
-		if((img = LoadImg(driver->createImageFromFile({ file.data(), (irr::u32)file.size() }))) != nullptr)
-			return std::make_pair(img, file);
+		if((img = LoadImg(driver->createImageFromFile({ file.data(), static_cast<irr::u32>(file.size()) }))) != nullptr)
+			return std::make_pair(img, epro::path_string{ file });
 		return fail;
 	} else if(status == ImageDownloader::downloadStatus::NONE) {
 		for(auto& path : (type == imgType::ART) ? mainGame->pic_dirs : mainGame->cover_dirs) {
@@ -511,7 +511,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 					archiveFile->drop();
 				} else {
 					file = fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension);
-					base_img = driver->createImageFromFile({ file.data(), (irr::u32)file.size() });
+					base_img = driver->createImageFromFile({ file.data(), static_cast<irr::u32>(file.size()) });
 				}
 				if((img = LoadImg(base_img)) != nullptr)
 					return std::make_pair(img, file);
@@ -610,7 +610,7 @@ irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 	if(status != ImageDownloader::downloadStatus::NONE) {
 		if(status == ImageDownloader::downloadStatus::DOWNLOADED) {
 			const auto path = gImageDownloader->GetDownloadPath(code, imgType::FIELD);
-			auto downloaded = driver->getTexture({ path.data(), (irr::u32)path.size() });
+			auto downloaded = driver->getTexture({ path.data(), static_cast<irr::u32>(path.size()) });
 			tFields.emplace(code, downloaded);
 			return downloaded;
 		}

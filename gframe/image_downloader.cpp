@@ -201,7 +201,7 @@ ImageDownloader::downloadStatus ImageDownloader::GetDownloadStatus(uint32_t code
 		return downloadStatus::NONE;
 	return it->second.status;
 }
-epro::path_string ImageDownloader::GetDownloadPath(uint32_t code, imgType type) {
+epro::path_stringview ImageDownloader::GetDownloadPath(uint32_t code, imgType type) {
 	if(type == imgType::THUMB)
 		type = imgType::ART;
 	std::lock_guard<std::mutex> lk(pic_download);
