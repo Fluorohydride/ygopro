@@ -826,10 +826,9 @@ irr::video::ITexture* ImageManager::guiScalingResizeCached(irr::video::ITexture*
 						 srcrect.getHeight(),
 						 destrect.getWidth(),
 						 destrect.getHeight());
-	irr::io::path scalename{ scale_name.data(), (irr::u32)scale_name.size() };
 
 	// Search for existing scaled texture.
-	irr::video::ITexture* scaled = g_txrCache[scalename];
+	irr::video::ITexture*& scaled = g_txrCache[scale_name];
 	if(scaled)
 		return scaled;
 
@@ -865,9 +864,8 @@ irr::video::ITexture* ImageManager::guiScalingResizeCached(irr::video::ITexture*
 #endif
 
 	// Convert the scaled image back into a texture.
-	scaled = driver->addTexture(scalename, destimg);
+	scaled = driver->addTexture({ scale_name.data(), static_cast<irr::u32>(scale_name.size()) }, destimg);
 	destimg->drop();
-	g_txrCache[scalename] = scaled;
 
 	return scaled;
 }

@@ -108,11 +108,11 @@ private:
 	epro::path_string textures_path;
 	std::pair<std::atomic<irr::s32>, std::atomic<irr::s32>> sizes[3];
 	std::atomic<chrono_time> timestamp_id;
-	std::map<irr::io::path, irr::video::ITexture*> g_txrCache;
-	std::map<irr::io::path, irr::video::IImage*> g_imgCache;
 	std::mutex obj_clear_lock;
 	std::thread obj_clear_thread;
 	std::condition_variable cv;
+	std::map<epro::path_string, irr::video::ITexture*> g_txrCache;
+	std::map<irr::io::path, irr::video::IImage*> g_imgCache; //ITexture->getName returns a io::path
 	loading_map loading_pics[4];
 	std::deque<std::pair<loading_map::key_type, loading_map::mapped_type>> to_clear;
 	std::atomic<bool> stop_threads;
