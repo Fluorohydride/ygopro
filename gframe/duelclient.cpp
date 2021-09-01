@@ -1,17 +1,17 @@
 #include <algorithm>
 #include <fmt/printf.h>
 #include <fmt/chrono.h>
-#if !defined(_WIN32) && !defined(__ANDROID__)
+#if defined(_WIN32)
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h>
+#include <unistd.h>
+#if !defined(__ANDROID__)
 #include <sys/types.h>
 #include <signal.h>
 #include <ifaddrs.h>
 #include <net/if.h>
 #endif
-#ifndef _WIN32
-#include <arpa/inet.h>
-#include <unistd.h>
-#else
-#include <ws2tcpip.h>
 #endif
 #include "game_config.h"
 #include <irrlicht.h>
