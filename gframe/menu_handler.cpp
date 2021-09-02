@@ -280,6 +280,42 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->ShowElement(mainGame->wMainMenu);
 				break;
 			}
+			case BUTTON_EXPORT_DECK: {
+				if(mainGame->lstReplayList->getSelected() == -1)
+					break;
+				Replay replay;
+				wchar_t ex_filename[256];
+				wchar_t namebuf[4][20];
+				wchar_t filename[256];
+				myswprintf(ex_filename, L"%ls", mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected()));
+				if(!replay.OpenReplay(ex_filename))
+					break;
+				const ReplayHeader& rh = replay.pheader;
+				if(rh.flag & REPLAY_SINGLE_MODE)
+					break;
+				int max = (rh.flag & REPLAY_TAG) ? 4 : 2;
+				//player name
+				for(int i = 0; i < max; ++i)
+					replay.ReadName(namebuf[i]);
+				//skip pre infos
+				for(int i = 0; i < 4; ++i)
+					replay.ReadInt32();
+				//deck
+				for(int i = 0; i < max; ++i) {
+					int main = replay.ReadInt32();
+					Deck tmp_deck;
+					for(int j = 0; j < main; ++j)
+						tmp_deck.main.push_back(dataManager.GetCodePointer(replay.ReadInt32()));
+					int extra = replay.ReadInt32();
+					for(int j = 0; j < extra; ++j)
+						tmp_deck.extra.push_back(dataManager.GetCodePointer(replay.ReadInt32()));
+					myswprintf(filename, L"%ls %ls", ex_filename, namebuf[i]);
+					deckManager.SaveDeck(tmp_deck, filename);
+				}
+				mainGame->stACMessage->setText(dataManager.GetSysString(1335));
+				mainGame->PopupElement(mainGame->wACMessage, 20);
+				break;
+			}
 			case BUTTON_BOT_START: {
 				int sel = mainGame->lstBotList->getSelected();
 				if(sel == -1)

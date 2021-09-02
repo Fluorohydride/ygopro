@@ -219,11 +219,30 @@ bool Game::Initialize() {
 	cbHostLFlist->setSelected(gameConf.use_lflist ? gameConf.default_lflist : cbHostLFlist->getItemCount() - 1);
 	env->addStaticText(dataManager.GetSysString(1225), rect<s32>(20, 60, 220, 80), false, false, wCreateHost);
 	cbRule = env->addComboBox(rect<s32>(140, 55, 300, 80), wCreateHost);
-	cbRule->addItem(dataManager.GetSysString(1240));
-	cbRule->addItem(dataManager.GetSysString(1241));
-	cbRule->addItem(dataManager.GetSysString(1242));
-	cbRule->addItem(dataManager.GetSysString(1243));
-	cbRule->setSelected(gameConf.defaultOT - 1);
+	cbRule->setMaxSelectionRows(10);
+	cbRule->addItem(dataManager.GetSysString(1481));
+	cbRule->addItem(dataManager.GetSysString(1482));
+	cbRule->addItem(dataManager.GetSysString(1483));
+	cbRule->addItem(dataManager.GetSysString(1484));
+	cbRule->addItem(dataManager.GetSysString(1485));
+	cbRule->addItem(dataManager.GetSysString(1486));
+	switch(gameConf.defaultOT) {
+	case 1:
+		cbRule->setSelected(0);
+		break;
+	case 2:
+		cbRule->setSelected(1);
+		break;
+	case 4:
+		cbRule->setSelected(3);
+		break;
+	case 8:
+		cbRule->setSelected(2);
+		break;
+	default:
+		cbRule->setSelected(5);
+		break;
+	}	
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
@@ -696,14 +715,15 @@ bool Game::Initialize() {
 	stLimit = env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 2 + 25 / 6, 280, 22 + 25 / 6), false, false, wFilter);
 	cbLimit = env->addComboBox(rect<s32>(260, 25 / 6, 390, 20 + 25 / 6), wFilter, COMBOBOX_LIMIT);
 	cbLimit->setMaxSelectionRows(10);
-	cbLimit->addItem(dataManager.GetSysString(1310));
+	cbLimit->addItem(dataManager.GetSysString(1486));
 	cbLimit->addItem(dataManager.GetSysString(1316));
 	cbLimit->addItem(dataManager.GetSysString(1317));
 	cbLimit->addItem(dataManager.GetSysString(1318));
-	cbLimit->addItem(dataManager.GetSysString(1240));
-	cbLimit->addItem(dataManager.GetSysString(1241));
-	cbLimit->addItem(dataManager.GetSysString(1242));
-	cbLimit->addItem(dataManager.GetSysString(1243));
+	cbLimit->addItem(dataManager.GetSysString(1481));
+	cbLimit->addItem(dataManager.GetSysString(1482));
+	cbLimit->addItem(dataManager.GetSysString(1483));
+	cbLimit->addItem(dataManager.GetSysString(1484));
+	cbLimit->addItem(dataManager.GetSysString(1485));
 	stAttribute = env->addStaticText(dataManager.GetSysString(1319), rect<s32>(10, 22 + 50 / 6, 70, 42 + 50 / 6), false, false, wFilter);
 	cbAttribute = env->addComboBox(rect<s32>(60, 20 + 50 / 6, 190, 40 + 50 / 6), wFilter, COMBOBOX_ATTRIBUTE);
 	cbAttribute->setMaxSelectionRows(10);
@@ -781,8 +801,9 @@ bool Game::Initialize() {
 	btnDeleteReplay = env->addButton(rect<s32>(360, 355, 460, 380), wReplay, BUTTON_DELETE_REPLAY, dataManager.GetSysString(1361));
 	btnRenameReplay = env->addButton(rect<s32>(360, 385, 460, 410), wReplay, BUTTON_RENAME_REPLAY, dataManager.GetSysString(1362));
 	btnReplayCancel = env->addButton(rect<s32>(470, 385, 570, 410), wReplay, BUTTON_CANCEL_REPLAY, dataManager.GetSysString(1347));
+	btnExportDeck = env->addButton(rect<s32>(470, 325, 570, 350), wReplay, BUTTON_EXPORT_DECK, dataManager.GetSysString(1369));
 	env->addStaticText(dataManager.GetSysString(1349), rect<s32>(360, 30, 570, 50), false, true, wReplay);
-	stReplayInfo = env->addStaticText(L"", rect<s32>(360, 60, 570, 350), false, true, wReplay);
+	stReplayInfo = env->addStaticText(L"", rect<s32>(360, 60, 570, 320), false, true, wReplay);
 	env->addStaticText(dataManager.GetSysString(1353), rect<s32>(360, 275, 570, 295), false, true, wReplay);
 	ebRepStartTurn = env->addEditBox(L"", rect<s32>(360, 300, 460, 320), true, wReplay, -1);
 	ebRepStartTurn->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);

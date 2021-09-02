@@ -71,7 +71,16 @@ const std::unordered_map<int, int>* DeckManager::GetLFListContent(int lfhash) {
 		return &lit->content;
 	return nullptr;
 }
-int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg) {
+static int checkAvail(int ot, int avail) {
+	if((ot & avail) == avail)
+		return 0;
+	if((ot & AVAIL_OCG) && !(avail == AVAIL_OCG))
+		return DECKERROR_OCGONLY;
+	if((ot & AVAIL_TCG) && !(avail == AVAIL_TCG))
+		return DECKERROR_TCGONLY;
+	return DECKERROR_NOTAVAIL;
+}
+int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 	std::unordered_map<int, int> ccount;
 	auto list = GetLFListContent(lfhash);
 	if(!list)
@@ -83,13 +92,13 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 		return (DECKERROR_EXTRACOUNT << 28) + deck.extra.size();
 	if(deck.side.size() > 15)
 		return (DECKERROR_SIDECOUNT << 28) + deck.side.size();
-
+	const int rule_map[6] = { AVAIL_OCG, AVAIL_TCG, AVAIL_SC, AVAIL_CUSTOM, AVAIL_OCGTCG, 0 };
+	int avail = rule_map[rule];
 	for(size_t i = 0; i < deck.main.size(); ++i) {
 		code_pointer cit = deck.main[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
+		int gameruleDeckError = checkAvail(cit->second.ot, avail);
+		if(gameruleDeckError)
+			return (gameruleDeckError << 28) + cit->first;
 		if(cit->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_TOKEN | TYPE_LINK))
 			return (DECKERROR_EXTRACOUNT << 28);
 		int code = cit->second.alias ? cit->second.alias : cit->first;
@@ -103,10 +112,9 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 	}
 	for(size_t i = 0; i < deck.extra.size(); ++i) {
 		code_pointer cit = deck.extra[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
+		int gameruleDeckError = checkAvail(cit->second.ot, avail);
+		if(gameruleDeckError)
+			return (gameruleDeckError << 28) + cit->first;
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];
@@ -118,10 +126,9 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 	}
 	for(size_t i = 0; i < deck.side.size(); ++i) {
 		code_pointer cit = deck.side[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
+		int gameruleDeckError = checkAvail(cit->second.ot, avail);
+		if(gameruleDeckError)
+			return (gameruleDeckError << 28) + cit->first;
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];
