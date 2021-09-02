@@ -79,7 +79,7 @@ int DeckManager::IsGameRuleDisallowed(unsigned char hostInfoRule, unsigned int c
 			return DECKERROR_OCGONLY;
 		if(!allow_tcg && ((cardOt & 0x3) == 0x2))
 			return DECKERROR_TCGONLY;
-	} else if(!(cardOt & 0x8) && (cardOt & 0x3)) { // in CCG duels, cards labeled with ither OCG or TCG, but not CCG, would not be allowed.
+	} else if((cardOt & 0x8) && (cardOt & 0x3)) { // in CCG duels, cards labeled with ither OCG or TCG, but not CCG, would not be allowed.
 		if((cardOt & 0x3) == 0x2) {
 			return DECKERROR_TCGONLY;
 		} else {
