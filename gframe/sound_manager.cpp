@@ -1,7 +1,4 @@
 #include "sound_manager.h"
-#ifndef _WIN32
-#include <dirent.h>
-#endif
 #ifdef IRRKLANG_STATIC
 #include "../ikpmp3/ikpMP3.h"
 #endif
@@ -30,56 +27,29 @@ bool SoundManager::Init() {
 }
 void SoundManager::RefreshBGMList() {
 	RefershBGMDir(L"", BGM_DUEL);
-	RefershBGMDir(L"duel/", BGM_DUEL);
-	RefershBGMDir(L"menu/", BGM_MENU);
-	RefershBGMDir(L"deck/", BGM_DECK);
-	RefershBGMDir(L"advantage/", BGM_ADVANTAGE);
-	RefershBGMDir(L"disadvantage/", BGM_DISADVANTAGE);
-	RefershBGMDir(L"win/", BGM_WIN);
-	RefershBGMDir(L"lose/", BGM_LOSE);
+	RefershBGMDir(L"duel", BGM_DUEL);
+	RefershBGMDir(L"menu", BGM_MENU);
+	RefershBGMDir(L"deck", BGM_DECK);
+	RefershBGMDir(L"advantage", BGM_ADVANTAGE);
+	RefershBGMDir(L"disadvantage", BGM_DISADVANTAGE);
+	RefershBGMDir(L"win", BGM_WIN);
+	RefershBGMDir(L"lose", BGM_LOSE);
 }
 void SoundManager::RefershBGMDir(std::wstring path, int scene) {
-#ifdef _WIN32
-	WIN32_FIND_DATAW fdataw;
-	std::wstring search = L"./sound/BGM/" + path + L"*.*";
-	HANDLE fh = FindFirstFileW(search.c_str(), &fdataw);
-	if(fh == INVALID_HANDLE_VALUE)
-		return;
-	do {
-		size_t len = wcslen(fdataw.cFileName);
-		if((fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || len < 5
-			|| !(_wcsicmp(fdataw.cFileName + len - 4, L".mp3") == 0 || _wcsicmp(fdataw.cFileName + len - 4, L".ogg") == 0))
-			continue;
-		std::wstring filename = path + (std::wstring)fdataw.cFileName;
-		BGMList[BGM_ALL].push_back(filename);
-		BGMList[scene].push_back(filename);
-	} while(FindNextFileW(fh, &fdataw));
-	FindClose(fh);
-#else
-	DIR * dir;
-	struct dirent * dirp;
-	std::wstring wsearchpath = L"./sound/BGM/" + path;
-	char searchpath[256];
-	BufferIO::EncodeUTF8(wsearchpath.c_str(), searchpath);
-	if((dir = opendir(searchpath)) == NULL)
-		return;
-	while((dirp = readdir(dir)) != NULL) {
-		size_t len = strlen(dirp->d_name);
-		if(len < 5 || !(strcasecmp(dirp->d_name + len - 4, ".mp3") == 0 || strcasecmp(dirp->d_name + len - 4, ".ogg")))
-			continue;
-		wchar_t wname[256];
-		BufferIO::DecodeUTF8(dirp->d_name, wname);
-		std::wstring filename = path + (std::wstring)wname;
-		BGMList[BGM_ALL].push_back(filename);
-		BGMList[scene].push_back(filename);
-	}
-	closedir(dir);
-#endif
+	std::wstring search = L"./sound/BGM/" + path;
+	FileSystem::TraversalDir(search.c_str(), [this, &path, scene](const wchar_t* name, bool isdir) {
+		if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".mp3", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ogg", 4))) {
+			std::wstring filename = path + L"/" + name;
+			BGMList[BGM_ALL].push_back(filename);
+			BGMList[scene].push_back(filename);
+		}
+	});
 }
 void SoundManager::PlaySoundEffect(int sound) {
 #ifdef YGOPRO_USE_IRRKLANG
 	if(!mainGame->chkEnableSound->isChecked())
 		return;
+	engineSound->setSoundVolume(mainGame->gameConf.sound_volume);
 	switch(sound) {
 	case SOUND_SUMMON: {
 		engineSound->play2D("./sound/summon.wav");
@@ -204,13 +174,14 @@ void SoundManager::PlaySoundEffect(int sound) {
 	default:
 		break;
 	}
-	engineSound->setSoundVolume(mainGame->gameConf.sound_volume);
 #endif
 }
 void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 	if(element == mainGame->wMessage) {
 		PlaySoundEffect(SOUND_INFO);
 	} else if(element == mainGame->wQuery) {
+		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wSurrender) {
 		PlaySoundEffect(SOUND_QUESTION);
 	} else if(element == mainGame->wOptions) {
 		PlaySoundEffect(SOUND_QUESTION);
@@ -224,6 +195,8 @@ void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 		PlaySoundEffect(SOUND_QUESTION);
 	} else if(element == mainGame->wReplaySave) {
 		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wFTSelect) {
+		PlaySoundEffect(SOUND_QUESTION);
 	}
 }
 void SoundManager::PlayMusic(char* song, bool loop) {
@@ -232,8 +205,8 @@ void SoundManager::PlayMusic(char* song, bool loop) {
 		return;
 	if(!engineMusic->isCurrentlyPlaying(song)) {
 		engineMusic->stopAllSounds();
-		soundBGM = engineMusic->play2D(song, loop, false, true);
 		engineMusic->setSoundVolume(mainGame->gameConf.music_volume);
+		soundBGM = engineMusic->play2D(song, loop, false, true);
 	}
 #endif
 }

@@ -23,11 +23,11 @@ solution "ygo"
 
     configuration "vs*"
         flags "EnableSSE2"
-        buildoptions { "-wd4996" }
+        buildoptions { "-wd4996", "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
 
     configuration "not vs*"
-        buildoptions { "-fno-strict-aliasing", "-Wno-multichar" }
+        buildoptions { "-fno-strict-aliasing", "-Wno-format-security" }
     configuration {"not vs*", "windows"}
         buildoptions { "-static-libgcc" }
 
@@ -41,9 +41,6 @@ solution "ygo"
         defines "NDEBUG"
         buildoptions "-march=native"
 
-    configuration { "Debug", "vs*" }
-        defines { "_ITERATOR_DEBUG_LEVEL=0" }
-
     configuration "Release"
         flags { "OptimizeSpeed" }
         targetdir "bin/release"
@@ -51,9 +48,9 @@ solution "ygo"
     include "ocgcore"
     include "gframe"
     if os.is("windows") then
+    include "lua"
     include "event"
     include "freetype"
     include "irrlicht"
-    include "lua"
     include "sqlite3"
     end

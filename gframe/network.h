@@ -114,7 +114,7 @@ struct DuelPlayer {
 
 class DuelMode {
 public:
-	DuelMode(): host_player(0), pduel(0) {}
+	DuelMode(): host_player(0), pduel(0), duel_stage(0) {}
 	virtual ~DuelMode() {}
 	virtual void Chat(DuelPlayer* dp, void* pdata, int len) {}
 	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {}
@@ -123,7 +123,7 @@ public:
 	virtual void ToObserver(DuelPlayer* dp) {}
 	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) {}
 	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) {}
-	virtual void UpdateDeck(DuelPlayer* dp, void* pdata) {}
+	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {}
 	virtual void StartDuel(DuelPlayer* dp) {}
 	virtual void HandResult(DuelPlayer* dp, unsigned char res) {}
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {}
@@ -140,6 +140,7 @@ public:
 	event* etimer;
 	DuelPlayer* host_player;
 	HostInfo host_info;
+	int duel_stage;
 	unsigned long pduel;
 	wchar_t name[20];
 	wchar_t pass[20];
@@ -184,6 +185,7 @@ public:
 #define STOC_TP_RESULT		0x6
 #define STOC_CHANGE_SIDE	0x7
 #define STOC_WAITING_SIDE	0x8
+#define STOC_DECK_COUNT		0x9
 #define STOC_CREATE_GAME	0x11
 #define STOC_JOIN_GAME		0x12
 #define STOC_TYPE_CHANGE	0x13
@@ -219,4 +221,11 @@ public:
 #define MODE_SINGLE		0x0
 #define MODE_MATCH		0x1
 #define MODE_TAG		0x2
+
+#define DUEL_STAGE_BEGIN		0
+#define DUEL_STAGE_FINGER		1
+#define DUEL_STAGE_FIRSTGO		2
+#define DUEL_STAGE_DUELING		3
+#define DUEL_STAGE_SIDING		4
+#define DUEL_STAGE_END			5
 #endif //NETWORK_H

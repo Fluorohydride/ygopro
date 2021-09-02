@@ -42,6 +42,7 @@ public:
 	std::vector<ClientCard*> conti_cards;
 	std::vector<std::pair<int,int>> activatable_descs;
 	std::vector<int> select_options;
+	std::vector<int> select_options_index;
 	std::vector<ChainInfo> chains;
 	int extra_p_count[2];
 
@@ -60,14 +61,13 @@ public:
 	bool select_panalmode;
 	bool select_ready;
 	int announce_count;
-	int declarable_type;
 	int select_counter_count;
 	int select_counter_type;
 	std::vector<ClientCard*> selectable_cards;
 	std::vector<ClientCard*> selected_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
-	std::vector<int> opcode;
+	std::vector<int> declare_opcodes;
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
@@ -82,6 +82,7 @@ public:
 	bool last_chain;
 	bool deck_reversed;
 	bool conti_selecting;
+	bool cant_check_grave;
 
 	ClientField();
 	void Clear();
@@ -107,14 +108,16 @@ public:
 	void FadeCard(ClientCard* pcard, int alpha, int frame);
 	bool ShowSelectSum(bool panelmode);
 	bool CheckSelectSum();
+	bool CheckSelectTribute();
 	bool check_min(const std::set<ClientCard*>& left, std::set<ClientCard*>::const_iterator index, int min, int max);
 	bool check_sel_sum_s(const std::set<ClientCard*>& left, int index, int acc);
 	void check_sel_sum_t(const std::set<ClientCard*>& left, int acc);
 	bool check_sum(std::set<ClientCard*>::const_iterator index, std::set<ClientCard*>::const_iterator end, int acc, int count);
+	bool check_sel_sum_trib_s(const std::set<ClientCard*>& left, int index, int acc);
+	void check_sel_sum_trib_t(const std::set<ClientCard*>& left, int acc);
+	bool check_sum_trib(std::set<ClientCard*>::const_iterator index, std::set<ClientCard*>::const_iterator end, int acc);
 
-	void UpdateDeclarableCodeType(bool enter);
-	void UpdateDeclarableCodeOpcode(bool enter);
-	void UpdateDeclarableCode(bool enter);
+	void UpdateDeclarableList();
 
 	irr::gui::IGUIElement* panel;
 	std::vector<int> ancard;
@@ -129,6 +132,7 @@ public:
 	ClientCard* clicked_card;
 	ClientCard* command_card;
 	ClientCard* highlighting_card;
+	ClientCard* menu_card;
 	int list_command;
 
 	virtual bool OnEvent(const irr::SEvent& event);
@@ -138,6 +142,7 @@ public:
 	void UpdateChainButtons();
 	void ShowCancelOrFinishButton(int buttonOp);
 	void SetShowMark(ClientCard* pcard, bool enable);
+	void ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* element, irr::gui::IGUIElement* parent);
 	void SetResponseSelectedCards() const;
 	void SetResponseSelectedOption() const;
 	void CancelOrFinish();
@@ -148,5 +153,6 @@ public:
 //special cards
 #define CARD_MARINE_DOLPHIN	78734254
 #define CARD_TWINKLE_MOSS	13857930
+#define CARD_QUESTION		38723936
 
 #endif //CLIENT_FIELD_H
