@@ -369,6 +369,7 @@ public:
 	irr::gui::IGUIButton* btnDeleteReplay;
 	irr::gui::IGUIButton* btnRenameReplay;
 	irr::gui::IGUIButton* btnReplayCancel;
+	irr::gui::IGUIButton* btnExportDeck;
 	irr::gui::IGUIEditBox* ebRepStartTurn;
 	//single play
 	irr::gui::IGUIWindow* wSinglePlay;
@@ -633,6 +634,7 @@ extern Game* mainGame;
 #define BUTTON_CANCEL_REPLAY		132
 #define BUTTON_DELETE_REPLAY		133
 #define BUTTON_RENAME_REPLAY		134
+#define BUTTON_EXPORT_DECK			135
 #define BUTTON_REPLAY_START			140
 #define BUTTON_REPLAY_PAUSE			141
 #define BUTTON_REPLAY_STEP			142
