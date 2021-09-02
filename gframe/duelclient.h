@@ -36,7 +36,7 @@ private:
 	static char last_successful_msg[0x2000];
 	static unsigned int last_successful_msg_length;
 	static wchar_t event_string[256];
-	static mtrandom rnd;
+	static mt19937 rnd;
 public:
 	static bool StartClient(unsigned int ip, unsigned short port, bool create_game = true);
 	static void ConnectTimeout(evutil_socket_t fd, short events, void* arg);
