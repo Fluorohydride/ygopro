@@ -1448,15 +1448,13 @@ void DeckBuilder::FilterCards() {
 		if(filter_lm) {
 			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList).at(ptr->first) != filter_lm - 1))
 				continue;
-			if(filter_lm == 4 && (data.ot & 0x3) != 1)
+			if(filter_lm == 4 && data.ot != 1)
 				continue;
-			if(filter_lm == 5 && (data.ot & 0x3) != 2)
+			if(filter_lm == 5 && data.ot != 2)
 				continue;
-			if(filter_lm == 6 && (data.ot & 0x3) != 3)
+			if(filter_lm == 6 && data.ot != 3)
 				continue;
 			if(filter_lm == 7 && data.ot != 4)
-				continue;
-			if(filter_lm == 8 && !(data.ot & 0x8))
 				continue;
 		}
 		bool is_target = true;
