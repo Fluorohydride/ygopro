@@ -192,11 +192,30 @@ bool Game::Initialize() {
 	cbHostLFlist->setSelected(gameConf.use_lflist ? gameConf.default_lflist : cbHostLFlist->getItemCount() - 1);
 	env->addStaticText(dataManager.GetSysString(1225), rect<s32>(20, 60, 220, 80), false, false, wCreateHost);
 	cbRule = env->addComboBox(rect<s32>(140, 55, 300, 80), wCreateHost);
-	cbRule->addItem(dataManager.GetSysString(1240));
-	cbRule->addItem(dataManager.GetSysString(1241));
-	cbRule->addItem(dataManager.GetSysString(1242));
-	cbRule->addItem(dataManager.GetSysString(1243));
-	cbRule->setSelected(gameConf.defaultOT - 1);
+	cbRule->setMaxSelectionRows(10);
+	cbRule->addItem(dataManager.GetSysString(1481));
+	cbRule->addItem(dataManager.GetSysString(1482));
+	cbRule->addItem(dataManager.GetSysString(1483));
+	cbRule->addItem(dataManager.GetSysString(1484));
+	cbRule->addItem(dataManager.GetSysString(1485));
+	cbRule->addItem(dataManager.GetSysString(1486));
+	switch(gameConf.defaultOT) {
+	case 1:
+		cbRule->setSelected(0);
+		break;
+	case 2:
+		cbRule->setSelected(1);
+		break;
+	case 4:
+		cbRule->setSelected(3);
+		break;
+	case 8:
+		cbRule->setSelected(2);
+		break;
+	default:
+		cbRule->setSelected(5);
+		break;
+	}	
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
@@ -669,14 +688,15 @@ bool Game::Initialize() {
 	stLimit = env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 2 + 25 / 6, 280, 22 + 25 / 6), false, false, wFilter);
 	cbLimit = env->addComboBox(rect<s32>(260, 25 / 6, 390, 20 + 25 / 6), wFilter, COMBOBOX_LIMIT);
 	cbLimit->setMaxSelectionRows(10);
-	cbLimit->addItem(dataManager.GetSysString(1310));
+	cbLimit->addItem(dataManager.GetSysString(1486));
 	cbLimit->addItem(dataManager.GetSysString(1316));
 	cbLimit->addItem(dataManager.GetSysString(1317));
 	cbLimit->addItem(dataManager.GetSysString(1318));
-	cbLimit->addItem(dataManager.GetSysString(1240));
-	cbLimit->addItem(dataManager.GetSysString(1241));
-	cbLimit->addItem(dataManager.GetSysString(1242));
-	cbLimit->addItem(dataManager.GetSysString(1243));
+	cbLimit->addItem(dataManager.GetSysString(1481));
+	cbLimit->addItem(dataManager.GetSysString(1482));
+	cbLimit->addItem(dataManager.GetSysString(1483));
+	cbLimit->addItem(dataManager.GetSysString(1484));
+	cbLimit->addItem(dataManager.GetSysString(1485));
 	stAttribute = env->addStaticText(dataManager.GetSysString(1319), rect<s32>(10, 22 + 50 / 6, 70, 42 + 50 / 6), false, false, wFilter);
 	cbAttribute = env->addComboBox(rect<s32>(60, 20 + 50 / 6, 190, 40 + 50 / 6), wFilter, COMBOBOX_ATTRIBUTE);
 	cbAttribute->setMaxSelectionRows(10);

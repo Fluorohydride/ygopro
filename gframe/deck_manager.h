@@ -39,7 +39,7 @@ public:
 	void LoadLFList();
 	const wchar_t* GetLFListName(int lfhash);
 	const std::unordered_map<int, int>* GetLFListContent(int lfhash);
-	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg);
+	int CheckDeck(Deck& deck, int lfhash, int rule);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
