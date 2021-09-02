@@ -600,7 +600,7 @@ extern Game* mainGame;
 extern unsigned short aServerPort;
 extern unsigned short replay_mode;
 extern HostInfo game_info;
-extern time_t pre_seed[3];
+extern unsigned int pre_seed[3];
 #endif
 }
 

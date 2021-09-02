@@ -25,7 +25,7 @@ Game* mainGame;
 #ifdef YGOPRO_SERVER_MODE
 unsigned short aServerPort;
 unsigned short replay_mode;
-time_t pre_seed[3];
+unsigned int pre_seed[3];
 HostInfo game_info;
 
 void Game::MainServerLoop() {
@@ -86,7 +86,6 @@ bool Game::Initialize() {
 		return false;
 	}
 	dataManager.FileSystem = device->getFileSystem();
-	LoadExpansions();
 	if(!dataManager.LoadDB(L"cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");
 		return false;
@@ -95,7 +94,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load strings!");
 		return false;
 	}
-	dataManager.LoadStrings("./expansions/strings.conf");
+	LoadExpansions();
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	if(!numFont) {
@@ -747,7 +746,7 @@ bool Game::Initialize() {
 	int catewidth = 0;
 	for(int i = 0; i < 32; ++i) {
 		irr::core::dimension2d<unsigned int> dtxt = mainGame->guiFont->getDimension(dataManager.GetSysString(1100 + i));
-		if(dtxt.Width + 40 > catewidth)
+		if((int)dtxt.Width + 40 > catewidth)
 			catewidth = dtxt.Width + 40;
 	}
 	for(int i = 0; i < 32; ++i)
@@ -1098,17 +1097,20 @@ std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth,
 #endif //YGOPRO_SERVER_MODE
 void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
+		wchar_t fpath[1024];
+		myswprintf(fpath, L"./expansions/%ls", name);
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
-			wchar_t fpath[1024];
-			myswprintf(fpath, L"./expansions/%ls", name);
 			dataManager.LoadDB(fpath);
 		}
 #ifdef YGOPRO_SERVER_MODE
 	});
 #else
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".conf", 5)) {
+			char upath[1024];
+			BufferIO::EncodeUTF8(fpath, upath);
+			dataManager.LoadStrings(upath);
+		}
 		if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ypk", 4))) {
-			wchar_t fpath[1024];
-			myswprintf(fpath, L"./expansions/%ls", name);
 #ifdef _WIN32
 			dataManager.FileSystem->addFileArchive(fpath, true, false, EFAT_ZIP);
 #else
