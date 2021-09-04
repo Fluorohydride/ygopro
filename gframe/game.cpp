@@ -688,7 +688,7 @@ bool Game::Initialize() {
 	stLimit = env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 2 + 25 / 6, 280, 22 + 25 / 6), false, false, wFilter);
 	cbLimit = env->addComboBox(rect<s32>(260, 25 / 6, 390, 20 + 25 / 6), wFilter, COMBOBOX_LIMIT);
 	cbLimit->setMaxSelectionRows(10);
-	cbLimit->addItem(dataManager.GetSysString(1486));
+	cbLimit->addItem(dataManager.GetSysString(1310));
 	cbLimit->addItem(dataManager.GetSysString(1316));
 	cbLimit->addItem(dataManager.GetSysString(1317));
 	cbLimit->addItem(dataManager.GetSysString(1318));
