@@ -1533,6 +1533,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int c, l, s, ss;
 		unsigned int code;
 		bool panelmode = false;
+		int handcount = 0;
 		mainGame->dField.select_ready = false;
 		ClientCard* pcard;
 		for (int i = 0; i < count1; ++i) {
@@ -1553,6 +1554,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->is_selected = false;
 			if (l & 0xf1)
 				panelmode = true;
+			if(l & LOCATION_HAND) {
+				handcount++;
+				if(handcount >= 10)
+					panelmode = true;
+			}
 		}
 		int count2 = BufferIO::ReadInt8(pbuf);
 		for (int i = count1; i < count1 + count2; ++i) {
@@ -1573,6 +1579,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->is_selected = true;
 			if (l & 0xf1)
 				panelmode = true;
+			if(l & LOCATION_HAND) {
+				handcount++;
+				if(handcount >= 10)
+					panelmode = true;
+			}
 		}
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 		if(select_hint)
