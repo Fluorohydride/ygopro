@@ -2,6 +2,7 @@
 #define SOUNDMANAGER_H
 
 #include "game.h"
+#include "../ocgcore/mtrandom.h"
 #ifdef YGOPRO_USE_IRRKLANG
 #include <irrKlang.h>
 #endif
@@ -12,6 +13,7 @@ class SoundManager {
 private:
 	std::vector<std::wstring> BGMList[8];
 	int bgm_scene;
+	mt19937 rnd;
 #ifdef YGOPRO_USE_IRRKLANG
 	irrklang::ISoundEngine* engineSound;
 	irrklang::ISoundEngine* engineMusic;

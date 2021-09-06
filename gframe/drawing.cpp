@@ -1105,27 +1105,32 @@ void Game::DrawThumb(code_pointer cp, position2di pos, const std::unordered_map<
 			break;
 		}
 	}
+	bool showAvail = false;
+	bool showNotAvail = false;
 	int filter_lm = cbLimit->getSelected();
+	bool avail = !((filter_lm == 4 && !(cp->second.ot & AVAIL_OCG)
+				|| (filter_lm == 5 && !(cp->second.ot & AVAIL_TCG))
+				|| (filter_lm == 6 && !(cp->second.ot & AVAIL_SC))
+				|| (filter_lm == 7 && !(cp->second.ot & AVAIL_CUSTOM))
+				|| (filter_lm == 8 && (cp->second.ot & AVAIL_OCGTCG) != AVAIL_OCGTCG)));
 	if(filter_lm >= 4) {
-		bool avail = !((filter_lm == 4 && !(cp->second.ot & AVAIL_OCG)
-					|| (filter_lm == 5 && !(cp->second.ot & AVAIL_TCG))
-					|| (filter_lm == 6 && !(cp->second.ot & AVAIL_SC))
-					|| (filter_lm == 7 && !(cp->second.ot & AVAIL_CUSTOM))
-					|| (filter_lm == 8 && (cp->second.ot & AVAIL_OCGTCG) != AVAIL_OCGTCG)));
-		if(avail) {
-			if((cp->second.ot & AVAIL_OCG) && !(cp->second.ot & AVAIL_TCG))
-				driver->draw2DImage(imageManager.tOT, otloc, recti(0, 128, 128, 192), 0, 0, true);
-			else if((cp->second.ot & AVAIL_TCG) && !(cp->second.ot & AVAIL_OCG))
-				driver->draw2DImage(imageManager.tOT, otloc, recti(0, 192, 128, 256), 0, 0, true);
-		}
-		else {
-			if(cp->second.ot & AVAIL_OCG)
-				driver->draw2DImage(imageManager.tOT, otloc, recti(0, 0, 128, 64), 0, 0, true);
-			else if(cp->second.ot & AVAIL_TCG)
-				driver->draw2DImage(imageManager.tOT, otloc, recti(0, 64, 128, 128), 0, 0, true);
-			else
-				driver->draw2DImage(imageManager.tLim, otloc, recti(0, 0, 64, 64), 0, 0, true);
-		}
+		showAvail = avail;
+		showNotAvail = !avail;
+	} else if(!(cp->second.ot & gameConf.defaultOT)) {
+		showNotAvail = true;
+	}
+	if(showAvail) {
+		if((cp->second.ot & AVAIL_OCG) && !(cp->second.ot & AVAIL_TCG))
+			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 128, 128, 192), 0, 0, true);
+		else if((cp->second.ot & AVAIL_TCG) && !(cp->second.ot & AVAIL_OCG))
+			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 192, 128, 256), 0, 0, true);
+	} else if(showNotAvail) {
+		if(cp->second.ot & AVAIL_OCG)
+			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 0, 128, 64), 0, 0, true);
+		else if(cp->second.ot & AVAIL_TCG)
+			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 64, 128, 128), 0, 0, true);
+		else if(!avail)
+			driver->draw2DImage(imageManager.tLim, otloc, recti(0, 0, 64, 64), 0, 0, true);
 	}
 }
 void Game::DrawDeckBd() {
