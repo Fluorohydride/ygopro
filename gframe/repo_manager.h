@@ -89,12 +89,13 @@ private:
 	void CloneOrUpdateTask();
 	
 	// libgit2 Callbacks stuff
-	struct FetchCbPayload
+	struct GitCbPayload
 	{
 		RepoManager* rm;
 		const std::string& path;
 	};
 	static int FetchCb(const git_indexer_progress* stats, void* payload);
+	static void CheckoutCb(const char* path, size_t completed_steps, size_t total_steps, void* payload);
 };
 
 extern RepoManager* gRepoManager;

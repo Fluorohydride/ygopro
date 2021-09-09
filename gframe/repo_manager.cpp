@@ -11,6 +11,9 @@
 #include "libgit2.hpp"
 
 static constexpr int MAX_HISTORY_LENGTH = 100;
+static constexpr int FETCH_OBJECTS_PERCENTAGE = 60;
+static constexpr int DELTA_OBJECTS_PERCENTAGE = 80;
+static constexpr int CHECKOUT_PERCENTAGE = 99;
 
 namespace ygo {
 
@@ -255,7 +258,7 @@ void RepoManager::CloneOrUpdateTask() {
 			};
 			const std::string& url = _repo.url;
 			const std::string& path = _repo.repo_path;
-			FetchCbPayload payload{ this, path };
+			GitCbPayload payload{ this, path };
 			if(DoesRepoExist(path.data())) {
 				auto repo = Git::MakeUnique(git_repository_open_ext, path.data(),
 											GIT_REPOSITORY_OPEN_NO_SEARCH, nullptr);
@@ -270,12 +273,16 @@ void RepoManager::CloneOrUpdateTask() {
 						auto remote = Git::MakeUnique(git_remote_lookup, repo.get(), "origin");
 						Git::Check(git_remote_fetch(remote.get(), nullptr, &fetchOpts, nullptr));
 						QueryPartialHistory(repo.get(), walker.get());
+						SetRepoPercentage(path, DELTA_OBJECTS_PERCENTAGE);
 						// git reset --hard FETCH_HEAD
+						git_checkout_options checkoutOpts = GIT_CHECKOUT_OPTIONS_INIT;
+						checkoutOpts.progress_cb = RepoManager::CheckoutCb;
+						checkoutOpts.progress_payload = &payload;
 						git_oid oid;
 						Git::Check(git_reference_name_to_id(&oid, repo.get(), "FETCH_HEAD"));
 						auto commit = Git::MakeUnique(git_commit_lookup, repo.get(), &oid);
 						Git::Check(git_reset(repo.get(), reinterpret_cast<git_object*>(commit.get()),
-											 GIT_RESET_HARD, nullptr));
+											 GIT_RESET_HARD, &checkoutOpts));
 					}
 					catch(const std::exception& e) {
 						history.partial_history.clear();
@@ -296,6 +303,8 @@ void RepoManager::CloneOrUpdateTask() {
 				git_clone_options cloneOpts = GIT_CLONE_OPTIONS_INIT;
 				cloneOpts.fetch_opts.callbacks.transfer_progress = RepoManager::FetchCb;
 				cloneOpts.fetch_opts.callbacks.payload = &payload;
+				cloneOpts.checkout_opts.progress_cb = RepoManager::CheckoutCb;
+				cloneOpts.checkout_opts.progress_payload = &payload;
 				auto repo = Git::MakeUnique(git_clone, url.data(), path.data(), &cloneOpts);
 				auto walker = Git::MakeUnique(git_revwalk_new, repo.get());
 				git_revwalk_sorting(walker.get(), GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
@@ -316,15 +325,28 @@ void RepoManager::CloneOrUpdateTask() {
 int RepoManager::FetchCb(const git_indexer_progress* stats, void* payload) {
 	int percent;
 	if(stats->received_objects != stats->total_objects) {
-		percent = (75 * stats->received_objects) / stats->total_objects;
+		percent = (FETCH_OBJECTS_PERCENTAGE * stats->received_objects) / stats->total_objects;
 	} else if(stats->total_deltas == 0) {
-		percent = 75;
+		percent = FETCH_OBJECTS_PERCENTAGE;
 	} else {
-		percent = 75 + ((25 * stats->indexed_deltas) / stats->total_deltas);
+		static constexpr auto DELTA_INCREMENT = DELTA_OBJECTS_PERCENTAGE - FETCH_OBJECTS_PERCENTAGE;
+		percent = FETCH_OBJECTS_PERCENTAGE + ((DELTA_INCREMENT * stats->indexed_deltas) / stats->total_deltas);
 	}
-	auto pl = static_cast<FetchCbPayload*>(payload);
+	auto pl = static_cast<GitCbPayload*>(payload);
 	pl->rm->SetRepoPercentage(pl->path, percent);
 	return pl->rm->fetchReturnValue;
+}
+
+void RepoManager::CheckoutCb(const char* path, size_t completed_steps, size_t total_steps, void* payload) {
+	int percent;
+	if(total_steps == 0)
+		percent = CHECKOUT_PERCENTAGE;
+	else {
+		static constexpr auto DELTA_INCREMENT = CHECKOUT_PERCENTAGE - DELTA_OBJECTS_PERCENTAGE;
+		percent = DELTA_OBJECTS_PERCENTAGE + ((DELTA_INCREMENT * completed_steps) / total_steps);
+	}
+	auto pl = static_cast<GitCbPayload*>(payload);
+	pl->rm->SetRepoPercentage(pl->path, percent);
 }
 
 }
