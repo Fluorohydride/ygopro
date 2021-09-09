@@ -41,8 +41,8 @@ struct Payload {
 	const char* filename = nullptr;
 };
 
-int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownloaded, curl_off_t TotalToUpload, curl_off_t NowUploaded) {
-	Payload* payload = reinterpret_cast<Payload*>(ptr);
+static int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownloaded, curl_off_t TotalToUpload, curl_off_t NowUploaded) {
+	Payload* payload = static_cast<Payload*>(ptr);
 	if(payload && payload->callback) {
 		int percentage = 0;
 		if(TotalToDownload > 0.0) {
@@ -58,7 +58,7 @@ int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownl
 	return 0;
 }
 
-size_t WriteCallback(char *contents, size_t size, size_t nmemb, void *userp) {
+static size_t WriteCallback(char *contents, size_t size, size_t nmemb, void *userp) {
 	size_t realsize = size * nmemb;
 	auto payload = static_cast<WritePayload*>(userp);
 	auto buff = payload->outbuffer;
@@ -74,7 +74,7 @@ size_t WriteCallback(char *contents, size_t size, size_t nmemb, void *userp) {
 	return realsize;
 }
 
-CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
+static CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 	char curl_error_buffer[CURL_ERROR_SIZE];
 	CURL* curl_handle = curl_easy_init();
 	curl_easy_setopt(curl_handle, CURLOPT_ERRORBUFFER, curl_error_buffer);
@@ -135,7 +135,7 @@ static void Reboot() {
 	exit(0);
 }
 
-bool CheckMd5(std::fstream& instream, uint8_t md5[MD5_DIGEST_LENGTH]) {
+static bool CheckMd5(std::fstream& instream, uint8_t md5[MD5_DIGEST_LENGTH]) {
 	MD5_CTX context{};
 	MD5_Init(&context);
 	std::array<char, 512> buff;
