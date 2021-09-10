@@ -399,7 +399,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_DECK_EDIT: {
 				mainGame->RefreshCategoryDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
-				if(open_file && deckManager.LoadDeck(open_file_name)) {
+				if(open_file && deckManager.LoadDeck(open_file_name_with_category)) {
 #ifdef WIN32
 					wchar_t *dash = wcsrchr(open_file_name, L'\\');
 #else
