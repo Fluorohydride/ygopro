@@ -2,6 +2,9 @@
 #define TEXT_TYPES_H_
 #include <string>
 #include <fmt/core.h>
+#if FMT_VERSION >= 80000
+#include <fmt/xchar.h>
+#endif
 #include "nonstd/string_view.hpp"
 namespace nonstd {
 namespace sv_lite {
