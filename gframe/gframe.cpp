@@ -11,6 +11,7 @@ int enable_log = 0;
 bool exit_on_return = false;
 bool open_file = false;
 wchar_t open_file_name[256] = L"";
+wchar_t open_file_name_with_category[256] = L"";
 bool bot_mode = false;
 
 void ClickButton(irr::gui::IGUIElement* btn) {
@@ -75,6 +76,7 @@ int main(int argc, char* argv[]) {
 #endif //_WIN32
 
 	bool keep_on_return = false;
+	bool deckCategorySpecified = false;
 	for(int i = 1; i < wargc; ++i) {
 		if(wargv[i][0] == L'-' && wargv[i][1] == L'e' && wargv[i][2] != L'\0') {
 			ygo::dataManager.LoadDB(&wargv[i][2]);
@@ -109,9 +111,16 @@ int main(int argc, char* argv[]) {
 		} else if(!wcscmp(wargv[i], L"-k")) { // Keep on return
 			exit_on_return = false;
 			keep_on_return = true;
+		} else if(!wcscmp(wargv[i], L"--deck-category")) {
+			++i;
+			if(i < wargc) {
+				deckCategorySpecified = true;
+				wcscpy(ygo::mainGame->gameConf.lastcategory, wargv[i]);
+			}
 		} else if(!wcscmp(wargv[i], L"-d")) { // Deck
 			++i;
-			ygo::mainGame->gameConf.lastcategory[0] = 0;
+			if(!deckCategorySpecified)
+				ygo::mainGame->gameConf.lastcategory[0] = 0;
 			if(i + 1 < wargc) { // select deck
 				wcscpy(ygo::mainGame->gameConf.lastdeck, wargv[i]);
 				continue;
@@ -120,6 +129,11 @@ int main(int argc, char* argv[]) {
 				if(i < wargc) {
 					open_file = true;
 					wcscpy(open_file_name, wargv[i]);
+					if(deckCategorySpecified && wcslen(ygo::mainGame->gameConf.lastcategory)) {
+						swprintf(open_file_name_with_category, 256, L"%ls/%ls", ygo::mainGame->gameConf.lastcategory, open_file_name);
+					} else {
+						wcscpy(open_file_name_with_category, open_file_name);
+					}
 				}
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
