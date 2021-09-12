@@ -1468,7 +1468,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int c, l, s, ss;
 		unsigned int code;
 		bool panelmode = false;
-		int hand_count[2] = { mainGame->dField.hand[0].size(), mainGame->dField.hand[1].size() };
+		size_t hand_count[2] = { mainGame->dField.hand[0].size(), mainGame->dField.hand[1].size() };
 		int select_count_in_hand[2] = { 0, 0 };
 		bool select_ready = mainGame->dField.select_min == 0;
 		mainGame->dField.select_ready = select_ready;
@@ -1533,7 +1533,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int c, l, s, ss;
 		unsigned int code;
 		bool panelmode = false;
-		int hand_count[2] = { mainGame->dField.hand[0].size(), mainGame->dField.hand[1].size() };
+		size_t hand_count[2] = { mainGame->dField.hand[0].size(), mainGame->dField.hand[1].size() };
 		int select_count_in_hand[2] = { 0, 0 };
 		mainGame->dField.select_ready = false;
 		ClientCard* pcard;
