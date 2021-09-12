@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
 				if(i < wargc) {
 					open_file = true;
 					wcscpy(open_file_name, wargv[i]);
-					if(deckCategorySpecified) {
+					if(deckCategorySpecified && wcslen(ygo::mainGame->gameConf.lastcategory)) {
 						swprintf(open_file_name_with_category, 256, L"%ls/%ls", ygo::mainGame->gameConf.lastcategory, open_file_name);
 					} else {
 						wcscpy(open_file_name_with_category, open_file_name);
