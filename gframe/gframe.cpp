@@ -190,19 +190,17 @@ inline void ThreadsCleanup() {
 //where it can't properly deduce the destructors of its members
 //https://reviews.llvm.org/D45898
 //https://bugs.llvm.org/show_bug.cgi?id=28280
-//add a workaround to construct the game object manually still on the stack by using
-//a buffer and using in place new
+//add a workaround to construct the game object indirectly
+//to avoid constructing it with brace initialization
 #if defined(__clang_major__) && __clang_major__ <= 10
-class StackGame {
-	std::aligned_storage_t<sizeof(ygo::Game), alignof(ygo::Game)> game_buf[1];
-	ygo::Game* get() { return reinterpret_cast<ygo::Game*>(&game_buf[0]); }
+class Game {
+	ygo::Game game;
 public:
-	StackGame() { new (&game_buf[0]) ygo::Game(); }
-	~StackGame() { get()->~Game(); }
-	ygo::Game* operator&() { return get(); }
+	Game() :game() {};
+	ygo::Game* operator&() { return &game; }
 };
 #else
-using StackGame = ygo::Game;
+using Game = ygo::Game;
 #endif
 
 int _tmain(int argc, epro::path_char* argv[]) {
@@ -263,7 +261,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 	bool firstlaunch = true;
 	bool reset = false;
 	do {
-		StackGame _game{};
+		Game _game{};
 		ygo::mainGame = &_game;
 		if(data->tmp_device) {
 			ygo::mainGame->device = data->tmp_device;
