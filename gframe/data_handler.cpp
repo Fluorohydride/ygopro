@@ -97,43 +97,7 @@ void DataHandler::LoadZipArchives() {
 		}
 	}
 }
-static void DeleteOutdatedDbs() {
-#if defined(_MSC_VER) && _MSC_VER == 1900
-	static const epro::path_stringview dbs[] = {
-#else
-	static constexpr epro::path_stringview dbs[] = {
-#endif
-		EPRO_TEXT("./expansions/BLVO-release.cdb"),
-		EPRO_TEXT("./expansions/cards-rush-prerelease.cdb"),
-		EPRO_TEXT("./expansions/cards-unofficial-new.cdb"),
-		EPRO_TEXT("./expansions/cards-unofficial-removal.cdb"),
-		EPRO_TEXT("./expansions/fix-errata-pre-errata.cdb"),
-		EPRO_TEXT("./expansions/fixMisc-unofficial.cdb"),
-		EPRO_TEXT("./expansions/fixOT-unofficial.cdb"),
-		EPRO_TEXT("./expansions/fixString-unofficial.cdb"),
-		EPRO_TEXT("./expansions/prerelease.cdb"),
-		EPRO_TEXT("./expansions/prerelease_21PP.cdb"),
-		EPRO_TEXT("./expansions/prerelease-etco.cdb"),
-		EPRO_TEXT("./expansions/prerelease-liov.cdb"),
-		EPRO_TEXT("./expansions/prerelease-PGB1.cdb"),
-		EPRO_TEXT("./expansions/prerelease-unofficial-21PP.cdb"),
-		EPRO_TEXT("./expansions/prerelease-unofficial-cp20.cdb"),
-		EPRO_TEXT("./expansions/prerelease-unofficial-liov.cdb"),
-		EPRO_TEXT("./expansions/prerelease-unofficial-selection10.cdb"),
-		EPRO_TEXT("./expansions/Proxy_Horse.cdb"),
-		EPRO_TEXT("./expansions/release.cdb"),
-		EPRO_TEXT("./expansions/release-dbgi-ocg.cdb"),
-		EPRO_TEXT("./expansions/release-phra-ocg.cdb"),
-		EPRO_TEXT("./expansions/release-sd40-ibfp.cdb"),
-		EPRO_TEXT("./expansions/release-selection10.cdb"),
-		EPRO_TEXT("./expansions/release-sr11-ocg.cdb"),
-	};
-	for(const auto& db : dbs) {
-		Utils::FileDelete(db);
-	}
-}
 DataHandler::DataHandler(epro::path_stringview working_dir) {
-	DeleteOutdatedDbs();
 	configs = std::unique_ptr<GameConfig>(new GameConfig);
 	gGameConfig = configs.get();
 	tmp_device = nullptr;
