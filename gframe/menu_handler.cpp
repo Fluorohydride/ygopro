@@ -428,6 +428,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnDeleteReplay->setEnabled(false);
 				mainGame->btnRenameReplay->setEnabled(false);
 				mainGame->btnExportDeck->setEnabled(false);
+				mainGame->btnShareReplay->setEnabled(false);
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->chkYrp->setChecked(false);
 				mainGame->chkYrp->setEnabled(false);
@@ -442,6 +443,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnDeleteSinglePlay->setEnabled(false);
 				mainGame->btnRenameSinglePlay->setEnabled(false);
 				mainGame->btnOpenSinglePlay->setEnabled(false);
+				mainGame->btnShareSinglePlay->setEnabled(false);
 				mainGame->ShowElement(mainGame->wSinglePlay);
 				mainGame->RefreshSingleplay();
 				break;
@@ -530,6 +532,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->PopupElement(mainGame->wACMessage, 20);
 				break;
 			}
+			case BUTTON_SHARE_REPLAY: {
+				const auto& list = mainGame->lstReplayList;
+				const auto selected = list->getSelected();
+				if(selected != -1 && !list->isDirectory(selected)) {
+					Utils::SystemOpen(Utils::ToPathString(list->getListItem(selected, true)), Utils::SHARE_FILE);
+				}
+				break;
+			}
 			case BUTTON_DELETE_SINGLEPLAY: {
 				int sel = mainGame->lstSinglePlayList->getSelected();
 				if(sel == -1)
@@ -539,6 +549,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->PopupElement(mainGame->wQuery);
 				prev_operation = id;
 				prev_sel = sel;
+				break;
+			}
+			case BUTTON_SHARE_SINGLEPLAY: {
+				const auto& list = mainGame->lstSinglePlayList;
+				const auto selected = list->getSelected();
+				if(selected != -1 && !list->isDirectory(selected)) {
+					Utils::SystemOpen(Utils::ToPathString(list->getListItem(selected, true)), Utils::SHARE_FILE);
+				}
 				break;
 			}
 			case BUTTON_OPEN_SINGLEPLAY: {
@@ -677,6 +695,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnDeleteReplay->setEnabled(false);
 				mainGame->btnRenameReplay->setEnabled(false);
 				mainGame->btnExportDeck->setEnabled(false);
+				mainGame->btnShareReplay->setEnabled(false);
 				mainGame->btnLoadReplay->setText(gDataManager->GetSysString(1348).data());
 				if(sel == -1)
 					break;
@@ -694,6 +713,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnDeleteReplay->setEnabled(true);
 				mainGame->btnRenameReplay->setEnabled(true);
 				mainGame->btnExportDeck->setEnabled(replay.IsExportable());
+				mainGame->btnShareReplay->setEnabled(true);
 				std::wstring repinfo;
 				time_t curtime = replay.pheader.seed;
 				repinfo.append(fmt::format(L"{:%Y/%m/%d %H:%M:%S}\n", *std::localtime(&curtime)));
@@ -718,6 +738,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnDeleteSinglePlay->setEnabled(false);
 				mainGame->btnRenameSinglePlay->setEnabled(false);
 				mainGame->btnOpenSinglePlay->setEnabled(false);
+				mainGame->btnShareSinglePlay->setEnabled(false);
 				int sel = mainGame->lstSinglePlayList->getSelected();
 				mainGame->stSinglePlayInfo->setText(L"");
 				if(mainGame->lstSinglePlayList->isDirectory(sel)) {
@@ -732,6 +753,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnDeleteSinglePlay->setEnabled(true);
 				mainGame->btnRenameSinglePlay->setEnabled(true);
 				mainGame->btnOpenSinglePlay->setEnabled(true);
+				mainGame->btnShareSinglePlay->setEnabled(true);
 				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true);
 				mainGame->stSinglePlayInfo->setText(mainGame->ReadPuzzleMessage(name).data());
 				break;

@@ -144,7 +144,8 @@ namespace ygo {
 
 		enum OpenType {
 			OPEN_URL,
-			OPEN_FILE
+			OPEN_FILE,
+			SHARE_FILE,
 		};
 
 		static void SystemOpen(epro::path_stringview arg, OpenType type = OPEN_URL);

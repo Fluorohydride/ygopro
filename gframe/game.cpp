@@ -1166,6 +1166,12 @@ bool Game::Initialize() {
 	btnExportDeck = env->addButton(Scale(470, 325, 570, 350), wReplay, BUTTON_EXPORT_DECK, gDataManager->GetSysString(1358).data());
 	defaultStrings.emplace_back(btnExportDeck, 1358);
 	btnExportDeck->setEnabled(false);
+	btnShareReplay = env->addButton(Scale(360, 325, 460, 350), wReplay, BUTTON_SHARE_REPLAY, gDataManager->GetSysString(1378).data());
+	defaultStrings.emplace_back(btnShareReplay, 1378);
+	btnShareReplay->setEnabled(false);
+#ifndef __ANDROID__
+	btnShareReplay->setVisible(false);
+#endif
 	chkYrp = env->addCheckBox(false, Scale(360, 250, 560, 270), wReplay, -1, gDataManager->GetSysString(1356).data());
 	defaultStrings.emplace_back(chkYrp, 1356);
  	tmpptr = env->addStaticText(gDataManager->GetSysString(1353).data(), Scale(360, 275, 570, 295), false, true, wReplay);
@@ -1187,6 +1193,12 @@ bool Game::Initialize() {
 	btnOpenSinglePlay = env->addButton(Scale(470, 325, 570, 350), wSinglePlay, BUTTON_OPEN_SINGLEPLAY, gDataManager->GetSysString(1377).data());
 	defaultStrings.emplace_back(btnOpenSinglePlay, 1377);
 	btnOpenSinglePlay->setEnabled(false);
+	btnShareSinglePlay = env->addButton(Scale(360, 325, 460, 350), wSinglePlay, BUTTON_SHARE_SINGLEPLAY, gDataManager->GetSysString(1378).data());
+	defaultStrings.emplace_back(btnShareSinglePlay, 1378);
+	btnShareSinglePlay->setEnabled(false);
+#ifndef __ANDROID__
+	btnShareSinglePlay->setVisible(false);
+#endif
 	btnDeleteSinglePlay = env->addButton(Scale(360, 355, 460, 380), wSinglePlay, BUTTON_DELETE_SINGLEPLAY, gDataManager->GetSysString(1361).data());
 	defaultStrings.emplace_back(btnDeleteSinglePlay, 1361);
 	btnDeleteSinglePlay->setEnabled(false);

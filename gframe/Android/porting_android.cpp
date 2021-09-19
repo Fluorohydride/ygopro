@@ -508,6 +508,7 @@ JAVAVOIDSTRINGMETHOD(addWindbotDatabase)
 JAVAVOIDSTRINGMETHOD(installUpdate)
 JAVAVOIDSTRINGMETHOD(openUrl)
 JAVAVOIDSTRINGMETHOD(openFile)
+JAVAVOIDSTRINGMETHOD(shareFile)
 
 void showErrorDialog(epro::stringview context, epro::stringview message) {
 	jmethodID showDialog = jnienv->GetMethodID(nativeActivity, "showErrorDialog", JPARAMS(JSTRING JSTRING)JVOID);

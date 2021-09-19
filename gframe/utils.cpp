@@ -478,13 +478,21 @@ namespace ygo {
 
 	void Utils::SystemOpen(epro::path_stringview arg, OpenType type) {
 #ifdef _WIN32
+		if(type == SHARE_FILE)
+			return;
 		ShellExecute(nullptr, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), working_dir, arg).data() : arg.data(), nullptr, nullptr, SW_SHOWNORMAL);
 #elif defined(__ANDROID__)
-		if(type == OPEN_FILE)
-			porting::openFile(fmt::format("{}/{}", working_dir, arg));
-		else
-			porting::openUrl(arg);
+		switch(type) {
+		case OPEN_FILE:
+			return porting::openFile(fmt::format("{}/{}", working_dir, arg));
+		case OPEN_URL:
+			return porting::openUrl(arg);
+		case SHARE_FILE:
+			return porting::shareFile(fmt::format("{}/{}", working_dir, arg));
+		}
 #elif defined(EDOPRO_MACOS) || defined(__linux__)
+		if(type == SHARE_FILE)
+			return;
 #ifdef EDOPRO_MACOS
 #define OPEN "open"
 #else
