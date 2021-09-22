@@ -594,8 +594,15 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(tabSettings.chkAutoChainOrder, 1276);
 	tabSettings.chkDottedLines = env->addCheckBox(gGameConfig->dotted_lines, Scale(20, 200, 280, 225), tabPanel, CHECKBOX_DOTTED_LINES, gDataManager->GetSysString(1376).data());
 	defaultStrings.emplace_back(tabSettings.chkDottedLines, 1376);
-#ifdef __ANDROID__
-	tabSettings.chkDottedLines->setEnabled(false);
+#if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	{
+		const auto type = driver->getDriverType();
+		if(type == irr::video::EDT_OGLES1 || type == irr::video::EDT_OGLES2) {
+			tabSettings.chkDottedLines->setEnabled(false);
+			tabSettings.chkDottedLines->setChecked(false);
+			gGameConfig->dotted_lines = false;
+		}
+	}
 #endif
 	// audio
 	tabSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, Scale(20, 230, 280, 255), tabPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).data());
