@@ -423,8 +423,8 @@ std::wstring DataManager::FormatAttribute(uint32_t attribute) {
 }
 std::wstring DataManager::FormatRace(uint32_t race, bool isSkill) {
 	std::wstring res;
-	for(uint32_t i = isSkill ? 2100 : 1020, filter = 1; filter <= RACE_MAX; filter <<= 1, ++i) {
-		if(race & filter) {
+	for(uint32_t i = isSkill ? 2100 : 1020; race; race >>= 1, ++i) {
+		if(race & 0x1u) {
 			if(!res.empty())
 				res += L'|';
 			appendstring(res, GetSysString(i));
