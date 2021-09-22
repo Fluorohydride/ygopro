@@ -1047,6 +1047,31 @@ bool Game::Initialize() {
 	tmpptr = env->addButton(nextHandTestRow(mainMenuWidth / 2 + 5, mainMenuWidth - 10, false), wHandTest, BUTTON_HAND_TEST_START, gDataManager->GetSysString(1215).data()); // start
 	defaultStrings.emplace_back(tmpptr, 1215);
 	//
+
+#ifdef __ANDROID__
+	btnYdkeManage = env->addButton(Scale(205, 190, 295, 230), 0, BUTTON_DECK_YDKE_MANAGE, gDataManager->GetSysString(2083).data());
+	btnYdkeManage->setVisible(false);
+	btnYdkeManage->setEnabled(true);
+
+	wYdkeManage = env->addWindow(Scale(mainMenuLeftX, 200, mainMenuRightX, 450), false, gDataManager->GetSysString(2084).data());
+	defaultStrings.emplace_back(wYdkeManage, 2084);
+	wYdkeManage->getCloseButton()->setVisible(false);
+	wYdkeManage->setVisible(false);
+	offset = 30;
+	auto nextYdkeManageRow = [&offset, &mainMenuWidth, this](bool increment = true) {
+		if(increment) offset += 55;
+		return Scale(10, offset, mainMenuWidth - 10, offset + 40);
+	};
+	tmpptr = env->addButton(nextYdkeManageRow(false), wYdkeManage, BUTTON_IMPORT_YDKE, gDataManager->GetSysString(2085).data());
+	defaultStrings.emplace_back(tmpptr, 2085);
+	tmpptr = env->addButton(nextYdkeManageRow(), wYdkeManage, BUTTON_EXPORT_YDKE, gDataManager->GetSysString(2086).data());
+	defaultStrings.emplace_back(tmpptr, 2086);
+	tmpptr = env->addButton(nextYdkeManageRow(), wYdkeManage, BUTTON_EXPORT_DECK_PLAINTEXT, gDataManager->GetSysString(2087).data());
+	defaultStrings.emplace_back(tmpptr, 2087);
+	tmpptr = env->addButton(nextYdkeManageRow(), wYdkeManage, BUTTON_CLOSE_YDKE_WINDOW, gDataManager->GetSysString(1210).data());
+	defaultStrings.emplace_back(tmpptr, 1210);
+#endif
+	//
 	scrFilter = env->addScrollBar(false, Scale(999, 161, 1019, 629), 0, SCROLL_FILTER);
 	scrFilter->setLargeStep(DECK_SEARCH_SCROLL_STEP);
 	scrFilter->setSmallStep(DECK_SEARCH_SCROLL_STEP);
@@ -3017,8 +3042,12 @@ void Game::OnResize() {
 	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
 	btnHandTest->setRelativePosition(Resize(205, 90, 295, 130));
 	btnHandTestSettings->setRelativePosition(Resize(205, 140, 295, 180));
+#ifdef __ANDROID__
+	btnYdkeManage->setRelativePosition(Resize(205, 190, 295, 230));
+	SetCentered(wYdkeManage, false);
+#endif
 	stHandTestSettings->setRelativePosition(Resize(0, 0, 90, 40));
-	SetCentered(wHandTest);
+	SetCentered(wHandTest, false);
 
 	wSort->setRelativePosition(Resize(930, 132, 1020, 156));
 	cbSortType->setRelativePosition(Resize(10, 2, 85, 22));
@@ -3206,8 +3235,8 @@ irr::core::recti Game::ResizeWin(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y
 	y2 = sy + y;
 	return Scale(x, y, x2, y2);
 }
-void Game::SetCentered(irr::gui::IGUIElement* elem) {
-	if(is_building || dInfo.isInDuel)
+void Game::SetCentered(irr::gui::IGUIElement* elem, bool use_offset) {
+	if(use_offset && (is_building || dInfo.isInDuel))
 		elem->setRelativePosition(ResizeWinFromCenter(0, 0, elem->getRelativePosition().getWidth(), elem->getRelativePosition().getHeight(), Scale(155)));
 	else
 		elem->setRelativePosition(ResizeWinFromCenter(0, 0, elem->getRelativePosition().getWidth(), elem->getRelativePosition().getHeight()));

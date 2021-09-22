@@ -216,7 +216,7 @@ public:
 	irr::core::recti ResizePhaseHint(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 width);
 	irr::core::recti ResizeWinFromCenter(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 xoff = 0, irr::s32 yoff = 0);
 	irr::core::recti ResizeWin(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, bool chat = false);
-	void SetCentered(irr::gui::IGUIElement* elem);
+	void SetCentered(irr::gui::IGUIElement* elem, bool use_offset = true);
 	void ValidateName(irr::gui::IGUIElement* box);
 	
 	std::wstring ReadPuzzleMessage(epro::wstringview script_name);
@@ -582,6 +582,8 @@ public:
 	irr::gui::IGUIButton* btnHandTestSettings;
 	irr::gui::IGUIStaticText* stHandTestSettings;
 	irr::gui::IGUIWindow* wHandTest;
+	irr::gui::IGUIButton* btnYdkeManage;
+	irr::gui::IGUIWindow* wYdkeManage;
 	irr::gui::IGUICheckBox* chkHandTestNoOpponent;
 	irr::gui::IGUICheckBox* chkHandTestNoShuffle;
 	irr::gui::IGUIEditBox* ebHandTestStartHand;
