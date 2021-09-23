@@ -51,8 +51,9 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 	auto CreateSecret = [&secret_buf=secret_buf](bool update) {
 		if(update) {
 			auto& secret = ygo::mainGame->dInfo.secret;
-			fmt::format_to_n(secret_buf, sizeof(secret_buf), "{{\"id\": {},\"addr\" : {},\"port\" : {},\"pass\" : \"{}\" }}",
+			auto ret = fmt::format_to_n(secret_buf, sizeof(secret_buf) - 1, "{{\"id\": {},\"addr\" : {},\"port\" : {},\"pass\" : \"{}\" }}",
 							 secret.game_id, secret.server_address, secret.server_port, BufferIO::EncodeUTF8(secret.pass));
+			*ret.out = '\0';
 		}
 		return secret_buf;
 	};
