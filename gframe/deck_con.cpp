@@ -86,9 +86,7 @@ void DeckBuilder::Initialize(bool refresh) {
 	mainGame->btnSideReload->setVisible(false);
 	mainGame->btnHandTest->setVisible(true);
 	mainGame->btnHandTestSettings->setVisible(true);
-#ifdef __ANDROID__
 	mainGame->btnYdkeManage->setVisible(true);
-#endif
 	filterList = &gdeckManager->_lfList[mainGame->cbDBLFList->getSelected()];
 	if(refresh) {
 		ClearSearch();
@@ -132,9 +130,7 @@ void DeckBuilder::Terminate(bool showmenu) {
 	}
 	mainGame->btnHandTest->setVisible(false);
 	mainGame->btnHandTestSettings->setVisible(false);
-#ifdef __ANDROID__
 	mainGame->btnYdkeManage->setVisible(false);
-#endif
 	mainGame->wHandTest->setVisible(false);
 	mainGame->device->setEventReceiver(&mainGame->menuHandler);
 	mainGame->wACMessage->setVisible(false);
@@ -225,7 +221,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->env->setFocus(mainGame->btnHandTestSettings);
 				break;
 			}
-#ifdef __ANDROID__
 			case BUTTON_DECK_YDKE_MANAGE: {
 				mainGame->PopupElement(mainGame->wYdkeManage);
 				break;
@@ -247,7 +242,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->env->setFocus(mainGame->btnYdkeManage);
 				break;
 			}
-#endif
 			case BUTTON_CLEAR_DECK: {
 #ifdef __ANDROID__
 				std::lock_guard<std::mutex> lock(mainGame->gMutex);

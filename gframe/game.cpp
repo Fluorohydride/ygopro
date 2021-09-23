@@ -1055,7 +1055,6 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(tmpptr, 1215);
 	//
 
-#ifdef __ANDROID__
 	btnYdkeManage = env->addButton(Scale(205, 190, 295, 230), 0, BUTTON_DECK_YDKE_MANAGE, gDataManager->GetSysString(2083).data());
 	btnYdkeManage->setVisible(false);
 	btnYdkeManage->setEnabled(true);
@@ -1077,7 +1076,6 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(tmpptr, 2087);
 	tmpptr = env->addButton(nextYdkeManageRow(), wYdkeManage, BUTTON_CLOSE_YDKE_WINDOW, gDataManager->GetSysString(1210).data());
 	defaultStrings.emplace_back(tmpptr, 1210);
-#endif
 	//
 	scrFilter = env->addScrollBar(false, Scale(999, 161, 1019, 629), 0, SCROLL_FILTER);
 	scrFilter->setLargeStep(DECK_SEARCH_SCROLL_STEP);
@@ -3049,10 +3047,8 @@ void Game::OnResize() {
 	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
 	btnHandTest->setRelativePosition(Resize(205, 90, 295, 130));
 	btnHandTestSettings->setRelativePosition(Resize(205, 140, 295, 180));
-#ifdef __ANDROID__
 	btnYdkeManage->setRelativePosition(Resize(205, 190, 295, 230));
 	SetCentered(wYdkeManage, false);
-#endif
 	stHandTestSettings->setRelativePosition(Resize(0, 0, 90, 40));
 	SetCentered(wHandTest, false);
 
