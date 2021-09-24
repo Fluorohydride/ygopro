@@ -152,7 +152,7 @@ void ImageDownloader::DownloadPic() {
 			if(src.type != type)
 				continue;
 			auto fp = fileopen(name.data(), "wb");
-			if(fp == nullptr) {
+			if(fp == nullptr && gGameConfig->logDownloadErrors) {
 				ygo::ErrorLog(fmt::format("Failed opening {} for write.", Utils::ToUTF8IfNeeded(name)));
 				ygo::ErrorLog(fmt::format("Error: {}.", strerror(errno)));
 				continue;
