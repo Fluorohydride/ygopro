@@ -2,7 +2,8 @@
 #include <fstream>
 #include <curl/curl.h>
 #include <fmt/format.h>
-#include <errno.h>
+#include <cerrno>
+#include <array>
 #include "logging.h"
 #include "utils.h"
 #include "game_config.h"
@@ -17,14 +18,13 @@ namespace ygo {
 
 struct curl_payload {
 	FILE* stream;
-	char header[8];
-	int header_written;
+	size_t header_written;
+	std::array<uint8_t, 8> header;
 };
 
 ImageDownloader::ImageDownloader() : stop_threads(false) {
-	for(auto& thread : download_threads) {
+	for(auto& thread : download_threads)
 		thread = std::thread(&ImageDownloader::DownloadPic, this);
-	}
 }
 ImageDownloader::~ImageDownloader() {
 	std::unique_lock<std::mutex> lck(pic_download);
@@ -37,67 +37,69 @@ ImageDownloader::~ImageDownloader() {
 void ImageDownloader::AddDownloadResource(PicSource src) {
 	pic_urls.push_back(src);
 }
-static constexpr uint8_t pngheader[] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
-static constexpr uint8_t jpgheader[] = { 0xff, 0xd8, 0xff };
-#define PNG_FILE 1
-#define JPG_FILE 2
-int CheckImageHeader(void* header) {
-	if(!memcmp(pngheader, header, sizeof(pngheader))) {
+
+static constexpr std::array<uint8_t, 8> pngheader{ 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
+static constexpr std::array<uint8_t, 3> jpgheader{ 0xff, 0xd8, 0xff };
+
+enum headerType : uint8_t {
+	UNK_FILE,
+	PNG_FILE,
+	JPG_FILE,
+};
+
+static headerType ImageHeaderType(const std::array<uint8_t, 8>& header) {
+	if(pngheader == header)
 		return PNG_FILE;
-	} else if(!memcmp(jpgheader, header, sizeof(jpgheader))) {
+	if(!memcmp(jpgheader.data(), header.data(), jpgheader.size()))
 		return JPG_FILE;
-	} else
-		return 0;
+	return UNK_FILE;
 }
-size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
+static size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
+	static constexpr auto header_size = sizeof(curl_payload::header);
 	auto data = static_cast<curl_payload*>(userdata);
-	if(data->header_written < sizeof(data->header)) {
-		auto increase = std::min(nmemb * size, (size_t)(sizeof(data->header) - data->header_written));
+	const size_t nbytes = size * nmemb;
+	if(data->header_written < header_size) {
+		auto increase = std::min(nbytes, header_size - data->header_written);
 		memcpy(&data->header[data->header_written], ptr, increase);
 		data->header_written += increase;
-		if(data->header_written == sizeof(data->header) && !CheckImageHeader(data->header))
+		if(data->header_written == header_size && ImageHeaderType(data->header) == UNK_FILE)
 			return -1;
 	}
 	FILE* out = data->stream;
-	size_t nbytes = size * nmemb;
 	fwrite(ptr, 1, nbytes, out);
 	return nbytes;
 }
-const epro::path_char* GetExtension(char* header) {
-	int res = CheckImageHeader(header);
-	if(res == PNG_FILE)
-		return EPRO_TEXT(".png");
-	else if(res == JPG_FILE)
-		return EPRO_TEXT(".jpg");
-	return EPRO_TEXT("");
+static epro::path_stringview GetExtension(const std::array<uint8_t, 8>& header) {
+	switch(ImageHeaderType(header)) {
+		case PNG_FILE:
+			return EPRO_TEXT(".png");
+		case JPG_FILE:
+			return EPRO_TEXT(".jpg");
+		default:
+			return EPRO_TEXT("");
+	}
 }
 void ImageDownloader::DownloadPic() {
 	Utils::SetThreadName("PicDownloader");
-	curl_payload payload;
-	char curl_error_buffer[CURL_ERROR_SIZE];
-	CURL* curl = [&payload, &curl_error_buffer] {
-		auto curl = curl_easy_init();
-		if(!curl)
-			return curl;
-		curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curl_error_buffer);
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &payload);
-		curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
-		if(gGameConfig->ssl_certificate_path.size() && Utils::FileExists(Utils::ToPathString(gGameConfig->ssl_certificate_path)))
-			curl_easy_setopt(curl, CURLOPT_CAINFO, gGameConfig->ssl_certificate_path.data());
-#ifdef _WIN32
-		else
-			curl_easy_setopt(curl, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
-#endif
-		return curl;
-	}();
+	CURL* curl = curl_easy_init();
 	if(curl == nullptr) {
 		ErrorLog("Failed to start downloader thread");
 		return;
 	}
-	auto SetPayloadAndUrl = [&payload,&curl](epro::stringview url, FILE* stream) {
+	curl_payload payload;
+	char curl_error_buffer[CURL_ERROR_SIZE];
+	curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curl_error_buffer);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &payload);
+	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
+	if(gGameConfig->ssl_certificate_path.size() && Utils::FileExists(Utils::ToPathString(gGameConfig->ssl_certificate_path)))
+		curl_easy_setopt(curl, CURLOPT_CAINFO, gGameConfig->ssl_certificate_path.data());
+#ifdef _WIN32
+	else
+		curl_easy_setopt(curl, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
+#endif
+	auto SetPayloadAndUrl = [&payload, &curl](epro::stringview url, FILE* stream) {
 		payload.stream = stream;
-		memset(&payload.header, 0, sizeof(payload.header));
 		payload.header_written = 0;
 		curl_easy_setopt(curl, CURLOPT_URL, url.data());
 	};
@@ -114,9 +116,8 @@ void ImageDownloader::DownloadPic() {
 				return;
 			}
 		}
-		downloading.push_back(std::move(to_download.front()));
+		auto file = std::move(to_download.front());
 		to_download.pop_front();
-		auto& file = downloading.back();
 		auto type = file.type;
 		auto code = file.code;
 		auto& map_elem = downloading_images[type][code];
@@ -125,29 +126,26 @@ void ImageDownloader::DownloadPic() {
 		auto name = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
 		if(type == imgType::THUMB)
 			type = imgType::ART;
-		const auto dest_folder = [type, &name, code]()->epro::path_string {
-			const epro::path_char* dest = nullptr;
-			switch(type) {
-				default:
-				case imgType::ART:
-				case imgType::THUMB: {
-					dest = EPRO_TEXT("./pics/{}");
-					break;
-				}
-				case imgType::FIELD: {
-					dest = EPRO_TEXT("./pics/field/{}");
-					name.append(EPRO_TEXT("_f"));
-					break;
-				}
-				case imgType::COVER: {
-					dest = EPRO_TEXT("./pics/cover/{}");
-					name.append(EPRO_TEXT("_c"));
-					break;
-				}
+		epro::path_stringview dest;
+		switch(type) {
+			case imgType::ART:
+			case imgType::THUMB: {
+				dest = EPRO_TEXT("./pics/{}"_sv);
+				break;
 			}
-			return fmt::format(dest, code);
-		}();
-		const epro::path_char* ext = nullptr;
+			case imgType::FIELD: {
+				dest = EPRO_TEXT("./pics/field/{}"_sv);
+				name.append(EPRO_TEXT("_f"));
+				break;
+			}
+			case imgType::COVER: {
+				dest = EPRO_TEXT("./pics/cover/{}"_sv);
+				name.append(EPRO_TEXT("_c"));
+				break;
+			}
+		}
+		auto dest_folder = fmt::format(dest, code);
+		CURLcode res{ static_cast<CURLcode>(1) };
 		for(auto& src : pic_urls) {
 			if(src.type != type)
 				continue;
@@ -158,11 +156,12 @@ void ImageDownloader::DownloadPic() {
 				continue;
 			}
 			SetPayloadAndUrl(fmt::format(src.url, code), fp);
-			CURLcode res = curl_easy_perform(curl);
+			res = curl_easy_perform(curl);
 			fclose(fp);
 			if(res == CURLE_OK) {
-				ext = GetExtension(payload.header);
-				if(!Utils::FileMove(name, dest_folder + ext))
+				const auto ext = GetExtension(payload.header);
+				dest_folder.append(ext.data(), ext.size());
+				if(!Utils::FileMove(name, dest_folder))
 					Utils::FileDelete(name);
 				break;
 			}
@@ -173,9 +172,9 @@ void ImageDownloader::DownloadPic() {
 			Utils::FileDelete(name);
 		}
 		lck.lock();
-		if(ext) {
+		if(res == CURLE_OK) {
 			map_elem.status = downloadStatus::DOWNLOADED;
-			map_elem.path = dest_folder + ext;
+			map_elem.path = std::move(dest_folder);
 		} else
 			map_elem.status = downloadStatus::DOWNLOAD_ERROR;
 	}
@@ -186,9 +185,10 @@ void ImageDownloader::AddToDownloadQueue(uint32_t code, imgType type) {
 	std::lock_guard<std::mutex> lck(pic_download);
 	if(stop_threads)
 		return;
-	if(downloading_images[type].find(code) == downloading_images[type].end()) {
-		downloading_images[type][code].status = downloadStatus::DOWNLOADING;
-		to_download.emplace_back(downloadParam{ code, type, downloadStatus::NONE, EPRO_TEXT("") });
+	auto& map = downloading_images[type];
+	if(map.find(code) == map.end()) {
+		map[code].status = downloadStatus::DOWNLOADING;
+		to_download.emplace_back(downloadParam{ code, type });
 		cv.notify_one();
 	}
 }
