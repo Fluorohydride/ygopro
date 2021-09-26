@@ -41,15 +41,6 @@ struct AndroidCore {
 #include "ocgcore_functions.inl"
 #undef X
 
-#define CREATE_CLONE(x) static auto x##_copy = x;
-#define STORE_CLONE(x) x##_copy = x;
-#define CLEAR_CLONE(x) x##_copy = nullptr;
-
-#define X(type,name,...) CREATE_CLONE(name)
-#include "ocgcore_functions.inl"
-#undef X
-#undef CREATE_CLONE
-
 #ifdef _WIN32
 static inline void* OpenLibrary(epro::path_stringview path) {
 	return LoadLibrary(fmt::format("{}" CORENAME, path).data());
@@ -108,109 +99,70 @@ static inline void* OpenLibrary(epro::path_stringview path) {
 
 #endif
 
-#define RESTORE_CLONE(x) if(x##_copy) { x = x##_copy; x##_copy = nullptr; }
-
-void RestoreFromCopies() {
-#define X(type,name,...) RESTORE_CLONE(name)
+class Core {
+#define X(type,name,...) type(*int_##name)(__VA_ARGS__);
 #include "ocgcore_functions.inl"
 #undef X
-}
+	void* library{ nullptr };
+	bool valid{ false };
+	bool enabled{ false };
 
-#undef RESTORE_CLONE
+	bool check_api_version() const {
+		int max = 0, min = 0;
+		int_OCG_GetVersion(&max, &min);
+		return (max == OCG_VERSION_MAJOR) && (min == OCG_VERSION_MINOR);
+	}
+public:
 
-void ClearCopies() {
-#define X(type,name,...) CLEAR_CLONE(name)
+	Core(epro::path_stringview path) {
+		library = OpenLibrary(path);
+		if(!library)
+			return;
+#define X(type,name,...) if((int_##name = GetFunction(library, name)) == nullptr) return;
 #include "ocgcore_functions.inl"
 #undef X
-}
-
-bool check_api_version() {
-	int min = 0;
-	int max = 0;
-	OCG_GetVersion(&max, &min);
-	return (max == OCG_VERSION_MAJOR) && (min == OCG_VERSION_MINOR);
-}
-
-#define LOAD_FUNCTION(x) x = GetFunction(newcore, x);\
-		if(!x){ UnloadCore(newcore); return nullptr; }
+		valid = check_api_version();
+	}
+	~Core() {
+		if(enabled) {
+#define X(type,name,...) name = nullptr;
+#include "ocgcore_functions.inl"
+#undef X
+		}
+		if(library)
+			CloseLibrary(library);
+	}
+	void Enable() {
+#define X(type,name,...) name = int_##name;
+#include "ocgcore_functions.inl"
+#undef X
+	}
+	bool IsValid() const {
+		return valid;
+	}
+};
 
 void* LoadOCGcore(epro::path_stringview path) {
-	void* newcore = OpenLibrary(path);
-	if(!newcore)
-		return nullptr;
-	ClearCopies();
-#define X(type,name,...) LOAD_FUNCTION(name)
-#include "ocgcore_functions.inl"
-#undef X
-	if(!check_api_version()) {
-		UnloadCore(newcore);
+	Core* core = new Core(path);
+	if(!core->IsValid()) {
+		delete core;
 		return nullptr;
 	}
-	return newcore;
+	core->Enable();
+	return core;
 }
-#undef LOAD_FUNCTION
-
-#define LOAD_WITH_COPY_CHECK(x) STORE_CLONE(x)\
-		x = GetFunction(handle, x);\
-		if(!x) {\
-			RestoreFromCopies();\
-			return false;\
-		}
-
-bool ReloadCore(void* handle) {
-	if(!handle)
-		return false;
-#define X(type,name,...) LOAD_WITH_COPY_CHECK(name)
-#include "ocgcore_functions.inl"
-#undef X
-	if(!check_api_version()) {
-		RestoreFromCopies();
-		return false;
-	}
-	ClearCopies();
-	return true;
-}
-
-#undef LOAD_WITH_COPY_CHECK
-
-#define CLEAR_FUNCTION(x) x = nullptr;
 
 void UnloadCore(void* handle) {
-	CloseLibrary(handle);
-#define X(type,name,...) CLEAR_FUNCTION(name)
-#include "ocgcore_functions.inl"
-#undef X
+	delete static_cast<Core*>(handle);
 }
-
-#undef CLEAR_FUNCTION
-
-#define CHANGE_WITH_COPY_CHECK(x) STORE_CLONE(x)\
-		x = GetFunction(newcore, x);\
-		if(!x) {\
-			CloseLibrary(newcore);\
-			RestoreFromCopies();\
-			return nullptr;\
-		}
 
 void* ChangeOCGcore(epro::path_stringview path, void* handle) {
-	void* newcore = OpenLibrary(path);
-	if(!newcore)
+	Core* newcore = new Core(path);
+	if(!newcore->IsValid())
 		return nullptr;
-#define X(type,name,...) CHANGE_WITH_COPY_CHECK(name)
-#include "ocgcore_functions.inl"
-#undef X
-	if(!check_api_version()) {
-		CloseLibrary(newcore);
-		RestoreFromCopies();
-		return nullptr;
-	}
-	ClearCopies();
-	if(handle)
-		CloseLibrary(handle);
+	delete static_cast<Core*>(handle);
+	newcore->Enable();
 	return newcore;
 }
-#undef CHANGE_WITH_COPY_CHECK
-#undef STORE_CLONE
-#undef CLEAR_CLONE
 
 #endif //YGOPRO_BUILD_DLL

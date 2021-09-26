@@ -5,8 +5,8 @@
 #else
 #include "ocgapi_types.h"
 #include "text_types.h"
-bool ReloadCore(void* handle);
-void UnloadCore(void *handle);
+
+void UnloadCore(void* handle);
 void* LoadOCGcore(epro::path_stringview path);
 void* ChangeOCGcore(epro::path_stringview path, void* handle);
 
