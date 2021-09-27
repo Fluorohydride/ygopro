@@ -20,8 +20,10 @@ struct GameConfig
 	bool Save(const epro::path_char* filename);
 
 	irr::video::E_DRIVER_TYPE driver_type{ irr::video::EDT_COUNT };
-#if defined(__linux__) && !defined(__ANDROID__)
-	bool useWayland{ false };
+#if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	//By default it's 2, and in that scenario thhe prompt to try wayland is shown,
+	//in every other case it'll always be 1 or 0
+	uint8_t useWayland{ 2 };
 #endif
 	bool vsync{ true };
 	std::string windowStruct;

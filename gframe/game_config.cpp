@@ -180,7 +180,7 @@ bool GameConfig::Load(const epro::path_char* filename) {
 			DESERIALIZE_BOOL(noCheckDeck)
 			DESERIALIZE_BOOL(hideHandsInReplays)
 			DESERIALIZE_BOOL(noShuffleDeck)
-#if defined(__linux__) && !defined(__ANDROID__)
+#if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 			DESERIALIZE_BOOL(useWayland)
 #endif
 			DESERIALIZE_BOOL(vsync)
@@ -329,8 +329,9 @@ bool GameConfig::Save(const epro::path_char* filename) {
 	conf_file << "# Overwritten on normal game exit\n";
 #define SERIALIZE(name) Serialize(conf_file, #name, name)
 	conf_file << "driver_type = " << getDriverName(driver_type) << "\n";
-#if defined(__linux__) && !defined(__ANDROID__)
-	SERIALIZE(useWayland);
+#if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	if(useWayland <= 1)
+		Serialize(conf_file, "useWayland", useWayland == 1);
 #endif
 	SERIALIZE(vsync);
 	SERIALIZE(maxFPS);

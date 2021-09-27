@@ -82,6 +82,7 @@ static HWND GetWindowHandle(irr::video::IVideoDriver* driver) {
 #endif
 
 static inline irr::video::E_DRIVER_TYPE getDefaultDriver(irr::E_DEVICE_TYPE device_type) {
+	(void)device_type;
 #ifdef _WIN32
 	return irr::video::EDT_DIRECT3D9;
 #elif defined(__ANDROID__)
@@ -101,7 +102,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	irr::SIrrlichtCreationParameters params{};
 	params.AntiAlias = configs->antialias;
 #if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
-	if(configs->useWayland)
+	if(configs->useWayland == 1)
 		params.DeviceType = irr::E_DEVICE_TYPE::EIDT_WAYLAND;
 #endif
 	params.Vsync = configs->vsync;

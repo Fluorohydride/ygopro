@@ -111,7 +111,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		int id = caller->getID();
 		if(mainGame->wRules->isVisible() && (id != BUTTON_RULE_OK && id != CHECKBOX_EXTRA_RULE && id != COMBOBOX_DUEL_RULE))
 			break;
-		if(mainGame->wMessage->isVisible() && id != BUTTON_MSG_OK && prev_operation != ACTION_UPDATE_PROMPT && prev_operation != ACTION_SHOW_CHANGELOG)
+		if(mainGame->wMessage->isVisible() && id != BUTTON_MSG_OK &&
+		   prev_operation != ACTION_UPDATE_PROMPT
+		   && prev_operation != ACTION_SHOW_CHANGELOG
+#if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+		   && prev_operation != ACTION_TRY_WAYLAND
+#endif
+		   )
 			break;
 		if(mainGame->wCustomRules->isVisible() && id != BUTTON_CUSTOM_RULE_OK && ((id < CHECKBOX_OBSOLETE || id > TCG_SEGOC_FIRSTTRIGGER) && id != COMBOBOX_DUEL_RULE))
 			break;
@@ -611,6 +617,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_YES: {
 				mainGame->HideElement(mainGame->wQuery);
+#if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+				if(prev_operation == ACTION_TRY_WAYLAND) {
+					gGameConfig->useWayland = 1;
+					SaveConfig();
+					Utils::Reboot();
+				}
+#endif
 				if(prev_operation == BUTTON_DELETE_REPLAY) {
 					if(Replay::DeleteReplay(Utils::ToPathString(mainGame->lstReplayList->getListItem(prev_sel, true)))) {
 						mainGame->stReplayInfo->setText(L"");
@@ -632,8 +645,18 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_NO: {
-				if (prev_operation == ACTION_UPDATE_PROMPT || prev_operation == ACTION_SHOW_CHANGELOG) {
+				switch(prev_operation) {
+#if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+				case ACTION_TRY_WAYLAND:
+					gGameConfig->useWayland = 0;
+					SaveConfig();
+					Utils::Reboot();
+#endif
+				case ACTION_UPDATE_PROMPT:
+				case ACTION_SHOW_CHANGELOG:
 					mainGame->wQuery->setRelativePosition(mainGame->ResizeWin(490, 200, 840, 340)); // from Game::OnResize
+				default:
+					break;
 				}
 				mainGame->HideElement(mainGame->wQuery);
 				prev_operation = 0;

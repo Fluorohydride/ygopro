@@ -265,7 +265,10 @@ enum GUI {
 	BUTTON_ONLINE_MULTIPLAYER, // first button on main menu
 
 	ACTION_UPDATE_PROMPT,
-	ACTION_SHOW_CHANGELOG
+	ACTION_SHOW_CHANGELOG,
+#if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	ACTION_TRY_WAYLAND,
+#endif
 };
 
 }

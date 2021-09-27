@@ -1826,22 +1826,34 @@ bool Game::MainLoop() {
 			stACMessage->setText(gDataManager->GetSysString(1438).data());
 			PopupElement(wACMessage, 30);
 		}
-		if(!update_prompted && !(dInfo.isInDuel || dInfo.isInLobby || is_siding
-			|| wRoomListPlaceholder->isVisible() || wLanWindow->isVisible()
-			|| wCreateHost->isVisible() || wHostPrepare->isVisible()) && gClientUpdater->HasUpdate()) {
-			std::lock_guard<std::mutex> lock(gMutex);
-			menuHandler.prev_operation = ACTION_UPDATE_PROMPT;
-			stQMessage->setText(fmt::format(L"{}\n{}", gDataManager->GetSysString(1460), gDataManager->GetSysString(1461)).data());
-			SetCentered(wQuery);
-			PopupElement(wQuery);
-			update_prompted = true;
-		} else if (show_changelog) {
-			std::lock_guard<std::mutex> lock(gMutex);
-			menuHandler.prev_operation = ACTION_SHOW_CHANGELOG;
-			stQMessage->setText(gDataManager->GetSysString(1451).data());
-			SetCentered(wQuery);
-			PopupElement(wQuery);
-			show_changelog = false;
+		if(!wQuery->isVisible()) {
+			if(!update_prompted && !(dInfo.isInDuel || dInfo.isInLobby || is_siding
+				|| wRoomListPlaceholder->isVisible() || wLanWindow->isVisible()
+				|| wCreateHost->isVisible() || wHostPrepare->isVisible()) && gClientUpdater->HasUpdate()) {
+				std::lock_guard<std::mutex> lock(gMutex);
+				menuHandler.prev_operation = ACTION_UPDATE_PROMPT;
+				stQMessage->setText(fmt::format(L"{}\n{}", gDataManager->GetSysString(1460), gDataManager->GetSysString(1461)).data());
+				SetCentered(wQuery);
+				PopupElement(wQuery);
+				update_prompted = true;
+			} else if (show_changelog) {
+				std::lock_guard<std::mutex> lock(gMutex);
+				menuHandler.prev_operation = ACTION_SHOW_CHANGELOG;
+				stQMessage->setText(gDataManager->GetSysString(1451).data());
+				SetCentered(wQuery);
+				PopupElement(wQuery);
+				show_changelog = false;
+			}
+#if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+			else if(gGameConfig->useWayland == 2) {
+				std::lock_guard<std::mutex> lock(gMutex);
+				menuHandler.prev_operation = ACTION_TRY_WAYLAND;
+				stQMessage->setText(L"Do you want to try the new native wayland backend?\nIf you're having issues after enabling it manually change the useWayland option in your system.conf file.");
+				SetCentered(wQuery);
+				PopupElement(wQuery);
+				show_changelog = false;
+			}
+#endif
 		}
 		if(!update_checked && gClientUpdater->UpdateDownloaded()) {
 			if(gClientUpdater->UpdateFailed()) {
