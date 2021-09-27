@@ -509,7 +509,7 @@ namespace ygo {
 #endif
 	}
 
-	[[noreturn]] void Utils::Reboot() {
+	void Utils::Reboot() {
 #if !defined(__ANDROID__)
 		const auto& path = ygo::Utils::GetExePath();
 #ifdef _WIN32

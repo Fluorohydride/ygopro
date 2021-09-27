@@ -620,7 +620,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 #if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 				if(prev_operation == ACTION_TRY_WAYLAND) {
 					gGameConfig->useWayland = 1;
-					SaveConfig();
+					mainGame->SaveConfig();
 					Utils::Reboot();
 				}
 #endif
@@ -649,7 +649,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 #if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 				case ACTION_TRY_WAYLAND:
 					gGameConfig->useWayland = 0;
-					SaveConfig();
+					mainGame->SaveConfig();
 					Utils::Reboot();
 #endif
 				case ACTION_UPDATE_PROMPT:
