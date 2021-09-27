@@ -516,12 +516,20 @@ void Game::DrawMisc() {
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 
+	matManager.mTRTexture.AmbientColor = skin::DUELFIELD_CHAIN_COLOR_VAL;
+	auto setCoords = [&](int i) {
+		const auto div = i / 5;
+		const auto mod = i % 5;
+		matManager.vChainNum[0].TCoords = irr::core::vector2df(0.19375f * mod, 0.2421875f * div);
+		matManager.vChainNum[1].TCoords = irr::core::vector2df(0.19375f * (mod + 1), 0.2421875f * div);
+		matManager.vChainNum[2].TCoords = irr::core::vector2df(0.19375f * mod, 0.2421875f * (div + 1));
+		matManager.vChainNum[3].TCoords = irr::core::vector2df(0.19375f * (mod + 1), 0.2421875f * (div + 1));
+	};
 	for(size_t i = 0; i < dField.chains.size(); ++i) {
 		const auto& chain = dField.chains[i];
 		if(chain.solved)
 			break;
 		matManager.mTRTexture.setTexture(0, imageManager.tChain);
-		matManager.mTRTexture.AmbientColor = 0xffffff00;
 		SetZRotation(ic);
 		ic.setTranslation(chain.chain_pos);
 		driver->setMaterial(matManager.mTRTexture);
@@ -530,10 +538,7 @@ void Game::DrawMisc() {
 		it.setScale(0.6f);
 		it.setTranslation(chain.chain_pos);
 		matManager.mTRTexture.setTexture(0, imageManager.tNumber);
-		matManager.vChainNum[0].TCoords = irr::core::vector2df(0.19375f * (i % 5), 0.2421875f * (i / 5));
-		matManager.vChainNum[1].TCoords = irr::core::vector2df(0.19375f * (i % 5 + 1), 0.2421875f * (i / 5));
-		matManager.vChainNum[2].TCoords = irr::core::vector2df(0.19375f * (i % 5), 0.2421875f * (i / 5 + 1));
-		matManager.vChainNum[3].TCoords = irr::core::vector2df(0.19375f * (i % 5 + 1), 0.2421875f * (i / 5 + 1));
+		setCoords(i);
 		driver->setMaterial(matManager.mTRTexture);
 		driver->setTransform(irr::video::ETS_WORLD, it);
 		driver->drawVertexPrimitiveList(matManager.vChainNum, 4, matManager.iRectangle, 2);
