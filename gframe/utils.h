@@ -150,6 +150,8 @@ namespace ygo {
 
 		static void SystemOpen(epro::path_stringview arg, OpenType type = OPEN_URL);
 
+		static void Reboot();
+
 	private:
 		static void InternalSetThreadName(const char* name, const wchar_t* wname);
 		template<typename T>

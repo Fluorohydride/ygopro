@@ -508,5 +508,38 @@ namespace ygo {
 			perror("Failed to open arg or file:");
 #endif
 	}
+
+	[[noreturn]] void Utils::Reboot() {
+#if !defined(__ANDROID__)
+		const auto& path = ygo::Utils::GetExePath();
+#ifdef _WIN32
+		STARTUPINFO si{ sizeof(si) };
+		PROCESS_INFORMATION pi{};
+		auto command = fmt::format(EPRO_TEXT("{} -C {} show_changelog"), ygo::Utils::GetFileName(path, true), ygo::Utils::working_dir);
+		if(!CreateProcess(path.data(), &command[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi))
+			return;
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+#else
+#ifdef __linux__
+		struct stat fileStat;
+		stat(path.data(), &fileStat);
+		chmod(path.data(), fileStat.st_mode | S_IXUSR | S_IXGRP | S_IXOTH);
+#endif
+		auto pid = vfork();
+		if(pid == 0) {
+#ifdef __linux__
+			execl(path.data(), path.data(), "-C", ygo::Utils::working_dir.data(), "show_changelog", nullptr);
+#else
+			execlp("open", "open", "-b", "io.github.edo9300.ygoprodll", "--args", "-C", ygo::Utils::working_dir.data(), "show_changelog", nullptr);
+#endif
+			_exit(EXIT_FAILURE);
+		}
+		if(pid < 0 || waitpid(pid, nullptr, WNOHANG) != 0)
+			return;
+#endif
+		exit(0);
+#endif
+	}
 }
 
