@@ -32,7 +32,6 @@ public:
 	bool connected{ false };
 	void Check();
 private:
-	int64_t start{ 0 };
 	int previous_gameid{ 0 };
 	bool running{ false };
 	char secret_buf[128];
