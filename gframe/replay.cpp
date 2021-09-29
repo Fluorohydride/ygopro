@@ -228,7 +228,7 @@ bool Replay::CheckReplay(const wchar_t* name) {
 	ReplayHeader rheader;
 	size_t count = fread(&rheader, sizeof(ReplayHeader), 1, rfp);
 	fclose(rfp);
-	return count == 1 && rheader.id == 0x31707279 && rheader.version >= 0x12d0u;
+	return count == 1 && rheader.id == 0x31707279 && rheader.version >= 0x12d0u && (rheader.version < 0x1353u || (rheader.flag & REPLAY_UNIFORM));
 }
 bool Replay::DeleteReplay(const wchar_t* name) {
 	wchar_t fname[256];
