@@ -406,7 +406,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					wchar_t *dash = wcsrchr(open_file_name, L'/');
 #endif
 					wchar_t *dot = wcsrchr(open_file_name, L'.');
-					if(dot && !mywcsncasecmp(dot, L".ydk", 4)) { // full path
+					if(dash && dot && !mywcsncasecmp(dot, L".ydk", 4)) { // full path
 						wchar_t deck_name[256];
 						wcsncpy(deck_name, dash + 1, dot - dash - 1);
 						deck_name[dot - dash - 1] = L'\0';
