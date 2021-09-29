@@ -225,7 +225,10 @@ static void OnJoinRequest(const DiscordUser* request, void* payload) {
 			   request->username,
 			   request->discriminator,
 			   request->userId);
-	Discord_Respond(request->userId, DISCORD_REPLY_YES);
+	if(ygo::mainGame->dInfo.secret.pass.empty())
+		Discord_Respond(request->userId, DISCORD_REPLY_YES);
+	else
+		Discord_Respond(request->userId, DISCORD_REPLY_NO);
 }
 #endif
 
