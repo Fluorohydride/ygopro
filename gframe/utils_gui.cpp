@@ -103,8 +103,10 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	irr::SIrrlichtCreationParameters params{};
 	params.AntiAlias = configs->antialias;
 #if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
-	if(configs->useWayland == 1)
+	if(configs->useWayland == 1) {
 		params.DeviceType = irr::E_DEVICE_TYPE::EIDT_WAYLAND;
+		fmt::print("You're using the wayland device backend.\nKeep in mind that it's still experimental and might be unstable.\nIf you are getting any major issues, or the game doesn't start, you can manually disable this option from the system.conf file by toggling the useWayland option.\nFeel free to report any issues you encounter.\n")
+	}
 #endif
 	params.Vsync = configs->vsync;
 	if(configs->driver_type == irr::video::EDT_COUNT)
