@@ -399,14 +399,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_DECK_EDIT: {
 				mainGame->RefreshCategoryDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
-				if(open_file && deckManager.LoadDeck(open_file_name_with_category)) {
+				if(open_file && deckManager.LoadDeck(open_file_name)) {
 #ifdef WIN32
 					wchar_t *dash = wcsrchr(open_file_name, L'\\');
 #else
 					wchar_t *dash = wcsrchr(open_file_name, L'/');
 #endif
 					wchar_t *dot = wcsrchr(open_file_name, L'.');
-					if(dash && dot) {
+					if(dash && dot && !mywcsncasecmp(dot, L".ydk", 4)) { // full path
 						wchar_t deck_name[256];
 						wcsncpy(deck_name, dash + 1, dot - dash - 1);
 						deck_name[dot - dash - 1] = L'\0';
@@ -416,7 +416,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						mainGame->btnManageDeck->setEnabled(false);
 						mainGame->cbDBCategory->setEnabled(false);
 						mainGame->cbDBDecks->setEnabled(false);
-					} else {
+					} else if(dash) { // has category
+						wchar_t deck_name[256];
+						wcsncpy(deck_name, dash + 1, 256);
+						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
+							if(!wcscmp(mainGame->cbDBDecks->getItem(i), deck_name)) {
+								wcscpy(mainGame->gameConf.lastdeck, deck_name);
+								mainGame->cbDBDecks->setSelected(i);
+								break;
+							}
+						}
+					} else { // only deck name
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 							if(!wcscmp(mainGame->cbDBDecks->getItem(i), open_file_name)) {
 								wcscpy(mainGame->gameConf.lastdeck, open_file_name);
