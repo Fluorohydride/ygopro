@@ -170,7 +170,10 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 #endif
 	device->getLogger()->setLogLevel(irr::ELL_ERROR);
 #if defined(__linux__) && !defined(__ANDROID__)
-	X11 = std::make_unique<X11Helper>();
+#if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+	if(params.DeviceType != irr::E_DEVICE_TYPE::EIDT_WAYLAND)
+#endif
+		X11 = std::make_unique<X11Helper>();
 #endif
 	return device;
 }
@@ -248,7 +251,7 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	}
 	static_cast<CCursorControl*>(device->getCursorControl())->updateBorderSize(fullscreen, true);
 #elif defined(__linux__) && !defined(__ANDROID__)
-	if(!X11->LibX11)
+	if(!X11 || !X11->LibX11)
 		return;
 	struct {
 		unsigned long   flags;
