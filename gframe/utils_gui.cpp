@@ -108,7 +108,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 		fmt::print("You're using the wayland device backend.\nKeep in mind that it's still experimental and might be unstable.\n"
 				   "If you are getting any major issues, or the game doesn't start,\n"
 				   "you can manually disable this option from the system.conf file by toggling the useWayland option.\n"
-				   "Feel free to report any issues you encounter.\n")
+				   "Feel free to report any issues you encounter.\n");
 	}
 #endif
 	params.Vsync = configs->vsync;
