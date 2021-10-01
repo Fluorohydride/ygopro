@@ -11,7 +11,6 @@ int enable_log = 0;
 bool exit_on_return = false;
 bool open_file = false;
 wchar_t open_file_name[256] = L"";
-wchar_t open_file_name_with_category[256] = L"";
 bool bot_mode = false;
 
 void ClickButton(irr::gui::IGUIElement* btn) {
@@ -128,11 +127,14 @@ int main(int argc, char* argv[]) {
 				exit_on_return = !keep_on_return;
 				if(i < wargc) {
 					open_file = true;
-					wcscpy(open_file_name, wargv[i]);
-					if(deckCategorySpecified && wcslen(ygo::mainGame->gameConf.lastcategory)) {
-						swprintf(open_file_name_with_category, 256, L"%ls/%ls", ygo::mainGame->gameConf.lastcategory, open_file_name);
+					if(deckCategorySpecified) {
+#ifdef WIN32
+						myswprintf(open_file_name, L"%ls\\%ls", ygo::mainGame->gameConf.lastcategory, wargv[i]);
+#else
+						myswprintf(open_file_name, L"%ls/%ls", ygo::mainGame->gameConf.lastcategory, wargv[i]);
+#endif
 					} else {
-						wcscpy(open_file_name_with_category, open_file_name);
+						wcscpy(open_file_name, wargv[i]);
 					}
 				}
 				ClickButton(ygo::mainGame->btnDeckEdit);
