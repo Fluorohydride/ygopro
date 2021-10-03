@@ -22,7 +22,7 @@ public:
 	bool GetString(int code, CardString* pStr);
 	const wchar_t* GetName(int code);
 	const wchar_t* GetText(int code);
-	const wchar_t* GetDesc(int strCode);
+	const wchar_t* GetDesc(unsigned int strCode);
 	const wchar_t* GetSysString(int code);
 	const wchar_t* GetVictoryString(int code);
 	const wchar_t* GetCounterName(int code);

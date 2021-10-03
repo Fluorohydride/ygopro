@@ -188,10 +188,10 @@ const wchar_t* DataManager::GetText(int code) {
 		return csit->second.text.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetDesc(int strCode) {
-	if((unsigned int)strCode < 10000u)
+const wchar_t* DataManager::GetDesc(unsigned int strCode) {
+	if(strCode < 10000u)
 		return GetSysString(strCode);
-	unsigned int code = strCode >> 4;
+	unsigned int code = (strCode >> 4) & 0x0fffffff;
 	unsigned int offset = strCode & 0xf;
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
