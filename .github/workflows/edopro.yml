@@ -76,8 +76,6 @@ jobs:
       shell: bash
       run: |
         sudo apt remove libsqlite3-dev
-        sudo apt update
-        sudo apt install libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libxxf86vm-dev
     - uses: actions/checkout@v1
       with:
         fetch-depth: 1
@@ -89,6 +87,56 @@ jobs:
       shell: bash
       run: ./travis/dependencies.sh
     - name: Build
+      shell: bash
+      run: ./travis/build.sh
+    - name: Predeploy
+      shell: bash
+      run: ./travis/predeploy.sh
+    - name: Deploy
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      shell: bash
+      run: ./ocgcore/travis/deploy.sh
+
+  Linux-gcc-aarch64-7-5-0:
+    runs-on: ubuntu-18.04
+    if: >-
+      !(
+        contains(github.event.head_commit.message, '[ci skip]') ||
+        contains(github.event.head_commit.message, '[skip ci]') ||
+        contains(github.event.head_commit.message, '[actions skip]') ||
+        contains(github.event.head_commit.message, '[skip actions]')
+      )
+    env:
+      DEPLOY_BRANCH: travis-linux-aarch64
+      TRAVIS_OS_NAME: linux
+    steps:
+    - name: Set custom env vars
+      shell: bash
+      run: |
+        echo "VCPKG_ROOT=$PWD/vcpkg" >> $GITHUB_ENV
+        echo "VCPKG_CACHE_7Z_URL=$DEPENDENCIES_BASE_URL/installed_aarch64-linux.7z" >> $GITHUB_ENV
+    - name: Get apt packages
+      shell: bash
+      run: |
+        sudo apt remove libsqlite3-dev
+        sudo apt update
+        sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+        submodules: true
+    - name: Install premake
+      shell: bash
+      run: ./travis/install-premake5.sh
+    - name: Install dependencies
+      shell: bash
+      run: |
+        ./travis/dependencies.sh && \
+        mv $VCPKG_ROOT/installed/arm64-linux $VCPKG_ROOT/installed/x64-linux
+    - name: Build
+      env:
+        CC: /usr/bin/aarch64-linux-gnu-gcc
+        CXX: /usr/bin/aarch64-linux-gnu-g++
       shell: bash
       run: ./travis/build.sh
     - name: Predeploy
