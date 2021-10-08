@@ -72,7 +72,7 @@ uint16_t DuelClient::temp_port = 0;
 uint16_t DuelClient::temp_ver = 0;
 bool DuelClient::try_needed = false;
 
-std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address, int port) {
+std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address, uint16_t port) {
 	uint32_t remote_addr = inet_addr(address.data());
 	if(remote_addr == -1) {
 		evutil_addrinfo hints{};
@@ -87,7 +87,7 @@ std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address
 		remote_addr = in_answer->sin_addr.s_addr;
 		evutil_freeaddrinfo(answer);
 	}
-	return { remote_addr, static_cast<uint16_t>(port) };
+	return { remote_addr, port };
 }
 
 bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool create_game) {

@@ -54,9 +54,9 @@ public:
 	static bool is_local_host;
 	static std::atomic<bool> answered;
 
-	static std::pair<uint32_t, uint16_t> ResolveServer(epro::stringview address, int port);
+	static std::pair<uint32_t, uint16_t> ResolveServer(epro::stringview address, uint16_t port);
 	static inline std::pair<uint32_t, uint16_t> ResolveServer(epro::wstringview address, epro::wstringview port) {
-		return ResolveServer(BufferIO::EncodeUTF8(address), std::stoi({ port.data(), port.size() }));
+		return ResolveServer(BufferIO::EncodeUTF8(address), static_cast<uint16_t>(std::stoi({ port.data(), port.size() })));
 	}
 	static bool StartClient(uint32_t ip, uint16_t port, uint32_t gameid = 0, bool create_game = true);
 	static void ConnectTimeout(evutil_socket_t fd, short events, void* arg);

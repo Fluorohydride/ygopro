@@ -2291,8 +2291,8 @@ void Game::LoadServers() {
 					tmp_server.name = BufferIO::DecodeUTF8(obj.at("name").get_ref<std::string&>());
 					tmp_server.address = obj.at("address").get<std::string>();
 					tmp_server.roomaddress = obj.at("roomaddress").get<std::string>();
-					tmp_server.roomlistport = obj.at("roomlistport").get<int>();
-					tmp_server.duelport = obj.at("duelport").get<int>();
+					tmp_server.roomlistport = obj.at("roomlistport").get<uint16_t>();
+					tmp_server.duelport = obj.at("duelport").get<uint16_t>();
 					int i = serverChoice->addItem(tmp_server.name.data());
 					if(gGameConfig->lastServer == tmp_server.name)
 						serverChoice->setSelected(i);

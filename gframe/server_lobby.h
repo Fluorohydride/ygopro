@@ -10,8 +10,8 @@ struct ServerInfo {
 	std::wstring name;
 	std::string address;
 	std::string roomaddress;
-	int duelport;
-	int roomlistport;
+	uint16_t duelport;
+	uint16_t roomlistport;
 };
 struct RoomInfo {
 	std::wstring name;
