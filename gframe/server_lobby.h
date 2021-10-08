@@ -7,11 +7,28 @@
 
 namespace ygo {
 struct ServerInfo {
+	enum Protocol {
+		HTTP,
+		HTTPS,
+	} protocol{ HTTP };
 	std::wstring name;
 	std::string address;
 	std::string roomaddress;
 	uint16_t duelport;
 	uint16_t roomlistport;
+	static epro::stringview GetProtocolString(Protocol protocol) {
+		switch(protocol) {
+		case HTTP:
+			return "http";
+		case HTTPS:
+			return "https";
+		}
+	}
+	static Protocol GetProtocol(epro::stringview protocol) {
+		if(protocol == "https")
+			return HTTPS;
+		return HTTP;
+	}
 };
 struct RoomInfo {
 	std::wstring name;

@@ -2293,6 +2293,12 @@ void Game::LoadServers() {
 					tmp_server.roomaddress = obj.at("roomaddress").get<std::string>();
 					tmp_server.roomlistport = obj.at("roomlistport").get<uint16_t>();
 					tmp_server.duelport = obj.at("duelport").get<uint16_t>();
+					{
+						auto it = obj.find("protocol");
+						if(it != obj.end() && it->is_string()) {
+							tmp_server.protocol = ServerInfo::GetProtocol(it->get_ref<std::string&>());
+						}
+					}
 					int i = serverChoice->addItem(tmp_server.name.data());
 					if(gGameConfig->lastServer == tmp_server.name)
 						serverChoice->setSelected(i);

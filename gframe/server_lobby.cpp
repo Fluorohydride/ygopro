@@ -180,7 +180,7 @@ void ServerLobby::GetRoomsThread() {
 	curl_easy_setopt(curl_handle, CURLOPT_ERRORBUFFER, curl_error_buffer);
 	curl_easy_setopt(curl_handle, CURLOPT_FAILONERROR, 1);
 	//if(mainGame->chkShowActiveRooms->isChecked()) {
-		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", serverInfo.roomaddress, serverInfo.roomlistport).data());
+		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("{}://{}:{}/api/getrooms", ServerInfo::GetProtocolString(serverInfo.protocol), serverInfo.roomaddress, serverInfo.roomlistport).data());
 	/*} else {
 		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", serverInfo.roomaddress, serverInfo.roomlistport).data());
 	}*/
