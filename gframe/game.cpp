@@ -2294,7 +2294,7 @@ void Game::LoadServers() {
 					tmp_server.roomlistport = obj.at("roomlistport").get<uint16_t>();
 					tmp_server.duelport = obj.at("duelport").get<uint16_t>();
 					{
-						auto it = obj.find("protocol");
+						auto it = obj.find("roomlistprotocol");
 						if(it != obj.end() && it->is_string()) {
 							tmp_server.protocol = ServerInfo::GetProtocol(it->get_ref<std::string&>());
 						}
