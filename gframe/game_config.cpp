@@ -262,8 +262,8 @@ bool GameConfig::Load(const epro::path_char* filename) {
 				dpi_scale = std::stof(str);
 			else if(type == "skin")
 				skin = Utils::ToPathString(str);
-			else if(type == "ssl_certificate_path")
-				ssl_certificate_path = str;
+			else if(type == "override_ssl_certificate_path")
+				override_ssl_certificate_path = str;
 			else if(type == "language")
 				locale = Utils::ToPathString(str);
 			else if(type == "scale_background")
@@ -389,7 +389,7 @@ bool GameConfig::Save(const epro::path_char* filename) {
 	conf_file << "ctrlClickIsRMB = "           << ctrlClickIsRMB << "\n";
 	conf_file << "dpi_scale = "                << std::to_string(dpi_scale) << "\n"; // Forces float to show decimals
 	conf_file << "skin = "            	       << Utils::ToUTF8IfNeeded(skin) << "\n";
-	conf_file << "ssl_certificate_path = "     << ssl_certificate_path << "\n";
+	conf_file << "override_ssl_certificate_path = "<< override_ssl_certificate_path << "\n";
 	conf_file << "language = "                 << Utils::ToUTF8IfNeeded(locale) << "\n";
 	conf_file << "scale_background = "         << scale_background << "\n";
 	conf_file << "dotted_lines = "             << dotted_lines << "\n";

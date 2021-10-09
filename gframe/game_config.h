@@ -109,6 +109,7 @@ struct GameConfig
 	epro::path_string skin{ EPRO_TEXT("none") };
 	epro::path_string locale{ EPRO_TEXT("English") };
 	std::string ssl_certificate_path;
+	std::string override_ssl_certificate_path;
 
 	nlohmann::json configs;
 	nlohmann::json user_configs;
