@@ -168,7 +168,6 @@ void CheckArguments(int argc, epro::path_char* argv[]) {
 #undef PARAM_CHECK
 
 inline void ThreadsStartup() {
-	curl_global_init(CURL_GLOBAL_SSL);
 #ifdef _WIN32
 	const WORD wVersionRequested = MAKEWORD(2, 2);
 	WSADATA wsaData;
@@ -177,6 +176,7 @@ inline void ThreadsStartup() {
 #else
 	evthread_use_pthreads();
 #endif
+	curl_global_init(CURL_GLOBAL_SSL);
 }
 inline void ThreadsCleanup() {
 	curl_global_cleanup();
