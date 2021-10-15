@@ -47,9 +47,7 @@ private:
 	int null_lflist_index = -1;
 	std::unordered_map<uint32_t, CardDataC*> dummy_entries;
 	CardDataC* GetDummyOrMappedCardData(uint32_t code);
-	CardDataC* GetMappedCardData(uint32_t code);
 	bool load_dummies{ true };
-	std::map<uint32_t, uint32_t> mapped_ids;
 public:
 	Deck current_deck;
 	Deck sent_deck;

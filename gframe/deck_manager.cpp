@@ -18,7 +18,7 @@
 namespace ygo {
 CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) {
 	if(!load_dummies)
-		return GetMappedCardData(code);
+		return gDataManager->GetMappedCardData(code);
 	auto it = dummy_entries.find(code);
 	if(it != dummy_entries.end())
 		return it->second;
@@ -27,12 +27,6 @@ CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) {
 	tmp->alias = code;
 	dummy_entries[code] = tmp;
 	return tmp;
-}
-CardDataC* DeckManager::GetMappedCardData(uint32_t code) {
-	auto it = mapped_ids.find(code);
-	if(it != mapped_ids.end())
-		return gDataManager->GetCardData(it->second);
-	return nullptr;
 }
 void DeckManager::ClearDummies() {
 	for(auto& card : dummy_entries) {

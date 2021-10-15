@@ -3,6 +3,7 @@
 #include <fmt/format.h>
 #include <IReadFile.h>
 #include <sqlite3.h>
+#include <nlohmann/json.hpp>
 #include "ireadfile_sqlite.h"
 #include "bufferio.h"
 #include "logging.h"
@@ -287,6 +288,39 @@ bool DataManager::LoadLocaleStrings(const epro::path_string& file) {
 	}
 	return true;
 }
+bool DataManager::LoadIdsMapping(const epro::path_string& file) {
+#if defined(__MINGW32__) && defined(UNICODE)
+	auto fd = _wopen(file.data(), _O_RDONLY);
+	if(fd == -1)
+		return false;
+	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
+	std::istream mappings_file(&b);
+#else
+	std::ifstream mappings_file(file);
+#endif
+	if(mappings_file.fail())
+		return false;
+	nlohmann::json mappings;
+	try {
+		mappings_file >> mappings;
+	} catch(const std::exception& e) {
+		ErrorLog(fmt::format("Failed to load id mappings json \"{}\": {}", Utils::ToUTF8IfNeeded(file), e.what()));
+		return false;
+	}
+	auto cit = mappings.find("mappings");
+	if(cit == mappings.end() || !cit->is_array())
+		return false;
+	try {
+		for(auto& obj : *cit) {
+			auto pair = obj.get<std::pair<uint32_t, uint32_t>>();
+			mapped_ids[pair.first] = pair.second;
+		}
+	} catch(const std::exception& e) {
+		ErrorLog(fmt::format("Error while parsing mappings json \"{}\": {}", Utils::ToUTF8IfNeeded(file), e.what()));
+		return false;
+	};
+	return true;
+}
 void DataManager::ClearLocaleStrings() {
 	_sysStrings.ClearLocales();
 	_victoryStrings.ClearLocales();
@@ -304,6 +338,12 @@ CardDataC* DataManager::GetCardData(uint32_t code) {
 	auto it = cards.find(code);
 	if(it != cards.end())
 		return &it->second._data;
+	return nullptr;
+}
+CardDataC* DataManager::GetMappedCardData(uint32_t code) {
+	auto it = mapped_ids.find(code);
+	if(it != mapped_ids.end())
+		return gDataManager->GetCardData(it->second);
 	return nullptr;
 }
 bool DataManager::GetString(uint32_t code, CardString* pStr) {
