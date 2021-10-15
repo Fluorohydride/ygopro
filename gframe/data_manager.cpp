@@ -225,13 +225,15 @@ bool DataManager::LoadStrings(const epro::path_string& file) {
 			if(type == "system") {
 				_sysStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
 			} else {
-				LocaleStringHelper* obj = nullptr;
+				LocaleStringHelper* obj;
 				if(type == "victory")
 					obj = &_victoryStrings;
 				else if(type == "counter")
 					obj = &_counterStrings;
 				else if(type == "setname")
 					obj = &_setnameStrings;
+				else
+					continue;
 				obj->SetMain(std::stoi(value, 0, 16), BufferIO::DecodeUTF8(str));
 			}
 		}
@@ -269,15 +271,16 @@ bool DataManager::LoadLocaleStrings(const epro::path_string& file) {
 			if(type == "system") {
 				_sysStrings.SetLocale(std::stoi(value), BufferIO::DecodeUTF8(str));
 			} else {
-				LocaleStringHelper* obj = nullptr;
+				LocaleStringHelper* obj;
 				if(type == "victory")
 					obj = &_victoryStrings;
 				else if(type == "counter")
 					obj = &_counterStrings;
 				else if(type == "setname")
 					obj = &_setnameStrings;
-				if(obj)
-					obj->SetLocale(std::stoi(value, 0, 16), BufferIO::DecodeUTF8(str));
+				else
+					continue;
+				obj->SetLocale(std::stoi(value, 0, 16), BufferIO::DecodeUTF8(str));
 			}
 		}
 		catch(...) {}
@@ -524,7 +527,7 @@ inline bool check_skills(CardDataC* p1, CardDataC* p2) {
 	}
 	return is_skill(p2->type);
 }
-bool card_sorter(CardDataC* p1, CardDataC* p2, bool(*sortoop)(CardDataC* p1, CardDataC* p2)) {
+static bool card_sorter(CardDataC* p1, CardDataC* p2, bool(*sortoop)(CardDataC* p1, CardDataC* p2)) {
 	if(check_either_skills(p1->type, p2->type))
 		return check_skills(p1, p2);
 	if((p1->type & 0x7) != (p2->type & 0x7))

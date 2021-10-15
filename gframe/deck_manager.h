@@ -63,7 +63,7 @@ public:
 	}
 	void ClearDummies();
 	bool LoadLFListSingle(const epro::path_string& path);
-	bool LoadLFListFolder(epro::path_string path);
+	bool LoadLFListFolder(epro::path_stringview path);
 	void LoadLFList();
 	void RefreshLFList();
 	void RefreshDeck(Deck & deck);

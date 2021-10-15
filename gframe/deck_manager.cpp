@@ -41,7 +41,7 @@ void DeckManager::ClearDummies() {
 	dummy_entries.clear();
 }
 bool DeckManager::LoadLFListSingle(const epro::path_string& path) {
-	static const char key[] = "$whitelist";
+	static constexpr auto key = "$whitelist"_sv;
 #if defined(__MINGW32__) && defined(UNICODE)
 	auto fd = _wopen(path.data(), _O_RDONLY);
 	if(fd == -1)
@@ -75,7 +75,7 @@ bool DeckManager::LoadLFListSingle(const epro::path_string& path) {
 			loaded = true;
 			continue;
 		}
-		if(str.rfind(key, 0) == 0) {
+		if(str.rfind(key.data(), 0, key.size()) == 0) {
 			lflist.whitelist = true;
 			continue;
 		}
@@ -101,8 +101,8 @@ bool DeckManager::LoadLFListSingle(const epro::path_string& path) {
 		_lfList.push_back(lflist);
 	return loaded;
 }
-bool DeckManager::LoadLFListFolder(epro::path_string path) {
-	path = Utils::NormalizePath(path);
+bool DeckManager::LoadLFListFolder(epro::path_stringview _path) {
+	auto path = Utils::NormalizePath(_path);
 	bool loaded = false;
 	auto lflists = Utils::FindFiles(path, { EPRO_TEXT("conf") });
 	for (const auto& lflist : lflists) {
