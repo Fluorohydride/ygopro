@@ -132,6 +132,7 @@ DataHandler::DataHandler(epro::path_stringview working_dir) {
 	LoadDatabases();
 	LoadPicUrls();
 	deckManager->LoadLFList();
+	dataManager->LoadIdsMapping(EPRO_TEXT("./config/mappings.json"));
 	WindBotPanel::absolute_deck_path = Utils::ToUnicodeIfNeeded(Utils::GetAbsolutePath(EPRO_TEXT("./deck")));
 }
 DataHandler::~DataHandler() {

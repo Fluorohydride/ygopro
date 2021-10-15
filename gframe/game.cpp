@@ -1598,6 +1598,7 @@ bool Game::MainLoop() {
 						}
 					}
 					gDataManager->LoadStrings(data_path + EPRO_TEXT("strings.conf"));
+					gDataManager->LoadIdsMapping(data_path + EPRO_TEXT("./config/mappings.json"));
 				} else {
 					if(Utils::ToUTF8IfNeeded(gGameConfig->locale) == repo->language) {
 						for(auto& file : files)
