@@ -289,11 +289,11 @@ uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const 
 	const bool loadalways = !!extralist;
 	for(auto code : mainlist) {
 		if(!(cd = gDataManager->GetCardData(code))) {
-			if(!loadalways) {
+			cd = gdeckManager->GetDummyOrMappedCardData(code);
+			if((!cd || cd->code == 0) && !loadalways) {
 				errorcode = code;
 				continue;
 			}
-			cd = gdeckManager->GetDummyOrMappedCardData(code);
 		}
 		if(!cd || cd->type & TYPE_TOKEN)
 			continue;
@@ -306,11 +306,11 @@ uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const 
 	if(extralist) {
 		for(auto code : *extralist) {
 			if(!(cd = gDataManager->GetCardData(code))) {
-				if(!loadalways) {
+				cd = gdeckManager->GetDummyOrMappedCardData(code);
+				if((!cd || cd->code == 0) && !loadalways) {
 					errorcode = code;
 					continue;
 				}
-				cd = gdeckManager->GetDummyOrMappedCardData(code);
 			}
 			if(!cd || cd->type & TYPE_TOKEN)
 				continue;
@@ -319,11 +319,11 @@ uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const 
 	}
 	for(auto code : sidelist) {
 		if(!(cd = gDataManager->GetCardData(code))) {
-			if(!loadalways) {
+			cd = gdeckManager->GetDummyOrMappedCardData(code);
+			if((!cd || cd->code == 0) && !loadalways) {
 				errorcode = code;
 				continue;
 			}
-			cd = gdeckManager->GetDummyOrMappedCardData(code);
 		}
 		if(!cd || cd->type & TYPE_TOKEN)
 			continue;
