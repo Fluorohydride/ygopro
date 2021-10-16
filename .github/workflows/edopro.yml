@@ -192,6 +192,10 @@ jobs:
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       shell: bash
       run: ./ocgcore/travis/deploy.sh
+    - uses: actions/upload-artifact@v2
+      with:
+        name: osx
+        path: bin/release/ygoprodll.app
 
   Mac-os-aarch64:
     runs-on: macos-latest
@@ -244,3 +248,44 @@ jobs:
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       shell: bash
       run: ./ocgcore/travis/deploy.sh
+    - uses: actions/upload-artifact@v2
+      with:
+        name: osx-aarch64
+        path: bin/release/ygoprodll.app
+
+  Mac-os-universal:
+    runs-on: macos-latest
+    env:
+      DEPLOY_BRANCH: travis-osx-universal
+    needs: Mac-os, Mac-os-aarch64
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+        submodules: true
+    - name: Download osx artifacts
+      uses: actions/download-artifact@v2
+
+    - name: Display structure of downloaded files
+      run: ls -R
+    - name: Merge binaries
+      shell: bash
+      run: |
+        lipo -create -output ygoprodll ./osx-aarch64/ygoprodll.app ./osx/ygoprodll.app
+    - name: Merge binaries
+      shell: bash
+      run: |
+        mkdir bin/release && cp ygoprodll bin/release/ygoprodll.app
+    - name: Predeploy
+      shell: bash
+      run: ./travis/predeploy.sh
+    - name: Deploy
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      shell: bash
+      run: ./ocgcore/travis/deploy.sh
+    - name: Delete artifacts
+      uses: geekyeggo/delete-artifact@v1
+      with:
+        name: |
+            osx-aarch64
+            osx
