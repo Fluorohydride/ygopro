@@ -265,9 +265,6 @@ jobs:
         submodules: true
     - name: Download osx artifacts
       uses: actions/download-artifact@v2
-
-    - name: Display structure of downloaded files
-      run: ls -R
     - name: Merge binaries
       shell: bash
       run: |
@@ -275,7 +272,7 @@ jobs:
     - name: Merge binaries
       shell: bash
       run: |
-        mkdir bin/release && cp ygoprodll bin/release/ygoprodll.app
+        mkdir -p bin/release && cp ygoprodll bin/release/ygoprodll.app
     - name: Predeploy
       shell: bash
       run: ./travis/predeploy.sh
