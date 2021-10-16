@@ -257,6 +257,7 @@ jobs:
     runs-on: macos-latest
     env:
       DEPLOY_BRANCH: travis-osx-universal
+      TRAVIS_OS_NAME: osx
     needs: [ Mac-os, Mac-os-aarch64 ]
     steps:
     - uses: actions/checkout@v1
