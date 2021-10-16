@@ -3,7 +3,7 @@ on: [push, pull_request]
 env:
   BUILD_CONFIG: release
   COVERS_URL: ${{ secrets.COVERS_URL }}
-  DEPENDENCIES_BASE_URL: https://github.com/edo9300/edopro-vcpkg-cache/releases/download/20211003
+  DEPENDENCIES_BASE_URL: https://github.com/edo9300/edopro-vcpkg-cache/releases/download/20211016
   DEPLOY_DIR: deploy
   DEPLOY_REPO: ${{ secrets.DEPLOY_REPO }}
   DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
@@ -183,6 +183,58 @@ jobs:
       shell: bash
       run: ./travis/dependencies.sh
     - name: Build
+      shell: bash
+      run: ./travis/build.sh
+    - name: Predeploy
+      shell: bash
+      run: ./travis/predeploy.sh
+    - name: Deploy
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      shell: bash
+      run: ./ocgcore/travis/deploy.sh
+
+  Mac-os-aarch64:
+    runs-on: macos-latest
+    if: >-
+      !(
+        contains(github.event.head_commit.message, '[ci skip]') ||
+        contains(github.event.head_commit.message, '[skip ci]') ||
+        contains(github.event.head_commit.message, '[actions skip]') ||
+        contains(github.event.head_commit.message, '[skip actions]')
+      )
+    env:
+      DEPLOY_BRANCH: travis-osx-aarch64
+      TRAVIS_OS_NAME: osx
+      VCPKG_ROOT: ./vcpkg2
+      ARM64: 1
+      MACOSX_DEPLOYMENT_TARGET: 11.0
+      SDKROOT: /Applications/Xcode_12.4.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
+    steps:
+    - name: Set custom env vars
+      shell: bash
+      run: |
+        echo "VCPKG_CACHE_7Z_URL=$DEPENDENCIES_BASE_URL/installed_aarch64-osx.7z" >> $GITHUB_ENV
+    # - name: Update brew packages
+      # shell: bash
+      # run: |
+        # brew install dylibbundler
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+        submodules: true
+    - name: Install premake
+      shell: bash
+      run: ./travis/install-premake5.sh
+    - name: Install dependencies
+      shell: bash
+      run: |
+        ./travis/dependencies.sh && \
+        mv $VCPKG_ROOT/installed/arm64-osx $VCPKG_ROOT/installed/x64-osx
+    - name: Build
+      env:
+        CXXFLAGS: -target arm64-apple-macos11
+        CFLAGS: -target arm64-apple-macos11
+        LDFLAGS: -target arm64-apple-macos11
       shell: bash
       run: ./travis/build.sh
     - name: Predeploy
