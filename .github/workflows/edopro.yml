@@ -270,10 +270,10 @@ jobs:
       shell: bash
       run: |
         lipo -create -output ygoprodll ./osx-aarch64/ygoprodll.app ./osx/ygoprodll.app
-    - name: Merge binaries
+    - name: Move merged binary
       shell: bash
       run: |
-        mkdir -p bin/release && cp ygoprodll bin/release/ygoprodll.app
+        mkdir -p bin/release && cp ygoprodll bin/release/ygoprodll.app && chmod +x bin/release/ygoprodll.app
     - name: Predeploy
       shell: bash
       run: ./travis/predeploy.sh
