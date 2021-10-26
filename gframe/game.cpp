@@ -1708,10 +1708,6 @@ bool Game::MainLoop() {
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
 		gMutex.lock();
-		if(should_refresh_hands && dInfo.isInDuel) {
-			should_refresh_hands = false;
-			dField.RefreshHandHitboxes();
-		}
 		if(dInfo.isInDuel) {
 			if(dInfo.isReplay)
 				discord.UpdatePresence(DiscordWrapper::REPLAY);
@@ -1761,6 +1757,10 @@ bool Game::MainLoop() {
 				discord.UpdatePresence(DiscordWrapper::MENU);
 			gSoundManager->PlayBGM(SoundManager::BGM::MENU, gGameConfig->loopMusic);
 			DrawBackImage(imageManager.tBackGround_menu, resized);
+		}
+		if(should_refresh_hands && dInfo.isInDuel) {
+			should_refresh_hands = false;
+			dField.RefreshHandHitboxes();
 		}
 #ifndef __ANDROID__
 		// text width is actual size, other pixels are relative to the assumed 1024x640
