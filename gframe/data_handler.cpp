@@ -109,10 +109,10 @@ DataHandler::DataHandler(epro::path_stringview working_dir) {
 		if(configs->override_ssl_certificate_path != "none" && Utils::FileExists(Utils::ToPathString(configs->override_ssl_certificate_path)))
 			configs->ssl_certificate_path = configs->override_ssl_certificate_path;
 	} else
-		configs->ssl_certificate_path = fmt::format("{}/cacert.cer", Utils::ToUTF8IfNeeded(working_dir));
+		configs->ssl_certificate_path = fmt::format("{}/cacert.pem", Utils::ToUTF8IfNeeded(working_dir));
 #else
 	Utils::OSOperator = new irr::COSAndroidOperator();
-	configs->ssl_certificate_path = fmt::format("{}/cacert.cer", porting::internal_storage);
+	configs->ssl_certificate_path = fmt::format("{}/cacert.pem", porting::internal_storage);
 #endif
 	filesystem = new irr::io::CFileSystem();
 	dataManager = std::unique_ptr<DataManager>(new DataManager());
