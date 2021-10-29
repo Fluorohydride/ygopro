@@ -61,6 +61,13 @@ static inline void NameThread(const char* threadName) {
 	__try {	RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info); }
 	__except(EXCEPTION_EXECUTE_HANDLER) {}
 }
+using SetThreadDescription_t = HRESULT(WINAPI*)(HANDLE, PCWSTR);
+inline const SetThreadDescription_t GetSetThreadDescription() {
+	auto proc = GetProcAddress(GetModuleHandle(EPRO_TEXT("kernel32.dll")), "SetThreadDescription");
+	if(proc == nullptr)
+		proc = GetProcAddress(GetModuleHandle(EPRO_TEXT("KernelBase.dll")), "SetThreadDescription");
+	return reinterpret_cast<SetThreadDescription_t>(proc);
+}
 }
 #pragma warning(pop)
 #endif
@@ -73,7 +80,8 @@ namespace ygo {
 
 	void Utils::InternalSetThreadName(const char* name, const wchar_t* wname) {
 #if defined(_WIN32)
-		static const auto PSetThreadDescription = (HRESULT(WINAPI *)(HANDLE, PCWSTR))GetProcAddress(GetModuleHandle(EPRO_TEXT("kernel32.dll")), "SetThreadDescription");
+		(void)name;
+		static const auto PSetThreadDescription = WindowsWeirdStuff::GetSetThreadDescription();
 		if(PSetThreadDescription)
 			PSetThreadDescription(GetCurrentThread(), wname);
 #if defined(_MSC_VER)
