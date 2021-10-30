@@ -287,7 +287,7 @@ void RepoManager::CloneOrUpdateTask() {
 					catch(const std::exception& e) {
 						history.partial_history.clear();
 						history.warning = e.what();
-						ErrorLog(fmt::format("Warning occurred in repo {}: {}", url, e.what()));
+						ErrorLog("Warning occurred in repo {}: {}", url, history.warning);
 					}
 				}
 				if(history.partial_history.size() >= MAX_HISTORY_LENGTH) {
@@ -314,7 +314,7 @@ void RepoManager::CloneOrUpdateTask() {
 		}
 		catch(const std::exception& e) {
 			history.error = e.what();
-			ErrorLog(fmt::format("Exception occurred in repo {}: {}", _repo.url, e.what()));
+			ErrorLog("Exception occurred in repo {}: {}", _repo.url, history.error);
 		}
 		lck.lock();
 		_repo.history = std::move(history);

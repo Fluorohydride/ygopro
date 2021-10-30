@@ -304,7 +304,7 @@ bool DataManager::LoadIdsMapping(const epro::path_string& file) {
 	try {
 		mappings_file >> mappings;
 	} catch(const std::exception& e) {
-		ErrorLog(fmt::format("Failed to load id mappings json \"{}\": {}", Utils::ToUTF8IfNeeded(file), e.what()));
+		ErrorLog("Failed to load id mappings json \"{}\": {}", Utils::ToUTF8IfNeeded(file), e.what());
 		return false;
 	}
 	auto cit = mappings.find("mappings");
@@ -316,7 +316,7 @@ bool DataManager::LoadIdsMapping(const epro::path_string& file) {
 			mapped_ids[pair.first] = pair.second;
 		}
 	} catch(const std::exception& e) {
-		ErrorLog(fmt::format("Error while parsing mappings json \"{}\": {}", Utils::ToUTF8IfNeeded(file), e.what()));
+		ErrorLog("Error while parsing mappings json \"{}\": {}", Utils::ToUTF8IfNeeded(file), e.what());
 		return false;
 	};
 	return true;
@@ -328,7 +328,7 @@ void DataManager::ClearLocaleStrings() {
 	_setnameStrings.ClearLocales();
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	ErrorLog(fmt::format("Error when loading database ({}): {}", cur_database, sqlite3_errmsg(pDB)));
+	ErrorLog("Error when loading database ({}): {}", cur_database, sqlite3_errmsg(pDB));
 	if(pStmt)
 		sqlite3_finalize(pStmt);
 	sqlite3_close(pDB);

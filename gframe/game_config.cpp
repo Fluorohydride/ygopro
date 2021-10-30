@@ -30,7 +30,7 @@ GameConfig::GameConfig() {
 					conf_file >> configs;
 				}
 				catch(const std::exception& e) {
-					ErrorLog(fmt::format("Exception occurred while loading configs.json: {}", e.what()));
+					ErrorLog("Exception occurred while loading configs.json: {}", e.what());
 					//throw(e);
 				}
 			}
@@ -53,7 +53,7 @@ GameConfig::GameConfig() {
 					user_conf_file >> user_configs;
 				}
 				catch(const std::exception& e) {
-					ErrorLog(fmt::format("Exception occurred while loading user_configs.json: {}", e.what()));
+					ErrorLog("Exception occurred while loading user_configs.json: {}", e.what());
 					//throw(e);
 				}
 			}

@@ -190,7 +190,7 @@ static void OnJoin(const char* secret, void* payload) {
 		host.pass = BufferIO::DecodeUTF8(json["pass"].get_ref<const std::string&>());
 	}
 	catch(const std::exception& e) {
-		ygo::ErrorLog(fmt::format("Exception occurred: {}", e.what()));
+		ygo::ErrorLog("Exception occurred: {}", e.what());
 		return;
 	}
 	game->isHostingOnline = true;

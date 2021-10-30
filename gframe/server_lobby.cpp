@@ -204,7 +204,7 @@ void ServerLobby::GetRoomsThread() {
 	if(res != CURLE_OK) {
 		if(gGameConfig->logDownloadErrors)
 			ErrorLog("Error updating the room list:");
-			ErrorLog(fmt::format("Curl error: ({}) {} ({})", res, curl_easy_strerror(res), curl_error_buffer));
+			ErrorLog("Curl error: ({}) {} ({})", res, curl_easy_strerror(res), curl_error_buffer);
 		//error
 		mainGame->PopupMessage(gDataManager->GetSysString(2037));
 		mainGame->btnLanRefresh2->setEnabled(true);
@@ -256,7 +256,7 @@ void ServerLobby::GetRoomsThread() {
 			}
 		}
 		catch (const std::exception& e) {
-			ErrorLog(fmt::format("Exception occurred parsing server rooms: {}", e.what()));
+			ErrorLog("Exception occurred parsing server rooms: {}", e.what());
 		}
 	}
 	has_refreshed = true;
@@ -283,7 +283,7 @@ void ServerLobby::JoinServer(bool host) {
 		serverinfo = DuelClient::ResolveServer(server.address, server.duelport);
 	}
 	catch(const std::exception& e) {
-		ErrorLog(fmt::format("Exception occurred: {}", e.what()));
+		ErrorLog("Exception occurred: {}", e.what());
 		return;
 	}
 	if(host) {
