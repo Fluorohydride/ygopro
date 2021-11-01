@@ -1526,21 +1526,8 @@ void ClientField::UpdateDeclarableList() {
 		return;
 	}
 	if(pname[0] == 0) {
-		std::vector<int> cache;
-		cache.swap(ancard);
 		int sel = mainGame->lstANCard->getSelected();
-		int selcode = (sel == -1) ? 0 : cache[sel];
-		mainGame->lstANCard->clear();
-		for(const auto& trycode : cache) {
-			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declare_opcodes)) {
-				ancard.push_back(trycode);
-				mainGame->lstANCard->addItem(cstr.name.c_str());
-				if(trycode == selcode)
-					mainGame->lstANCard->setSelected(cstr.name.c_str());
-			}
-		}
-		if(!ancard.empty())
-			return;
+		trycode = (sel == -1) ? 0 : ancard[sel];
 	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
@@ -1549,7 +1536,7 @@ void ClientField::UpdateDeclarableList() {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, declare_opcodes)) {
-				if(pname == cit->second.name) { //exact match
+				if(pname == cit->second.name || trycode == cit->first) { //exact match or last used
 					mainGame->lstANCard->insertItem(0, cit->second.name.c_str(), -1);
 					ancard.insert(ancard.begin(), cit->first);
 				} else {

@@ -32,7 +32,7 @@ int SingleMode::SinglePlayThread() {
 	const int start_lp = 8000;
 	const int start_hand = 5;
 	const int draw_count = 1;
-	const int opt = 0;
+	int opt = 0;
 	std::random_device rd;
 	unsigned int seed = rd();
 	mt19937 rnd(seed);
@@ -50,6 +50,8 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dInfo.clientname[0] = 0;
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
+	if(mainGame->chkSinglePlayReturnDeckTop->isChecked())
+		opt |= DUEL_RETURN_DECK_TOP;
 	char filename[256];
 	size_t slen = 0;
 	if(open_file) {
