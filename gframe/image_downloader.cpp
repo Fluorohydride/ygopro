@@ -166,7 +166,7 @@ void ImageDownloader::DownloadPic() {
 				break;
 			}
 			if(gGameConfig->logDownloadErrors) {
-				ygo::ErrorLog("Failed downloading pic for {}", code))
+				ygo::ErrorLog("Failed downloading pic for {}", code);
 				ygo::ErrorLog("Curl error: ({}) {} ({})", res, curl_easy_strerror(res), curl_error_buffer);
 			}
 			Utils::FileDelete(name);
