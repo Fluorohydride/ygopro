@@ -5,6 +5,7 @@
 #define _tmain main
 #include <unistd.h>
 #endif
+#include <cstdio>
 #include <curl/curl.h>
 #include <event2/thread.h>
 #include <IrrlichtDevice.h>
