@@ -204,6 +204,7 @@ using Game = ygo::Game;
 #endif
 
 int _tmain(int argc, epro::path_char* argv[]) {
+	std::puts(EDOPRO_VERSION_STRING_DEBUG);
 	epro::path_stringview dest;
 	int skipped = 0;
 	if(argc > 2 && (argv[1] == EPRO_TEXT("from_discord"_sv) || argv[1] == EPRO_TEXT("-C"_sv))) {
