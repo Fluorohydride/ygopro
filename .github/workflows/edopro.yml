@@ -64,6 +64,8 @@ jobs:
                 
         color: 0xff0000
         webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+        username: Github
 
   Linux-gcc-7-5-0:
     runs-on: ubuntu-18.04
@@ -118,6 +120,8 @@ jobs:
                 
         color: 0xff0000
         webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+        username: Github
 
   Linux-gcc-aarch64-7-5-0:
     runs-on: ubuntu-18.04
@@ -179,6 +183,8 @@ jobs:
                 
         color: 0xff0000
         webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+        username: Github
 
   Mac-os:
     runs-on: macos-10.15
@@ -240,6 +246,8 @@ jobs:
                 
         color: 0xff0000
         webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+        username: Github
 
   Mac-os-aarch64:
     runs-on: macos-latest
@@ -307,6 +315,8 @@ jobs:
                 
         color: 0xff0000
         webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+        username: Github
 
   Mac-os-universal:
     runs-on: macos-latest
@@ -353,3 +363,5 @@ jobs:
                 
         color: 0xff0000
         webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+        username: Github
