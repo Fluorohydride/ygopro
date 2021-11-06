@@ -93,6 +93,9 @@ bool Game::Initialize() {
 	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	if(!textFont) {
 		const wchar_t* textFontPaths[] = {
+			L"C:/Windows/Fonts/YuGothM.ttc",
+			L"C:/Windows/Fonts/meiryo.ttc",
+			L"C:/Windows/Fonts/msgothic.ttc",
 			L"C:/Windows/Fonts/msyh.ttc",
 			L"C:/Windows/Fonts/msyh.ttf",
 			L"C:/Windows/Fonts/simsun.ttc",
