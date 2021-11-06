@@ -11,6 +11,12 @@ extern bool open_file;
 extern epro::path_string open_file_name;
 extern bool show_changelog;
 
+#ifdef _MSC_VER
+#define unreachable() __assume(0)
+#else
+#define unreachable() __builtin_unreachable()
+#endif
+
 #define EDOPRO_VERSION_MAJOR 39
 #define EDOPRO_VERSION_MINOR 2
 #define EDOPRO_VERSION_PATCH 1
