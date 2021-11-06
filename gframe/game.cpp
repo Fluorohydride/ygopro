@@ -93,12 +93,12 @@ bool Game::Initialize() {
 	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	if(!textFont) {
 		const wchar_t* textFontPaths[] = {
-			L"C:/Windows/Fonts/YuGothM.ttc",
-			L"C:/Windows/Fonts/meiryo.ttc",
-			L"C:/Windows/Fonts/msgothic.ttc",
 			L"C:/Windows/Fonts/msyh.ttc",
 			L"C:/Windows/Fonts/msyh.ttf",
 			L"C:/Windows/Fonts/simsun.ttc",
+			L"C:/Windows/Fonts/YuGothM.ttc",
+			L"C:/Windows/Fonts/meiryo.ttc",
+			L"C:/Windows/Fonts/msgothic.ttc",
 			L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
 			L"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
 			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc",
