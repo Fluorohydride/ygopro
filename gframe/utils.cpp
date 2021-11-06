@@ -40,9 +40,10 @@ using Stat = struct stat;
 #include <ext/stdio_filebuf.h>
 #endif
 
-#if defined(_WIN32) && defined(_MSC_VER)
+#if defined(_WIN32)
 namespace WindowsWeirdStuff {
 
+#if defined(_MSC_VER)
 //https://docs.microsoft.com/en-us/visualstudio/debugger/how-to-set-a-thread-name-in-native-code?view=vs-2015&redirectedfrom=MSDN
 
 static constexpr DWORD MS_VC_EXCEPTION = 0x406D1388;
@@ -61,6 +62,8 @@ static inline void NameThread(const char* threadName) {
 	__try {	RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info); }
 	__except(EXCEPTION_EXECUTE_HANDLER) {}
 }
+#pragma warning(pop)
+#endif
 using SetThreadDescription_t = HRESULT(WINAPI*)(HANDLE, PCWSTR);
 inline const SetThreadDescription_t GetSetThreadDescription() {
 	auto proc = GetProcAddress(GetModuleHandle(EPRO_TEXT("kernel32.dll")), "SetThreadDescription");
@@ -69,7 +72,6 @@ inline const SetThreadDescription_t GetSetThreadDescription() {
 	return reinterpret_cast<SetThreadDescription_t>(proc);
 }
 }
-#pragma warning(pop)
 #endif
 
 namespace ygo {
