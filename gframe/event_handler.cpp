@@ -2757,62 +2757,70 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 		mainGame->stCardListTip->setVisible(true);
 	}
 }
-int GetSuitableReturn(uint32_t maxseq, size_t size) {
-	int32_t bitvaluesize = maxseq;
-	int32_t uint8size = (maxseq < 255) ? size * 8 : -1;
-	int32_t uint16size = (maxseq < 65535) ? size * 16 : -1;
-	int32_t uint32size = (maxseq < 4294967295) ? size * 32 : -1;
-	int32_t res = std::min<uint32_t>(bitvaluesize, std::min<uint32_t>(uint8size, std::min<uint32_t>(uint16size, uint32size)));
-	if(res == bitvaluesize)
-		return 1;
-	if(res == uint8size)
-		return 2;
-	if(res == uint16size)
-		return 3;
-	if(res == uint32size)
-		return 4;
-	return 1;
+static int GetSuitableReturn(uint32_t maxseq, uint32_t size) {
+	using nl8 = std::numeric_limits<uint8_t>;
+	using nl16 = std::numeric_limits<uint16_t>;
+	using nl32 = std::numeric_limits<uint32_t>;
+	if(maxseq < nl8::max()) {
+		if(maxseq >= size * nl8::digits)
+			return 2;
+	} else if(maxseq < nl16::max()) {
+		if(maxseq >= size * nl16::digits)
+			return 1;
+	}
+	else if(maxseq < nl32::max()) {
+		if(maxseq >= size * nl32::digits)
+			return 0;
+	}
+	return 3;
+}
+template<typename T>
+static inline void WriteCard(ProgressiveBuffer& buffer, uint32_t i, uint32_t value) {
+	static constexpr auto off = 8 >> (sizeof(T) / 2);
+	buffer.at<T>(i + off) = static_cast<T>(value);
 }
 void ClientField::SetResponseSelectedCards() const {
 	if (!mainGame->dInfo.compat_mode) {
 		if(mainGame->dInfo.curMsg == MSG_SELECT_UNSELECT_CARD) {
 			uint32_t respbuf[] = { 1, selected_cards[0]->select_seq };
-			DuelClient::SetResponseB((char*)respbuf, sizeof(respbuf));
+			DuelClient::SetResponseB(respbuf, sizeof(respbuf));
 		} else {
 			uint32_t maxseq = 0;
-			size_t size = selected_cards.size();
+			uint32_t size = static_cast<uint32_t>(selected_cards.size());
 			for(auto& c : selected_cards) {
 				maxseq = std::max(maxseq, c->select_seq);
 			}
 			ProgressiveBuffer ret;
 			switch(GetSuitableReturn(maxseq, size)) {
-				case 1: {
+				case 3: {
 					ret.at<int32_t>(0) = 3;
 					for(auto c : selected_cards)
-						ret.bitSet(c->select_seq + (sizeof(int) * 8));
+						ret.bitSet(c->select_seq + (sizeof(int32_t) * 8));
 					break;
 				}
 				case 2:	{
 					ret.at<int32_t>(0) = 2;
-					ret.at<int32_t>(1) = size;
-					for(size_t i = 0; i < size; ++i)
-						ret.at<int8_t>(i + 8) = selected_cards[i]->select_seq;
+					ret.at<uint32_t>(1) = size;
+					for(uint32_t i = 0; i < size; ++i)
+						WriteCard<uint8_t>(ret, i, selected_cards[i]->select_seq);
 					break;
 				}
-				case 3:	{
+				case 1:	{
 					ret.at<int32_t>(0) = 1;
-					ret.at<int32_t>(1) = size;
-					for(size_t i = 0; i < size; ++i)
-						ret.at<int16_t>(i + 4) = selected_cards[i]->select_seq;
+					ret.at<uint32_t>(1) = size;
+					for(uint32_t i = 0; i < size; ++i)
+						WriteCard<uint16_t>(ret, i, selected_cards[i]->select_seq);
 					break;
 				}
-				case 4:	{
+				case 0:	{
 					ret.at<int32_t>(0) = 0;
-					ret.at<int32_t>(1) = size;
-					for(size_t i = 0; i < size; ++i)
-						ret.at<int32_t>(i + 2) = selected_cards[i]->select_seq;
+					ret.at<uint32_t>(1) = size;
+					for(uint32_t i = 0; i < size; ++i)
+						WriteCard<uint32_t>(ret, i, selected_cards[i]->select_seq);
 					break;
 				}
+				default:
+					unreachable();
 			}
 			DuelClient::SetResponseB(ret.data.data(), ret.data.size());
 		}
