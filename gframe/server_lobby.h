@@ -22,6 +22,8 @@ struct ServerInfo {
 			return "http";
 		case HTTPS:
 			return "https";
+		default:
+			unreachable();
 		}
 	}
 	static Protocol GetProtocol(epro::stringview protocol) {
