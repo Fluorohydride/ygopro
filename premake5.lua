@@ -123,8 +123,13 @@ workspace "ygo"
 		buildoptions { "-fno-strict-aliasing", "-Wno-multichar" }
 
 	filter { "action:not vs*", "system:windows" }
-	  linkoptions { "-mthreads", "-municode", "-static-libgcc", "-static-libstdc++", "-static", "-lpthread" }
-	  defines { "UNICODE", "_UNICODE" }
+		buildoptions { "-static-libgcc", "-static-libstdc++", "-static", "-lpthread" }
+		linkoptions { "-mthreads", "-municode", "-static-libgcc", "-static-libstdc++", "-static", "-lpthread" }
+		defines { "UNICODE", "_UNICODE" }
+
+	filter { "action:not vs*", "system:windows", "configurations:Release" }
+		buildoptions { "-s" }
+		linkoptions { "-s" }
 
 	filter "configurations:Debug"
 		symbols "On"
