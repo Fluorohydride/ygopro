@@ -4,6 +4,8 @@
 #include <fmt/core.h>
 #if FMT_VERSION >= 80000
 #include <fmt/xchar.h>
+#elif FMT_VERSION < 60000
+#include <fmt/time.h>
 #endif
 #include "nonstd/string_view.hpp"
 namespace nonstd {
