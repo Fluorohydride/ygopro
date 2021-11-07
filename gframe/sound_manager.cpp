@@ -104,7 +104,7 @@ void SoundManager::RefreshSoundsList() {
 	const auto extensions = mixer->GetSupportedSoundExtensions();
 	for(const auto& sound : fx) {
 		for(const auto& ext : extensions) {
-			const auto filename = fmt::format(sound.second, ext);
+			const auto filename = fmt::format(to_string_view(sound.second), ext);
 			if(Utils::FileExists(filename)) {
 				SFXList[sound.first] = Utils::ToUTF8IfNeeded(filename);
 				break;
