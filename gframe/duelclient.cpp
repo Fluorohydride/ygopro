@@ -48,7 +48,7 @@ std::vector<uint8_t> DuelClient::duel_client_write;
 bool DuelClient::is_closing = false;
 uint64_t DuelClient::select_hint = 0;
 std::wstring DuelClient::event_string;
-randengine DuelClient::rnd;
+RNG::mt19937 DuelClient::rnd;
 
 ReplayStream DuelClient::replay_stream;
 Replay DuelClient::last_replay;

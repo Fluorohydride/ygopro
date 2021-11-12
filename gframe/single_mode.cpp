@@ -1,6 +1,5 @@
 #include "single_mode.h"
 #include <fmt/chrono.h>
-#include "random_fwd.h"
 #include "game_config.h"
 #include "duelclient.h"
 #include "game.h"
@@ -77,15 +76,15 @@ int SingleMode::SinglePlayThread(DuelOptions&& duelOptions) {
 	mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 45));
 	is_continuing = false;
 	is_restarting = false;
+	auto rnd = Utils::GetRandomNumberGenerator();
 restart:
-	uint32_t seed = static_cast<uint32_t>(time(0));;
-	DuelClient::rnd.seed(seed);
+	uint32_t seed = static_cast<uint32_t>(rnd());
 	mainGame->dInfo.isSingleMode = true;
 	OCG_Player team = { duelOptions.startingLP, duelOptions.startingDrawCount, duelOptions.drawCountPerTurn };
 	bool hand_test = mainGame->dInfo.isHandTest = (duelOptions.scriptName == "hand-test-mode");
 	if(hand_test)
 		opt |= DUEL_ATTACK_FIRST_TURN;
-	pduel = mainGame->SetupDuel({ DuelClient::rnd(), opt, team, team });
+	pduel = mainGame->SetupDuel({ seed, opt, team, team });
 	mainGame->dInfo.compat_mode = false;
 	mainGame->dInfo.startlp = mainGame->dInfo.lp[0] = mainGame->dInfo.lp[1] = duelOptions.startingLP;
 	mainGame->dInfo.strLP[0] = mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[0]);
@@ -97,7 +96,7 @@ restart:
 	ReplayHeader rh;
 	rh.id = REPLAY_YRP1;
 	rh.version = CLIENT_VERSION;
-	rh.flag = REPLAY_SINGLE_MODE | REPLAY_LUA64 | REPLAY_NEWREPLAY | REPLAY_64BIT_DUELFLAG;
+	rh.flag = REPLAY_SINGLE_MODE | REPLAY_LUA64 | REPLAY_NEWREPLAY | REPLAY_64BIT_DUELFLAG | REPLAY_DIRECT_SEED;
 	if(hand_test)
 		rh.flag |= REPLAY_HAND_TEST;
 	rh.seed = seed;
@@ -116,7 +115,7 @@ restart:
 		InitReplay();
 		Deck playerdeck(gdeckManager->current_deck);
 		if ((duelOptions.duelFlags & DUEL_PSEUDO_SHUFFLE) == 0)
-			std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), DuelClient::rnd);
+			std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), rnd);
 		auto LoadDeck = [&](uint8_t team) {
 			OCG_NewCardInfo card_info = { team, 0, 0, team, 0, 0, POS_FACEDOWN_DEFENSE };
 			card_info.loc = LOCATION_DECK;

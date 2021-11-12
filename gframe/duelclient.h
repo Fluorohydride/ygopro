@@ -18,7 +18,7 @@
 #include "network.h"
 #include "data_manager.h"
 #include "deck_manager.h"
-#include "random_fwd.h"
+#include "RNG/mt19937.h"
 #include "replay.h"
 
 namespace ygo {
@@ -46,7 +46,7 @@ private:
 	static std::thread client_thread;
 	static std::condition_variable cv;
 public:
-	static randengine rnd;
+	static RNG::mt19937 rnd;
 	static uint32_t temp_ip;
 	static uint16_t temp_port;
 	static uint16_t temp_ver;

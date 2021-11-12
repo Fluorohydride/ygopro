@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <fmt/format.h>
 #include <irrlicht.h>
-#include "random_fwd.h"
 #include "config.h"
 #include "deck_con.h"
 #include "utils.h"
@@ -265,7 +264,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				std::shuffle(
 					gdeckManager->current_deck.main.begin(),
 					gdeckManager->current_deck.main.end(),
-					randengine(time(nullptr))
+					Utils::GetRandomNumberGenerator()
 				);
 				break;
 			}

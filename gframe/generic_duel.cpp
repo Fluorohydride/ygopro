@@ -2,7 +2,6 @@
 #include "netserver.h"
 #include "game.h"
 #include "core_utils.h"
-#include "random_fwd.h"
 
 namespace ygo {
 
@@ -574,14 +573,15 @@ void GenericDuel::TPResult(DuelPlayer* dp, uint8_t tp) {
 	cur_player[0] = players.home_iterator->player;
 	cur_player[1] = players.opposing_iterator->player;
 	dp->state = CTOS_RESPONSE;
+	auto rnd = Utils::GetRandomNumberGenerator();
+	const uint32_t seed = static_cast<uint32_t>(rnd());
 	ReplayHeader rh;
 	rh.id = REPLAY_YRP1;
 	rh.version = CLIENT_VERSION;
-	rh.flag = REPLAY_LUA64 | REPLAY_NEWREPLAY | REPLAY_64BIT_DUELFLAG;
-	rh.seed = static_cast<uint32_t>(time(0));
+	rh.flag = REPLAY_LUA64 | REPLAY_NEWREPLAY | REPLAY_64BIT_DUELFLAG | REPLAY_DIRECT_SEED;
+	rh.seed = seed;
 	last_replay.BeginRecord(true, EPRO_TEXT("./replay/_LastReplay.yrp"));
 	last_replay.WriteHeader(rh);
-	randengine rnd(rh.seed);
 	//records the replay with the new system
 	new_replay.BeginRecord();
 	rh.id = REPLAY_YRPX;
@@ -604,7 +604,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, uint8_t tp) {
 	if(host_info.no_shuffle_deck)
 		opt |= ((uint64_t)DUEL_PSEUDO_SHUFFLE);
 	OCG_Player team = { host_info.start_lp, host_info.start_hand, host_info.draw_count };
-	pduel = mainGame->SetupDuel({ rnd(), opt, team, team });
+	pduel = mainGame->SetupDuel({ seed, opt, team, team });
 	if(!host_info.no_shuffle_deck) {
 		IteratePlayers([&rnd](duelist& dueler) {
 			std::shuffle(dueler.pdeck.main.begin(), dueler.pdeck.main.end(), rnd);

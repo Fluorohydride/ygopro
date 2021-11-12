@@ -80,6 +80,8 @@ namespace ygo {
 	irr::IOSOperator* Utils::OSOperator{ nullptr };
 	epro::path_string Utils::working_dir;
 
+	RNG::SplitMix64 Utils::generator(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+
 	void Utils::InternalSetThreadName(const char* name, const wchar_t* wname) {
 #if defined(_WIN32)
 		(void)name;

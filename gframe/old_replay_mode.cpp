@@ -1,9 +1,9 @@
 #include "replay_mode.h"
 #include <fmt/format.h>
+#include "RNG/mt19937.h"
 #include "duelclient.h"
 #include "game.h"
 #include "single_mode.h"
-#include "random_fwd.h"
 
 namespace ygo {
 	bool ReplayMode::ReadReplayResponse() {
@@ -108,7 +108,7 @@ namespace ygo {
 		const ReplayHeader& rh = cur_yrp->pheader;
 		uint32_t seed = rh.seed;
 		if(!(rh.flag & REPLAY_DIRECT_SEED))
-			seed = randengine(seed)();
+			seed = RNG::mt19937(seed)();
 		auto names = ReplayMode::cur_yrp->GetPlayerNames();
 		mainGame->dInfo.selfnames.clear();
 		mainGame->dInfo.opponames.clear();

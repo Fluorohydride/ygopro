@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#include "RNG/Xoshiro256.hpp"
+#include "RNG/SplitMix64.hpp"
 #include "bufferio.h"
 #include "text_types.h"
 
@@ -152,6 +154,11 @@ namespace ygo {
 
 		static void Reboot();
 
+		static inline RNG::Xoshiro256StarStar GetRandomNumberGenerator() {
+			RNG::Xoshiro256StarStar::StateType seed = { { generator(), generator(), generator(), generator() } };
+			return RNG::Xoshiro256StarStar(seed);
+		}
+
 	private:
 		static void InternalSetThreadName(const char* name, const wchar_t* wname);
 		template<typename T>
@@ -162,6 +169,7 @@ namespace ygo {
 		static auto GetFilePathImpl(const epro::basic_string_view<T>& file);
 		template<typename T>
 		static auto GetFileNameImpl(const epro::basic_string_view<T>& file, bool keepextension = false);
+		static RNG::SplitMix64 generator;
 	};
 	
 #define CHAR_T_STRING(text) epro::basic_string_view<T>{ std::is_same<T, wchar_t>::value ? reinterpret_cast<const T*>(L ##text) : reinterpret_cast<const T*>(text) }
