@@ -85,7 +85,7 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.current_player[1] = 0;
 	if(!mainGame->dInfo.isRelay)
 		mainGame->dInfo.current_player[1] = mainGame->dInfo.team2 - 1;
-	auto names = ReplayMode::cur_replay.GetPlayerNames();
+	const auto& names = ReplayMode::cur_replay.GetPlayerNames();
 	mainGame->dInfo.selfnames.clear();
 	mainGame->dInfo.opponames.clear();
 	mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin(), names.begin() + mainGame->dInfo.team1);

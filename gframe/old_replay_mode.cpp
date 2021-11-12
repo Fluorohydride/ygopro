@@ -109,7 +109,7 @@ namespace ygo {
 		uint32_t seed = rh.seed;
 		if(!(rh.flag & REPLAY_DIRECT_SEED))
 			seed = RNG::mt19937(seed)();
-		auto names = ReplayMode::cur_yrp->GetPlayerNames();
+		const auto& names = ReplayMode::cur_yrp->GetPlayerNames();
 		mainGame->dInfo.selfnames.clear();
 		mainGame->dInfo.opponames.clear();
 		mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin(), names.begin() + ReplayMode::cur_yrp->GetPlayersCount(0));
@@ -125,8 +125,8 @@ namespace ygo {
 		mainGame->dInfo.lp[0] = start_lp;
 		mainGame->dInfo.lp[1] = start_lp;
 		mainGame->dInfo.startlp = start_lp;
-		mainGame->dInfo.strLP[0] = fmt::to_wstring(mainGame->dInfo.lp[0]);
-		mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[1]);
+		mainGame->dInfo.strLP[0] = fmt::to_wstring(start_lp);
+		mainGame->dInfo.strLP[1] = mainGame->dInfo.strLP[0];
 		mainGame->dInfo.turn = 0;
 		if (!mainGame->dInfo.isSingleMode || (rh.flag & REPLAY_HAND_TEST)) {
 			auto rule_cards = cur_yrp->GetRuleCards();
