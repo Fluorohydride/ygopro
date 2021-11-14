@@ -17,18 +17,13 @@
 namespace ygo {
 
 constexpr wchar_t const* DataManager::unknown_string;
+static constexpr auto SELECT_STMT =
+R"(SELECT datas.id,datas.ot,datas.alias,datas.setcode,datas.type,datas.atk,datas.def,datas.level,datas.race,datas.attribute,datas.category,texts.name,texts.desc,texts.str1,texts.str2,texts.str3,texts.str4,texts.str5,texts.str6,texts.str7,texts.str8,texts.str9,texts.str10,texts.str11,texts.str12,texts.str13,texts.str14,texts.str15,texts.str16
+FROM datas,texts WHERE texts.id = datas.id ORDER BY texts.id;)"_sv;
 
-static constexpr epro::stringview SELECT_STMT{
-R"(
-SELECT datas.id,datas.ot,datas.alias,datas.setcode,datas.type,datas.atk,datas.def,datas.level,datas.race,datas.attribute,datas.category,texts.name,texts.desc,texts.str1,texts.str2,texts.str3,texts.str4,texts.str5,texts.str6,texts.str7,texts.str8,texts.str9,texts.str10,texts.str11,texts.str12,texts.str13,texts.str14,texts.str15,texts.str16
-FROM datas,texts WHERE texts.id = datas.id ORDER BY texts.id;
-)"_sv };
-
-static constexpr epro::stringview SELECT_STMT_LOCALE{
-R"(
-SELECT id,name,desc,str1,str2,str3,str4,str5,str6,str7,str8,str9,str10,str11,str12,str13,str14,str15,str16
-FROM texts ORDER BY texts.id;
-)"_sv };
+static constexpr auto SELECT_STMT_LOCALE =
+R"(SELECT id,name,desc,str1,str2,str3,str4,str5,str6,str7,str8,str9,str10,str11,str12,str13,str14,str15,str16
+FROM texts ORDER BY texts.id;)"_sv;
 
 DataManager::DataManager() : irrvfs(irrsqlite_createfilesystem()) {
 	if(sqlite3_threadsafe())
