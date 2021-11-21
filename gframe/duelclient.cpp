@@ -2589,6 +2589,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			if(rev) {
 				for(const auto& pcard : mainGame->dField.deck[player])
 					mainGame->dField.MoveCard(pcard, 10);
+				mainGame->WaitFrameSignal(10, lock);
 			}
 		}
 		return true;
