@@ -143,6 +143,7 @@ workspace "ygo"
 
 	filter "configurations:Release"
 		optimize "Size"
+		flags "LinkTimeOptimization"
 		targetdir "bin/release"
 
 	subproject = true
