@@ -123,6 +123,65 @@ jobs:
         avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
         username: Github
 
+  Linux-gcc-10.3.0:
+    runs-on: ubuntu-latest
+    if: >-
+      !(
+        contains(github.event.head_commit.message, '[ci skip]') ||
+        contains(github.event.head_commit.message, '[skip ci]') ||
+        contains(github.event.head_commit.message, '[actions skip]') ||
+        contains(github.event.head_commit.message, '[skip actions]')
+      )
+    env:
+      DEPLOY_BRANCH: travis-linux-gcc-10
+      TRAVIS_OS_NAME: linux
+    steps:
+    - name: Set custom env vars
+      shell: bash
+      run: |
+        echo "VCPKG_ROOT=$PWD/vcpkg" >> $GITHUB_ENV
+        echo "VCPKG_CACHE_7Z_URL=$DEPENDENCIES_BASE_URL/installed_x64-linux.7z" >> $GITHUB_ENV
+    - name: Get apt packages
+      shell: bash
+      run: |
+        sudo apt remove libsqlite3-dev
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+        submodules: true
+    - name: Install premake
+      shell: bash
+      run: ./travis/install-premake5.sh
+    - name: Install dependencies
+      shell: bash
+      run: ./travis/dependencies.sh
+    - name: Build
+      env:
+        CC: gcc-10
+        CXX: g++-10
+      shell: bash
+      run: ./travis/build.sh
+    - name: Predeploy
+      shell: bash
+      run: ./travis/predeploy.sh
+    - name: Deploy
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      shell: bash
+      run: ./ocgcore/travis/deploy.sh
+    - name: Log Failure
+      uses: sarisia/actions-status-discord@v1
+      if: failure()
+      with:
+        nodetail: true
+        description: |
+            [[${{ github.event.repository.name }}] ${{ github.job }} failed on ${{ github.ref }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+        title: |
+                
+        color: 0xff0000
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+        username: Github
+
   Linux-gcc-aarch64-7-5-0:
     runs-on: ubuntu-18.04
     if: >-
