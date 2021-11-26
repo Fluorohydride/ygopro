@@ -123,7 +123,7 @@ jobs:
         avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
         username: Github
 
-  Linux-gcc-10.3.0:
+  Linux-gcc-10-3-0:
     runs-on: ubuntu-latest
     if: >-
       !(
