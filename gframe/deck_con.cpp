@@ -1174,10 +1174,7 @@ bool DeckBuilder::CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std
 	if(filter_marks && (data->_data.link_marker & filter_marks) != filter_marks)
 		return false;
 	if((filter_lm != LIMITATION_FILTER_NONE || filterList->whitelist) && filter_lm != LIMITATION_FILTER_ALL) {
-		uint32_t limitcode = data->_data.code;
-		auto flit = filterList->content.find(limitcode);
-		if(flit == filterList->content.end() && data->_data.alias)
-			flit = filterList->content.find(data->_data.alias);
+		auto flit = filterList->GetLimitationIterator(&data->_data);
 		int count = 3;
 		if(flit == filterList->content.end()) {
 			if(filterList->whitelist)
@@ -1373,31 +1370,27 @@ void DeckBuilder::pop_side(int seq) {
 bool DeckBuilder::check_limit(CardDataC* pointer) {
 	uint32_t limitcode = pointer->alias ? pointer->alias : pointer->code;
 	int found = 0;
-	int limit = 3;
-	banlist_content_t::iterator it;
-	auto f = [&](const auto pcard)->bool {
-		if((it = filterList->content.find(pcard->code)) != filterList->content.end())
-			limit = it->second;
-		else if(pcard->alias && (it = filterList->content.find(pcard->alias)) != filterList->content.end())
-			limit = it->second;
-		else if(filterList->whitelist)
-			limit = 0;
-		return limit > 0;
-	};
-	auto f2 = [&](const auto& list) {
-		for(auto& pcard : list) {
+	int limit = filterList->whitelist ? 0 : 3;
+	auto endit = filterList->content.end();
+	auto it = filterList->GetLimitationIterator(pointer);
+	if(it != endit)
+		limit = it->second;
+	if(limit == 0)
+		return false;
+	const auto& deck = gdeckManager->current_deck;
+	for(auto* plist : { &deck.main , &deck.extra,&deck.side }) {
+		for(auto& pcard : *plist) {
 			if(pcard->code == limitcode || pcard->alias == limitcode) {
-				if((it = filterList->content.find(pcard->code)) != filterList->content.end())
+				if((it = filterList->content.find(pcard->code)) != endit)
 					limit = std::min(limit, it->second);
-				else if((it = filterList->content.find(pcard->alias)) != filterList->content.end())
+				else if((it = filterList->content.find(pcard->alias)) != endit)
 					limit = std::min(limit, it->second);
 				found++;
 			}
 			if(limit <= found)
 				return false;
 		}
-		return true;
-	};
-	return f(pointer) && f2(gdeckManager->current_deck.main) && f2(gdeckManager->current_deck.extra) && f2(gdeckManager->current_deck.side);
+	}
+	return true;
 }
 }

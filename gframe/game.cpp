@@ -2343,7 +2343,7 @@ void Game::ShowCardInfo(uint32_t code, bool resize, imgType type) {
 	if(only_texture)
 		return;
 	auto tmp_code = code;
-	if(cd->alias && (cd->alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
+	if(cd->IsInArtworkOffsetRange())
 		tmp_code = cd->alias;
 	stName->setText(gDataManager->GetName(tmp_code).data());
 	stPasscodeScope->setText(fmt::format(L"[{:08}] {}", tmp_code, gDataManager->FormatScope(cd->ot)).data());

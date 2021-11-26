@@ -743,8 +743,6 @@ irr::core::rect<T> Game::Scale(irr::core::rect<T> rect) {
 
 #define POSITION_HINT		0x8000
 
-#define CARD_ARTWORK_VERSIONS_OFFSET	10
-
 #define DECK_SEARCH_SCROLL_STEP		100
 
 constexpr float FIELD_X = 4.2f;

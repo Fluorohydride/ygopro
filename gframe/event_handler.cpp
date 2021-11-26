@@ -2283,7 +2283,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				auto path = mainGame->FindScript(fmt::format(EPRO_TEXT("c{}.lua"), mainGame->showingcard));
 				if(path.empty()) {
 					auto cd = gDataManager->GetCardData(mainGame->showingcard);
-					if(cd && cd->alias && (cd->alias - mainGame->showingcard < CARD_ARTWORK_VERSIONS_OFFSET || mainGame->showingcard - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
+					if(cd && cd->IsInArtworkOffsetRange())
 						path = mainGame->FindScript(fmt::format(EPRO_TEXT("c{}.lua"), cd->alias));
 				}
 				if(path.size() && path != EPRO_TEXT("archives"))

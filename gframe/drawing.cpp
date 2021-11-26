@@ -1195,10 +1195,7 @@ void Game::WaitFrameSignal(int frame, std::unique_lock<std::mutex>& _lck) {
 }
 void Game::DrawThumb(CardDataC* cp, irr::core::position2di pos, LFList* lflist, bool drag, const irr::core::recti* cliprect, bool load_image) {
 	auto code = cp->code;
-	uint32_t limitcode = cp->code;
-	auto flit = lflist->content.find(limitcode);
-	if(flit == lflist->content.end() && cp->alias)
-		flit = lflist->content.find(cp->alias);
+	auto flit = lflist->GetLimitationIterator(cp);
 	int count = 3;
 	if(flit == lflist->content.end()) {
 		if(lflist->whitelist)

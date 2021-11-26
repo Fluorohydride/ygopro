@@ -69,6 +69,14 @@ struct CardDataC {
 	uint32_t ot;
 	uint32_t category;
 	std::vector<uint16_t> setcodes;
+
+	static constexpr auto CARD_ARTWORK_VERSIONS_OFFSET = 10;
+
+	bool IsInArtworkOffsetRange() const {
+		if(alias == 0)
+			return false;
+		return (alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - alias < CARD_ARTWORK_VERSIONS_OFFSET);
+	}
 };
 struct CardString {
 	std::wstring name;

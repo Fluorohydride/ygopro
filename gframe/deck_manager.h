@@ -18,6 +18,14 @@ struct LFList {
 	std::wstring listName;
 	banlist_content_t content;
 	bool whitelist;
+	auto GetLimitationIterator(const CardDataC* pcard) const {
+		auto flit = content.find(pcard->code);
+		if(flit == content.end() && pcard->alias) {
+			if(!whitelist || pcard->IsInArtworkOffsetRange())
+				flit = content.find(pcard->alias);
+		}
+		return flit;
+	}
 };
 struct Deck {
 	std::vector<CardDataC*> main;
