@@ -21,7 +21,7 @@ namespace ygo {
 
 class ClientUpdater {
 public:
-	ClientUpdater();
+	ClientUpdater(epro::path_stringview override_url);
 	~ClientUpdater();
 	bool StartUpdate(update_callback callback, void* payload, const epro::path_string& dest = EPRO_TEXT("./updates/"));
 	void StartUnzipper(unzip_callback callback, void* payload, const epro::path_string& src = EPRO_TEXT("./updates/"));
@@ -60,6 +60,7 @@ private:
 	std::atomic<bool> downloaded{ false };
 	std::atomic<bool> failed{ false };
 	std::atomic<bool> downloading{ false };
+	std::string update_url{ UPDATE_URL };
 #else
 	bool HasUpdate() {
 		return false;

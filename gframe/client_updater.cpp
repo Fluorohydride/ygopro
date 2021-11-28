@@ -306,9 +306,14 @@ void ClientUpdater::CheckUpdate() {
 }
 #endif
 
-ClientUpdater::ClientUpdater() {
-#if defined(UPDATE_URL) && !defined(__ANDROID__)
+ClientUpdater::ClientUpdater(epro::path_stringview override_url) {
+	(void)override_url;
+#if defined(UPDATE_URL)
+	if(override_url.size())
+		update_url = Utils::ToUTF8IfNeeded(override_url);
+#if !defined(__ANDROID__)
 	Lock = GetLock();
+#endif
 #endif
 }
 

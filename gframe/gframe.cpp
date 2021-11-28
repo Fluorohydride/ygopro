@@ -65,6 +65,7 @@ enum LAUNCH_PARAM {
 	MUTE,
 	CHANGELOG,
 	DISCORD,
+	OVERRIDE_UPDATE_URL,
 	COUNT,
 };
 
@@ -74,6 +75,7 @@ LAUNCH_PARAM GetOption(epro::path_char option) {
 	case 'm': return LAUNCH_PARAM::MUTE;
 	case 'l': return LAUNCH_PARAM::CHANGELOG;
 	case 'D': return LAUNCH_PARAM::DISCORD;
+	case 'u': return LAUNCH_PARAM::OVERRIDE_UPDATE_URL;
 	default: return LAUNCH_PARAM::COUNT;
 	}
 }
@@ -159,21 +161,24 @@ using Game = ygo::Game;
 int _tmain(int argc, epro::path_char* argv[]) {
 	std::puts(EDOPRO_VERSION_STRING_DEBUG);
 	const auto args = ParseArguments(argc, argv);
-	const auto& workdir = args[LAUNCH_PARAM::WORK_DIR];
-	epro::path_stringview dest = workdir.enabled ? workdir.argument : ygo::Utils::GetExeFolder();
-	if(!ygo::Utils::ChangeDirectory(dest)) {
-		const auto err = fmt::format("failed to change directory to: {}", ygo::Utils::ToUTF8IfNeeded(dest));
-		ygo::ErrorLog(err);
-		fmt::print("{}\n", err);
-		ygo::GUIUtils::ShowErrorWindow("Initialization fail", err);
-		return EXIT_FAILURE;
+	epro::path_stringview dest;
+	{
+		const auto& workdir = args[LAUNCH_PARAM::WORK_DIR];
+		dest = workdir.enabled ? workdir.argument : ygo::Utils::GetExeFolder();
+		if(!ygo::Utils::ChangeDirectory(dest)) {
+			const auto err = fmt::format("failed to change directory to: {}", ygo::Utils::ToUTF8IfNeeded(dest));
+			ygo::ErrorLog(err);
+			fmt::print("{}\n", err);
+			ygo::GUIUtils::ShowErrorWindow("Initialization fail", err);
+			return EXIT_FAILURE;
+		}
 	}
 	show_changelog = args[LAUNCH_PARAM::CHANGELOG].enabled;
 	ThreadsStartup();
 #ifndef _WIN32
 	setlocale(LC_CTYPE, "UTF-8");
 #endif //_WIN32
-	ygo::ClientUpdater updater;
+	ygo::ClientUpdater updater(args[LAUNCH_PARAM::OVERRIDE_UPDATE_URL].argument);
 	ygo::gClientUpdater = &updater;
 	std::shared_ptr<ygo::DataHandler> data{ nullptr };
 	try {
