@@ -111,7 +111,7 @@ namespace ygo {
 #ifdef __linux__
 	bool Utils::FileCopyFD(int source, int destination) {
 		off_t bytesCopied = 0;
-		struct stat fileinfo = { 0 };
+		Stat fileinfo = { 0 };
 		fstat(source, &fileinfo);
 		int result = sendfile(destination, source, &bytesCopied, fileinfo.st_size);
 		return result != -1;
@@ -527,7 +527,7 @@ namespace ygo {
 #ifdef _WIN32
 		STARTUPINFO si{ sizeof(si) };
 		PROCESS_INFORMATION pi{};
-		auto command = fmt::format(EPRO_TEXT("{} -C {} show_changelog"), ygo::Utils::GetFileName(path, true), ygo::Utils::working_dir);
+		auto command = fmt::format(EPRO_TEXT("{} -C {} -l"), ygo::Utils::GetFileName(path, true), ygo::Utils::working_dir);
 		if(!CreateProcess(path.data(), &command[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi))
 			return;
 		CloseHandle(pi.hProcess);
@@ -541,9 +541,9 @@ namespace ygo {
 		auto pid = vfork();
 		if(pid == 0) {
 #ifdef __linux__
-			execl(path.data(), path.data(), "-C", ygo::Utils::working_dir.data(), "show_changelog", nullptr);
+			execl(path.data(), path.data(), "-C", ygo::Utils::working_dir.data(), "-l", nullptr);
 #else
-			execlp("open", "open", "-b", "io.github.edo9300.ygoprodll", "--args", "-C", ygo::Utils::working_dir.data(), "show_changelog", nullptr);
+			execlp("open", "open", "-b", "io.github.edo9300.ygoprodll", "--args", "-C", ygo::Utils::working_dir.data(), "-l", nullptr);
 #endif
 			_exit(EXIT_FAILURE);
 		}
