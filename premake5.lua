@@ -12,7 +12,7 @@ else
 	BUILD_LUA = true
 	BUILD_EVENT = false --not implemented on linux
 	BUILD_FREETYPE = false
-	BUILD_IRRLICHT = true
+	BUILD_IRRLICHT = not os.ishost("macos")
 	BUILD_SQLITE = false
 end
 
@@ -44,7 +44,8 @@ workspace "YGOPro"
 
     filter "system:macosx"
         includedirs { "/usr/local/include", "/usr/local/include/*" }
-        libdirs { "/usr/local/lib", "/usr/X11/lib" }
+        removeincludedirs { "/usr/local/include/X11" }
+        libdirs { "/usr/local/lib" }
         buildoptions { "-stdlib=libc++" }
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
 

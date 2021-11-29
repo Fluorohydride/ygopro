@@ -55,8 +55,11 @@ project "ygopro"
         buildoptions { "-std=c++14", "-fno-rtti" }
     filter "not system:windows"
         includedirs { "/usr/include/irrlicht", "/usr/include/freetype2" }
-        links { "event_pthreads", "GL", "dl", "pthread", "X11", "Xxf86vm" }
+        links { "event_pthreads", "dl", "pthread", "X11" }
+    filter "system:macosx"
+        links { "z" }
     filter "system:linux"
+        links { "GL", "Xxf86vm" }
         if USE_IRRKLANG then
             defines { "YGOPRO_USE_IRRKLANG" }
             links { "IrrKlang" }

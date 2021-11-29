@@ -1,3 +1,10 @@
+.DS_Store
+
+cards.cdb
+ygopro
+ygopro.exe
+/ygopro.app
+
 /bin/
 /build/
 /obj/
