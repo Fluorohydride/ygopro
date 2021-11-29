@@ -6,7 +6,7 @@ project "ygopro"
 
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore" }
-    links { "ocgcore", "clzma", "cspmemvfs", "lua", "irrlicht", "freetype", "sqlite", "event" }
+    links { "ocgcore", "clzma", "cspmemvfs", "lua", "irrlicht", "freetype", "event" }
 
     if BUILD_EVENT then
     	includedirs { "../event/include" }
@@ -22,6 +22,9 @@ project "ygopro"
 
     if BUILD_SQLITE then
         includedirs { "../sqlite" }
+        links { "sqlite" }
+    else
+        links { "sqlite3" } --most system use this name
     end
 
     filter "system:windows"
