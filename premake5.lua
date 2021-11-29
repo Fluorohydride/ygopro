@@ -12,7 +12,7 @@ else
 	BUILD_LUA = true
 	BUILD_EVENT = false --not implemented on linux
 	BUILD_FREETYPE = false
-	BUILD_IRRLICHT = not os.ishost("macos")
+	BUILD_IRRLICHT = not os.ishost("macosx")
 	BUILD_SQLITE = false
 end
 

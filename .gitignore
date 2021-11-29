@@ -1,6 +1,8 @@
 .DS_Store
 
 cards.cdb
+error.log
+
 ygopro
 ygopro.exe
 /ygopro.app
