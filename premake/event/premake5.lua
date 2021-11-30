@@ -9,5 +9,5 @@ project "event"
             "event_tagging.c", "http.c", "evdns.c", "evrpc.c" }
 
     filter "system:windows"
-			  prebuildcommands { "xcopy /E /Y $(ProjectDir)..\\event\\WIN32-Code $(ProjectDir)..\\event\\include" }
+        prebuildcommands { "xcopy /E /Y $(ProjectDir)..\\event\\WIN32-Code $(ProjectDir)..\\event\\include" }
         files { "win32select.c", "evthread_win32.c", "buffer_iocp.c", "event_iocp.c", "bufferevent_async.c" }

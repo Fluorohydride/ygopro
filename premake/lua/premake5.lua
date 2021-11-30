@@ -4,10 +4,10 @@ project "lua"
     files { "src/*.c", "src/*.h", "src/*.hpp" }
     removefiles { "src/lua.c", "src/luac.c" }
 
-    filter "action:vs*"	
+    filter "action:vs*"
         buildoptions { "/TP" }
 
-    filter "not action:vs*"	
+    filter "not action:vs*"
         buildoptions { "-x c++" }
 
     filter "system:bsd"

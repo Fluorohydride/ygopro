@@ -9,7 +9,7 @@ project "ygopro"
     links { "ocgcore", "clzma", "cspmemvfs", "lua", "sqlite3", "irrlicht", "freetype", "event" }
 
     if BUILD_EVENT then
-    	includedirs { "../event/include" }
+        includedirs { "../event/include" }
     end
 
     if BUILD_IRRLICHT then

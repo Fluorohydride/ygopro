@@ -1,19 +1,19 @@
 if os.ishost("windows") then
-	USE_IRRKLANG = true
-	IRRKLANG_PRO = false
-	BUILD_LUA = true
-	BUILD_EVENT = true
-	BUILD_FREETYPE = true
-	BUILD_IRRLICHT = true
-	BUILD_SQLITE = true
+    USE_IRRKLANG = true
+    IRRKLANG_PRO = false
+    BUILD_LUA = true
+    BUILD_EVENT = true
+    BUILD_FREETYPE = true
+    BUILD_IRRLICHT = true
+    BUILD_SQLITE = true
 else
-	USE_IRRKLANG = true
-	IRRKLANG_PRO = false
-	BUILD_LUA = true
-	BUILD_EVENT = false --not implemented on linux
-	BUILD_FREETYPE = false
-	BUILD_IRRLICHT = not os.ishost("macosx")
-	BUILD_SQLITE = false
+    USE_IRRKLANG = true
+    IRRKLANG_PRO = false
+    BUILD_LUA = true
+    BUILD_EVENT = false --not implemented on linux
+    BUILD_FREETYPE = false
+    BUILD_IRRLICHT = not os.ishost("macosx")
+    BUILD_SQLITE = false
 end
 
 workspace "YGOPro"
@@ -91,19 +91,19 @@ workspace "YGOPro"
     include "ocgcore"
     include "gframe"
     if BUILD_LUA then
-		include "lua"
-	end
-	if BUILD_EVENT then
-		include "event"
-	end
+        include "lua"
+    end
+    if BUILD_EVENT then
+        include "event"
+    end
     if BUILD_FREETYPE then
-		include "freetype"
+        include "freetype"
     end
     if BUILD_IRRLICHT then
-		include "irrlicht"
+        include "irrlicht"
     end
     if BUILD_SQLITE then
-		include "sqlite3"
+        include "sqlite3"
     end
     if USE_IRRKLANG then
         if IRRKLANG_PRO then
