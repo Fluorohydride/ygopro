@@ -103,7 +103,7 @@ workspace "YGOPro"
 		include "irrlicht"
     end
     if BUILD_SQLITE then
-		include "sqlite"
+		include "sqlite3"
     end
     if USE_IRRKLANG then
         if IRRKLANG_PRO then

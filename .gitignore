@@ -17,7 +17,7 @@ ygopro.exe
 /irrklang/
 /ikpmp3/
 /lua/
-/sqlite/
+/sqlite3/
 
 /gframe/*.ico
 /gframe/ygopro.rc

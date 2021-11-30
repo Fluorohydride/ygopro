@@ -3,5 +3,5 @@ project "cspmemvfs"
     files { "*.c", "*.h" }
 
     if BUILD_SQLITE then
-        includedirs { "../../sqlite" }
+        includedirs { "../../sqlite3" }
     end
