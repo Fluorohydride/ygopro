@@ -39,6 +39,7 @@ project "ygopro"
                     libdirs { "../irrklang/lib/Win32-vs2019" }
                 filter { "configurations:Debug" }
                     libdirs { "../irrklang/lib/Win32-visualStudio-debug" }
+                filter {}
             else
                 libdirs { "../irrklang/lib/Win32-visualStudio" }
             end
