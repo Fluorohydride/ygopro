@@ -49,4 +49,4 @@ project "freetype"
 
     filter "not system:windows"
         files { "src/base/ftsystem.c",
-        "src/base/ftdebug.c" }
+                "src/base/ftdebug.c" }
