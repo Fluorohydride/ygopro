@@ -157,7 +157,7 @@ bool DataManager::ParseDB(sqlite3* pDB) {
 			cs.uppercase_name.clear();
 
 		if(GetWstring(cs.text, pStmt, 12))
-			cs.uppercase_text = Utils::ToUpperNoAccents(cs.name);
+			cs.uppercase_text = Utils::ToUpperNoAccents(cs.text);
 		else
 			cs.uppercase_text.clear();
 
@@ -197,7 +197,7 @@ bool DataManager::ParseLocaleDB(sqlite3* pDB) {
 			cs.uppercase_name.clear();
 
 		if(GetWstring(cs.text, pStmt, 2))
-			cs.uppercase_text = Utils::ToUpperNoAccents(cs.name);
+			cs.uppercase_text = Utils::ToUpperNoAccents(cs.text);
 		else
 			(void)cs.uppercase_text.clear();
 
