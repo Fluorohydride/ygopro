@@ -5,13 +5,9 @@
 
 namespace CoreUtils {
 
-#define PARSE_SINGLE(query,value) case query: {\
-value = BufferIO::Read<decltype(value)>(current);\
-break;\
-}
+#define PARSE(value) do {value = BufferIO::Read<decltype(value)>(current);} while(0); break
 
 void Query::Parse(char*& current) {
-	//char* current = buff;
 	flag = 0;
 	for(;;) {
 		auto size = BufferIO::Read<uint16_t>(current);
@@ -19,29 +15,29 @@ void Query::Parse(char*& current) {
 			onfield_skipped = true;
 			return;
 		}
-		auto _flag = BufferIO::Read<uint32_t>(current);
-		flag |= _flag;
-		switch(_flag) {
-			PARSE_SINGLE(QUERY_CODE,code)
-			PARSE_SINGLE(QUERY_POSITION, position)
-			PARSE_SINGLE(QUERY_ALIAS, alias)
-			PARSE_SINGLE(QUERY_TYPE, type)
-			PARSE_SINGLE(QUERY_LEVEL, level)
-			PARSE_SINGLE(QUERY_RANK, rank)
-			PARSE_SINGLE(QUERY_ATTRIBUTE, attribute)
-			PARSE_SINGLE(QUERY_RACE, race)
-			PARSE_SINGLE(QUERY_ATTACK, attack)
-			PARSE_SINGLE(QUERY_DEFENSE, defense)
-			PARSE_SINGLE(QUERY_BASE_ATTACK, base_attack)
-			PARSE_SINGLE(QUERY_BASE_DEFENSE, base_defense)
-			PARSE_SINGLE(QUERY_REASON, reason)
-			PARSE_SINGLE(QUERY_OWNER, owner)
-			PARSE_SINGLE(QUERY_STATUS, status)
-			PARSE_SINGLE(QUERY_IS_PUBLIC, is_public)
-			PARSE_SINGLE(QUERY_LSCALE, lscale)
-			PARSE_SINGLE(QUERY_RSCALE, rscale)
-			PARSE_SINGLE(QUERY_IS_HIDDEN, is_hidden)
-			PARSE_SINGLE(QUERY_COVER, cover)
+		auto cur_flag = BufferIO::Read<uint32_t>(current);
+		flag |= cur_flag;
+		switch(cur_flag) {
+			case QUERY_CODE: PARSE(code);
+			case QUERY_POSITION: PARSE(position);
+			case QUERY_ALIAS: PARSE(alias);
+			case QUERY_TYPE: PARSE(type);
+			case QUERY_LEVEL: PARSE(level);
+			case QUERY_RANK: PARSE(rank);
+			case QUERY_ATTRIBUTE: PARSE(attribute);
+			case QUERY_RACE: PARSE(race);
+			case QUERY_ATTACK: PARSE(attack);
+			case QUERY_DEFENSE: PARSE(defense);
+			case QUERY_BASE_ATTACK: PARSE(base_attack);
+			case QUERY_BASE_DEFENSE: PARSE(base_defense);
+			case QUERY_REASON: PARSE(reason);
+			case QUERY_OWNER: PARSE(owner);
+			case QUERY_STATUS: PARSE(status);
+			case QUERY_IS_PUBLIC: PARSE(is_public);
+			case QUERY_LSCALE: PARSE(lscale);
+			case QUERY_RSCALE: PARSE(rscale);
+			case QUERY_IS_HIDDEN: PARSE(is_hidden);
+			case QUERY_COVER: PARSE(cover);
 			case QUERY_REASON_CARD: {
 				reason_card = ReadLocInfo(current, false);
 				break;
@@ -73,9 +69,8 @@ void Query::Parse(char*& current) {
 				link_marker = BufferIO::Read<uint32_t>(current);
 				break;
 			}
-			case QUERY_END: {
+			case QUERY_END:
 				return;
-			}
 			default: {
 				current += size - sizeof(uint32_t);
 				break;
@@ -83,10 +78,10 @@ void Query::Parse(char*& current) {
 		}
 	}
 }
-#undef PARSE_SINGLE
-#define PARSE_SINGLE(query,value) if(flag & query) {\
+#undef PARSE
+#define PARSE_SINGLE(query,value) do{if(flag & query) {\
 value = BufferIO::Read<uint32_t>(current);\
-}
+}} while(0)
 
 void Query::ParseCompat(char* current, uint32_t len) {
 	if(len <= 8) {
@@ -94,20 +89,20 @@ void Query::ParseCompat(char* current, uint32_t len) {
 		return;
 	}
 	flag = BufferIO::Read<int32_t>(current);
-	PARSE_SINGLE(QUERY_CODE, code)
+	PARSE_SINGLE(QUERY_CODE, code);
 	if(flag & QUERY_POSITION)
 		position = (BufferIO::Read<uint32_t>(current) >> 24) & 0xff;
-	PARSE_SINGLE(QUERY_ALIAS, alias)
-	PARSE_SINGLE(QUERY_TYPE, type)
-	PARSE_SINGLE(QUERY_LEVEL, level)
-	PARSE_SINGLE(QUERY_RANK, rank)
-	PARSE_SINGLE(QUERY_ATTRIBUTE, attribute)
-	PARSE_SINGLE(QUERY_RACE, race)
-	PARSE_SINGLE(QUERY_ATTACK, attack)
-	PARSE_SINGLE(QUERY_DEFENSE, defense)
-	PARSE_SINGLE(QUERY_BASE_ATTACK, base_attack)
-	PARSE_SINGLE(QUERY_BASE_DEFENSE, base_defense)
-	PARSE_SINGLE(QUERY_REASON, reason)
+	PARSE_SINGLE(QUERY_ALIAS, alias);
+	PARSE_SINGLE(QUERY_TYPE, type);
+	PARSE_SINGLE(QUERY_LEVEL, level);
+	PARSE_SINGLE(QUERY_RANK, rank);
+	PARSE_SINGLE(QUERY_ATTRIBUTE, attribute);
+	PARSE_SINGLE(QUERY_RACE, race);
+	PARSE_SINGLE(QUERY_ATTACK, attack);
+	PARSE_SINGLE(QUERY_DEFENSE, defense);
+	PARSE_SINGLE(QUERY_BASE_ATTACK, base_attack);
+	PARSE_SINGLE(QUERY_BASE_DEFENSE, base_defense);
+	PARSE_SINGLE(QUERY_REASON, reason);
 	if(flag & QUERY_REASON_CARD)
 		reason_card = ReadLocInfo(current, true);
 	if(flag &  QUERY_EQUIP_CARD)
@@ -127,15 +122,16 @@ void Query::ParseCompat(char* current, uint32_t len) {
 		for(uint32_t i = 0; i < count; i++)
 			counters.push_back(BufferIO::Read<uint32_t>(current));
 	}
-	PARSE_SINGLE(QUERY_OWNER, owner)
-	PARSE_SINGLE(QUERY_STATUS, status)
-	PARSE_SINGLE(QUERY_LSCALE, lscale)
-	PARSE_SINGLE(QUERY_RSCALE, rscale)
+	PARSE_SINGLE(QUERY_OWNER, owner);
+	PARSE_SINGLE(QUERY_STATUS, status);
+	PARSE_SINGLE(QUERY_LSCALE, lscale);
+	PARSE_SINGLE(QUERY_RSCALE, rscale);
 	if(flag & QUERY_LINK) {
 		link = BufferIO::Read<uint32_t>(current);
 		link_marker = BufferIO::Read<uint32_t>(current);
 	}
 }
+#undef PARSE_SINGLE
 
 template<typename T>
 void insert_value(std::vector<uint8_t>& vec, const T& _val) {
@@ -145,167 +141,136 @@ void insert_value(std::vector<uint8_t>& vec, const T& _val) {
 	vec.resize(vec_size + val_size);
 	std::memcpy(&vec[vec_size], &val, val_size);
 }
-#define INSERT(query, val)if(_flag == query) insert_value<decltype(val)>(buffer, val);
-void Query::GenerateBuffer(std::vector<uint8_t>& buffer, bool is_public, bool check_hidden) {
+#define SET(val) do{insert_value<decltype(val)>(buffer, val);} while(0); break
+void Query::GenerateBuffer(std::vector<uint8_t>& buffer, bool is_for_public_buffer, bool check_hidden) const {
 	if(onfield_skipped) {
 		insert_value<uint16_t>(buffer, 0);
 		return;
 	}
-	for(uint64_t _flag = 1; _flag <= QUERY_END; _flag <<= 1) {
-		if((this->flag & _flag) != _flag)
+	const bool query_must_be_pubilc = is_for_public_buffer || (check_hidden && ((flag & QUERY_IS_HIDDEN) && is_hidden));
+	for(uint64_t cur_flag = 1; cur_flag <= QUERY_END; cur_flag <<= 1) {
+		if((flag & cur_flag) == 0)
 			continue;
-		if(((is_public || (check_hidden && ((this->flag & QUERY_IS_HIDDEN) && is_hidden))) && !IsPublicQuery(_flag))) {
-			continue;
-		}
-		if((_flag == QUERY_REASON_CARD && reason_card.location == 0) ||
-			(_flag == QUERY_EQUIP_CARD && equip_card.location == 0))
-			continue;
-		insert_value<uint16_t>(buffer, GetSize(_flag) + sizeof(uint32_t));
-		insert_value<uint32_t>(buffer, _flag);
-		/*if(((is_public || (check_hidden && ((this->flag & QUERY_IS_HIDDEN) && is_hidden))) && !IsPublicQuery(_flag))) {
-			const auto vec_size = buffer.size();
-			const auto flag_size = GetSize(_flag);
+		if(query_must_be_pubilc && !IsPublicQuery(cur_flag)) {
+			//Sends query that "removes" the knowledge for cards
+			/*const auto vec_size = buffer.size();
+			const auto flag_size = GetSize(cur_flag);
 			buffer.resize(vec_size + flag_size);
-			std::memset(&buffer[vec_size], 0, flag_size);
+			std::memset(&buffer[vec_size], 0, flag_size);*/
 			continue;
-		}*/
-		INSERT(QUERY_CODE, code)
-		INSERT(QUERY_POSITION, position)
-		INSERT(QUERY_ALIAS, alias)
-		INSERT(QUERY_TYPE, type)
-		INSERT(QUERY_LEVEL, level)
-		INSERT(QUERY_RANK, rank)
-		INSERT(QUERY_ATTRIBUTE, attribute)
-		INSERT(QUERY_RACE, race)
-		INSERT(QUERY_ATTACK, attack)
-		INSERT(QUERY_DEFENSE, defense)
-		INSERT(QUERY_BASE_ATTACK, base_attack)
-		INSERT(QUERY_BASE_DEFENSE, base_defense)
-		INSERT(QUERY_REASON, reason)
-		INSERT(QUERY_OWNER, owner)
-		INSERT(QUERY_STATUS, status)
-		INSERT(QUERY_IS_PUBLIC, this->is_public)
-		INSERT(QUERY_LSCALE, lscale)
-		INSERT(QUERY_RSCALE, rscale)
-		INSERT(QUERY_IS_HIDDEN, is_hidden)
-		INSERT(QUERY_COVER, cover)
-		if(_flag == QUERY_REASON_CARD || _flag == QUERY_EQUIP_CARD) {
-			auto& info = (_flag == QUERY_REASON_CARD) ? reason_card : equip_card;
-			insert_value<uint8_t>(buffer, info.controler);
-			insert_value<uint8_t>(buffer, info.location);
-			insert_value<uint32_t>(buffer, info.sequence);
-			insert_value<uint32_t>(buffer, info.position);
 		}
-		if(_flag == QUERY_TARGET_CARD) {
-			insert_value<uint32_t>(buffer, target_cards.size());
-			for(auto& info : target_cards) {
+		if((cur_flag == QUERY_REASON_CARD && reason_card.location == 0) ||
+			(cur_flag == QUERY_EQUIP_CARD && equip_card.location == 0))
+			continue;
+		insert_value<uint16_t>(buffer, GetSize(cur_flag) + sizeof(uint32_t));
+		insert_value<uint32_t>(buffer, cur_flag);
+		switch(cur_flag) {
+			case QUERY_CODE: SET(code);
+			case QUERY_POSITION: SET(position);
+			case QUERY_ALIAS: SET(alias);
+			case QUERY_TYPE: SET(type);
+			case QUERY_LEVEL: SET(level);
+			case QUERY_RANK: SET(rank);
+			case QUERY_ATTRIBUTE: SET(attribute);
+			case QUERY_RACE: SET(race);
+			case QUERY_ATTACK: SET(attack);
+			case QUERY_DEFENSE: SET(defense);
+			case QUERY_BASE_ATTACK: SET(base_attack);
+			case QUERY_BASE_DEFENSE: SET(base_defense);
+			case QUERY_REASON: SET(reason);
+			case QUERY_OWNER: SET(owner);
+			case QUERY_STATUS: SET(status);
+			case QUERY_IS_PUBLIC: SET(is_public);
+			case QUERY_LSCALE: SET(lscale);
+			case QUERY_RSCALE: SET(rscale);
+			case QUERY_IS_HIDDEN: SET(is_hidden);
+			case QUERY_COVER: SET(cover);
+			case QUERY_REASON_CARD:
+			case QUERY_EQUIP_CARD: {
+				auto& info = (cur_flag == QUERY_REASON_CARD) ? reason_card : equip_card;
 				insert_value<uint8_t>(buffer, info.controler);
 				insert_value<uint8_t>(buffer, info.location);
 				insert_value<uint32_t>(buffer, info.sequence);
 				insert_value<uint32_t>(buffer, info.position);
+				break;
 			}
-		}
-		if(_flag == QUERY_OVERLAY_CARD || _flag == QUERY_COUNTERS) {
-			auto& vec = (_flag == QUERY_OVERLAY_CARD) ? overlay_cards : counters;
-			insert_value<uint32_t>(buffer, vec.size());
-			for(auto& val : vec) {
-				insert_value<uint32_t>(buffer, val);
+			case QUERY_TARGET_CARD: {
+				insert_value<uint32_t>(buffer, target_cards.size());
+				for(auto& info : target_cards) {
+					insert_value<uint8_t>(buffer, info.controler);
+					insert_value<uint8_t>(buffer, info.location);
+					insert_value<uint32_t>(buffer, info.sequence);
+					insert_value<uint32_t>(buffer, info.position);
+				}
+				break;
 			}
-		}
-		if(_flag == QUERY_LINK) {
-			insert_value<uint32_t>(buffer, link);
-			insert_value<uint32_t>(buffer, link_marker);
+			case QUERY_OVERLAY_CARD:
+			case QUERY_COUNTERS: {
+				auto& vec = (cur_flag == QUERY_OVERLAY_CARD) ? overlay_cards : counters;
+				insert_value<uint32_t>(buffer, vec.size());
+				for(auto& val : vec)
+					insert_value<uint32_t>(buffer, val);
+				break;
+			}
+			case QUERY_LINK: {
+				insert_value<uint32_t>(buffer, link);
+				insert_value<uint32_t>(buffer, link_marker);
+				break;
+			}
 		}
 	}
 }
+#undef SET
 
-bool Query::IsPublicQuery(uint32_t flag) {
-	if(((this->flag & QUERY_IS_PUBLIC) && is_public) || ((this->flag & QUERY_POSITION) && (position & POS_FACEUP)))
+bool Query::IsPublicQuery(uint32_t to_check_flag) const {
+	static constexpr auto private_queries = QUERY_CODE | QUERY_ALIAS | QUERY_TYPE | QUERY_LEVEL
+		| QUERY_RANK | QUERY_ATTRIBUTE | QUERY_RACE | QUERY_ATTACK | QUERY_DEFENSE | QUERY_BASE_ATTACK
+		| QUERY_BASE_DEFENSE | QUERY_STATUS | QUERY_LSCALE | QUERY_RSCALE | QUERY_LINK;
+
+	if(((flag & QUERY_IS_PUBLIC) && is_public) || ((flag & QUERY_POSITION) && (position & POS_FACEUP)))
 		return true;
-	switch(flag) {
-	case QUERY_CODE:
-	case QUERY_ALIAS:
-	case QUERY_TYPE:
-	case QUERY_LEVEL:
-	case QUERY_RANK:
-	case QUERY_ATTRIBUTE:
-	case QUERY_RACE:
-	case QUERY_ATTACK:
-	case QUERY_DEFENSE:
-	case QUERY_BASE_ATTACK:
-	case QUERY_BASE_DEFENSE:
-	case QUERY_STATUS:
-	case QUERY_LSCALE:
-	case QUERY_RSCALE:
-	case QUERY_LINK:
-		return false;
-	}
-	return true;
+	return (to_check_flag & private_queries) == 0;
 }
 
-uint32_t Query::GetSize(uint32_t flag) {
-	switch(flag) {
-	case QUERY_OWNER:
-	case QUERY_IS_PUBLIC:
-	case QUERY_IS_HIDDEN: {
+uint32_t Query::GetSize(uint32_t to_check_flag) const {
+	static constexpr auto uint8_queries = QUERY_OWNER | QUERY_IS_PUBLIC | QUERY_IS_HIDDEN;
+	static constexpr auto uint32_queries = QUERY_CODE | QUERY_POSITION | QUERY_ALIAS | QUERY_TYPE
+		| QUERY_LEVEL | QUERY_RANK | QUERY_ATTRIBUTE | QUERY_RACE | QUERY_ATTACK
+		| QUERY_DEFENSE | QUERY_BASE_ATTACK | QUERY_BASE_DEFENSE | QUERY_REASON
+		| QUERY_STATUS | QUERY_LSCALE | QUERY_RSCALE | QUERY_COVER;
+
+	if((to_check_flag & uint8_queries) != 0)
 		return sizeof(uint8_t);
-	}
-	case QUERY_CODE:
-	case QUERY_POSITION:
-	case QUERY_ALIAS:
-	case QUERY_TYPE:
-	case QUERY_LEVEL:
-	case QUERY_RANK:
-	case QUERY_ATTRIBUTE:
-	case QUERY_RACE:
-	case QUERY_ATTACK:
-	case QUERY_DEFENSE:
-	case QUERY_BASE_ATTACK:
-	case QUERY_BASE_DEFENSE:
-	case QUERY_REASON:
-	case QUERY_STATUS:
-	case QUERY_LSCALE:
-	case QUERY_RSCALE:
-	case QUERY_COVER: {
+
+	if((to_check_flag & uint32_queries) != 0)
 		return sizeof(uint32_t);
-		break;
-	}
-	case QUERY_REASON_CARD:
-	case QUERY_EQUIP_CARD: {
+
+	if((to_check_flag & (QUERY_REASON_CARD | QUERY_EQUIP_CARD)) != 0)
 		return sizeof(uint16_t) + sizeof(uint64_t);
-		break;
-	}
-	case QUERY_TARGET_CARD: {
+
+	switch(to_check_flag) {
+	case QUERY_TARGET_CARD:
 		return sizeof(uint32_t) + (target_cards.size() * (sizeof(uint16_t) + sizeof(uint64_t)));
-		break;
-	}
-	case QUERY_OVERLAY_CARD: {
+	case QUERY_OVERLAY_CARD:
 		return sizeof(uint32_t) + (overlay_cards.size() * sizeof(uint32_t));
-		break;
-	}
-	case QUERY_COUNTERS: {
+	case QUERY_COUNTERS:
 		return sizeof(uint32_t) + (counters.size() * sizeof(uint32_t));
-		break;
-	}
-	case QUERY_LINK: {
+	case QUERY_LINK:
 		return sizeof(uint32_t) + sizeof(uint32_t);
-		break;
-	}
 	case QUERY_END:
+	default:
 		return 0;
-		break;
 	}
-	return 0;
 }
 
-uint32_t Query::GetSize() {
+uint32_t Query::GetSize() const {
 	uint32_t size = 0;
 	if(onfield_skipped)
 		return 0;
-	for(uint64_t _flag = 1; _flag <= QUERY_END; _flag <<= 1) {
-		if((this->flag & _flag) != _flag)
+	for(uint64_t cur_flag = 1; cur_flag <= QUERY_END; cur_flag <<= 1) {
+		if((flag & cur_flag) == 0)
 			continue;
-		size += GetSize(_flag) + sizeof(uint32_t);
+		size += GetSize(cur_flag) + sizeof(uint32_t);
 	}
 	return size;
 }
@@ -328,8 +293,8 @@ PacketStream ParseMessages(OCG_Duel duel) {
 	uint32_t message_len;
 	auto msg = static_cast<char*>(OCG_DuelGetMessage(duel, &message_len));
 	if(message_len)
-		return { msg, message_len };
-	return {};
+		return PacketStream{ msg, message_len };
+	return PacketStream{};
 }
 
 void QueryStream::Parse(char* buff) {
@@ -348,7 +313,7 @@ void QueryStream::ParseCompat(char* buff, uint32_t len) {
 	}
 }
 
-void QueryStream::GenerateBuffer(std::vector<uint8_t>& buffer, bool check_hidden) {
+void QueryStream::GenerateBuffer(std::vector<uint8_t>& buffer, bool check_hidden) const {
 	auto prev_size = buffer.size();
 	buffer.resize(prev_size + sizeof(uint32_t));
 	for(auto& query : queries)
@@ -357,7 +322,7 @@ void QueryStream::GenerateBuffer(std::vector<uint8_t>& buffer, bool check_hidden
 	memcpy(&buffer[prev_size], &written_size, sizeof(uint32_t));
 }
 
-void QueryStream::GeneratePublicBuffer(std::vector<uint8_t>& buffer) {
+void QueryStream::GeneratePublicBuffer(std::vector<uint8_t>& buffer) const {
 	auto prev_size = buffer.size();
 	buffer.resize(prev_size + sizeof(uint32_t));
 	for(auto& query : queries)

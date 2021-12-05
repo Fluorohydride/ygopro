@@ -46,7 +46,7 @@ public:
 	friend class ygo::ClientCard;
 	Query() = delete;
 	Query(char* buff, bool compat = false, uint32_t len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
-	void GenerateBuffer(std::vector<uint8_t>& len, bool is_public, bool check_hidden);
+	void GenerateBuffer(std::vector<uint8_t>& len, bool is_for_public_buffer, bool check_hidden) const;
 	struct Token {};
 	Query(Token, char*& buff) { Parse(buff); };
 private:
@@ -81,17 +81,17 @@ private:
 	std::vector<loc_info> target_cards;
 	std::vector<uint32_t> overlay_cards;
 	std::vector<uint32_t> counters;
-	bool IsPublicQuery(uint32_t flag);
-	uint32_t GetSize(uint32_t flag);
-	uint32_t GetSize();
+	bool IsPublicQuery(uint32_t to_check_flag) const;
+	uint32_t GetSize(uint32_t to_check_flag) const;
+	uint32_t GetSize() const;
 };
 class QueryStream {
 public:
 	QueryStream() = delete;
 	QueryStream(char* buff, bool compat = false, uint32_t len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
-	void GenerateBuffer(std::vector<uint8_t>& buffer, bool check_hidden);
-	void GeneratePublicBuffer(std::vector<uint8_t>& buffer);
-	std::vector<Query>& GetQueries() { return queries; }
+	void GenerateBuffer(std::vector<uint8_t>& buffer, bool check_hidden) const;
+	void GeneratePublicBuffer(std::vector<uint8_t>& buffer)const;
+	const std::vector<Query>& GetQueries() const { return queries; }
 private:
 	std::vector<Query> queries;
 	void Parse(char* buff);

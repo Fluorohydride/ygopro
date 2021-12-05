@@ -330,7 +330,7 @@ void ClientField::UpdateFieldCard(uint8_t controler, uint8_t location, char* dat
 		return;
 	CoreUtils::QueryStream stream{ data, mainGame->dInfo.compat_mode, len };
 	auto cit = lst->begin();
-	for(auto& query : stream.GetQueries()) {
+	for(const auto& query : stream.GetQueries()) {
 		auto pcard = *cit++;
 		if(pcard)
 			pcard->UpdateInfo(query);
