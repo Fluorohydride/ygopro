@@ -548,6 +548,17 @@ public:
 	irr::gui::IGUIWindow* wLinkMarks;
 	irr::gui::IGUIButton* btnMark[8];
 	irr::gui::IGUIButton* btnMarksOK;
+	irr::gui::IGUIButton* btnCompareFilter;
+	irr::gui::IGUIWindow* wCompares;
+	irr::gui::IGUIStaticText* stCompareAttack;
+	irr::gui::IGUIComboBox* cbCompare;
+	irr::gui::IGUIStaticText* stCompareDefense;
+	irr::gui::IGUIComboBox* cbCalculateFirst;
+	irr::gui::IGUIComboBox* cbCalculate;
+	irr::gui::IGUIComboBox* cbCalculateSecond;
+	irr::gui::IGUIStaticText* stCalculate;
+	irr::gui::IGUIEditBox* ebCalculate;
+	irr::gui::IGUIButton* btnCompareOK;
 	//sort type
 	irr::gui::IGUIStaticText* wSort;
 	irr::gui::IGUIComboBox* cbSortType;
@@ -793,6 +804,14 @@ extern Game* mainGame;
 #define BUTTON_BIG_CARD_ZOOM_IN		381
 #define BUTTON_BIG_CARD_ZOOM_OUT	382
 #define BUTTON_BIG_CARD_ORIG_SIZE	383
+
+#define BUTTON_COMPARE_FILTER		390
+#define BUTTON_COMPARE_OK			391
+#define COMBOBOX_COMPARE			392
+#define COMBOBOX_CALCULATE_1			393
+#define COMBOBOX_CALCULATE			394
+#define COMBOBOX_CALCULATE_2			395
+#define EDITBOX_CALCULATE			396
 
 #define AVAIL_OCG					0x1
 #define AVAIL_TCG					0x2

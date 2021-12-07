@@ -727,7 +727,7 @@ bool Game::Initialize() {
 	stSearch = env->addStaticText(dataManager.GetSysString(1325), rect<s32>(205, 62 + 100 / 6, 280, 82 + 100 / 6), false, false, wFilter);
 	ebCardName = env->addEditBox(L"", rect<s32>(260, 60 + 100 / 6, 390, 80 + 100 / 6), true, wFilter, EDITBOX_KEYWORD);
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnEffectFilter = env->addButton(rect<s32>(345, 20 + 50 / 6, 390, 60 + 75 / 6), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
+	btnEffectFilter = env->addButton(rect<s32>(345, 20 + 50 / 6, 390, 40 + 50 / 6), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
 	btnStartFilter = env->addButton(rect<s32>(205, 80 + 125 / 6, 390, 100 + 125 / 6), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
 	if(gameConf.separate_clear_button) {
 		btnStartFilter->setRelativePosition(rect<s32>(260, 80 + 125 / 6, 390, 100 + 125 / 6));
@@ -767,6 +767,42 @@ bool Game::Initialize() {
 	btnMark[7] = env->addButton(recti(80, 80, 110, 110), wLinkMarks, -1, L"\u2198");
 	for(int i=0;i<8;i++)
 		btnMark[i]->setIsPushButton(true);
+	btnCompareFilter = env->addButton(rect<s32>(345, 40 + 75 / 6, 390, 60 + 75 / 6), wFilter, BUTTON_COMPARE_FILTER, dataManager.GetSysString(1375));
+	wCompares = env->addWindow(rect<s32>(690, 60, 1000, 180), false, L"");
+	wCompares->getCloseButton()->setVisible(false);
+	wCompares->setDrawTitlebar(false);
+	wCompares->setDraggable(false);
+	wCompares->setVisible(false);
+	stCompareAttack = env->addStaticText(dataManager.GetSysString(1376), rect<s32>(10, 11, 60, 41), false, false, wCompares);
+	cbCompare = env->addComboBox(rect<s32>(65, 10, 105, 40), wCompares, -1);
+	cbCompare->setMaxSelectionRows(10);
+	cbCompare->addItem(dataManager.GetSysString(1310));
+	cbCompare->addItem(L"\u003d");
+	cbCompare->addItem(L"\u003c");
+	cbCompare->addItem(L"\u2266");
+	cbCompare->addItem(L"\u003e");
+	cbCompare->addItem(L"\u2267");
+	cbCompare->addItem(L"\u2260");
+	stCompareDefense = env->addStaticText(dataManager.GetSysString(1377), rect<s32>(110, 11, 160, 41), false, false, wCompares);
+	cbCalculateFirst = env->addComboBox(rect<s32>(10, 45, 80, 75), wCompares, COMBOBOX_CALCULATE_1);
+	cbCalculateFirst->setMaxSelectionRows(10);
+	cbCalculateFirst->addItem(dataManager.GetSysString(1376));
+	cbCalculateFirst->addItem(dataManager.GetSysString(1377));
+	cbCalculate = env->addComboBox(rect<s32>(85, 45, 125, 75), wCompares, COMBOBOX_CALCULATE);
+	cbCalculate->setMaxSelectionRows(10);
+	cbCalculate->addItem(L"\u002b");
+	cbCalculate->addItem(L"\u002d");
+	cbCalculate->addItem(L"\u00d7");
+	cbCalculate->addItem(L"\u00f7");
+	cbCalculateSecond = env->addComboBox(rect<s32>(130, 45, 200, 75), wCompares, COMBOBOX_CALCULATE_2);
+	cbCalculateSecond->setMaxSelectionRows(10);
+	cbCalculateSecond->addItem(dataManager.GetSysString(1376));
+	cbCalculateSecond->addItem(dataManager.GetSysString(1377));
+	cbCalculateSecond->setSelected(1);
+	stCalculate = env->addStaticText(L"\u003d", rect<s32>(205, 46, 215, 76), false, false, wCompares);
+	ebCalculate = env->addEditBox(L"", rect<s32>(220, 45, 300, 75), true, wCompares, EDITBOX_CALCULATE);
+	ebCalculate->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	btnCompareOK = env->addButton(recti(100, 80, 210, 110), wCompares, BUTTON_COMPARE_OK, dataManager.GetSysString(1211));
 	//replay window
 	wReplay = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1202));
 	wReplay->getCloseButton()->setVisible(false);
@@ -1810,7 +1846,7 @@ void Game::OnResize() {
 	ebAttack->setRelativePosition(Resize(260, 20 + 50 / 6, 340, 40 + 50 / 6));
 	ebDefense->setRelativePosition(Resize(260, 40 + 75 / 6, 340, 60 + 75 / 6));
 	ebCardName->setRelativePosition(Resize(260, 60 + 100 / 6, 390, 80 + 100 / 6));
-	btnEffectFilter->setRelativePosition(Resize(345, 20 + 50 / 6, 390, 60 + 75 / 6));
+	btnEffectFilter->setRelativePosition(Resize(345, 20 + 50 / 6, 390, 40 + 50 / 6));
 	btnStartFilter->setRelativePosition(Resize(260, 80 + 125 / 6, 390, 100 + 125 / 6));
 	if(btnClearFilter)
 		btnClearFilter->setRelativePosition(Resize(205, 80 + 125 / 6, 255, 100 + 125 / 6));
@@ -1824,6 +1860,8 @@ void Game::OnResize() {
 		btncatepos.LowerRightCorner.Y - btncatepos.getHeight() / 2 + 245));
 
 	wLinkMarks->setRelativePosition(ResizeWin(700, 30, 820, 150));
+	btnCompareFilter->setRelativePosition(Resize(345, 40 + 75 / 6, 390, 60 + 75 / 6));
+	wCompares->setRelativePosition(ResizeWin(690, 60, 1000, 180));
 	stDBCategory->setRelativePosition(Resize(10, 9, 100, 29));
 	stDeck->setRelativePosition(Resize(10, 39, 100, 59));
 	stCategory->setRelativePosition(Resize(10, 2 + 25 / 6, 70, 22 + 25 / 6));

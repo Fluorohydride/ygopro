@@ -55,6 +55,11 @@ public:
 	unsigned int filter_scl;
 	unsigned int filter_marks;
 	int filter_lm;
+	int filter_compare;
+	int filter_calc1;
+	int filter_calc2;
+	int filter_calctype;
+	int filter_calcvalue;
 	position2di mouse_pos;
 	int hovered_code;
 	int hovered_pos;

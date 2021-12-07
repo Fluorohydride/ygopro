@@ -59,7 +59,7 @@ static bool check_set_code(const CardDataC& data, int set_code) {
 }
 
 static inline bool havePopupWindow() {
-	return mainGame->wQuery->isVisible() || mainGame->wCategories->isVisible() || mainGame->wLinkMarks->isVisible() || mainGame->wDeckManage->isVisible() || mainGame->wDMQuery->isVisible();
+	return mainGame->wQuery->isVisible() || mainGame->wCategories->isVisible() || mainGame->wLinkMarks->isVisible() || mainGame->wCompares->isVisible() || mainGame->wDeckManage->isVisible() || mainGame->wDMQuery->isVisible();
 }
 
 void DeckBuilder::Initialize() {
@@ -134,6 +134,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		if(((mainGame->wCategories->isVisible() && id != BUTTON_CATEGORY_OK) ||
 			(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) ||
 			(mainGame->wLinkMarks->isVisible() && id != BUTTON_MARKERS_OK) ||
+			(mainGame->wCompares->isVisible() && id != BUTTON_COMPARE_OK) ||
 			(mainGame->wDMQuery->isVisible() && id != BUTTON_DM_OK && id != BUTTON_DM_CANCEL) ||
 			(mainGame->wDeckManage->isVisible() && !(id >= WINDOW_DECK_MANAGE && id < COMBOBOX_LFLIST)))
 			&& event.GUIEvent.EventType != irr::gui::EGET_LISTBOX_CHANGED
@@ -766,6 +767,33 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					filter_marks |= 0004;
 				mainGame->HideElement(mainGame->wLinkMarks);
 				mainGame->btnMarksFilter->setPressed(filter_marks > 0);
+				InstantSearch();
+				break;
+			}
+			case BUTTON_COMPARE_FILTER: {
+				mainGame->PopupElement(mainGame->wCompares);
+				break;
+			}
+			case BUTTON_COMPARE_OK: {
+				bool preresed = false;
+				filter_compare = 0;
+				filter_calc1 = 0;
+				filter_calc2 = 1;
+				filter_calctype = 0;
+				filter_calcvalue = 0;
+				if ((int)mainGame->cbCompare->getSelected() > 0) {
+					preresed = true;
+					filter_compare = (int)mainGame->cbCompare->getSelected();
+				}
+				if ((int)wcslen(mainGame->ebCalculate->getText()) > 0) {
+					preresed = true;
+					filter_calc1 = (int)mainGame->cbCalculateFirst->getSelected();
+					filter_calc2 = (int)mainGame->cbCalculateSecond->getSelected();
+					filter_calctype = (int)mainGame->cbCalculate->getSelected() + 1;
+					filter_calcvalue = BufferIO::GetVal(mainGame->ebCalculate->getText());
+				}
+				mainGame->HideElement(mainGame->wCompares);
+				mainGame->btnCompareFilter->setPressed(preresed);
 				InstantSearch();
 				break;
 			}
@@ -1446,6 +1474,21 @@ void DeckBuilder::FilterCards() {
 			continue;
 		if(filter_marks && (data.link_marker & filter_marks) != filter_marks)
 			continue;
+		if(filter_compare) {
+			if((filter_compare == 1 && data.attack != data.defense) || (filter_compare == 2 && data.attack >= data.defense)
+			        || (filter_compare == 3 && data.attack > data.defense) || (filter_compare == 4 && data.attack <= data.defense)
+			        || (filter_compare == 5 && data.attack < data.defense) || (filter_compare == 6 && data.attack == data.defense)
+			        || data.attack == -2 || data.defense == -2 || !(data.type & TYPE_MONSTER) || (data.type & TYPE_LINK))
+				continue;
+		}
+		if(filter_calctype) {
+			int calcfirst = filter_calc1 == 0 ? data.attack : data.defense;
+			int calcsecond = filter_calc2 == 0 ? data.attack : data.defense;
+			if((filter_calctype == 1 && (calcfirst + calcsecond) != filter_calcvalue) || (filter_calctype == 2 && (calcfirst - calcsecond) != filter_calcvalue)
+			        || (filter_calctype == 3 && (calcfirst * calcsecond) != filter_calcvalue) || (filter_calctype == 4 && (calcfirst / calcsecond) != filter_calcvalue)
+			        || data.attack == -2 || data.defense == -2 || !(data.type & TYPE_MONSTER) || (data.type & TYPE_LINK))
+				continue;
+		}
 		if(filter_lm) {
 			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList).at(ptr->first) != filter_lm - 1))
 				continue;
@@ -1536,8 +1579,19 @@ void DeckBuilder::ClearFilter() {
 	filter_marks = 0;
 	for(int i = 0; i < 8; i++)
 		mainGame->btnMark[i]->setPressed(false);
+	filter_compare = 0;
+	filter_calc1 = 0;
+	filter_calc2 = 1;
+	filter_calctype = 0;
+	filter_calcvalue = 0;
+	mainGame->cbCompare->setSelected(0);
+	mainGame->cbCalculateFirst->setSelected(0);
+	mainGame->cbCalculate->setSelected(0);
+	mainGame->cbCalculateSecond->setSelected(1);
+	mainGame->ebCalculate->setText(L"");
 	mainGame->btnEffectFilter->setPressed(false);
 	mainGame->btnMarksFilter->setPressed(false);
+	mainGame->btnCompareFilter->setPressed(false);
 }
 void DeckBuilder::SortList() {
 	auto left = results.begin();
