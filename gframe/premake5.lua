@@ -12,7 +12,7 @@ project "ygopro"
         includedirs { "../event/include" }
     end
 
-    if BUILD_IRRLICHT then
+    if BUILD_IRRLICHT or os.ishost("macosx") then
         includedirs { "../irrlicht/include" }
     end
 
@@ -24,14 +24,17 @@ project "ygopro"
         includedirs { "../sqlite3" }
     end
 
+    if USE_IRRKLANG then
+        defines { "YGOPRO_USE_IRRKLANG" }
+        includedirs { "../irrklang/include" }
+    end
+
     filter "system:windows"
         defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
         libdirs { "$(DXSDK_DIR)Lib/x86" }
         if USE_IRRKLANG then
-            defines { "YGOPRO_USE_IRRKLANG" }
             links { "irrKlang" }
-            includedirs { "../irrklang/include" }
             if IRRKLANG_PRO then
                 defines { "IRRKLANG_STATIC" }
                 links { "ikpmp3" }
@@ -53,13 +56,16 @@ project "ygopro"
         includedirs { "/usr/include/irrlicht", "/usr/include/freetype2" }
         links { "event_pthreads", "dl", "pthread", "X11" }
     filter "system:macosx"
+        libdirs { "../irrlicht/source/Irrlicht/MacOSX/build/Release/" }
         links { "z" }
+        if USE_IRRKLANG then
+            links { "irrklang" }
+            libdirs { "../irrklang/bin/macosx-gcc" }
+        end
     filter "system:linux"
         links { "GL", "Xxf86vm" }
         if USE_IRRKLANG then
-            defines { "YGOPRO_USE_IRRKLANG" }
             links { "IrrKlang" }
             linkoptions{ "-Wl,-rpath=./irrklang/bin/linux-gcc-64/" }
             libdirs { "../irrklang/bin/linux-gcc-64" }
-            includedirs { "../irrklang/include" }
         end
