@@ -43,8 +43,7 @@ workspace "YGOPro"
         libdirs { "/usr/local/lib" }
 
     filter "system:macosx"
-        includedirs { "/usr/local/include", "/usr/local/include/*" }
-        removeincludedirs { "/usr/local/include/X11" }
+        includedirs { "/usr/local/include/freetype2" }
         libdirs { "/usr/local/lib" }
         buildoptions { "-stdlib=libc++" }
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
