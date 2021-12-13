@@ -2085,7 +2085,7 @@ void Game::SetCursor(ECURSOR_ICON icon) {
 		cursor->setActiveIcon(icon);
 	}
 }
-void Game::StartProcess(const wchar_t* cmd, const wchar_t* param1, const wchar_t* param2) {
+bool Game::StartProcess(const wchar_t* cmd, const wchar_t* param1, const wchar_t* param2) {
 	if(cmd[0] == 0)
 		return;
 #ifdef _WIN32
@@ -2096,8 +2096,9 @@ void Game::StartProcess(const wchar_t* cmd, const wchar_t* param1, const wchar_t
 	ZeroMemory(&pi, sizeof(pi));
 	wchar_t command[MAX_PATH];
 	myswprintf(command, L"%ls \"%ls\" \"%ls\"", cmd, param1, param2);
-	CreateProcessW(NULL, command, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+	return CreateProcessW(NULL, command, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 #else
+	return true;
 //	if(fork() == 0) {
 //		exit(0);
 //	}

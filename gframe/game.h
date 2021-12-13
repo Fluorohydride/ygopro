@@ -193,7 +193,7 @@ public:
 	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(ECURSOR_ICON icon);
-	void StartProcess(const wchar_t* cmd, const wchar_t* param1 = L"", const wchar_t* param2 = L"");
+	bool StartProcess(const wchar_t* cmd, const wchar_t* param1 = L"", const wchar_t* param2 = L"");
 
 	std::mutex gMutex;
 	Signal frameSignal;
