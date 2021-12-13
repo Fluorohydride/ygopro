@@ -28,7 +28,7 @@ endif ()
 target_link_libraries (ygopro ocgcore clzma)
 
 if (MSVC)
-    target_link_libraries (ygopro irrlicht freetype sqlite3 event lua)
+    target_link_libraries (ygopro irrlicht freetype sqlite3 event)
     include_directories ( "../irrlicht/include" "../freetype/include" "../event/include" "../sqlite3" )
 else ()
     target_link_libraries (ygopro
@@ -36,7 +36,6 @@ else ()
         ${FREETYPE_LIBRARIES}
         ${SQLITE_LIBRARIES}
         ${LIBEVENT_LIBRARIES}
-        ${LUA_LIBRARIES}
         ${OPENGL_gl_LIBRARY}
     )
     include_directories (

@@ -233,8 +233,8 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 			duel_mode = new TagDuel();
 			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, TagDuel::TagTimer, duel_mode);
 		}
-		if(pkt->info.rule > 3)
-			pkt->info.rule = 0;
+		if(pkt->info.rule > 5)
+			pkt->info.rule = 5;
 		if(pkt->info.mode > 2)
 			pkt->info.mode = 0;
 		unsigned int hash = 1;
