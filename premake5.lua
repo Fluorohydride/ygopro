@@ -3,6 +3,10 @@ solution "ygo"
     language "C++"
     objdir "obj"
 
+    if os.ishost("windows") then
+        BUILD_LUA=true
+    end
+
     configurations { "Release", "Debug" }
 
     configuration "windows"
