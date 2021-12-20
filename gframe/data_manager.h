@@ -22,7 +22,7 @@ public:
 	bool GetString(int code, CardString* pStr);
 	const wchar_t* GetName(int code);
 	const wchar_t* GetText(int code);
-	const wchar_t* GetDesc(int strCode);
+	const wchar_t* GetDesc(unsigned int strCode);
 	const wchar_t* GetSysString(int code);
 	const wchar_t* GetVictoryString(int code);
 	const wchar_t* GetCounterName(int code);
@@ -51,7 +51,6 @@ public:
 	wchar_t scBuffer[128];
 	wchar_t lmBuffer[32];
 
-	static wchar_t strBuffer[4096];
 	static byte scriptBuffer[0x20000];
 	static const wchar_t* unknown_string;
 	static int CardReader(int, void*);

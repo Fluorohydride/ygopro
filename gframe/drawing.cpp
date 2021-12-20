@@ -921,8 +921,11 @@ void Game::DrawSpec() {
 			} else if(showcardp < showcarddif) {
 				DrawShadowText(lpcFont, lstr, ResizePhaseHint(660, 290, 960, 370, pos.Width), Resize(-1, -1, 0, 0), 0xffffffff);
 				if(dInfo.vic_string && (showcardcode == 1 || showcardcode == 2)) {
-					driver->draw2DRectangle(0xa0000000, Resize(540, 320, 790, 340));
-					DrawShadowText(guiFont, dInfo.vic_string, Resize(490, 320, 840, 340), Resize(-2, -1, 0, 0), 0xffffffff, 0xff000000, true, true, 0);
+					int w = guiFont->getDimension(dInfo.vic_string).Width;
+					if(w < 200)
+						w = 200;
+					driver->draw2DRectangle(0xa0000000, ResizeWin(640 - w / 2, 320, 690 + w / 2, 340));
+					DrawShadowText(guiFont, dInfo.vic_string, ResizeWin(640 - w / 2, 320, 690 + w / 2, 340), Resize(-2, -1, 0, 0), 0xffffffff, 0xff000000, true, true, 0);
 				}
 			} else if(showcardp < showcarddif + 10) {
 				int alpha = ((showcarddif + 10 - showcardp) * 25) << 24;
@@ -1102,24 +1105,32 @@ void Game::DrawThumb(code_pointer cp, position2di pos, const std::unordered_map<
 			break;
 		}
 	}
-	if(cbLimit->getSelected() >= 4 && (cp->second.ot & gameConf.defaultOT)) {
-		switch(cp->second.ot) {
-		case 1:
+	bool showAvail = false;
+	bool showNotAvail = false;
+	int filter_lm = cbLimit->getSelected();
+	bool avail = !((filter_lm == 4 && !(cp->second.ot & AVAIL_OCG)
+				|| (filter_lm == 5 && !(cp->second.ot & AVAIL_TCG))
+				|| (filter_lm == 6 && !(cp->second.ot & AVAIL_SC))
+				|| (filter_lm == 7 && !(cp->second.ot & AVAIL_CUSTOM))
+				|| (filter_lm == 8 && (cp->second.ot & AVAIL_OCGTCG) != AVAIL_OCGTCG)));
+	if(filter_lm >= 4) {
+		showAvail = avail;
+		showNotAvail = !avail;
+	} else if(!(cp->second.ot & gameConf.defaultOT)) {
+		showNotAvail = true;
+	}
+	if(showAvail) {
+		if((cp->second.ot & AVAIL_OCG) && !(cp->second.ot & AVAIL_TCG))
 			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 128, 128, 192), 0, 0, true);
-			break;
-		case 2:
+		else if((cp->second.ot & AVAIL_TCG) && !(cp->second.ot & AVAIL_OCG))
 			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 192, 128, 256), 0, 0, true);
-			break;
-		}
-	} else if(cbLimit->getSelected() >= 4 || !(cp->second.ot & gameConf.defaultOT)) {
-		switch(cp->second.ot) {
-		case 1:
+	} else if(showNotAvail) {
+		if(cp->second.ot & AVAIL_OCG)
 			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 0, 128, 64), 0, 0, true);
-			break;
-		case 2:
+		else if(cp->second.ot & AVAIL_TCG)
 			driver->draw2DImage(imageManager.tOT, otloc, recti(0, 64, 128, 128), 0, 0, true);
-			break;
-		}
+		else if(!avail)
+			driver->draw2DImage(imageManager.tLim, otloc, recti(0, 0, 64, 64), 0, 0, true);
 	}
 }
 void Game::DrawDeckBd() {
@@ -1219,11 +1230,11 @@ void Game::DrawDeckBd() {
 				myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
 				wcscat(textBuffer, scaleBuffer);
 			}
-			if((ptr->second.ot & 0x3) == 1)
+			if((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_OCG)
 				wcscat(textBuffer, L" [OCG]");
-			else if((ptr->second.ot & 0x3) == 2)
+			else if((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_TCG)
 				wcscat(textBuffer, L" [TCG]");
-			else if((ptr->second.ot & 0x7) == 4)
+			else if((ptr->second.ot & AVAIL_CUSTOM) == AVAIL_CUSTOM)
 				wcscat(textBuffer, L" [Custom]");
 			DrawShadowText(textFont, textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), Resize(1, 1, 0, 0));
 		} else {
@@ -1232,11 +1243,11 @@ void Game::DrawDeckBd() {
 			const wchar_t* ptype = dataManager.FormatType(ptr->second.type);
 			DrawShadowText(textFont, ptype, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
 			textBuffer[0] = 0;
-			if((ptr->second.ot & 0x3) == 1)
+			if((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_OCG)
 				wcscat(textBuffer, L"[OCG]");
-			else if((ptr->second.ot & 0x3) == 2)
+			else if((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_TCG)
 				wcscat(textBuffer, L"[TCG]");
-			else if((ptr->second.ot & 0x7) == 4)
+			else if((ptr->second.ot & AVAIL_CUSTOM) == AVAIL_CUSTOM)
 				wcscat(textBuffer, L"[Custom]");
 			DrawShadowText(textFont, textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), Resize(1, 1, 0, 0));
 		}

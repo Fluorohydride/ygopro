@@ -71,7 +71,16 @@ const std::unordered_map<int, int>* DeckManager::GetLFListContent(int lfhash) {
 		return &lit->content;
 	return nullptr;
 }
-int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg) {
+static int checkAvail(int ot, int avail) {
+	if((ot & avail) == avail)
+		return 0;
+	if((ot & AVAIL_OCG) && !(avail == AVAIL_OCG))
+		return DECKERROR_OCGONLY;
+	if((ot & AVAIL_TCG) && !(avail == AVAIL_TCG))
+		return DECKERROR_TCGONLY;
+	return DECKERROR_NOTAVAIL;
+}
+int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 	std::unordered_map<int, int> ccount;
 	auto list = GetLFListContent(lfhash);
 	if(!list)
@@ -83,13 +92,13 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 		return (DECKERROR_EXTRACOUNT << 28) + deck.extra.size();
 	if(deck.side.size() > 15)
 		return (DECKERROR_SIDECOUNT << 28) + deck.side.size();
-
+	const int rule_map[6] = { AVAIL_OCG, AVAIL_TCG, AVAIL_SC, AVAIL_CUSTOM, AVAIL_OCGTCG, 0 };
+	int avail = rule_map[rule];
 	for(size_t i = 0; i < deck.main.size(); ++i) {
 		code_pointer cit = deck.main[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
+		int gameruleDeckError = checkAvail(cit->second.ot, avail);
+		if(gameruleDeckError)
+			return (gameruleDeckError << 28) + cit->first;
 		if(cit->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_TOKEN | TYPE_LINK))
 			return (DECKERROR_EXTRACOUNT << 28);
 		int code = cit->second.alias ? cit->second.alias : cit->first;
@@ -103,10 +112,9 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 	}
 	for(size_t i = 0; i < deck.extra.size(); ++i) {
 		code_pointer cit = deck.extra[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
+		int gameruleDeckError = checkAvail(cit->second.ot, avail);
+		if(gameruleDeckError)
+			return (gameruleDeckError << 28) + cit->first;
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];
@@ -118,10 +126,9 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 	}
 	for(size_t i = 0; i < deck.side.size(); ++i) {
 		code_pointer cit = deck.side[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
+		int gameruleDeckError = checkAvail(cit->second.ot, avail);
+		if(gameruleDeckError)
+			return (gameruleDeckError << 28) + cit->first;
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];
@@ -192,6 +199,43 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	deck = ndeck;
 	return true;
 }
+void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) {
+	wchar_t catepath[256];
+	switch(index) {
+	case 0:
+		myswprintf(catepath, L"./pack");
+		break;
+	case 1:
+		myswprintf(catepath, mainGame->gameConf.bot_deck_path);
+		break;
+	case -1:
+	case 2:
+	case 3:
+		myswprintf(catepath, L"./deck");
+		break;
+	default:
+		myswprintf(catepath, L"./deck/%ls", text);
+	}
+	BufferIO::CopyWStr(catepath, ret, 256);
+}
+void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+	wchar_t filepath[256];
+	wchar_t catepath[256];
+	wchar_t* deckname = (wchar_t*)cbDeck->getItem(cbDeck->getSelected());
+	if(deckname != NULL) {
+		GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
+		myswprintf(filepath, L"%ls/%ls.ydk", catepath, deckname);
+		BufferIO::CopyWStr(filepath, ret, 256);
+	}
+	else {
+		BufferIO::CopyWStr(L"", ret, 256);
+	}
+}
+bool DeckManager::LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+	wchar_t filepath[256];
+	GetDeckFile(filepath, cbCategory, cbDeck);
+	return LoadDeck(filepath);
+}
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 #ifdef WIN32
 	FILE* fp = _wfopen(file, (wchar_t*)mode);
@@ -204,11 +248,11 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 }
 bool DeckManager::LoadDeck(const wchar_t* file) {
 	int sp = 0, ct = 0, mainc = 0, sidec = 0, code;
-	wchar_t localfile[64];
-	myswprintf(localfile, L"./deck/%ls.ydk", file);
-	FILE* fp = OpenDeckFile(localfile, "r");
+	FILE* fp = OpenDeckFile(file, "r");
 	if(!fp) {
-		fp = OpenDeckFile(file, "r");
+		wchar_t localfile[64];
+		myswprintf(localfile, L"./deck/%ls.ydk", file);
+		fp = OpenDeckFile(localfile, "r");
 	}
 	if(!fp)
 		return false;
@@ -234,11 +278,9 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 	LoadDeck(current_deck, cardlist, mainc, sidec);
 	return true;
 }
-bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
+bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
 	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
 		return false;
-	wchar_t file[64];
-	myswprintf(file, L"./deck/%ls.ydk", name);
 	FILE* fp = OpenDeckFile(file, "w");
 	if(!fp)
 		return false;
@@ -254,9 +296,7 @@ bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
 	fclose(fp);
 	return true;
 }
-bool DeckManager::DeleteDeck(Deck& deck, const wchar_t* name) {
-	wchar_t file[64];
-	myswprintf(file, L"./deck/%ls.ydk", name);
+bool DeckManager::DeleteDeck(const wchar_t* file) {
 #ifdef WIN32
 	BOOL result = DeleteFileW(file);
 	return !!result;
@@ -266,5 +306,32 @@ bool DeckManager::DeleteDeck(Deck& deck, const wchar_t* name) {
 	int result = unlink(filefn);
 	return result == 0;
 #endif
+}
+bool DeckManager::CreateCategory(const wchar_t* name) {
+	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
+		return false;
+	if(name[0] == 0)
+		return false;
+	wchar_t localname[256];
+	myswprintf(localname, L"./deck/%ls", name);
+	return FileSystem::MakeDir(localname);
+}
+bool DeckManager::RenameCategory(const wchar_t* oldname, const wchar_t* newname) {
+	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
+		return false;
+	if(newname[0] == 0)
+		return false;
+	wchar_t oldlocalname[256];
+	wchar_t newlocalname[256];
+	myswprintf(oldlocalname, L"./deck/%ls", oldname);
+	myswprintf(newlocalname, L"./deck/%ls", newname);
+	return FileSystem::Rename(oldlocalname, newlocalname);
+}
+bool DeckManager::DeleteCategory(const wchar_t* name) {
+	wchar_t localname[256];
+	myswprintf(localname, L"./deck/%ls", name);
+	if(!FileSystem::IsDirExists(localname))
+		return false;
+	return FileSystem::DeleteDir(localname);
 }
 }

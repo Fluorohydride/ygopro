@@ -2,6 +2,7 @@
 #define CLIENT_FIELD_H
 
 #include "config.h"
+#include "../ocgcore/mtrandom.h"
 #include <vector>
 #include <set>
 #include <map>
@@ -42,6 +43,7 @@ public:
 	std::vector<ClientCard*> conti_cards;
 	std::vector<std::pair<int,int>> activatable_descs;
 	std::vector<int> select_options;
+	std::vector<int> select_options_index;
 	std::vector<ChainInfo> chains;
 	int extra_p_count[2];
 
@@ -82,6 +84,7 @@ public:
 	bool deck_reversed;
 	bool conti_selecting;
 	bool cant_check_grave;
+	mt19937 rnd;
 
 	ClientField();
 	void Clear();
@@ -131,6 +134,7 @@ public:
 	ClientCard* clicked_card;
 	ClientCard* command_card;
 	ClientCard* highlighting_card;
+	ClientCard* menu_card;
 	int list_command;
 
 	virtual bool OnEvent(const irr::SEvent& event);

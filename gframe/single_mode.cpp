@@ -32,10 +32,10 @@ int SingleMode::SinglePlayThread() {
 	const int start_lp = 8000;
 	const int start_hand = 5;
 	const int draw_count = 1;
-	const int opt = 0;
-	mtrandom rnd;
-	time_t seed = time(0);
-	rnd.reset(seed);
+	int opt = 0;
+	std::random_device rd;
+	unsigned int seed = rd();
+	mt19937 rnd(seed);
 	set_script_reader((script_reader)DataManager::ScriptReaderEx);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
@@ -50,6 +50,8 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dInfo.clientname[0] = 0;
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
+	if(mainGame->chkSinglePlayReturnDeckTop->isChecked())
+		opt |= DUEL_RETURN_DECK_TOP;
 	char filename[256];
 	size_t slen = 0;
 	if(open_file) {
@@ -77,8 +79,9 @@ int SingleMode::SinglePlayThread() {
 	ReplayHeader rh;
 	rh.id = 0x31707279;
 	rh.version = PRO_VERSION;
-	rh.flag = REPLAY_SINGLE_MODE;
+	rh.flag = REPLAY_UNIFORM | REPLAY_SINGLE_MODE;
 	rh.seed = seed;
+	rh.start_time = (unsigned int)time(nullptr);
 	mainGame->gMutex.lock();
 	mainGame->HideElement(mainGame->wSinglePlay);
 	mainGame->ClearCardInfo();
@@ -728,7 +731,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 				}
 				pbuf += 6;
 			}
-			pbuf++;
+			count = BufferIO::ReadInt8(pbuf);
+			pbuf += count * 15;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			SinglePlayReload();
 			mainGame->gMutex.lock();

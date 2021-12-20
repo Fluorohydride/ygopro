@@ -15,6 +15,7 @@ ClientField::ClientField() {
 	hovered_card = 0;
 	clicked_card = 0;
 	highlighting_card = 0;
+	menu_card = 0;
 	hovered_controler = 0;
 	hovered_location = 0;
 	hovered_sequence = 0;
@@ -34,6 +35,7 @@ ClientField::ClientField() {
 		mzone[p].resize(7, 0);
 		szone[p].resize(8, 0);
 	}
+	rnd.reset(std::random_device()());
 }
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
@@ -83,6 +85,7 @@ void ClientField::Clear() {
 	hovered_card = 0;
 	clicked_card = 0;
 	highlighting_card = 0;
+	menu_card = 0;
 	hovered_controler = 0;
 	hovered_location = 0;
 	hovered_sequence = 0;
@@ -369,6 +372,18 @@ void ClientField::ClearSelect() {
 		(*cit)->is_selectable = false;
 		(*cit)->is_selected = false;
 	}
+	for(auto cit = selected_cards.begin(); cit != selected_cards.end(); ++cit) {
+		(*cit)->is_selectable = false;
+		(*cit)->is_selected = false;
+	}
+	for(auto cit = selectsum_all.begin(); cit != selectsum_all.end(); ++cit) {
+		(*cit)->is_selectable = false;
+		(*cit)->is_selected = false;
+	}
+	for(auto cit = selectsum_cards.begin(); cit != selectsum_cards.end(); ++cit) {
+		(*cit)->is_selectable = false;
+		(*cit)->is_selected = false;
+	}
 }
 void ClientField::ClearChainSelect() {
 	for(auto cit = activatable_cards.begin(); cit != activatable_cards.end(); ++cit) {
@@ -395,7 +410,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			}
 		}
 		if(has_card_in_grave) {
-			std::random_shuffle(selectable_cards.begin(), selectable_cards.end());
+			rnd.shuffle_vector(selectable_cards);
 		}
 	}
 	int startpos;
@@ -445,7 +460,8 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 						mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
 					if(selectable_cards[i]->overlayTarget->controler)
 						mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-					else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+					else
+						mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 				} else if(selectable_cards[i]->location == LOCATION_DECK || selectable_cards[i]->location == LOCATION_EXTRA || selectable_cards[i]->location == LOCATION_REMOVED) {
 					if(selectable_cards[i]->position & POS_FACEDOWN)
 						mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
@@ -465,7 +481,8 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 				wchar_t formatBuffer[2048];
 				myswprintf(formatBuffer, L"%d", sort_list[i]);
 				mainGame->stCardPos[i]->setText(formatBuffer);
-			} else mainGame->stCardPos[i]->setText(L"");
+			} else
+				mainGame->stCardPos[i]->setText(L"");
 			mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 		}
 		mainGame->stCardPos[i]->setVisible(true);
@@ -1509,21 +1526,8 @@ void ClientField::UpdateDeclarableList() {
 		return;
 	}
 	if(pname[0] == 0) {
-		std::vector<int> cache;
-		cache.swap(ancard);
 		int sel = mainGame->lstANCard->getSelected();
-		int selcode = (sel == -1) ? 0 : cache[sel];
-		mainGame->lstANCard->clear();
-		for(const auto& trycode : cache) {
-			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declare_opcodes)) {
-				ancard.push_back(trycode);
-				mainGame->lstANCard->addItem(cstr.name.c_str());
-				if(trycode == selcode)
-					mainGame->lstANCard->setSelected(cstr.name.c_str());
-			}
-		}
-		if(!ancard.empty())
-			return;
+		trycode = (sel == -1) ? 0 : ancard[sel];
 	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
@@ -1532,7 +1536,7 @@ void ClientField::UpdateDeclarableList() {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, declare_opcodes)) {
-				if(pname == cit->second.name) { //exact match
+				if(pname == cit->second.name || trycode == cit->first) { //exact match or last used
 					mainGame->lstANCard->insertItem(0, cit->second.name.c_str(), -1);
 					ancard.insert(ancard.begin(), cit->first);
 				} else {
