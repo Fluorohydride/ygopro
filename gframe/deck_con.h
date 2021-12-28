@@ -51,13 +51,13 @@ public:
 	void ClearSearch();
 	void SortList();
 
-	bool push_main(CardDataC* pointer, int seq = -1, bool forced = false);
-	bool push_extra(CardDataC* pointer, int seq = -1, bool forced = false);
-	bool push_side(CardDataC* pointer, int seq = -1, bool forced = false);
+	bool push_main(const CardDataC* pointer, int seq = -1, bool forced = false);
+	bool push_extra(const CardDataC* pointer, int seq = -1, bool forced = false);
+	bool push_side(const CardDataC* pointer, int seq = -1, bool forced = false);
 	void pop_main(int seq);
 	void pop_extra(int seq);
 	void pop_side(int seq);
-	bool check_limit(CardDataC* pointer);
+	bool check_limit(const CardDataC* pointer);
 #define DECLARE_WITH_CACHE(type, name) type name;\
 										type prev_##name;
 	DECLARE_WITH_CACHE(uint64_t, filter_effect)
@@ -87,13 +87,13 @@ public:
 	int scroll_pos;
 	int dragx;
 	int dragy;
-	CardDataC* dragging_pointer;
+	const CardDataC* dragging_pointer;
 	int prev_deck;
 	int prev_operation;
 
 	LFList* filterList;
-	std::map<std::wstring, std::vector<CardDataC*>> searched_terms;
-	std::vector<CardDataC*> results;
+	std::map<std::wstring, std::vector<const CardDataC*>> searched_terms;
+	std::vector<const CardDataC*> results;
 	std::wstring result_string;
 };
 

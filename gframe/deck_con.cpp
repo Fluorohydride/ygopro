@@ -21,26 +21,28 @@ static int parse_filter(const wchar_t* pstr, uint32_t& type) {
 	if(*pstr == L'=') {
 		type = 1;
 		return BufferIO::GetVal(pstr + 1);
-	} else if(*pstr >= L'0' && *pstr <= L'9') {
+	}
+	if(*pstr >= L'0' && *pstr <= L'9') {
 		type = 1;
 		return BufferIO::GetVal(pstr);
-	} else if(*pstr == L'>') {
+	}
+	if(*pstr == L'>') {
 		if(*(pstr + 1) == L'=') {
 			type = 2;
 			return BufferIO::GetVal(pstr + 2);
-		} else {
-			type = 3;
-			return BufferIO::GetVal(pstr + 1);
 		}
-	} else if(*pstr == L'<') {
+		type = 3;
+		return BufferIO::GetVal(pstr + 1);
+	}
+	if(*pstr == L'<') {
 		if(*(pstr + 1) == L'=') {
 			type = 4;
 			return BufferIO::GetVal(pstr + 2);
-		} else {
-			type = 5;
-			return BufferIO::GetVal(pstr + 1);
 		}
-	} else if(*pstr == L'?') {
+		type = 5;
+		return BufferIO::GetVal(pstr + 1);
+	}
+	if(*pstr == L'?') {
 		type = 6;
 		return 0;
 	}
@@ -857,7 +859,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						to.erase(pos);
 					}
 					uint32_t code = BufferIO::GetVal(to.data());
-					CardDataC* pointer = nullptr;
+					const CardDataC* pointer = nullptr;
 					if(!code || !(pointer = gDataManager->GetCardData(code))) {
 						for(auto& card : gDataManager->cards) {
 							const auto& name = card.second.GetStrings()->uppercase_name;
@@ -1057,7 +1059,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	}
 	for(const auto& term : searchterms) {
 		int trycode = BufferIO::GetVal(term.data());
-		CardDataC* data = nullptr;
+		const CardDataC* data = nullptr;
 		if(trycode && (data = gDataManager->GetCardData(trycode))) {
 			searched_terms[term] = { data };
 			continue;
@@ -1086,7 +1088,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		if(tokens.empty())
 			tokens.push_back(L"");
 		wchar_t checkterm = term.size() ? term.front() : 0;
-		std::vector<CardDataC*> result;
+		std::vector<const CardDataC*> result;
 		for(auto& card : gDataManager->cards) {
 			if(CheckCard(&card.second, static_cast<SEARCH_MODIFIER>(modif), tokens, set_code))
 				result.push_back(&card.second._data);
@@ -1315,7 +1317,7 @@ void DeckBuilder::SortList() {
 		break;
 	}
 }
-bool DeckBuilder::push_main(CardDataC* pointer, int seq, bool forced) {
+bool DeckBuilder::push_main(const CardDataC* pointer, int seq, bool forced) {
 	if(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK) && pointer->type != (TYPE_SPELL | TYPE_LINK))
 		return false;
 	auto& container = gdeckManager->current_deck.main;
@@ -1328,7 +1330,7 @@ bool DeckBuilder::push_main(CardDataC* pointer, int seq, bool forced) {
 	GetHoveredCard();
 	return true;
 }
-bool DeckBuilder::push_extra(CardDataC* pointer, int seq, bool forced) {
+bool DeckBuilder::push_extra(const CardDataC* pointer, int seq, bool forced) {
 	if(!(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) || pointer->type == (TYPE_SPELL | TYPE_LINK))
 		return false;
 	auto& container = gdeckManager->current_deck.extra;
@@ -1341,7 +1343,7 @@ bool DeckBuilder::push_extra(CardDataC* pointer, int seq, bool forced) {
 	GetHoveredCard();
 	return true;
 }
-bool DeckBuilder::push_side(CardDataC* pointer, int seq, bool forced) {
+bool DeckBuilder::push_side(const CardDataC* pointer, int seq, bool forced) {
 	auto& container = gdeckManager->current_deck.side;
 	if(!mainGame->is_siding && !forced && (int)container.size() >= 15)
 		return false;
@@ -1367,7 +1369,7 @@ void DeckBuilder::pop_side(int seq) {
 	container.erase(container.begin() + seq);
 	GetHoveredCard();
 }
-bool DeckBuilder::check_limit(CardDataC* pointer) {
+bool DeckBuilder::check_limit(const CardDataC* pointer) {
 	uint32_t limitcode = pointer->alias ? pointer->alias : pointer->code;
 	int found = 0;
 	int limit = filterList->whitelist ? 0 : 3;

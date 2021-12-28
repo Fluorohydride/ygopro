@@ -16,7 +16,7 @@
 #endif
 
 namespace ygo {
-CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) {
+const CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) {
 	if(!load_dummies)
 		return gDataManager->GetMappedCardData(code);
 	auto it = dummy_entries.find(code);
@@ -145,7 +145,7 @@ epro::wstringview DeckManager::GetLFListName(uint32_t lfhash) {
 		return lflist->listName;
 	return gDataManager->unknown_string;
 }
-int DeckManager::TypeCount(std::vector<CardDataC*> cards, uint32_t type) {
+int DeckManager::TypeCount(Deck::Vector cards, uint32_t type) {
 	int count = 0;
 	for(auto card : cards) {
 		if(card->type & type)
@@ -153,10 +153,10 @@ int DeckManager::TypeCount(std::vector<CardDataC*> cards, uint32_t type) {
 	}
 	return count;
 }
-inline DeckError CheckCards(const std::vector<CardDataC*> &cards, LFList* curlist,
+static DeckError CheckCards(const Deck::Vector &cards, LFList* curlist,
 					  DuelAllowedCards allowedCards,
 					  banlist_content_t &ccount,
-					  DeckError(*additionalCheck)(CardDataC*) = nullptr) {
+					  DeckError(*additionalCheck)(const CardDataC*) = nullptr) {
 	DeckError ret{ DeckError::NONE };
 	for (const auto cit : cards) {
 		ret.code = cit->code;
@@ -251,13 +251,13 @@ DeckError DeckManager::CheckDeck(Deck& deck, uint32_t lfhash, DuelAllowedCards a
 	}
 	if(ret.type)
 		return ret;
-	ret = CheckCards(deck.main, curlist, allowedCards, ccount, [](CardDataC* cit)->DeckError {
+	ret = CheckCards(deck.main, curlist, allowedCards, ccount, [](const CardDataC* cit)->DeckError {
 		if ((cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) || (cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
 			return { DeckError::EXTRACOUNT };
 		return { DeckError::NONE };
 	});
 	if (ret.type) return ret;
-	ret = CheckCards(deck.extra, curlist, allowedCards , ccount, [](CardDataC* cit)->DeckError {
+	ret = CheckCards(deck.extra, curlist, allowedCards , ccount, [](const CardDataC* cit)->DeckError {
 		if (!(cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && !(cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
 			return { DeckError::EXTRACOUNT };
 		return { DeckError::NONE };
@@ -283,7 +283,7 @@ uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint3
 uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, const cardlist_type* extralist) {
 	deck.clear();
 	uint32_t errorcode = 0;
-	CardDataC* cd = nullptr;
+	const CardDataC* cd = nullptr;
 	const bool loadalways = !!extralist;
 	for(auto code : mainlist) {
 		if(!(cd = gDataManager->GetCardData(code))) {

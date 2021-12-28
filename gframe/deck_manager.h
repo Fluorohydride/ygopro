@@ -28,15 +28,10 @@ struct LFList {
 	}
 };
 struct Deck {
-	std::vector<CardDataC*> main;
-	std::vector<CardDataC*> extra;
-	std::vector<CardDataC*> side;
-	Deck() {}
-	Deck(const Deck& ndeck) {
-		main = ndeck.main;
-		extra = ndeck.extra;
-		side = ndeck.side;
-	}
+	using Vector = std::vector<const CardDataC*>;
+	Vector main;
+	Vector extra;
+	Vector side;
 	void clear() {
 		main.clear();
 		extra.clear();
@@ -54,7 +49,7 @@ class DeckManager {
 private:
 	int null_lflist_index = -1;
 	std::unordered_map<uint32_t, CardDataC*> dummy_entries;
-	CardDataC* GetDummyOrMappedCardData(uint32_t code);
+	const CardDataC* GetDummyOrMappedCardData(uint32_t code);
 	bool load_dummies{ true };
 public:
 	Deck current_deck;
@@ -72,11 +67,11 @@ public:
 	bool LoadLFListFolder(epro::path_stringview path);
 	void LoadLFList();
 	void RefreshLFList();
-	void RefreshDeck(Deck & deck);
+	void RefreshDeck(Deck& deck);
 	LFList* GetLFList(uint32_t lfhash);
 	epro::wstringview GetLFListName(uint32_t lfhash);
 	DeckError CheckDeck(Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes = 0);
-	int TypeCount(std::vector<CardDataC*> cards, uint32_t type);
+	int TypeCount(Deck::Vector cards, uint32_t type);
 	static uint32_t LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec, uint32_t mainc2 = 0, uint32_t sidec2 = 0);
 	static uint32_t LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, const cardlist_type* extralist = nullptr);
 	bool LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec);

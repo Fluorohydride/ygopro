@@ -119,44 +119,44 @@ public:
 	bool LoadLocaleStrings(const epro::path_string& file);
 	bool LoadIdsMapping(const epro::path_string& file);
 	void ClearLocaleStrings();
-	CardDataC* GetCardData(uint32_t code);
-	CardDataC* GetMappedCardData(uint32_t code);
-	bool GetString(uint32_t code, CardString* pStr);
-	epro::wstringview GetName(uint32_t code);
-	epro::wstringview GetText(uint32_t code);
-	epro::wstringview GetUppercaseName(uint32_t code);
-	epro::wstringview GetUppercaseText(uint32_t code);
-	epro::wstringview GetDesc(uint64_t strCode, bool compat);
-	inline epro::wstringview GetSysString(uint32_t code) {
+	const CardDataC* GetCardData(uint32_t code) const;
+	const CardDataC* GetMappedCardData(uint32_t code) const;
+	bool GetString(uint32_t code, CardString* pStr) const;
+	epro::wstringview GetName(uint32_t code) const;
+	epro::wstringview GetText(uint32_t code) const;
+	epro::wstringview GetUppercaseName(uint32_t code) const;
+	epro::wstringview GetUppercaseText(uint32_t code) const;
+	epro::wstringview GetDesc(uint64_t strCode, bool compat) const;
+	inline epro::wstringview GetSysString(uint32_t code)  const {
 		return _sysStrings.GetLocale(code);
 	}
-	inline epro::wstringview GetVictoryString(int code) {
+	inline epro::wstringview GetVictoryString(int code)  const {
 		return _victoryStrings.GetLocale(code);
 	}
-	inline epro::wstringview GetCounterName(uint32_t code) {
+	inline epro::wstringview GetCounterName(uint32_t code)  const {
 		return _counterStrings.GetLocale(code);
 	}
-	inline epro::wstringview GetSetName(uint32_t code) {
+	inline epro::wstringview GetSetName(uint32_t code)  const {
 		return _setnameStrings.GetLocale(code, L"");
 	}
-	std::vector<uint16_t> GetSetCode(std::vector<std::wstring>& setname);
-	std::wstring GetNumString(int num, bool bracket = false);
-	epro::wstringview FormatLocation(uint32_t location, int sequence);
-	std::wstring FormatAttribute(uint32_t attribute);
-	std::wstring FormatRace(uint32_t race, bool isSkill = false);
-	std::wstring FormatType(uint32_t type);
-	std::wstring FormatScope(uint32_t scope, bool hideOCGTCG = false);
-	std::wstring FormatSetName(const std::vector<uint16_t>& setcodes);
-	std::wstring FormatLinkMarker(uint32_t link_marker);
+	std::vector<uint16_t> GetSetCode(std::vector<std::wstring>& setname) const;
+	std::wstring GetNumString(int num, bool bracket = false) const;
+	epro::wstringview FormatLocation(uint32_t location, int sequence) const;
+	std::wstring FormatAttribute(uint32_t attribute) const;
+	std::wstring FormatRace(uint32_t race, bool isSkill = false) const;
+	std::wstring FormatType(uint32_t type) const;
+	std::wstring FormatScope(uint32_t scope, bool hideOCGTCG = false) const;
+	std::wstring FormatSetName(const std::vector<uint16_t>& setcodes) const;
+	std::wstring FormatLinkMarker(uint32_t link_marker) const;
 
 	std::unordered_map<uint32_t, CardDataM> cards;
 
 	static constexpr wchar_t const* unknown_string = L"???";
 	static void CardReader(void* payload, uint32_t code, OCG_CardData* data);
-	static bool deck_sort_lv(CardDataC* l1, CardDataC* l2);
-	static bool deck_sort_atk(CardDataC* l1, CardDataC* l2);
-	static bool deck_sort_def(CardDataC* l1, CardDataC* l2);
-	static bool deck_sort_name(CardDataC* l1, CardDataC* l2);
+	static bool deck_sort_lv(const CardDataC* l1, const CardDataC* l2);
+	static bool deck_sort_atk(const CardDataC* l1, const CardDataC* l2);
+	static bool deck_sort_def(const CardDataC* l1, const CardDataC* l2);
+	static bool deck_sort_name(const CardDataC* l1, const CardDataC* l2);
 private:
 	std::unique_ptr<sqlite3_vfs> irrvfs;
 	template<typename T1, typename T2 = T1>
@@ -165,7 +165,7 @@ private:
 	class LocaleStringHelper {
 	public:
 		indexed_map<std::wstring> map{};
-		epro::wstringview GetLocale(uint32_t code, epro::wstringview ret = DataManager::unknown_string) {
+		epro::wstringview GetLocale(uint32_t code, epro::wstringview ret = DataManager::unknown_string)  const {
 			auto search = map.find(code);
 			if(search == map.end() || search->second.first.empty())
 				return ret;
