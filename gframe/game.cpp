@@ -1604,7 +1604,7 @@ bool Game::MainLoop() {
 						}
 					}
 					gDataManager->LoadStrings(data_path + EPRO_TEXT("strings.conf"));
-					gDataManager->LoadIdsMapping(data_path + EPRO_TEXT("mappings.json"));
+					refresh_db = gDataManager->LoadIdsMapping(data_path + EPRO_TEXT("mappings.json")) || refresh_db;
 				} else {
 					if(Utils::ToUTF8IfNeeded(gGameConfig->locale) == repo->language) {
 						for(auto& file : files)
@@ -1626,10 +1626,12 @@ bool Game::MainLoop() {
 					}
 				}
 			}
-			if(refresh_db && is_building && !is_siding)
-				gdeckManager->RefreshDeck(gdeckManager->current_deck);
-			if(refresh_db && is_building && deckBuilder.results.size())
-				deckBuilder.StartFilter(true);
+			if(refresh_db && is_building) {
+				if(!is_siding)
+					gdeckManager->RefreshDeck(gdeckManager->current_deck);
+				if(deckBuilder.results.size())
+					deckBuilder.StartFilter(true);
+			}
 			if(gRepoManager->GetUpdatingReposNumber() == 0) {
 				gdeckManager->StopDummyLoading();
 				ReloadElementsStrings();
