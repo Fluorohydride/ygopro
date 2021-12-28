@@ -87,7 +87,7 @@ public:
 	int scroll_pos;
 	int dragx;
 	int dragy;
-	CardDataC* draging_pointer;
+	CardDataC* dragging_pointer;
 	int prev_deck;
 	int prev_operation;
 

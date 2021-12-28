@@ -640,10 +640,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			click_pos = hovered_pos;
 			dragx = event.MouseInput.X;
 			dragy = event.MouseInput.Y;
-			if(!hovered_code || !(draging_pointer = gDataManager->GetCardData(hovered_code)))
+			if(!hovered_code || !(dragging_pointer = gDataManager->GetCardData(hovered_code)))
 				break;
 			if(hovered_pos == 4) {
-				if(!event.MouseInput.Shift && !check_limit(draging_pointer))
+				if(!event.MouseInput.Shift && !check_limit(dragging_pointer))
 					break;
 			}
 			is_draging = true;
@@ -667,20 +667,20 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			bool pushed = false;
 			if(hovered_pos == 1)
-				pushed = push_main(draging_pointer, hovered_seq, event.MouseInput.Shift);
+				pushed = push_main(dragging_pointer, hovered_seq, event.MouseInput.Shift);
 			else if(hovered_pos == 2)
-				pushed = push_extra(draging_pointer, hovered_seq + is_lastcard, event.MouseInput.Shift);
+				pushed = push_extra(dragging_pointer, hovered_seq + is_lastcard, event.MouseInput.Shift);
 			else if(hovered_pos == 3)
-				pushed = push_side(draging_pointer, hovered_seq + is_lastcard, event.MouseInput.Shift);
+				pushed = push_side(dragging_pointer, hovered_seq + is_lastcard, event.MouseInput.Shift);
 			else if(hovered_pos == 4 && !mainGame->is_siding)
 				pushed = true;
 			if(!pushed) {
 				if(click_pos == 1)
-					push_main(draging_pointer);
+					push_main(dragging_pointer);
 				else if(click_pos == 2)
-					push_extra(draging_pointer);
+					push_extra(dragging_pointer);
 				else if(click_pos == 3)
-					push_side(draging_pointer);
+					push_side(dragging_pointer);
 			}
 			is_draging = false;
 			break;
@@ -733,14 +733,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 			} else {
 				if(click_pos == 1) {
-					push_side(draging_pointer);
+					push_side(dragging_pointer);
 				} else if(click_pos == 2) {
-					push_side(draging_pointer);
+					push_side(dragging_pointer);
 				} else if(click_pos == 3) {
-					if(!push_extra(draging_pointer))
-						push_main(draging_pointer);
+					if(!push_extra(dragging_pointer))
+						push_main(dragging_pointer);
 				} else {
-					push_side(draging_pointer);
+					push_side(dragging_pointer);
 				}
 				is_draging = false;
 			}
@@ -873,12 +873,12 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						firstcode = pointer->code;
 					mouse_pos.set(event.DropEvent.X, event.DropEvent.Y);
 					is_draging = true;
-					draging_pointer = pointer;
+					dragging_pointer = pointer;
 					GetHoveredCard();
 					if(hovered_pos == 3)
-						push_side(draging_pointer, hovered_seq + is_lastcard, true);
+						push_side(dragging_pointer, hovered_seq + is_lastcard, true);
 					else {
-						push_main(draging_pointer, hovered_seq, true) || push_extra(draging_pointer, hovered_seq + is_lastcard, true);
+						push_main(dragging_pointer, hovered_seq, true) || push_extra(dragging_pointer, hovered_seq + is_lastcard, true);
 					}
 					is_draging = false;
 				}
