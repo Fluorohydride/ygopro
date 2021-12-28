@@ -16,7 +16,7 @@
 
 namespace ygo {
 
-constexpr wchar_t const* DataManager::unknown_string;
+constexpr epro::wstringview DataManager::unknown_string;
 static constexpr auto SELECT_STMT =
 R"(SELECT datas.id,datas.ot,datas.alias,datas.setcode,datas.type,datas.atk,datas.def,datas.level,datas.race,datas.attribute,datas.category,texts.name,texts.desc,texts.str1,texts.str2,texts.str3,texts.str4,texts.str5,texts.str6,texts.str7,texts.str8,texts.str9,texts.str10,texts.str11,texts.str12,texts.str13,texts.str14,texts.str15,texts.str16
 FROM datas,texts WHERE texts.id = datas.id ORDER BY texts.id;)"_sv;
@@ -375,8 +375,8 @@ const CardDataC* DataManager::GetMappedCardData(uint32_t code) const {
 bool DataManager::GetString(uint32_t code, CardString* pStr) const {
 	auto csit = cards.find(code);
 	if(csit == cards.end()) {
-		pStr->name = unknown_string;
-		pStr->text = unknown_string;
+		pStr->name = { unknown_string.data(), unknown_string.size() };
+		pStr->text = { unknown_string.data(), unknown_string.size() };
 		return false;
 	}
 	*pStr = *csit->second.GetStrings();
@@ -483,7 +483,7 @@ std::wstring DataManager::FormatAttribute(uint32_t attribute) const {
 		}
 	}
 	if(res.empty())
-		return unknown_string;
+		return std::wstring{ unknown_string };
 	return res;
 }
 std::wstring DataManager::FormatRace(uint32_t race, bool isSkill) const {
@@ -496,7 +496,7 @@ std::wstring DataManager::FormatRace(uint32_t race, bool isSkill) const {
 		}
 	}
 	if(res.empty())
-		return unknown_string;
+		return std::wstring{ unknown_string };
 	return res;
 }
 std::wstring DataManager::FormatType(uint32_t type) const {
@@ -516,7 +516,7 @@ std::wstring DataManager::FormatType(uint32_t type) const {
 		}
 	}
 	if(res.empty())
-		return unknown_string;
+		return std::wstring{ unknown_string };
 	return res;
 }
 std::wstring DataManager::FormatScope(uint32_t scope, bool hideOCGTCG) const {
@@ -552,7 +552,7 @@ std::wstring DataManager::FormatSetName(const std::vector<uint16_t>& setcodes) c
 		if(!res.empty())
 			res += L'|';
 		if(name.empty())
-			res.append(unknown_string);
+			appendstring(res, unknown_string);
 		else
 			appendstring(res, name);
 	}

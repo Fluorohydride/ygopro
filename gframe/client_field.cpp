@@ -403,7 +403,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			// text
 			std::wstring text = L"";
 			if(conti_selecting)
-				text = DataManager::unknown_string;
+				text = std::wstring{ DataManager::unknown_string };
 			else if(curcard->location == LOCATION_OVERLAY) {
 				text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
 					curcard->overlayTarget->sequence + 1, curcard->sequence + 1);

@@ -907,7 +907,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							text = fmt::to_wstring(sort_list[pos + i]);
 					} else {
 						if(conti_selecting)
-							text = DataManager::unknown_string;
+							text = std::wstring{ DataManager::unknown_string };
 						else if(curcard->location == LOCATION_OVERLAY) {
 							text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
 								curcard->overlayTarget->sequence + 1, curcard->sequence + 1);
