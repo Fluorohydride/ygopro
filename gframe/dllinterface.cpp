@@ -124,18 +124,24 @@ public:
 		valid = check_api_version();
 	}
 	~Core() {
-		if(enabled) {
-#define X(type,name,...) name = nullptr;
-#include "ocgcore_functions.inl"
-#undef X
-		}
-		if(library)
+		Disable();
+		if(library) {
 			CloseLibrary(library);
+		}
 	}
 	void Enable() {
 #define X(type,name,...) name = int_##name;
 #include "ocgcore_functions.inl"
 #undef X
+		enabled = true;
+	}
+	void Disable() {
+		if(enabled) {
+#define X(type,name,...) name = nullptr;
+#include "ocgcore_functions.inl"
+#undef X
+			enabled = false;
+		}
 	}
 	bool IsValid() const {
 		return valid;
