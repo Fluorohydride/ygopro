@@ -145,17 +145,17 @@ epro::wstringview DeckManager::GetLFListName(uint32_t lfhash) {
 		return lflist->listName;
 	return gDataManager->unknown_string;
 }
-int DeckManager::TypeCount(Deck::Vector cards, uint32_t type) {
+int DeckManager::TypeCount(const Deck::Vector& cards, uint32_t type) const {
 	int count = 0;
-	for(auto card : cards) {
+	for(const auto& card : cards) {
 		if(card->type & type)
 			count++;
 	}
 	return count;
 }
-static DeckError CheckCards(const Deck::Vector &cards, LFList* curlist,
+static DeckError CheckCards(const Deck::Vector& cards, LFList* curlist,
 					  DuelAllowedCards allowedCards,
-					  banlist_content_t &ccount,
+					  banlist_content_t& ccount,
 					  DeckError(*additionalCheck)(const CardDataC*) = nullptr) {
 	DeckError ret{ DeckError::NONE };
 	for (const auto cit : cards) {
