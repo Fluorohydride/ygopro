@@ -80,7 +80,7 @@ public:
 	bool SaveDeck(Deck& deck, epro::path_stringview name);
 	bool SaveDeck(epro::path_stringview name, const cardlist_type& mainlist, const cardlist_type& extralist, const cardlist_type& sidelist);
 	static const wchar_t* ExportDeckBase64(const Deck& deck);
-	static const wchar_t* ExportDeckCardNames(const Deck deck);
+	static const wchar_t* ExportDeckCardNames(Deck deck);
 	static void ImportDeckBase64(Deck& deck, const wchar_t* buffer);
 	static bool ImportDeckBase64Omega(Deck& deck, epro::wstringview buffer);
 	static bool DeleteDeck(Deck& deck, epro::path_stringview name);
