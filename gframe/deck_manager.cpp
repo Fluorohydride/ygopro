@@ -16,7 +16,7 @@
 #endif
 
 namespace ygo {
-const CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) {
+const CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) const {
 	if(!load_dummies)
 		return gDataManager->GetMappedCardData(code);
 	auto it = dummy_entries.find(code);
@@ -543,7 +543,7 @@ const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
 	}
 	return res.data();
 }
-cardlist_type BufferToCardlist(const std::vector<uint8_t>& input) {
+static cardlist_type BufferToCardlist(const std::vector<uint8_t>& input) {
 	cardlist_type vect(input.size() / 4);
 	memcpy(vect.data(), input.data(), input.size());
 	return vect;
