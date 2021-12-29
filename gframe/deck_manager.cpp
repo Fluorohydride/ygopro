@@ -128,9 +128,11 @@ void DeckManager::RefreshDeck(Deck& deck) {
 	for(auto& list : { &deck.main, &deck.extra, &deck.side }) {
 		for(auto& card : *list) {
 			if(card->code == 0 && card->alias) {
-				if(auto cd = gDataManager->GetCardData(card->alias)) {
+				const CardDataC* cd;
+				if((cd = gDataManager->GetCardData(card->alias)) == nullptr)
+					cd = gDataManager->GetMappedCardData(card->alias);
+				if(cd != nullptr)
 					card = cd;
-				}
 			}
 		}
 	}
