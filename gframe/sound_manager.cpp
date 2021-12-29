@@ -75,7 +75,7 @@ void SoundManager::RefreshBGMList() {
 }
 void SoundManager::RefreshSoundsList() {
 #ifdef BACKEND
-	static constexpr std::pair<SFX, epro::path_stringview> fx[] = {
+	static constexpr std::pair<SFX, epro::path_stringview> fx[]{
 		{SUMMON, EPRO_TEXT("./sound/summon.{}"_sv)},
 		{SPECIAL_SUMMON, EPRO_TEXT("./sound/specialsummon.{}"_sv)},
 		{ACTIVATE, EPRO_TEXT("./sound/activate.{}"_sv)},
@@ -124,7 +124,7 @@ void SoundManager::RefreshBGMDir(epro::path_stringview path, BGM scene) {
 }
 void SoundManager::RefreshChantsList() {
 #ifdef BACKEND
-	static constexpr std::pair<CHANT, epro::path_stringview> types[] = {
+	static constexpr std::pair<CHANT, epro::path_stringview> types[]{
 		{CHANT::SUMMON,    EPRO_TEXT("summon"_sv)},
 		{CHANT::ATTACK,    EPRO_TEXT("attack"_sv)},
 		{CHANT::ACTIVATE,  EPRO_TEXT("activate"_sv)}

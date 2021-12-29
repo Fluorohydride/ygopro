@@ -156,7 +156,7 @@ bool ImageManager::Initial() {
 void ImageManager::ChangeTextures(epro::path_stringview _path) {
 	if(_path == textures_path)
 		return;
-	textures_path = { _path.data(), _path.size() };
+	textures_path.assign(_path.data(), _path.size());
 	const bool is_base = textures_path == BASE_PATH;
 	GET_TEXTURE(tAct, "act");
 	GET_TEXTURE(tAttack, "attack");

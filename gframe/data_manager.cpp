@@ -402,11 +402,11 @@ epro::wstringview DataManager::GetDesc(uint64_t strCode, bool compat) const {
 	if(compat) {
 		if(strCode < 10000)
 			return GetSysString(strCode);
-		code = strCode >> 4;
-		stringid = strCode & 0xf;
+		code = static_cast<uint32_t>(strCode >> 4);
+		stringid = static_cast<uint32_t>(strCode & 0xf);
 	} else {
-		code = strCode >> 20;
-		stringid = strCode & 0xfffff;
+		code = static_cast<uint32_t>(strCode >> 20);
+		stringid = static_cast<uint32_t>(strCode & 0xfffff);
 	}
 	if(code == 0)
 		return GetSysString(stringid);
@@ -510,7 +510,7 @@ std::wstring DataManager::FormatType(uint32_t type) const {
 	return res;
 }
 std::wstring DataManager::FormatScope(uint32_t scope, bool hideOCGTCG) const {
-	static constexpr std::pair<int, int> SCOPES[] = {
+	static constexpr std::pair<int, int> SCOPES[]{
 		{SCOPE_OCG, 1900},
 		{SCOPE_TCG, 1901},
 		{SCOPE_ANIME, 1265},
