@@ -69,13 +69,12 @@ sqlite3* DataManager::OpenDb(irr::io::IReadFile* reader) {
 }
 
 static inline bool GetWstring(std::wstring& out, sqlite3_stmt* stmt, int iCol) {
-	out.clear();
 #if WCHAR_MAX == UINT16_MAX
 	auto* text = (const wchar_t*)sqlite3_column_text16(stmt, iCol);
 	if(text != nullptr) {
 		auto len = static_cast<size_t>(sqlite3_column_bytes16(stmt, iCol)) / sizeof(wchar_t);
 		if(len != 0) {
-			out = { text, len };
+			out.assign(text, len);
 			return true;
 		}
 	}
@@ -89,6 +88,7 @@ static inline bool GetWstring(std::wstring& out, sqlite3_stmt* stmt, int iCol) {
 		}
 	}
 #endif
+	out.clear();
 	return false;
 }
 
@@ -375,8 +375,8 @@ const CardDataC* DataManager::GetMappedCardData(uint32_t code) const {
 bool DataManager::GetString(uint32_t code, CardString* pStr) const {
 	auto csit = cards.find(code);
 	if(csit == cards.end()) {
-		pStr->name = { unknown_string.data(), unknown_string.size() };
-		pStr->text = { unknown_string.data(), unknown_string.size() };
+		pStr->name.assign(unknown_string.data(), unknown_string.size());
+		pStr->text.assign(unknown_string.data(), unknown_string.size());
 		return false;
 	}
 	*pStr = *csit->second.GetStrings();
