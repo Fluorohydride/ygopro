@@ -153,17 +153,22 @@ void SoundManager::PlaySoundEffect(SFX sound) {
 #ifdef BACKEND
 	if(!soundsEnabled) return;
 	if(sound >= SFX::SFX_TOTAL_SIZE) return;
-	if(SFXList[sound].empty()) return;
-	mixer->PlaySound(SFXList[sound]);
+	const auto& soundfile = SFXList[sound];
+	if(soundfile.empty()) return;
+	mixer->PlaySound(soundfile);
 #endif
 }
 void SoundManager::PlayBGM(BGM scene, bool loop) {
 #ifdef BACKEND
-	auto& list = BGMList[scene];
+	if(!musicEnabled)
+		return;
+	const auto& list = BGMList[scene];
 	int count = list.size();
-	if(musicEnabled && (scene != bgm_scene || !mixer->MusicPlaying()) && count > 0) {
+	if(count == 0)
+		return;
+	if(scene != bgm_scene || !mixer->MusicPlaying()) {
 		bgm_scene = scene;
-		int bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
+		auto bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
 		const std::string BGMName = fmt::format("{}/./sound/BGM/{}", working_dir, list[bgm]);
 		mixer->PlayMusic(BGMName, loop);
 	}
@@ -173,12 +178,14 @@ bool SoundManager::PlayChant(CHANT chant, uint32_t code) {
 #ifdef BACKEND
 	if(!soundsEnabled) return false;
 	auto key = std::make_pair(chant, code);
-	if (ChantsList.count(key)) {
-		mixer->PlaySound(ChantsList[key]);
-		return true;
-	}
-#endif
+	auto chant_it = ChantsList.find(key);
+	if(chant_it == ChantsList.end())
+		return false;
+	mixer->PlaySound(chant_it->second);
+	return true;
+#else
 	return false;
+#endif
 }
 void SoundManager::SetSoundVolume(double volume) {
 #ifdef BACKEND
