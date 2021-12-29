@@ -200,7 +200,7 @@ static DeckError CheckCards(const Deck::Vector& cards, LFList* curlist,
 	}
 	return { DeckError::NONE };
 }
-DeckError DeckManager::CheckDeck(Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes) {
+DeckError DeckManager::CheckDeck(const Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes) {
 	banlist_content_t ccount;
 	LFList* curlist = nullptr;
 	for(auto& list : _lfList) {
@@ -481,7 +481,7 @@ bool DeckManager::SaveDeck(epro::path_stringview name, const cardlist_type& main
 		deckfile << fmt::to_string(card) << "\n";
 	return true;
 }
-const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
+const wchar_t* DeckManager::ExportDeckBase64(const Deck& deck) {
 	static std::wstring res;
 	auto decktobuf = [](const auto& src) {
 		static cardlist_type cards;
@@ -494,7 +494,7 @@ const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
 	res = fmt::format(L"ydke://{}!{}!{}!", decktobuf(deck.main), decktobuf(deck.extra), decktobuf(deck.side));
 	return res.data();
 }
-const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
+const wchar_t* DeckManager::ExportDeckCardNames(const Deck deck) {
 	static std::wstring res;
 	res.clear();
 	std::sort(deck.main.begin(), deck.main.end(), DataManager::deck_sort_lv);

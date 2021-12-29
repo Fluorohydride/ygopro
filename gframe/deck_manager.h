@@ -70,7 +70,7 @@ public:
 	void RefreshDeck(Deck& deck);
 	LFList* GetLFList(uint32_t lfhash);
 	epro::wstringview GetLFListName(uint32_t lfhash);
-	DeckError CheckDeck(Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes = 0);
+	DeckError CheckDeck(const Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes = 0);
 	int TypeCount(const Deck::Vector& cards, uint32_t type) const;
 	static uint32_t LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec, uint32_t mainc2 = 0, uint32_t sidec2 = 0);
 	static uint32_t LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, const cardlist_type* extralist = nullptr);
@@ -79,8 +79,8 @@ public:
 	bool LoadDeckDouble(epro::path_stringview file, epro::path_stringview file2, Deck* deck = nullptr);
 	bool SaveDeck(Deck& deck, epro::path_stringview name);
 	bool SaveDeck(epro::path_stringview name, const cardlist_type& mainlist, const cardlist_type& extralist, const cardlist_type& sidelist);
-	static const wchar_t* ExportDeckBase64(Deck& deck);
-	static const wchar_t* ExportDeckCardNames(Deck deck);
+	static const wchar_t* ExportDeckBase64(const Deck& deck);
+	static const wchar_t* ExportDeckCardNames(const Deck deck);
 	static void ImportDeckBase64(Deck& deck, const wchar_t* buffer);
 	static bool ImportDeckBase64Omega(Deck& deck, epro::wstringview buffer);
 	static bool DeleteDeck(Deck& deck, epro::path_stringview name);
