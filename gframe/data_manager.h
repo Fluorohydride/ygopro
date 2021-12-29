@@ -121,7 +121,6 @@ public:
 	void ClearLocaleStrings();
 	const CardDataC* GetCardData(uint32_t code) const;
 	const CardDataC* GetMappedCardData(uint32_t code) const;
-	bool GetString(uint32_t code, CardString* pStr) const;
 	epro::wstringview GetName(uint32_t code) const;
 	epro::wstringview GetText(uint32_t code) const;
 	epro::wstringview GetUppercaseName(uint32_t code) const;
@@ -186,7 +185,7 @@ private:
 	sqlite3* OpenDb(irr::io::IReadFile* reader);
 	bool ParseDB(sqlite3* pDB);
 	bool ParseLocaleDB(sqlite3* pDB);
-	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = nullptr);
+	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = nullptr) const;
 	std::unordered_map<uint32_t, CardString> locales;
 	indexed_map<CardDataM*, CardString*> indexes;
 	LocaleStringHelper _counterStrings;

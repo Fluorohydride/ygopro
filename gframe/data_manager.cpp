@@ -353,7 +353,7 @@ void DataManager::ClearLocaleStrings() {
 	_counterStrings.ClearLocales();
 	_setnameStrings.ClearLocales();
 }
-bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
+bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) const {
 	ErrorLog("Error when loading database ({}): {}", cur_database, sqlite3_errmsg(pDB));
 	if(pStmt)
 		sqlite3_finalize(pStmt);
@@ -371,16 +371,6 @@ const CardDataC* DataManager::GetMappedCardData(uint32_t code) const {
 	if(it != mapped_ids.end())
 		return gDataManager->GetCardData(it->second);
 	return nullptr;
-}
-bool DataManager::GetString(uint32_t code, CardString* pStr) const {
-	auto csit = cards.find(code);
-	if(csit == cards.end()) {
-		pStr->name.assign(unknown_string.data(), unknown_string.size());
-		pStr->text.assign(unknown_string.data(), unknown_string.size());
-		return false;
-	}
-	*pStr = *csit->second.GetStrings();
-	return true;
 }
 epro::wstringview DataManager::GetName(uint32_t code) const {
 	auto csit = cards.find(code);
