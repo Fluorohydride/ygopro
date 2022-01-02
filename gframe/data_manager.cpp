@@ -510,7 +510,7 @@ std::wstring DataManager::FormatType(uint32_t type) const {
 	return res;
 }
 std::wstring DataManager::FormatScope(uint32_t scope, bool hideOCGTCG) const {
-	static constexpr std::pair<int, int> SCOPES[]{
+	static constexpr std::pair<uint32_t, uint32_t> SCOPES[]{
 		{SCOPE_OCG, 1900},
 		{SCOPE_TCG, 1901},
 		{SCOPE_ANIME, 1265},
@@ -564,6 +564,7 @@ void DataManager::CardReader(void* payload, uint32_t code, OCG_CardData* data) {
 	if(carddata != nullptr)
 		memcpy(data, carddata, sizeof(CardData));
 }
+
 inline bool is_skill(uint32_t type) {
 	return (type & (TYPE_SKILL | TYPE_ACTION));
 }
@@ -573,12 +574,16 @@ inline bool check_both_skills(uint32_t type1, uint32_t type2) {
 inline bool check_either_skills(uint32_t type1, uint32_t type2) {
 	return is_skill(type1) || is_skill(type2);
 }
+static constexpr uint32_t monster_spell_trap = TYPE_MONSTER | TYPE_SPELL | TYPE_TRAP;
+static constexpr uint32_t not_monster_spell_trap = ~monster_spell_trap;
+static constexpr uint32_t spsummon_proc_types = TYPE_LINK | TYPE_XYZ | TYPE_SYNCHRO | TYPE_RITUAL | TYPE_FUSION;
+
 inline bool check_skills(const CardDataC* p1, const CardDataC* p2) {
 	if(check_both_skills(p1->type, p2->type)) {
-		if((p1->type & 0xfffffff8) == (p2->type & 0xfffffff8)) {
+		if((p1->type & not_monster_spell_trap) == (p2->type & not_monster_spell_trap)) {
 			return p1->code < p2->code;
 		} else {
-			return (p1->type & 0xfffffff8) < (p2->type & 0xfffffff8);
+			return (p1->type & not_monster_spell_trap) < (p2->type & not_monster_spell_trap);
 		}
 	}
 	return is_skill(p2->type);
@@ -586,19 +591,24 @@ inline bool check_skills(const CardDataC* p1, const CardDataC* p2) {
 static bool card_sorter(const CardDataC* p1, const CardDataC* p2, bool(*sortoop)(const CardDataC* p1, const CardDataC* p2)) {
 	if(check_either_skills(p1->type, p2->type))
 		return check_skills(p1, p2);
-	if((p1->type & 0x7) != (p2->type & 0x7))
-		return (p1->type & 0x7) < (p2->type & 0x7);
-	if((p1->type & 0x7) == 1) {
+	if((p1->type & monster_spell_trap) != (p2->type & monster_spell_trap))
+		return (p1->type & monster_spell_trap) < (p2->type & monster_spell_trap);
+	if((p1->type & monster_spell_trap) == 1) {
 		return sortoop(p1, p2);
 	}
-	if((p1->type & 0xfffffff8) != (p2->type & 0xfffffff8))
-		return (p1->type & 0xfffffff8) < (p2->type & 0xfffffff8);
+	if((p1->type & not_monster_spell_trap) != (p2->type & not_monster_spell_trap))
+		return (p1->type & not_monster_spell_trap) < (p2->type & not_monster_spell_trap);
 	return p1->code < p2->code;
+}
+inline uint32_t get_monster_card_type(uint32_t type) {
+	if(type & spsummon_proc_types)
+		return type & (spsummon_proc_types | TYPE_MONSTER);
+	return type & (TYPE_NORMAL | TYPE_EFFECT | TYPE_MONSTER);
 }
 bool DataManager::deck_sort_lv(const CardDataC* p1, const CardDataC* p2) {
 	return card_sorter(p1, p2, [](const CardDataC* p1, const CardDataC* p2)->bool {
-		int type1 = (p1->type & 0x48020c0) ? (p1->type & 0x48020c1) : (p1->type & 0x31);
-		int type2 = (p2->type & 0x48020c0) ? (p2->type & 0x48020c1) : (p2->type & 0x31);
+		uint32_t type1 = get_monster_card_type(p1->type);
+		uint32_t type2 = get_monster_card_type(p2->type);
 		if(type1 != type2)
 			return type1 < type2;
 		if(p1->level != p2->level)
@@ -618,8 +628,8 @@ bool DataManager::deck_sort_atk(const CardDataC* p1, const CardDataC* p2) {
 			return p1->defense > p2->defense;
 		if(p1->level != p2->level)
 			return p1->level > p2->level;
-		int type1 = (p1->type & 0x48020c0) ? (p1->type & 0x48020c1) : (p1->type & 0x31);
-		int type2 = (p2->type & 0x48020c0) ? (p2->type & 0x48020c1) : (p2->type & 0x31);
+		uint32_t type1 = get_monster_card_type(p1->type);
+		uint32_t type2 = get_monster_card_type(p2->type);
 		if(type1 != type2)
 			return type1 < type2;
 		return p1->code < p2->code;
@@ -633,8 +643,8 @@ bool DataManager::deck_sort_def(const CardDataC* p1, const CardDataC* p2) {
 			return p1->attack > p2->attack;
 		if(p1->level != p2->level)
 			return p1->level > p2->level;
-		int type1 = (p1->type & 0x48020c0) ? (p1->type & 0x48020c1) : (p1->type & 0x31);
-		int type2 = (p2->type & 0x48020c0) ? (p2->type & 0x48020c1) : (p2->type & 0x31);
+		uint32_t type1 = get_monster_card_type(p1->type);
+		uint32_t type2 = get_monster_card_type(p2->type);
 		if(type1 != type2)
 			return type1 < type2;
 		return p1->code < p2->code;
