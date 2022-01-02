@@ -651,7 +651,7 @@ bool DataManager::deck_sort_def(const CardDataC* p1, const CardDataC* p2) {
 	});
 }
 bool DataManager::deck_sort_name(const CardDataC* p1, const CardDataC* p2) {
-	int res = gDataManager->GetName(p1->code).compare(gDataManager->GetName(p2->code));
+	int res = gDataManager->GetUppercaseName(p1->code).compare(gDataManager->GetUppercaseName(p2->code));
 	if(res != 0)
 		return res < 0;
 	return p1->code < p2->code;
