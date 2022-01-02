@@ -688,6 +688,7 @@ void ClientField::RefreshAllCards() {
 		if(pcard) {
 			pcard->UpdateDrawCoordinates(true);
 			pcard->is_moving = false;
+			pcard->aniFrame = 0;
 		}
 	};
 	auto refreshloc = [&refresh](const auto& zone) {
