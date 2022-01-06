@@ -124,10 +124,10 @@ local ygopro_config=function(static_core)
 		end
 
 	filter { "system:macosx", "configurations:Debug" }
-		links { "fmtd", "curl-d" }
+		links { "fmtd", "curl-d", "ldap" }
 
 	filter { "system:macosx", "configurations:Release" }
-		links { "fmt", "curl" }
+		links { "fmt", "curl", "ldap" }
 
 	filter { "system:linux or windows", "action:not vs*", "configurations:Debug" }
 		if _OPTIONS["vcpkg-root"] then
