@@ -487,3 +487,23 @@ jobs:
         webhook: ${{ secrets.DISCORD_WEBHOOK }}
         avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
         username: Github
+
+  Notify-success:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_BRANCH: travis-osx-universal
+      TRAVIS_OS_NAME: osx
+    needs: [ Windows, Linux-gcc-7-5-0, Mac-os-universal ]
+    steps:
+    - name: Log Success
+      uses: sarisia/actions-status-discord@v1
+      with:
+        nodetail: true
+        description: |
+            [[${{ github.event.repository.name }}] Build EDOPro success on ${{ github.ref }}](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+        title: |
+                
+        color: 0x0f9826
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+        username: Github
