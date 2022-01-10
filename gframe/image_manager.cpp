@@ -284,7 +284,7 @@ void ImageManager::RefreshCachedTextures() {
 				ret_texture = nullptr;
 				continue;
 			}
-			ret_texture = driver->addTexture({ loaded.path.data(), loaded.path.size() }, texture);
+			ret_texture = driver->addTexture({ loaded.path.data(), static_cast<irr::u32>(loaded.path.size()) }, texture);
 			texture->drop();
 		}
 		if(readd.size()) {
