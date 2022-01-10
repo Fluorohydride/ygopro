@@ -60,6 +60,7 @@ public:
 	irr::video::ITexture* GetTextureFromFile(const irr::io::path& file, int width, int height);
 	irr::video::ITexture* GetTextureCard(uint32_t code, imgType type, bool wait = false, bool fit = false, int* chk = nullptr);
 	irr::video::ITexture* GetTextureField(uint32_t code);
+	irr::video::ITexture* GetCheckboxScaledTexture(float scale);
 	irr::video::ITexture* guiScalingResizeCached(irr::video::ITexture* src, const irr::core::rect<irr::s32>& srcrect,
 												 const irr::core::rect<irr::s32> &destrect);
 	void draw2DImageFilterScaled(irr::video::ITexture* txr,
@@ -100,6 +101,7 @@ public:
 	A(tField[2][4])
 	A(tFieldTransparent[2][4])
 	A(tSettings)
+	A(tCheckBox[3])
 #undef A
 private:
 	void ClearFutureObjects();

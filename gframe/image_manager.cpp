@@ -131,6 +131,12 @@ bool ImageManager::Initial() {
 	CHECK_RETURN(tFieldTransparent[1][3], "field-transparentSP4");
 	GET_TEXTURE(tSettings, "settings");
 	CHECK_RETURN(tSettings, "settings");
+
+	// Not required to be present
+	GET_TEXTURE(tCheckBox[0], "checkbox_16");
+	GET_TEXTURE(tCheckBox[1], "checkbox_32");
+	GET_TEXTURE(tCheckBox[2], "checkbox_64");
+	
 	sizes[0].first = sizes[1].first = CARD_IMG_WIDTH * gGameConfig->dpi_scale;
 	sizes[0].second = sizes[1].second = CARD_IMG_HEIGHT * gGameConfig->dpi_scale;
 	sizes[2].first = CARD_THUMB_WIDTH * gGameConfig->dpi_scale;
@@ -198,6 +204,9 @@ void ImageManager::ChangeTextures(epro::path_stringview _path) {
 	GET_TEXTURE(tField[1][3], "fieldSP4");
 	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4");
 	GET_TEXTURE(tSettings, "settings");
+	GET_TEXTURE(tCheckBox[0], "checkbox_16");
+	GET_TEXTURE(tCheckBox[1], "checkbox_32");
+	GET_TEXTURE(tCheckBox[2], "checkbox_64");
 	RefreshCovers();
 }
 void ImageManager::ResetTextures() {
@@ -635,6 +644,14 @@ irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 	}
 	gImageDownloader->AddToDownloadQueue(code, imgType::FIELD);
 	return nullptr;
+}
+
+irr::video::ITexture* ImageManager::GetCheckboxScaledTexture(float scale) {
+	if(scale > 3.5f && tCheckBox[2])
+			return tCheckBox[2];
+	if(scale > 2.0f && tCheckBox[1])
+		return tCheckBox[1];
+	return tCheckBox[0];
 }
 
 

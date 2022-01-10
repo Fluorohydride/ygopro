@@ -2031,6 +2031,15 @@ bool Game::ApplySkin(const epro::path_string& skinname, bool reload, bool firstr
 		reapply_colors();
 	if(wAbout)
 		wAbout->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
+	if(dpi_scale > 1.5f) {
+		auto* sprite_texture = imageManager.GetCheckboxScaledTexture(dpi_scale);
+		if(sprite_texture) {
+			auto* sprites = skin->getSpriteBank();
+			auto sprite_id = sprites->addTextureAsSprite(sprite_texture);
+			if(sprite_id != -1)
+				skin->setIcon(irr::gui::EGDI_CHECK_BOX_CHECKED, sprite_id);
+		}
+	}
 	return applied;
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
