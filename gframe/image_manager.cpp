@@ -12,6 +12,8 @@
 #include "image_downloader.h"
 #include "game.h"
 
+static int constexpr IMAGES_LOAD_PER_FRAME_MAX = 50;
+
 #define BASE_PATH EPRO_TEXT("./textures/")
 
 namespace ygo {
@@ -25,13 +27,20 @@ namespace ygo {
 ImageManager::ImageManager() {
 	stop_threads = false;
 	obj_clear_thread = std::thread(&ImageManager::ClearFutureObjects, this);
+	for(auto& thread : load_threads)
+		thread = std::thread(&ImageManager::LoadPic, this);
 }
 ImageManager::~ImageManager() {
-	obj_clear_lock.lock();
 	stop_threads = true;
-	cv.notify_all();
+	obj_clear_lock.lock();
+	cv_clear.notify_all();
 	obj_clear_lock.unlock();
 	obj_clear_thread.join();
+	pic_load.lock();
+	cv_load.notify_all();
+	pic_load.unlock();
+	for(auto& thread : load_threads)
+		thread.join();
 	for(auto& it : g_imgCache) {
 		if(it.second)
 			it.second->drop();
@@ -136,7 +145,7 @@ bool ImageManager::Initial() {
 	GET_TEXTURE(tCheckBox[0], "checkbox_16");
 	GET_TEXTURE(tCheckBox[1], "checkbox_32");
 	GET_TEXTURE(tCheckBox[2], "checkbox_64");
-	
+
 	sizes[0].first = sizes[1].first = CARD_IMG_WIDTH * gGameConfig->dpi_scale;
 	sizes[0].second = sizes[1].second = CARD_IMG_HEIGHT * gGameConfig->dpi_scale;
 	sizes[2].first = CARD_THUMB_WIDTH * gGameConfig->dpi_scale;
@@ -219,8 +228,8 @@ void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 void ImageManager::ClearTexture(bool resize) {
 	auto ClearMap = [&](texture_map &map) {
 		for(const auto& tit : map) {
-			if(tit.second) {
-				driver->removeTexture(tit.second);
+			if(tit.second.texture) {
+				driver->removeTexture(tit.second.texture);
 			}
 		}
 		map.clear();
@@ -231,76 +240,79 @@ void ImageManager::ClearTexture(bool resize) {
 		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * gGameConfig->dpi_scale;
 		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
 		RefreshCovers();
-	}
-	if(!resize) {
-		ClearCachedTextures(resize);
-	}
+	} else
+		ClearCachedTextures();
 	ClearMap(tMap[0]);
 	ClearMap(tMap[1]);
 	ClearMap(tThumb);
-	ClearMap(tFields);
 	ClearMap(tCovers);
+	for(const auto& tit : tFields) {
+		if(tit.second) {
+			driver->removeTexture(tit.second);
+		}
+	}
+	tFields.clear();
 }
 #undef GET_TEXTURE
 #undef GET_TEXTURE_SIZED
 #undef X
-void ImageManager::RemoveTexture(uint32_t code) {
-	for(auto map : { &tMap[0], &tMap[1] }) {
-		auto tit = map->find(code);
-		if(tit != map->end()) {
-			if(tit->second)
-				driver->removeTexture(tit->second);
-			map->erase(tit);
-		}
-	}
-}
 void ImageManager::RefreshCachedTextures() {
-	auto StartLoad = [this](loading_map& src, texture_map& dest, int index, imgType type) {
-		std::vector<int> readd;
-		for (auto it = src.begin(); it != src.end();) {
-			if (it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
-				auto pair = it->second.get();
-				if (pair.first) {
-					if (pair.first->getDimension().Width != sizes[index].first || pair.first->getDimension().Height != sizes[index].second) {
-						readd.push_back(it->first);
-						dest[it->first] = nullptr;
-						it = src.erase(it);
-						continue;
-					}
-					dest[it->first] = driver->addTexture(pair.second.data(), pair.first);
-					pair.first->drop();
-				} else if (pair.second != EPRO_TEXT("wait for download")) {
-					dest[it->first] = nullptr;
-				}
-				it = src.erase(it);
+	auto LoadTexture = [this](int index, texture_map& dest, auto& size, imgType type) {
+		auto& src = loaded_pics[index];
+		std::vector<uint32_t> readd;
+		for(int i = 0; i < IMAGES_LOAD_PER_FRAME_MAX; i++) {
+			std::unique_lock<std::mutex> lck(pic_load);
+			if(src.empty())
+				break;
+			auto loaded = std::move(src.front());
+			src.pop_front();
+			lck.unlock();
+			auto& map_elem = dest[loaded.code];
+			if(loaded.status == loadStatus::WAIT_DOWNLOAD) {
+				map_elem.preload_status = preloadStatus::WAIT_DOWNLOAD;
 				continue;
 			}
-			it++;
+			auto& ret_texture = map_elem.texture;
+			map_elem.preload_status = preloadStatus::LOADED;
+			if(loaded.status == loadStatus::LOAD_FAIL) {
+				ret_texture = nullptr;
+				continue;
+			}
+			auto* texture = loaded.texture;
+			if(texture->getDimension().Width != size.first || texture->getDimension().Height != size.second) {
+				readd.push_back(loaded.code);
+				ret_texture = nullptr;
+				continue;
+			}
+			ret_texture = driver->addTexture({ loaded.path.data(), loaded.path.size() }, texture);
+			texture->drop();
 		}
-		for (auto& code : readd) {
-			src.emplace(code, std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id)));
+		if(readd.size()) {
+			std::unique_lock<std::mutex> lck(pic_load);
+			for(auto& code : readd)
+				to_load.emplace_front(code, type, index, std::ref(size.first), std::ref(size.second), timestamp_id, std::ref(timestamp_id));
+			cv_load.notify_all();
 		}
 	};
-	StartLoad(loading_pics[0], tMap[0], 0, imgType::ART);
-	StartLoad(loading_pics[1], tMap[1], 1, imgType::ART);
-	StartLoad(loading_pics[2], tThumb, 2, imgType::THUMB);
-	StartLoad(loading_pics[3], tCovers, 1, imgType::COVER);
+	LoadTexture(0, tMap[0], sizes[0], imgType::ART);
+	LoadTexture(1, tMap[1], sizes[1], imgType::ART);
+	LoadTexture(2, tThumb, sizes[2], imgType::THUMB);
+	LoadTexture(3, tCovers, sizes[1], imgType::COVER);
 }
 void ImageManager::ClearFutureObjects() {
 	Utils::SetThreadName("ImgObjsClear");
 	while(!stop_threads) {
 		std::unique_lock<std::mutex> lck(obj_clear_lock);
 		while(to_clear.empty()) {
-			cv.wait(lck);
+			cv_clear.wait(lck);
 			if(stop_threads)
 				return;
 		}
 		auto img = std::move(to_clear.front());
 		to_clear.pop_front();
 		lck.unlock();
-		auto pair = img.second.get();
-		if(pair.first)
-			pair.first->drop();
+		if(img.texture)
+			img.texture->drop();
 	}
 }
 void ImageManager::RefreshCovers() {
@@ -344,33 +356,52 @@ void ImageManager::RefreshCovers() {
 #undef GET
 #undef GTFF
 }
-void ImageManager::ClearCachedTextures(bool resize) {
+void ImageManager::LoadPic() {
+	Utils::SetThreadName("PicLoader");
+	while(!stop_threads) {
+		std::unique_lock<std::mutex> lck(pic_load);
+		while(to_load.empty()) {
+			cv_load.wait(lck);
+			if(stop_threads) {
+				return;
+			}
+		}
+		auto loaded = std::move(to_load.front());
+		to_load.pop_front();
+		lck.unlock();
+		auto load_status = LoadCardTexture(loaded.code, loaded.type, loaded.reference_width, loaded.reference_height, loaded.timestamp, loaded.reference_timestamp);
+		lck.lock();
+		loaded_pics[loaded.index].push_front(std::move(load_status));
+	}
+}
+void ImageManager::ClearCachedTextures() {
 	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	std::unique_lock<std::mutex> lck(obj_clear_lock);
-	for(auto& map : loading_pics) {
-		to_clear.insert(to_clear.end(), std::make_move_iterator(map.begin()), std::make_move_iterator(map.end()));
-		map.clear();
+	{
+		std::unique_lock<std::mutex> lck2(pic_load);
+		for(auto& map : loaded_pics) {
+			to_clear.insert(to_clear.end(), std::make_move_iterator(map.begin()), std::make_move_iterator(map.end()));
+			map.clear();
+		}
+		to_load.clear();
 	}
-	cv.notify_one();
+	cv_clear.notify_one();
 }
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
-bool ImageManager::imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, irr::s32 width, irr::s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
+bool ImageManager::imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, irr::s32 width, irr::s32 height, chrono_time timestamp_id, const std::atomic<chrono_time>& source_timestamp_id) {
 	// Cache rectsngle boundaries.
-	const double sw = src->getDimension().Width;
-	const double sh = src->getDimension().Height;
+	auto& sdim = src->getDimension();
+	const double sw = sdim.Width;
+	const double sh = sdim.Height;
 
 	// Walk each destination image pixel.
 	// Note: loop y around x for better cache locality.
 	const auto& dim = dest->getDimension();
 	const auto divw = sw / dim.Width;
 	const auto divh = sh / dim.Height;
-	if(timestamp_id != source_timestamp_id.load())
-		return false;
-	for(irr::u32 dy = 0; dy < dim.Height; dy++)
+	irr::u32 dy = 0;
+	for(; dy < dim.Height && timestamp_id == source_timestamp_id; dy++) {
 		for(irr::u32 dx = 0; dx < dim.Width; dx++) {
-			if(timestamp_id != source_timestamp_id.load())
-				return false;
-
 			// Calculate floating-point source rectangle bounds.
 			const double minsx = dx * divw;
 			const double maxsx = minsx + divw;
@@ -386,9 +417,6 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* d
 			// Loop over the integral pixel positions described by those bounds.
 			for(double sy = csy; sy < maxsy; sy++)
 				for(double sx = csx; sx < maxsx; sx++) {
-					if(timestamp_id != source_timestamp_id.load())
-						return false;
-
 					// Calculate width, height, then area of dest pixel
 					// that's covered by this source pixel.
 					double pw = 1;
@@ -427,9 +455,10 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* d
 			}
 			dest->setPixel(dx, dy, pxl);
 		}
-	return true;
+	}
+	return dy == dim.Height;
 }
-irr::video::IImage* ImageManager::GetScaledImage(irr::video::IImage* srcimg, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
+irr::video::IImage* ImageManager::GetScaledImage(irr::video::IImage* srcimg, int width, int height, chrono_time timestamp_id, const std::atomic<chrono_time>& source_timestamp_id) {
 	if(width <= 0 || height <= 0)
 		return nullptr;
 	if(!srcimg || timestamp_id != source_timestamp_id.load())
@@ -440,7 +469,7 @@ irr::video::IImage* ImageManager::GetScaledImage(irr::video::IImage* srcimg, int
 		return srcimg;
 	} else {
 		irr::video::IImage* destimg = driver->createImage(srcimg->getColorFormat(), dim);
-		if(timestamp_id != source_timestamp_id.load() || !imageScaleNNAA(srcimg, destimg, width, height, timestamp_id, std::ref(source_timestamp_id))) {
+		if(timestamp_id != source_timestamp_id || !imageScaleNNAA(srcimg, destimg, width, height, timestamp_id, source_timestamp_id)) {
 			destimg->drop();
 			destimg = nullptr;
 		}
@@ -457,14 +486,12 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const irr::io::path& file
 	}
 	return driver->getTexture(file);
 }
-ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType type, std::atomic<irr::s32>& _width, std::atomic<irr::s32>& _height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
-	static constexpr auto fail = std::make_pair(nullptr, EPRO_TEXT("fail"));
-	static constexpr auto waitdownload = std::make_pair(nullptr, EPRO_TEXT("wait for download"));
+ImageManager::load_return ImageManager::LoadCardTexture(uint32_t code, imgType type, const std::atomic<irr::s32>& _width, const std::atomic<irr::s32>& _height, chrono_time timestamp_id, const std::atomic<chrono_time>& source_timestamp_id) {
 	int width = _width;
 	int height = _height;
 	if(type == imgType::THUMB)
 		type = imgType::ART;
-
+	load_return ret{ loadStatus::LOAD_FAIL, code };
 	auto LoadImg = [&](irr::video::IImage* base_img)->irr::video::IImage* {
 		if(!base_img)
 			return nullptr;
@@ -472,7 +499,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 			width = _width;
 			height = _height;
 		}
-		while(const auto img = GetScaledImage(base_img, width, height, timestamp_id, std::ref(source_timestamp_id))) {
+		while(const auto img = GetScaledImage(base_img, width, height, timestamp_id, source_timestamp_id)) {
 			if(timestamp_id != source_timestamp_id.load()) {
 				img->drop();
 				base_img->drop();
@@ -496,16 +523,19 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 	auto status = gImageDownloader->GetDownloadStatus(code, type);
 	if(status == ImageDownloader::downloadStatus::DOWNLOADED) {
 		if(timestamp_id != source_timestamp_id.load())
-			return fail;
+			return ret;
 		const auto file = gImageDownloader->GetDownloadPath(code, type);
-		if((img = LoadImg(driver->createImageFromFile({ file.data(), static_cast<irr::u32>(file.size()) }))) != nullptr)
-			return std::make_pair(img, epro::path_string{ file });
-		return fail;
+		if((img = LoadImg(driver->createImageFromFile({ file.data(), static_cast<irr::u32>(file.size()) }))) != nullptr) {
+			ret.status = loadStatus::LOAD_OK;
+			ret.path = epro::path_string{ file };
+			ret.texture = img;
+		}
+		return ret;
 	} else if(status == ImageDownloader::downloadStatus::NONE) {
 		for(auto& path : (type == imgType::ART) ? mainGame->pic_dirs : mainGame->cover_dirs) {
 			for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
 				if(timestamp_id != source_timestamp_id.load())
-					return fail;
+					return ret;
 				irr::video::IImage* base_img = nullptr;
 				epro::path_string file;
 				if(path == EPRO_TEXT("archives")) {
@@ -522,14 +552,19 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 					file = fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension);
 					base_img = driver->createImageFromFile({ file.data(), static_cast<irr::u32>(file.size()) });
 				}
-				if((img = LoadImg(base_img)) != nullptr)
-					return std::make_pair(img, file);
+				if((img = LoadImg(base_img)) != nullptr) {
+					ret.status = loadStatus::LOAD_OK;
+					ret.path = file;
+					ret.texture = img;
+					return ret;
+				}
 			}
 		}
 		gImageDownloader->AddToDownloadQueue(code, type);
-		return waitdownload;
+		ret.status = loadStatus::WAIT_DOWNLOAD;
+		return ret;
 	}
-	return fail;
+	return ret;
 }
 irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, bool wait, bool fit, int* chk) {
 	if(chk)
@@ -555,16 +590,14 @@ irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, 
 				size_index = 0;
 				return tCovers;
 			}
-			// Should never come to these last cases
-			case imgType::FIELD:
 			default:
-				return tMap[0];
+				unreachable();
 		}
 	}();
 	if(code == 0)
 		return ret_unk;
-	auto tit = map.find(code);
-	if(tit == map.end()) {
+	auto& elem = map[code];
+	if(elem.preload_status != preloadStatus::LOADED) {
 		auto status = gImageDownloader->GetDownloadStatus(code, type);
 		if(status == ImageDownloader::downloadStatus::DOWNLOADING) {
 			if(chk)
@@ -577,20 +610,19 @@ irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, 
 			return map[code] ? map[code] : ret_unk;
 		}*/
 		if(status == ImageDownloader::downloadStatus::DOWNLOAD_ERROR) {
-			map[code] = nullptr;
+			map[code].texture = nullptr;
 			return ret_unk;
 		}
-		auto& load_entry = loading_pics[index];
-		auto a = load_entry.find(code);
 		if(chk)
 			*chk = 2;
-		if(a == load_entry.end()) {
+		if(elem.preload_status == preloadStatus::NONE || (elem.preload_status == preloadStatus::WAIT_DOWNLOAD && status == ImageDownloader::downloadStatus::DOWNLOADED)) {
+			elem.preload_status = preloadStatus::LOADING;
 			if(wait) {
-				auto tmp_img = LoadCardTexture(code, type, std::ref(sizes[size_index].first), std::ref(sizes[size_index].second), timestamp_id.load(), std::ref(timestamp_id));
-				auto& rmap = map[code];
-				if(tmp_img.first) {
-					rmap = driver->addTexture(tmp_img.second.data(), tmp_img.first);
-					tmp_img.first->drop();
+				auto load_result = LoadCardTexture(code, type, sizes[size_index].first, sizes[size_index].second, timestamp_id, timestamp_id);
+				auto& rmap = map[code].texture;
+				if(load_result.status == loadStatus::LOAD_OK) {
+					rmap = driver->addTexture(load_result.path.data(), load_result.texture);
+					load_result.texture->drop();
 					if(chk)
 						*chk = 1;
 				} else {
@@ -600,14 +632,19 @@ irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, 
 				}
 				return (rmap) ? rmap : ret_unk;
 			} else {
-				load_entry.emplace(code, std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[size_index].first), std::ref(sizes[size_index].second), timestamp_id.load(), std::ref(timestamp_id)));
+				std::unique_lock<std::mutex> lck(pic_load);
+				to_load.emplace_front(code, type, index, std::ref(sizes[size_index].first), std::ref(sizes[size_index].second), timestamp_id.load(), std::ref(timestamp_id));
+				cv_load.notify_all();
 			}
 		}
 		return ret_unk;
 	}
-	if(chk && !tit->second)
+	auto* texture = elem.texture;
+	if(chk && texture == nullptr)
 		*chk = 0;
-	return (tit->second) ? tit->second : ret_unk;
+	if(texture)
+		return texture;
+	return ret_unk;
 }
 irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 	if(code == 0)
