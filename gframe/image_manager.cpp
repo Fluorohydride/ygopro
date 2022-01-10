@@ -634,7 +634,7 @@ irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, 
 			} else {
 				std::unique_lock<std::mutex> lck(pic_load);
 				to_load.emplace_front(code, type, index, std::ref(sizes[size_index].first), std::ref(sizes[size_index].second), timestamp_id.load(), std::ref(timestamp_id));
-				cv_load.notify_all();
+				cv_load.notify_one();
 			}
 		}
 		return ret_unk;

@@ -260,7 +260,7 @@ catch(...) { what = def; }
 			to_analyze_mutex.lock();
 			to_analyze.push_back(std::move(tmp));
 			to_analyze_mutex.unlock();
-			cv.notify_all();
+			cv.notify_one();
 		}
 		event_base_loopexit(client_base, 0);
 	}
@@ -271,7 +271,7 @@ int DuelClient::ClientThread() {
 	event_base_dispatch(client_base);
 	to_analyze_mutex.lock();
 	stop_threads = true;
-	cv.notify_all();
+	cv.notify_one();
 	to_analyze_mutex.unlock();
 	parsing_thread.join();
 	bufferevent_free(client_bev);
