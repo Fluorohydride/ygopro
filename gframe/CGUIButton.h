@@ -5,12 +5,12 @@
 #ifndef __C_GUI_BUTTON_H_INCLUDED__
 #define __C_GUI_BUTTON_H_INCLUDED__
 
-#include "IrrCompileConfig.h"
+#include "irrlicht/IrrCompileConfig.h"
 #ifdef _IRR_COMPILE_WITH_GUI_
 
-#include "IGUIButton.h"
-#include "IGUISpriteBank.h"
-#include "SColor.h"
+#include "irrlicht/IGUIButton.h"
+#include "irrlicht/IGUISpriteBank.h"
+#include "irrlicht/SColor.h"
 
 namespace irr
 {
@@ -140,4 +140,3 @@ namespace gui
 #endif // _IRR_COMPILE_WITH_GUI_
 
 #endif // __C_GUI_BUTTON_H_INCLUDED__
-

@@ -53,12 +53,12 @@
 #	include <ostream>
 #endif
 
-#include "irrTypes.h"
-#include "irrAllocator.h"
-#include "irrArray.h"
-#include "irrMath.h"
-#include "irrString.h"
-#include "path.h"
+#include "irrlicht/irrTypes.h"
+#include "irrlicht/irrAllocator.h"
+#include "irrlicht/irrArray.h"
+#include "irrlicht/irrMath.h"
+#include "irrlicht/irrString.h"
+#include "irrlicht/path.h"
 
 //! UTF-16 surrogate start values.
 static const irr::u16 UTF16_HI_SURROGATE = 0xD800;
