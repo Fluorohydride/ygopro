@@ -184,9 +184,9 @@ static void OnJoin(const char* secret, void* payload) {
 	auto& host = ygo::mainGame->dInfo.secret;
 	try {
 		nlohmann::json json = nlohmann::json::parse(secret);
-		host.game_id = json["id"].get<int>();
-		host.server_address = json["addr"].get<int>();
-		host.server_port = json["port"].get<int>();
+		host.game_id = json["id"].get<uint32_t>();
+		host.server_address = json["addr"].get<uint32_t>();
+		host.server_port = json["port"].get<uint16_t>();
 		host.pass = BufferIO::DecodeUTF8(json["pass"].get_ref<const std::string&>());
 	}
 	catch(const std::exception& e) {
