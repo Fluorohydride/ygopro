@@ -1604,7 +1604,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
-								if(mcard->location == LOCATION_SZONE && mcard->lscale) {
+								if(mcard->location == LOCATION_SZONE && (mcard->type & TYPE_PENDULUM)) {
 									myswprintf(formatBuffer, L"\n%d/%d", mcard->lscale, mcard->rscale);
 									str.append(formatBuffer);
 								}
