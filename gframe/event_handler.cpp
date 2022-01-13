@@ -1590,7 +1590,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
 									str.append(fmt::format(L"\n({})", gDataManager->GetName(mcard->alias)));
 								}
-								if(mcard->location == LOCATION_SZONE && mcard->lscale) {
+								if(mcard->location == LOCATION_SZONE && (mcard->type & TYPE_PENDULUM)) {
 									str.append(fmt::format(L"\n{}/{}", mcard->lscale, mcard->rscale));
 								}
 							}
