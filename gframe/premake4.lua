@@ -20,7 +20,11 @@ project "ygopro"
         files "ygopro.rc"
         includedirs { "../event/include", "../sqlite3" }
         links { "ws2_32", "lua" }
+    configuration "linux"
+        links { "lua5.3-c++" }
+    configuration "macosx"
+        links { "lua" }
     configuration "not vs*"
         buildoptions { "-std=c++14", "-fno-rtti" }
     configuration "not windows"
-        links { "lua5.3-c++", "event_pthreads", "dl", "pthread" }
+        links { "event_pthreads", "dl", "pthread" } 

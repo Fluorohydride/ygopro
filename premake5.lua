@@ -53,7 +53,11 @@ solution "ygo"
     include "ocgcore"
     include "gframe"
     if os.ishost("windows") then
-    include "lua"
-    include "event"
-    include "sqlite3"
+        include "lua"
+        include "event"
+        include "sqlite3"
+    end
+    if os.ishost("macosx") then
+        include "lua"
+        LDFLAGS = "-framework Cocoa"
     end
