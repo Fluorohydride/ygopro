@@ -134,7 +134,6 @@ void SoundManager::RefreshChantsList() {
 		const epro::path_string searchPath = fmt::format(EPRO_TEXT("./sound/{}"), chantType.second);
 		Utils::MakeDirectory(searchPath);
 		for (auto& file : Utils::FindFiles(searchPath, mixer->GetSupportedSoundExtensions())) {
-			const auto filepath = fmt::format(EPRO_TEXT("{}/{}"), searchPath, file);
 			auto scode = Utils::GetFileName(file);
 			try {
 				uint32_t code = static_cast<uint32_t>(std::stoul(scode));
