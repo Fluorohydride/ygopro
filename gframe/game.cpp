@@ -2217,7 +2217,7 @@ Game::RepoGui* Game::AddGithubRepositoryStatusWindow(const GitRepo* repo) {
 }
 void Game::LoadGithubRepositories() {
 	bool update_ready = true;
-	for(auto& repo : gRepoManager->GetAllRepos()) {
+	for(const auto& repo : gRepoManager->GetAllRepos()) {
 		auto grepo = AddGithubRepositoryStatusWindow(repo);
 		if(repo->ready && update_ready) {
 			UpdateRepoInfo(repo, grepo);
@@ -2252,31 +2252,32 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 		grepo->commit_history_partial = grepo->commit_history_full;
 		return;
 	}
-	std::string text;
-	std::for_each(repo->history.full_history.begin(), repo->history.full_history.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
-	if(text.size())
-		text.erase(text.size() - 2, 2);
-	grepo->commit_history_full = BufferIO::DecodeUTF8(text);
-	grepo->commit_history_partial.clear();
+	auto get_text = [](const std::vector<std::string>& history) {
+		std::string text;
+		std::for_each(history.begin(), history.end(), [&text](const std::string& n) { if(n.size()) { text.append(n).append(2, '\n'); }});
+		if(text.size())
+			text.erase(text.size() - 2, 2);
+		return BufferIO::DecodeUTF8(text);
+	};
+	grepo->commit_history_full = get_text(repo->history.full_history);
 	if(repo->history.partial_history.size()) {
 		if(repo->history.partial_history.front() == repo->history.full_history.front() && repo->history.partial_history.back() == repo->history.full_history.back()) {
 			grepo->commit_history_partial = grepo->commit_history_full;
 		} else {
-			text.clear();
-			std::for_each(repo->history.partial_history.begin(), repo->history.partial_history.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
-			if(text.size())
-				text.erase(text.size() - 2, 2);
-			grepo->commit_history_partial = BufferIO::DecodeUTF8(text);
+			grepo->commit_history_partial = get_text(repo->history.partial_history);
 		}
 	} else {
 		if(repo->history.warning.size()) {
 			grepo->history_button1->setText(gDataManager->GetSysString(1448).data());
+			defaultStrings.emplace_back(grepo->history_button1, 1448);
+			grepo->history_button2->setText(gDataManager->GetSysString(1448).data());
+			defaultStrings.emplace_back(grepo->history_button2, 1448);
 			grepo->commit_history_partial = fmt::format(L"{}\n{}\n\n{}",
 				gDataManager->GetSysString(1449),
 				gDataManager->GetSysString(1450),
 				BufferIO::DecodeUTF8(repo->history.warning));
 		} else {
-			grepo->commit_history_partial = gDataManager->GetSysString(1446).data();
+			grepo->commit_history_partial.assign(gDataManager->GetSysString(1446).data(), gDataManager->GetSysString(1446).size());
 		}
 	}
 	grepo->history_button1->setEnabled(true);
