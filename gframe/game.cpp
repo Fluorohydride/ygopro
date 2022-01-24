@@ -2223,14 +2223,12 @@ void Game::LoadGithubRepositories() {
 			UpdateRepoInfo(repo, grepo);
 			if(repo->is_language) {
 				auto lang = Utils::ToPathString(repo->language);
-				auto it = std::find_if(locales.begin(), locales.end(),
-									   [&lang]
-				(const std::pair<epro::path_string, std::vector<epro::path_string>>& locale)->bool {
+				const auto find_pred = [&lang](const locale_entry_t& locale) {
 					return locale.first == lang;
-				});
-				if(it != locales.end()) {
+				};
+				const auto it = std::find_if(locales.begin(), locales.end(), find_pred);
+				if(it != locales.end())
 					it->second.push_back(Utils::ToPathString(repo->data_path));
-				}
 			}
 		} else {
 			update_ready = false;

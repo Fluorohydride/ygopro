@@ -310,7 +310,8 @@ public:
 	std::vector<epro::path_string> cores_to_load;
 	void PopulateLocales();
 	void ApplyLocale(size_t index, bool forced = false);
-	std::vector<std::pair<epro::path_string, std::vector<epro::path_string>>> locales;
+	using locale_entry_t = std::pair<epro::path_string, std::vector<epro::path_string>>;
+	std::vector<locale_entry_t> locales;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
 	std::wstring queued_caption;
