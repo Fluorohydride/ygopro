@@ -20,6 +20,9 @@ bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
+#ifndef _DEBUG
+	params.LoggingLevel = irr::ELOG_LEVEL::ELL_ERROR;
+#endif
 	params.AntiAlias = gameConf.antialias;
 	if(gameConf.use_d3d)
 		params.DriverType = irr::video::EDT_DIRECT3D9;
