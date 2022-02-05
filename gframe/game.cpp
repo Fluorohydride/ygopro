@@ -20,9 +20,6 @@ bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
-#ifndef _DEBUG
-	params.LoggingLevel = irr::ELOG_LEVEL::ELL_ERROR;
-#endif
 	params.AntiAlias = gameConf.antialias;
 	if(gameConf.use_d3d)
 		params.DriverType = irr::video::EDT_DIRECT3D9;
@@ -34,6 +31,9 @@ bool Game::Initialize() {
 		ErrorLog("Failed to create Irrlicht Engine device!");
 		return false;
 	}
+#ifndef _DEBUG
+	device->getLogger()->setLogLevel(irr::ELOG_LEVEL::ELL_ERROR);
+#endif
 	xScale = 1;
 	yScale = 1;
 	linePatternD3D = 0;
