@@ -286,7 +286,7 @@ void ClientUpdater::CheckUpdate() {
 	WritePayload payload{};
 	std::vector<char> retrieved_data;
 	payload.outbuffer = &retrieved_data;
-	if(curlPerform(UPDATE_URL, &payload) != CURLE_OK)
+	if(curlPerform(update_url.data(), &payload) != CURLE_OK)
 		return;
 	try {
 		const auto j = nlohmann::json::parse(retrieved_data);
