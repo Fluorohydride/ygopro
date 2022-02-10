@@ -8,7 +8,7 @@
 #include <IrrCompileConfig.h>
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
 
-class edoproDropper;
+struct IDropTarget;
 
 #include "CIrrDeviceStub.h"
 #include <IrrlichtDevice.h>
@@ -115,6 +115,8 @@ public:
 		// we just have to make it public
 		return CIrrDeviceStub::checkSuccessiveClicks(mouseX, mouseY, inputEvent);
 	}
+
+	virtual void enableDragDrop(bool enable, drop_callback_function_t dragCheck = nullptr, void* userParameter = nullptr) _IRR_OVERRIDE_;
 
 	//! Switch to fullscreen
 	bool switchToFullScreen(bool reset = false);
@@ -399,7 +401,7 @@ private:
 
 	SJoystickWin32Control* JoyControl;
 
-	edoproDropper* dropper;
+	IDropTarget* DropTarget;
 
 	bool has_charevent;
 
