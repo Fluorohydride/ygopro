@@ -199,10 +199,10 @@ bool DataManager::ParseLocaleDB(sqlite3* pDB) {
 		if(GetWstring(cs.text, pStmt, 2))
 			cs.uppercase_text = Utils::ToUpperNoAccents(cs.text);
 		else
-			(void)cs.uppercase_text.clear();
+			cs.uppercase_text.clear();
 
 		for(int i = 0; i < 16; ++i)
-			GetWstring(cs.desc[i], pStmt, i + 3);
+			(void)GetWstring(cs.desc[i], pStmt, i + 3);
 
 		CardDataM* card_data = nullptr;
 		if(indexesiterator != indexes.end()) {
@@ -417,12 +417,12 @@ epro::wstringview DataManager::GetDesc(uint64_t strCode, bool compat) const {
 }
 std::vector<uint16_t> DataManager::GetSetCode(std::vector<std::wstring>& setname) const {
 	std::vector<uint16_t> res;
-	for(auto& string : _setnameStrings.map) {
+	for(const auto& string : _setnameStrings.map) {
 		if(string.second.first.empty())
 			continue;
 		const auto str = Utils::ToUpperNoAccents(string.second.second.size() ? string.second.second : string.second.first);
-		if(str.find(L'|') != std::wstring::npos){
-			for(auto& name : Utils::TokenizeString<std::wstring>(str, L'|')) {
+		if(str.find(L'|') != std::wstring::npos) {
+			for(const auto& name : Utils::TokenizeString<std::wstring>(str, L'|')) {
 				if(Utils::ContainsSubstring(name, setname)) {
 					res.push_back(static_cast<uint16_t>(string.first));
 					break;

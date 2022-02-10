@@ -29,8 +29,6 @@ struct WindBot {
 #endif
 	launch_ret_t Launch(int port, epro::wstringview pass, bool chat, int hand, const wchar_t* overridedeck) const;
 
-	static uint32_t version;
-
 #ifndef __ANDROID__
 	static nlohmann::ordered_json databases;
 	static bool serialized;

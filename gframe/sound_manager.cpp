@@ -36,7 +36,7 @@ SoundManager::SoundManager(double sounds_volume, double music_volume, bool sound
 		succesfully_initied = soundsEnabled = musicEnabled = false;
 		return;
 	}
-	rnd.seed(time(0)&0xffffffff);
+	rnd.seed(static_cast<uint32_t>(time(0)));
 	bgm_scene = -1;
 	RefreshBGMList();
 	RefreshSoundsList();

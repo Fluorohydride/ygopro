@@ -90,7 +90,7 @@ public:
 	QueryStream() = delete;
 	QueryStream(char* buff, bool compat = false, uint32_t len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
 	void GenerateBuffer(std::vector<uint8_t>& buffer, bool check_hidden) const;
-	void GeneratePublicBuffer(std::vector<uint8_t>& buffer)const;
+	void GeneratePublicBuffer(std::vector<uint8_t>& buffer) const;
 	const std::vector<Query>& GetQueries() const { return queries; }
 private:
 	std::vector<Query> queries;

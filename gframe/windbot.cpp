@@ -24,7 +24,7 @@ namespace ygo {
 #if !defined(_WIN32) && !defined(__ANDROID__)
 epro::path_string WindBot::executablePath{};
 #endif
-uint32_t WindBot::version{ CLIENT_VERSION };
+static constexpr uint32_t version{ CLIENT_VERSION };
 #ifndef __ANDROID__
 nlohmann::ordered_json WindBot::databases{};
 bool WindBot::serialized{ false };
