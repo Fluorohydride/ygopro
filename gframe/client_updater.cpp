@@ -9,6 +9,10 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #endif // _WIN32
+#if defined(__MINGW32__) && defined(UNICODE)
+#include <fcntl.h>
+#include <ext/stdio_filebuf.h>
+#endif
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
 #include <thread>
@@ -25,9 +29,11 @@
 
 #define LOCKFILE EPRO_TEXT("./.edopro_lock")
 
+using md5array = std::array<uint8_t, MD5_DIGEST_LENGTH>;
+
 struct WritePayload {
 	std::vector<char>* outbuffer = nullptr;
-	std::fstream* outfstream = nullptr;
+	std::ostream* outfstream = nullptr;
 	MD5_CTX* md5context = nullptr;
 };
 
@@ -104,7 +110,7 @@ static CURLcode curlPerform(const char* url, void* payload, void* payload2 = nul
 	return res;
 }
 
-static bool CheckMd5(std::fstream& instream, uint8_t md5[MD5_DIGEST_LENGTH]) {
+static bool CheckMd5(std::istream& instream, const md5array& md5) {
 	MD5_CTX context{};
 	MD5_Init(&context);
 	std::array<char, 512> buff;
@@ -112,9 +118,9 @@ static bool CheckMd5(std::fstream& instream, uint8_t md5[MD5_DIGEST_LENGTH]) {
 		instream.read(buff.data(), buff.size());
 		MD5_Update(&context, buff.data(), static_cast<size_t>(instream.gcount()));
 	}
-	uint8_t result[MD5_DIGEST_LENGTH];
-	MD5_Final(result, &context);
-	return memcmp(result, md5, MD5_DIGEST_LENGTH) == 0;
+	md5array result;
+	MD5_Final(result.data(), &context);
+	return result == md5;
 }
 
 #ifndef __ANDROID__
@@ -237,26 +243,51 @@ void ClientUpdater::DownloadUpdate(epro::path_string dest_path, void* payload, u
 		cbpayload.filename = file.name.data();
 		cbpayload.is_new = true;
 		cbpayload.previous_percent = -1;
-		std::array<uint8_t, MD5_DIGEST_LENGTH> binmd5;
+		md5array binmd5;
 		if(file.md5.size() != binmd5.size() * 2) {
 			failed = true;
 			continue;
 		}
-		for(size_t i = 0; i < binmd5.size(); i ++) {
-			uint8_t b = static_cast<uint8_t>(std::stoul(file.md5.substr(i * 2, 2), nullptr, 16));
-			binmd5[i] = b;
-		}
-		std::fstream stream;
-		stream.open(name, std::fstream::in | std::fstream::binary);
-		if(stream.good() && CheckMd5(stream, binmd5.data()))
+		try {
+			for(size_t i = 0; i < binmd5.size(); i++) {
+				uint8_t b = static_cast<uint8_t>(std::stoul(file.md5.substr(i * 2, 2), nullptr, 16));
+				binmd5[i] = b;
+			}
+		} catch(...) {
+			failed = true;
 			continue;
-		stream.close();
+		}
+		{
+#if defined(__MINGW32__) && defined(UNICODE)
+			auto fd = _wopen(name.data(), _O_RDONLY | _O_BINARY);
+			if(fd != -1) {
+				__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
+				std::istream stream(&b);
+				if(!stream.fail() && CheckMd5(stream, binmd5))
+					continue;
+			}
+#else
+			std::ifstream stream(name, std::ifstream::binary);
+			if(!stream.fail() && CheckMd5(stream, binmd5))
+				continue;
+#endif
+		}
 		if(!ygo::Utils::CreatePath(name)) {
 			failed = true;
 			continue;
 		}
-		stream.open(name, std::fstream::out | std::fstream::trunc | std::ofstream::binary);
-		if(!stream.good()) {
+#if defined(__MINGW32__) && defined(UNICODE)
+		auto fd = _wopen(name.data(), _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY);
+		if(fd == -1) {
+			failed = true;
+			continue;
+		}
+		__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::out);
+		std::ostream stream(&b);
+#else
+		std::ofstream stream(name, std::ofstream::trunc | std::ofstream::binary);
+#endif
+		if(stream.fail()) {
 			failed = true;
 			continue;
 		}
@@ -269,9 +300,9 @@ void ClientUpdater::DownloadUpdate(epro::path_string dest_path, void* payload, u
 			failed = true;
 			continue;
 		}
-		uint8_t md5[MD5_DIGEST_LENGTH]{};
-		MD5_Final(md5, &context);
-		if(memcmp(md5, binmd5.data(), MD5_DIGEST_LENGTH) != 0) {
+		md5array md5;
+		MD5_Final(md5.data(), &context);
+		if(md5 != binmd5) {
 			stream.close();
 			Utils::FileDelete(name);
 			failed = true;
