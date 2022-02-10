@@ -294,7 +294,7 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 
 	// Log.
 	if(logger)
-		logger->log(L"CGUITTFont", core::stringw(core::stringw(L"Creating new font: ") + core::ustring(filename).toWCHAR_s() + L" " + core::stringc(size) + L"pt " + (antialias ? L"+antialias " : L"-antialias ") + (transparency ? L"+transparency" : L"-transparency")).c_str(), irr::ELL_INFORMATION);
+		logger->log(L"CGUITTFont", core::stringw(core::stringw(L"Creating new font: ") + core::stringc(filename) + L" " + core::stringc(size) + L"pt " + (antialias ? L"+antialias " : L"-antialias ") + (transparency ? L"+transparency" : L"-transparency")).c_str(), irr::ELL_INFORMATION);
 
 	// Grab the face.
 	SGUITTFace* face = 0;
@@ -329,15 +329,7 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 				return false;
 			}
 		} else {
-			core::ustring converter(filename);
-			if(FT_New_Face(c_library, reinterpret_cast<const char*>(converter.toUTF8_s().c_str()), 0, &face->face)) {
-				if(logger) logger->log(L"CGUITTFont", L"FT_New_Face failed.", irr::ELL_INFORMATION);
-
-				c_faces.remove(filename);
-				delete face;
-				face = 0;
-				return false;
-			}
+			return false;
 		}
 	} else {
 		// Using another instance of this face.
@@ -544,7 +536,7 @@ void CGUITTFont::drawustring(const core::ustring& utext, const core::rect<s32>& 
 
 	// Determine offset positions.
 	if(hcenter || vcenter) {
-		textDimension = getDimension(utext);
+		textDimension = getDimensionustring(utext);
 
 		if(hcenter)
 			offset.X = ((position.getWidth() - textDimension.Width) >> 1) + offset.X;
@@ -559,7 +551,7 @@ void CGUITTFont::drawustring(const core::ustring& utext, const core::rect<s32>& 
 	// Start parsing characters.
 	u32 n;
 	uchar32_t previousChar = 0;
-	core::ustring::const_iterator iter(utext);
+	auto iter = utext.begin();
 	while(!iter.atEnd()) {
 		uchar32_t currentChar = *iter;
 
@@ -570,11 +562,12 @@ void CGUITTFont::drawustring(const core::ustring& utext, const core::rect<s32>& 
 		bool visible = (Invisible.findFirst(currentChar) == -1);
 		if(n > 0 && visible) {
 			bool lineBreak = false;
-			if(currentChar == L'\r') { // Mac or Windows breaks
+			if(currentChar == U'\r') { // Mac or Windows breaks
 				lineBreak = true;
-				if(*(iter + 1) == (uchar32_t)'\n')	// Windows line breaks.
+				const auto next = iter + 1;
+				if(!next.atEnd() && *next == U'\n')	// Windows line breaks.
 					currentChar = *(++iter);
-			} else if(currentChar == (uchar32_t)'\n') { // Unix breaks
+			} else if(currentChar == U'\n') { // Unix breaks
 				lineBreak = true;
 			}
 
@@ -624,25 +617,30 @@ core::dimension2d<u32> CGUITTFont::getCharDimension(const wchar_t ch) const {
 }
 
 core::dimension2d<u32> CGUITTFont::getDimension(const wchar_t* text) const {
-	return getDimension(core::ustring(text));
+	return getDimensionustring(text);
 }
 
-core::dimension2d<u32> CGUITTFont::getDimension(const core::ustring& text) const {
+core::dimension2d<u32> CGUITTFont::getDimension(const core::stringw& text) const {
+	return getDimensionustring(text);
+}
+
+core::dimension2d<u32> CGUITTFont::getDimensionustring(const core::ustring& text) const {
 	core::dimension2d<u32> text_dimension(0, supposed_line_height);
 	core::dimension2d<u32> line(0, supposed_line_height);
 
 	uchar32_t previousChar = 0;
-	core::ustring::const_iterator iter = text.begin();
+	auto iter = text.begin();
 	for(; !iter.atEnd(); ++iter) {
 		uchar32_t p = *iter;
 		bool lineBreak = false;
-		if(p == '\r') {	// Mac or Windows line breaks.
+		if(p == U'\r') {	// Mac or Windows line breaks.
 			lineBreak = true;
-			if(*(iter + 1) == '\n') {
+			auto next = iter + 1;
+			if(!next.atEnd() && *next == U'\n') {
 				++iter;
 				p = *iter;
 			}
-		} else if(p == '\n') {	// Unix line breaks.
+		} else if(p == U'\n') {	// Unix line breaks.
 			lineBreak = true;
 		}
 
@@ -788,9 +786,7 @@ s32 CGUITTFont::getCharacterFromPos(const core::ustring& text, s32 pixel_x) cons
 
 	u32 character = 0;
 	uchar32_t previousChar = 0;
-	core::ustring::const_iterator iter = text.begin();
-	while(!iter.atEnd()) {
-		uchar32_t c = *iter;
+	for(auto c : text) {
 		x += getWidthFromCharacter(c);
 
 		// Kerning.
@@ -801,7 +797,6 @@ s32 CGUITTFont::getCharacterFromPos(const core::ustring& text, s32 pixel_x) cons
 			return character;
 
 		previousChar = c;
-		++iter;
 		++character;
 	}
 
@@ -871,12 +866,8 @@ core::vector2di CGUITTFont::getKerning(const uchar32_t thisLetter, const uchar32
 }
 
 void CGUITTFont::setInvisibleCharacters(const wchar_t *s) {
-	core::ustring us(s);
-	Invisible = us;
-}
-
-void CGUITTFont::setInvisibleCharacters(const core::ustring& s) {
-	Invisible = s;
+	Invisible_w = s;
+	Invisible = Invisible_w;
 }
 
 video::IImage* CGUITTFont::createTextureFromChar(const uchar32_t& ch) {
@@ -948,7 +939,7 @@ core::dimension2d<u32> CGUITTFont::getDimensionUntilEndOfLine(const wchar_t* p) 
 	for(const wchar_t* temp = p; temp && *temp != '\0' && *temp != L'\r' && *temp != L'\n'; ++temp)
 		s.append(*temp);
 
-	return getDimension(s.c_str());
+	return getDimension(s);
 }
 
 core::array<scene::ISceneNode*> CGUITTFont::addTextSceneNode(const wchar_t* text, scene::ISceneManager* smgr, scene::ISceneNode* parent, const video::SColor& color, bool center) {

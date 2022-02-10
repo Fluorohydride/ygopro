@@ -39,6 +39,7 @@
 #include <rect.h>
 #include <SMesh.h>
 #include <irrMap.h>
+#include <path.h>
 
 namespace irr {
 class IrrlichtDevice;
@@ -232,7 +233,8 @@ public:
 
 	//! Returns the dimension of a text string.
 	virtual core::dimension2d<u32> getDimension(const wchar_t* text) const;
-	virtual core::dimension2d<u32> getDimension(const core::ustring& text) const;
+	virtual core::dimension2d<u32> getDimension(const core::stringw& text) const;
+	virtual core::dimension2d<u32> getDimensionustring(const core::ustring& text) const;
 
 	//! Calculates the index of the character in the text which is on a specific position.
 	virtual s32 getCharacterFromPos(const wchar_t* text, s32 pixel_x) const;
@@ -253,7 +255,6 @@ public:
 
 	//! Define which characters should not be drawn by the font.
 	virtual void setInvisibleCharacters(const wchar_t *s);
-	virtual void setInvisibleCharacters(const core::ustring& s);
 
 	//! Get the last glyph page if there's still available slots.
 	//! If not, it will return zero.
@@ -342,6 +343,7 @@ private:
 	s32 GlobalKerningHeight;
 	s32 supposed_line_height;
 	core::ustring Invisible;
+	core::stringw Invisible_w;
 
 	CGUITTFont* fallback;
 };

@@ -180,7 +180,7 @@ void CGUICustomText::draw() {
 				}
 				if(HAlign == EGUIA_LOWERRIGHT) {
 					frameRect.UpperLeftCorner.X = frameRect.LowerRightCorner.X -
-						font->getDimension(Text.c_str()).Width;
+						font->getDimension(Text).Width;
 				}
 
 				if(hasHorizontalAutoscrolling())
@@ -188,7 +188,7 @@ void CGUICustomText::draw() {
 				if(hasVerticalAutoscrolling())
 					frameRect.UpperLeftCorner.Y -= (s32)round((float)curFrame * animationStep);
 
-				font->draw(Text.c_str(), frameRect,
+				font->draw(Text, frameRect,
 						   getActiveColor(),
 						   HAlign == EGUIA_CENTER && !autoscrolling && hasHorizontalAutoscrolling(), VAlign == EGUIA_CENTER && !autoscrolling && hasVerticalAutoscrolling(), (RestrainTextInside ? &AbsoluteClippingRect : NULL));
 			} else {
@@ -219,9 +219,9 @@ void CGUICustomText::draw() {
 				for(u32 i = start; i < end; ++i, r.UpperLeftCorner.Y += height) {
 					if(HAlign == EGUIA_LOWERRIGHT) {
 						r.UpperLeftCorner.X = frameRect.LowerRightCorner.X -
-							font->getDimension(BrokenText[i].c_str()).Width;
+							font->getDimension(BrokenText[i]).Width;
 					}
-					font->draw(BrokenText[i].c_str(), r,
+					font->draw(BrokenText[i], r,
 							   getActiveColor(),
 							   HAlign == EGUIA_CENTER, false, (RestrainTextInside ? &AbsoluteClippingRect : NULL));
 				}
@@ -467,8 +467,8 @@ void CGUICustomText::breakText(bool scrollbar_spacing) {
 				if(word.size()) {
 					// here comes the next whitespace, look if
 					// we must break the last word to the next line.
-					const u32 whitelgth = font->getDimension(whitespace.c_str()).Width;
-					u32 wordlgth = font->getDimension(word.c_str()).Width;
+					const u32 whitelgth = font->getDimension(whitespace).Width;
+					u32 wordlgth = font->getDimension(word).Width;
 
 					if(wordlgth > elWidth) {
 						// This word is too long to fit in the available space, look for
@@ -479,7 +479,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing) {
 							core::stringw first = word.subString(0, where);
 							core::stringw second = word.subString(where, word.size() - where);
 							BrokenText.push_back(line + first + L"-");
-							const s32 secondLength = font->getDimension(second.c_str()).Width;
+							const s32 secondLength = font->getDimension(second).Width;
 
 							length = secondLength;
 							line = second;
@@ -491,7 +491,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing) {
 							while(wordlgth > elWidth) {
 								u32 j = (word.size() > 1) ? 1 : 0;
 								for(; j < word.size() - 1; j++) {
-									if(font->getDimension((line + whitespace + word.subString(0, j + 1)).c_str()).Width > elWidth)
+									if(font->getDimension(line + whitespace + word.subString(0, j + 1)).Width > elWidth)
 										break;
 								}
 								//if not enough space for the word just give up and dont' try to calculate the broken lines
@@ -504,7 +504,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing) {
 								core::stringw first = word.subString(0, j);
 								second = word.subString(j, word.size() - j);
 								BrokenText.push_back(line + whitespace + first);
-								secondLength = font->getDimension(second.c_str()).Width;
+								secondLength = font->getDimension(second).Width;
 								word = second;
 								wordlgth = secondLength;
 								whitespace = L"";
@@ -574,8 +574,8 @@ void CGUICustomText::breakText(bool scrollbar_spacing) {
 				if(word.size()) {
 					// here comes the next whitespace, look if
 					// we must break the last word to the next line.
-					const u32 whitelgth = font->getDimension(whitespace.c_str()).Width;
-					const u32 wordlgth = font->getDimension(word.c_str()).Width;
+					const u32 whitelgth = font->getDimension(whitespace).Width;
+					const u32 wordlgth = font->getDimension(word).Width;
 
 					if(length && (length + wordlgth + whitelgth > elWidth)) {
 						// break to next line
@@ -633,7 +633,7 @@ void CGUICustomText::updateAutoScrollingStuff() {
 	animationStep = 0;
 	int offset = 0;
 	if(hasHorizontalAutoscrolling())
-		offset = getActiveFont()->getDimension(Text.c_str()).Width - frameRect.getWidth();
+		offset = getActiveFont()->getDimension(Text).Width - frameRect.getWidth();
 	if(hasVerticalAutoscrolling())
 		offset = getTextHeight() - frameRect.getHeight();
 	if(forcedSteps) {
@@ -704,7 +704,7 @@ s32 CGUICustomText::getTextWidth() const {
 		s32 widest = 0;
 
 		for(u32 line = 0; line < BrokenText.size(); ++line) {
-			s32 width = font->getDimension(BrokenText[line].c_str()).Width;
+			s32 width = font->getDimension(BrokenText[line]).Width;
 
 			if(width > widest)
 				widest = width;
@@ -712,7 +712,7 @@ s32 CGUICustomText::getTextWidth() const {
 
 		return widest;
 	} else {
-		return font->getDimension(Text.c_str()).Width;
+		return font->getDimension(Text).Width;
 	}
 }
 

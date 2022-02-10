@@ -439,7 +439,7 @@ void Game::DrawCard(ClientCard* pcard) {
 		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
 	}
 }
-template<typename T, typename = std::enable_if_t<std::is_same<T, irr::core::ustring>::value>>
+template<typename T>
 inline void DrawShadowTextPos(irr::gui::CGUITTFont* font, const T& text, const irr::core::recti& shadowposition, const irr::core::recti& mainposition,
 					   irr::video::SColor color = 0xffffffff, irr::video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const irr::core::recti* clip = nullptr) {
 	font->drawustring(text, shadowposition, shadowcolor, hcenter, vcenter, clip);
@@ -449,11 +449,6 @@ inline void DrawShadowTextPos(irr::gui::CGUITTFont* font, const T& text, const i
 #if !defined(_MSC_VER) && !defined(__forceinline)
 #define __forceinline __attribute__((always_inline)) inline
 #endif
-template<typename... Args>
-__forceinline void DrawShadowTextPos(irr::gui::CGUITTFont* font, epro::wstringview text, Args&&... args) {
-	const irr::core::ustring _text(text.data(), text.size());
-	DrawShadowTextPos(font, _text, std::forward<Args>(args)...);
-}
 template<typename T, typename... Args>
 __forceinline void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const irr::core::recti& shadowposition, const irr::core::recti& padding, Args&&... args) {
 	const irr::core::recti position(shadowposition.UpperLeftCorner.X + padding.UpperLeftCorner.X, shadowposition.UpperLeftCorner.Y + padding.UpperLeftCorner.Y,
@@ -610,18 +605,17 @@ void Game::DrawMisc() {
 	irr::core::recti p2size = Resize(986, 31, 986, 50);
 	int i = 0;
 	for(const auto& player : self) {
-		const irr::core::ustring utext(player.data(), player.size());
 		if(i++== dInfo.current_player[0])
-			textFont->drawustring(utext, p1size, 0xffffffff, false, false, 0);
+			textFont->drawustring(player, p1size, 0xffffffff, false, false, 0);
 		else
-			textFont->drawustring(utext, p1size, 0xff808080, false, false, 0);
+			textFont->drawustring(player, p1size, 0xff808080, false, false, 0);
 		p1size += irr::core::vector2di{ 0, p1size.getHeight() + ResizeY(4) };
 	}
 	i = 0;
 	const auto basecorner = p2size.UpperLeftCorner.X;
 	for(const auto& player : oppo) {
-		const irr::core::ustring utext(player.data(), player.size());
-		auto cld = textFont->getDimension(utext);
+		const irr::core::ustring utext(player);
+		auto cld = textFont->getDimensionustring(utext);
 		p2size.UpperLeftCorner.X = basecorner - cld.Width;
 		if(i++ == dInfo.current_player[1])
 			textFont->drawustring(utext, p2size, 0xffffffff, false, false, 0);
@@ -708,9 +702,9 @@ void Game::DrawStatus(ClientCard* pcard) {
 		return skin::DUELFIELD_CARD_LEVEL_VAL;
 	};
 
-	const auto atk = adFont->getDimension(pcard->atkstring);
+	const auto atk = adFont->getDimensionustring(pcard->atkstring);
 
-	const auto slash = adFont->getDimension(L"/");
+	const auto slash = adFont->getDimensionustring(L"/");
 	const auto half_slash_width = static_cast<int>(std::floor(slash.Width / 2));
 
 	const auto padding_1111 = Resize(1, 1, 1, 1);
@@ -768,8 +762,8 @@ void Game::DrawPendScale(ClientCard* pcard) {
 Draws the text in the middle of the bottom side of the zone
 */
 void Game::DrawStackIndicator(epro::wstringview text, irr::video::S3DVertex* v, bool opponent) {
-	const irr::core::ustring utext(text.data(), text.size());
-	const auto dim = textFont->getDimension(utext) / 2;
+	const irr::core::ustring utext(text);
+	const auto dim = textFont->getDimensionustring(utext) / 2;
 	//int width = dim.Width / 2, height = dim.Height / 2;
 	float x0 = (v[0].Pos.X + v[1].Pos.X) / 2.0f;
 	float y0 = (opponent) ? v[0].Pos.Y : v[2].Pos.Y;
@@ -995,10 +989,9 @@ void Game::DrawSpec() {
 		case 101: {
 			irr::core::ustring lstr = L"";
 			if(1 <= showcardcode && showcardcode <= 14) {
-				const auto tmpstring = gDataManager->GetSysString(1700 + showcardcode);
-				lstr = irr::core::ustring(tmpstring.data(), tmpstring.size());
+				lstr = gDataManager->GetSysString(1700 + showcardcode);
 			}
-			auto pos = lpcFont->getDimension(lstr);
+			auto pos = lpcFont->getDimensionustring(lstr);
 			if(showcardp < 10.0f) {
 				int alpha = ((int)std::round(showcardp) * 25) << 24;
 				DrawShadowText(lpcFont, lstr, ResizePhaseHint(661 - (9 - showcardp) * 40, 291, 960, 370, pos.Width), Resize(-1, -1, 0, 0), alpha | 0xffffff, alpha);
@@ -1046,7 +1039,7 @@ void Game::DrawSpec() {
 				continue;
 			if(!showChat && i > 2)
 				continue;
-			int w = textFont->getDimension(chatMsg[i]).Width;
+			int w = textFont->getDimensionustring(chatMsg[i]).Width;
 			irr::core::recti chatrect = wChat->getRelativePosition();
 			auto rectloc = chatrect;
 			rectloc -= irr::core::vector2di(0, (i + 1) * chatrect.getHeight() + Scale(1));
@@ -1279,7 +1272,7 @@ void Game::DrawDeckBd() {
 													  gDataManager->GetSysString(1314), gdeckManager->TypeCount(gdeckManager->current_deck.main, TYPE_TRAP));
 
 		const auto mainpos = Resize(310, 137, 797, 157);
-		const auto mainDeckTypeSize = textFont->getDimension(main_types_count_str);
+		const auto mainDeckTypeSize = textFont->getDimensionustring(main_types_count_str);
 		const auto pos = irr::core::recti(mainpos.LowerRightCorner.X - mainDeckTypeSize.Width - 5, mainpos.UpperLeftCorner.Y,
 										  mainpos.LowerRightCorner.X, mainpos.LowerRightCorner.Y);
 
@@ -1314,7 +1307,7 @@ void Game::DrawDeckBd() {
 													   gDataManager->GetSysString(1076), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_LINK));
 
 		const auto extrapos = Resize(310, 440, 797, 460);
-		const auto extraDeckTypeSize = textFont->getDimension(extra_types_count_str);
+		const auto extraDeckTypeSize = textFont->getDimensionustring(extra_types_count_str);
 		const auto pos = irr::core::recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 5, extrapos.UpperLeftCorner.Y,
 										  extrapos.LowerRightCorner.X, extrapos.LowerRightCorner.Y);
 
@@ -1347,7 +1340,7 @@ void Game::DrawDeckBd() {
 													  gDataManager->GetSysString(1314), gdeckManager->TypeCount(gdeckManager->current_deck.side, TYPE_TRAP));
 
 		const auto sidepos = Resize(310, 537, 797, 557);
-		const auto sideDeckTypeSize = textFont->getDimension(side_types_count_str);
+		const auto sideDeckTypeSize = textFont->getDimensionustring(side_types_count_str);
 		const auto pos = irr::core::recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 5, sidepos.UpperLeftCorner.Y,
 										  sidepos.LowerRightCorner.X, sidepos.LowerRightCorner.Y);
 
@@ -1371,7 +1364,7 @@ void Game::DrawDeckBd() {
 		DrawShadowText(textFont, gDataManager->GetSysString(1333), Resize(809, 136, 914, 156), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
 
 		const auto tmpstring = gDataManager->GetSysString(1333);
-		const auto size = textFont->getDimension(irr::core::ustring(tmpstring.data(), tmpstring.size())).Width + ResizeX(5);
+		const auto size = textFont->getDimensionustring(tmpstring).Width + ResizeX(5);
 		const auto pos = irr::core::recti(ResizeX(809) + size, ResizeY(136), ResizeX(809) + size + 10, ResizeY(156));
 		DrawShadowText(numFont, deckBuilder.result_string, pos, Resize(0, 1, 0, 1), 0xffffffff, 0xff000000, false, true);
 
