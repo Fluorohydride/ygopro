@@ -7,7 +7,6 @@
 #include <unordered_map>
 #include <map>
 #include <atomic>
-#include <future>
 #include <queue>
 #include <mutex>
 #include <condition_variable>
