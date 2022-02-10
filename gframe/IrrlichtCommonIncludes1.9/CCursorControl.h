@@ -116,7 +116,7 @@ public:
 		return CIrrDeviceStub::checkSuccessiveClicks(mouseX, mouseY, inputEvent);
 	}
 
-	virtual void enableDragDrop(bool enable, drop_callback_function_t dragCheck = nullptr, void* userParameter = nullptr) _IRR_OVERRIDE_;
+	virtual void enableDragDrop(bool enable, drop_callback_function_t dragCheck = nullptr) _IRR_OVERRIDE_;
 
 	//! Switch to fullscreen
 	bool switchToFullScreen(bool reset = false);
