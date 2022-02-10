@@ -371,7 +371,8 @@ bool CGUISkinSystem::applySkin(const fschar_t *skinname) {
 	/*io::path oldpath = fs->getWorkingDirectory();
 	fs->changeWorkingDirectoryTo(skinsPath);*/
 	workingDir = skinsPath;
-	registry = new CXMLRegistry(fs);
+	CXMLRegistry reg{ fs };
+	registry = &reg;
 	loaded_skin = nullptr;
 	gui::CImageGUISkin* skin = loadSkinFromFile(skinname);
 	if(skin == nullptr) {
@@ -381,7 +382,6 @@ bool CGUISkinSystem::applySkin(const fschar_t *skinname) {
 	loaded_skin = skin;
 	// If we're going to switch skin we need to find all the progress bars and overwrite their colors	
 	skin->drop();
-	delete registry;
 	registry = nullptr;
 	//fs->changeWorkingDirectoryTo(oldpath);
 
