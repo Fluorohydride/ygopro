@@ -41,9 +41,11 @@ void Replay::BeginRecord(bool write, epro::path_string name) {
 		fclose(fp);
 		fp = nullptr;
 	}
-	if(write)
+	is_recording = true;
+	if(write) {
 		fp = fileopen(name.data(), "wb");
-	is_recording = fp != nullptr;
+		is_recording = fp != nullptr;
+	}
 }
 void Replay::WritePacket(const ReplayPacket& p) {
 	Write<uint8_t>(p.message, false);
