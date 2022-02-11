@@ -5,7 +5,6 @@
 #include "text_types.h"
 
 extern uint16_t PRO_VERSION;
-extern bool exit_on_return;
 extern bool is_from_discord;
 extern bool open_file;
 extern epro::path_string open_file_name;

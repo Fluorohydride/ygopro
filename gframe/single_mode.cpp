@@ -192,8 +192,6 @@ restart:
 				mainGame->wPhase->setVisible(false);
 				mainGame->deckBuilder.Initialize(false);
 			}
-			if(exit_on_return)
-				mainGame->device->closeDevice();
 		} else
 			mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
 		is_restarting = false;
@@ -324,8 +322,6 @@ restart:
 			mainGame->wPhase->setVisible(false);
 			mainGame->deckBuilder.Initialize(false);
 		}
-		if(exit_on_return)
-			mainGame->device->closeDevice();
 	}
 	open_file = false;
 	return 0;

@@ -27,7 +27,6 @@
 #include "osx_menu.h"
 #endif
 
-bool exit_on_return = false;
 bool is_from_discord = false;
 bool open_file = false;
 epro::path_string open_file_name = EPRO_TEXT("");

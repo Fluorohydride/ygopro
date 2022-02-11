@@ -137,7 +137,7 @@ bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool c
 void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 	if(connect_state & 0x7)
 		return;
-	if(!is_closing && !exit_on_return) {
+	if(!is_closing) {
 		temp_ver = 0;
 		std::lock_guard<std::mutex> lock(mainGame->gMutex);
 		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
@@ -157,7 +157,7 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 void DuelClient::StopClient(bool is_exiting) {
 	mainGame->frameSignal.SetNoWait(true);
 	if((connect_state & 0x7) != 0) {
-		is_closing = is_exiting || exit_on_return;
+		is_closing = is_exiting;
 		to_analyze_mutex.lock();
 		to_analyze.clear();
 		event_base_loopbreak(client_base);
@@ -392,8 +392,6 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 					mainGame->ShowElement(mainGame->wLanWindow);
 			}
 			mainGame->PopupMessage(gDataManager->GetSysString(1400));
-			if(exit_on_return)
-				mainGame->device->closeDevice();
 		} else if(connect_state == 0x7) {
 			if(!mainGame->dInfo.isInDuel && !mainGame->is_building) {
 				std::lock_guard<std::mutex> lock(mainGame->gMutex);
@@ -1030,8 +1028,6 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		}
 		connect_state |= 0x100;
 		event_base_loopbreak(client_base);
-		if(exit_on_return)
-			mainGame->device->closeDevice();
 		break;
 	}
 	case STOC_REPLAY: {
@@ -1278,8 +1274,6 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			}
 			connect_state |= 0x100;
 			event_base_loopbreak(client_base);
-			if(exit_on_return)
-				mainGame->device->closeDevice();
 			return false;
 		}
 	}
