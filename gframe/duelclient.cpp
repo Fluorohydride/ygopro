@@ -1186,6 +1186,12 @@ inline T2 CompatRead(char*& buf) {
 		return static_cast<T2>(BufferIO::Read<T1>(buf));
 	return BufferIO::Read<T2>(buf);
 }
+template<typename T1, typename T2>
+inline T2 CompatRead(const char*& buf) {
+	if(mainGame->dInfo.compat_mode)
+		return static_cast<T2>(BufferIO::Read<T1>(buf));
+	return BufferIO::Read<T2>(buf);
+}
 inline void Play(SoundManager::SFX sound) {
 	if(!mainGame->dInfo.isCatchingUp)
 		gSoundManager->PlaySoundEffect(sound);
@@ -1200,12 +1206,12 @@ inline std::unique_lock<std::mutex> LockIf() {
 		return std::unique_lock<std::mutex>(mainGame->gMutex);
 	return std::unique_lock<std::mutex>();
 }
-int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
-	char* pbuf = msg;
-	if(!mainGame->dInfo.isReplay) {
+int DuelClient::ClientAnalyze(const char* msg, uint32_t len) {
+	const char* pbuf = msg;
+	if(!mainGame->dInfo.isReplay && !mainGame->dInfo.isSingleMode) {
 		mainGame->dInfo.curMsg = BufferIO::Read<uint8_t>(pbuf);
 		len--;
-		if(mainGame->dInfo.curMsg != MSG_WAITING && !mainGame->dInfo.isSingleMode) {
+		if(mainGame->dInfo.curMsg != MSG_WAITING) {
 			replay_stream.emplace_back(mainGame->dInfo.curMsg, pbuf, len);
 		}
 	}

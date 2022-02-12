@@ -17,24 +17,6 @@
 #endif
 
 namespace ygo {
-ReplayPacket::ReplayPacket(const CoreUtils::Packet& packet) {
-	char* buf = (char*)packet.data.data();
-	uint8_t msg = BufferIO::Read<uint8_t>(buf);
-	Set(msg, buf, (uint32_t)(packet.data.size() - sizeof(uint8_t)));
-}
-ReplayPacket::ReplayPacket(char* buf, uint32_t len) {
-	uint8_t msg = BufferIO::Read<uint8_t>(buf);
-	Set(msg, buf, len);
-}
-ReplayPacket::ReplayPacket(uint8_t msg, char* buf, uint32_t len) {
-	Set(msg, buf, len);
-}
-void ReplayPacket::Set(uint8_t msg, char* buf, uint32_t len) {
-	message = msg;
-	data.resize(len);
-	if(len)
-		memcpy(data.data(), buf, data.size());
-}
 void Replay::BeginRecord(bool write, epro::path_string name) {
 	Reset();
 	if(fp != nullptr) {
@@ -47,10 +29,10 @@ void Replay::BeginRecord(bool write, epro::path_string name) {
 		is_recording = fp != nullptr;
 	}
 }
-void Replay::WritePacket(const ReplayPacket& p) {
+void Replay::WritePacket(const CoreUtils::Packet& p) {
 	Write<uint8_t>(p.message, false);
-	Write<uint32_t>(p.data.size(), false);
-	WriteData((char*)p.data.data(), p.data.size());
+	Write<uint32_t>(p.buff_size(), false);
+	WriteData(p.data(), p.buff_size());
 }
 bool Replay::IsStreamedReplay() {
 	return pheader.id == REPLAY_YRPX;
@@ -279,7 +261,7 @@ void Replay::ParseDecks() {
 			replay_custom_rule_cards.push_back(Read<uint32_t>());
 	}
 }
-bool Replay::ReadNextPacket(ReplayPacket* packet) {
+bool Replay::ReadNextPacket(CoreUtils::Packet* packet) {
 	if(!can_read)
 		return false;
 	uint8_t message = Read<uint8_t>();
@@ -289,18 +271,18 @@ bool Replay::ReadNextPacket(ReplayPacket* packet) {
 	uint32_t len = Read<uint32_t>();
 	if(!can_read)
 		return false;
-	return ReadData(packet->data, len);
+	return ReadData(packet->buffer, len);
 }
 void Replay::ParseStream() {
 	packets_stream.clear();
 	if(!IsStreamedReplay())
 		return;
-	ReplayPacket p;
+	CoreUtils::Packet p;
 	while(ReadNextPacket(&p)) {
 		if(p.message == MSG_AI_NAME) {
-			char* pbuf = (char*)p.data.data();
+			char* pbuf = p.data();
 			int len = BufferIO::Read<uint16_t>(pbuf);
-			if((len + 1) != p.data.size() - sizeof(uint16_t))
+			if((len + 1) != p.buff_size() - sizeof(uint16_t))
 				break;
 			pbuf[len] = 0;
 			players[1] = BufferIO::DecodeUTF8(pbuf);
@@ -312,7 +294,7 @@ void Replay::ParseStream() {
 		if(p.message == OLD_REPLAY_MODE) {
 			if(!yrp) {
 				yrp = std::unique_ptr<Replay>(new Replay{});
-				if(!yrp->OpenReplayFromBuffer(std::move(p.data)))
+				if(!yrp->OpenReplayFromBuffer(std::move(p.buffer)))
 					yrp = nullptr;
 			}
 			continue;

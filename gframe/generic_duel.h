@@ -35,9 +35,9 @@ public:
 	virtual void TimeConfirm(DuelPlayer* dp);
 	virtual void EndDuel();
 
-	void BeforeParsing(CoreUtils::Packet& packet, int& return_value, bool& record, bool& record_last);
+	void BeforeParsing(const CoreUtils::Packet& packet, int& return_value, bool& record, bool& record_last);
 	void Sending(CoreUtils::Packet& packet, int& return_value, bool& record, bool& record_last);
-	void AfterParsing(CoreUtils::Packet& packet, int& return_value, bool& record, bool& record_last);
+	void AfterParsing(const CoreUtils::Packet& packet, int& return_value, bool& record, bool& record_last);
 	void DuelEndProc();
 	void WaitforResponse(uint8_t player);
 	void RefreshMzone(uint8_t player, uint32_t flag = 0x3881fff);

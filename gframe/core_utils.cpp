@@ -7,7 +7,7 @@ namespace CoreUtils {
 
 #define PARSE(value) do {value = BufferIO::Read<decltype(value)>(current);} while(0); break
 
-void Query::Parse(char*& current) {
+void Query::Parse(const char*& current) {
 	flag = 0;
 	for(;;) {
 		auto size = BufferIO::Read<uint16_t>(current);
@@ -83,7 +83,7 @@ void Query::Parse(char*& current) {
 value = BufferIO::Read<uint32_t>(current);\
 }} while(0)
 
-void Query::ParseCompat(char* current, uint32_t len) {
+void Query::ParseCompat(const char* current, uint32_t len) {
 	if(len <= 8) {
 		onfield_skipped = true;
 		return;
@@ -267,6 +267,20 @@ uint32_t Query::GetSize() const {
 	return size;
 }
 
+loc_info ReadLocInfo(const char*& p, bool compat) {
+	loc_info info;
+	info.controler = BufferIO::Read<uint8_t>(p);
+	info.location = BufferIO::Read<uint8_t>(p);
+	if(compat) {
+		info.sequence = BufferIO::Read<uint8_t>(p);
+		info.position = BufferIO::Read<uint8_t>(p);
+	} else {
+		info.sequence = BufferIO::Read<uint32_t>(p);
+		info.position = BufferIO::Read<uint32_t>(p);
+	}
+	return info;
+}
+
 loc_info ReadLocInfo(char*& p, bool compat) {
 	loc_info info;
 	info.controler = BufferIO::Read<uint8_t>(p);
@@ -289,15 +303,15 @@ PacketStream ParseMessages(OCG_Duel duel) {
 	return PacketStream{};
 }
 
-void QueryStream::Parse(char* buff) {
+void QueryStream::Parse(const char* buff) {
 	auto size = BufferIO::Read<uint32_t>(buff);
-	char* current = buff;
+	const char* current = buff;
 	while(static_cast<uint32_t>(current - buff) < size)
 		queries.emplace_back(Query::Token{}, current);
 }
 
-void QueryStream::ParseCompat(char* buff, uint32_t len) {
-	char* start = buff;
+void QueryStream::ParseCompat(const char* buff, uint32_t len) {
+	const char* start = buff;
 	while(static_cast<uint32_t>(buff - start) < len) {
 		int size = BufferIO::Read<int32_t>(buff);
 		queries.emplace_back(buff, true, size);

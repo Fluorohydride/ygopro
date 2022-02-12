@@ -2,11 +2,11 @@
 #define REPLAY_H
 
 #include <memory> //std::unique_ptr
-#include "config.h"
-#include "core_utils.h"
 #include <ctime>
 #include <vector>
 #include <fstream>
+#include "config.h"
+#include "core_utils.h"
 #include "text_types.h"
 
 namespace ygo {
@@ -34,17 +34,6 @@ struct ReplayHeader {
 	uint8_t props[8];
 };
 
-class ReplayPacket {
-public:
-	ReplayPacket() {}
-	ReplayPacket(const CoreUtils::Packet& packet);
-	ReplayPacket(char* buf, uint32_t len);
-	ReplayPacket(uint8_t msg, char* buf, uint32_t len);
-	void Set(uint8_t msg, char* buf, uint32_t len);
-	uint8_t message;
-	std::vector<uint8_t> data;
-};
-
 using cardlist_type = std::vector<uint32_t>;
 
 struct ReplayDeck {
@@ -52,7 +41,7 @@ struct ReplayDeck {
 };
 
 using ReplayDeckList = std::vector<ReplayDeck>;
-using ReplayStream = std::vector<ReplayPacket>;
+using ReplayStream = std::vector<CoreUtils::Packet>;
 
 struct ReplayResponse {
 public:
@@ -64,10 +53,10 @@ class Replay {
 public:
 	void BeginRecord(bool write = true, epro::path_string name = EPRO_TEXT("./replay/_LastReplay.yrpX"));
 	void WriteStream(const ReplayStream& stream);
-	void WritePacket(const ReplayPacket& p);
+	void WritePacket(const CoreUtils::Packet& p);
 	bool IsStreamedReplay();
 	template<typename T>
-	void Write(T data, bool flush = true);
+	void Write(const T& data, bool flush = true);
 	void WritetoFile(const void* data, size_t size, bool flush);
 	void WriteHeader(ReplayHeader& header);
 	void WriteData(const void* data, size_t length, bool flush = true);
@@ -109,7 +98,7 @@ private:
 	T Read();
 	bool ReadNextResponse(ReplayResponse* res);
 	bool ReadName(wchar_t* data);
-	bool ReadNextPacket(ReplayPacket* packet);
+	bool ReadNextPacket(CoreUtils::Packet* packet);
 	FILE* fp{ nullptr };
 	size_t data_position;
 	void ParseNames();
@@ -131,7 +120,7 @@ private:
 	int turn_count;
 };
 template<typename T>
-inline void Replay::Write(T data, bool flush) {
+inline void Replay::Write(const T& data, bool flush) {
 	WriteData(&data, sizeof(T), flush);
 }
 

@@ -30,6 +30,16 @@ public:
 		Read(p, &ret, sizeof(T));
 		return ret;
 	}
+	inline static void Read(const char*& p, void* dest, size_t size) {
+		std::memcpy(dest, p, size);
+		p += size;
+	}
+	template<typename T>
+	inline static T Read(const char*& p) {
+		T ret;
+		Read(p, &ret, sizeof(T));
+		return ret;
+	}
 	template<typename T>
 	inline static void Write(char*& p, T value) {
 		std::memcpy(p, &value, sizeof(T));

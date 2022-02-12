@@ -243,9 +243,9 @@ restart:
 	if(saveReplay && !is_restarting) {
 		last_replay.EndRecord(0x1000);
 		auto oldbuffer = last_replay.GetSerializedBuffer();
-		ReplayPacket tmp{};
+		CoreUtils::Packet tmp{};
 		tmp.message = OLD_REPLAY_MODE;
-		tmp.data.swap(oldbuffer);
+		tmp.buffer.swap(oldbuffer);
 		new_replay.WritePacket(tmp);
 		new_replay.EndRecord();
 	}
@@ -327,13 +327,10 @@ restart:
 	return 0;
 }
 
-bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
+bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet& packet) {
 	auto Analyze = [&packet]()->bool {
 		DuelClient::answered = false;
-		return DuelClient::ClientAnalyze((char*)packet.data.data(), packet.data.size());
-	};
-	auto Data = [&packet]()->char* {
-		return (char*)(packet.data.data() + sizeof(uint8_t));
+		return DuelClient::ClientAnalyze(packet);
 	};
 	int player;
 	replay_stream.clear();
@@ -351,7 +348,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 			return false;
 		}
 		case MSG_HINT: {
-			char* pbuf = Data();
+			const char* pbuf = packet.data();
 			int type = BufferIO::Read<uint8_t>(pbuf);
 			int player = BufferIO::Read<uint8_t>(pbuf);
 			/*uint64_t data = BufferIO::Read<uint64_t>(pbuf);*/
@@ -363,9 +360,9 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 		}
 		case MSG_AI_NAME:
 		case MSG_SHOW_HINT: {
-			char* pbuf = Data();
+			char* pbuf = packet.data();
 			int len = BufferIO::Read<uint16_t>(pbuf);
-			if((len + 1) != packet.data.size() - (sizeof(uint8_t) + sizeof(uint16_t)))
+			if((len + 1) != packet.buff_size() - (sizeof(uint16_t)))
 				break;
 			pbuf[len] = 0;
 			if(packet.message == MSG_AI_NAME) {
@@ -422,7 +419,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 			break;
 		}
 	}
-	char* pbuf = Data();
+	char* pbuf = packet.data();
 	switch(mainGame->dInfo.curMsg) {
 		case MSG_SHUFFLE_DECK: {
 			player = BufferIO::Read<uint8_t>(pbuf);

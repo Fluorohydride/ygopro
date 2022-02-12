@@ -1,12 +1,13 @@
 #ifndef NETSERVER_H
 #define NETSERVER_H
 
+#include <set>
+#include <unordered_map>
 #include "config.h"
+#include "core_utils.h"
 #include "network.h"
 #include "data_manager.h"
 #include "deck_manager.h"
-#include <set>
-#include <unordered_map>
 
 namespace ygo {
 
@@ -61,6 +62,27 @@ public:
 		BufferIO::Write<uint8_t>(p, proto);
 		memcpy(p, buffer, len);
 		last_sent = static_cast<uint16_t>(len + 3u);
+		if(dp)
+			bufferevent_write(dp->bev, net_server_write, last_sent);
+	}
+	static void SendBufferToPlayer(DuelPlayer* dp, uint8_t proto, const std::vector<uint8_t>& buffer) {
+		char* p = net_server_write;
+		BufferIO::Write<uint16_t>(p, static_cast<uint16_t>(1u + buffer.size()));
+		BufferIO::Write<uint8_t>(p, proto);
+		memcpy(p, buffer.data(), buffer.size());
+		last_sent = static_cast<uint16_t>(buffer.size() + 3u);
+		if(dp)
+			bufferevent_write(dp->bev, net_server_write, last_sent);
+	}
+	static void SendCoreUtilsPacketToPlayer(DuelPlayer* dp, uint8_t proto, const CoreUtils::Packet& packet) {
+		char* p = net_server_write;
+		BufferIO::Write<uint16_t>(p, static_cast<uint16_t>(sizeof(uint8_t) + packet.size()));
+		BufferIO::Write<uint8_t>(p, proto);
+
+		BufferIO::Write<uint8_t>(p, packet.message);
+		memcpy(p, packet.data(), packet.buff_size());
+
+		last_sent = static_cast<uint16_t>(packet.size() + sizeof(uint16_t) + sizeof(uint8_t));
 		if(dp)
 			bufferevent_write(dp->bev, net_server_write, last_sent);
 	}

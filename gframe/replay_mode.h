@@ -43,8 +43,8 @@ public:
 	static void EndDuel();
 	static void Restart(bool refresh);
 	static void Undo();
-	static bool ReplayAnalyze(ReplayPacket p);
-	static bool ReplayAnalyze(CoreUtils::Packet packet);
+	static bool ReplayAnalyze(const CoreUtils::Packet& packet);
+	static bool OldReplayAnalyze(const CoreUtils::Packet& packet);
 
 	static void ReplayRefresh(uint8_t player, uint8_t location, uint32_t flag = 0x2f81fff);
 	static void ReplayRefresh(uint32_t flag = 0x2f81fff);

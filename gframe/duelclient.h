@@ -71,7 +71,10 @@ public:
 	static std::pair<uint32_t, uint32_t> GetPlayersCount();
 	static ReplayStream replay_stream;
 	static Replay last_replay;
-	static int ClientAnalyze(char* msg, uint32_t len);
+	static int ClientAnalyze(const char* msg, uint32_t len);
+	static int ClientAnalyze(const CoreUtils::Packet& packet) {
+		return ClientAnalyze(packet.data(), packet.buff_size());
+	}
 	static int GetSpectatorsCount() {
 		return watching;
 	};

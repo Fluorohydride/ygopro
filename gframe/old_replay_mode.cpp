@@ -51,7 +51,7 @@ namespace ygo {
 		if (mainGame->dInfo.isSingleMode) {
 			auto msg = CoreUtils::ParseMessages(pduel);
 			for(auto& message : msg.packets) {
-				is_continuing = ReplayAnalyze(message) && is_continuing;
+				is_continuing = OldReplayAnalyze(message) && is_continuing;
 			}
 		} else {
 			ReplayRefresh(0, LOCATION_DECK, 0x2181fff);
@@ -65,11 +65,11 @@ namespace ygo {
 			mainGame->gMutex.lock();
 		while(is_continuing && !exit_pending) {
 			/*int engFlag = */OCG_DuelProcess(pduel);
-			auto msg = CoreUtils::ParseMessages(pduel);
-			for(auto& message : msg.packets) {
+			const auto msg = CoreUtils::ParseMessages(pduel);
+			for(const auto& message : msg.packets) {
 				if(is_restarting || !is_continuing)
 					break;
-				is_continuing = ReplayAnalyze(message) && is_continuing;
+				is_continuing = OldReplayAnalyze(message) && is_continuing;
 			}
 			if(is_restarting) {
 				mainGame->gMutex.lock();
@@ -80,11 +80,11 @@ namespace ygo {
 				if(mainGame->dInfo.isSingleMode) {
 					is_continuing = true;
 					skip_step = 0;
-					auto msg = CoreUtils::ParseMessages(pduel);
-					for(auto& message : msg.packets) {
+					const auto msg = CoreUtils::ParseMessages(pduel);
+					for(const auto& message : msg.packets) {
 						if(is_restarting || !is_continuing)
 							break;
-						is_continuing = ReplayAnalyze(message) && is_continuing;
+						is_continuing = OldReplayAnalyze(message) && is_continuing;
 					}
 				}
 				if(step == 0) {
@@ -183,7 +183,7 @@ namespace ygo {
 		return true;
 	}
 
-	bool ReplayMode::ReplayAnalyze(CoreUtils::Packet packet) {
+	bool ReplayMode::OldReplayAnalyze(const CoreUtils::Packet& packet) {
 		if(packet.message == MSG_SELECT_BATTLECMD || packet.message == MSG_SELECT_IDLECMD || packet.message == MSG_SELECT_CHAIN)
 			ReplayRefresh();
 		switch(packet.message) {
@@ -211,9 +211,9 @@ namespace ygo {
 				return ReadReplayResponse();
 			}
 		}
-		if(!ReplayAnalyze(ReplayPacket((char*)packet.data.data(), (int)(packet.data.size() - sizeof(uint8_t)))))
+		if(!ReplayAnalyze(packet))
 			return false;
-		char* pbuf = (char*)(packet.data.data() + sizeof(uint8_t));
+		const char* pbuf = packet.data();
 		int player;
 		switch(mainGame->dInfo.curMsg) {
 			case MSG_SHUFFLE_DECK: {
