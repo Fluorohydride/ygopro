@@ -199,7 +199,7 @@ void ReplayMode::Restart(bool refresh) {
 	is_restarting = true;
 }
 void ReplayMode::Undo() {
-	if(skip_step > 0 || current_step == 0)
+	if(mainGame->dInfo.isCatchingUp || current_step == 0)
 		return;
 	mainGame->dInfo.isCatchingUp = true;
 	Restart(false);
