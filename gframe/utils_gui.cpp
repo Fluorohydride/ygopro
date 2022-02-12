@@ -173,8 +173,12 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hBigIcon));
 	if(gGameConfig->windowStruct.size()) {
 		auto winstruct = base64_decode(gGameConfig->windowStruct);
-		if(winstruct.size() == sizeof(WINDOWPLACEMENT))
-			SetWindowPlacement(hWnd, reinterpret_cast<WINDOWPLACEMENT*>(winstruct.data()));
+		if(winstruct.size() == sizeof(WINDOWPLACEMENT)) {
+			WINDOWPLACEMENT wp;
+			memcpy(&wp, winstruct.data(), sizeof(WINDOWPLACEMENT));
+			if(wp.length == sizeof(WINDOWPLACEMENT))
+				SetWindowPlacement(hWnd, &wp);
+		}
 	}
 #elif defined(EDOPRO_MACOS)
 	if(gGameConfig->windowStruct.size())
