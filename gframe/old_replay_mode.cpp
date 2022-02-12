@@ -67,6 +67,8 @@ namespace ygo {
 			/*int engFlag = */OCG_DuelProcess(pduel);
 			auto msg = CoreUtils::ParseMessages(pduel);
 			for(auto& message : msg.packets) {
+				if(is_restarting || !is_continuing)
+					break;
 				is_continuing = ReplayAnalyze(message) && is_continuing;
 			}
 			if(is_restarting) {
@@ -80,6 +82,8 @@ namespace ygo {
 					skip_step = 0;
 					auto msg = CoreUtils::ParseMessages(pduel);
 					for(auto& message : msg.packets) {
+						if(is_restarting || !is_continuing)
+							break;
 						is_continuing = ReplayAnalyze(message) && is_continuing;
 					}
 				}
