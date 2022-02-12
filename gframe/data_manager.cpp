@@ -476,9 +476,32 @@ std::wstring DataManager::FormatAttribute(uint32_t attribute) const {
 		return std::wstring{ unknown_string };
 	return res;
 }
-std::wstring DataManager::FormatRace(uint32_t race, bool isSkill) const {
+static std::wstring FormatSkill(uint32_t skill_type) {
 	std::wstring res;
-	for(uint32_t i = isSkill ? 2100 : 1020; race; race >>= 1, ++i) {
+	for(uint32_t i = 2100; skill_type; skill_type >>= 1, ++i) {
+		if(skill_type & 0x1u) {
+			if(!res.empty())
+				res += L'|';
+			appendstring(res, gDataManager->GetSysString(i));
+		}
+	}
+	if(res.empty())
+		return std::wstring{ DataManager::unknown_string };
+	return res;
+}
+std::wstring DataManager::FormatRace(uint32_t race, bool isSkill) const {
+	if(isSkill) return FormatSkill(race);
+	std::wstring res;
+	uint32_t i = 1020;
+	for(; race && i <= 1049; race >>= 1, ++i) {
+		if(race & 0x1u) {
+			if(!res.empty())
+				res += L'|';
+			appendstring(res, GetSysString(i));
+		}
+	}
+	//strings 1050 above are already used, read the rest from this other range
+	for(i = 2500; race; race >>= 1, ++i) {
 		if(race & 0x1u) {
 			if(!res.empty())
 				res += L'|';
