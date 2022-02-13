@@ -2304,6 +2304,23 @@ int DuelClient::ClientAnalyze(const char* msg, uint32_t len) {
 		return false;
 	}
 	case MSG_SELECT_SUM: {
+		auto GetCard = [&] {
+			CoreUtils::loc_info info{};
+			if(mainGame->dInfo.compat_mode) {
+				uint8_t c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+				uint8_t l = BufferIO::Read<uint8_t>(pbuf);
+				uint32_t s = CompatRead<uint8_t, uint32_t>(pbuf);
+				info.controler = c;
+				info.location = l;
+				info.sequence = s;
+			} else {
+				info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
+				info.controler = mainGame->LocalPlayer(info.controler);
+			}
+			if((info.location & LOCATION_OVERLAY) > 0)
+				return mainGame->dField.GetCard(info.controler, info.location & (~LOCATION_OVERLAY) & 0xff, info.sequence)->overlayed[info.position];
+			return mainGame->dField.GetCard(info.controler, info.location, info.sequence);
+		};
 		/*uint8_t selecting_player*/
 		if(mainGame->dInfo.compat_mode) {
 			mainGame->dField.select_mode = BufferIO::Read<uint8_t>(pbuf);
@@ -2323,10 +2340,7 @@ int DuelClient::ClientAnalyze(const char* msg, uint32_t len) {
 		mainGame->dField.selectsum_cards.clear();
 		for (uint32_t i = 0; i < mainGame->dField.must_select_count; ++i) {
 			uint32_t code = BufferIO::Read<uint32_t>(pbuf);
-			uint8_t c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
-			uint8_t l = BufferIO::Read<uint8_t>(pbuf);
-			uint32_t s = CompatRead<uint8_t, uint32_t>(pbuf);
-			ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
+			ClientCard* pcard = GetCard();
 			if (code != 0 && pcard->code != code)
 				pcard->SetCode(code);
 			pcard->opParam = BufferIO::Read<uint32_t>(pbuf);
@@ -2336,10 +2350,7 @@ int DuelClient::ClientAnalyze(const char* msg, uint32_t len) {
 		uint32_t count = CompatRead<uint8_t, uint32_t>(pbuf);
 		for(uint32_t i = 0; i < count; ++i) {
 			uint32_t code = BufferIO::Read<uint32_t>(pbuf);
-			uint8_t c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
-			uint8_t l = BufferIO::Read<uint8_t>(pbuf);
-			uint32_t s = CompatRead<uint8_t, uint32_t>(pbuf);
-			ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
+			ClientCard* pcard = GetCard();
 			if (code != 0 && pcard->code != code)
 				pcard->SetCode(code);
 			pcard->opParam = BufferIO::Read<uint32_t>(pbuf);
