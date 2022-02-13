@@ -216,49 +216,44 @@ void ServerLobby::GetRoomsThread() {
 		return;
 	}
 
-	if(retrieved_data == "[server busy]") {
-		mainGame->PopupMessage(gDataManager->GetSysString(2031));
-	} else {
-		roomsVector.clear();
-		try {
-			nlohmann::json j = nlohmann::json::parse(retrieved_data);
-			if (j.size()) {
+	roomsVector.clear();
+	try {
+		auto j = nlohmann::json::parse(retrieved_data);
+		if(j.size()) {
 #define GET(field, type) obj[field].get<type>()
-				for (auto& obj : j["rooms"]) {
-					RoomInfo room;
-					room.id = GET("roomid", int);
-					room.name = BufferIO::DecodeUTF8(obj["roomname"].get_ref<std::string&>());
-					room.description = BufferIO::DecodeUTF8(obj["roomnotes"].get_ref<std::string&>());
-					room.locked = GET("needpass", bool);
-					room.started = obj["istart"].get_ref<std::string&>() == "start";
-					room.info.mode = GET("roommode", int);
-					room.info.team1 = GET("team1", int);
-					room.info.team2 = GET("team2", int);
-					room.info.best_of = GET("best_of", int);
-					const auto flag = GET("duel_flag", uint64_t);
-					room.info.duel_flag_low = flag & 0xffffffff;
-					room.info.duel_flag_high = (flag >> 32) & 0xffffffff;
-					room.info.forbiddentypes = GET("forbidden_types", int);
-					room.info.extra_rules = GET("extra_rules", int);
-					room.info.start_lp = GET("start_lp", int);
-					room.info.start_hand = GET("start_hand", int);
-					room.info.draw_count = GET("draw_count", int);
-					room.info.time_limit = GET("time_limit", int);
-					room.info.rule = GET("rule", int);
-					room.info.no_check_deck = GET("no_check", bool);
-					room.info.no_shuffle_deck = GET("no_shuffle", bool) || (flag & DUEL_PSEUDO_SHUFFLE);
-					room.info.lflist = GET("banlist_hash", int);
+			for(auto& obj : j["rooms"]) {
+				RoomInfo room;
+				room.id = GET("roomid", int);
+				room.name = BufferIO::DecodeUTF8(obj["roomname"].get_ref<std::string&>());
+				room.description = BufferIO::DecodeUTF8(obj["roomnotes"].get_ref<std::string&>());
+				room.locked = GET("needpass", bool);
+				room.started = obj["istart"].get_ref<std::string&>() == "start";
+				room.info.mode = GET("roommode", int);
+				room.info.team1 = GET("team1", int);
+				room.info.team2 = GET("team2", int);
+				room.info.best_of = GET("best_of", int);
+				const auto flag = GET("duel_flag", uint64_t);
+				room.info.duel_flag_low = flag & 0xffffffff;
+				room.info.duel_flag_high = (flag >> 32) & 0xffffffff;
+				room.info.forbiddentypes = GET("forbidden_types", int);
+				room.info.extra_rules = GET("extra_rules", int);
+				room.info.start_lp = GET("start_lp", int);
+				room.info.start_hand = GET("start_hand", int);
+				room.info.draw_count = GET("draw_count", int);
+				room.info.time_limit = GET("time_limit", int);
+				room.info.rule = GET("rule", int);
+				room.info.no_check_deck = GET("no_check", bool);
+				room.info.no_shuffle_deck = GET("no_shuffle", bool) || (flag & DUEL_PSEUDO_SHUFFLE);
+				room.info.lflist = GET("banlist_hash", int);
 #undef GET
-					for (auto& obj2 : obj["users"])
-						room.players.push_back(BufferIO::DecodeUTF8(obj2["name"].get_ref<std::string&>()));
+				for(auto& obj2 : obj["users"])
+					room.players.push_back(BufferIO::DecodeUTF8(obj2["name"].get_ref<std::string&>()));
 
-					roomsVector.push_back(std::move(room));
-				}
+				roomsVector.push_back(std::move(room));
 			}
 		}
-		catch (const std::exception& e) {
-			ErrorLog("Exception occurred parsing server rooms: {}", e.what());
-		}
+	} catch(const std::exception& e) {
+		ErrorLog("Exception occurred parsing server rooms: {}", e.what());
 	}
 	has_refreshed = true;
 	is_refreshing = false;
