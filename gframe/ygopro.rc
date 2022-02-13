@@ -1,8 +1,8 @@
 1 ICON "ygopro.ico"
 
 1 VERSIONINFO
-FILEVERSION 39, 2, 1, 0
-PRODUCTVERSION 39, 2, 1, 0
+FILEVERSION 39, 3, 0, 0
+PRODUCTVERSION 39, 3, 0, 0
 FILEOS 0x4
 FILETYPE 0x1
 
@@ -13,10 +13,10 @@ BEGIN
 		BEGIN
 			VALUE "OriginalFilename", "EDOPro.exe"
 			VALUE "InternalName", "ygoprodll"
-			VALUE "FileVersion", "39.2.1.0"
+			VALUE "FileVersion", "39.3.0.0"
 			VALUE "ProductName", "Project Ignis: EDOPro"
-			VALUE "ProductVersion", "39.2.1.0"
-			VALUE "LegalCopyright", "Copyright (C) 2020-2021 edo9300 and others"
+			VALUE "ProductVersion", "39.3.0.0"
+			VALUE "LegalCopyright", "Copyright (C) 2020-2022 edo9300 and others"
 			VALUE "CompanyName", "Project Ignis"
 			VALUE "FileDescription", "Project Ignis: EDOPro, the bleeding-edge automatic duel simulator"
 		END
