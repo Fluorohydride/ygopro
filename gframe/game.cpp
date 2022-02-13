@@ -60,7 +60,7 @@ namespace porting {
 #define ClearZBuffer(driver) do {driver->clearZBuffer();} while(0)
 #endif
 
-uint16_t PRO_VERSION = 0x1352;
+uint16_t PRO_VERSION = 0x1353;
 
 namespace ygo {
 
