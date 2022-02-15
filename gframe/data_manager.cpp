@@ -120,6 +120,7 @@ bool DataManager::ParseDB(sqlite3* pDB) {
 		cd.ot = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 1));
 		cd.alias = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 2));
 		cd.setcodes_p = nullptr;
+		cd.setcodes.clear();
 		uint64_t setcodes = sqlite3_column_int64(pStmt, 3);
 		for(int i = 0; i < 4; i++) {
 			uint16_t setcode = (setcodes >> (i * 16)) & 0xffff;
