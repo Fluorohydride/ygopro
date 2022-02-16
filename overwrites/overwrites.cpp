@@ -31,28 +31,29 @@ void ___write(const wchar_t* ch) {
 }
 */
 
-extern "C" void __stdcall handledfreeaddrinfo(addrinfo* ai) {
-	static const auto pfFreeAddrInfo = (WSPIAPI_PFREEADDRINFO)WspiapiLoad(2);
+namespace {
+const auto pfFreeAddrInfo = (WSPIAPI_PFREEADDRINFO)WspiapiLoad(2);
+extern "C" void __stdcall handledfreeaddrinfo(addrinfo * ai) {
 	pfFreeAddrInfo(ai);
 }
 
+const auto pfGetAddrInfo = (WSPIAPI_PGETADDRINFO)WspiapiLoad(0);
 extern "C" INT __stdcall handledgetaddrinfo(const char* nodename, const char* servname, const addrinfo* hints, addrinfo** res) {
-	static const auto pfGetAddrInfo = (WSPIAPI_PGETADDRINFO)WspiapiLoad(0);
 	auto iError = pfGetAddrInfo(nodename, servname, hints, res);
 	WSASetLastError(iError);
 	return iError;
 }
 
+const auto pfGetNameInfo = (WSPIAPI_PGETNAMEINFO)WspiapiLoad(1);
 extern "C" INT __stdcall handledgetnameinfo(const sockaddr* sa, socklen_t salen, char* host, size_t hostlen, char* serv, size_t servlen, int flags) {
-	static const auto pfGetNameInfo = (WSPIAPI_PGETNAMEINFO)WspiapiLoad(1);
 	const auto iError = pfGetNameInfo(sa, salen, host, hostlen, serv, servlen, flags);
 	WSASetLastError(iError);
 	return iError;
 }
 
-static inline bool IsUnderKernelex() {
+const bool kernelex = GetModuleHandle(__TEXT("ntdll.dll")) == nullptr;
+inline bool IsUnderKernelex() {
 	//ntdll.dll is loaded automatically in every windows nt process, but it seems it isn't in windows 9x
-	static const bool kernelex = GetModuleHandle(__TEXT("ntdll.dll")) == nullptr;
 	return kernelex;
 }
 
@@ -65,14 +66,31 @@ otherwise fall back to the internal implementation
 */
 
 #define GETFUNC(funcname) (decltype(&handled##funcname))GetProcAddress(GetModuleHandle(LIBNAME), #funcname)
-#define MAKELOADER(funcname,ret,args,argnames)\
-ret __stdcall internalimpl##funcname args ;\
+#define MAKELOADER(funcname,ret,args,argnames) \
+ret __stdcall internalimpl##funcname args ; \
+extern "C" ret __stdcall handled##funcname args; \
+const auto basefunc##funcname = [] { \
+	auto func = GETFUNC(funcname); \
+	return func ? func : internalimpl##funcname; \
+}(); \
 extern "C" ret __stdcall handled##funcname args { \
-	static auto basefunc = [] { \
+	return basefunc##funcname argnames ; \
+} \
+ret __stdcall internalimpl##funcname args
+
+#define MAKELOADER_WITH_CHECK(funcname,ret,args,argnames) \
+ret __stdcall internalimpl##funcname args ; \
+extern "C" ret __stdcall handled##funcname args; \
+const auto basefunc##funcname = [] { \
+	auto func = GETFUNC(funcname); \
+	return func ? func : internalimpl##funcname; \
+}(); \
+extern "C" ret __stdcall handled##funcname args { \
+	if(!basefunc##funcname) { \
 		auto func = GETFUNC(funcname); \
-		return func ? func : internalimpl##funcname; \
-	}(); \
-	return basefunc argnames ; \
+		return (func ? func : internalimpl##funcname) argnames ; \
+	} \
+	return basefunc##funcname argnames; \
 } \
 ret __stdcall internalimpl##funcname args
 
@@ -81,7 +99,7 @@ ret __stdcall internalimpl##funcname args
 MAKELOADER(IsWellKnownSid, BOOL, (PSID pSid, WELL_KNOWN_SID_TYPE WellKnownSidType), (pSid, WellKnownSidType)) {
 	return FALSE;
 }
-static CHAR* convert_from_wstring(const WCHAR* wstr) {
+CHAR* convert_from_wstring(const WCHAR* wstr) {
 	if(wstr == nullptr)
 		return nullptr;
 	const int wstr_len = (int)wcslen(wstr);
@@ -93,25 +111,29 @@ static CHAR* convert_from_wstring(const WCHAR* wstr) {
 	}
 	return strTo;
 }
-extern "C" BOOL __stdcall handledCryptAcquireContextW(HCRYPTPROV *phProv, LPCWSTR pszContainer, LPCWSTR pszProvider, DWORD dwProvType, DWORD dwFlags) {
-	static auto basefunc = []()->decltype(&handledCryptAcquireContextW) {
-		if(IsUnderKernelex()) {
-			return [](HCRYPTPROV *phProv, LPCWSTR pszContainer, LPCWSTR pszProvider, DWORD dwProvType, DWORD dwFlags)->BOOL {
-				static auto basefunc = (decltype(&CryptAcquireContextA))GetProcAddress(GetModuleHandle(LIBNAME), "CryptAcquireContextA");
-				auto container = convert_from_wstring(pszContainer);
-				auto provider = convert_from_wstring(pszProvider);
-				auto res = basefunc(phProv, container, provider, dwProvType, dwFlags);
-				if(res == FALSE && GetLastError() == NTE_BAD_FLAGS)
-					res = basefunc(phProv, container, provider, dwProvType, dwFlags & ~CRYPT_SILENT);
-				free(container);
-				free(provider);
-				return res;
-			};
-		} else {
-			return GETFUNC(CryptAcquireContextW);
-		}
-	}();
-	return basefunc(phProv, pszContainer, pszProvider, dwProvType, dwFlags);
+
+auto basefuncKernelexCryptAcquireContextW = (decltype(&CryptAcquireContextA))GetProcAddress(GetModuleHandle(LIBNAME), "CryptAcquireContextA");
+BOOL __stdcall kernelexCryptAcquireContextW(HCRYPTPROV* phProv, LPCWSTR pszContainer, LPCWSTR pszProvider, DWORD dwProvType, DWORD dwFlags) {
+	auto container = convert_from_wstring(pszContainer);
+	auto provider = convert_from_wstring(pszProvider);
+	auto res = basefuncKernelexCryptAcquireContextW(phProv, container, provider, dwProvType, dwFlags);
+	if(res == FALSE && GetLastError() == NTE_BAD_FLAGS)
+		res = basefuncKernelexCryptAcquireContextW(phProv, container, provider, dwProvType, dwFlags & ~CRYPT_SILENT);
+	free(container);
+	free(provider);
+	return res;
+}
+
+extern "C" BOOL __stdcall handledCryptAcquireContextW(HCRYPTPROV * phProv, LPCWSTR pszContainer, LPCWSTR pszProvider, DWORD dwProvType, DWORD dwFlags);
+auto basefuncCryptAcquireContextW = []()->decltype(&handledCryptAcquireContextW) {
+	if(IsUnderKernelex()) {
+		return kernelexCryptAcquireContextW;
+	} else {
+		return GETFUNC(CryptAcquireContextW);
+	}
+}();
+extern "C" BOOL __stdcall handledCryptAcquireContextW(HCRYPTPROV* phProv, LPCWSTR pszContainer, LPCWSTR pszProvider, DWORD dwProvType, DWORD dwFlags) {
+	return basefuncCryptAcquireContextW(phProv, pszContainer, pszProvider, dwProvType, dwFlags);
 }
 
 #undef LIBNAME
@@ -195,7 +217,7 @@ inline PTEB_2K NtCurrentTeb2k(void) {
 inline PPEB_2K NtCurrentPeb(void) {
 	return NtCurrentTeb2k()->Peb;
 }
-static PLDR_MODULE __stdcall GetLdrModule(LPCVOID address) {
+PLDR_MODULE __stdcall GetLdrModule(LPCVOID address) {
 	PLDR_MODULE first_mod, mod;
 	first_mod = mod = (PLDR_MODULE)NtCurrentPeb()->LoaderData->InLoadOrderModuleList.Flink;
 	do {
@@ -207,13 +229,13 @@ static PLDR_MODULE __stdcall GetLdrModule(LPCVOID address) {
 	return nullptr;
 }
 
-static void LoaderLock(BOOL lock) {
+void LoaderLock(BOOL lock) {
 	if(lock)
 		EnterCriticalSection(NtCurrentPeb()->LoaderLock);
 	else
 		LeaveCriticalSection(NtCurrentPeb()->LoaderLock);
 }
-static HMODULE GetModuleHandleFromPtr(LPCVOID p) {
+HMODULE GetModuleHandleFromPtr(LPCVOID p) {
 	PLDR_MODULE pLM;
 	HMODULE ret;
 	LoaderLock(TRUE);
@@ -227,7 +249,7 @@ static HMODULE GetModuleHandleFromPtr(LPCVOID p) {
 }
 
 BYTE slist_lock[0x100];
-static void SListLock(PSLIST_HEADER ListHead) {
+void SListLock(PSLIST_HEADER ListHead) {
 	DWORD index = (((DWORD)ListHead) >> MEMORY_ALLOCATION_ALIGNMENT) & 0xFF;
 
 	__asm {
@@ -240,7 +262,7 @@ static void SListLock(PSLIST_HEADER ListHead) {
 	return;
 }
 
-static void SListUnlock(PSLIST_HEADER ListHead) {
+void SListUnlock(PSLIST_HEADER ListHead) {
 	DWORD index = (((DWORD)ListHead) >> MEMORY_ALLOCATION_ALIGNMENT) & 0xFF;
 	slist_lock[index] = 0;
 }
@@ -283,29 +305,13 @@ MAKELOADER(InterlockedFlushSList, PSLIST_ENTRY, (PSLIST_HEADER ListHead), (ListH
 	return ret;
 }
 
-void __stdcall internalimplInitializeSListHead(PSLIST_HEADER ListHead) {
+
+MAKELOADER_WITH_CHECK(InitializeSListHead, void, (PSLIST_HEADER ListHead), (ListHead)) {
 	SListLock(ListHead);
 	ListHead->Next.Next = nullptr;
 	ListHead->Depth = 0;
 	ListHead->Sequence = 0;
 	SListUnlock(ListHead);
-}
-
-/*
-on first load this will be called when setting up the crt, calling GetProcAddress
-at that moment will make the program crash.
-*/
-extern "C" void __stdcall handledInitializeSListHead(PSLIST_HEADER ListHead) {
-	static decltype(&handledInitializeSListHead) basefunc = nullptr;
-	static int firstrun = 0;
-	if(firstrun == 1) {
-		firstrun++;
-		basefunc = GETFUNC(InitializeSListHead);
-	} else if(firstrun == 0)
-		firstrun++;
-	if(basefunc)
-		return basefunc(ListHead);
-	return internalimplInitializeSListHead(ListHead);
 }
 
 MAKELOADER(QueryDepthSList, USHORT, (PSLIST_HEADER ListHead), (ListHead)) {
@@ -342,7 +348,7 @@ MAKELOADER(GetNumaHighestNodeNumber, BOOL, (PULONG HighestNodeNumber), (HighestN
 	return TRUE;
 }
 
-static void IncLoadCount(HMODULE hMod) {
+void IncLoadCount(HMODULE hMod) {
 	WCHAR path[MAX_PATH];
 	if(GetModuleFileNameW(hMod, path, sizeof(path)) != sizeof(path))
 		LoadLibraryW(path);
@@ -453,7 +459,7 @@ MAKELOADER(GetLogicalProcessorInformation, BOOL, (PSYSTEM_LOGICAL_PROCESSOR_INFO
 	return FALSE;
 }
 
-MAKELOADER(EncodePointer, PVOID, (PVOID ptr), (ptr)) {
+MAKELOADER_WITH_CHECK(EncodePointer, PVOID, (PVOID ptr), (ptr)) {
 	return (PVOID)((UINT_PTR)ptr ^ 0xDEADBEEF);
 }
 
@@ -465,6 +471,7 @@ extern "C" ULONG __stdcall handledif_nametoindex(PCSTR* InterfaceName) {
 	return 0;
 }
 
-extern "C" ULONG __stdcall if_nametoindex(PCSTR * InterfaceName) {
+extern "C" ULONG __stdcall if_nametoindex(PCSTR* InterfaceName) {
 	return 0;
+}
 }
