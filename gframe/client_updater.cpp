@@ -33,7 +33,7 @@ using md5array = std::array<uint8_t, MD5_DIGEST_LENGTH>;
 
 struct WritePayload {
 	std::vector<char>* outbuffer = nullptr;
-	std::ostream* outfstream = nullptr;
+	std::ostream* outstream = nullptr;
 	MD5_CTX* md5context = nullptr;
 };
 
@@ -51,9 +51,9 @@ static int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t N
 	Payload* payload = static_cast<Payload*>(ptr);
 	if(payload && payload->callback) {
 		int percentage = 0;
-		if(TotalToDownload > 0.0) {
-			double fractiondownloaded = (double)NowDownloaded / (double)TotalToDownload;
-			percentage = (int)std::round(fractiondownloaded * 100);
+		if(TotalToDownload > 0) {
+			double fractiondownloaded = static_cast<double>(NowDownloaded) / static_cast<double>(TotalToDownload);
+			percentage = static_cast<int>(std::round(fractiondownloaded * 100));
 		}
 		if(percentage != payload->previous_percent) {
 			payload->callback(percentage, payload->current, payload->total, payload->filename, payload->is_new, payload->payload);
@@ -65,19 +65,19 @@ static int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t N
 }
 
 static size_t WriteCallback(char *contents, size_t size, size_t nmemb, void *userp) {
-	size_t realsize = size * nmemb;
-	auto payload = static_cast<WritePayload*>(userp);
+	size_t readsize = size * nmemb;
+	auto* payload = static_cast<WritePayload*>(userp);
 	auto buff = payload->outbuffer;
 	if(buff) {
 		size_t prev_size = buff->size();
-		buff->resize(prev_size + realsize);
-		memcpy((char*)buff->data() + prev_size, contents, realsize);
+		buff->resize(prev_size + readsize);
+		memcpy(buff->data() + prev_size, contents, readsize);
 	}
-	if(payload->outfstream)
-		payload->outfstream->write(contents, realsize);
+	if(payload->outstream)
+		payload->outstream->write(contents, readsize);
 	if(payload->md5context)
-		MD5_Update(payload->md5context, contents, realsize);
-	return realsize;
+		MD5_Update(payload->md5context, contents, readsize);
+	return readsize;
 }
 
 static CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
@@ -123,47 +123,6 @@ static bool CheckMd5(std::istream& instream, const md5array& md5) {
 	return result == md5;
 }
 
-#ifndef __ANDROID__
-static inline void DeleteOld() {
-#if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT("{}.old"), ygo::Utils::GetExePath()));
-#if !defined(__linux__)
-	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT("{}.old"), ygo::Utils::GetCorePath()));
-#endif
-#endif
-}
-
-static inline ygo::ClientUpdater::lock_type GetLock() {
-	ygo::ClientUpdater::lock_type file{};
-#ifdef _WIN32
-	file = CreateFile(LOCKFILE, GENERIC_READ,
-					  0, nullptr, CREATE_ALWAYS,
-					  FILE_ATTRIBUTE_HIDDEN, nullptr);
-	if(file == INVALID_HANDLE_VALUE)
-		return nullptr;
-#else
-	file = open(LOCKFILE, O_CREAT | O_CLOEXEC, S_IRWXU);
-	if(file < 0 || flock(file, LOCK_EX | LOCK_NB) != 0) {
-		close(file);
-		return 0;
-	}
-#endif
-	DeleteOld();
-	return file;
-}
-
-static inline void FreeLock(ygo::ClientUpdater::lock_type lock) {
-	if(!lock)
-		return;
-#ifdef _WIN32
-	CloseHandle(lock);
-#else
-	flock(lock, LOCK_UN);
-	close(lock);
-#endif
-	ygo::Utils::FileDelete(LOCKFILE);
-}
-#endif //__ANDROID__
 #endif //UPDATE_URL
 
 namespace ygo {
@@ -173,7 +132,7 @@ void ClientUpdater::StartUnzipper(unzip_callback callback, void* payload, const 
 #ifdef __ANDROID__
 	porting::installUpdate(fmt::format("{}{}{}.apk", Utils::working_dir, src, update_urls.front().name));
 #else
-	if(Lock)
+	if(Lock.acquired())
 		std::thread(&ClientUpdater::Unzip, this, src, payload, callback).detach();
 #endif
 #endif
@@ -181,14 +140,14 @@ void ClientUpdater::StartUnzipper(unzip_callback callback, void* payload, const 
 
 void ClientUpdater::CheckUpdates() {
 #ifdef UPDATE_URL
-	if(Lock)
+	if(Lock.acquired())
 		std::thread(&ClientUpdater::CheckUpdate, this).detach();
 #endif
 }
 
 bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const epro::path_string& dest) {
 #ifdef UPDATE_URL
-	if(!has_update || downloading || !Lock)
+	if(!has_update || downloading || !Lock.acquired())
 		return false;
 	std::thread(&ClientUpdater::DownloadUpdate, this, dest, payload, callback).detach();
 	return true;
@@ -292,7 +251,7 @@ void ClientUpdater::DownloadUpdate(epro::path_string dest_path, void* payload, u
 			continue;
 		}
 		WritePayload wpayload;
-		wpayload.outfstream = &stream;
+		wpayload.outstream = &stream;
 		MD5_CTX context{};
 		wpayload.md5context = &context;
 		MD5_Init(wpayload.md5context);
@@ -337,21 +296,53 @@ void ClientUpdater::CheckUpdate() {
 }
 #endif
 
+static inline void DeleteOld() {
+#if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
+	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT("{}.old"), ygo::Utils::GetExePath()));
+#if !defined(__linux__)
+	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT("{}.old"), ygo::Utils::GetCorePath()));
+#endif
+#endif
+	(void)0;
+}
+
 ClientUpdater::ClientUpdater(epro::path_stringview override_url) {
 	(void)override_url;
 #if defined(UPDATE_URL)
 	if(override_url.size())
 		update_url = Utils::ToUTF8IfNeeded(override_url);
-#if !defined(__ANDROID__)
-	Lock = GetLock();
+	if(Lock.acquired())
+		DeleteOld();
 #endif
+}
+#ifndef __ANDROID__
+ClientUpdater::FileLock::FileLock() {
+#ifdef _WIN32
+	m_lock = CreateFile(LOCKFILE, GENERIC_READ,
+					  0, nullptr, CREATE_ALWAYS,
+					  FILE_ATTRIBUTE_HIDDEN, nullptr);
+	if(m_lock == INVALID_HANDLE_VALUE)
+		m_lock = null_lock;
+#else
+	m_lock = open(LOCKFILE, O_CREAT | O_CLOEXEC, S_IRWXU);
+	if(m_lock < 0 || flock(m_lock, LOCK_EX | LOCK_NB) != 0) {
+		close(m_lock);
+		m_lock = null_lock;
+	}
 #endif
 }
 
-ClientUpdater::~ClientUpdater() {
-#if defined(UPDATE_URL) && !defined(__ANDROID__)
-	FreeLock(Lock);
+ClientUpdater::FileLock::~FileLock() {
+	if(m_lock = null_lock)
+		return;
+#ifdef _WIN32
+	CloseHandle(m_lock);
+#else
+	flock(m_lock, LOCK_UN);
+	close(m_lock);
 #endif
+	ygo::Utils::FileDelete(LOCKFILE);
 }
+#endif
 
 };
