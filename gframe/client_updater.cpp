@@ -315,7 +315,7 @@ ClientUpdater::ClientUpdater(epro::path_stringview override_url) {
 		DeleteOld();
 #endif
 }
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && defined(UPDATE_URL)
 ClientUpdater::FileLock::FileLock() {
 #ifdef _WIN32
 	m_lock = CreateFile(LOCKFILE, GENERIC_READ,
