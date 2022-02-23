@@ -333,7 +333,7 @@ ClientUpdater::FileLock::FileLock() {
 }
 
 ClientUpdater::FileLock::~FileLock() {
-	if(m_lock = null_lock)
+	if(m_lock == null_lock)
 		return;
 #ifdef _WIN32
 	CloseHandle(m_lock);
