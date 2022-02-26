@@ -2371,14 +2371,12 @@ int DuelClient::ClientAnalyze(const char* msg, uint32_t len) {
 		mainGame->dField.selectable_cards.clear();
 		mainGame->dField.selected_cards.clear();
 		mainGame->dField.sort_list.clear();
-		uint32_t code, l, s;
-		uint8_t c;
 		ClientCard* pcard;
 		for(uint32_t i = 0; i < count; ++i) {
-			code = BufferIO::Read<uint32_t>(pbuf);
-			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
-			l = CompatRead<uint8_t, uint32_t>(pbuf);
-			s = CompatRead<uint8_t, uint32_t>(pbuf);
+			const auto code = BufferIO::Read<uint32_t>(pbuf);
+			const auto c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			const auto l = CompatRead<uint8_t, uint32_t>(pbuf);
+			const auto s = CompatRead<uint8_t, uint32_t>(pbuf);
 			pcard = mainGame->dField.GetCard(c, l, s);
 			if (code != 0 && pcard->code != code)
 				pcard->SetCode(code);
@@ -2774,8 +2772,6 @@ int DuelClient::ClientAnalyze(const char* msg, uint32_t len) {
 		else
 			lst = mainGame->dField.szone;
 		ClientCard* mc[7];
-		ClientCard* swp;
-		uint8_t ps;
 		auto lock = LockIf();
 		for (int i = 0; i < count; ++i) {
 			CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
@@ -2793,15 +2789,15 @@ int DuelClient::ClientAnalyze(const char* msg, uint32_t len) {
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->WaitFrameSignal(20, lock);
 		for (int i = 0; i < count; ++i) {
-			CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
-			previous.controler = mainGame->LocalPlayer(previous.controler);
-			ps = mc[i]->sequence;
-			if (previous.location > 0) {
-				swp = lst[previous.controler][previous.sequence];
-				lst[previous.controler][ps] = swp;
-				lst[previous.controler][previous.sequence] = mc[i];
-				mc[i]->sequence = previous.sequence;
-				swp->sequence = ps;
+			CoreUtils::loc_info current = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
+			current.controler = mainGame->LocalPlayer(current.controler);
+			if (current.location > 0) {
+				uint8_t prev_seq = mc[i]->sequence;
+				auto tmp = lst[current.controler][current.sequence];
+				lst[current.controler][prev_seq] = tmp;
+				lst[current.controler][current.sequence] = mc[i];
+				mc[i]->sequence = current.sequence;
+				tmp->sequence = prev_seq;
 			}
 		}
 		if(!mainGame->dInfo.isCatchingUp) {
