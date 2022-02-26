@@ -28,6 +28,7 @@
 #include "game_config.h"
 
 #define LOCKFILE EPRO_TEXT("./.edopro_lock")
+#define UPDATES_FOLDER EPRO_TEXT("./updates/{}")
 
 using md5array = std::array<uint8_t, MD5_DIGEST_LENGTH>;
 
@@ -123,40 +124,29 @@ static bool CheckMd5(std::istream& instream, const md5array& md5) {
 	return result == md5;
 }
 
-#endif //UPDATE_URL
-
 namespace ygo {
 
-void ClientUpdater::StartUnzipper(unzip_callback callback, void* payload, const epro::path_string& src) {
-#ifdef UPDATE_URL
+void ClientUpdater::StartUnzipper(unzip_callback callback, void* payload) {
 #ifdef __ANDROID__
 	porting::installUpdate(fmt::format("{}{}{}.apk", Utils::working_dir, src, update_urls.front().name));
 #else
 	if(Lock.acquired())
-		std::thread(&ClientUpdater::Unzip, this, src, payload, callback).detach();
-#endif
+		std::thread(&ClientUpdater::Unzip, this, payload, callback).detach();
 #endif
 }
 
 void ClientUpdater::CheckUpdates() {
-#ifdef UPDATE_URL
 	if(Lock.acquired())
 		std::thread(&ClientUpdater::CheckUpdate, this).detach();
-#endif
 }
 
-bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const epro::path_string& dest) {
-#ifdef UPDATE_URL
-	if(!has_update || downloading || !Lock.acquired())
+bool ClientUpdater::StartUpdate(update_callback callback, void* payload) {
+	if(!Lock.acquired() || !has_update || downloading)
 		return false;
-	std::thread(&ClientUpdater::DownloadUpdate, this, dest, payload, callback).detach();
+	std::thread(&ClientUpdater::DownloadUpdate, this, payload, callback).detach();
 	return true;
-#else
-	return false;
-#endif
 }
-#ifdef UPDATE_URL
-void ClientUpdater::Unzip(epro::path_string src, void* payload, unzip_callback callback) {
+void ClientUpdater::Unzip(void* payload, unzip_callback callback) {
 	Utils::SetThreadName("Unzip");
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
 	const auto& path = ygo::Utils::GetExePath();
@@ -175,7 +165,7 @@ void ClientUpdater::Unzip(epro::path_string src, void* payload, unzip_callback c
 	int i = 1;
 	for(auto& file : update_urls) {
 		uzpl.cur = i++;
-		auto name = src + ygo::Utils::ToPathString(file.name);
+		auto name = fmt::format(UPDATES_FOLDER, ygo::Utils::ToPathString(file.name));
 		uzpl.filename = name.data();
 		ygo::Utils::UnzipArchive(name, callback, &cbpayload);
 	}
@@ -183,12 +173,12 @@ void ClientUpdater::Unzip(epro::path_string src, void* payload, unzip_callback c
 }
 
 #ifdef __ANDROID__
-#define formatstr EPRO_TEXT("{}/{}.apk")
+#define formatstr (UPDATES_FOLDER EPRO_TEXT(".apk"))
 #else
-#define formatstr EPRO_TEXT("{}/{}")
+#define formatstr UPDATES_FOLDER
 #endif
 
-void ClientUpdater::DownloadUpdate(epro::path_string dest_path, void* payload, update_callback callback) {
+void ClientUpdater::DownloadUpdate(void* payload, update_callback callback) {
 	Utils::SetThreadName("Updater");
 	downloading = true;
 	Payload cbpayload{};
@@ -197,7 +187,7 @@ void ClientUpdater::DownloadUpdate(epro::path_string dest_path, void* payload, u
 	cbpayload.payload = payload;
 	int i = 1;
 	for(auto& file : update_urls) {
-		auto name = fmt::format(formatstr, dest_path, ygo::Utils::ToPathString(file.name));
+		auto name = fmt::format(formatstr, ygo::Utils::ToPathString(file.name));
 		cbpayload.current = i++;
 		cbpayload.filename = file.name.data();
 		cbpayload.is_new = true;
@@ -294,7 +284,6 @@ void ClientUpdater::CheckUpdate() {
 	catch(...) { update_urls.clear(); }
 	has_update = !!update_urls.size();
 }
-#endif
 
 static inline void DeleteOld() {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
@@ -307,15 +296,12 @@ static inline void DeleteOld() {
 }
 
 ClientUpdater::ClientUpdater(epro::path_stringview override_url) {
-	(void)override_url;
-#if defined(UPDATE_URL)
 	if(override_url.size())
 		update_url = Utils::ToUTF8IfNeeded(override_url);
 	if(Lock.acquired())
 		DeleteOld();
-#endif
 }
-#if !defined(__ANDROID__) && defined(UPDATE_URL)
+#ifndef __ANDROID__
 ClientUpdater::FileLock::FileLock() {
 #ifdef _WIN32
 	m_lock = CreateFile(LOCKFILE, GENERIC_READ,
@@ -346,3 +332,5 @@ ClientUpdater::FileLock::~FileLock() {
 #endif
 
 };
+
+#endif //UPDATE_URL

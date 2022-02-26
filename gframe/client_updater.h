@@ -17,15 +17,14 @@ struct UnzipperPayload {
 using update_callback = void(*)(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload);
 
 namespace ygo {
-
+#ifdef UPDATE_URL
 class ClientUpdater {
 public:
 	ClientUpdater(epro::path_stringview override_url);
 	~ClientUpdater() = default;
-	bool StartUpdate(update_callback callback, void* payload, const epro::path_string& dest = EPRO_TEXT("./updates/"));
-	void StartUnzipper(unzip_callback callback, void* payload, const epro::path_string& src = EPRO_TEXT("./updates/"));
+	bool StartUpdate(update_callback callback, void* payload);
+	void StartUnzipper(unzip_callback callback, void* payload);
 	void CheckUpdates();
-#ifdef UPDATE_URL
 	bool HasUpdate() {
 		return has_update;
 	}
@@ -56,8 +55,8 @@ private:
 #endif
 	};
 	void CheckUpdate();
-	void DownloadUpdate(epro::path_string dest_path, void* payload, update_callback callback);
-	void Unzip(epro::path_string src, void* payload, unzip_callback callback);
+	void DownloadUpdate(void* payload, update_callback callback);
+	void Unzip(void* payload, unzip_callback callback);
 	struct DownloadInfo {
 		std::string name;
 		std::string url;
@@ -70,18 +69,20 @@ private:
 	std::atomic<bool> failed{ false };
 	std::atomic<bool> downloading{ false };
 	std::string update_url{ UPDATE_URL };
-#else
-	bool HasUpdate() {
-		return false;
-	}
-	bool UpdateDownloaded() {
-		return false;
-	}
-	bool UpdateFailed() {
-		return false;
-	}
-#endif
 };
+#else
+class ClientUpdater {
+public:
+	ClientUpdater(epro::path_stringview) {}
+	~ClientUpdater() = default;
+	static constexpr bool StartUpdate(update_callback, void*) { return false; }
+	static constexpr void StartUnzipper(unzip_callback, void*) {}
+	static constexpr void CheckUpdates() {}
+	static constexpr bool HasUpdate() { return false; }
+	static constexpr bool UpdateDownloaded() { return false; }
+	static constexpr bool UpdateFailed() { return true; }
+};
+#endif
 
 extern ClientUpdater* gClientUpdater;
 

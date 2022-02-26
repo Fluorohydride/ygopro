@@ -1836,9 +1836,9 @@ bool Game::MainLoop() {
 			PopupElement(wACMessage, 30);
 		}
 		if(!wQuery->isVisible()) {
-			if(!update_prompted && !(dInfo.isInDuel || dInfo.isInLobby || is_siding
+			if(!update_prompted && gClientUpdater->HasUpdate() && !(dInfo.isInDuel || dInfo.isInLobby || is_siding
 				|| wRoomListPlaceholder->isVisible() || wLanWindow->isVisible()
-				|| wCreateHost->isVisible() || wHostPrepare->isVisible()) && gClientUpdater->HasUpdate()) {
+				|| wCreateHost->isVisible() || wHostPrepare->isVisible())) {
 				std::lock_guard<std::mutex> lock(gMutex);
 				menuHandler.prev_operation = ACTION_UPDATE_PROMPT;
 				stQMessage->setText(fmt::format(L"{}\n{}", gDataManager->GetSysString(1460), gDataManager->GetSysString(1461)).data());
