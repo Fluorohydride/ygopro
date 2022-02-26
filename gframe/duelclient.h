@@ -64,8 +64,8 @@ public:
 	static void ClientRead(bufferevent* bev, void* ctx);
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread();
-	static void HandleSTOCPacketLan(char* data, uint32_t len);
-	static void HandleSTOCPacketLan2(char* data, uint32_t len);
+	static void HandleSTOCPacketLanSync(char* data, uint32_t len);
+	static void HandleSTOCPacketLanAsync(char* data, uint32_t len);
 	static void ParserThread();
 	static bool CheckReady();
 	static std::pair<uint32_t, uint32_t> GetPlayersCount();
