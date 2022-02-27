@@ -22,13 +22,13 @@ public:
 	}
 	template<typename input_type>
 	inline static void Read(input_type*& p, void* dest, size_t size) {
-		static_assert(std::is_same<std::remove_cv<input_type>::type, uint8_t>::value == true, "only uint8_t supported as buffer input");
+		static_assert(std::is_same<std::remove_cv_t<input_type>, uint8_t>::value == true, "only uint8_t supported as buffer input");
 		std::memcpy(dest, p, size);
 		p += size;
 	}
 	template<typename T, typename input_type>
 	inline static T Read(input_type*& p) {
-		static_assert(std::is_same<std::remove_cv<input_type>::type, uint8_t>::value == true, "only uint8_t supported as buffer input");
+		static_assert(std::is_same<std::remove_cv_t<input_type>, uint8_t>::value == true, "only uint8_t supported as buffer input");
 		T ret;
 		Read(p, &ret, sizeof(T));
 		return ret;
