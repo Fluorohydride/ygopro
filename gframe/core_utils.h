@@ -10,21 +10,21 @@ namespace CoreUtils {
 class Packet {
 public:
 	Packet() {}
-	Packet(const char* buf, int len) {
+	Packet(const uint8_t* buf, int len) {
 		uint8_t msg = BufferIO::Read<uint8_t>(buf);
 		Set(msg, buf, len);
 	};
-	Packet(int msg, const char* buf, int len) {
+	Packet(int msg, const uint8_t* buf, int len) {
 		Set(msg, buf, len);
 	};
-	void Set(int msg, const char* buf, int len) {
+	void Set(int msg, const uint8_t* buf, int len) {
 		message = msg;
 		buffer.resize(len);
 		if(len)
 			memcpy(buffer.data(), buf, len);
 	};
-	char* data() { return reinterpret_cast<char*>(buffer.data()); }
-	const char* data() const { return reinterpret_cast<const char*>(buffer.data()); }
+	uint8_t* data() { return buffer.data(); }
+	const uint8_t* data() const { return buffer.data(); }
 	uint8_t message;
 	std::vector<uint8_t> buffer;
 	auto size() const { return buffer.size() + sizeof(uint8_t); }
@@ -34,7 +34,7 @@ class PacketStream {
 public:
 	std::vector<Packet> packets;
 	PacketStream() {}
-	PacketStream(char* buf, uint32_t len);
+	PacketStream(uint8_t* buf, uint32_t len);
 };
 struct loc_info {
 	uint8_t controler;
@@ -42,20 +42,20 @@ struct loc_info {
 	uint32_t sequence;
 	uint32_t position;
 };
-loc_info ReadLocInfo(const char*& p, bool compat);
-loc_info ReadLocInfo(char*& p, bool compat);
+loc_info ReadLocInfo(const uint8_t*& p, bool compat);
+loc_info ReadLocInfo(uint8_t*& p, bool compat);
 class Query {
 public:
 	friend class QueryStream;
 	friend class ygo::ClientCard;
 	Query() = delete;
-	Query(const char* buff, bool compat = false, uint32_t len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
+	Query(const uint8_t* buff, bool compat = false, uint32_t len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
 	void GenerateBuffer(std::vector<uint8_t>& len, bool is_for_public_buffer, bool check_hidden) const;
 	struct Token {};
-	Query(Token, const char*& buff) { Parse(buff); };
+	Query(Token, const uint8_t*& buff) { Parse(buff); };
 private:
-	void Parse(const char*& buff);
-	void ParseCompat(const char* buff, uint32_t len);
+	void Parse(const uint8_t*& buff);
+	void ParseCompat(const uint8_t* buff, uint32_t len);
 	bool onfield_skipped = false;
 	uint32_t flag;
 	uint32_t code;
@@ -92,14 +92,14 @@ private:
 class QueryStream {
 public:
 	QueryStream() = delete;
-	QueryStream(const char* buff, bool compat = false, uint32_t len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
+	QueryStream(const uint8_t* buff, bool compat = false, uint32_t len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
 	void GenerateBuffer(std::vector<uint8_t>& buffer, bool check_hidden) const;
 	void GeneratePublicBuffer(std::vector<uint8_t>& buffer) const;
 	const std::vector<Query>& GetQueries() const { return queries; }
 private:
 	std::vector<Query> queries;
-	void Parse(const char* buff);
-	void ParseCompat(const char* buff, uint32_t len);
+	void Parse(const uint8_t* buff);
+	void ParseCompat(const uint8_t* buff, uint32_t len);
 	uint32_t GetSize() const;
 };
 using OCG_Duel = void*;

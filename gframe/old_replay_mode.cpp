@@ -213,7 +213,7 @@ namespace ygo {
 		}
 		if(!ReplayAnalyze(packet))
 			return false;
-		const char* pbuf = packet.data();
+		const auto* pbuf = packet.data();
 		int player;
 		switch(mainGame->dInfo.curMsg) {
 			case MSG_SHUFFLE_DECK: {
@@ -276,10 +276,10 @@ namespace ygo {
 	}
 	void ReplayMode::ReplayRefresh(uint8_t player, uint8_t location, uint32_t flag) {
 		uint32_t len = 0;
-		auto buff = OCG_DuelQueryLocation(pduel, &len, { flag, player, location });
+		auto buff = static_cast<uint8_t*>(OCG_DuelQueryLocation(pduel, &len, { flag, player, location }));
 		if(len == 0)
 			return;
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)buff);
+		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, buff);
 	}
 	void ReplayMode::ReplayRefresh(uint32_t flag) {
 		for(int p = 0; p < 2; p++)
@@ -288,10 +288,10 @@ namespace ygo {
 	}
 	void ReplayMode::ReplayRefreshSingle(uint8_t player, uint8_t location, uint32_t sequence, uint32_t flag) {
 		uint32_t len = 0;
-		auto buff = OCG_DuelQuery(pduel, &len, { flag, player, location, sequence });
+		auto buff = static_cast<uint8_t*>(OCG_DuelQuery(pduel, &len, { flag, player, location, sequence }));
 		if(buff == nullptr)
 			return;
-		mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)buff);
+		mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, buff);
 	}
 	void ReplayMode::ReplayReload() {
 		for(int p = 0; p < 2; p++)

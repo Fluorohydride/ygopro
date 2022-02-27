@@ -7,7 +7,7 @@ namespace CoreUtils {
 
 #define PARSE(value) do {value = BufferIO::Read<decltype(value)>(current);} while(0); break
 
-void Query::Parse(const char*& current) {
+void Query::Parse(const uint8_t*& current) {
 	flag = 0;
 	for(;;) {
 		auto size = BufferIO::Read<uint16_t>(current);
@@ -83,7 +83,7 @@ void Query::Parse(const char*& current) {
 value = BufferIO::Read<uint32_t>(current);\
 }} while(0)
 
-void Query::ParseCompat(const char* current, uint32_t len) {
+void Query::ParseCompat(const uint8_t* current, uint32_t len) {
 	if(len <= 8) {
 		onfield_skipped = true;
 		return;
@@ -267,7 +267,7 @@ uint32_t Query::GetSize() const {
 	return size;
 }
 
-loc_info ReadLocInfo(const char*& p, bool compat) {
+loc_info ReadLocInfo(const uint8_t*& p, bool compat) {
 	loc_info info;
 	info.controler = BufferIO::Read<uint8_t>(p);
 	info.location = BufferIO::Read<uint8_t>(p);
@@ -281,7 +281,7 @@ loc_info ReadLocInfo(const char*& p, bool compat) {
 	return info;
 }
 
-loc_info ReadLocInfo(char*& p, bool compat) {
+loc_info ReadLocInfo(uint8_t*& p, bool compat) {
 	loc_info info;
 	info.controler = BufferIO::Read<uint8_t>(p);
 	info.location = BufferIO::Read<uint8_t>(p);
@@ -297,21 +297,21 @@ loc_info ReadLocInfo(char*& p, bool compat) {
 
 PacketStream ParseMessages(OCG_Duel duel) {
 	uint32_t message_len;
-	auto msg = static_cast<char*>(OCG_DuelGetMessage(duel, &message_len));
+	auto msg = static_cast<uint8_t*>(OCG_DuelGetMessage(duel, &message_len));
 	if(message_len)
 		return PacketStream{ msg, message_len };
 	return PacketStream{};
 }
 
-void QueryStream::Parse(const char* buff) {
+void QueryStream::Parse(const uint8_t* buff) {
 	auto size = BufferIO::Read<uint32_t>(buff);
-	const char* current = buff;
+	const auto* current = buff;
 	while(static_cast<uint32_t>(current - buff) < size)
 		queries.emplace_back(Query::Token{}, current);
 }
 
-void QueryStream::ParseCompat(const char* buff, uint32_t len) {
-	const char* start = buff;
+void QueryStream::ParseCompat(const uint8_t* buff, uint32_t len) {
+	const auto* start = buff;
 	while(static_cast<uint32_t>(buff - start) < len) {
 		int size = BufferIO::Read<int32_t>(buff);
 		queries.emplace_back(buff, true, size);
@@ -346,8 +346,8 @@ void QueryStream::GeneratePublicBuffer(std::vector<uint8_t>& buffer) const {
 	memcpy(&buffer[prev_size], &written_size, sizeof(uint32_t));
 }
 
-PacketStream::PacketStream(char* buff, uint32_t len) {
-	char* current = buff;
+PacketStream::PacketStream(uint8_t* buff, uint32_t len) {
+	auto* current = buff;
 	while(static_cast<uint32_t>(current - buff) < len) {
 		uint32_t size = BufferIO::Read<uint32_t>(current);
 		packets.emplace_back(current, size - sizeof(uint8_t));

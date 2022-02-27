@@ -20,28 +20,28 @@ public:
 	static void insert_value(std::vector<uint8_t>& vec, T val) {
 		insert_data(vec, &val, sizeof(T));
 	}
-	inline static void Read(char*& p, void* dest, size_t size) {
+	inline static void Read(uint8_t*& p, void* dest, size_t size) {
 		std::memcpy(dest, p, size);
 		p += size;
 	}
 	template<typename T>
-	inline static T Read(char*& p) {
+	inline static T Read(uint8_t*& p) {
 		T ret;
 		Read(p, &ret, sizeof(T));
 		return ret;
 	}
-	inline static void Read(const char*& p, void* dest, size_t size) {
+	inline static void Read(const uint8_t*& p, void* dest, size_t size) {
 		std::memcpy(dest, p, size);
 		p += size;
 	}
 	template<typename T>
-	inline static T Read(const char*& p) {
+	inline static T Read(const uint8_t*& p) {
 		T ret;
 		Read(p, &ret, sizeof(T));
 		return ret;
 	}
 	template<typename T>
-	inline static void Write(char*& p, T value) {
+	inline static void Write(uint8_t*& p, T value) {
 		std::memcpy(p, &value, sizeof(T));
 		p += sizeof(T);
 	}
@@ -259,7 +259,7 @@ public:
 	}
 
 	template<typename T>
-	static T getStruct(void* data, size_t len) {
+	static T getStruct(const void* data, size_t len) {
 		T pkt{};
 		memcpy(&pkt, data, std::min<size_t>(sizeof(T), len));
 		return pkt;

@@ -282,14 +282,11 @@ bool ReplayMode::ReplayAnalyze(const CoreUtils::Packet& p) {
 			break;
 		}
 		case MSG_AI_NAME: {
-			const char* pbuf = p.data();
-			int len = BufferIO::Read<uint16_t>(pbuf);
-			const char* begin = pbuf;
-			pbuf += len + 1;
-			std::string namebuf;
-			namebuf.resize(len);
-			memcpy(&namebuf[0], begin, len + 1);
-			mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8(namebuf);
+			const auto* pbuf = p.data();
+			auto len = BufferIO::Read<uint16_t>(pbuf);
+			if((len + 1) != p.buff_size() - (sizeof(uint16_t)))
+				break;
+			mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8({ reinterpret_cast<const char*>(pbuf), len });
 			return true;
 		}
 		case OLD_REPLAY_MODE:

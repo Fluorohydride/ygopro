@@ -94,8 +94,8 @@ public:
 	ClientCard* GetCard(uint8_t controler, uint8_t location, uint32_t sequence, uint32_t sub_seq = 0);
 	void AddCard(ClientCard* pcard, uint8_t controler, uint8_t location, uint32_t sequence);
 	ClientCard* RemoveCard(uint8_t controler, uint8_t location, uint32_t sequence);
-	void UpdateCard(uint8_t controler, uint8_t location, uint32_t sequence, const char* data, uint32_t len = 0);
-	void UpdateFieldCard(uint8_t controler, uint8_t location, const char* data, uint32_t len = 0);
+	void UpdateCard(uint8_t controler, uint8_t location, uint32_t sequence, const uint8_t* data, uint32_t len = 0);
+	void UpdateFieldCard(uint8_t controler, uint8_t location, const uint8_t* data, uint32_t len = 0);
 	void ClearCommandFlag();
 	void ClearSelect();
 	void ClearChainSelect();

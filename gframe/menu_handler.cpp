@@ -31,8 +31,8 @@ namespace ygo {
 static void UpdateDeck() {
 	gGameConfig->lastdeck = mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected());
 	const auto& deck = gdeckManager->current_deck;
-	char deckbuf[0xf000];
-	char* pdeck = deckbuf;
+	uint8_t deckbuf[0xf000];
+	auto* pdeck = deckbuf;
 	static constexpr auto max_deck_size = sizeof(deckbuf) / sizeof(uint32_t) - 2;
 	const auto totsize = deck.main.size() + deck.extra.size() + deck.side.size();
 	if(totsize > max_deck_size)

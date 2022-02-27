@@ -316,7 +316,7 @@ ClientCard* ClientField::RemoveCard(uint8_t controler, uint8_t location, uint32_
 	pcard->location = 0;
 	return pcard;
 }
-void ClientField::UpdateCard(uint8_t controler, uint8_t location, uint32_t sequence, const char* data, uint32_t len) {
+void ClientField::UpdateCard(uint8_t controler, uint8_t location, uint32_t sequence, const uint8_t* data, uint32_t len) {
 	ClientCard* pcard = GetCard(controler, location, sequence);
 	if(pcard) {
 		if(mainGame->dInfo.compat_mode)
@@ -324,7 +324,7 @@ void ClientField::UpdateCard(uint8_t controler, uint8_t location, uint32_t seque
 		pcard->UpdateInfo(CoreUtils::Query{ data, mainGame->dInfo.compat_mode, len });
 	}
 }
-void ClientField::UpdateFieldCard(uint8_t controler, uint8_t location, const char* data, uint32_t len) {
+void ClientField::UpdateFieldCard(uint8_t controler, uint8_t location, const uint8_t* data, uint32_t len) {
 	auto lst = GetList(location, controler);
 	if(!lst)
 		return;

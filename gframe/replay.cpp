@@ -280,12 +280,12 @@ void Replay::ParseStream() {
 	CoreUtils::Packet p;
 	while(ReadNextPacket(&p)) {
 		if(p.message == MSG_AI_NAME) {
-			char* pbuf = p.data();
-			int len = BufferIO::Read<uint16_t>(pbuf);
+			auto* pbuf = p.data();
+			uint16_t len = BufferIO::Read<uint16_t>(pbuf);
 			if((len + 1) != p.buff_size() - sizeof(uint16_t))
 				break;
 			pbuf[len] = 0;
-			players[1] = BufferIO::DecodeUTF8(pbuf);
+			players[1] = BufferIO::DecodeUTF8({ reinterpret_cast<char*>(pbuf), len });
 			continue;
 		}
 		if(p.message == MSG_NEW_TURN) {

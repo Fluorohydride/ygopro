@@ -308,7 +308,7 @@ void DuelClient::HandleSTOCPacketLanSync(std::vector<uint8_t>&& data) {
 	}
 	if(mainGame->dInfo.isCatchingUp)
 		return;
-	auto* pdata = (char*)data.data() + 1;
+	auto* pdata = data.data() + 1;
 	switch(pktType) {
 		case STOC_CHAT: {
 			auto pkt = BufferIO::getStruct<STOC_Chat>(pdata, data.size());
@@ -368,7 +368,7 @@ void DuelClient::HandleSTOCPacketLanSync(std::vector<uint8_t>&& data) {
 
 
 void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
-	auto* pdata = (char*)data.data();
+	auto* pdata = data.data();
 	auto len = data.size();
 	uint8_t pktType = BufferIO::Read<uint8_t>(pdata);
 	switch(pktType) {
@@ -1178,13 +1178,13 @@ std::pair<uint32_t, uint32_t> DuelClient::GetPlayersCount() {
 	return { count1, count2 };
 }
 template<typename T1, typename T2>
-inline T2 CompatRead(char*& buf) {
+inline T2 CompatRead(uint8_t*& buf) {
 	if(mainGame->dInfo.compat_mode)
 		return static_cast<T2>(BufferIO::Read<T1>(buf));
 	return BufferIO::Read<T2>(buf);
 }
 template<typename T1, typename T2>
-inline T2 CompatRead(const char*& buf) {
+inline T2 CompatRead(const uint8_t*& buf) {
 	if(mainGame->dInfo.compat_mode)
 		return static_cast<T2>(BufferIO::Read<T1>(buf));
 	return BufferIO::Read<T2>(buf);
@@ -1203,8 +1203,8 @@ inline std::unique_lock<std::mutex> LockIf() {
 		return std::unique_lock<std::mutex>(mainGame->gMutex);
 	return std::unique_lock<std::mutex>();
 }
-int DuelClient::ClientAnalyze(const char* msg, uint32_t len) {
-	const char* pbuf = msg;
+int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
+	const auto* pbuf = msg;
 	if(!mainGame->dInfo.isReplay && !mainGame->dInfo.isSingleMode) {
 		mainGame->dInfo.curMsg = BufferIO::Read<uint8_t>(pbuf);
 		len--;
