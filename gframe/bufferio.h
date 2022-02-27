@@ -46,14 +46,12 @@ public:
 		p += sizeof(T);
 	}
 	template<typename T>
-	inline static int CopyStr(const T* src, T* pstr, int bufsize) {
-		auto p = (const uint8_t*)(src);
-		for(const auto* tg = p + (bufsize * sizeof(T)); p <= tg; p += sizeof(T), pstr++) {
-			std::memcpy(pstr, p, sizeof(T));
-			if(!*pstr)
-				break;
-		}
-		return (const T*)p - src;
+	inline static int CopyStr(const T* src, T* pstr, size_t bufsize) {
+		size_t l = 0;
+		for(; src[l] && l < bufsize - 1; ++l)
+			pstr[l] = src[l];
+		pstr[l] = 0;
+		return static_cast<int>(l);
 	}
 private:
 	template<bool check = false>
