@@ -20,22 +20,15 @@ public:
 	static void insert_value(std::vector<uint8_t>& vec, T val) {
 		insert_data(vec, &val, sizeof(T));
 	}
-	inline static void Read(uint8_t*& p, void* dest, size_t size) {
+	template<typename input_type>
+	inline static void Read(input_type*& p, void* dest, size_t size) {
+		static_assert(std::is_same<std::remove_cv<input_type>::type, uint8_t>::value == true, "only uint8_t supported as buffer input");
 		std::memcpy(dest, p, size);
 		p += size;
 	}
-	template<typename T>
-	inline static T Read(uint8_t*& p) {
-		T ret;
-		Read(p, &ret, sizeof(T));
-		return ret;
-	}
-	inline static void Read(const uint8_t*& p, void* dest, size_t size) {
-		std::memcpy(dest, p, size);
-		p += size;
-	}
-	template<typename T>
-	inline static T Read(const uint8_t*& p) {
+	template<typename T, typename input_type>
+	inline static T Read(input_type*& p) {
+		static_assert(std::is_same<std::remove_cv<input_type>::type, uint8_t>::value == true, "only uint8_t supported as buffer input");
 		T ret;
 		Read(p, &ret, sizeof(T));
 		return ret;
