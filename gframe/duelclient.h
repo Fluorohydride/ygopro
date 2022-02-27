@@ -32,7 +32,6 @@ private:
 	static bool is_host;
 	static event_base* client_base;
 	static bufferevent* client_bev;
-	static std::vector<uint8_t> duel_client_read;
 	static bool is_closing;
 	static uint64_t select_hint;
 	static std::wstring event_string;
@@ -63,8 +62,8 @@ public:
 	static void ClientRead(bufferevent* bev, void* ctx);
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread();
-	static void HandleSTOCPacketLanSync(char* data, uint32_t len);
-	static void HandleSTOCPacketLanAsync(char* data, uint32_t len);
+	static void HandleSTOCPacketLanSync(std::vector<uint8_t>&& data);
+	static void HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data);
 	static void ParserThread();
 	static bool CheckReady();
 	static std::pair<uint32_t, uint32_t> GetPlayersCount();

@@ -43,7 +43,6 @@ bool DuelClient::is_local_host = false;
 std::atomic<bool> DuelClient::answered{ false };
 event_base* DuelClient::client_base = nullptr;
 bufferevent* DuelClient::client_bev = nullptr;
-std::vector<uint8_t> DuelClient::duel_client_read;
 bool DuelClient::is_closing = false;
 uint64_t DuelClient::select_hint = 0;
 std::wstring DuelClient::event_string;
@@ -185,10 +184,11 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 		evbuffer_copyout(input, &packet_len, 2);
 		if(len < packet_len + 2u)
 			return;
-		duel_client_read.resize(packet_len + 2);
-		evbuffer_remove(input, duel_client_read.data(), packet_len + 2);
+		evbuffer_remove(input, &packet_len, 2);
+		std::vector<uint8_t> duel_client_read(packet_len);
+		evbuffer_remove(input, duel_client_read.data(), packet_len);
 		if(packet_len)
-			HandleSTOCPacketLanSync((char*)&duel_client_read[2], packet_len);
+			HandleSTOCPacketLanSync(std::move(duel_client_read));
 		len = evbuffer_get_length(input);
 	}
 }
@@ -293,28 +293,25 @@ void DuelClient::ParserThread() {
 		auto pkt = std::move(to_analyze.front());
 		to_analyze.pop_front();
 		lck.unlock();
-		HandleSTOCPacketLanAsync((char*)pkt.data(), pkt.size());
+		HandleSTOCPacketLanAsync(pkt);
 	}
 }
 
-void DuelClient::HandleSTOCPacketLanSync(char* data, uint32_t len) {
-	uint8_t pktType = static_cast<uint8_t>(data[0]);
+void DuelClient::HandleSTOCPacketLanSync(std::vector<uint8_t>&& data) {
+	uint8_t pktType = data[0];
 	if(pktType != STOC_CHAT && pktType != STOC_CHAT_2) {
-		std::vector<uint8_t> tmpvec{};
-		tmpvec.resize(len);
-		memcpy(tmpvec.data(), data, len);
 		to_analyze_mutex.lock();
-		to_analyze.emplace_back(std::move(tmpvec));
+		to_analyze.push_back(std::move(data));
 		to_analyze_mutex.unlock();
 		cv.notify_one();
 		return;
 	}
 	if(mainGame->dInfo.isCatchingUp)
 		return;
-	char* pdata = data + 1;
+	auto* pdata = (char*)data.data() + 1;
 	switch(pktType) {
 		case STOC_CHAT: {
-			auto pkt = BufferIO::getStruct<STOC_Chat>(pdata, len);
+			auto pkt = BufferIO::getStruct<STOC_Chat>(pdata, data.size());
 			int player = pkt.player;
 			int type = -1;
 			if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2) {
@@ -353,7 +350,7 @@ void DuelClient::HandleSTOCPacketLanSync(char* data, uint32_t len) {
 			break;
 		}
 		case STOC_CHAT_2: {
-			auto pkt = BufferIO::getStruct<STOC_Chat2>(pdata, len);
+			auto pkt = BufferIO::getStruct<STOC_Chat2>(pdata, data.size());
 			if(pkt.type == STOC_Chat2::PTYPE_DUELIST && (mainGame->dInfo.player_type >= 7 || !pkt.is_team) && mainGame->tabSettings.chkIgnoreOpponents->isChecked())
 				return;
 			if(pkt.type == STOC_Chat2::PTYPE_OBS && mainGame->tabSettings.chkIgnoreSpectators->isChecked())
@@ -370,8 +367,9 @@ void DuelClient::HandleSTOCPacketLanSync(char* data, uint32_t len) {
 }
 
 
-void DuelClient::HandleSTOCPacketLanAsync(char* data, uint32_t len) {
-	char* pdata = data;
+void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
+	auto* pdata = (char*)data.data();
+	auto len = data.size();
 	uint8_t pktType = BufferIO::Read<uint8_t>(pdata);
 	switch(pktType) {
 	case INTERNAL_HANDLE_CONNECTION_END: {
