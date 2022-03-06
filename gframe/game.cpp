@@ -1913,6 +1913,8 @@ bool Game::MainLoop() {
 		frameSignal.SetNoWait(true);
 	}
 	DuelClient::StopClient(true);
+	//This is set again as waitable in the above call
+	frameSignal.SetNoWait(true);
 	SingleMode::StopPlay(true);
 	ReplayMode::StopReplay(true);
 	ClearTextures();
