@@ -1,6 +1,7 @@
 #ifndef REPLAY_MODE_H
 #define REPLAY_MODE_H
 
+#include <thread>
 #include "dllinterface.h"
 #include "config.h"
 #include "data_manager.h"
@@ -26,6 +27,7 @@ private:
 	static int skip_turn;
 	static int current_step;
 	static int skip_step;
+	static std::thread replay_thread;
 
 public:
 	static Replay cur_replay;

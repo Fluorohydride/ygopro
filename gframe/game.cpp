@@ -1905,16 +1905,17 @@ bool Game::MainLoop() {
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 	discord.UpdatePresence(DiscordWrapper::TERMINATE);
-	replaySignal.SetNoWait(true);
-	actionSignal.SetNoWait(true);
-	closeDoneSignal.SetNoWait(true);
+	{
+		std::lock_guard<std::mutex> lk(gMutex);
+		replaySignal.SetNoWait(true);
+		actionSignal.SetNoWait(true);
+		closeDoneSignal.SetNoWait(true);
+		frameSignal.SetNoWait(true);
+	}
 	DuelClient::StopClient(true);
+	SingleMode::StopPlay(true);
+	ReplayMode::StopReplay(true);
 	ClearTextures();
-	if(dInfo.isSingleMode)
-		SingleMode::StopPlay(true);
-	if(dInfo.isReplay)
-		ReplayMode::StopReplay(true);
-	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	SaveConfig();
 #ifdef YGOPRO_BUILD_DLL
 	if(ocgcore)

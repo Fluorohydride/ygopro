@@ -7,7 +7,7 @@
 class Signal {
 public:
 	Signal():_nowait(false){}
-	~Signal() {}
+	~Signal() { SetNoWait(true); }
 	void Set() {
 		val.notify_all();
 	}

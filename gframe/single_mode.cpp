@@ -24,11 +24,14 @@ Replay SingleMode::last_replay;
 Replay SingleMode::new_replay;
 ReplayStream SingleMode::replay_stream;
 Signal SingleMode::singleSignal;
+std::thread SingleMode::single_mode_thread;
 
 bool SingleMode::StartPlay(DuelOptions&& duelOptions) {
 	if(mainGame->dInfo.isSingleMode)
 		return false;
-	std::thread(SinglePlayThread, std::move(duelOptions)).detach();
+	if(single_mode_thread.joinable())
+		single_mode_thread.join();
+	single_mode_thread = std::thread(SinglePlayThread, std::move(duelOptions));
 	return true;
 }
 void SingleMode::StopPlay(bool is_exiting) {
@@ -36,9 +39,11 @@ void SingleMode::StopPlay(bool is_exiting) {
 	is_continuing = false;
 	is_restarting = false;
 	mainGame->actionSignal.Set();
-	if(is_closing)
+	if(is_closing) {
 		singleSignal.SetNoWait(true);
-	else
+		if(single_mode_thread.joinable())
+			single_mode_thread.join();
+	} else
 		singleSignal.Set();
 }
 void SingleMode::Restart() {
