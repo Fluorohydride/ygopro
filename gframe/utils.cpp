@@ -527,7 +527,7 @@ namespace ygo {
 #ifdef _WIN32
 		STARTUPINFO si{ sizeof(si) };
 		PROCESS_INFORMATION pi{};
-		auto command = fmt::format(EPRO_TEXT("{} -C {} -l"), ygo::Utils::GetFileName(path, true), ygo::Utils::working_dir);
+		auto command = fmt::format(EPRO_TEXT("{} -C \"{}\" -l"), ygo::Utils::GetFileName(path, true), ygo::Utils::working_dir);
 		if(!CreateProcess(path.data(), &command[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi))
 			return;
 		CloseHandle(pi.hProcess);
