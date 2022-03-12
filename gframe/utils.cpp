@@ -363,55 +363,56 @@ namespace ygo {
 		return true;
 	}
 
-	const epro::path_string& Utils::GetExePath() {
-		static const epro::path_string binarypath = []()->epro::path_string {
+	static const epro::path_string exe_path = []()->epro::path_string {
 #ifdef _WIN32
-			TCHAR exepath[MAX_PATH];
-			GetModuleFileName(nullptr, exepath, MAX_PATH);
-			return Utils::NormalizePath<TCHAR>(exepath, false);
+		TCHAR exepath[MAX_PATH];
+		GetModuleFileName(nullptr, exepath, MAX_PATH);
+		return Utils::NormalizePath<TCHAR>(exepath, false);
 #elif defined(__linux__) && !defined(__ANDROID__)
-			epro::path_char buff[PATH_MAX];
-			ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
-			if(len != -1)
-				buff[len] = EPRO_TEXT('\0');
-			return buff;
+		epro::path_char buff[PATH_MAX];
+		ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
+		if(len != -1)
+			buff[len] = EPRO_TEXT('\0');
+		return buff;
 #elif defined(EDOPRO_MACOS)
-			CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-			CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
-			CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(nullptr, bundle_url);
-			CFRelease(bundle_url);
-			CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
-			CFRelease(bundle_base_url);
-			/*
-			#ifdef MAC_OS_DISCORD_LAUNCHER
-				system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).data());
-			#endif
-			*/
-			epro::path_string res = epro::path_string(CFStringGetCStringPtr(path, kCFStringEncodingUTF8)) + "/";
-			CFRelease(path);
-			CFRelease(bundle_path);
-			return res;
+		CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+		CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
+		CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(nullptr, bundle_url);
+		CFRelease(bundle_url);
+		CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
+		CFRelease(bundle_base_url);
+		/*
+		#ifdef MAC_OS_DISCORD_LAUNCHER
+			//launches discord launcher so that it's registered as bundle to launch by discord
+			system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).data());
+		#endif
+		*/
+		epro::path_string res = epro::path_string(CFStringGetCStringPtr(path, kCFStringEncodingUTF8)) + "/";
+		CFRelease(path);
+		CFRelease(bundle_path);
+		return res;
 #else
-			return EPRO_TEXT("");
+		return EPRO_TEXT("");
 #endif
-		}();
-		return binarypath;
+	}();
+	const epro::path_string& Utils::GetExePath() {
+		return exe_path;
 	}
 
+	static const epro::path_string exe_folder = Utils::GetFilePath(exe_path);
 	const epro::path_string& Utils::GetExeFolder() {
-		static const epro::path_string binarypath = GetFilePath(GetExePath());
-		return binarypath;
+		return exe_folder;
 	}
 
-	const epro::path_string& Utils::GetCorePath() {
-		static const epro::path_string binarypath = [] {
+	static const epro::path_string core_path = [] {
 #ifdef _WIN32
-			return fmt::format(EPRO_TEXT("{}/ocgcore.dll"), GetExeFolder());
+		return fmt::format(EPRO_TEXT("{}/ocgcore.dll"), Utils::GetExeFolder());
 #else
-			return EPRO_TEXT(""); // Unused on POSIX
+		return EPRO_TEXT(""); // Unused on POSIX
 #endif
-		}();
-		return binarypath;
+	}();
+	const epro::path_string& Utils::GetCorePath() {
+		return core_path;
 	}
 
 	bool Utils::UnzipArchive(epro::path_stringview input, unzip_callback callback, unzip_payload* payload, epro::path_stringview dest) {
