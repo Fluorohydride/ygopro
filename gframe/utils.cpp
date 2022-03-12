@@ -174,7 +174,7 @@ namespace ygo {
 		return chdir(newpath.data()) == 0;
 #endif
 	}
-	const const epro::path_string& Utils::GetWorkingDirectory() {
+	const epro::path_string& Utils::GetWorkingDirectory() {
 		return working_dir;
 	}
 	bool Utils::FileDelete(epro::path_stringview source) {
