@@ -55,7 +55,6 @@ namespace ygo {
 		static std::vector<SynchronizedIrrArchive> archives;
 		static irr::io::IFileSystem* filesystem;
 		static irr::IOSOperator* OSOperator;
-		static epro::path_string working_dir;
 		static bool MakeDirectory(epro::path_stringview path);
 #ifdef __linux__
 		static bool FileCopyFD(int source, int destination);
@@ -68,6 +67,7 @@ namespace ygo {
 		static inline std::string ToUTF8IfNeeded(epro::path_stringview input);
 		static inline std::wstring ToUnicodeIfNeeded(epro::path_stringview input);
 		static bool SetWorkingDirectory(epro::path_stringview newpath);
+		static const epro::path_string& GetWorkingDirectory();
 		static bool FileDelete(epro::path_stringview source);
 		static bool ClearDirectory(epro::path_stringview path);
 		static bool DeleteDirectory(epro::path_stringview source);

@@ -131,7 +131,7 @@ bool Game::Initialize() {
 	if(!(ocgcore = LoadOCGcore(Utils::working_dir)) && !(ocgcore = LoadOCGcore(fmt::format(EPRO_TEXT("{}/expansions/"), Utils::working_dir))))
 		coreloaded = false;
 #endif
-	skinSystem = new CGUISkinSystem(fmt::format(EPRO_TEXT("{}/skin"), Utils::working_dir).data(), device);
+	skinSystem = new CGUISkinSystem(fmt::format(EPRO_TEXT("{}/skin"), Utils::GetWorkingDirectory()).data(), device);
 	if(!skinSystem)
 		throw std::runtime_error("Couldn't create skin system");
 	linePatternGL = 0x0f0f;

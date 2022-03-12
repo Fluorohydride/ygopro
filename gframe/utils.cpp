@@ -78,7 +78,6 @@ namespace ygo {
 	std::vector<SynchronizedIrrArchive> Utils::archives;
 	irr::io::IFileSystem* Utils::filesystem{ nullptr };
 	irr::IOSOperator* Utils::OSOperator{ nullptr };
-	epro::path_string Utils::working_dir;
 
 	RNG::SplitMix64 Utils::generator(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
@@ -166,12 +165,17 @@ namespace ygo {
 		return stat(path.data(), &sb) != -1 && S_ISREG(sb.st_mode) != 0;
 #endif
 	}
+	static epro::path_string working_dir;
 	bool Utils::SetWorkingDirectory(epro::path_stringview newpath) {
+		working_dir = NormalizePathImpl(newpath);
 #ifdef _WIN32
 		return SetCurrentDirectory(newpath.data());
 #else
 		return chdir(newpath.data()) == 0;
 #endif
+	}
+	const const epro::path_string& Utils::GetWorkingDirectory() {
+		return working_dir;
 	}
 	bool Utils::FileDelete(epro::path_stringview source) {
 #ifdef _WIN32
@@ -493,15 +497,15 @@ namespace ygo {
 #ifdef _WIN32
 		if(type == SHARE_FILE)
 			return;
-		ShellExecute(nullptr, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), working_dir, arg).data() : arg.data(), nullptr, nullptr, SW_SHOWNORMAL);
+		ShellExecute(nullptr, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), GetWorkingDirectory(), arg).data() : arg.data(), nullptr, nullptr, SW_SHOWNORMAL);
 #elif defined(__ANDROID__)
 		switch(type) {
 		case OPEN_FILE:
-			return porting::openFile(fmt::format("{}/{}", working_dir, arg));
+			return porting::openFile(fmt::format("{}/{}", GetWorkingDirectory(), arg));
 		case OPEN_URL:
 			return porting::openUrl(arg);
 		case SHARE_FILE:
-			return porting::shareFile(fmt::format("{}/{}", working_dir, arg));
+			return porting::shareFile(fmt::format("{}/{}", GetWorkingDirectory(), arg));
 		}
 #elif defined(EDOPRO_MACOS) || defined(__linux__)
 		if(type == SHARE_FILE)
@@ -524,11 +528,11 @@ namespace ygo {
 
 	void Utils::Reboot() {
 #if !defined(__ANDROID__)
-		const auto& path = ygo::Utils::GetExePath();
+		const auto& path = GetExePath();
 #ifdef _WIN32
 		STARTUPINFO si{ sizeof(si) };
 		PROCESS_INFORMATION pi{};
-		auto command = fmt::format(EPRO_TEXT("{} -C \"{}\" -l"), ygo::Utils::GetFileName(path, true), ygo::Utils::working_dir);
+		auto command = fmt::format(EPRO_TEXT("{} -C \"{}\" -l"), GetFileName(path, true), GetWorkingDirectory());
 		if(!CreateProcess(path.data(), &command[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi))
 			return;
 		CloseHandle(pi.hProcess);
@@ -542,9 +546,9 @@ namespace ygo {
 		auto pid = vfork();
 		if(pid == 0) {
 #ifdef __linux__
-			execl(path.data(), path.data(), "-C", ygo::Utils::working_dir.data(), "-l", nullptr);
+			execl(path.data(), path.data(), "-C", GetWorkingDirectory().data(), "-l", nullptr);
 #else
-			execlp("open", "open", "-b", "io.github.edo9300.ygoprodll", "--args", "-C", ygo::Utils::working_dir.data(), "-l", nullptr);
+			execlp("open", "open", "-b", "io.github.edo9300.ygoprodll", "--args", "-C", GetWorkingDirectory().data(), "-l", nullptr);
 #endif
 			_exit(EXIT_FAILURE);
 		}

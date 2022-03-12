@@ -97,7 +97,7 @@ void DataHandler::LoadZipArchives() {
 		}
 	}
 }
-DataHandler::DataHandler(epro::path_stringview working_dir) {
+DataHandler::DataHandler() {
 	configs = std::unique_ptr<GameConfig>(new GameConfig());
 	gGameConfig = configs.get();
 	tmp_device = nullptr;
@@ -109,7 +109,7 @@ DataHandler::DataHandler(epro::path_stringview working_dir) {
 		if(configs->override_ssl_certificate_path != "none" && Utils::FileExists(Utils::ToPathString(configs->override_ssl_certificate_path)))
 			configs->ssl_certificate_path = configs->override_ssl_certificate_path;
 	} else
-		configs->ssl_certificate_path = fmt::format("{}/cacert.pem", Utils::ToUTF8IfNeeded(working_dir));
+		configs->ssl_certificate_path = fmt::format("{}/cacert.pem", Utils::ToUTF8IfNeeded(Utils::GetWorkingDirectory()));
 #else
 	Utils::OSOperator = new irr::COSAndroidOperator();
 	configs->ssl_certificate_path = fmt::format("{}/cacert.pem", porting::internal_storage);
@@ -121,11 +121,10 @@ DataHandler::DataHandler(epro::path_stringview working_dir) {
 	if(!strings_loaded)
 		throw std::runtime_error("Failed to load strings!");
 	Utils::filesystem = filesystem;
-	Utils::working_dir = Utils::NormalizePath(working_dir);
 	LoadZipArchives();
 	deckManager = std::unique_ptr<DeckManager>(new DeckManager());
 	gitManager = std::unique_ptr<RepoManager>(new RepoManager());
-	sounds = std::unique_ptr<SoundManager>(new SoundManager(configs->soundVolume / 100.0, configs->musicVolume / 100.0, configs->enablesound, configs->enablemusic, Utils::working_dir));
+	sounds = std::unique_ptr<SoundManager>(new SoundManager(configs->soundVolume / 100.0, configs->musicVolume / 100.0, configs->enablesound, configs->enablemusic));
 	gitManager->LoadRepositoriesFromJson(configs->user_configs);
 	gitManager->LoadRepositoriesFromJson(configs->configs);
 	if(gitManager->TerminateIfNothingLoaded())

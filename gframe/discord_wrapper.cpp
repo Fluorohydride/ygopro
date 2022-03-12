@@ -35,7 +35,7 @@ epro::path_string Unescape(epro::path_string path) {
 bool DiscordWrapper::Initialize() {
 #ifdef DISCORD_APP_ID
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	epro::path_string param = fmt::format(formatstr, Unescape(ygo::Utils::GetExePath()), ygo::Utils::working_dir);
+	epro::path_string param = fmt::format(formatstr, Unescape(ygo::Utils::GetExePath()), ygo::Utils::GetWorkingDirectory());
 	Discord_Register(DISCORD_APP_ID, ygo::Utils::ToUTF8IfNeeded(param).data());
 #else
 	RegisterURL(DISCORD_APP_ID);

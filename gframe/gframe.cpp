@@ -160,10 +160,9 @@ using Game = ygo::Game;
 int _tmain(int argc, epro::path_char* argv[]) {
 	std::puts(EDOPRO_VERSION_STRING_DEBUG);
 	const auto args = ParseArguments(argc, argv);
-	epro::path_stringview dest;
 	{
 		const auto& workdir = args[LAUNCH_PARAM::WORK_DIR];
-		dest = workdir.enabled ? workdir.argument : ygo::Utils::GetExeFolder();
+		const epro::path_stringview dest = workdir.enabled ? workdir.argument : ygo::Utils::GetExeFolder();
 		if(!ygo::Utils::SetWorkingDirectory(dest)) {
 			const auto err = fmt::format("failed to change directory to: {}", ygo::Utils::ToUTF8IfNeeded(dest));
 			ygo::ErrorLog(err);
@@ -181,7 +180,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 	ygo::gClientUpdater = &updater;
 	std::shared_ptr<ygo::DataHandler> data{ nullptr };
 	try {
-		data = std::make_shared<ygo::DataHandler>(dest);
+		data = std::make_shared<ygo::DataHandler>();
 		ygo::gImageDownloader = data->imageDownloader.get();
 		ygo::gDataManager = data->dataManager.get();
 		ygo::gSoundManager = data->sounds.get();

@@ -53,7 +53,7 @@ public:
 		ATTACK,
 		ACTIVATE
 	};
-	SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, epro::path_stringview working_directory);
+	SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled);
 	bool IsUsable();
 	void RefreshBGMList();
 	void RefreshChantsList();
