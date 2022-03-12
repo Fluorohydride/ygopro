@@ -80,7 +80,7 @@ private:
 	void RefreshBGMDir(epro::path_stringview path, BGM scene);
 	bool soundsEnabled = false;
 	bool musicEnabled = false;
-	std::string working_dir = "./";
+	std::string working_dir;
 	bool succesfully_initied = false;
 };
 

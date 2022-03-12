@@ -128,7 +128,7 @@ bool Game::Initialize() {
 	filesystem->grab();
 	coreloaded = true;
 #ifdef YGOPRO_BUILD_DLL
-	if(!(ocgcore = LoadOCGcore(Utils::working_dir)) && !(ocgcore = LoadOCGcore(fmt::format(EPRO_TEXT("{}/expansions/"), Utils::working_dir))))
+	if(!(ocgcore = LoadOCGcore(Utils::GetWorkingDirectory())) && !(ocgcore = LoadOCGcore(fmt::format(EPRO_TEXT("{}/expansions/"), Utils::GetWorkingDirectory()))))
 		coreloaded = false;
 #endif
 	skinSystem = new CGUISkinSystem(fmt::format(EPRO_TEXT("{}/skin"), Utils::GetWorkingDirectory()).data(), device);
@@ -1644,7 +1644,7 @@ bool Game::MainLoop() {
 		if(!dInfo.isStarted && cores_to_load.size() && gRepoManager->GetUpdatingReposNumber() == 0) {
 			for(auto& path : cores_to_load) {
 				void* ncore = nullptr;
-				if((ncore = ChangeOCGcore(Utils::working_dir + path, ocgcore))) {
+				if((ncore = ChangeOCGcore(Utils::GetWorkingDirectory() + path, ocgcore))) {
 					corename = Utils::ToUnicodeIfNeeded(path);
 					coreJustLoaded = true;
 					ocgcore = ncore;
