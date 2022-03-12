@@ -166,7 +166,7 @@ namespace ygo {
 		return stat(path.data(), &sb) != -1 && S_ISREG(sb.st_mode) != 0;
 #endif
 	}
-	bool Utils::ChangeDirectory(epro::path_stringview newpath) {
+	bool Utils::SetWorkingDirectory(epro::path_stringview newpath) {
 #ifdef _WIN32
 		return SetCurrentDirectory(newpath.data());
 #else
