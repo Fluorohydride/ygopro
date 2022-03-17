@@ -83,7 +83,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	if(configs->useWayland == 2) {
 		if(!try_guess_wayland())
 			configs->useWayland = 0;
-	} else if(configs->useWayland == 1) {
+	} else if(configs->useWayland == 1 && try_guess_wayland()) {
 		params.DeviceType = irr::E_DEVICE_TYPE::EIDT_WAYLAND;
 		fmt::print("You're using the wayland device backend.\n"
 				   "Keep in mind that it's still experimental and might be unstable.\n"
