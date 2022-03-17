@@ -91,6 +91,10 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 				   "you can manually disable this option from the system.conf file by toggling the useWayland option.\n"
 				   "Feel free to report any issues you encounter.\n");
 	}
+	// This correspond to the program's class name, used by window managers and
+	// desktop environments to group multiple instances with their desktop file
+	char class_name[] = "EDOPro";
+	params.PrivateData = class_name;
 #endif
 	params.Vsync = configs->vsync;
 	if(configs->driver_type == irr::video::EDT_COUNT)
