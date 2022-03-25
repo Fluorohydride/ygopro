@@ -291,6 +291,8 @@ template<typename T>
 T Utils::ToUpperChar(T c) {
 #define IN_INTERVAL(start, end) (c >= start && c <= end)
 	if(std::is_same<T, wchar_t>::value) {
+		if(c > 255)
+			return c;
 		if(IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)
 		   || c == 0x2c6f || c == 0x250 //latin capital/small letter turned a
 		   || c == 0x2200) //for all
@@ -318,7 +320,7 @@ T Utils::ToUpperChar(T c) {
 		if(c == 191) { //inverted question mark
 			return static_cast<T>('?');
 		}
-		return static_cast<T>(std::towupper(c));
+		return static_cast<T>(std::toupper(static_cast<int>(c)));
 	} else
 		return static_cast<T>(std::toupper(c));
 #undef IN_INTERVAL
