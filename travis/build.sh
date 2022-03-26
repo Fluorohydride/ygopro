@@ -10,7 +10,7 @@ UPDATE_URL=${UPDATE_URL:-""}
 
 if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     ./premake5 vs2017 --oldwindows=true --sound=sfml --no-joystick=true --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\" --covers=\"$COVERS_URL\" --discord=\"$DISCORD_APP_ID\" --update-url=\"$UPDATE_URL\"
-    msbuild.exe -m -p:Configuration=$BUILD_CONFIG ./build/ygo.sln -t:ygoprodll -verbosity:minimal -p:EchoOff=true
+    msbuild.exe -m -p:Configuration=$BUILD_CONFIG -p:Platform=Win32 ./build/ygo.sln -t:ygoprodll -verbosity:minimal -p:EchoOff=true
     python.exe ./travis/patcher.py bin/$BUILD_CONFIG/ygoprodll.exe
 fi
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then

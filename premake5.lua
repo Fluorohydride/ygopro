@@ -66,19 +66,28 @@ workspace "ygo"
 	objdir "obj"
 	startproject "ygopro"
 	staticruntime "on"
-	if _OPTIONS["oldwindows"] then
-		filter "action:vs2015"
-			toolset "v140_xp"
-		filter { "action:vs*", "action:not vs2015" }
-			toolset "v141_xp"
-		filter {}
-	end
 
 	configurations { "Debug", "Release" }
 
 	filter "system:windows"
 		systemversion "latest"
 		defines { "WIN32", "_WIN32", "NOMINMAX" }
+		platforms {"Win32", "x64"}
+
+	filter "platforms:Win32"
+		architecture "x86"
+
+	filter "platforms:x64"
+		architecture "x64"
+
+	if _OPTIONS["oldwindows"] then
+		filter { "architecture:not *64" , "action:vs2015" }
+			toolset "v140_xp"
+		filter { "architecture:not *64" , "action:not vs2015" }
+			toolset "v141_xp"
+		filter {}
+	end
+
 
 	if _OPTIONS["vcpkg-root"] then
 		filter "system:linux"
