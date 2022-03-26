@@ -1,3 +1,4 @@
+#ifndef _WIN64
 #include <WinSock2.h>
 #include <Windows.h>
 #define socklen_t int
@@ -475,3 +476,4 @@ extern "C" ULONG __stdcall if_nametoindex(PCSTR* InterfaceName) {
 	return 0;
 }
 }
+#endif

@@ -1,3 +1,12 @@
+IFDEF RAX
+    END_IF_NOT_X64 equ end  ; kill stop the assembler if we're not compiling for x64
+ELSE
+    END_IF_NOT_X64 equ <>
+ENDIF
+
+END_IF_NOT_X64
+
+
 .model flat
 
 ;windows 9x under kernelex
