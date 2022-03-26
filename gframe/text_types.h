@@ -42,6 +42,10 @@ using nonstd::basic_string_view;
 using path_stringview = basic_string_view<path_char>;
 using stringview = basic_string_view<char>;
 using wstringview = basic_string_view<wchar_t>;
+template<typename T>
+inline fmt::basic_string_view<typename T::value_type> to_fmtstring_view(const T& s) {
+	return { s.data(), s.size() };
+}
 }
 using namespace nonstd::literals;
 #endif /* TEXT_TYPES_H_ */
