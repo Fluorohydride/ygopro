@@ -145,6 +145,9 @@ workspace "ygo"
 		defines "_DEBUG"
 		targetdir "bin/debug"
 		runtime "Debug"
+		
+	filter { "action:vs*", "configurations:Debug", "architecture:*64" }
+		targetdir "bin/x64/debug"
 
 	filter { "configurations:Release*" , "action:not vs*" }
 		symbols "On"
@@ -154,6 +157,9 @@ workspace "ygo"
 		optimize "Size"
 		flags "LinkTimeOptimization"
 		targetdir "bin/release"
+		
+	filter { "action:vs*", "configurations:Release", "architecture:*64" }
+		targetdir "bin/x64/release"
 	
 	filter { "system:linux", "configurations:Release" }
 		linkoptions { "-static-libgcc", "-static-libstdc++" }
