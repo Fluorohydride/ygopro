@@ -59,7 +59,8 @@ sqlite3* DataManager::OpenDb(epro::path_stringview file) {
 }
 
 sqlite3* DataManager::OpenDb(irr::io::IReadFile* reader) {
-	cur_database = fmt::format("{}", irr::core::stringc{ reader->getFileName() });
+	const auto& filename = reader->getFileName();
+	cur_database = fmt::format("{}", Utils::ToUTF8IfNeeded({ filename.data(), filename.size() }));
 	sqlite3* pDB{ nullptr };
 	if(irrdb_open(reader, &pDB, SQLITE_OPEN_READONLY) != SQLITE_OK) {
 		Error(pDB);
