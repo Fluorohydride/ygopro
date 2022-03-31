@@ -104,6 +104,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 #if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	params.OGLES2ShaderPath = EPRO_TEXT("BUNDLED");
 	params.WindowResizable = true;
+	params.UseIntegratedGPU = true;
 #endif
 #ifndef __ANDROID__
 	params.WindowSize = irr::core::dimension2d<irr::u32>((irr::u32)(1024 * configs->dpi_scale), (irr::u32)(640 * configs->dpi_scale));
