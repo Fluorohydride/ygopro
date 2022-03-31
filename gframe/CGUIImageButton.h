@@ -1,7 +1,7 @@
 #ifndef _C_GUI_IMAGE_BUTTON_H_
 #define _C_GUI_IMAGE_BUTTON_H_
 
-#include <irrlicht.h>
+#include <irrlicht/irrlicht.h>
 #include "CGUIButton.h"
 
 namespace irr {

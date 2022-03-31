@@ -28,7 +28,7 @@
    john@suckerfreegames.com
 */
 
-#include <irrlicht.h>
+#include <irrlicht/irrlicht.h>
 #include "CGUITTFont.h"
 
 namespace irr {
