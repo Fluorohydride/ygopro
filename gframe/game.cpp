@@ -808,7 +808,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(wMessage, 1216);
 	wMessage->getCloseButton()->setVisible(false);
 	wMessage->setVisible(false);
-	stMessage = irr::gui::CGUICustomText::addCustomText(L"", false, env, wMessage, -1, Scale(20, 20, 350, 100));
+	stMessage = irr::gui::CGUICustomText::addCustomText(L"", false, env, wMessage, -1, Scale(10, 20, 350, 100));
 	stMessage->setWordWrap(true);
 	stMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	btnMsgOK = env->addButton(Scale(130, 105, 220, 130), wMessage, BUTTON_MSG_OK, gDataManager->GetSysString(1211).data());
