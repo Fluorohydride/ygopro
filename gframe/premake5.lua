@@ -58,6 +58,7 @@ project "ygopro"
     filter "system:macosx"
         libdirs { "../irrlicht/source/Irrlicht/MacOSX/build/Release/" }
         links { "z" }
+        defines { "GL_SILENCE_DEPRECATION" }
         if USE_IRRKLANG then
             links { "irrklang" }
             libdirs { "../irrklang/bin/macosx-gcc" }
