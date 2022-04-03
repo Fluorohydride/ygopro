@@ -322,6 +322,6 @@ project "irrlicht"
         libdirs { "$(DXSDK_DIR)Lib/x86" }
         links { "imm32" }
 
-    filter { "not system:windows" }
+    filter { "system:linux" }
         links { "X11", "Xxf86vm" }
 

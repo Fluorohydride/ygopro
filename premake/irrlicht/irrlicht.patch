@@ -717,6 +717,44 @@ index 60da342..8fd8f4a 100644
  		postEventFromUser(ievent);
  	}
  }
+diff --git a/source/Irrlicht/MacOSX/MacOSX.xcodeproj/project.pbxproj b/source/Irrlicht/MacOSX/MacOSX.xcodeproj/project.pbxproj
+index 65f4cec..d465792 100644
+--- a/source/Irrlicht/MacOSX/MacOSX.xcodeproj/project.pbxproj
++++ b/source/Irrlicht/MacOSX/MacOSX.xcodeproj/project.pbxproj
+@@ -6088,10 +6088,12 @@
+ 		1DEB922308733DC00010E9CD /* Debug */ = {
+ 			isa = XCBuildConfiguration;
+ 			buildSettings = {
+-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
++				ARCHS = "$(ARCHS_STANDARD)";
++				GCC_PREPROCESSOR_DEFINITIONS = GLES_SILENCE_DEPRECATION;
+ 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+ 				GCC_WARN_UNUSED_VARIABLE = NO;
+ 				HEADER_SEARCH_PATHS = ../../../include;
++				MACOSX_DEPLOYMENT_TARGET = 10.10;
+ 				OTHER_CFLAGS = (
+ 					"-DMACOSX",
+ 					"-D_DEBUG",
+@@ -6104,16 +6106,18 @@
+ 		1DEB922408733DC00010E9CD /* Release */ = {
+ 			isa = XCBuildConfiguration;
+ 			buildSettings = {
+-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
++				ARCHS = "$(ARCHS_STANDARD)";
+ 				GCC_DYNAMIC_NO_PIC = YES;
+ 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+ 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+ 				GCC_OPTIMIZATION_LEVEL = 3;
++				GCC_PREPROCESSOR_DEFINITIONS = GLES_SILENCE_DEPRECATION;
+ 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+ 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+ 				GCC_WARN_UNUSED_VARIABLE = NO;
+ 				HEADER_SEARCH_PATHS = ../../../include;
+ 				INSTALL_MODE_FLAG = "a+rwx";
++				MACOSX_DEPLOYMENT_TARGET = 10.10;
+ 				OTHER_CFLAGS = "-DMACOSX";
+ 				PREBINDING = NO;
+ 				SDKROOT = "";
 diff --git a/source/Irrlicht/MacOSX/OSXClipboard.h b/source/Irrlicht/MacOSX/OSXClipboard.h
 index 68f598d..9d6832d 100644
 --- a/source/Irrlicht/MacOSX/OSXClipboard.h

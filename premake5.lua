@@ -29,15 +29,6 @@ workspace "YGOPro"
         systemversion "latest"
         startproject "ygopro"
 
-    filter "action:vs2015"
-        toolset "v140_xp"
-
-    filter "action:vs2017"
-        toolset "v141_xp"
-
-    filter "action:vs2019"
-        toolset "v141_xp"
-
     filter "system:bsd"
         includedirs { "/usr/local/include" }
         libdirs { "/usr/local/lib" }
@@ -104,8 +95,6 @@ workspace "YGOPro"
     if BUILD_SQLITE then
         include "sqlite3"
     end
-    if USE_IRRKLANG then
-        if IRRKLANG_PRO then
-            include "ikpmp3"
-        end
+    if USE_IRRKLANG and IRRKLANG_PRO then
+        include "ikpmp3"
     end
