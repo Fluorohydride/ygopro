@@ -9,84 +9,83 @@ namespace ygo {
 void ClientCard::UpdateDrawCoordinates(bool setTrans) {
 	mainGame->dField.GetCardDrawCoordinates(this, &curPos, &curRot, setTrans);
 }
-void ClientCard::SetCode(uint32_t code) {
-	if((location == LOCATION_HAND) && (this->code != code)) {
-		this->code = code;
-		if(!mainGame->dInfo.isCatchingUp)
-			mainGame->dField.MoveCard(this, 5);
-	} else
-		this->code = code;
+template <typename T>
+static inline bool IsDifferent(T& what, T _new) {
+	return std::exchange(what, _new) != what;
 }
-#define CHECK_AND_SET(_query, value)if(query.flag & _query) value = query.value;
+void ClientCard::SetCode(uint32_t new_code) {
+	if(!IsDifferent(code, new_code))
+		return;
+	if(location != LOCATION_HAND)
+		return;
+	if(mainGame->dInfo.isCatchingUp)
+		return;
+	mainGame->dField.MoveCard(this, 5);
+}
+#define CHECK_AND_SET(_query, value) do { if(query.flag & _query) value = query.value; } while(0)
 void ClientCard::UpdateInfo(const CoreUtils::Query& query) {
-	CHECK_AND_SET(QUERY_ALIAS, alias)
-	CHECK_AND_SET(QUERY_TYPE, type)
-	CHECK_AND_SET(QUERY_ATTRIBUTE, attribute)
-	CHECK_AND_SET(QUERY_RACE, race)
-	CHECK_AND_SET(QUERY_BASE_ATTACK, base_attack)
-	CHECK_AND_SET(QUERY_BASE_DEFENSE, base_defense)
-	CHECK_AND_SET(QUERY_REASON, reason)
-	CHECK_AND_SET(QUERY_OWNER, owner)
-	CHECK_AND_SET(QUERY_STATUS, status)
-	CHECK_AND_SET(QUERY_COVER, cover)
-	if(query.flag & QUERY_CODE) {
-		if((location == LOCATION_HAND) && (query.code != code)) {
-			code = query.code;
-			if(!mainGame->dInfo.isCatchingUp)
-				mainGame->dField.MoveCard(this, 5);
-		} else
-			code = query.code;
-	}
+	CHECK_AND_SET(QUERY_ALIAS, alias);
+	CHECK_AND_SET(QUERY_TYPE, type);
+	CHECK_AND_SET(QUERY_ATTRIBUTE, attribute);
+	CHECK_AND_SET(QUERY_RACE, race);
+	CHECK_AND_SET(QUERY_BASE_ATTACK, base_attack);
+	CHECK_AND_SET(QUERY_BASE_DEFENSE, base_defense);
+	CHECK_AND_SET(QUERY_REASON, reason);
+	CHECK_AND_SET(QUERY_OWNER, owner);
+	CHECK_AND_SET(QUERY_STATUS, status);
+	CHECK_AND_SET(QUERY_COVER, cover);
+	if(query.flag & QUERY_CODE)
+		SetCode(query.code);
 	if(query.flag & QUERY_POSITION) {
-		if((location & (LOCATION_EXTRA | LOCATION_REMOVED)) && query.position != position) {
-			position = query.position;
+		if(IsDifferent(position, static_cast<uint8_t>(query.position)) && (location & (LOCATION_EXTRA | LOCATION_REMOVED)))
 			mainGame->dField.MoveCard(this, 1);
-		} else
-			position = query.position;
 	}
 	if(query.flag & QUERY_LEVEL) {
-		level = query.level;
-		lvstring = fmt::format(L"L{}",level);
+		if(IsDifferent(level, query.level))
+			lvstring = fmt::format(L"L{}",level);
 	}
 	if(query.flag & QUERY_RANK) {
-		rank = query.rank;
-		rkstring = fmt::format(L"R{}", rank);
+		if(IsDifferent(rank, query.rank))
+			rkstring = fmt::format(L"R{}", rank);
 	}
 	if(query.flag & QUERY_ATTACK) {
-		attack = query.attack;
-		if(attack < 0) {
-			atkstring = L"?";
-		} else
-			atkstring = fmt::to_wstring(attack);
+		if(IsDifferent(attack, query.attack)) {
+			if(attack < 0) {
+				atkstring = L"?";
+			} else
+				atkstring = fmt::to_wstring(attack);
+		}
 	}
 	if(query.flag & QUERY_DEFENSE) {
-		defense = query.defense;
-		if(type & TYPE_LINK) {
-			defstring = L"-";
-		} else if(defense < 0) {
-			defstring = L"?";
-		} else
-			defstring = fmt::to_wstring(defense);
+		if(IsDifferent(defense, query.defense)) {
+			if(type & TYPE_LINK) {
+				defstring = L"-";
+			} else if(defense < 0) {
+				defstring = L"?";
+			} else
+				defstring = fmt::to_wstring(defense);
+		}
 	}
 	/*if(query.flag & QUERY_REASON_CARD) {
 
 	}*/
 	if(query.flag & QUERY_EQUIP_CARD) {
-		ClientCard* ecard = mainGame->dField.GetCard(mainGame->LocalPlayer(query.equip_card.controler), query.equip_card.location, query.equip_card.sequence);
+		const auto& equip = query.equip_card;
+		ClientCard* ecard = mainGame->dField.GetCard(mainGame->LocalPlayer(equip.controler), equip.location, equip.sequence);
 		if(ecard) {
 			equipTarget = ecard;
 			ecard->equipped.insert(this);
 		}
 	}
 	if(query.flag & QUERY_TARGET_CARD) {
-		for(auto& card : query.target_cards) {
+		for(const auto& card : query.target_cards) {
 			ClientCard* tcard = mainGame->dField.GetCard(mainGame->LocalPlayer(card.controler), card.location, card.sequence);
 			cardTarget.insert(tcard);
 			tcard->ownerTarget.insert(this);
 		}
 	}
 	if(query.flag & QUERY_OVERLAY_CARD) {
-		int i = 0;
+		size_t i = 0;
 		for(auto& code : query.overlay_cards) {
 			overlayed[i++]->SetCode(code);
 		}
@@ -99,28 +98,21 @@ void ClientCard::UpdateInfo(const CoreUtils::Query& query) {
 		}
 	}
 	if(query.flag & QUERY_IS_PUBLIC) {
-		if(is_public != !!query.is_public && !mainGame->dInfo.isCatchingUp) {
-			is_public = query.is_public;
+		if(IsDifferent(is_public, !!query.is_public) && !mainGame->dInfo.isCatchingUp)
 			mainGame->dField.MoveCard(this, 5);
-		} else
-			is_public = query.is_public;
 	}
 	if(query.flag & QUERY_LSCALE) {
-		lscale = query.lscale;
-		lscstring = fmt::to_wstring(lscale);
+		if(IsDifferent(lscale, query.lscale))
+			lscstring = fmt::to_wstring(lscale);
 	}
 	if(query.flag & QUERY_RSCALE) {
-		rscale = query.rscale;
-		rscstring = fmt::to_wstring(rscale);
+		if(IsDifferent(rscale, query.rscale))
+			rscstring = fmt::to_wstring(rscale);
 	}
 	if(query.flag & QUERY_LINK) {
-		if (link != query.link) {
-			link = query.link;
+		if(IsDifferent(link, query.link))
 			linkstring = fmt::format(L"L{}", link);
-		}
-		if (link_marker != query.link_marker) {
-			link_marker = query.link_marker;
-		}
+		link_marker = query.link_marker;
 	}
 }
 void ClientCard::ClearTarget() {

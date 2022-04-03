@@ -81,7 +81,7 @@ public:
 	std::wstring rscstring;
 
 	void UpdateDrawCoordinates(bool setTrans = false);
-	void SetCode(uint32_t code);
+	void SetCode(uint32_t new_code);
 	void UpdateInfo(const CoreUtils::Query& query);
 	void ClearTarget();
 	static bool client_card_sort(ClientCard* c1, ClientCard* c2);
