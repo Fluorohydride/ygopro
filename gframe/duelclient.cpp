@@ -2026,7 +2026,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else pcard->dRot = irr::core::vector3df(0, 0, 0);
 			pcard->is_moving = true;
 			pcard->aniFrame = 5;
-			mainGame->WaitFrameSignal(45);
+			mainGame->WaitFrameSignal(count > 5 ? 12 : 45);
 			mainGame->dField.MoveCard(pcard, 5);
 			mainGame->WaitFrameSignal(5);
 		}

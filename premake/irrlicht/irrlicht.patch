@@ -1,0 +1,818 @@
+diff --git a/include/IOSOperator.h b/include/IOSOperator.h
+index 2ab75a1..b574950 100644
+--- a/include/IOSOperator.h
++++ b/include/IOSOperator.h
+@@ -26,11 +26,11 @@ public:
+ 	}
+ 
+ 	//! Copies text to the clipboard
+-	virtual void copyToClipboard(const c8* text) const = 0;
++	virtual void copyToClipboard(const c16* text) const = 0;
+ 
+ 	//! Get text from the clipboard
+ 	/** \return Returns 0 if no string is in there. */
+-	virtual const c8* getTextFromClipboard() const = 0;
++	virtual const c16* getTextFromClipboard() const = 0;
+ 
+ 	//! Get the processor speed in megahertz
+ 	/** \param MHz The integer variable to store the speed in.
+diff --git a/include/irrString.h b/include/irrString.h
+index 43557cd..ffa06bc 100644
+--- a/include/irrString.h
++++ b/include/irrString.h
+@@ -1360,6 +1360,15 @@ typedef string<c8> stringc;
+ //! Typedef for wide character strings
+ typedef string<wchar_t> stringw;
+ 
++//! wrap of mbstowcs
++static inline wchar_t* toWideChar(const char* p)
++{
++	size_t lenOld = strlen(p);
++	wchar_t* ws = new wchar_t[lenOld + 1];
++	size_t lenNew = mbstowcs(ws, p, lenOld);
++	ws[lenNew] = 0;
++	return ws;
++}
+ 
+ } // end namespace core
+ } // end namespace irr
+diff --git a/include/irrTypes.h b/include/irrTypes.h
+index 403f890..940e859 100644
+--- a/include/irrTypes.h
++++ b/include/irrTypes.h
+@@ -48,6 +48,9 @@ typedef __int16			s16;
+ typedef signed short		s16;
+ #endif
+ 
++//! 16 bit character variable.
++/** This is a typedef for wchar_t, it ensures portability of the engine. */
++typedef wchar_t			c16;
+ 
+ 
+ //! 32 bit unsigned variable.
+diff --git a/source/Irrlicht/CGUIEditBox.cpp b/source/Irrlicht/CGUIEditBox.cpp
+index 395fb69..cc6b75f 100644
+--- a/source/Irrlicht/CGUIEditBox.cpp
++++ b/source/Irrlicht/CGUIEditBox.cpp
+@@ -287,7 +287,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
+ 				const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
+ 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
+ 
+-				core::stringc s;
++				core::stringw s;
+ 				s = Text.subString(realmbgn, realmend - realmbgn).c_str();
+ 				Operator->copyToClipboard(s.c_str());
+ 			}
+@@ -300,7 +300,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
+ 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
+ 
+ 				// copy
+-				core::stringc sc;
++				core::stringw sc;
+ 				sc = Text.subString(realmbgn, realmend - realmbgn).c_str();
+ 				Operator->copyToClipboard(sc.c_str());
+ 
+@@ -330,16 +330,10 @@ bool CGUIEditBox::processKey(const SEvent& event)
+ 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
+ 
+ 				// add new character
+-				const c8* p = Operator->getTextFromClipboard();
++				const c16* p = Operator->getTextFromClipboard();
+ 				if (p)
+ 				{
+-					// TODO: we should have such a function in core::string
+-					size_t lenOld = strlen(p);
+-					wchar_t *ws = new wchar_t[lenOld + 1];
+-					size_t len = mbstowcs(ws,p,lenOld);
+-					ws[len] = 0;
+-					irr::core::stringw widep(ws);
+-					delete[] ws;
++					irr::core::stringw widep(p);
+ 
+ 					if (MarkBegin == MarkEnd)
+ 					{
+@@ -664,6 +658,16 @@ bool CGUIEditBox::processKey(const SEvent& event)
+ 	case KEY_ESCAPE:
+ 	case KEY_TAB:
+ 	case KEY_SHIFT:
++	case KEY_LSHIFT:
++	case KEY_RSHIFT:
++	case KEY_MENU:
++	case KEY_LMENU:
++	case KEY_RMENU:
++	case KEY_LWIN:
++	case KEY_RWIN:
++	case KEY_CAPITAL:
++	case KEY_NUMLOCK:
++	case KEY_SCROLL:
+ 	case KEY_F1:
+ 	case KEY_F2:
+ 	case KEY_F3:
+diff --git a/source/Irrlicht/CGUIListBox.cpp b/source/Irrlicht/CGUIListBox.cpp
+index 2c19a43..eb834a4 100644
+--- a/source/Irrlicht/CGUIListBox.cpp
++++ b/source/Irrlicht/CGUIListBox.cpp
+@@ -425,7 +425,7 @@ bool CGUIListBox::OnEvent(const SEvent& event)
+ 				}
+ 
+ 				case EMIE_MOUSE_MOVED:
+-					if (Selecting || MoveOverSelect)
++					if (MoveOverSelect)
+ 					{
+ 						if (isPointInside(p))
+ 						{
+diff --git a/source/Irrlicht/CIrrDeviceLinux.cpp b/source/Irrlicht/CIrrDeviceLinux.cpp
+index 39b1888..d359957 100644
+--- a/source/Irrlicht/CIrrDeviceLinux.cpp
++++ b/source/Irrlicht/CIrrDeviceLinux.cpp
+@@ -63,6 +63,7 @@ namespace
+ 	Atom X_ATOM_TARGETS;
+ 	Atom X_ATOM_UTF8_STRING;
+ 	Atom X_ATOM_TEXT;
++	Atom X_ATOM_XSEL_DATA;
+ };
+ 
+ namespace irr
+@@ -1106,11 +1107,14 @@ bool CIrrDeviceLinux::run()
+ 				{
+ 					XEvent respond;
+ 					XSelectionRequestEvent *req = &(event.xselectionrequest);
+-					if (  req->target == XA_STRING)
++					if ( req->target == XA_STRING
++						|| req->target == X_ATOM_TEXT
++						|| req->target == X_ATOM_UTF8_STRING )
+ 					{
+ 						XChangeProperty (display,
+ 								req->requestor,
+-								req->property, req->target,
++								req->property,
++								req->target == X_ATOM_TEXT ? XA_STRING : req->target,
+ 								8, // format
+ 								PropModeReplace,
+ 								(unsigned char*) Clipboard.c_str(),
+@@ -1124,11 +1128,14 @@ bool CIrrDeviceLinux::run()
+ 						data[0] = X_ATOM_TEXT;
+ 						data[1] = XA_STRING;
+ 
+-						XChangeProperty (display, req->requestor,
+-								req->property, req->target,
+-								8, PropModeReplace,
+-								(unsigned char *) &data,
+-								sizeof (data));
++						XChangeProperty (display,
++								req->requestor,
++								req->property,
++								XA_ATOM,
++								32, // format
++								PropModeReplace,
++								(unsigned char *) &X_ATOM_UTF8_STRING,
++								1);
+ 						respond.xselection.property = req->property;
+ 					}
+ 					else
+@@ -1875,34 +1882,36 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
+ 	Clipboard = "";
+ 	if (ownerWindow != None )
+ 	{
+-		XConvertSelection (display, X_ATOM_CLIPBOARD, XA_STRING, XA_PRIMARY, ownerWindow, CurrentTime);
+-		XFlush (display);
+-
+-		// check for data
+-		Atom type;
+-		int format;
+-		unsigned long numItems, bytesLeft, dummy;
+-		unsigned char *data;
+-		XGetWindowProperty (display, ownerWindow,
+-				XA_PRIMARY, // property name
+-				0, // offset
+-				0, // length (we only check for data, so 0)
++		XConvertSelection (display, X_ATOM_CLIPBOARD, X_ATOM_UTF8_STRING, X_ATOM_XSEL_DATA, window, CurrentTime);
++		XSync (display, 0);
++		XEvent event;
++		do nanosleep ((const struct timespec[]){{0, 1L}}, NULL);
++		while (!XCheckTypedEvent (display, SelectionNotify, &event));
++		if ( (event.xselection.selection == X_ATOM_CLIPBOARD) && event.xselection.property )
++		{
++			Atom type;
++			int format;
++			unsigned long size, dummy;
++			unsigned char *data;
++			int result = XGetWindowProperty (event.xselection.display,
++				event.xselection.requestor,
++				event.xselection.property,
++				0L,  // offset
++				(~0L), // length (max)
+ 				0, // Delete 0==false
+ 				AnyPropertyType, // AnyPropertyType or property identifier
+ 				&type, // return type
+ 				&format, // return format
+-				&numItems, // number items
+-				&bytesLeft, // remaining bytes for partial reads
++				&size, // number items
++				&dummy, // remaining bytes for partial reads
+ 				&data); // data
+-		if ( bytesLeft > 0 )
+-		{
+-			// there is some data to get
+-			int result = XGetWindowProperty (display, ownerWindow, XA_PRIMARY, 0,
+-										bytesLeft, 0, AnyPropertyType, &type, &format,
+-										&numItems, &dummy, &data);
+-			if (result == Success)
+-				Clipboard = (irr::c8*)data;
+-			XFree (data);
++			if ( result == Success
++				&& (type == X_ATOM_UTF8_STRING || type == XA_STRING) ) // not implemented: INCR (partial reads)
++			{
++				Clipboard = strndup((char*)data, size);
++				XFree (data);
++			}
++			XDeleteProperty (event.xselection.display, event.xselection.requestor, event.xselection.property);
+ 		}
+ 	}
+ 
+@@ -1966,6 +1975,7 @@ void CIrrDeviceLinux::initXAtoms()
+ 	X_ATOM_TARGETS = XInternAtom(display, "TARGETS", False);
+ 	X_ATOM_UTF8_STRING = XInternAtom (display, "UTF8_STRING", False);
+ 	X_ATOM_TEXT = XInternAtom (display, "TEXT", False);
++	X_ATOM_XSEL_DATA = XInternAtom (display, "XSEL_DATA", False);
+ #endif
+ }
+ 
+diff --git a/source/Irrlicht/CIrrDeviceWin32.cpp b/source/Irrlicht/CIrrDeviceWin32.cpp
+index 28290cb..76dfea1 100644
+--- a/source/Irrlicht/CIrrDeviceWin32.cpp
++++ b/source/Irrlicht/CIrrDeviceWin32.cpp
+@@ -20,6 +20,8 @@
+ #include "COSOperator.h"
+ #include "dimension2d.h"
+ #include "IGUISpriteBank.h"
++#include "IGUIEnvironment.h"
++#include "IGUIElement.h"
+ #include <winuser.h>
+ #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
+ #ifdef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
+@@ -749,6 +751,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+ 		return 0;
+ 	}
+ 
++	dev = getDeviceFromHWnd(hWnd);
++	if (dev)
++	{
++		irr::gui::IGUIElement* ele = dev->getGUIEnvironment()->getFocus();
++		if (!ele || (ele->getType() != irr::gui::EGUIET_EDIT_BOX) || !ele->isEnabled())
++		{
++			HIMC hIMC = ImmGetContext(hWnd);
++			if (hIMC)
++			{
++				ImmNotifyIME(hIMC, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
++				ImmReleaseContext(hWnd, hIMC);
++			}
++			ImmAssociateContextEx(hWnd, NULL, 0);
++		}
++		else
++			ImmAssociateContextEx(hWnd, NULL, IACE_DEFAULT);
++	}
++
+ 	switch (message)
+ 	{
+ 	case WM_PAINT:
+@@ -773,7 +793,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+ 			event.KeyInput.Key = (irr::EKEY_CODE)wParam;
+ 			event.KeyInput.PressedDown = (message==WM_KEYDOWN || message == WM_SYSKEYDOWN);
+ 
++#ifdef MAPVK_VSC_TO_VK_EX
++			const UINT MY_MAPVK_VSC_TO_VK_EX = MAPVK_VSC_TO_VK_EX;
++#else
+ 			const UINT MY_MAPVK_VSC_TO_VK_EX = 3; // MAPVK_VSC_TO_VK_EX should be in SDK according to MSDN, but isn't in mine.
++#endif
+ 			if ( event.KeyInput.Key == irr::KEY_SHIFT )
+ 			{
+ 				// this will fail on systems before windows NT/2000/XP, not sure _what_ will return there instead.
+@@ -904,6 +928,53 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+ 		KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
+ 		KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage( LOWORD(KEYBOARD_INPUT_HKL) );
+ 		return 0;
++
++	case WM_IME_STARTCOMPOSITION:
++		{
++			dev = getDeviceFromHWnd(hWnd);
++			irr::gui::IGUIElement* ele = dev->getGUIEnvironment()->getFocus();
++			if (!ele)
++				break;
++			irr::core::position2di pos = ele->getAbsolutePosition().UpperLeftCorner;
++			COMPOSITIONFORM CompForm = { CFS_POINT, { pos.X, pos.Y + ele->getAbsolutePosition().getHeight() } };
++			HIMC hIMC = ImmGetContext(hWnd);
++			ImmSetCompositionWindow(hIMC, &CompForm);
++			ImmReleaseContext(hWnd, hIMC);
++		}
++		break;
++
++	case WM_IME_CHAR:
++		event.EventType = irr::EET_KEY_INPUT_EVENT;
++		event.KeyInput.PressedDown = true;
++#ifdef _UNICODE
++		event.KeyInput.Char = wParam;
++#else
++		BYTE ch[3];
++		if (wParam >> 8) {
++			ch[0] = wParam >> 8;
++			ch[1] = wParam & 0xff;
++			ch[2] = 0;
++		} else {
++			ch[0] = wParam;
++			ch[1] = 0;
++		}
++		WORD unicodeChar;
++		MultiByteToWideChar(
++			KEYBOARD_INPUT_CODEPAGE,
++			MB_PRECOMPOSED, // default
++			(LPCSTR)ch,
++			sizeof(wParam),
++			(WCHAR*)&unicodeChar,
++			1);
++		event.KeyInput.Char = unicodeChar;
++#endif
++		event.KeyInput.Key = irr::KEY_ACCEPT;
++		event.KeyInput.Shift = 0;
++		event.KeyInput.Control = 0;
++		dev = getDeviceFromHWnd(hWnd);
++		if (dev)
++			dev->postEventFromUser(event);
++		return 0;
+ 	}
+ 	return DefWindowProc(hWnd, message, wParam, lParam);
+ }
+@@ -1797,8 +1868,8 @@ void CIrrDeviceWin32::handleSystemMessages()
+ 
+ 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+ 	{
+-		// No message translation because we don't use WM_CHAR and it would conflict with our
+-		// deadkey handling.
++		// conflict with deadkey handling.
++		TranslateMessage(&msg);
+ 
+ 		if (ExternalWindow && msg.hwnd == HWnd)
+ 			WndProc(HWnd, msg.message, msg.wParam, msg.lParam);
+diff --git a/source/Irrlicht/COSOperator.cpp b/source/Irrlicht/COSOperator.cpp
+index c5e4552..3b00628 100644
+--- a/source/Irrlicht/COSOperator.cpp
++++ b/source/Irrlicht/COSOperator.cpp
+@@ -9,6 +9,7 @@
+ #include <windows.h>
+ #endif
+ #else
++#include <locale.h>
+ #include <string.h>
+ #include <unistd.h>
+ #ifndef _IRR_SOLARIS_PLATFORM_
+@@ -54,9 +55,10 @@ const core::stringc& COSOperator::getOperatingSystemVersion() const
+ 
+ 
+ //! copies text to the clipboard
+-void COSOperator::copyToClipboard(const c8* text) const
++void COSOperator::copyToClipboard(const c16* text) const
+ {
+-	if (strlen(text)==0)
++	size_t len = wcslen(text);
++	if (len==0)
+ 		return;
+ 
+ // Windows version
+@@ -68,15 +70,15 @@ void COSOperator::copyToClipboard(const c8* text) const
+ 	EmptyClipboard();
+ 
+ 	HGLOBAL clipbuffer;
+-	char * buffer;
++	wchar_t * buffer;
+ 
+-	clipbuffer = GlobalAlloc(GMEM_DDESHARE, strlen(text)+1);
+-	buffer = (char*)GlobalLock(clipbuffer);
++	clipbuffer = GlobalAlloc(GMEM_DDESHARE, sizeof(wchar_t) * (len + 1));
++	buffer = (wchar_t*)GlobalLock(clipbuffer);
+ 
+-	strcpy(buffer, text);
++	wcscpy(buffer, text);
+ 
+ 	GlobalUnlock(clipbuffer);
+-	SetClipboardData(CF_TEXT, clipbuffer);
++	SetClipboardData(CF_UNICODETEXT, clipbuffer);
+ 	CloseClipboard();
+ 
+ // MacOSX version
+@@ -86,7 +88,18 @@ void COSOperator::copyToClipboard(const c8* text) const
+ 
+ #elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+     if ( IrrDeviceLinux )
+-        IrrDeviceLinux->copyToClipboard(text);
++	{
++		size_t wlen = sizeof(wchar_t) * (len + 1);
++		char ctext[wlen];
++
++		char* oldLocale = setlocale(LC_CTYPE, NULL);
++		setlocale(LC_CTYPE, "");
++		size_t lenNew = wcstombs(ctext, text, wlen);
++		ctext[lenNew] = 0;
++		setlocale(LC_CTYPE, oldLocale);
++
++		IrrDeviceLinux->copyToClipboard(ctext);
++	}
+ #else
+ 
+ #endif
+@@ -95,7 +108,7 @@ void COSOperator::copyToClipboard(const c8* text) const
+ 
+ //! gets text from the clipboard
+ //! \return Returns 0 if no string is in there.
+-const c8* COSOperator::getTextFromClipboard() const
++const c16* COSOperator::getTextFromClipboard() const
+ {
+ #if defined(_IRR_XBOX_PLATFORM_)
+ 		return 0;
+@@ -103,10 +116,10 @@ const c8* COSOperator::getTextFromClipboard() const
+ 	if (!OpenClipboard(NULL))
+ 		return 0;
+ 
+-	char * buffer = 0;
++	wchar_t * buffer = 0;
+ 
+-	HANDLE hData = GetClipboardData( CF_TEXT );
+-	buffer = (char*)GlobalLock( hData );
++	HANDLE hData = GetClipboardData( CF_UNICODETEXT );
++	buffer = (wchar_t*)GlobalLock( hData );
+ 	GlobalUnlock( hData );
+ 	CloseClipboard();
+ 	return buffer;
+@@ -116,7 +129,16 @@ const c8* COSOperator::getTextFromClipboard() const
+ 
+ #elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+     if ( IrrDeviceLinux )
+-        return IrrDeviceLinux->getTextFromClipboard();
++	{
++		const c8 * p = IrrDeviceLinux->getTextFromClipboard();
++
++		char* oldLocale = setlocale(LC_CTYPE, NULL);
++		setlocale(LC_CTYPE, "");
++		wchar_t* ws = core::toWideChar(p);
++		setlocale(LC_CTYPE, oldLocale);
++
++		return ws;
++	}
+     return 0;
+ 
+ #else
+diff --git a/source/Irrlicht/COSOperator.h b/source/Irrlicht/COSOperator.h
+index 819805f..a86cb6e 100644
+--- a/source/Irrlicht/COSOperator.h
++++ b/source/Irrlicht/COSOperator.h
+@@ -27,11 +27,11 @@ public:
+ 	virtual const core::stringc& getOperatingSystemVersion() const;
+ 
+ 	//! copies text to the clipboard
+-	virtual void copyToClipboard(const c8* text) const;
++	virtual void copyToClipboard(const c16* text) const;
+ 
+ 	//! gets text from the clipboard
+ 	//! \return Returns 0 if no string is in there.
+-	virtual const c8* getTextFromClipboard() const;
++	virtual const c16* getTextFromClipboard() const;
+ 
+ 	//! gets the processor speed in megahertz
+ 	//! \param Mhz:
+diff --git a/source/Irrlicht/MacOSX/AppDelegate.h b/source/Irrlicht/MacOSX/AppDelegate.h
+index ccb116d..29705f2 100644
+--- a/source/Irrlicht/MacOSX/AppDelegate.h
++++ b/source/Irrlicht/MacOSX/AppDelegate.h
+@@ -10,7 +10,7 @@
+ #import <Cocoa/Cocoa.h>
+ #import "CIrrDeviceMacOSX.h"
+ 
+-@interface AppDelegate : NSObject
++@interface AppDelegate : NSTextView <NSApplicationDelegate>
+ {
+ 	BOOL			_quit;
+ 	irr::CIrrDeviceMacOSX	*_device;
+diff --git a/source/Irrlicht/MacOSX/AppDelegate.mm b/source/Irrlicht/MacOSX/AppDelegate.mm
+index 14a7f86..37f6a51 100644
+--- a/source/Irrlicht/MacOSX/AppDelegate.mm
++++ b/source/Irrlicht/MacOSX/AppDelegate.mm
+@@ -74,6 +74,35 @@
+ 	return (_quit);
+ }
+ 
++- (void)keyDown:(NSEvent *)event
++{
++	[self interpretKeyEvents:@[event]];
++}
++
++- (void)insertText:(id)string
++{
++	[self setString: @""];
++	if ([string isKindOfClass:[NSAttributedString class]])
++	{
++		_device->handleInputEvent([[string string] UTF8String]);
++	}
++	else
++	{
++		_device->handleInputEvent([string UTF8String]);
++	}
++}
++
++- (void)doCommandBySelector:(SEL)selector
++{
++	_device->processKeyEvent();
++}
++
++- (void)paste:(id)sender
++{
++	// TODO: pass the pasted string. Now we discard it otherwise it will be kept in the editbox.
++	[self setString: @""];
++}
++
+ @end
+ 
+ #endif // _IRR_COMPILE_WITH_OSX_DEVICE_
+diff --git a/source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h b/source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h
+index f629588..d2fefae 100644
+--- a/source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h
++++ b/source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h
+@@ -95,6 +95,8 @@ namespace irr
+ 		void setMouseLocation(int x, int y);
+ 		void setResize(int width, int height);
+ 		void setCursorVisible(bool visible);
++		void handleInputEvent(const char *str);
++		void processKeyEvent();
+ 
+ 	private:
+ 
+diff --git a/source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm b/source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm
+index 60da342..8fd8f4a 100644
+--- a/source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm
++++ b/source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm
+@@ -592,6 +592,31 @@ void CIrrDeviceMacOSX::closeDevice()
+ 	CGLContext = NULL;
+ }
+ 
++void CIrrDeviceMacOSX::processKeyEvent()
++{
++	irr::SEvent ievent;
++	NSEvent *event = [[NSApplication sharedApplication] currentEvent];
++	postKeyEvent(event, ievent, true);
++}
++
++void CIrrDeviceMacOSX::handleInputEvent(const char *cStr)
++{
++	SEvent ievent;
++	irr::core::stringw widep(irr::core::toWideChar(cStr));
++
++	ievent.EventType = irr::EET_KEY_INPUT_EVENT;
++	ievent.KeyInput.Key = (irr::EKEY_CODE)0;
++	ievent.KeyInput.PressedDown = true;
++	ievent.KeyInput.Shift = false;
++	ievent.KeyInput.Control = false;
++
++	for (int i = 0; i < widep.size(); ++i)
++	{
++		ievent.KeyInput.Char = widep[i];
++		postEventFromUser(ievent);
++	}
++}
++
+ bool CIrrDeviceMacOSX::createWindow()
+ {
+ 	CGDisplayErr error;
+@@ -721,14 +746,20 @@ bool CIrrDeviceMacOSX::createWindow()
+ 						[Window setDelegate:(id<NSWindowDelegate>)[NSApp delegate]];
+ 
+ 						if(CreationParams.DriverType == video::EDT_OPENGL)
++						{
++							[[Window contentView] setWantsBestResolutionOpenGLSurface:NO];
+ 							[OGLContext setView:[Window contentView]];
++						}
+ 
+ 						[Window setAcceptsMouseMovedEvents:TRUE];
+ 						[Window setIsVisible:TRUE];
+ 						[Window makeKeyAndOrderFront:nil];
+ 					}
+ 					else if(CreationParams.DriverType == video::EDT_OPENGL) //use another window for drawing
++					{
++						[(NSView*)CreationParams.WindowId setWantsBestResolutionOpenGLSurface:NO];
+ 						[OGLContext setView:(NSView*)CreationParams.WindowId];
++					}
+ 
+ 					if (CreationParams.DriverType == video::EDT_OPENGL)
+ 						CGLContext = (CGLContextObj) [OGLContext CGLContextObj];
+@@ -881,6 +912,8 @@ bool CIrrDeviceMacOSX::createWindow()
+ 			newSwapInterval = (CreationParams.Vsync) ? 1 : 0;
+ 			CGLSetParameter(CGLContext,kCGLCPSwapInterval,&newSwapInterval);
+ 		}
++
++		[[Window contentView] addSubview:(AppDelegate*)[NSApp delegate]];
+ 	}
+ 
+ 	return (result);
+@@ -971,6 +1004,41 @@ bool CIrrDeviceMacOSX::run()
+ 	os::Timer::tick();
+ 	storeMouseLocation();
+ 
++	auto focusElement = getGUIEnvironment()->getFocus();
++	bool editing = focusElement && focusElement->getType() == irr::gui::EGUIET_EDIT_BOX;
++	auto textView = (NSTextView*)[NSApp delegate];
++
++	if (!editing)
++	{
++		[textView setHidden:YES];
++		[Window makeFirstResponder:nil];
++	}
++	else
++	{
++		auto crect = focusElement->getAbsolutePosition();
++
++		// ensure font height enough to fill the rect, otherwize ime window will overlaps the edit box
++		[textView setFont:[NSFont userFontOfSize:crect.getHeight() - 5]];
++
++		// change origin from top left to bottom right
++		auto frameHeight = [[textView superview] frame].size.height;
++		NSRect rect = {
++			(frameHeight - crect.LowerRightCorner.Y > crect.getHeight()) ?
++				crect.UpperLeftCorner.X :
++				crect.UpperLeftCorner.X + crect.getWidth() / 2,
++			(frameHeight - crect.LowerRightCorner.Y > crect.getHeight()) ?
++				frameHeight - crect.LowerRightCorner.Y - crect.getHeight() - 1 :
++				frameHeight - crect.LowerRightCorner.Y,
++			crect.getWidth() / 2,
++			crect.getHeight(),
++		};
++		[textView setFrame:rect];
++		[textView setHidden:NO];
++
++		// start to receive input events
++		[Window makeFirstResponder:textView];
++	}
++
+ 	event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:[NSDate distantPast] inMode:NSDefaultRunLoopMode dequeue:YES];
+ 	if (event != nil)
+ 	{
+@@ -979,6 +1047,13 @@ bool CIrrDeviceMacOSX::run()
+ 		switch([(NSEvent *)event type])
+ 		{
+ 			case NSKeyDown:
++				if (editing)
++				{
++					// delegate to text edit control to handle text input
++					[NSApp sendEvent:event];
++					break;
++				}
++
+ 				postKeyEvent(event,ievent,true);
+ 				break;
+ 
+@@ -1174,13 +1249,11 @@ void CIrrDeviceMacOSX::postKeyEvent(void *event,irr::SEvent &ievent,bool pressed
+ 	std::map<int,int>::const_iterator iter;
+ 	unsigned int result,c,mkey,mchar;
+ 	const unsigned char *cStr;
+-	BOOL skipCommand;
+ 
+ 	str = [(NSEvent *)event characters];
+ 	if ((str != nil) && ([str length] > 0))
+ 	{
+ 		mkey = mchar = 0;
+-		skipCommand = false;
+ 		c = [str characterAtIndex:0];
+ 		mchar = c;
+ 
+@@ -1199,19 +1272,11 @@ void CIrrDeviceMacOSX::postKeyEvent(void *event,irr::SEvent &ievent,bool pressed
+ 			}
+ 			else
+ 			{
+-				cStr = (unsigned char *)[str cStringUsingEncoding:NSWindowsCP1252StringEncoding];
++				cStr = (unsigned char *)[str UTF8String];
+ 				if (cStr != NULL && strlen((char*)cStr) > 0)
+ 				{
+ 					mchar = cStr[0];
+ 					mkey = toupper(mchar);
+-					if ([(NSEvent *)event modifierFlags] & NSCommandKeyMask)
+-					{
+-						if (mkey == 'C' || mkey == 'V' || mkey == 'X')
+-						{
+-							mchar = 0;
+-							skipCommand = true;
+-						}
+-					}
+ 				}
+ 			}
+ 		}
+@@ -1220,14 +1285,9 @@ void CIrrDeviceMacOSX::postKeyEvent(void *event,irr::SEvent &ievent,bool pressed
+ 		ievent.KeyInput.Key = (irr::EKEY_CODE)mkey;
+ 		ievent.KeyInput.PressedDown = pressed;
+ 		ievent.KeyInput.Shift = ([(NSEvent *)event modifierFlags] & NSShiftKeyMask) != 0;
+-		ievent.KeyInput.Control = ([(NSEvent *)event modifierFlags] & NSControlKeyMask) != 0;
++		ievent.KeyInput.Control = ([(NSEvent *)event modifierFlags] & (NSControlKeyMask | NSCommandKeyMask)) != 0;
+ 		ievent.KeyInput.Char = mchar;
+ 
+-		if (skipCommand)
+-			ievent.KeyInput.Control = true;
+-		else if ([(NSEvent *)event modifierFlags] & NSCommandKeyMask)
+-			[NSApp sendEvent:(NSEvent *)event];
+-
+ 		postEventFromUser(ievent);
+ 	}
+ }
+diff --git a/source/Irrlicht/MacOSX/MacOSX.xcodeproj/project.pbxproj b/source/Irrlicht/MacOSX/MacOSX.xcodeproj/project.pbxproj
+index 65f4cec..d465792 100644
+--- a/source/Irrlicht/MacOSX/MacOSX.xcodeproj/project.pbxproj
++++ b/source/Irrlicht/MacOSX/MacOSX.xcodeproj/project.pbxproj
+@@ -6088,10 +6088,12 @@
+ 		1DEB922308733DC00010E9CD /* Debug */ = {
+ 			isa = XCBuildConfiguration;
+ 			buildSettings = {
+-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
++				ARCHS = "$(ARCHS_STANDARD)";
++				GCC_PREPROCESSOR_DEFINITIONS = GLES_SILENCE_DEPRECATION;
+ 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+ 				GCC_WARN_UNUSED_VARIABLE = NO;
+ 				HEADER_SEARCH_PATHS = ../../../include;
++				MACOSX_DEPLOYMENT_TARGET = 10.10;
+ 				OTHER_CFLAGS = (
+ 					"-DMACOSX",
+ 					"-D_DEBUG",
+@@ -6104,16 +6106,18 @@
+ 		1DEB922408733DC00010E9CD /* Release */ = {
+ 			isa = XCBuildConfiguration;
+ 			buildSettings = {
+-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
++				ARCHS = "$(ARCHS_STANDARD)";
+ 				GCC_DYNAMIC_NO_PIC = YES;
+ 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+ 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+ 				GCC_OPTIMIZATION_LEVEL = 3;
++				GCC_PREPROCESSOR_DEFINITIONS = GLES_SILENCE_DEPRECATION;
+ 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+ 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+ 				GCC_WARN_UNUSED_VARIABLE = NO;
+ 				HEADER_SEARCH_PATHS = ../../../include;
+ 				INSTALL_MODE_FLAG = "a+rwx";
++				MACOSX_DEPLOYMENT_TARGET = 10.10;
+ 				OTHER_CFLAGS = "-DMACOSX";
+ 				PREBINDING = NO;
+ 				SDKROOT = "";
+diff --git a/source/Irrlicht/MacOSX/OSXClipboard.h b/source/Irrlicht/MacOSX/OSXClipboard.h
+index 68f598d..9d6832d 100644
+--- a/source/Irrlicht/MacOSX/OSXClipboard.h
++++ b/source/Irrlicht/MacOSX/OSXClipboard.h
+@@ -7,8 +7,8 @@
+ extern "C" {
+ #endif
+ 
+-	void	OSXCopyToClipboard(const char *text);
+-	char*	OSXCopyFromClipboard();
++	void	OSXCopyToClipboard(const wchar_t *text);
++	wchar_t*	OSXCopyFromClipboard();
+ 
+ #ifdef __cplusplus
+ }
+diff --git a/source/Irrlicht/MacOSX/OSXClipboard.mm b/source/Irrlicht/MacOSX/OSXClipboard.mm
+index d549911..1c9dc0f 100644
+--- a/source/Irrlicht/MacOSX/OSXClipboard.mm
++++ b/source/Irrlicht/MacOSX/OSXClipboard.mm
+@@ -3,34 +3,35 @@
+ // This file is part of the "Irrlicht Engine".
+ // For conditions of distribution and use, see copyright notice in Irrlicht.h
+ 
++#include "irrString.h"
+ #include "OSXClipboard.h"
+ #import <Cocoa/Cocoa.h>
+ 
+-void OSXCopyToClipboard(const char *text)
++void OSXCopyToClipboard(const wchar_t *text)
+ {
+ 	NSString *str;
+ 	NSPasteboard *board;
+ 
+-	if ((text != NULL) && (strlen(text) > 0))
++	if ((text != NULL) && (wcslen(text) > 0))
+ 	{
+-		str = [NSString stringWithCString:text encoding:NSWindowsCP1252StringEncoding];
++		str = [[NSString alloc] initWithBytes:text length:wcslen(text)*sizeof(*text) encoding:NSUTF32LittleEndianStringEncoding];
+ 		board = [NSPasteboard generalPasteboard];
+ 		[board declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:NSApp];
+ 		[board setString:str forType:NSStringPboardType];
+ 	}
+ }
+ 
+-char* OSXCopyFromClipboard()
++wchar_t* OSXCopyFromClipboard()
+ {
+ 	NSString* str;
+ 	NSPasteboard* board;
+-	char* result;
++	wchar_t* result;
+ 
+ 	result = NULL;
+ 	board = [NSPasteboard generalPasteboard];
+ 	str = [board stringForType:NSStringPboardType];
+ 	if (str != nil)
+-		result = (char*)[str cStringUsingEncoding:NSWindowsCP1252StringEncoding];
++		result = (wchar_t*)[str cStringUsingEncoding:NSUTF32LittleEndianStringEncoding];
+ 	return (result);
+ }
+ 

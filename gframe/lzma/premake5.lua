@@ -1,3 +1,3 @@
 project "clzma"
     kind "StaticLib"
-    files { "**.c", "**.h" }
+    files { "*.c", "*.h" }

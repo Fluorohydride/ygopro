@@ -31,6 +31,9 @@ bool Game::Initialize() {
 		ErrorLog("Failed to create Irrlicht Engine device!");
 		return false;
 	}
+#ifndef _DEBUG
+	device->getLogger()->setLogLevel(irr::ELOG_LEVEL::ELL_ERROR);
+#endif
 	xScale = 1;
 	yScale = 1;
 	linePatternD3D = 0;
