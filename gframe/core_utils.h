@@ -31,10 +31,14 @@ public:
 	auto buff_size() const { return buffer.size(); }
 };
 class PacketStream {
-public:
 	std::vector<Packet> packets;
+public:
 	PacketStream() {}
 	PacketStream(uint8_t* buf, uint32_t len);
+	auto begin() { return packets.begin(); }
+	auto begin() const { return packets.begin(); }
+	auto end() { return packets.end(); }
+	auto end() const { return packets.end(); }
 };
 struct loc_info {
 	uint8_t controler;

@@ -735,9 +735,8 @@ void GenericDuel::Process() {
 	int stop = 0;
 	do {
 		engFlag = OCG_DuelProcess(pduel);
-		auto msg = CoreUtils::ParseMessages(pduel);
-		for(auto& message : msg.packets) {
-			stop = Analyze(message);
+		for(auto& message : CoreUtils::ParseMessages(pduel)) {
+			stop = Analyze(std::move(message));
 			if(stop)
 				break;
 		}

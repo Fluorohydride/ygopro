@@ -228,15 +228,13 @@ restart:
 	is_closing = false;
 	is_continuing = true;
 	int engFlag = 0;
-	auto msg = CoreUtils::ParseMessages(pduel);
-	for(auto& message : msg.packets)
+	for(auto& message : CoreUtils::ParseMessages(pduel))
 		is_continuing = SinglePlayAnalyze(message) && is_continuing;
 	if(is_continuing) {
 		OCG_StartDuel(pduel);
 		do {
 			engFlag = OCG_DuelProcess(pduel);
-			msg = CoreUtils::ParseMessages(pduel);
-			for(auto& message : msg.packets) {
+			for(auto& message : CoreUtils::ParseMessages(pduel)) {
 				if(message.message == MSG_WIN && hand_test)
 					continue;
 				is_continuing = SinglePlayAnalyze(message) && is_continuing;
