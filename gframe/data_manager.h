@@ -89,10 +89,10 @@ struct CardString {
 class CardDataM {
 public:
 	CardDataC _data{};
-	const CardString* GetStrings() const {
+	const CardString& GetStrings() const {
 		if(_locale_strings)
-			return _locale_strings;
-		return &_strings;
+			return *_locale_strings;
+		return _strings;
 	}
 	CardDataM(){}
 	CardDataM(CardDataC&& data, CardString&& strings, CardString* locale_strings = nullptr):

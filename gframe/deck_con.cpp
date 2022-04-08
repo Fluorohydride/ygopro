@@ -860,7 +860,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					const CardDataC* pointer = nullptr;
 					if(!code || !(pointer = gDataManager->GetCardData(code))) {
 						for(auto& card : gDataManager->cards) {
-							const auto& name = card.second.GetStrings()->uppercase_name;
+							const auto& name = card.second.GetStrings().uppercase_name;
 							if(name == to) {
 								pointer = &card.second._data;
 								break;
@@ -1244,16 +1244,16 @@ bool DeckBuilder::CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std
 				return !res;
 			return res;
 		};
-		const auto strings = data->GetStrings();
+		const auto& strings = data->GetStrings();
 		if(modifier & SEARCH_MODIFIER_NAME_ONLY) {
-			return checkNeg(Utils::ContainsSubstring(strings->uppercase_name, tokens));
+			return checkNeg(Utils::ContainsSubstring(strings.uppercase_name, tokens));
 		} else if(modifier & SEARCH_MODIFIER_ARCHETYPE_ONLY) {
 			if(set_code.empty() && tokens.size() > 0 && tokens.front().size())
 				return checkNeg(false);
 			return checkNeg(check_set_code(data->_data, set_code));
 		} else {
-			return checkNeg((set_code.size() && check_set_code(data->_data, set_code)) || Utils::ContainsSubstring(strings->uppercase_name, tokens)
-					|| Utils::ContainsSubstring(strings->uppercase_text, tokens));
+			return checkNeg((set_code.size() && check_set_code(data->_data, set_code)) || Utils::ContainsSubstring(strings.uppercase_name, tokens)
+					|| Utils::ContainsSubstring(strings.uppercase_text, tokens));
 		}
 	}
 	return true;

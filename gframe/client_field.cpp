@@ -1276,8 +1276,7 @@ void ClientField::UpdateDeclarableList(bool refresh) {
 		for(const auto& trycode : cache) {
 			if(check_code(trycode)) {
 				ancard.push_back(trycode);
-				const auto& name = cd->GetStrings()->name;
-				auto idx = mainGame->lstANCard->addItem(name.data());
+				auto idx = mainGame->lstANCard->addItem(cd->GetStrings().name.data());
 				if(trycode == selcode)
 					mainGame->lstANCard->setSelected(idx);
 			}
@@ -1287,7 +1286,7 @@ void ClientField::UpdateDeclarableList(bool refresh) {
 	}
 	if(check_code(BufferIO::GetVal(ptext))) {
 		mainGame->lstANCard->clear();
-		mainGame->lstANCard->addItem(cd->GetStrings()->name.data());
+		mainGame->lstANCard->addItem(cd->GetStrings().name.data());
 		ancard = { cd->_data.code };
 		return;
 	}
@@ -1295,15 +1294,15 @@ void ClientField::UpdateDeclarableList(bool refresh) {
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(const auto& card : gDataManager->cards) {
-		const auto strings = card.second.GetStrings();
-		const auto& name = strings->uppercase_name;
+		const auto& strings = card.second.GetStrings();
+		const auto& name = strings.uppercase_name;
 		if(name.find(pname) != std::wstring::npos) {
 			if(is_declarable(&card.second._data, declare_opcodes)) {
 				if(pname == name) { //exact match
-					mainGame->lstANCard->insertItem(0, strings->name.data(), -1);
+					mainGame->lstANCard->insertItem(0, strings.name.data(), -1);
 					ancard.insert(ancard.begin(), card.first);
 				} else {
-					mainGame->lstANCard->addItem(strings->name.data());
+					mainGame->lstANCard->addItem(strings.name.data());
 					ancard.push_back(card.first);
 				}
 			}
