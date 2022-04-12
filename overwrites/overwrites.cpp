@@ -1,64 +1,10 @@
 #ifndef _WIN64
 #include <WinSock2.h>
-#include <Windows.h>
-#define socklen_t int
-#define EAI_AGAIN           WSATRY_AGAIN
-#define EAI_BADFLAGS        WSAEINVAL
-#define EAI_FAIL            WSANO_RECOVERY
-#define EAI_FAMILY          WSAEAFNOSUPPORT
-#define EAI_MEMORY          WSA_NOT_ENOUGH_MEMORY
-#define EAI_NOSECURENAME    WSA_SECURE_HOST_NOT_FOUND
-#define EAI_NONAME          WSAHOST_NOT_FOUND
-#define EAI_NODATA          EAI_NONAME
-#define EAI_SERVICE         WSATYPE_NOT_FOUND
-#define EAI_SOCKTYPE        WSAESOCKTNOSUPPORT
-#define EAI_IPSECPOLICY     WSA_IPSEC_NAME_POLICY_ERROR
-#include <WSPiApi.h>
-#include <winternl.h>
-
-//some implementations taken from https://sourceforge.net/projects/win2kxp/
-
-#if 0
-//can't use c runtime functions as the runtime might not have been loaded yet
-void ___write(const char* ch) {
-	DWORD dwCount;
-	static HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	WriteConsoleA(hOut, ch, strlen(ch), &dwCount, nullptr);
-}
-void ___write(const wchar_t* ch) {
-	DWORD dwCount;
-	static HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	WriteConsoleW(hOut, ch, wcslen(ch), &dwCount, nullptr);
-}
 #endif
+#include <Windows.h>
 
-
-namespace {
-const auto pfFreeAddrInfo = (WSPIAPI_PFREEADDRINFO)WspiapiLoad(2);
-extern "C" void __stdcall handledfreeaddrinfo(addrinfo * ai) {
-	pfFreeAddrInfo(ai);
-}
-
-const auto pfGetAddrInfo = (WSPIAPI_PGETADDRINFO)WspiapiLoad(0);
-extern "C" INT __stdcall handledgetaddrinfo(const char* nodename, const char* servname, const addrinfo* hints, addrinfo** res) {
-	auto iError = pfGetAddrInfo(nodename, servname, hints, res);
-	WSASetLastError(iError);
-	return iError;
-}
-
-const auto pfGetNameInfo = (WSPIAPI_PGETNAMEINFO)WspiapiLoad(1);
-extern "C" INT __stdcall handledgetnameinfo(const sockaddr* sa, socklen_t salen, char* host, size_t hostlen, char* serv, size_t servlen, int flags) {
-	const auto iError = pfGetNameInfo(sa, salen, host, hostlen, serv, servlen, flags);
-	WSASetLastError(iError);
-	return iError;
-}
-
-const bool kernelex = GetModuleHandle(__TEXT("ntdll.dll")) == nullptr;
-inline bool IsUnderKernelex() {
-	//ntdll.dll is loaded automatically in every windows nt process, but it seems it isn't in windows 9x
-	return kernelex;
-}
-
+#define KERNELEX 0
+#define LIBGIT2_1_4 0
 
 /*
 creates 2 functions, the stub function prefixed by handledxxx that is then exported via asm,
@@ -96,26 +42,73 @@ extern "C" ret __stdcall handled##funcname args { \
 } \
 ret __stdcall internalimpl##funcname args
 
-#define MAKELOADER_KERNELEX(funcname,ret,args,argnames) \
-ret __stdcall kernelex##funcname args ; \
-extern "C" ret __stdcall handled##funcname args; \
-const auto basefunc##funcname = [] { \
-	if (IsUnderKernelex()) \
-		return kernelex##funcname; \
-	else \
-		return GETFUNC(funcname); \
-}(); \
-extern "C" ret __stdcall handled##funcname args { \
-	return basefunc##funcname argnames ; \
-} \
-ret __stdcall kernelex##funcname args
+#ifndef _WIN64
+#define socklen_t int
+#define EAI_AGAIN           WSATRY_AGAIN
+#define EAI_BADFLAGS        WSAEINVAL
+#define EAI_FAIL            WSANO_RECOVERY
+#define EAI_FAMILY          WSAEAFNOSUPPORT
+#define EAI_MEMORY          WSA_NOT_ENOUGH_MEMORY
+#define EAI_NOSECURENAME    WSA_SECURE_HOST_NOT_FOUND
+#define EAI_NONAME          WSAHOST_NOT_FOUND
+#define EAI_NODATA          EAI_NONAME
+#define EAI_SERVICE         WSATYPE_NOT_FOUND
+#define EAI_SOCKTYPE        WSAESOCKTNOSUPPORT
+#define EAI_IPSECPOLICY     WSA_IPSEC_NAME_POLICY_ERROR
+#include <WSPiApi.h>
+#include <winternl.h>
+#endif
+
+namespace {
+#ifndef _WIN64
+//some implementations taken from https://sourceforge.net/projects/win2kxp/
+
+#if 0
+//can't use c runtime functions as the runtime might not have been loaded yet
+void ___write(const char* ch) {
+	DWORD dwCount;
+	static HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	WriteConsoleA(hOut, ch, strlen(ch), &dwCount, nullptr);
+}
+void ___write(const wchar_t* ch) {
+	DWORD dwCount;
+	static HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	WriteConsoleW(hOut, ch, wcslen(ch), &dwCount, nullptr);
+}
+#endif
+
+
+const auto pfFreeAddrInfo = (WSPIAPI_PFREEADDRINFO)WspiapiLoad(2);
+extern "C" void __stdcall handledfreeaddrinfo(addrinfo * ai) {
+	pfFreeAddrInfo(ai);
+}
+
+const auto pfGetAddrInfo = (WSPIAPI_PGETADDRINFO)WspiapiLoad(0);
+extern "C" INT __stdcall handledgetaddrinfo(const char* nodename, const char* servname, const addrinfo* hints, addrinfo** res) {
+	auto iError = pfGetAddrInfo(nodename, servname, hints, res);
+	WSASetLastError(iError);
+	return iError;
+}
+
+const auto pfGetNameInfo = (WSPIAPI_PGETNAMEINFO)WspiapiLoad(1);
+extern "C" INT __stdcall handledgetnameinfo(const sockaddr* sa, socklen_t salen, char* host, size_t hostlen, char* serv, size_t servlen, int flags) {
+	const auto iError = pfGetNameInfo(sa, salen, host, hostlen, serv, servlen, flags);
+	WSASetLastError(iError);
+	return iError;
+}
+
+const bool kernelex = GetModuleHandle(__TEXT("ntdll.dll")) == nullptr;
+inline bool IsUnderKernelex() {
+	//ntdll.dll is loaded automatically in every windows nt process, but it seems it isn't in windows 9x
+	return kernelex;
+}
 
 #define LIBNAME __TEXT("Advapi32.dll")
 
 MAKELOADER(IsWellKnownSid, BOOL, (PSID pSid, WELL_KNOWN_SID_TYPE WellKnownSidType), (pSid, WellKnownSidType)) {
 	return FALSE;
 }
-#if 0
+#if KERNELEX
 CHAR* convert_from_wstring(const WCHAR* wstr) {
 	if(wstr == nullptr)
 		return nullptr;
@@ -129,6 +122,20 @@ CHAR* convert_from_wstring(const WCHAR* wstr) {
 	return strTo;
 }
 
+
+#define MAKELOADER_KERNELEX(funcname,ret,args,argnames) \
+ret __stdcall kernelex##funcname args ; \
+extern "C" ret __stdcall handled##funcname args; \
+const auto basefunc##funcname = [] { \
+	if (IsUnderKernelex()) \
+		return kernelex##funcname; \
+	else \
+		return GETFUNC(funcname); \
+}(); \
+extern "C" ret __stdcall handled##funcname args { \
+	return basefunc##funcname argnames ; \
+} \
+ret __stdcall kernelex##funcname args
 
 MAKELOADER_KERNELEX(CryptAcquireContextW, BOOL, (HCRYPTPROV* phProv, LPCWSTR pszContainer, LPCWSTR pszProvider, DWORD dwProvType, DWORD dwFlags),
 					(phProv, pszContainer, pszProvider, dwProvType, dwFlags)) {
@@ -353,7 +360,7 @@ MAKELOADER(ConvertFiberToThread, BOOL, (), ()) {
 	}
 }
 
-#if 0
+#if LIBGIT2_1_4
 // Fiber local storage callback function workaround
 // When fiber local storage is used, it's possible to provide
 // a callback function that would be called on thread termination
@@ -392,21 +399,6 @@ MAKELOADER(FlsFree, BOOL, (DWORD dwFlsIndex), (dwFlsIndex)) {
 	tl.CallCallback();
 	return TlsFree(dwFlsIndex);
 }
-
-/* We need the initial tick count to detect if the tick
- * count has rolled over. */
-DWORD initial_tick_count = GetTickCount();
-MAKELOADER(GetTickCount64, ULONGLONG, (), ()) {
-	/* GetTickCount returns the number of milliseconds that have
-	 * elapsed since the system was started. */
-	DWORD count = GetTickCount();
-	if(count < initial_tick_count) {
-		/* The tick count has rolled over - adjust for it. */
-		count = (0xFFFFFFFFu - initial_tick_count) + count;
-	}
-	return static_cast<DWORD>(static_cast<double>(count) / 1000.0);
-}
-
 using fpRtlNtStatusToDosError = ULONG(WINAPI*)(DWORD Status);
 using fpNtQuerySystemInformation = NTSTATUS(WINAPI*)(ULONG SystemInformationClass, PVOID SystemInformation, ULONG SystemInformationLength, PULONG ReturnLength);
 
@@ -611,6 +603,25 @@ MAKELOADER_WITH_CHECK(EncodePointer, PVOID, (PVOID ptr), (ptr)) {
 MAKELOADER(DecodePointer, PVOID, (PVOID ptr), (ptr)) {
 	return (PVOID)((UINT_PTR)ptr ^ 0xDEADBEEF);
 }
+#endif
+
+#if LIBGIT2_1_4
+#undef LIBNAME
+#define LIBNAME __TEXT("kernel32.dll")
+/* We need the initial tick count to detect if the tick
+ * count has rolled over. */
+DWORD initial_tick_count = GetTickCount();
+MAKELOADER(GetTickCount64, ULONGLONG, (), ()) {
+	/* GetTickCount returns the number of milliseconds that have
+	 * elapsed since the system was started. */
+	DWORD count = GetTickCount();
+	if(count < initial_tick_count) {
+		/* The tick count has rolled over - adjust for it. */
+		count = (0xFFFFFFFFu - initial_tick_count) + count;
+	}
+	return static_cast<DWORD>(static_cast<double>(count) / 1000.0);
+}
+#endif
 
 extern "C" ULONG __stdcall handledif_nametoindex(PCSTR* InterfaceName) {
 	return 0;
@@ -620,4 +631,3 @@ extern "C" ULONG __stdcall if_nametoindex(PCSTR* InterfaceName) {
 	return 0;
 }
 }
-#endif

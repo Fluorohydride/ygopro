@@ -1,10 +1,14 @@
 IFDEF RAX
-    END_IF_NOT_X86 equ end  ; kill stop the assembler if we're not compiling for x86
-ELSE
-    END_IF_NOT_X86 equ <>
-ENDIF
+.data
 
-END_IF_NOT_X86
+handledif_nametoindex PROTO :DWORD
+__imp_if_nametoindex DQ handledif_nametoindex
+public __imp_if_nametoindex
+
+; handledGetTickCount64 PROTO
+; __imp_GetTickCount64 DQ handledGetTickCount64
+; public __imp_GetTickCount64
+ELSE
 
 .model flat
 .data
@@ -122,4 +126,5 @@ public __imp__if_nametoindex@4
 ; __imp__GetTickCount64@0 dd handledGetTickCount64
 ; public __imp__GetTickCount64@0
 
+ENDIF
 end
