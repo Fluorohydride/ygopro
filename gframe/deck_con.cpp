@@ -90,6 +90,7 @@ void DeckBuilder::Initialize() {
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_category = mainGame->cbDBCategory->getSelected();
 	RefreshReadonly(prev_category);
+	RefreshPackListScroll();
 	prev_operation = 0;
 	prev_sel = -1;
 	is_modified = false;
@@ -116,6 +117,7 @@ void DeckBuilder::Terminate() {
 	mainGame->ClearTextures();
 	mainGame->showingcode = 0;
 	mainGame->scrFilter->setVisible(false);
+	mainGame->scrPackCards->setVisible(false);
 	int catesel = mainGame->cbDBCategory->getSelected();
 	if(catesel >= 0)
 		BufferIO::CopyWStr(mainGame->cbDBCategory->getItem(catesel), mainGame->gameConf.lastcategory, 64);
@@ -999,7 +1001,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				wchar_t catepath[256];
 				deckManager.GetCategoryPath(catepath, mainGame->lstCategories->getSelected(), mainGame->lstCategories->getListItem(mainGame->lstCategories->getSelected()));
 				myswprintf(filepath, L"%ls/%ls.ydk", catepath, mainGame->lstDecks->getListItem(decksel));
-				deckManager.LoadDeck(filepath);
+				deckManager.LoadDeck(filepath, showing_pack);
+				RefreshPackListScroll();
 				prev_deck = decksel;
 				break;
 			}
@@ -1021,6 +1024,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if(hovered_pos == 0 || hovered_seq == -1)
 				break;
 			click_pos = hovered_pos;
+			if(readonly)
+				break;
 			dragx = event.MouseInput.X;
 			dragy = event.MouseInput.Y;
 			draging_pointer = dataManager.GetCodePointer(hovered_code);
@@ -1224,7 +1229,33 @@ void DeckBuilder::GetHoveredCard() {
 	int y = pos.Y;
 	is_lastcard = 0;
 	if(x >= 314 && x <= 794) {
-		if(y >= 164 && y <= 435) {
+		if(showing_pack) {
+			if((x <= 772 || !mainGame->scrPackCards->isVisible()) && y >= 164 && y <= 624) {
+				int mainsize = deckManager.current_deck.main.size();
+				int lx = 10;
+				int dy = 68;
+				if(mainsize > 10 * 7)
+					lx = 11;
+				if(mainsize > 11 * 7)
+					lx = 12;
+				if(mainsize > 60)
+					dy = 66;
+				int px;
+				int py = (y - 164) / dy;
+				hovered_pos = 1;
+				if(x >= 750)
+					px = lx - 1;
+				else
+					px = (x - 314) * (lx - 1) / (mainGame->scrPackCards->isVisible() ? 414.0f : 436.0f);
+				hovered_seq = py * lx + px + mainGame->scrPackCards->getPos() * lx;
+				if(hovered_seq >= mainsize) {
+					hovered_seq = -1;
+					hovered_code = 0;
+				} else {
+					hovered_code = deckManager.current_deck.main[hovered_seq]->first;
+				}
+			}
+		} else if(y >= 164 && y <= 435) {
 			int lx = 10, px, py = (y - 164) / 68;
 			hovered_pos = 1;
 			if(deckManager.current_deck.main.size() > 40)
@@ -1583,8 +1614,12 @@ void DeckBuilder::RefreshDeckList() {
 void DeckBuilder::RefreshReadonly(int catesel) {
 	bool hasDeck = mainGame->cbDBDecks->getItemCount() != 0;
 	readonly = catesel < 2;
+	showing_pack = catesel == 0;
 	mainGame->btnSaveDeck->setEnabled(!readonly);
 	mainGame->btnSaveDeckAs->setEnabled(!readonly);
+	mainGame->btnClearDeck->setEnabled(!readonly);
+	mainGame->btnShuffleDeck->setEnabled(!readonly);
+	mainGame->btnSortDeck->setEnabled(!readonly);
 	mainGame->btnDeleteDeck->setEnabled(hasDeck && !readonly);
 	mainGame->btnRenameCategory->setEnabled(catesel > 3);
 	mainGame->btnDeleteCategory->setEnabled(catesel > 3);
@@ -1594,11 +1629,25 @@ void DeckBuilder::RefreshReadonly(int catesel) {
 	mainGame->btnMoveDeck->setEnabled(hasDeck && !readonly);
 	mainGame->btnCopyDeck->setEnabled(hasDeck);
 }
+void DeckBuilder::RefreshPackListScroll() {
+	if(showing_pack) {
+		mainGame->scrPackCards->setPos(0);
+		int mainsize = deckManager.current_deck.main.size();
+		if(mainsize <= 7 * 12) {
+			mainGame->scrPackCards->setVisible(false);
+		} else {
+			mainGame->scrPackCards->setVisible(true);
+			mainGame->scrPackCards->setMax((int)ceil(((float)mainsize - 7 * 12) / 12.0f));
+		}
+	} else {
+		mainGame->scrPackCards->setVisible(false);
+	}
+}
 void DeckBuilder::ChangeCategory(int catesel) {
 	mainGame->RefreshDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
 	mainGame->cbDBDecks->setSelected(0);
-	deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
 	RefreshReadonly(catesel);
+	deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
 	is_modified = false;
 	prev_category = catesel;
 	prev_deck = 0;

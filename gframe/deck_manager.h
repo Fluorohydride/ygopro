@@ -40,13 +40,13 @@ public:
 	const wchar_t* GetLFListName(int lfhash);
 	const std::unordered_map<int, int>* GetLFListContent(int lfhash);
 	int CheckDeck(Deck& deck, int lfhash, int rule);
-	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec);
+	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_packlist = false);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
 	void GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
 	bool LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
 	FILE* OpenDeckFile(const wchar_t * file, const char * mode);
-	bool LoadDeck(const wchar_t* file);
+	bool LoadDeck(const wchar_t* file, bool is_packlist = false);
 	bool SaveDeck(Deck& deck, const wchar_t* file);
 	bool DeleteDeck(const wchar_t* file);
 	bool CreateCategory(const wchar_t* name);

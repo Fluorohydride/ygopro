@@ -140,7 +140,7 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 	}
 	return 0;
 }
-int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec) {
+int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_packlist) {
 	deck.clear();
 	int code;
 	int errorcode = 0;
@@ -153,6 +153,10 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec) {
 		}
 		if(cd.type & TYPE_TOKEN)
 			continue;
+		else if(is_packlist) {
+			deck.main.push_back(dataManager.GetCodePointer(code));
+			continue;
+		}
 		else if(cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) {
 			if(deck.extra.size() >= 15)
 				continue;
@@ -234,7 +238,11 @@ void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, 
 bool DeckManager::LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
 	wchar_t filepath[256];
 	GetDeckFile(filepath, cbCategory, cbDeck);
-	return LoadDeck(filepath);
+	bool is_packlist = cbCategory->getSelected() == 0;
+	bool res = LoadDeck(filepath, is_packlist);
+	if(res && mainGame->is_building)
+		mainGame->deckBuilder.RefreshPackListScroll();
+	return res;
 }
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 #ifdef WIN32
@@ -246,7 +254,7 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 #endif
 	return fp;
 }
-bool DeckManager::LoadDeck(const wchar_t* file) {
+bool DeckManager::LoadDeck(const wchar_t* file, bool is_packlist) {
 	int sp = 0, ct = 0, mainc = 0, sidec = 0, code;
 	FILE* fp = OpenDeckFile(file, "r");
 	if(!fp) {
@@ -256,10 +264,10 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 	}
 	if(!fp)
 		return false;
-	int cardlist[128];
+	int cardlist[300];
 	bool is_side = false;
 	char linebuf[256];
-	while(fgets(linebuf, 256, fp) && ct < 128) {
+	while(fgets(linebuf, 256, fp) && ct < 300) {
 		if(linebuf[0] == '!') {
 			is_side = true;
 			continue;
@@ -275,7 +283,7 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 		else mainc++;
 	}
 	fclose(fp);
-	LoadDeck(current_deck, cardlist, mainc, sidec);
+	LoadDeck(current_deck, cardlist, mainc, sidec, is_packlist);
 	return true;
 }
 bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {

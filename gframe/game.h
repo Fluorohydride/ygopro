@@ -525,6 +525,7 @@ public:
 	irr::gui::IGUIComboBox* cbDMCategory;
 	irr::gui::IGUIButton* btnDMOK;
 	irr::gui::IGUIButton* btnDMCancel;
+	irr::gui::IGUIScrollBar* scrPackCards;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
 	irr::gui::IGUIScrollBar* scrFilter;
