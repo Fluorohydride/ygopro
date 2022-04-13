@@ -28,7 +28,7 @@ local ygopro_config=function(static_core)
 		defines { "UPDATE_URL=" .. _OPTIONS["update-url"] }
 	end
 	includedirs "../ocgcore"
-	links { "clzma", "freetype", "Irrlicht" }
+	links { "clzma", "Irrlicht" }
 	filter "system:macosx"
 		links { "iconv" }
 	filter {}
@@ -82,9 +82,6 @@ local ygopro_config=function(static_core)
 				end
 		end
 	end
-	
-	filter {}
-		includedirs { "../freetype/include" }
 
 	filter "system:windows"
 		kind "ConsoleApp"
@@ -124,21 +121,21 @@ local ygopro_config=function(static_core)
 		end
 
 	filter { "system:macosx", "configurations:Debug" }
-		links { "fmtd", "curl-d", "ldap" }
+		links { "fmtd", "curl-d", "ldap", "freetype" }
 
 	filter { "system:macosx", "configurations:Release" }
-		links { "fmt", "curl", "ldap" }
+		links { "fmt", "curl", "ldap", "freetyped" }
 
 	filter { "system:linux or windows", "action:not vs*", "configurations:Debug" }
 		if _OPTIONS["vcpkg-root"] then
-			links { "png16d", "bz2d", "fmtd", "curl-d" }
+			links { "png16d", "bz2d", "fmtd", "curl-d", "freetyped" }
 		else
 			links { "fmt", "curl" }
 		end
 
 	filter { "system:linux or windows", "action:not vs*", "configurations:Release" }
 		if _OPTIONS["vcpkg-root"] then
-			links { "png", "bz2" }
+			links { "png", "bz2", "freetype" }
 		end
 		links { "fmt", "curl" }
 

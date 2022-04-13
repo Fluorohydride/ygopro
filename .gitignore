@@ -40,7 +40,6 @@ CMakeLists.txt.user
 premake5
 premake5.exe
 /freetype/*
-!/freetype/premake4.lua
 /irrlicht/*
 !/irrlicht/premake5.lua
 !/irrlicht/defines.lua

@@ -169,7 +169,6 @@ workspace "ygo"
 		include "ocgcore"
 	end
 	include "gframe"
-	include "freetype"
 	if os.istarget("windows") then
 		include "irrlicht"
 	end

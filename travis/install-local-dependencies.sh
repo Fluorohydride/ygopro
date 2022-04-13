@@ -24,14 +24,14 @@ if [[ ! -z $USE_IRRKLANG ]]; then
 fi
 
 # We are locked to FreeType 2.6.5 for now because of TTF interpreter behaviour in newer versions
-curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name http://downloads.sourceforge.net/freetype/freetype-2.6.5.tar.bz2
-echo Extracting FreeType...
-tar xf freetype-2.6.5.tar.bz2 > /dev/null
-mv freetype-2.6.5/builds freetype
-mv freetype-2.6.5/include freetype
-mv freetype-2.6.5/src freetype
-rm -rf freetype-2.6.5
-rm freetype-2.6.5.tar.bz2
+# curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name http://downloads.sourceforge.net/freetype/freetype-2.6.5.tar.bz2
+# echo Extracting FreeType...
+# tar xf freetype-2.6.5.tar.bz2 > /dev/null
+# mv freetype-2.6.5/builds freetype
+# mv freetype-2.6.5/include freetype
+# mv freetype-2.6.5/src freetype
+# rm -rf freetype-2.6.5
+# rm freetype-2.6.5.tar.bz2
 
 if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     if [[ ! -z $USE_IRRKLANG ]]; then
