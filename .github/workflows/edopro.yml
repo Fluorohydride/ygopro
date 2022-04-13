@@ -280,6 +280,7 @@ jobs:
       shell: bash
       run: |
         ./travis/dependencies.sh && \
+        rm -rf $VCPKG_ROOT/installed/x64-linux \
         mv $VCPKG_ROOT/installed/arm64-linux $VCPKG_ROOT/installed/x64-linux
     - name: Build
       env:
@@ -407,6 +408,7 @@ jobs:
       shell: bash
       run: |
         ./travis/dependencies.sh && \
+        rm -rf $VCPKG_ROOT/installed/x64-osx \
         mv $VCPKG_ROOT/installed/arm64-osx $VCPKG_ROOT/installed/x64-osx
     - name: Build
       env:
