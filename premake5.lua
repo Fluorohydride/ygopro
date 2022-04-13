@@ -10,44 +10,44 @@ LUA_LIB_NAME = "lua"
 
 -- read settings from command line
 
-newoption { trigger = "build-lua", description = "" }
-newoption { trigger = "no-build-lua", description = "" }
-newoption { trigger = "lua-include-dir", description = "", value = "path" }
-newoption { trigger = "lua-lib-dir", description = "", value = "path" }
-newoption { trigger = "lua-lib-name", description = "", value = "name", default = "lua" }
+newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
+newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "" }
+newoption { trigger = "lua-include-dir", category = "YGOPro - lua", description = "", value = "PATH" }
+newoption { trigger = "lua-lib-dir", category = "YGOPro - lua", description = "", value = "PATH" }
+newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME", default = "lua" }
 
-newoption { trigger = "build-event", description = "" }
-newoption { trigger = "no-build-event", description = "" }
-newoption { trigger = "event-include-dir", description = "", value = "path" }
-newoption { trigger = "event-lib-dir", description = "", value = "path" }
+newoption { trigger = "build-event", category = "YGOPro - event", description = "" }
+newoption { trigger = "no-build-event", category = "YGOPro - event", description = "" }
+newoption { trigger = "event-include-dir", category = "YGOPro - event", description = "", value = "PATH" }
+newoption { trigger = "event-lib-dir", category = "YGOPro - event", description = "", value = "PATH" }
 
-newoption { trigger = "build-freetype", description = "" }
-newoption { trigger = "no-build-freetype", description = "" }
-newoption { trigger = "freetype-include-dir", description = "", value = "path" }
-newoption { trigger = "freetype-lib-dir", description = "", value = "path" }
+newoption { trigger = "build-freetype", category = "YGOPro - freetype", description = "" }
+newoption { trigger = "no-build-freetype", category = "YGOPro - freetype", description = "" }
+newoption { trigger = "freetype-include-dir", category = "YGOPro - freetype", description = "", value = "PATH" }
+newoption { trigger = "freetype-lib-dir", category = "YGOPro - freetype", description = "", value = "PATH" }
 
-newoption { trigger = "build-sqlite", description = "" }
-newoption { trigger = "no-build-sqlite", description = "" }
-newoption { trigger = "sqlite-include-dir", description = "", value = "path" }
-newoption { trigger = "sqlite-lib-dir", description = "", value = "path" }
+newoption { trigger = "build-sqlite", category = "YGOPro - sqlite", description = "" }
+newoption { trigger = "no-build-sqlite", category = "YGOPro - sqlite", description = "" }
+newoption { trigger = "sqlite-include-dir", category = "YGOPro - sqlite", description = "", value = "PATH" }
+newoption { trigger = "sqlite-lib-dir", category = "YGOPro - sqlite", description = "", value = "PATH" }
 
-newoption { trigger = "build-irrlicht", description = "" }
-newoption { trigger = "no-build-irrlicht", description = "" }
-newoption { trigger = "irrlicht-include-dir", description = "", value = "path" }
-newoption { trigger = "irrlicht-lib-dir", description = "", value = "path" }
+newoption { trigger = "build-irrlicht", category = "YGOPro - irrlicht", description = "" }
+newoption { trigger = "no-build-irrlicht", category = "YGOPro - irrlicht", description = "" }
+newoption { trigger = "irrlicht-include-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
+newoption { trigger = "irrlicht-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
 
-newoption { trigger = "use-irrklang", description = "" }
-newoption { trigger = "no-use-irrklang", description = "" }
-newoption { trigger = "irrklang-include-dir", description = "", value = "path" }
-newoption { trigger = "irrklang-lib-dir", description = "", value = "path" }
+newoption { trigger = "use-irrklang", category = "YGOPro - irrklang", description = "" }
+newoption { trigger = "no-use-irrklang", category = "YGOPro - irrklang", description = "" }
+newoption { trigger = "irrklang-include-dir", category = "YGOPro - irrklang", description = "", value = "PATH" }
+newoption { trigger = "irrklang-lib-dir", category = "YGOPro - irrklang", description = "", value = "PATH" }
 
-newoption { trigger = "irrklang-pro", description = "" }
-newoption { trigger = "no-irrklang-pro", description = "" }
-newoption { trigger = "irrklang-pro-release-lib-dir", description = "", value = "path" }
-newoption { trigger = "irrklang-pro-debug-lib-dir", description = "", value = "path" }
+newoption { trigger = "irrklang-pro", category = "YGOPro - irrklang - pro", description = "" }
+newoption { trigger = "no-irrklang-pro", category = "YGOPro - irrklang - pro", description = "" }
+newoption { trigger = "irrklang-pro-release-lib-dir", category = "YGOPro - irrklang - pro", description = "", value = "PATH" }
+newoption { trigger = "irrklang-pro-debug-lib-dir", category = "YGOPro - irrklang - pro", description = "", value = "PATH" }
 
-newoption { trigger = "winxp-support", description = "" }
-newoption { trigger = "mac-arm", description = "M1" }
+newoption { trigger = "winxp-support", category = "YGOPro", description = "" }
+newoption { trigger = "mac-arm", category = "YGOPro", description = "M1" }
 
 if(_OPTIONS["build-lua"]) then
     BUILD_LUA = true
