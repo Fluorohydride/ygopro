@@ -265,7 +265,7 @@ catch(...) { what = def; }
 	}
 }
 
-int DuelClient::ClientThread() {
+void DuelClient::ClientThread() {
 	Utils::SetThreadName("ClientThread");
 	event_base_dispatch(client_base);
 	to_analyze_mutex.lock();
@@ -278,7 +278,6 @@ int DuelClient::ClientThread() {
 	connect_state = 0;
 	client_bev = 0;
 	client_base = 0;
-	return 0;
 }
 
 void DuelClient::ParserThread() {

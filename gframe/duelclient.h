@@ -61,7 +61,7 @@ public:
 	static void StopClient(bool is_exiting = false);
 	static void ClientRead(bufferevent* bev, void* ctx);
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
-	static int ClientThread();
+	static void ClientThread();
 	static void HandleSTOCPacketLanSync(std::vector<uint8_t>&& data);
 	static void HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data);
 	static void ParserThread();
