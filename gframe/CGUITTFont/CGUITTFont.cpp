@@ -29,6 +29,7 @@
 */
 
 #include "CGUITTFont.h"
+#include FT_MODULE_H
 #include <IVideoDriver.h>
 #include <IrrlichtDevice.h>
 #include <IGUIEnvironment.h>
@@ -195,12 +196,19 @@ void SGUITTGlyph::unload() {
 	isLoaded = false;
 }
 
+#if defined(TT_CONFIG_OPTION_SUBPIXEL_HINTING)
+#define forceHinting(library) do { FT_UInt val = 35; FT_Property_Set(library, "truetype", "interpreter-version", &val); } while(0)
+#else
+#define forceHinting(library) (void)0
+#endif
+
 //////////////////////
 
 CGUITTFont* CGUITTFont::createTTFont(IGUIEnvironment *env, const io::path& filename, const u32 size, std::list<io::path> fallback, const bool antialias, const bool transparency) {
 	if(!c_libraryLoaded) {
 		if(FT_Init_FreeType(&c_library))
 			return 0;
+		forceHinting(c_library);
 		c_libraryLoaded = true;
 	}
 
@@ -224,6 +232,7 @@ CGUITTFont* CGUITTFont::createTTFont(IrrlichtDevice *device, const io::path& fil
 	if(!c_libraryLoaded) {
 		if(FT_Init_FreeType(&c_library))
 			return 0;
+		forceHinting(c_library);
 		c_libraryLoaded = true;
 	}
 
