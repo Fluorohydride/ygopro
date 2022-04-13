@@ -64,7 +64,7 @@ project "YGOPro"
     filter "not action:vs*"
         buildoptions { "-std=c++14", "-fno-rtti" }
     filter "not system:windows"
-        links { "event_pthreads", "dl", "pthread", "X11" }
+        links { "event_pthreads", "dl", "pthread" }
     filter "system:macosx"
         links { "z" }
         defines { "GL_SILENCE_DEPRECATION" }
@@ -76,7 +76,7 @@ project "YGOPro"
             links { "irrklang" }
         end
     filter "system:linux"
-        links { "GL", "Xxf86vm" }
+        links { "GL", "X11", "Xxf86vm" }
         if USE_IRRKLANG then
             links { "IrrKlang" }
             linkoptions{ IRRKLANG_LINK_RPATH }
