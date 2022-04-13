@@ -117,7 +117,7 @@ if USE_IRRKLANG then
     elseif os.istarget("macosx") then
         IRRKLANG_LIB_DIR = "../irrklang/bin/macosx-gcc"
     end
-    IRRKLANG_LIB_DIR = _OPTIONS["irrklang-lib-dir"] or "../irrklang/lib/Win32-visualStudio"
+    IRRKLANG_LIB_DIR = _OPTIONS["irrklang-lib-dir"] or IRRKLANG_LIB_DIR
 end
 
 if(_OPTIONS["irrklang-pro"]) and os.istarget("windows") then
