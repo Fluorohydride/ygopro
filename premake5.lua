@@ -139,7 +139,7 @@ end
 if GetParam("winxp-support") and os.istarget("windows") then
     WINXP_SUPPORT = true
 end
-if (GetParam("mac-arm") and os.istarget("macosx") then
+if GetParam("mac-arm") and os.istarget("macosx") then
     MAC_ARM = true
 end
 
