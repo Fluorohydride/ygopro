@@ -17,10 +17,10 @@ bool operator!=(const ClientVersion& ver1, const ClientVersion& ver2) {
 
 std::unordered_map<bufferevent*, DuelPlayer> NetServer::users;
 uint16_t NetServer::server_port = 0;
-event_base* NetServer::net_evbase = 0;
-event* NetServer::broadcast_ev = 0;
-evconnlistener* NetServer::listener = 0;
-DuelMode* NetServer::duel_mode = 0;
+event_base* NetServer::net_evbase = nullptr;
+event* NetServer::broadcast_ev = nullptr;
+evconnlistener* NetServer::listener = nullptr;
+DuelMode* NetServer::duel_mode = nullptr;
 uint8_t NetServer::net_server_read[0x20000];
 uint8_t NetServer::net_server_write[0x20000];
 uint16_t NetServer::last_sent = 0;
@@ -164,13 +164,13 @@ int NetServer::ServerThread() {
 		event_get_assignment(broadcast_ev, 0, &fd, 0, 0, 0);
 		evutil_closesocket(fd);
 		event_free(broadcast_ev);
-		broadcast_ev = 0;
+		broadcast_ev = nullptr;
 	}
 	if(duel_mode) {
 		event_free(duel_mode->etimer);
 		delete duel_mode;
 	}
-	duel_mode = 0;
+	duel_mode = nullptr;
 	event_base_free(net_evbase);
 	net_evbase = 0;
 	return 0;
