@@ -83,7 +83,12 @@ elseif GetParam("no-build-freetype") then
     BUILD_FREETYPE = false
 end
 if not BUILD_FREETYPE then
-    FREETYPE_INCLUDE_DIR = GetParam("freetype-include-dir") or "/usr/include/freetype2"
+    if os.istarget("linux") then
+        FREETYPE_INCLUDE_DIR = "/usr/include/freetype2"
+    elseif os.istarget("macosx") then
+        FREETYPE_INCLUDE_DIR = "/usr/local/include/freetype2"
+    end
+    FREETYPE_INCLUDE_DIR = GetParam("freetype-include-dir") or FREETYPE_INCLUDE_DIR
     FREETYPE_LIB_DIR = GetParam("freetype-lib-dir") or "/usr/local/lib"
 end
 
