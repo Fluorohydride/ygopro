@@ -420,7 +420,7 @@ epro::wstringview DataManager::GetDesc(uint64_t strCode, bool compat) const {
 		return unknown_string;
 	return desc;
 }
-std::vector<uint16_t> DataManager::GetSetCode(std::vector<std::wstring>& setname) const {
+std::vector<uint16_t> DataManager::GetSetCode(const std::vector<std::wstring>& setname) const {
 	std::vector<uint16_t> res;
 	for(const auto& string : _setnameStrings.map) {
 		if(string.second.first.empty())
