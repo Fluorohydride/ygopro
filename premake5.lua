@@ -1,19 +1,141 @@
-if os.ishost("windows") then
-    USE_IRRKLANG = true
-    IRRKLANG_PRO = false
+-- default global settings
+BUILD_LUA = true
+BUILD_EVENT = os.istarget("windows")
+BUILD_FREETYPE = os.istarget("windows")
+BUILD_SQLITE = os.istarget("windows")
+BUILD_IRRLICHT = not os.istarget("macosx")
+USE_IRRKLANG = true
+IRRKLANG_PRO = false
+LUA_LIB_NAME = "lua"
+
+-- read settings from command line
+
+newoption { trigger = "build-lua", description = "" }
+newoption { trigger = "no-build-lua", description = "" }
+newoption { trigger = "lua-include-dir", description = "", value = "path" }
+newoption { trigger = "lua-lib-dir", description = "", value = "path" }
+newoption { trigger = "lua-lib-name", description = "", value = "name", default = "lua" }
+
+newoption { trigger = "build-event", description = "" }
+newoption { trigger = "no-build-event", description = "" }
+newoption { trigger = "event-include-dir", description = "", value = "path" }
+newoption { trigger = "event-lib-dir", description = "", value = "path" }
+
+newoption { trigger = "build-freetype", description = "" }
+newoption { trigger = "no-build-freetype", description = "" }
+newoption { trigger = "freetype-include-dir", description = "", value = "path" }
+newoption { trigger = "freetype-lib-dir", description = "", value = "path" }
+
+newoption { trigger = "build-sqlite", description = "" }
+newoption { trigger = "no-build-sqlite", description = "" }
+newoption { trigger = "sqlite-include-dir", description = "", value = "path" }
+newoption { trigger = "sqlite-lib-dir", description = "", value = "path" }
+
+newoption { trigger = "build-irrlicht", description = "" }
+newoption { trigger = "no-build-irrlicht", description = "" }
+newoption { trigger = "irrlicht-include-dir", description = "", value = "path" }
+newoption { trigger = "irrlicht-lib-dir", description = "", value = "path" }
+
+newoption { trigger = "use-irrklang", description = "" }
+newoption { trigger = "no-use-irrklang", description = "" }
+newoption { trigger = "irrklang-include-dir", description = "", value = "path" }
+newoption { trigger = "irrklang-lib-dir", description = "", value = "path" }
+
+newoption { trigger = "irrklang-pro", description = "" }
+newoption { trigger = "no-irrklang-pro", description = "" }
+newoption { trigger = "irrklang-pro-release-lib-dir", description = "", value = "path" }
+newoption { trigger = "irrklang-pro-debug-lib-dir", description = "", value = "path" }
+
+newoption { trigger = "winxp-support", description = "" }
+newoption { trigger = "mac-arm", description = "M1" }
+
+if(_OPTIONS["build-lua"]) then
     BUILD_LUA = true
-    BUILD_EVENT = true
+elseif(_OPTIONS["no-build-lua"]) then
+    BUILD_LUA = false
+end
+if not BUILD_LUA then
+    -- at most times you need to change this if you change BUILD_LUA to false
+    -- make sure your lua lib is built with C++ and version >= 5.3
+    LUA_INCLUDE_DIR = _OPTIONS["lua-include-dir"] or "/usr/local/include/lua"
+    LUA_LIB_DIR = _OPTIONS["lua-lib-dir"] or "/usr/local/lib"
+    LUA_LIB_NAME = _OPTIONS["lua-lib-name"]
+end
+
+if(_OPTIONS["build-event"]) then
+    BUILD_EVENT = os.istarget("windows") -- only on windows for now
+elseif(_OPTIONS["no-build-event"]) then
+    BUILD_EVENT = false
+end
+if not BUILD_EVENT then
+    EVENT_INCLUDE_DIR = _OPTIONS["event-include-dir"] or "/usr/local/include/event2"
+    EVENT_LIB_DIR = _OPTIONS["event-lib-dir"] or "/usr/local/lib"
+end
+
+if(_OPTIONS["build-freetype"]) then
     BUILD_FREETYPE = true
-    BUILD_IRRLICHT = true
-    BUILD_SQLITE = true
-else
-    USE_IRRKLANG = true
-    IRRKLANG_PRO = false
-    BUILD_LUA = true
-    BUILD_EVENT = false --not implemented on linux
+elseif(_OPTIONS["no-build-freetype"]) then
     BUILD_FREETYPE = false
-    BUILD_IRRLICHT = not os.ishost("macosx")
+end
+if not BUILD_FREETYPE then
+    FREETYPE_INCLUDE_DIR = _OPTIONS["freetype-include-dir"] or "/usr/local/include/freetype2"
+    FREETYPE_LIB_DIR = _OPTIONS["freetype-lib-dir"] or "/usr/local/lib"
+end
+
+if(_OPTIONS["build-sqlite"]) then
+    BUILD_SQLITE = true
+elseif(_OPTIONS["no-build-sqlite"]) then
     BUILD_SQLITE = false
+end
+if not BUILD_SQLITE then
+    SQLITE_INCLUDE_DIR = _OPTIONS["sqlite-include-dir"] or "/usr/local/include"
+    SQLITE_LIB_DIR = _OPTIONS["sqlite-lib-dir"] or "/usr/local/lib"
+end
+
+if(_OPTIONS["build-irrlicht"]) then
+    BUILD_IRRLICHT = true
+elseif(_OPTIONS["no-build-irrlicht"]) then
+    BUILD_IRRLICHT = false
+end
+if not BUILD_IRRLICHT then
+    IRRLICHT_INCLUDE_DIR = _OPTIONS["irrlicht-include-dir"] or "/usr/local/include/irrlicht"
+    IRRLICHT_LIB_DIR = _OPTIONS["irrlicht-lib-dir"] or "/usr/local/lib"
+end
+
+if(_OPTIONS["use-irrklang"]) then
+    USE_IRRKLANG = true
+elseif(_OPTIONS["no-use-irrklang"]) then
+    USE_IRRKLANG = false
+end
+if USE_IRRKLANG then
+    IRRKLANG_INCLUDE_DIR = _OPTIONS["irrklang-include-dir"] or "../irrklang/include"
+    if os.istarget("windows") then
+        IRRKLANG_LIB_DIR = "../irrklang/lib/Win32-visualStudio"
+    elseif os.istarget("linux") then
+        IRRKLANG_LIB_DIR = "../irrklang/bin/linux-gcc-64"
+        IRRKLANG_LINK_RPATH = "-Wl,-rpath=./irrklang/bin/linux-gcc-64/"
+    elseif os.istarget("macosx") then
+        IRRKLANG_LIB_DIR = "../irrklang/bin/macosx-gcc"
+    end
+    IRRKLANG_LIB_DIR = _OPTIONS["irrklang-lib-dir"] or "../irrklang/lib/Win32-visualStudio"
+end
+
+if(_OPTIONS["irrklang-pro"]) and os.istarget("windows") then
+    IRRKLANG_PRO = true
+elseif(_OPTIONS["no-irrklang-pro"]) then
+    IRRKLANG_PRO = false
+end
+if IRRKLANG_PRO then
+    -- irrklang pro can't use the pro lib to debug
+    IRRKLANG_PRO_RELEASE_LIB_DIR = _OPTIONS["irrklang-pro-release-lib-dir"] or "../irrklang/lib/Win32-vs2019"
+    IRRKLANG_PRO_DEBUG_LIB_DIR = _OPTIONS["irrklang-pro-debug-lib-dir"] or "../irrklang/lib/Win32-visualStudio-debug"  
+end
+
+if(_OPTIONS["winxp-support"]) and os.istarget("windows") then
+    WINXP_SUPPORT = true
+end
+if(_OPTIONS["mac-arm"]) and os.istarget("macosx") then
+    MAC_ARM = true
 end
 
 workspace "YGOPro"
@@ -24,19 +146,23 @@ workspace "YGOPro"
     configurations { "Release", "Debug" }
 
     filter "system:windows"
-        defines { "WIN32", "_WIN32", "WINVER=0x0501" }
+        defines { "WIN32", "_WIN32" }
         entrypoint "mainCRTStartup"
         systemversion "latest"
-        startproject "ygopro"
-
-    filter "system:bsd"
-        includedirs { "/usr/local/include" }
-        libdirs { "/usr/local/lib" }
+        startproject "YGOPro"
+        if WINXP_SUPPORT then
+            defines { "WINVER=0x0501" }
+            toolset "v141_xp"
+        else
+            defines { "WINVER=0x0601" } -- WIN7
+        end
 
     filter "system:macosx"
-        includedirs { "/usr/local/include/freetype2" }
         libdirs { "/usr/local/lib" }
         buildoptions { "-stdlib=libc++" }
+        if MAC_ARM then
+            buildoptions { "--target=arm64-apple-macos12" }
+        end
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
 
     filter "system:linux"
@@ -59,7 +185,9 @@ workspace "YGOPro"
     filter { "configurations:Release", "not action:vs*" }
         symbols "On"
         defines "NDEBUG"
-        buildoptions "-march=native"
+        if not MAC_ARM then
+            buildoptions "-march=native"
+        end
 
     filter { "configurations:Debug", "action:vs*" }
         defines { "_ITERATOR_DEBUG_LEVEL=0" }
@@ -71,10 +199,7 @@ workspace "YGOPro"
         defines { "_CRT_SECURE_NO_WARNINGS" }
     
     filter "not action:vs*"
-        buildoptions { "-fno-strict-aliasing", "-Wno-multichar" }
-
-    filter {"not action:vs*", "system:windows"}
-        buildoptions { "-static-libgcc" }
+        buildoptions { "-fno-strict-aliasing", "-Wno-multichar", "-Wno-format-security" }
 
     filter {}
 
