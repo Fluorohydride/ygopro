@@ -67,15 +67,15 @@ scene::IMesh* CGUITTFont::shared_plane_ptr_ = 0;
 scene::SMesh CGUITTFont::shared_plane_;
 
 //
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+#define GetData(image) image->getData()
+#define Unlock(image)(void)0
+#else
+#define GetData(image) image->lock()
+#define Unlock(image) image->unlock()
+#endif
 
 video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVideoDriver* driver) const {
-	auto GetData = [](auto* image)->void* {
-#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
-		return image->getData();
-#else
-		return image->lock();
-#endif
-	};
 	// Determine what our texture size should be.
 	// Add 1 because textures are inclusive-exclusive.
 	core::dimension2du d(bits.width + 1, bits.rows + 1);
@@ -106,6 +106,7 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 				}
 				image_data += image_pitch;
 			}
+			Unlock(image);
 			break;
 		}
 
@@ -128,6 +129,7 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 				}
 				glyph_data += bits.pitch;
 			}
+			Unlock(image);
 			break;
 		}
 		default:
