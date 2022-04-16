@@ -1,6 +1,7 @@
 project "cspmemvfs"
     kind "StaticLib"
-    files { "**.c", "**.h" }
+    files { "*.c", "*.h" }
 
-    configuration "windows"
+    if BUILD_SQLITE then
         includedirs { "../../sqlite3" }
+    end
