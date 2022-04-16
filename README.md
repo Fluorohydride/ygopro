@@ -24,6 +24,20 @@
  * sqlite3
 * 可参考本项目 [appveyor.yml](https://github.com/mycard/ygopro/blob/server/appveyor.yml) 中的脚本
 
+### MacOS下编译
+* 需要以下组件或工具
+ * clang
+ * premake5
+ * libevent
+ * lua5.3
+ * sqlite3
+* 参考步骤
+ * 安装libevent sqlite3
+ * 编译premake5
+ * wget https://www.lua.org/ftp/lua-5.4.3.tar.gz && tar xf lua-5.4.3.tar.gz && mv lua-5.4.3 lua && cp premake/lua/* lua/
+ * ./premake5 gmake --cc=clang
+ * cd build && make config=release
+
 ### 运行
 * 使用[ygopro-server](https://github.com/mycard/ygopro-server)运行
 * 手动运行的参数是
