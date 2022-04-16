@@ -19,6 +19,7 @@ newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "
 newoption { trigger = "lua-include-dir", category = "YGOPro - lua", description = "", value = "PATH" }
 newoption { trigger = "lua-lib-dir", category = "YGOPro - lua", description = "", value = "PATH" }
 newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME", default = "lua" }
+newoption { trigger = "lua-deb", category = "YGOPro - lua", description = "" }
 
 newoption { trigger = "build-event", category = "YGOPro - event", description = "" }
 newoption { trigger = "no-build-event", category = "YGOPro - event", description = "" }
@@ -69,6 +70,13 @@ if not BUILD_LUA then
     LUA_INCLUDE_DIR = GetParam("lua-include-dir") or "/usr/local/include/lua"
     LUA_LIB_DIR = GetParam("lua-lib-dir") or "/usr/local/lib"
     LUA_LIB_NAME = GetParam("lua-lib-name")
+end
+
+if GetParam("lua-deb") then
+    BUILD_LUA = false
+    LUA_LIB_DIR = "/usr/lib/x86_64-linux-gnu"
+    LUA_LIB_NAME = "lua5.3-c++"
+    LUA_INCLUDE_DIR = "/usr/include/lua5.3"
 end
 
 if GetParam("build-event") then
