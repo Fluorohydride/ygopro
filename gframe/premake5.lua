@@ -1,32 +1,47 @@
 include "lzma/."
 include "spmemvfs/."
 
-project "ygopro"
+project "YGOPro"
     kind "WindowedApp"
 
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore" }
-    links { "ocgcore", "clzma", "cspmemvfs", "lua", "sqlite3", "irrlicht", "freetype", "event" }
+    links { "ocgcore", "clzma", "cspmemvfs", LUA_LIB_NAME, "sqlite3", "irrlicht", "freetype", "event" }
 
     if BUILD_EVENT then
         includedirs { "../event/include" }
+    else
+        includedirs { EVENT_INCLUDE_DIR }
+        libdirs { EVENT_LIB_DIR }
     end
 
-    if BUILD_IRRLICHT or os.ishost("macosx") then
+    if BUILD_IRRLICHT then
         includedirs { "../irrlicht/include" }
+    else
+        includedirs { IRRLICHT_INCLUDE_DIR }
+        libdirs { IRRLICHT_LIB_DIR }
     end
 
     if BUILD_FREETYPE then
         includedirs { "../freetype/include" }
+    else
+        includedirs { FREETYPE_INCLUDE_DIR }
+        libdirs { FREETYPE_LIB_DIR }
     end
 
     if BUILD_SQLITE then
         includedirs { "../sqlite3" }
+    else
+        includedirs { SQLITE_INCLUDE_DIR }
+        libdirs { SQLITE_LIB_DIR }
     end
 
     if USE_IRRKLANG then
         defines { "YGOPRO_USE_IRRKLANG" }
-        includedirs { "../irrklang/include" }
+        includedirs { IRRKLANG_INCLUDE_DIR }
+        if not IRRKLANG_PRO then
+            libdirs { IRRKLANG_LIB_DIR }
+        end
     end
 
     filter "system:windows"
@@ -39,34 +54,30 @@ project "ygopro"
                 defines { "IRRKLANG_STATIC" }
                 links { "ikpmp3" }
                 filter { "not configurations:Debug" }
-                    libdirs { "../irrklang/lib/Win32-vs2019" }
+                    libdirs { IRRKLANG_PRO_RELEASE_LIB_DIR }
                 filter { "configurations:Debug" }
-                    libdirs { "../irrklang/lib/Win32-visualStudio-debug" }
+                    libdirs { IRRKLANG_PRO_DEBUG_LIB_DIR }
                 filter {}
-            else
-                libdirs { "../irrklang/lib/Win32-visualStudio" }
             end
         end
         links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32" }
-    filter { "system:windows", "not action:vs*"}
-        includedirs { "/mingw/include/irrlicht", "/mingw/include/freetype2" }
     filter "not action:vs*"
         buildoptions { "-std=c++14", "-fno-rtti" }
     filter "not system:windows"
-        includedirs { "/usr/include/irrlicht", "/usr/include/freetype2" }
-        links { "event_pthreads", "dl", "pthread", "X11" }
+        links { "event_pthreads", "dl", "pthread" }
     filter "system:macosx"
-        libdirs { "../irrlicht/source/Irrlicht/MacOSX/build/Release/" }
         links { "z" }
         defines { "GL_SILENCE_DEPRECATION" }
+        if MAC_ARM then
+            buildoptions { "--target=arm64-apple-macos12" }
+            linkoptions { "-arch arm64" }
+        end
         if USE_IRRKLANG then
             links { "irrklang" }
-            libdirs { "../irrklang/bin/macosx-gcc" }
         end
     filter "system:linux"
-        links { "GL", "Xxf86vm" }
+        links { "GL", "X11", "Xxf86vm" }
         if USE_IRRKLANG then
             links { "IrrKlang" }
-            linkoptions{ "-Wl,-rpath=./irrklang/bin/linux-gcc-64/" }
-            libdirs { "../irrklang/bin/linux-gcc-64" }
+            linkoptions{ IRRKLANG_LINK_RPATH }
         end
