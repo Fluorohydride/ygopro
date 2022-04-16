@@ -15,9 +15,9 @@ mat_lua:
     - linux
   script:
     - apt update; apt -y install wget tar
-    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/lua-5.3.5.tar.gz | tar zfx -
-    - mv lua-5.3.5/src lua
-    - cp premake/lua/premake4.lua lua/;
+    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/lua-5.3.6.tar.gz | tar zfx -
+    - mv lua-5.3.6 lua
+    - cp premake/lua/premake5.lua lua/;
   artifacts:
     paths:
       - lua
@@ -29,7 +29,7 @@ mat_linux:
   script:
     - apt update; apt -y install git wget tar
     #- git clone --depth=1 https://code.mycard.moe/mycard/irrlicht irrlicht_linux
-    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-alpha14-linux.tar.gz | tar zfx -
+    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-beta1-linux.tar.gz | tar zfx -
   artifacts:
     paths:
       - premake5
@@ -42,11 +42,11 @@ mat_windows:
   script:
     - apt update; apt -y install wget tar patch p7zip-full
     # premake5.exe
-    - wget https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-alpha14-windows.zip
-    - 7z x -y premake-5.0.0-alpha14-windows.zip
+    - wget https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-beta1-windows.zip
+    - 7z x -y premake-5.0.0-beta1-windows.zip
     # event
     - wget -O - https://cdn01.moecube.com/ygopro-build-materials/libevent-2.0.22-stable.tar.gz | tar zfx -
-    - mv libevent-2.0.22-stable event ; cp -rf event/WIN32-Code/* event/include
+    - mv libevent-2.0.22-stable event
     # sqlite3
     - wget https://cdn01.moecube.com/ygopro-build-materials/sqlite-amalgamation-3310100.zip
     - 7z x -y sqlite-amalgamation-3310100.zip
@@ -75,7 +75,7 @@ exec_windows:
     - bash -c 'cp -rf premake/* .'
     #- cmd /C "patch -p0 < irrlicht\irrlicht.patch"
     - '.\premake5.exe vs2019'
-    - cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe" build\ygo.sln /m /p:Configuration=Release'
+    - cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe" build\YGOPro.sln /m /p:Configuration=Release'
     - copy bin\release\ygopro.exe .
   artifacts:
     paths:
@@ -87,13 +87,14 @@ exec_linux:
     - linux
   dependencies:
     #- mat_irrklang
+    - mat_lua
     - mat_linux
   cache:
     paths:
       - bin/
       - obj/
   script:
-    - apt update; apt -y install git build-essential libevent-dev libsqlite3-dev liblua5.3-dev
+    - apt update; apt -y install git build-essential libevent-dev libsqlite3-dev
     - git submodule update --init
     - ./premake5 gmake
     - cd build

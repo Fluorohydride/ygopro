@@ -19,8 +19,8 @@ before_install:
 #- sudo ln -s /usr/bin/gcc-6 /usr/local/bin/gcc
 #- sudo ln -s /usr/bin/g++-6 /usr/local/bin/g++
 #- g++ --version
-- wget -O - https://github.com/premake/premake-core/releases/download/v5.0.0-alpha14/premake-5.0.0-alpha14-linux.tar.gz | tar zfx -
-#- wget -O - https://www.lua.org/ftp/lua-5.3.5.tar.gz | tar zfx -; cd lua-5.3.5; sudo make linux install; cd ..
+- wget -O - https://github.com/premake/premake-core/releases/download/v5.0.0-beta1/premake-5.0.0-beta1-linux.tar.gz | tar zfx -
+#- wget -O - https://www.lua.org/ftp/lua-5.3.6.tar.gz | tar zfx -; cd lua-5.3.6; sudo make linux install; cd ..
 script:
 - ./premake5 gmake
 - cd build
