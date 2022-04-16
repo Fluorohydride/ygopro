@@ -9,6 +9,9 @@ USE_IRRKLANG = true
 IRRKLANG_PRO = false
 LUA_LIB_NAME = "lua"
 
+SERVER_MODE = true
+USE_IRRKLANG = false
+
 -- read settings from command line or environment variables
 
 newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
@@ -49,6 +52,7 @@ newoption { trigger = "irrklang-pro-debug-lib-dir", category = "YGOPro - irrklan
 
 newoption { trigger = "winxp-support", category = "YGOPro", description = "" }
 newoption { trigger = "mac-arm", category = "YGOPro", description = "M1" }
+newoption { trigger = "server-mode", category = "YGOPro", description = "" }
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
@@ -147,6 +151,9 @@ end
 if GetParam("mac-arm") and os.istarget("macosx") then
     MAC_ARM = true
 end
+if GetParam("server-mode") then
+    SERVER_MODE = true
+end
 
 workspace "YGOPro"
     location "build"
@@ -157,7 +164,9 @@ workspace "YGOPro"
 
     filter "system:windows"
         defines { "WIN32", "_WIN32" }
+if not SERVER_MODE then
         entrypoint "mainCRTStartup"
+end
         systemversion "latest"
         startproject "YGOPro"
         if WINXP_SUPPORT then
@@ -173,7 +182,9 @@ workspace "YGOPro"
         if MAC_ARM then
             buildoptions { "--target=arm64-apple-macos12" }
         end
+if not SERVER_MODE then
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
+end
 
     filter "system:linux"
         buildoptions { "-U_FORTIFY_SOURCE" }
@@ -221,15 +232,15 @@ workspace "YGOPro"
     if BUILD_EVENT then
         include "event"
     end
-    if BUILD_FREETYPE then
+    if BUILD_FREETYPE and not SERVER_MODE then
         include "freetype"
     end
-    if BUILD_IRRLICHT then
+    if BUILD_IRRLICHT and not SERVER_MODE then
         include "irrlicht"
     end
     if BUILD_SQLITE then
         include "sqlite3"
     end
-    if USE_IRRKLANG and IRRKLANG_PRO then
+    if USE_IRRKLANG and IRRKLANG_PRO and not SERVER_MODE then
         include "ikpmp3"
     end

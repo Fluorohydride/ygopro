@@ -1,12 +1,31 @@
 include "lzma/."
+if not SERVER_MODE then
 include "spmemvfs/."
+end
 
-project "YGOPro"
+project "ygopro"
+if SERVER_MODE then
+    kind "ConsoleApp"
+
+    defines { "YGOPRO_SERVER_MODE" }
+
+    files { "gframe.cpp", "config.h",
+            "game.cpp", "game.h", "myfilesystem.h",
+            "deck_manager.cpp", "deck_manager.h",
+            "data_manager.cpp", "data_manager.h",
+            "replay.cpp", "replay.h",
+            "netserver.cpp", "netserver.h",
+            "single_duel.cpp", "single_duel.h",
+            "tag_duel.cpp", "tag_duel.h" }
+    includedirs { "../ocgcore" }
+    links { "ocgcore", "clzma", LUA_LIB_NAME, "sqlite3", "event" }
+else
     kind "WindowedApp"
 
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore" }
     links { "ocgcore", "clzma", "cspmemvfs", LUA_LIB_NAME, "sqlite3", "irrlicht", "freetype", "event" }
+end
 
     if BUILD_EVENT then
         includedirs { "../event/include" }
@@ -47,7 +66,9 @@ project "YGOPro"
     filter "system:windows"
         defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
+if not SERVER_MODE then
         libdirs { "$(DXSDK_DIR)Lib/x86" }
+end
         if USE_IRRKLANG then
             links { "irrKlang" }
             if IRRKLANG_PRO then
@@ -60,14 +81,20 @@ project "YGOPro"
                 filter {}
             end
         end
+if SERVER_MODE then
+        links { "ws2_32" }
+else
         links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32" }
+end
     filter "not action:vs*"
         buildoptions { "-std=c++14", "-fno-rtti" }
     filter "not system:windows"
         links { "event_pthreads", "dl", "pthread" }
     filter "system:macosx"
+if not SERVER_MODE then
         links { "z" }
         defines { "GL_SILENCE_DEPRECATION" }
+end
         if MAC_ARM then
             buildoptions { "--target=arm64-apple-macos12" }
             linkoptions { "-arch arm64" }
@@ -76,7 +103,9 @@ project "YGOPro"
             links { "irrklang" }
         end
     filter "system:linux"
+if not SERVER_MODE then
         links { "GL", "X11", "Xxf86vm" }
+end
         if USE_IRRKLANG then
             links { "IrrKlang" }
             linkoptions{ IRRKLANG_LINK_RPATH }
