@@ -41,15 +41,15 @@ void ClientCard::UpdateInfo(const CoreUtils::Query& query) {
 			mainGame->dField.MoveCard(this, 1);
 	}
 	if(query.flag & QUERY_LEVEL) {
-		if(IsDifferent(level, query.level))
+		if(IsDifferent(level, query.level) || lvstring.empty())
 			lvstring = fmt::format(L"L{}",level);
 	}
 	if(query.flag & QUERY_RANK) {
-		if(IsDifferent(rank, query.rank))
+		if(IsDifferent(rank, query.rank) || rkstring.empty())
 			rkstring = fmt::format(L"R{}", rank);
 	}
 	if(query.flag & QUERY_ATTACK) {
-		if(IsDifferent(attack, query.attack)) {
+		if(IsDifferent(attack, query.attack) || atkstring.empty()) {
 			if(attack < 0) {
 				atkstring = L"?";
 			} else
@@ -57,7 +57,7 @@ void ClientCard::UpdateInfo(const CoreUtils::Query& query) {
 		}
 	}
 	if(query.flag & QUERY_DEFENSE) {
-		if(IsDifferent(defense, query.defense)) {
+		if(IsDifferent(defense, query.defense) || defstring.empty()) {
 			if(type & TYPE_LINK) {
 				defstring = L"-";
 			} else if(defense < 0) {
@@ -110,7 +110,7 @@ void ClientCard::UpdateInfo(const CoreUtils::Query& query) {
 			rscstring = fmt::to_wstring(rscale);
 	}
 	if(query.flag & QUERY_LINK) {
-		if(IsDifferent(link, query.link))
+		if(IsDifferent(link, query.link) || linkstring.empty())
 			linkstring = fmt::format(L"L{}", link);
 		link_marker = query.link_marker;
 	}
