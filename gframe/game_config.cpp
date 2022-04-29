@@ -359,8 +359,8 @@ bool GameConfig::Save(const epro::path_char* filename) {
 	SERIALIZE(noShuffleDeck);
 	SERIALIZE(noCheckDeck);
 	SERIALIZE(hideHandsInReplays);
-	conf_file << "textfont = "                 << BufferIO::EncodeUTF8(textfont) << " " << std::to_string(textfontsize) << "\n";
-	conf_file << "numfont = "                  << BufferIO::EncodeUTF8(numfont) << "\n";
+	conf_file << "textfont = "                 << Utils::ToUTF8IfNeeded(textfont) << " " << std::to_string(textfontsize) << "\n";
+	conf_file << "numfont = "                  << Utils::ToUTF8IfNeeded(numfont) << "\n";
 	conf_file << "serverport = "               << BufferIO::EncodeUTF8(serverport) << "\n";
 	conf_file << "lasthost = "                 << BufferIO::EncodeUTF8(lasthost) << "\n";
 	conf_file << "lastport = "                 << BufferIO::EncodeUTF8(lastport) << "\n";
