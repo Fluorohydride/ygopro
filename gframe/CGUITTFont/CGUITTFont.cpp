@@ -45,18 +45,15 @@ namespace gui {
 
 // Manages the FT_Face cache.
 struct SGUITTFace : public virtual irr::IReferenceCounted {
-	SGUITTFace() : face_buffer(0), face_buffer_size(0) {
-		memset((void*)&face, 0, sizeof(FT_Face));
-	}
+	SGUITTFace() : face{} { }
 
 	~SGUITTFace() {
+		FT_StreamRec* streamrec = face->stream;
 		FT_Done_Face(face);
-		delete[] face_buffer;
+		delete streamrec;
 	}
 
 	FT_Face face;
-	FT_Byte* face_buffer;
-	FT_Long face_buffer_size;
 };
 
 // Static variables.
@@ -287,6 +284,43 @@ CGUITTFont::CGUITTFont(IGUIEnvironment *env)
 	Glyphs.set_free_when_destroyed(false);
 }
 
+static unsigned long ReadFile(FT_Stream stream, unsigned long offset, unsigned char* buffer, unsigned long count) {
+	auto* file = static_cast<io::IReadFile*>(stream->descriptor.pointer);
+	if(stream->pos != offset && !file->seek(static_cast<long>(offset)))
+		return count == 0 ? 1 : 0;
+	size_t read = 0;
+	if(count != 0)
+		read = file->read(buffer, static_cast<size_t>(count));
+	return static_cast<unsigned long>(read);
+}
+
+static void CloseFile(FT_Stream stream) {
+	auto* file = static_cast<io::IReadFile*>(stream->descriptor.pointer);
+	file->drop();
+}
+
+static bool OpenFileStreamFont(FT_Library library, io::IReadFile* file, FT_Long face_index, FT_Face* aface) {
+	FT_StreamRec& stream = *(new FT_StreamRec);
+	stream.base = nullptr;
+	stream.size = static_cast<unsigned long>(file->getSize());
+	stream.pos = 0UL;
+	stream.descriptor.pointer = file;
+	stream.pathname.pointer = nullptr;
+	stream.read = ReadFile;
+	stream.close = CloseFile;
+
+	FT_Open_Args args;
+	args.flags = FT_OPEN_STREAM;
+	args.memory_base = nullptr;
+	args.memory_size = 0L;
+	args.stream = &stream;
+	args.driver = nullptr;
+	args.num_params = 0;
+	args.params = nullptr;
+
+	return FT_Open_Face(library, &args, face_index, aface) == FT_Err_Ok;
+}
+
 bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antialias, const bool transparency) {
 	// Some sanity checks.
 	if(Environment == 0 || Driver == 0) return false;
@@ -317,7 +351,7 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 		if(filesystem) {
 			// Read in the file data.
 			io::IReadFile* file = filesystem->createAndOpenFile(filename);
-			if(file == 0) {
+			if(file == nullptr) {
 				if(logger) logger->log(L"CGUITTFont", L"Failed to open the file.", irr::ELL_INFORMATION);
 
 				c_faces.remove(filename);
@@ -325,13 +359,9 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 				face = 0;
 				return false;
 			}
-			face->face_buffer = new FT_Byte[file->getSize()];
-			file->read(face->face_buffer, file->getSize());
-			face->face_buffer_size = file->getSize();
-			file->drop();
 
 			// Create the face.
-			if(FT_New_Memory_Face(c_library, face->face_buffer, face->face_buffer_size, 0, &face->face)) {
+			if(!OpenFileStreamFont(c_library, file, 0, &face->face)) {
 				if(logger) logger->log(L"CGUITTFont", L"FT_New_Memory_Face failed.", irr::ELL_INFORMATION);
 
 				c_faces.remove(filename);
