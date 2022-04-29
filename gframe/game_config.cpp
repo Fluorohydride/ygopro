@@ -205,15 +205,15 @@ bool GameConfig::Load(const epro::path_char* filename) {
 			else if(type == "lastServer")
 				lastServer = BufferIO::DecodeUTF8(str);
 			else if(type == "textfont") {
-				pos = str.find(L' ');
+				pos = str.find(' ');
 				if(pos == std::wstring::npos) {
-					textfont = BufferIO::DecodeUTF8(str);
+					textfont = Utils::ToPathString(str);
 					continue;
 				}
-				textfont = BufferIO::DecodeUTF8(str.substr(0, pos));
+				textfont = Utils::ToPathString(str.substr(0, pos));
 				textfontsize = std::stoi(str.substr(pos));
 			} else if(type == "numfont")
-				numfont = BufferIO::DecodeUTF8(str);
+				numfont = Utils::ToPathString(str);
 			else if(type == "serverport")
 				serverport = BufferIO::DecodeUTF8(str);
 			else if(type == "lasthost")

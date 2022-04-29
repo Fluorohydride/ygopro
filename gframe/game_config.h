@@ -65,8 +65,8 @@ struct GameConfig
 	bool botMute{ false };
 	int lastBot{ 0 };
 	std::wstring lastServer;
-	std::wstring textfont{ L"fonts/NotoSansJP-Regular.otf" };
-	std::wstring numfont{ L"fonts/NotoSansJP-Regular.otf" };
+	epro::path_string textfont{ EPRO_TEXT("fonts/NotoSansJP-Regular.otf") };
+	epro::path_string numfont{ EPRO_TEXT("fonts/NotoSansJP-Regular.otf") };
 	std::wstring roompass; // NOT SERIALIZED
 	//settings
 	bool chkMAutoPos{ false };
