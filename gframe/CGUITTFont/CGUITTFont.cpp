@@ -48,6 +48,8 @@ struct SGUITTFace : public virtual irr::IReferenceCounted {
 	SGUITTFace() : face{} { }
 
 	~SGUITTFace() {
+		if(face == nullptr)
+			return;
 		FT_StreamRec* streamrec = face->stream;
 		FT_Done_Face(face);
 		delete streamrec;
@@ -300,25 +302,19 @@ static void CloseFile(FT_Stream stream) {
 }
 
 static bool OpenFileStreamFont(FT_Library library, io::IReadFile* file, FT_Long face_index, FT_Face* aface) {
-	FT_StreamRec& stream = *(new FT_StreamRec);
-	stream.base = nullptr;
+	FT_Open_Args args{};
+	args.flags = FT_OPEN_STREAM;
+	args.stream = new FT_StreamRec{};
+
+	auto& stream = *args.stream;
 	stream.size = static_cast<unsigned long>(file->getSize());
-	stream.pos = 0UL;
 	stream.descriptor.pointer = file;
-	stream.pathname.pointer = nullptr;
 	stream.read = ReadFile;
 	stream.close = CloseFile;
-
-	FT_Open_Args args;
-	args.flags = FT_OPEN_STREAM;
-	args.memory_base = nullptr;
-	args.memory_size = 0L;
-	args.stream = &stream;
-	args.driver = nullptr;
-	args.num_params = 0;
-	args.params = nullptr;
-
-	return FT_Open_Face(library, &args, face_index, aface) == FT_Err_Ok;
+	bool ret = FT_Open_Face(library, &args, face_index, aface) == FT_Err_Ok;
+	if(!ret)
+		delete args.stream;
+	return ret;
 }
 
 bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antialias, const bool transparency) {
