@@ -50,6 +50,7 @@ newoption { trigger = "irrklang-pro", category = "YGOPro - irrklang - pro", desc
 newoption { trigger = "no-irrklang-pro", category = "YGOPro - irrklang - pro", description = "" }
 newoption { trigger = "irrklang-pro-release-lib-dir", category = "YGOPro - irrklang - pro", description = "", value = "PATH" }
 newoption { trigger = "irrklang-pro-debug-lib-dir", category = "YGOPro - irrklang - pro", description = "", value = "PATH" }
+newoption { trigger = 'build-ikpmp3', category = "YGOPro - irrklang - ikpmp3", description = "" }
 
 newoption { trigger = "winxp-support", category = "YGOPro", description = "" }
 newoption { trigger = "mac-arm", category = "YGOPro", description = "M1" }
@@ -153,6 +154,8 @@ if IRRKLANG_PRO then
     IRRKLANG_PRO_DEBUG_LIB_DIR = GetParam("irrklang-pro-debug-lib-dir") or "../irrklang/lib/Win32-visualStudio-debug"  
 end
 
+BUILD_IKPMP3 = USE_IRRKLANG and (GetParam("build-ikpmp3") or IRRKLANG_PRO)
+
 if GetParam("winxp-support") and os.istarget("windows") then
     WINXP_SUPPORT = true
 end
@@ -249,6 +252,6 @@ end
     if BUILD_SQLITE then
         include "sqlite3"
     end
-    if USE_IRRKLANG and IRRKLANG_PRO and not SERVER_MODE then
+    if BUILD_IKPMP3 and not SERVER_MODE then
         include "ikpmp3"
     end

@@ -27,6 +27,10 @@ else
     links { "ocgcore", "clzma", "cspmemvfs", LUA_LIB_NAME, "sqlite3", "irrlicht", "freetype", "event" }
 end
 
+    if BUILD_IKPMP3 then
+        links { "ikpmp3" }
+    end
+
     if BUILD_EVENT then
         includedirs { "../event/include" }
     else
@@ -73,7 +77,6 @@ end
             links { "irrKlang" }
             if IRRKLANG_PRO then
                 defines { "IRRKLANG_STATIC" }
-                links { "ikpmp3" }
                 filter { "not configurations:Debug" }
                     libdirs { IRRKLANG_PRO_RELEASE_LIB_DIR }
                 filter { "configurations:Debug" }
