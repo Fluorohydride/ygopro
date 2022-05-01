@@ -1195,6 +1195,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			if(hovered_pos >= 1 && hovered_pos <= 3 && hovered_seq != -1) {
+				mainGame->env->setFocus(0);
 				position2di dest;
 				int pos = hovered_pos;
 				int seq = hovered_seq;
@@ -1308,15 +1309,43 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				float dx;
 				switch(pos) {
 				case 1: {
-					if(deckManager.current_deck.main.size() <= 40) {
-						dx = 436.0f / 9;
+					float dy = 68;
+					if(showing_pack) {
+						if(mainGame->scrPackCards->isVisible() && seq > 0) {
+							seq = seq - 12 * mainGame->scrPackCards->getPos();
+						}
+						int mainsize = deckManager.current_deck.main.size();
 						lx = 10;
+						if(mainsize > 10 * 7)
+							lx = 11;
+						if(mainsize > 11 * 7)
+							lx = 12;
+						if(mainsize > 60)
+							dy = 66;
+						dx = (mainGame->scrPackCards->isVisible() ? 414.0f : 436.0f) / (lx - 1);
+						if(mainGame->scrPackCards->isVisible() && seq >= 12 * 7) {
+							int l = (seq - 12 * 6) / 12;
+							mainGame->scrPackCards->setPos(mainGame->scrPackCards->getPos() + l);
+							seq = seq - 12 * l;
+						}
+						if(seq < 0) {
+							mainGame->scrPackCards->setPos(mainGame->scrPackCards->getPos() - 1);
+							seq = seq + 12;
+						}
+						if(seq == 0) {
+							mainGame->scrPackCards->setPos(0);
+						}
 					} else {
-						lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
-						dx = 436.0f / (lx - 1);
+						if(deckManager.current_deck.main.size() <= 40) {
+							dx = 436.0f / 9;
+							lx = 10;
+						} else {
+							lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
+							dx = 436.0f / (lx - 1);
+						}
 					}
 					dest.X = 314 + CARD_THUMB_WIDTH / 2 + (seq % lx) * dx;
-					dest.Y = 164 + CARD_THUMB_HEIGHT / 2 + (seq / lx) * 68;
+					dest.Y = 164 + CARD_THUMB_HEIGHT / 2 + (seq / lx) * dy;
 					break;
 				}
 				case 2: {
