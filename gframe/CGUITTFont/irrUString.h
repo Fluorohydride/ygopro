@@ -326,7 +326,7 @@ public:
 			const uchar16_t* data = reinterpret_cast<const uchar16_t*>(ref->data());
 			if(!UTF16_IS_SURROGATE_HI(data[pos]))
 				return false;
-			if((pos + 1) < ref->size_raw())
+			if((pos + 1) >= ref->size_raw())
 				return false;
 			return UTF16_IS_SURROGATE_LO(data[pos + 1]);
 		}
