@@ -169,8 +169,9 @@ void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
 				if(tmp_repo.is_language)
 					JSON_SET_IF_VALID(language, string, std::string);
 #ifdef YGOPRO_BUILD_DLL
-				JSON_SET_IF_VALID(core_path, string, std::string);
 				JSON_SET_IF_VALID(has_core, boolean, bool);
+				if(tmp_repo.has_core)
+					JSON_SET_IF_VALID(core_path, string, std::string);
 #endif
 			}
 			if(tmp_repo.Sanitize())
