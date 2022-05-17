@@ -4106,8 +4106,8 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		}
 		mainGame->dInfo.startlp = std::max(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
 		mainGame->dField.RefreshAllCards();
-		val = CompatRead<uint8_t, uint32_t>(pbuf); //chains, always 0 in single mode
-		if(!mainGame->dInfo.isSingleMode) {
+		val = CompatRead<uint8_t, uint32_t>(pbuf); //number of chains
+		if(val > 0) {
 			for(uint32_t i = 0; i < val; ++i) {
 				uint32_t code = BufferIO::Read<uint32_t>(pbuf);
 				CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
@@ -4141,10 +4141,8 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 					mainGame->dField.current_chain.chain_pos.Y += chc * 0.25f;
 				mainGame->dField.chains.push_back(mainGame->dField.current_chain);
 			}
-			if(val) {
-				event_string = fmt::sprintf(gDataManager->GetSysString(1609), gDataManager->GetName(mainGame->dField.current_chain.code));
-				mainGame->dField.last_chain = true;
-			}
+			event_string = fmt::sprintf(gDataManager->GetSysString(1609), gDataManager->GetName(mainGame->dField.current_chain.code));
+			mainGame->dField.last_chain = true;
 		}
 		break;
 	}
