@@ -225,6 +225,10 @@ DeckError DeckManager::CheckDeck(const Deck& deck, uint32_t lfhash, DuelAllowedC
 		return ret;
 	if(TypeCount(deck.main, forbiddentypes) > 0 || TypeCount(deck.extra, forbiddentypes) > 0 || TypeCount(deck.side, forbiddentypes) > 0)
 		return ret.type = DeckError::FORBTYPE, ret;
+	if((OTCount(deck.main, SCOPE_LEGEND) + OTCount(deck.extra, SCOPE_LEGEND)) > 1)
+		return ret.type = DeckError::TOOMANYLEGENDS, ret;
+	if(TypeCount(deck.main, TYPE_SKILL) > 1)
+		return ret.type = DeckError::TOOMANYSKILLS, ret;
 	bool speed = mainGame->extra_rules & DECK_LIMIT_20;
 	size_t minmain = 40, maxmain = 60, maxextra = 15, maxside = 15;
 	if(doubled){
