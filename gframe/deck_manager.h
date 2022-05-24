@@ -60,7 +60,7 @@ public:
 	LFList* GetLFList(uint32_t lfhash);
 	epro::wstringview GetLFListName(uint32_t lfhash);
 	DeckError CheckDeck(const Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes = 0);
-	int TypeCount(const Deck::Vector& cards, uint32_t type) const;
+	static int TypeCount(const Deck::Vector& cards, uint32_t type);
 	static uint32_t LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec, uint32_t mainc2 = 0, uint32_t sidec2 = 0);
 	static uint32_t LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, const cardlist_type* extralist = nullptr);
 	bool LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec);

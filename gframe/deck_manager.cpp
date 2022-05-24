@@ -147,7 +147,7 @@ epro::wstringview DeckManager::GetLFListName(uint32_t lfhash) {
 		return lflist->listName;
 	return gDataManager->unknown_string;
 }
-int DeckManager::TypeCount(const Deck::Vector& cards, uint32_t type) const {
+int DeckManager::TypeCount(const Deck::Vector& cards, uint32_t type) {
 	int count = 0;
 	for(const auto& card : cards) {
 		if(card->type & type)
