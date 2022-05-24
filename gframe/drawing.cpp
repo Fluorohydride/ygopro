@@ -1226,7 +1226,7 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::position2di pos, LFList* lf
 							goto draw;
 		if(gGameConfig->showScopeLabel && !lflist->whitelist) {
 			// Label display logic:
-			// If it contains exactly one bit between Anime, Illegal, irr::video:: Game, Custom, and Prerelease, display that.
+			// If it contains exactly one bit between Anime, Illegal, Video Game, Custom, and Prerelease, display that.
 			// Else, if it contains exactly one bit between OCG and TCG, display that.
 			switch(cp->ot & ~(SCOPE_PRERELEASE | SCOPE_LEGEND)) {
 				int index;
