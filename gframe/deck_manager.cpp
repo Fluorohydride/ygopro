@@ -420,8 +420,11 @@ bool DeckManager::LoadDeck(epro::path_stringview file, Deck* deck, bool separate
 	}
 	if(deck)
 		LoadDeck(*deck, mainlist, sidelist, separated ? &extralist : nullptr);
-	else
-		LoadDeck(current_deck, mainlist, sidelist, separated ? &extralist : nullptr);
+	else {
+		Deck tmp;
+		LoadDeck(tmp, mainlist, sidelist, separated ? &extralist : nullptr);
+		mainGame->deckBuilder.SetCurrentDeck(std::move(tmp));
+	}
 	return true;
 }
 bool DeckManager::LoadDeckDouble(epro::path_stringview file, epro::path_stringview file2, Deck* deck) {
@@ -431,8 +434,11 @@ bool DeckManager::LoadDeckDouble(epro::path_stringview file, epro::path_stringvi
 	LoadCardList(fmt::format(EPRO_TEXT("./deck/{}.ydk"), file2), &mainlist, nullptr, &sidelist);
 	if(deck)
 		LoadDeck(*deck, mainlist, sidelist);
-	else
-		LoadDeck(current_deck, mainlist, sidelist);
+	else {
+		Deck tmp;
+		LoadDeck(tmp, mainlist, sidelist);
+		mainGame->deckBuilder.SetCurrentDeck(std::move(tmp));
+	}
 	return true;
 }
 bool DeckManager::SaveDeck(Deck& deck, epro::path_stringview name) {

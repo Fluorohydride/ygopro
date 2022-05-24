@@ -1628,7 +1628,7 @@ bool Game::MainLoop() {
 			}
 			if(refresh_db && is_building) {
 				if(!is_siding)
-					gdeckManager->RefreshDeck(gdeckManager->current_deck);
+					deckBuilder.RefreshCurrentDeck();
 				if(deckBuilder.results.size())
 					deckBuilder.StartFilter(true);
 			}

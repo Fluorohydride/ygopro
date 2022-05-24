@@ -142,17 +142,17 @@ void DeckBuilder::Terminate(bool showmenu) {
 		gGameConfig->lastdeck = mainGame->cbDBDecks->getItem(sel);
 	gGameConfig->lastlflist = gdeckManager->_lfList[mainGame->cbDBLFList->getSelected()].hash;
 }
-static void ImportDeck() {
+void DeckBuilder::ImportDeck() {
 	const wchar_t* deck_string = Utils::OSOperator->getTextFromClipboard();
 	if(deck_string) {
 		if(wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0)
-			DeckManager::ImportDeckBase64(gdeckManager->current_deck, deck_string);
+			DeckManager::ImportDeckBase64(current_deck, deck_string);
 		else
-			(void)DeckManager::ImportDeckBase64Omega(gdeckManager->current_deck, deck_string);
+			(void)DeckManager::ImportDeckBase64Omega(current_deck, deck_string);
 	}
 }
-static void ExportDeck(bool plain_text) {
-	auto deck_string = plain_text ? DeckManager::ExportDeckCardNames(gdeckManager->current_deck) : DeckManager::ExportDeckBase64(gdeckManager->current_deck);
+void DeckBuilder::ExportDeckToClipboard(bool plain_text) {
+	auto deck_string = plain_text ? DeckManager::ExportDeckCardNames(current_deck) : DeckManager::ExportDeckBase64(current_deck);
 	if(deck_string) {
 		Utils::OSOperator->copyToClipboard(deck_string);
 		mainGame->stACMessage->setText(gDataManager->GetSysString(1368).data());
@@ -229,11 +229,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_EXPORT_YDKE: {
-				ExportDeck(false);
+				ExportDeckToClipboard(false);
 				break;
 			}
 			case BUTTON_EXPORT_DECK_PLAINTEXT: {
-				ExportDeck(true);
+				ExportDeckToClipboard(true);
 				break;
 			}
 			case BUTTON_CLOSE_YDKE_WINDOW: {
@@ -248,29 +248,29 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->PopupElement(mainGame->wQuery);
 				prev_operation = id;
 #else
-				gdeckManager->current_deck.main.clear();
-				gdeckManager->current_deck.extra.clear();
-				gdeckManager->current_deck.side.clear();
+				current_deck.main.clear();
+				current_deck.extra.clear();
+				current_deck.side.clear();
 #endif
 				break;
 			}
 			case BUTTON_SORT_DECK: {
-				std::sort(gdeckManager->current_deck.main.begin(), gdeckManager->current_deck.main.end(), DataManager::deck_sort_lv);
-				std::sort(gdeckManager->current_deck.extra.begin(), gdeckManager->current_deck.extra.end(), DataManager::deck_sort_lv);
-				std::sort(gdeckManager->current_deck.side.begin(), gdeckManager->current_deck.side.end(), DataManager::deck_sort_lv);
+				std::sort(current_deck.main.begin(), current_deck.main.end(), DataManager::deck_sort_lv);
+				std::sort(current_deck.extra.begin(), current_deck.extra.end(), DataManager::deck_sort_lv);
+				std::sort(current_deck.side.begin(), current_deck.side.end(), DataManager::deck_sort_lv);
 				break;
 			}
 			case BUTTON_SHUFFLE_DECK: {
 				std::shuffle(
-					gdeckManager->current_deck.main.begin(),
-					gdeckManager->current_deck.main.end(),
+					current_deck.main.begin(),
+					current_deck.main.end(),
 					Utils::GetRandomNumberGenerator()
 				);
 				break;
 			}
 			case BUTTON_SAVE_DECK: {
 				int sel = mainGame->cbDBDecks->getSelected();
-				if(sel >= 0 && gdeckManager->SaveDeck(gdeckManager->current_deck, Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)))) {
+				if(sel >= 0 && gdeckManager->SaveDeck(current_deck, Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)))) {
 					mainGame->stACMessage->setText(gDataManager->GetSysString(1335).data());
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
@@ -298,7 +298,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->addItem(dname.data());
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
-				if(gdeckManager->SaveDeck(gdeckManager->current_deck, Utils::ToPathString(dname))) {
+				if(gdeckManager->SaveDeck(current_deck, Utils::ToPathString(dname))) {
 					mainGame->stACMessage->setText(gDataManager->GetSysString(1335).data());
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
@@ -362,13 +362,13 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SIDE_OK: {
-				if(gdeckManager->current_deck.main.size() != gdeckManager->pre_deck.main.size() || gdeckManager->current_deck.extra.size() != gdeckManager->pre_deck.extra.size()
-						|| gdeckManager->current_deck.side.size() != gdeckManager->pre_deck.side.size()) {
+				if(current_deck.main.size() != gdeckManager->pre_deck.main.size() || current_deck.extra.size() != gdeckManager->pre_deck.extra.size()
+						|| current_deck.side.size() != gdeckManager->pre_deck.side.size()) {
 					mainGame->PopupMessage(gDataManager->GetSysString(1410));
 					break;
 				}
 				mainGame->ClearCardInfo();
-				const auto& deck = gdeckManager->current_deck;
+				const auto& deck = current_deck;
 				uint8_t deckbuf[0xf000];
 				auto* pdeck = deckbuf;
 				static constexpr auto max_deck_size = sizeof(deckbuf) / sizeof(uint32_t) - 2;
@@ -386,11 +386,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				for(const auto& pcard : deck.side)
 					BufferIO::Write<uint32_t>(pdeck, pcard->code);
 				DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
-				gdeckManager->sent_deck = gdeckManager->current_deck;
+				gdeckManager->sent_deck = current_deck;
 				break;
 			}
 			case BUTTON_SIDE_RELOAD: {
-				gdeckManager->current_deck = gdeckManager->pre_deck;
+				current_deck = gdeckManager->pre_deck;
 				break;
 			}
 			case BUTTON_MSG_OK: {
@@ -405,7 +405,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				switch(prev_operation) {
 				case BUTTON_DELETE_DECK : {
 					int sel = mainGame->cbDBDecks->getSelected();
-					if(DeckManager::DeleteDeck(gdeckManager->current_deck, Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)))) {
+					if(DeckManager::DeleteDeck(current_deck, Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)))) {
 						mainGame->cbDBDecks->removeItem(sel);
 						int count = mainGame->cbDBDecks->getItemCount();
 						if(sel >= count)
@@ -429,9 +429,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					prev_deck = sel;
 				}
 				case BUTTON_CLEAR_DECK: {
-					gdeckManager->current_deck.main.clear();
-					gdeckManager->current_deck.extra.clear();
-					gdeckManager->current_deck.side.clear();
+					current_deck.main.clear();
+					current_deck.extra.clear();
+					current_deck.side.clear();
 				}
 				}
 				prev_operation = 0;
@@ -804,7 +804,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			switch(event.KeyInput.Key) {
 			case irr::KEY_KEY_C: {
 				if(event.KeyInput.Control)
-					ExportDeck(event.KeyInput.Shift);
+					ExportDeckToClipboard(event.KeyInput.Shift);
 				break;
 			}
 			case irr::KEY_KEY_V: {
@@ -838,10 +838,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(root->getElementFromPoint({ event.DropEvent.X, event.DropEvent.Y }) != root)
 					break;
 				if(wcsncmp(L"ydke://", event.DropEvent.Text, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0) {
-					gdeckManager->ImportDeckBase64(gdeckManager->current_deck, event.DropEvent.Text);
+					gdeckManager->ImportDeckBase64(current_deck, event.DropEvent.Text);
 					return true;
 				}
-				if(gdeckManager->ImportDeckBase64Omega(gdeckManager->current_deck, event.DropEvent.Text))
+				if(gdeckManager->ImportDeckBase64Omega(current_deck, event.DropEvent.Text))
 					return true;
 				std::wstringstream ss(Utils::ToUpperNoAccents<std::wstring>(event.DropEvent.Text));
 				std::wstring to;
@@ -924,21 +924,21 @@ void DeckBuilder::GetHoveredCard() {
 		if(y >= 164 && y <= 435) {
 			int lx = 10, px, py = (y - 164) / 68;
 			hovered_pos = 1;
-			if(gdeckManager->current_deck.main.size() > 40)
-				lx = (gdeckManager->current_deck.main.size() - 41) / 4 + 11;
+			if(current_deck.main.size() > 40)
+				lx = (current_deck.main.size() - 41) / 4 + 11;
 			if(x >= 750)
 				px = lx - 1;
 			else
 				px = (x - 314) * (lx - 1) / 436;
 			hovered_seq = py * lx + px;
-			if(hovered_seq >= (int)gdeckManager->current_deck.main.size()) {
+			if(hovered_seq >= (int)current_deck.main.size()) {
 				hovered_seq = -1;
 				hovered_code = 0;
 			} else {
-				hovered_code = gdeckManager->current_deck.main[hovered_seq]->code;
+				hovered_code = current_deck.main[hovered_seq]->code;
 			}
 		} else if(y >= 466 && y <= 530) {
-			int lx = gdeckManager->current_deck.extra.size();
+			int lx = current_deck.extra.size();
 			hovered_pos = 2;
 			if(lx < 10)
 				lx = 10;
@@ -946,16 +946,16 @@ void DeckBuilder::GetHoveredCard() {
 				hovered_seq = lx - 1;
 			else
 				hovered_seq = (x - 314) * (lx - 1) / 436;
-			if(hovered_seq >= (int)gdeckManager->current_deck.extra.size()) {
+			if(hovered_seq >= (int)current_deck.extra.size()) {
 				hovered_seq = -1;
 				hovered_code = 0;
 			} else {
-				hovered_code = gdeckManager->current_deck.extra[hovered_seq]->code;
+				hovered_code = current_deck.extra[hovered_seq]->code;
 				if(x >= 772)
 					is_lastcard = 1;
 			}
 		} else if (y >= 564 && y <= 628) {
-			int lx = gdeckManager->current_deck.side.size();
+			int lx = current_deck.side.size();
 			hovered_pos = 3;
 			if(lx < 10)
 				lx = 10;
@@ -963,11 +963,11 @@ void DeckBuilder::GetHoveredCard() {
 				hovered_seq = lx - 1;
 			else
 				hovered_seq = (x - 314) * (lx - 1) / 436;
-			if(hovered_seq >= (int)gdeckManager->current_deck.side.size()) {
+			if(hovered_seq >= (int)current_deck.side.size()) {
 				hovered_seq = -1;
 				hovered_code = 0;
 			} else {
-				hovered_code = gdeckManager->current_deck.side[hovered_seq]->code;
+				hovered_code = current_deck.side[hovered_seq]->code;
 				if(x >= 772)
 					is_lastcard = 1;
 			}
@@ -1318,7 +1318,7 @@ void DeckBuilder::SortList() {
 bool DeckBuilder::push_main(const CardDataC* pointer, int seq, bool forced) {
 	if(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK) && pointer->type != (TYPE_SPELL | TYPE_LINK))
 		return false;
-	auto& container = gdeckManager->current_deck.main;
+	auto& container = current_deck.main;
 	if(!mainGame->is_siding && !forced && (int)container.size() >= 60)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
@@ -1331,7 +1331,7 @@ bool DeckBuilder::push_main(const CardDataC* pointer, int seq, bool forced) {
 bool DeckBuilder::push_extra(const CardDataC* pointer, int seq, bool forced) {
 	if(!(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) || pointer->type == (TYPE_SPELL | TYPE_LINK))
 		return false;
-	auto& container = gdeckManager->current_deck.extra;
+	auto& container = current_deck.extra;
 	if(!mainGame->is_siding && !forced && (int)container.size() >= 15)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
@@ -1342,7 +1342,7 @@ bool DeckBuilder::push_extra(const CardDataC* pointer, int seq, bool forced) {
 	return true;
 }
 bool DeckBuilder::push_side(const CardDataC* pointer, int seq, bool forced) {
-	auto& container = gdeckManager->current_deck.side;
+	auto& container = current_deck.side;
 	if(!mainGame->is_siding && !forced && (int)container.size() >= 15)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
@@ -1353,17 +1353,17 @@ bool DeckBuilder::push_side(const CardDataC* pointer, int seq, bool forced) {
 	return true;
 }
 void DeckBuilder::pop_main(int seq) {
-	auto& container = gdeckManager->current_deck.main;
+	auto& container = current_deck.main;
 	container.erase(container.begin() + seq);
 	GetHoveredCard();
 }
 void DeckBuilder::pop_extra(int seq) {
-	auto& container = gdeckManager->current_deck.extra;
+	auto& container = current_deck.extra;
 	container.erase(container.begin() + seq);
 	GetHoveredCard();
 }
 void DeckBuilder::pop_side(int seq) {
-	auto& container = gdeckManager->current_deck.side;
+	auto& container = current_deck.side;
 	container.erase(container.begin() + seq);
 	GetHoveredCard();
 }
@@ -1377,8 +1377,8 @@ bool DeckBuilder::check_limit(const CardDataC* pointer) {
 		limit = it->second;
 	if(limit == 0)
 		return false;
-	const auto& deck = gdeckManager->current_deck;
-	for(auto* plist : { &deck.main , &deck.extra,&deck.side }) {
+	const auto& deck = current_deck;
+	for(auto* plist : { &deck.main, &deck.extra, &deck.side }) {
 		for(auto& pcard : *plist) {
 			if(pcard->code == limitcode || pcard->alias == limitcode) {
 				if((it = filterList->content.find(pcard->code)) != endit)
@@ -1392,5 +1392,8 @@ bool DeckBuilder::check_limit(const CardDataC* pointer) {
 		}
 	}
 	return true;
+}
+void DeckBuilder::RefreshCurrentDeck() {
+	gdeckManager->RefreshDeck(current_deck);
 }
 }

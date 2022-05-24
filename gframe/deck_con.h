@@ -6,6 +6,7 @@
 #include <IEventReceiver.h>
 #include <unordered_map>
 #include <vector>
+#include "deck.h"
 
 namespace ygo {
 
@@ -42,14 +43,25 @@ public:
 	virtual bool OnEvent(const irr::SEvent& event);
 	void Initialize(bool refresh = true);
 	void Terminate(bool showmenu = true);
+	const Deck& GetCurrentDeck() const {
+		return current_deck;
+	}
+	void SetCurrentDeck(Deck new_deck) {
+		current_deck = std::move(new_deck);
+	}
+	void StartFilter(bool force_refresh = false);
+	void RefreshCurrentDeck();
+private:
 	void GetHoveredCard();
 	bool FiltersChanged();
 	void FilterCards(bool force_refresh = false);
 	bool CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std::vector<std::wstring>& tokens, const std::vector<uint16_t>& setcode);
-	void StartFilter(bool force_refresh = false);
 	void ClearFilter();
 	void ClearSearch();
 	void SortList();
+
+	void ImportDeck();
+	void ExportDeckToClipboard(bool plain_text);
 
 	bool push_main(const CardDataC* pointer, int seq = -1, bool forced = false);
 	bool push_extra(const CardDataC* pointer, int seq = -1, bool forced = false);
@@ -78,6 +90,9 @@ public:
 #undef DECLARE_WITH_CACHE
 
 	irr::core::position2di mouse_pos;
+
+	Deck current_deck;
+public:
 	uint32_t hovered_code;
 	int hovered_pos;
 	int hovered_seq;

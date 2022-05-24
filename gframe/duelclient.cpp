@@ -667,7 +667,7 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 		mainGame->deckBuilder.hovered_code = 0;
 		mainGame->deckBuilder.is_draging = false;
 		gdeckManager->pre_deck = gdeckManager->sent_deck;
-		gdeckManager->current_deck = gdeckManager->sent_deck;
+		mainGame->deckBuilder.SetCurrentDeck(gdeckManager->sent_deck);
 		mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 		mainGame->dInfo.isFirst = (mainGame->dInfo.player_type < mainGame->dInfo.team1) || (mainGame->dInfo.player_type >=7);
 		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;

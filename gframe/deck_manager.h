@@ -7,6 +7,7 @@
 #include "network.h"
 #include "text_types.h"
 #include "data_manager.h"
+#include "deck.h"
 
 namespace ygo {
 
@@ -27,17 +28,6 @@ struct LFList {
 		return flit;
 	}
 };
-struct Deck {
-	using Vector = std::vector<const CardDataC*>;
-	Vector main;
-	Vector extra;
-	Vector side;
-	void clear() {
-		main.clear();
-		extra.clear();
-		side.clear();
-	}
-};
 enum class DuelAllowedCards {
 	ALLOWED_CARDS_OCG_ONLY,
 	ALLOWED_CARDS_TCG_ONLY,
@@ -52,7 +42,6 @@ private:
 	const CardDataC* GetDummyOrMappedCardData(uint32_t code) const;
 	bool load_dummies{ true };
 public:
-	Deck current_deck;
 	Deck sent_deck;
 	Deck pre_deck;
 	std::vector<LFList> _lfList;
