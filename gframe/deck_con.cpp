@@ -1320,22 +1320,102 @@ void DeckBuilder::SortList() {
 void DeckBuilder::RefreshLimitationStatus() {
 	main_and_extra_legend_count = DeckManager::OTCount(current_deck.main, SCOPE_LEGEND) + DeckManager::OTCount(current_deck.extra, SCOPE_LEGEND);
 	main_skill_count = DeckManager::TypeCount(current_deck.main, TYPE_SKILL);
+	main_monster_count = DeckManager::TypeCount(current_deck.main, TYPE_MONSTER);
+	main_spell_count = DeckManager::TypeCount(current_deck.main, TYPE_SPELL);
+	main_trap_count = DeckManager::TypeCount(current_deck.main, TYPE_TRAP);
+
+	extra_fusion_count = DeckManager::TypeCount(current_deck.extra, TYPE_MONSTER);
+	extra_xyz_count = DeckManager::TypeCount(current_deck.extra, TYPE_XYZ);
+	extra_synchro_count = DeckManager::TypeCount(current_deck.extra, TYPE_SYNCHRO);
+	extra_link_count = DeckManager::TypeCount(current_deck.extra, TYPE_LINK);
+
+	side_monster_count = DeckManager::TypeCount(current_deck.side, TYPE_MONSTER);
+	side_spell_count = DeckManager::TypeCount(current_deck.side, TYPE_SPELL);
+	side_trap_count = DeckManager::TypeCount(current_deck.side, TYPE_TRAP);
 }
 void DeckBuilder::RefreshLimitationStatusOnRemoved(const CardDataC* card, DeckType location) {
-	if(location == DeckType::SIDE)
-		return;
-	if(card->ot & SCOPE_LEGEND)
-		--main_and_extra_legend_count;
-	if((card->type & TYPE_SKILL) && location == DeckType::MAIN)
-		--main_skill_count;
+	switch(location) {
+		case DeckType::MAIN:
+		{
+			if(card->ot & SCOPE_LEGEND)
+				--main_and_extra_legend_count;
+			if(card->type & TYPE_MONSTER)
+				--main_monster_count;
+			if(card->type & TYPE_SPELL)
+				--main_spell_count;
+			if(card->type & TYPE_TRAP)
+				--main_trap_count;
+			if(card->type & TYPE_SKILL)
+				--main_skill_count;
+			break;
+		}
+		case DeckType::EXTRA:
+		{
+			if(card->ot & SCOPE_LEGEND)
+				--main_and_extra_legend_count;
+			if(card->type & TYPE_FUSION)
+				--extra_fusion_count;
+			if(card->type & TYPE_XYZ)
+				--extra_xyz_count;
+			if(card->type & TYPE_SYNCHRO)
+				--extra_synchro_count;
+			if(card->type & TYPE_LINK)
+				--extra_link_count;
+			break;
+		}
+		case DeckType::SIDE:
+		{
+			if(card->type & TYPE_MONSTER)
+				--side_monster_count;
+			if(card->type & TYPE_SPELL)
+				--side_spell_count;
+			if(card->type & TYPE_TRAP)
+				--side_trap_count;
+			break;
+		}
+	}
 }
 void DeckBuilder::RefreshLimitationStatusOnAdded(const CardDataC* card, DeckType location) {
-	if(location == DeckType::SIDE)
-		return;
-	if(card->ot & SCOPE_LEGEND)
-		++main_and_extra_legend_count;
-	if((card->type & TYPE_SKILL) && location == DeckType::MAIN)
-		++main_skill_count;
+	switch(location) {
+		case DeckType::MAIN:
+		{
+			if(card->ot & SCOPE_LEGEND)
+				++main_and_extra_legend_count;
+			if(card->type & TYPE_MONSTER)
+				++main_monster_count;
+			if(card->type & TYPE_SPELL)
+				++main_spell_count;
+			if(card->type & TYPE_TRAP)
+				++main_trap_count;
+			if(card->type & TYPE_SKILL)
+				++main_skill_count;
+			break;
+		}
+		case DeckType::EXTRA:
+		{
+			if(card->ot & SCOPE_LEGEND)
+				++main_and_extra_legend_count;
+			if(card->type & TYPE_FUSION)
+				++extra_fusion_count;
+			if(card->type & TYPE_XYZ)
+				++extra_xyz_count;
+			if(card->type & TYPE_SYNCHRO)
+				++extra_synchro_count;
+			if(card->type & TYPE_LINK)
+				++extra_link_count;
+			break;
+		}
+		case DeckType::SIDE:
+		{
+			if(card->type & TYPE_MONSTER)
+				++side_monster_count;
+			if(card->type & TYPE_SPELL)
+				++side_spell_count;
+			if(card->type & TYPE_TRAP)
+				++side_trap_count;
+			break;
+		}
+	}
 }
 bool DeckBuilder::push_main(const CardDataC* pointer, int seq, bool forced) {
 	if(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK) && pointer->type != (TYPE_SPELL | TYPE_LINK))

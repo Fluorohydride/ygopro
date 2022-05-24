@@ -1269,9 +1269,9 @@ void Game::DrawDeckBd() {
 		DrawShadowText(numFont, main_deck_size_str, Resize(379, 137, 439, 157), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
 
 		const auto main_types_count_str = fmt::format(L"{} {} {} {} {} {}",
-													  gDataManager->GetSysString(1312), gdeckManager->TypeCount(current_deck.main, TYPE_MONSTER),
-													  gDataManager->GetSysString(1313), gdeckManager->TypeCount(current_deck.main, TYPE_SPELL),
-													  gDataManager->GetSysString(1314), gdeckManager->TypeCount(current_deck.main, TYPE_TRAP));
+													  gDataManager->GetSysString(1312), deckBuilder.main_monster_count,
+													  gDataManager->GetSysString(1313), deckBuilder.main_spell_count,
+													  gDataManager->GetSysString(1314), deckBuilder.main_trap_count);
 
 		const auto mainpos = Resize(310, 137, 797, 157);
 		const auto mainDeckTypeSize = textFont->getDimensionustring(main_types_count_str);
@@ -1303,10 +1303,10 @@ void Game::DrawDeckBd() {
 		DrawShadowText(numFont, extra_deck_size_str, Resize(379, 440, 439, 460), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
 
 		const auto extra_types_count_str = fmt::format(L"{} {} {} {} {} {} {} {}",
-													   gDataManager->GetSysString(1056), gdeckManager->TypeCount(current_deck.extra, TYPE_FUSION),
-													   gDataManager->GetSysString(1073), gdeckManager->TypeCount(current_deck.extra, TYPE_XYZ),
-													   gDataManager->GetSysString(1063), gdeckManager->TypeCount(current_deck.extra, TYPE_SYNCHRO),
-													   gDataManager->GetSysString(1076), gdeckManager->TypeCount(current_deck.extra, TYPE_LINK));
+													   gDataManager->GetSysString(1056), deckBuilder.extra_fusion_count,
+													   gDataManager->GetSysString(1073), deckBuilder.extra_xyz_count,
+													   gDataManager->GetSysString(1063), deckBuilder.extra_synchro_count,
+													   gDataManager->GetSysString(1076), deckBuilder.extra_link_count);
 
 		const auto extrapos = Resize(310, 440, 797, 460);
 		const auto extraDeckTypeSize = textFont->getDimensionustring(extra_types_count_str);
@@ -1337,9 +1337,9 @@ void Game::DrawDeckBd() {
 		DrawShadowText(numFont, side_deck_size_str, Resize(379, 536, 439, 556), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
 
 		const auto side_types_count_str = fmt::format(L"{} {} {} {} {} {}",
-													  gDataManager->GetSysString(1312), gdeckManager->TypeCount(current_deck.side, TYPE_MONSTER),
-													  gDataManager->GetSysString(1313), gdeckManager->TypeCount(current_deck.side, TYPE_SPELL),
-													  gDataManager->GetSysString(1314), gdeckManager->TypeCount(current_deck.side, TYPE_TRAP));
+													  gDataManager->GetSysString(1312), deckBuilder.side_monster_count,
+													  gDataManager->GetSysString(1313), deckBuilder.side_spell_count,
+													  gDataManager->GetSysString(1314), deckBuilder.side_trap_count);
 
 		const auto sidepos = Resize(310, 537, 797, 557);
 		const auto sideDeckTypeSize = textFont->getDimensionustring(side_types_count_str);
