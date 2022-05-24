@@ -149,6 +149,7 @@ void DeckBuilder::ImportDeck() {
 			DeckManager::ImportDeckBase64(current_deck, deck_string);
 		else
 			(void)DeckManager::ImportDeckBase64Omega(current_deck, deck_string);
+		RefreshLimitationStatus();
 	}
 }
 void DeckBuilder::ExportDeckToClipboard(bool plain_text) {
@@ -391,6 +392,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_SIDE_RELOAD: {
 				current_deck = gdeckManager->pre_deck;
+				RefreshLimitationStatus();
 				break;
 			}
 			case BUTTON_MSG_OK: {
@@ -1315,30 +1317,62 @@ void DeckBuilder::SortList() {
 		break;
 	}
 }
+void DeckBuilder::RefreshLimitationStatus() {
+	main_and_extra_legend_count = DeckManager::OTCount(current_deck.main, SCOPE_LEGEND) + DeckManager::OTCount(current_deck.extra, SCOPE_LEGEND);
+	main_skill_count = DeckManager::TypeCount(current_deck.main, TYPE_SKILL);
+}
+void DeckBuilder::RefreshLimitationStatusOnRemoved(const CardDataC* card, DeckType location) {
+	if(location == DeckType::SIDE)
+		return;
+	if(card->ot & SCOPE_LEGEND)
+		--main_and_extra_legend_count;
+	if((card->type & TYPE_SKILL) && location == DeckType::MAIN)
+		--main_skill_count;
+}
+void DeckBuilder::RefreshLimitationStatusOnAdded(const CardDataC* card, DeckType location) {
+	if(location == DeckType::SIDE)
+		return;
+	if(card->ot & SCOPE_LEGEND)
+		++main_and_extra_legend_count;
+	if((card->type & TYPE_SKILL) && location == DeckType::MAIN)
+		++main_skill_count;
+}
 bool DeckBuilder::push_main(const CardDataC* pointer, int seq, bool forced) {
 	if(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK) && pointer->type != (TYPE_SPELL | TYPE_LINK))
 		return false;
 	auto& container = current_deck.main;
-	if(!mainGame->is_siding && !forced && (int)container.size() >= 60)
-		return false;
+	if(!forced) {
+		if(main_and_extra_legend_count >= 1 && (pointer->ot & SCOPE_LEGEND))
+			return false;
+		if(main_skill_count >= 1 && (pointer->type & TYPE_SKILL))
+			return false;
+		if(!mainGame->is_siding && (int)container.size() >= 60)
+			return false;
+	}
 	if(seq >= 0 && seq < (int)container.size())
 		container.insert(container.begin() + seq, pointer);
 	else
 		container.push_back(pointer);
 	GetHoveredCard();
+	RefreshLimitationStatusOnAdded(pointer, DeckType::MAIN);
 	return true;
 }
 bool DeckBuilder::push_extra(const CardDataC* pointer, int seq, bool forced) {
 	if(!(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) || pointer->type == (TYPE_SPELL | TYPE_LINK))
 		return false;
 	auto& container = current_deck.extra;
-	if(!mainGame->is_siding && !forced && (int)container.size() >= 15)
-		return false;
+	if(!forced) {
+		if(main_and_extra_legend_count >= 1 && (pointer->ot & SCOPE_LEGEND))
+			return false;
+		if(!mainGame->is_siding && (int)container.size() >= 15)
+			return false;
+	}
 	if(seq >= 0 && seq < (int)container.size())
 		container.insert(container.begin() + seq, pointer);
 	else
 		container.push_back(pointer);
 	GetHoveredCard();
+	RefreshLimitationStatusOnAdded(pointer, DeckType::EXTRA);
 	return true;
 }
 bool DeckBuilder::push_side(const CardDataC* pointer, int seq, bool forced) {
@@ -1350,22 +1384,32 @@ bool DeckBuilder::push_side(const CardDataC* pointer, int seq, bool forced) {
 	else
 		container.push_back(pointer);
 	GetHoveredCard();
+	RefreshLimitationStatusOnAdded(pointer, DeckType::SIDE);
 	return true;
 }
 void DeckBuilder::pop_main(int seq) {
 	auto& container = current_deck.main;
-	container.erase(container.begin() + seq);
+	auto it = container.begin() + seq;
+	auto pcard = *it;
+	container.erase(it);
 	GetHoveredCard();
+	RefreshLimitationStatusOnRemoved(pcard, DeckType::MAIN);
 }
 void DeckBuilder::pop_extra(int seq) {
 	auto& container = current_deck.extra;
-	container.erase(container.begin() + seq);
+	auto it = container.begin() + seq;
+	auto pcard = *it;
+	container.erase(it);
 	GetHoveredCard();
+	RefreshLimitationStatusOnRemoved(pcard, DeckType::EXTRA);
 }
 void DeckBuilder::pop_side(int seq) {
 	auto& container = current_deck.side;
-	container.erase(container.begin() + seq);
+	auto it = container.begin() + seq;
+	auto pcard = *it;
+	container.erase(it);
 	GetHoveredCard();
+	RefreshLimitationStatusOnRemoved(pcard, DeckType::SIDE);
 }
 bool DeckBuilder::check_limit(const CardDataC* pointer) {
 	uint32_t limitcode = pointer->alias ? pointer->alias : pointer->code;
@@ -1395,5 +1439,6 @@ bool DeckBuilder::check_limit(const CardDataC* pointer) {
 }
 void DeckBuilder::RefreshCurrentDeck() {
 	gdeckManager->RefreshDeck(current_deck);
+	RefreshLimitationStatus();
 }
 }

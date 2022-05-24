@@ -48,6 +48,7 @@ public:
 	}
 	void SetCurrentDeck(Deck new_deck) {
 		current_deck = std::move(new_deck);
+		RefreshLimitationStatus();
 	}
 	void StartFilter(bool force_refresh = false);
 	void RefreshCurrentDeck();
@@ -59,6 +60,15 @@ private:
 	void ClearFilter();
 	void ClearSearch();
 	void SortList();
+
+	void RefreshLimitationStatus();
+	enum DeckType {
+		MAIN,
+		EXTRA,
+		SIDE
+	};
+	void RefreshLimitationStatusOnRemoved(const CardDataC* card, DeckType location);
+	void RefreshLimitationStatusOnAdded(const CardDataC* card, DeckType location);
 
 	void ImportDeck();
 	void ExportDeckToClipboard(bool plain_text);
@@ -91,6 +101,8 @@ private:
 
 	irr::core::position2di mouse_pos;
 
+	uint16_t main_and_extra_legend_count;
+	uint16_t main_skill_count;
 	Deck current_deck;
 public:
 	uint32_t hovered_code;
