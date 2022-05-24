@@ -155,6 +155,15 @@ int DeckManager::TypeCount(const Deck::Vector& cards, uint32_t type) {
 	}
 	return count;
 }
+int DeckManager::OTCount(const Deck::Vector& cards, uint32_t ot) {
+	int count = 0;
+	for(const auto& card : cards) {
+		if(card->ot & ot)
+			count++;
+	}
+	return count;
+
+}
 static DeckError CheckCards(const Deck::Vector& cards, LFList* curlist,
 					  DuelAllowedCards allowedCards,
 					  banlist_content_t& ccount,
