@@ -542,6 +542,14 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 				text = gDataManager->GetSysString(1425).data();
 				break;
 			}
+			case DeckError::TOOMANYLEGENDS: {
+				text = gDataManager->GetSysString(1426).data();
+				break;
+			}
+			case DeckError::TOOMANYSKILLS: {
+				text = gDataManager->GetSysString(1427).data();
+				break;
+			}
 			default: {
 				text = gDataManager->GetSysString(1406).data();
 				break;
