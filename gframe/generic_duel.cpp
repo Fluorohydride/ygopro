@@ -277,6 +277,10 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 	} else {
 		auto type = dp->type;
 		NetServer::DisconnectPlayer(dp);
+		IteratePlayers([dp](duelist& dueler) {
+			if(dueler == dp)
+				dueler.player = nullptr;
+		});
 		if(duel_stage == DUEL_STAGE_BEGIN && !seeking_rematch) {
 			if(HostLeft())
 				return;
