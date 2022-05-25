@@ -111,6 +111,7 @@ restart:
 		last_replay.WriteHeader(rh);
 		//records the replay with the new system
 		new_replay.BeginRecord();
+		rh.seed = static_cast<uint32_t>(time(nullptr));
 		rh.id = REPLAY_YRPX;
 		new_replay.WriteHeader(rh);
 		replay_stream.clear();
