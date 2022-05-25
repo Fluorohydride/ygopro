@@ -363,9 +363,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SIDE_OK: {
-				if(current_deck.main.size() != gdeckManager->pre_deck.main.size() || current_deck.extra.size() != gdeckManager->pre_deck.extra.size()
-						|| current_deck.side.size() != gdeckManager->pre_deck.side.size()) {
-					mainGame->PopupMessage(gDataManager->GetSysString(1410));
+				auto old_skills = DeckManager::TypeCount(gdeckManager->pre_deck.main, TYPE_SKILL);
+				auto new_skills = DeckManager::TypeCount(current_deck.main, TYPE_SKILL);
+				if((current_deck.main.size() - new_skills) != (gdeckManager->pre_deck.main.size() - old_skills)
+				   || current_deck.extra.size() != gdeckManager->pre_deck.extra.size()) {
+					mainGame->PopupMessage(gDataManager->GetSysString(1408));
 					break;
 				}
 				mainGame->ClearCardInfo();

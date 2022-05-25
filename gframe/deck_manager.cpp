@@ -248,7 +248,8 @@ DeckError DeckManager::CheckDeck(const Deck& deck, uint32_t lfhash, DuelAllowedC
 			maxside = 6;
 		}
 	}
-	if(deck.main.size() < minmain || deck.main.size() > maxmain) {
+	auto skills = TypeCount(deck.main, TYPE_SKILL);
+	if((deck.main.size() - skills) < minmain || (deck.main.size() - skills) > maxmain) {
 		ret.type = DeckError::MAINCOUNT;
 		ret.count.current = deck.main.size();
 		ret.count.minimum = minmain;
@@ -408,9 +409,16 @@ bool DeckManager::LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t 
 		pcount[card->code]++;
 	for(auto& card : deck.side)
 		pcount[card->code]++;
+	auto old_skills = TypeCount(deck.main, TYPE_SKILL);
 	Deck ndeck;
 	LoadDeck(ndeck, dbuf, mainc, sidec);
-	if(ndeck.main.size() != deck.main.size() || ndeck.extra.size() != deck.extra.size())
+	auto new_skills = TypeCount(ndeck.main, TYPE_SKILL);
+	// ideally the check should be only new_skills > 1, but the player might host with don't check deck
+	// and thus have more than 1 skill in the deck, do this check to ensure that the sided deck will
+	// always be valid in such case and prevent softlocking during side decking
+	if(new_skills > std::max(old_skills, 1))
+		return false;
+	if((ndeck.main.size() - new_skills) != (deck.main.size() - old_skills) || ndeck.extra.size() != deck.extra.size())
 		return false;
 	for(auto& card : ndeck.main)
 		ncount[card->code]++;
