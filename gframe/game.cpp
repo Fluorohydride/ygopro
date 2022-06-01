@@ -522,20 +522,26 @@ bool Game::Initialize() {
 	btnDP->setEnabled(false);
 	btnDP->setPressed(true);
 	btnDP->setVisible(false);
+	btnDP->setAlignment(irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE);
 	btnSP = env->addButton(Scale(0, 0, 50, 20), wPhase, -1, L"\xff33\xff30");
 	btnSP->setEnabled(false);
 	btnSP->setPressed(true);
 	btnSP->setVisible(false);
+	btnSP->setAlignment(irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE);
 	btnM1 = env->addButton(Scale(160, 0, 210, 20), wPhase, -1, L"\xff2d\xff11");
 	btnM1->setEnabled(false);
 	btnM1->setPressed(true);
 	btnM1->setVisible(false);
+	btnM1->setAlignment(irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE);
 	btnBP = env->addButton(Scale(160, 0, 210, 20), wPhase, BUTTON_BP, L"\xff22\xff30");
 	btnBP->setVisible(false);
+	btnBP->setAlignment(irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE);
 	btnM2 = env->addButton(Scale(160, 0, 210, 20), wPhase, BUTTON_M2, L"\xff2d\xff12");
 	btnM2->setVisible(false);
+	btnM2->setAlignment(irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE);
 	btnEP = env->addButton(Scale(320, 0, 370, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
 	btnEP->setVisible(false);
+	btnEP->setAlignment(irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE);
 	//tab
 	infosExpanded = 0;
 	wInfos = irr::gui::CGUICustomTabControl::addCustomTabControl(env, Scale(1, 275, 301, 639), 0, true);
@@ -1302,6 +1308,7 @@ bool Game::Initialize() {
 	btnChainWhenAvail->setVisible(false);
 	//shuffle
 	btnShuffle = env->addButton(Scale(0, 0, 50, 20), wPhase, BUTTON_CMD_SHUFFLE, gDataManager->GetSysString(1307).data());
+	btnShuffle->setAlignment(irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE, irr::gui::EGUIA_SCALE);
 	defaultStrings.emplace_back(btnShuffle, 1307);
 	btnShuffle->setVisible(false);
 	//cancel or finish
@@ -2734,55 +2741,15 @@ int Game::GetMasterRule(uint64_t param, uint32_t forbiddentypes, int* truerule) 
 	else
 		return 2;
 }
-void Game::SetPhaseButtons(bool visibility) {
-	if(gGameConfig->alternative_phase_layout) {
+void Game::ResizePhaseButtons() {
+	if(gGameConfig->alternative_phase_layout)
 		wPhase->setRelativePosition(Resize(940, 80, 990, 340));
-		btnDP->setRelativePosition(Resize(0, 0, 50, 20));
-		btnSP->setRelativePosition(Resize(0, 40, 50, 60));
-		btnM1->setRelativePosition(Resize(0, 80, 50, 100));
-		btnBP->setRelativePosition(Resize(0, 120, 50, 140));
-		btnM2->setRelativePosition(Resize(0, 160, 50, 180));
-		btnEP->setRelativePosition(Resize(0, 200, 50, 220));
-		btnShuffle->setRelativePosition(Resize(0, 240, 50, 260));
-	} else {
-		// reset master rule 4 phase button position
+	else if((dInfo.duel_params & DUEL_3_COLUMNS_FIELD) && dInfo.duel_field >= 4)
+		wPhase->setRelativePosition(Resize(480, 290, 855, 350));
+	else
 		wPhase->setRelativePosition(Resize(480, 310, 855, 330));
-		if(dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
-			if(dInfo.duel_field >= 4) {
-				wPhase->setRelativePosition(Resize(480, 290, 855, 350));
-				btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));
-				btnDP->setRelativePosition(Resize(0, 40, 50, 60));
-				btnSP->setRelativePosition(Resize(0, 40, 50, 60));
-				btnM1->setRelativePosition(Resize(160, 20, 210, 40));
-				btnBP->setRelativePosition(Resize(160, 20, 210, 40));
-				btnM2->setRelativePosition(Resize(160, 20, 210, 40));
-				btnEP->setRelativePosition(Resize(310, 0, 360, 20));
-			} else {
-				btnShuffle->setRelativePosition(Resize(65, 0, 115, 20));
-				btnDP->setRelativePosition(Resize(65, 0, 115, 20));
-				btnSP->setRelativePosition(Resize(65, 0, 115, 20));
-				btnM1->setRelativePosition(Resize(130, 0, 180, 20));
-				btnBP->setRelativePosition(Resize(195, 0, 245, 20));
-				btnM2->setRelativePosition(Resize(260, 0, 310, 20));
-				btnEP->setRelativePosition(Resize(260, 0, 310, 20));
-			}
-		} else {
-			btnDP->setRelativePosition(Resize(0, 0, 50, 20));
-			if(dInfo.duel_field >= 4) {
-				btnSP->setRelativePosition(Resize(0, 0, 50, 20));
-				btnM1->setRelativePosition(Resize(160, 0, 210, 20));
-				btnBP->setRelativePosition(Resize(160, 0, 210, 20));
-				btnM2->setRelativePosition(Resize(160, 0, 210, 20));
-			} else {
-				btnSP->setRelativePosition(Resize(65, 0, 115, 20));
-				btnM1->setRelativePosition(Resize(130, 0, 180, 20));
-				btnBP->setRelativePosition(Resize(195, 0, 245, 20));
-				btnM2->setRelativePosition(Resize(260, 0, 310, 20));
-			}
-			btnEP->setRelativePosition(Resize(320, 0, 370, 20));
-			btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
-		}
-	}
+}
+void Game::SetPhaseButtons(bool visibility) {
 	if(visibility) {
 		btnDP->setVisible(gGameConfig->alternative_phase_layout || btnDP->isSubElement());
 		btnSP->setVisible(gGameConfig->alternative_phase_layout || btnSP->isSubElement());
@@ -2791,6 +2758,52 @@ void Game::SetPhaseButtons(bool visibility) {
 		btnBP->setVisible(gGameConfig->alternative_phase_layout || btnBP->isSubElement());
 		btnEP->setVisible(gGameConfig->alternative_phase_layout || btnEP->isSubElement());
 	}
+	ResizePhaseButtons();
+	if(gGameConfig->alternative_phase_layout) {
+		btnDP->setRelativePosition(Resize(0, 0, 50, 20));
+		btnSP->setRelativePosition(Resize(0, 40, 50, 60));
+		btnM1->setRelativePosition(Resize(0, 80, 50, 100));
+		btnBP->setRelativePosition(Resize(0, 120, 50, 140));
+		btnM2->setRelativePosition(Resize(0, 160, 50, 180));
+		btnEP->setRelativePosition(Resize(0, 200, 50, 220));
+		btnShuffle->setRelativePosition(Resize(0, 240, 50, 260));
+		return;
+	}
+	// reset master rule 4 phase button position
+	if(dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
+		if(dInfo.duel_field >= 4) {
+			btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));
+			btnDP->setRelativePosition(Resize(0, 40, 50, 60));
+			btnSP->setRelativePosition(Resize(0, 40, 50, 60));
+			btnM1->setRelativePosition(Resize(160, 20, 210, 40));
+			btnBP->setRelativePosition(Resize(160, 20, 210, 40));
+			btnM2->setRelativePosition(Resize(160, 20, 210, 40));
+			btnEP->setRelativePosition(Resize(310, 0, 360, 20));
+			return;
+		}
+		btnShuffle->setRelativePosition(Resize(65, 0, 115, 20));
+		btnDP->setRelativePosition(Resize(65, 0, 115, 20));
+		btnSP->setRelativePosition(Resize(65, 0, 115, 20));
+		btnM1->setRelativePosition(Resize(130, 0, 180, 20));
+		btnBP->setRelativePosition(Resize(195, 0, 245, 20));
+		btnM2->setRelativePosition(Resize(260, 0, 310, 20));
+		btnEP->setRelativePosition(Resize(260, 0, 310, 20));
+		return;
+	}
+	btnDP->setRelativePosition(Resize(0, 0, 50, 20));
+	btnEP->setRelativePosition(Resize(320, 0, 370, 20));
+	btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
+	if(dInfo.duel_field >= 4) {
+		btnSP->setRelativePosition(Resize(0, 0, 50, 20));
+		btnM1->setRelativePosition(Resize(160, 0, 210, 20));
+		btnBP->setRelativePosition(Resize(160, 0, 210, 20));
+		btnM2->setRelativePosition(Resize(160, 0, 210, 20));
+		return;
+	}
+	btnSP->setRelativePosition(Resize(65, 0, 115, 20));
+	btnM1->setRelativePosition(Resize(130, 0, 180, 20));
+	btnBP->setRelativePosition(Resize(195, 0, 245, 20));
+	btnM2->setRelativePosition(Resize(260, 0, 310, 20));
 }
 void Game::SetMessageWindow() {
 	if(is_building || dInfo.isInDuel) {
@@ -3230,7 +3243,7 @@ void Game::OnResize() {
 	btnReplaySwap->setRelativePosition(Resize(5, 30, 85, 50));
 	btnReplayExit->setRelativePosition(Resize(5, 105, 85, 125));
 
-	SetPhaseButtons();
+	ResizePhaseButtons();
 	btnSpectatorSwap->setRelativePosition(Resize(205, 100, 295, 135));
 	btnChainAlways->setRelativePosition(Resize(205, 140, 295, 175));
 	btnChainIgnore->setRelativePosition(Resize(205, 100, 295, 135));

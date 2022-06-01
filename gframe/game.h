@@ -173,6 +173,7 @@ public:
 	void UpdateDuelParam();
 	void UpdateExtraRules(bool set = false);
 	int GetMasterRule(uint64_t param, uint32_t forbidden = 0, int* truerule = 0);
+	void ResizePhaseButtons();
 	void SetPhaseButtons(bool visibility = false);
 	void SetMessageWindow();
 
