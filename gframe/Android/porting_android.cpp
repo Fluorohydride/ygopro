@@ -528,8 +528,9 @@ void showErrorDialog(epro::stringview context, epro::stringview message) {
 	int Events = 0;
 	int ident = 0;
 	android_poll_source* source = 0;
-	while(app_global->destroyRequested != 0 && 
-		!error_dialog_returned && ALooper_pollAll(-1, nullptr, &Events, (void**)&source) >= 0) {
+	while(!error_dialog_returned &&
+		ALooper_pollAll(-1, nullptr, &Events, (void**)&source) >= 0 &&
+		app_global->destroyRequested == 0) {
 		if(source != NULL)
 			source->process(app_global, source);
 	}
