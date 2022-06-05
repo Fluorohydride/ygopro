@@ -484,9 +484,6 @@ jobs:
 
   Notify-success:
     runs-on: ubuntu-latest
-    env:
-      DEPLOY_BRANCH: travis-osx-universal
-      TRAVIS_OS_NAME: osx
     needs: [ Windows, Linux-gcc-7-5-0, Mac-os-universal ]
     steps:
     - name: Log Success
