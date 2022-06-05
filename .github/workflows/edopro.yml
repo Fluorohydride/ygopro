@@ -52,7 +52,7 @@ jobs:
     - name: Deploy
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       shell: bash
-      run: ./ocgcore/travis/deploy.sh
+      run: ./travis/deploy.sh
     - name: Log Failure
       uses: sarisia/actions-status-discord@v1
       if: failure()
@@ -108,7 +108,7 @@ jobs:
     - name: Deploy
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       shell: bash
-      run: ./ocgcore/travis/deploy.sh
+      run: ./travis/deploy.sh
     - name: Log Failure
       uses: sarisia/actions-status-discord@v1
       if: failure()
@@ -167,7 +167,7 @@ jobs:
     - name: Deploy
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       shell: bash
-      run: ./ocgcore/travis/deploy.sh
+      run: ./travis/deploy.sh
     - name: Log Failure
       uses: sarisia/actions-status-discord@v1
       if: failure()
@@ -230,7 +230,7 @@ jobs:
     - name: Deploy
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       shell: bash
-      run: ./ocgcore/travis/deploy.sh
+      run: ./travis/deploy.sh
     - name: Log Failure
       uses: sarisia/actions-status-discord@v1
       if: failure()
@@ -294,7 +294,7 @@ jobs:
     - name: Deploy
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       shell: bash
-      run: ./ocgcore/travis/deploy.sh
+      run: ./travis/deploy.sh
     - name: Log Failure
       uses: sarisia/actions-status-discord@v1
       if: failure()
@@ -353,7 +353,7 @@ jobs:
     - name: Deploy
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       shell: bash
-      run: ./ocgcore/travis/deploy.sh
+      run: ./travis/deploy.sh
     - uses: actions/upload-artifact@v2
       with:
         name: osx
@@ -423,7 +423,7 @@ jobs:
     - name: Deploy
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       shell: bash
-      run: ./ocgcore/travis/deploy.sh
+      run: ./travis/deploy.sh
     - uses: actions/upload-artifact@v2
       with:
         name: osx-aarch64
@@ -469,7 +469,7 @@ jobs:
     - name: Deploy
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       shell: bash
-      run: ./ocgcore/travis/deploy.sh
+      run: ./travis/deploy.sh
     - name: Delete artifacts
       uses: geekyeggo/delete-artifact@v1
       with:
