@@ -60,6 +60,10 @@ newoption {
 	value = "url",
 	description = "API endpoint to check for updates from"
 }
+newoption {
+	trigger = "no-core",
+	description = "Ignore the ocgcore subproject and only generate the solution for yroprodll"
+}
 workspace "ygo"
 	location "build"
 	language "C++"
@@ -165,7 +169,7 @@ workspace "ygo"
 		linkoptions { "-static-libgcc", "-static-libstdc++" }
 
 	subproject = true
-	if not _OPTIONS["prebuilt-core"] then
+	if not _OPTIONS["prebuilt-core"] and not _OPTIONS["no-core"] then
 		include "ocgcore"
 	end
 	include "gframe"
