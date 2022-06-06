@@ -41,7 +41,7 @@ using Stat = struct stat;
 #endif
 
 #if defined(_WIN32)
-namespace WindowsWeirdStuff {
+namespace {
 
 #if defined(_MSC_VER)
 //https://docs.microsoft.com/en-us/visualstudio/debugger/how-to-set-a-thread-name-in-native-code?view=vs-2015&redirectedfrom=MSDN
@@ -57,19 +57,27 @@ struct THREADNAME_INFO {
 	DWORD dwFlags; // Reserved for future use, must be zero.
 };
 #pragma pack(pop)
-static inline void NameThread(const char* threadName) {
+inline void NameThreadMsvc(const char* threadName) {
 	const THREADNAME_INFO info{ 0x1000, threadName, ((DWORD)-1), 0 };
 	__try {	RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info); }
 	__except(EXCEPTION_EXECUTE_HANDLER) {}
 }
 #pragma warning(pop)
 #endif
-using SetThreadDescription_t = HRESULT(WINAPI*)(HANDLE, PCWSTR);
-inline const SetThreadDescription_t GetSetThreadDescription() {
+const auto PSetThreadDescription = [] {
 	auto proc = GetProcAddress(GetModuleHandle(EPRO_TEXT("kernel32.dll")), "SetThreadDescription");
 	if(proc == nullptr)
 		proc = GetProcAddress(GetModuleHandle(EPRO_TEXT("KernelBase.dll")), "SetThreadDescription");
+	using SetThreadDescription_t = HRESULT(WINAPI*)(HANDLE, PCWSTR);
 	return reinterpret_cast<SetThreadDescription_t>(proc);
+}();
+void NameThread(const char* name, const wchar_t* wname) {
+	(void)name;
+	if(PSetThreadDescription)
+		PSetThreadDescription(GetCurrentThread(), wname);
+#if defined(_MSC_VER)
+	NameThreadMsvc(name);
+#endif //_MSC_VER
 }
 }
 #endif
@@ -82,21 +90,13 @@ namespace ygo {
 	RNG::SplitMix64 Utils::generator(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
 	void Utils::InternalSetThreadName(const char* name, const wchar_t* wname) {
-#if defined(_WIN32)
-		(void)name;
-		static const auto PSetThreadDescription = WindowsWeirdStuff::GetSetThreadDescription();
-		if(PSetThreadDescription)
-			PSetThreadDescription(GetCurrentThread(), wname);
-#if defined(_MSC_VER)
-		WindowsWeirdStuff::NameThread(name);
-#endif //_MSC_VER
-#else
 		(void)wname;
-#if defined(__linux__)
+#if defined(_WIN32)
+		NameThread(name, wname);
+#elif defined(__linux__)
 		pthread_setname_np(pthread_self(), name);
 #elif defined(__APPLE__)
 		pthread_setname_np(name);
-#endif //__linux__
 #endif //_WIN32
 	}
 
