@@ -11,6 +11,7 @@
 #include <signal.h>
 #include <ifaddrs.h>
 #include <net/if.h>
+#include <sys/wait.h>
 #endif
 #endif
 #include "game_config.h"
@@ -163,6 +164,7 @@ void DuelClient::StopClient(bool is_exiting) {
 #if !defined(_WIN32) && !defined(__ANDROID__)
 		for(auto& pid : mainGame->gBot.windbotsPids) {
 			kill(pid, SIGKILL);
+			(void)waitpid(pid, nullptr, 0);
 		}
 		mainGame->gBot.windbotsPids.clear();
 #endif
