@@ -55,6 +55,7 @@ namespace ygo {
 		static std::vector<SynchronizedIrrArchive> archives;
 		static irr::io::IFileSystem* filesystem;
 		static irr::IOSOperator* OSOperator;
+		static epro::stringview GetLastErrorString();
 		static bool MakeDirectory(epro::path_stringview path);
 #ifdef __linux__
 		static bool FileCopyFD(int source, int destination);

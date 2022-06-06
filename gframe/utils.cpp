@@ -100,11 +100,51 @@ namespace ygo {
 #endif //_WIN32
 	}
 
+	thread_local std::string last_error_string;
+	epro::stringview Utils::GetLastErrorString() {
+		return last_error_string;
+	}
+
+	static void SetLastError() {
+#ifdef _WIN32
+		const auto error = GetLastError();
+		if(error == NOERROR) {
+			last_error_string.clear();
+			return;
+		}
+		static constexpr DWORD formatControl = FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_IGNORE_INSERTS |
+			FORMAT_MESSAGE_FROM_SYSTEM;
+
+		LPTSTR textBuffer = nullptr;
+		auto count = FormatMessage(formatControl, nullptr, error, 0, (LPTSTR)&textBuffer, 0, nullptr);
+		if(count != 0) {
+			last_error_string = Utils::ToUTF8IfNeeded(textBuffer);
+			LocalFree(textBuffer);
+			if(last_error_string.back() == '\n')
+				last_error_string.pop_back();
+			if(last_error_string.back() == '\r')
+				last_error_string.pop_back();
+			return;
+		}
+		last_error_string = "Unknown error";
+#else
+		last_error_string = strerror(errno);
+#endif
+	}
+
+	static inline bool SetLastErrorStringIfFailed(bool check) {
+		if(check)
+			return true;
+		SetLastError();
+		return false;
+	}
+
 	bool Utils::MakeDirectory(epro::path_stringview path) {
 #ifdef _WIN32
-		return CreateDirectory(path.data(), nullptr) || ERROR_ALREADY_EXISTS == GetLastError();
+		return SetLastErrorStringIfFailed(CreateDirectory(path.data(), nullptr) || ERROR_ALREADY_EXISTS == GetLastError());
 #else
-		return mkdir(path.data(), 0777) == 0 || errno == EEXIST;
+		return SetLastErrorStringIfFailed(mkdir(path.data(), 0777) == 0 || errno == EEXIST);
 #endif
 	}
 #ifdef __linux__
@@ -113,20 +153,22 @@ namespace ygo {
 		Stat fileinfo = { 0 };
 		fstat(source, &fileinfo);
 		int result = sendfile(destination, source, &bytesCopied, fileinfo.st_size);
-		return result != -1;
+		return SetLastErrorStringIfFailed(result != -1);
 	}
 #endif
 	bool Utils::FileCopy(epro::path_stringview source, epro::path_stringview destination) {
 		if(source == destination)
 			return false;
 #ifdef _WIN32
-		return CopyFile(source.data(), destination.data(), false);
+		return SetLastErrorStringIfFailed(CopyFile(source.data(), destination.data(), false));
 #elif defined(__linux__)
 		int input, output;
 		if((input = open(source.data(), O_RDONLY)) == -1) {
+			SetLastError();
 			return false;
 		}
 		if((output = creat(destination.data(), 0660)) == -1) {
+			SetLastError();
 			close(input);
 			return false;
 		}
@@ -135,7 +177,7 @@ namespace ygo {
 		close(output);
 		return result;
 #elif defined(__APPLE__)
-		return copyfile(source.data(), destination.data(), 0, COPYFILE_ALL) == 0;
+		return SetLastErrorStringIfFailed(copyfile(source.data(), destination.data(), 0, COPYFILE_ALL) == 0);
 #else
 		std::ifstream src(source.data(), std::ios::binary);
 		if(!src.is_open())
@@ -151,9 +193,9 @@ namespace ygo {
 	}
 	bool Utils::FileMove(epro::path_stringview source, epro::path_stringview destination) {
 #ifdef _WIN32
-		return MoveFile(source.data(), destination.data());
+		return SetLastErrorStringIfFailed(MoveFile(source.data(), destination.data()));
 #else
-		return rename(source.data(), destination.data()) == 0;
+		return SetLastErrorStringIfFailed(rename(source.data(), destination.data()) == 0);
 #endif
 	}
 	bool Utils::FileExists(epro::path_stringview path) {
@@ -167,21 +209,23 @@ namespace ygo {
 	}
 	static epro::path_string working_dir;
 	bool Utils::SetWorkingDirectory(epro::path_stringview newpath) {
-		working_dir = NormalizePathImpl(newpath);
 #ifdef _WIN32
-		return SetCurrentDirectory(newpath.data());
+		bool res = SetLastErrorStringIfFailed(SetCurrentDirectory(newpath.data()));
 #else
-		return chdir(newpath.data()) == 0;
+		bool res = SetLastErrorStringIfFailed(chdir(newpath.data()) == 0);
 #endif
+		if(res)
+			working_dir = NormalizePathImpl(newpath);
+		return res;
 	}
 	const epro::path_string& Utils::GetWorkingDirectory() {
 		return working_dir;
 	}
 	bool Utils::FileDelete(epro::path_stringview source) {
 #ifdef _WIN32
-		return DeleteFile(source.data());
+		return SetLastErrorStringIfFailed(DeleteFile(source.data()));
 #else
-		return remove(source.data()) == 0;
+		return SetLastErrorStringIfFailed(remove(source.data()) == 0);
 #endif
 	}
 

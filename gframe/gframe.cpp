@@ -164,7 +164,8 @@ int _tmain(int argc, epro::path_char* argv[]) {
 		const auto& workdir = args[LAUNCH_PARAM::WORK_DIR];
 		const epro::path_stringview dest = workdir.enabled ? workdir.argument : ygo::Utils::GetExeFolder();
 		if(!ygo::Utils::SetWorkingDirectory(dest)) {
-			const auto err = fmt::format("failed to change directory to: {}", ygo::Utils::ToUTF8IfNeeded(dest));
+			const auto err = fmt::format("failed to change directory to: {} ({})",
+										 ygo::Utils::ToUTF8IfNeeded(dest), ygo::Utils::GetLastErrorString());
 			ygo::ErrorLog(err);
 			fmt::print("{}\n", err);
 			ygo::GUIUtils::ShowErrorWindow("Initialization fail", err);
