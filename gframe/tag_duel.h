@@ -71,10 +71,10 @@ protected:
 	unsigned char last_response;
 	Replay last_replay;
 	unsigned char turn_count;
-	unsigned short time_limit[2];
-	unsigned short time_elapsed;
+	short time_limit[2];
+	short time_elapsed;
 #ifdef YGOPRO_SERVER_MODE
-	unsigned short time_compensator[2];
+	short time_compensator[2];
 #endif
 };
 
