@@ -193,7 +193,7 @@ workspace "YGOPro"
     filter { "configurations:Release", "action:vs*" }
         flags { "LinkTimeOptimization" }
         staticruntime "On"
-        disablewarnings { "4244", "4267", "4838", "4577", "4819", "4018", "4996", "4477", "4091", "4828", "4800", "6031", "6054", "6262" }
+        disablewarnings { "4244", "4267", "4838", "4577", "4819", "4018", "4996", "4477", "4091", "4828", "4800", "6011", "6031", "6054", "6262" }
 
     filter { "configurations:Release", "not action:vs*" }
         symbols "On"
@@ -203,7 +203,7 @@ workspace "YGOPro"
         end
 
     filter { "configurations:Debug", "action:vs*" }
-        disablewarnings { "4819", "4828", "6031", "6054", "6262" }
+        disablewarnings { "4819", "4828", "6011", "6031", "6054", "6262" }
 
     filter "action:vs*"
         vectorextensions "SSE2"
