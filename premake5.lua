@@ -203,7 +203,6 @@ workspace "YGOPro"
         end
 
     filter { "configurations:Debug", "action:vs*" }
-        defines { "_ITERATOR_DEBUG_LEVEL=0" }
         disablewarnings { "4819", "4828", "6031", "6054", "6262" }
 
     filter "action:vs*"
