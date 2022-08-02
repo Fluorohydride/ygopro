@@ -124,7 +124,7 @@ if USE_IRRKLANG then
         IRRKLANG_LIB_DIR = "../irrklang/lib/Win32-visualStudio"
     elseif os.istarget("linux") then
         IRRKLANG_LIB_DIR = "../irrklang/bin/linux-gcc-64"
-        IRRKLANG_LINK_RPATH = "-Wl,-rpath=./irrklang/bin/linux-gcc-64/"
+        IRRKLANG_LINK_RPATH = "-Wl,-rpath=./lib/"
     elseif os.istarget("macosx") then
         IRRKLANG_LIB_DIR = "../irrklang/bin/macosx-gcc"
     end
@@ -147,8 +147,12 @@ BUILD_IKPMP3 = USE_IRRKLANG and (GetParam("build-ikpmp3") or IRRKLANG_PRO)
 if GetParam("winxp-support") and os.istarget("windows") then
     WINXP_SUPPORT = true
 end
-if GetParam("mac-arm") and os.istarget("macosx") then
-    MAC_ARM = true
+if os.istarget("macosx") then
+    MAC_ARM = false
+    if GetParam("mac-arm") then
+        MAC_ARM = true
+    end
+    ON_MAC_ARM = MAC_ARM or os.outputof("arch") == "arm64"
 end
 
 workspace "YGOPro"
@@ -198,7 +202,7 @@ workspace "YGOPro"
     filter { "configurations:Release", "not action:vs*" }
         symbols "On"
         defines "NDEBUG"
-        if not MAC_ARM then
+        if not ON_MAC_ARM then
             buildoptions "-march=native"
         end
 
