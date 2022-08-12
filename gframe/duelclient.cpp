@@ -872,7 +872,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		memcpy(last_successful_msg, msg, len);
 		last_successful_msg_length = len;
 	}
-	mainGame->wCmdMenu->setVisible(false);
+	mainGame->dField.HideMenu();
 	if(!mainGame->dInfo.isReplay && mainGame->dInfo.curMsg != MSG_WAITING && mainGame->dInfo.curMsg != MSG_CARD_SELECTED) {
 		mainGame->waitFrame = -1;
 		mainGame->stHintMsg->setVisible(false);
