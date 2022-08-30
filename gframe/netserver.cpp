@@ -55,6 +55,27 @@ void NetServer::InitDuel()
 	BufferIO::CopyWStr(pkt->pass, duel_mode->pass, 20);
 }
 
+bool NetServer::IsCanIncreaseTime(unsigned short gameMsg, void *pdata, unsigned int len) {
+	int32* ivalue = (int32*)pdata;
+	switch(gameMsg) {
+		case MSG_RETRY:
+		case MSG_SELECT_UNSELECT_CARD:
+			return false;
+		case MSG_SELECT_CHAIN:
+			return ivalue[0] != -1;
+		case MSG_SELECT_IDLECMD: {
+			int32 idleChoice = ivalue[0] & 0xffff;
+			return idleChoice <= 5; // no shuffle hand, enter other phases
+		}
+		case MSG_SELECT_BATTLECMD: {
+			int32 battleChoice = ivalue[0] & 0xffff;
+			return battleChoice <= 1; // attack only
+		}
+		default:
+			return true;
+	}
+}
+
 unsigned short NetServer::StartServer(unsigned short port) {
 #else
 bool NetServer::StartServer(unsigned short port) {

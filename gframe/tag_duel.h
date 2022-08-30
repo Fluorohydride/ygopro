@@ -75,10 +75,11 @@ protected:
 	short time_elapsed;
 #ifdef YGOPRO_SERVER_MODE
 	short time_compensator[2];
+	short time_backed[2];
+	unsigned char last_game_msg;
 #endif
 };
 
 }
 
 #endif //TAG_DUEL_H
-
