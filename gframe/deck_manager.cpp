@@ -272,6 +272,11 @@ bool DeckManager::LoadDeck(const wchar_t* file, bool is_packlist) {
 		myswprintf(localfile, L"./deck/%ls.ydk", file);
 		reader = OpenDeckReader(localfile);
 	}
+	if(!reader && !mywcsncasecmp(file, L"./pack", 6)) {
+		wchar_t zipfile[64];
+		myswprintf(zipfile, L"%ls", file + 2);
+		reader = OpenDeckReader(zipfile);
+	}
 	if(!reader)
 		return false;
 	size_t size = reader->getSize();
@@ -279,6 +284,7 @@ bool DeckManager::LoadDeck(const wchar_t* file, bool is_packlist) {
 		reader->drop();
 		return false;
 	}
+	memset(deckBuffer, 0, sizeof(deckBuffer));
 	reader->read(deckBuffer, size);
 	reader->drop();
 	std::istringstream deckStream(deckBuffer);

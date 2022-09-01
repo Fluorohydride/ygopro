@@ -1601,15 +1601,7 @@ void DeckBuilder::RefreshDeckList() {
 	wchar_t catepath[256];
 	deckManager.GetCategoryPath(catepath, lstCategories->getSelected(), lstCategories->getListItem(lstCategories->getSelected()));
 	lstDecks->clear();
-	FileSystem::TraversalDir(catepath, [lstDecks](const wchar_t* name, bool isdir) {
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
-			size_t len = wcslen(name);
-			wchar_t deckname[256];
-			wcsncpy(deckname, name, len - 4);
-			deckname[len - 4] = 0;
-			lstDecks->addItem(deckname);
-		}
-		});
+	mainGame->RefreshDeck(catepath, [lstDecks](const wchar_t* item) { lstDecks->addItem(item); });
 }
 void DeckBuilder::RefreshReadonly(int catesel) {
 	bool hasDeck = mainGame->cbDBDecks->getItemCount() != 0;
@@ -1667,7 +1659,7 @@ void DeckBuilder::ShowDeckManage() {
 		if(isdir) {
 			lstCategories->addItem(name);
 		}
-		});
+	});
 	lstCategories->setSelected(prev_category);
 	RefreshDeckList();
 	RefreshReadonly(prev_category);

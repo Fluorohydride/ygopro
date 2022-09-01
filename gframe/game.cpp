@@ -1141,6 +1141,9 @@ void Game::LoadExpansions() {
 #endif
 				dataManager.LoadStrings(reader);
 			}
+			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".ydk", 4)) {
+				deckBuilder.expansionPacks.push_back(fname);
+			}
 		}
 	}
 }
@@ -1182,17 +1185,22 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBo
 	}
 	wchar_t catepath[256];
 	deckManager.GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
-	RefreshDeck(catepath, cbDeck);
-}
-void Game::RefreshDeck(const wchar_t* deckpath, irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
-	FileSystem::TraversalDir(deckpath, [cbDeck](const wchar_t* name, bool isdir) {
+	RefreshDeck(catepath, [cbDeck](const wchar_t* item) { cbDeck->addItem(item); });
+}
+void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const wchar_t*)>& additem) {
+	if(!mywcsncasecmp(deckpath, L"./pack", 6)) {
+		for(auto pack : deckBuilder.expansionPacks) {
+			additem(pack.substr(5, pack.size() - 9).c_str());
+		}
+	}
+	FileSystem::TraversalDir(deckpath, [additem](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
 			size_t len = wcslen(name);
 			wchar_t deckname[256];
 			wcsncpy(deckname, name, len - 4);
 			deckname[len - 4] = 0;
-			cbDeck->addItem(deckname);
+			additem(deckname);
 		}
 	});
 }

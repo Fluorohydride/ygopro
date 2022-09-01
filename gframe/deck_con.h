@@ -84,6 +84,7 @@ public:
 	const std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;
 	wchar_t result_string[8];
+	std::vector<std::wstring> expansionPacks;
 };
 
 }
