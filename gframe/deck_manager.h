@@ -51,6 +51,7 @@ public:
 	FILE* OpenDeckFile(const wchar_t* file, const char* mode);
 	IReadFile* OpenDeckReader(const wchar_t* file);
 	bool LoadDeck(const wchar_t* file, bool is_packlist = false);
+	bool LoadDeck(std::istringstream* deckStream, bool is_packlist = false);
 	bool SaveDeck(Deck& deck, const wchar_t* file);
 	bool DeleteDeck(const wchar_t* file);
 	bool CreateCategory(const wchar_t* name);
