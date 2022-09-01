@@ -5,6 +5,7 @@
 
 namespace ygo {
 
+char DeckManager::deckBuffer[0x10000];
 DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
@@ -254,20 +255,38 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 #endif
 	return fp;
 }
+IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
+#ifdef WIN32
+	IReadFile* reader = dataManager.FileSystem->createAndOpenFile(file);
+#else
+	char file2[256];
+	BufferIO::EncodeUTF8(file, file2);
+	IReadFile* reader = dataManager.FileSystem->createAndOpenFile(file2);
+#endif
+	return reader;
+}
 bool DeckManager::LoadDeck(const wchar_t* file, bool is_packlist) {
-	int sp = 0, ct = 0, mainc = 0, sidec = 0, code;
-	FILE* fp = OpenDeckFile(file, "r");
-	if(!fp) {
+	IReadFile* reader = OpenDeckReader(file);
+	if(!reader) {
 		wchar_t localfile[64];
 		myswprintf(localfile, L"./deck/%ls.ydk", file);
-		fp = OpenDeckFile(localfile, "r");
+		reader = OpenDeckReader(localfile);
 	}
-	if(!fp)
+	if(!reader)
 		return false;
+	size_t size = reader->getSize();
+	if(size >= 0x20000) {
+		reader->drop();
+		return false;
+	}
+	reader->read(deckBuffer, size);
+	reader->drop();
+	std::istringstream deckStream(deckBuffer);
+	int sp = 0, ct = 0, mainc = 0, sidec = 0, code;
 	int cardlist[300];
 	bool is_side = false;
-	char linebuf[256];
-	while(fgets(linebuf, 256, fp) && ct < 300) {
+	std::string linebuf;
+	while(std::getline(deckStream, linebuf) && ct < 300) {
 		if(linebuf[0] == '!') {
 			is_side = true;
 			continue;
@@ -277,12 +296,11 @@ bool DeckManager::LoadDeck(const wchar_t* file, bool is_packlist) {
 		sp = 0;
 		while(linebuf[sp] >= '0' && linebuf[sp] <= '9') sp++;
 		linebuf[sp] = 0;
-		code = atoi(linebuf);
+		code = atoi(linebuf.c_str());
 		cardlist[ct++] = code;
 		if(is_side) sidec++;
 		else mainc++;
 	}
-	fclose(fp);
 	LoadDeck(current_deck, cardlist, mainc, sidec, is_packlist);
 	return true;
 }

@@ -5,6 +5,7 @@
 #include "client_card.h"
 #include <unordered_map>
 #include <vector>
+#include <sstream>
 
 namespace ygo {
 
@@ -35,6 +36,8 @@ public:
 	Deck current_deck;
 	std::vector<LFList> _lfList;
 
+	static char deckBuffer[0x10000];
+
 	void LoadLFListSingle(const char* path);
 	void LoadLFList();
 	const wchar_t* GetLFListName(int lfhash);
@@ -45,7 +48,8 @@ public:
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
 	void GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
 	bool LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
-	FILE* OpenDeckFile(const wchar_t * file, const char * mode);
+	FILE* OpenDeckFile(const wchar_t* file, const char* mode);
+	IReadFile* OpenDeckReader(const wchar_t* file);
 	bool LoadDeck(const wchar_t* file, bool is_packlist = false);
 	bool SaveDeck(Deck& deck, const wchar_t* file);
 	bool DeleteDeck(const wchar_t* file);
