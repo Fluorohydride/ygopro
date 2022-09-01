@@ -1107,6 +1107,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if(!is_draging) {
 				if(hovered_pos == 0 || hovered_seq == -1)
 					break;
+				if(readonly)
+					break;
 				soundManager.PlaySoundEffect(SOUND_CARD_DROP);
 				if(hovered_pos == 1) {
 					pop_main(hovered_seq);
@@ -1145,6 +1147,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if (havePopupWindow())
 				break;
 			if (hovered_pos == 0 || hovered_seq == -1)
+				break;
+			if (readonly)
 				break;
 			if (is_draging)
 				break;
