@@ -4031,9 +4031,9 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 		socklen_t sz = sizeof(sockaddr_in);
 		char buf[256];
 		/*int ret = */recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
-		if(is_closing || pHP->identifier == NETWORK_SERVER_ID)
-			return;
 		HostPacket* pHP = (HostPacket*)buf;
+		if(is_closing || pHP->identifier != NETWORK_SERVER_ID)
+			return;
 		if(pHP->version != PRO_VERSION)
 			return;
 		unsigned int ipaddr = bc_addr.sin_addr.s_addr;
