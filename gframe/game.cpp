@@ -368,6 +368,9 @@ bool Game::Initialize() {
 	chkWaitChain = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1277));
 	chkWaitChain->setChecked(gameConf.chkWaitChain != 0);
 	posY += 30;
+	chkDefaultShowChain = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1354));
+	chkDefaultShowChain->setChecked(gameConf.chkDefaultShowChain != 0);
+	posY += 30;
 	chkQuickAnimation = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299));
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
 	posY += 30;
@@ -1281,6 +1284,7 @@ void Game::LoadConfig() {
 	gameConf.chkRandomPos = 0;
 	gameConf.chkAutoChain = 0;
 	gameConf.chkWaitChain = 0;
+	gameConf.chkDefaultShowChain = 0;
 	gameConf.chkIgnore1 = 0;
 	gameConf.chkIgnore2 = 0;
 	gameConf.use_lflist = 1;
@@ -1349,6 +1353,8 @@ void Game::LoadConfig() {
 			gameConf.chkAutoChain = atoi(valbuf);
 		} else if(!strcmp(strbuf, "waitchain")) {
 			gameConf.chkWaitChain = atoi(valbuf);
+		} else if(!strcmp(strbuf, "showchain")) {
+			gameConf.chkDefaultShowChain = atoi(valbuf);
 		} else if(!strcmp(strbuf, "mute_opponent")) {
 			gameConf.chkIgnore1 = atoi(valbuf);
 		} else if(!strcmp(strbuf, "mute_spectators")) {
@@ -1464,6 +1470,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "randompos = %d\n", (chkRandomPos->isChecked() ? 1 : 0));
 	fprintf(fp, "autochain = %d\n", (chkAutoChain->isChecked() ? 1 : 0));
 	fprintf(fp, "waitchain = %d\n", (chkWaitChain->isChecked() ? 1 : 0));
+	fprintf(fp, "showchain = %d\n", (chkDefaultShowChain->isChecked() ? 1 : 0));
 	fprintf(fp, "mute_opponent = %d\n", (chkIgnore1->isChecked() ? 1 : 0));
 	fprintf(fp, "mute_spectators = %d\n", (chkIgnore2->isChecked() ? 1 : 0));
 	fprintf(fp, "use_lflist = %d\n", gameConf.use_lflist);
