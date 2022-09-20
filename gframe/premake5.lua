@@ -63,11 +63,11 @@ project "YGOPro"
                 filter {}
             end
         end
-        links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32" }
+        links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32", "Dnsapi" }
     filter "not action:vs*"
         buildoptions { "-std=c++14", "-fno-rtti" }
     filter "not system:windows"
-        links { "event_pthreads", "dl", "pthread" }
+        links { "event_pthreads", "dl", "pthread", "resolv" }
     filter "system:macosx"
         links { "z" }
         defines { "GL_SILENCE_DEPRECATION" }

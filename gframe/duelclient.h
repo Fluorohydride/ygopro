@@ -17,6 +17,45 @@
 
 namespace ygo {
 
+class HostResult {
+public:
+	unsigned int host;
+	unsigned short port;
+	bool isValid() {
+		return host > 0 && port > 0;
+	}
+	HostResult() {
+		host = 0;
+		port = 0;
+	}
+};
+
+#ifndef _WIN32
+#include <resolv.h>
+#include <arpa/nameser.h>
+#include <arpa/nameser_compat.h>
+class RetrivedSRVRecord {
+public:
+	bool valid;
+	unsigned short priority;
+	unsigned short weight;
+	unsigned short port;
+	char host[100];
+	RetrivedSRVRecord(ns_msg nsMsg, int i) {
+		valid = false;
+		ns_rr rr;
+		if (ns_parserr(&nsMsg, ns_s_an, i, &rr) < 0 || ns_rr_type(rr) != T_SRV)
+			return;
+		priority = ns_get16(ns_rr_rdata(rr));
+		weight   = ns_get16(ns_rr_rdata(rr) + NS_INT16SZ);
+		port     = ns_get16(ns_rr_rdata(rr) + 2 * NS_INT16SZ);
+		if (dn_expand(ns_msg_base(nsMsg), ns_msg_end(nsMsg), ns_rr_rdata(rr) + 3 * NS_INT16SZ, host, sizeof(host)) < 0)
+			return;
+		valid = true;
+	}
+};
+#endif
+
 class DuelClient {
 private:
 	static unsigned int connect_state;
@@ -51,6 +90,9 @@ public:
 	static void SetResponseI(int respI);
 	static void SetResponseB(void* respB, unsigned char len);
 	static void SendResponse();
+	static unsigned int LookupHost(char *host);
+	static bool LookupSRV(char *hostname, HostResult *result);
+	static HostResult ParseHost(char *hostname);
 	static void SendPacketToServer(unsigned char proto) {
 		char* p = duel_client_write;
 		BufferIO::WriteInt16(p, 1);
@@ -84,7 +126,6 @@ public:
 	static int RefreshThread(event_base* broadev);
 	static void BroadcastReply(evutil_socket_t fd, short events, void* arg);
 };
-
 }
 
 #endif //DUELCLIENT_H

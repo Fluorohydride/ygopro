@@ -97,10 +97,16 @@ int main(int argc, char* argv[]) {
 			if(i < wargc)
 				ygo::mainGame->ebJoinHost->setText(wargv[i]);
 			continue;
-		} else if(!wcscmp(wargv[i], L"-p")) { // host Port
+		} else if(!wcscmp(wargv[i], L"-p")) { // host port, deprecated, and should use 1.1.1.1:7911 instead
 			++i;
-			if(i < wargc)
-				ygo::mainGame->ebJoinPort->setText(wargv[i]);
+			if(i < wargc) {
+				auto host = ygo::mainGame->ebJoinHost->getText();
+				if(wcslen(host) > 0) {
+					wchar_t appended[100];
+					myswprintf(appended, L"%ls:%ls", host, wargv[i]);
+					ygo::mainGame->ebJoinHost->setText(appended);
+				}
+			}
 			continue;
 		} else if(!wcscmp(wargv[i], L"-w")) { // host passWord
 			++i;
