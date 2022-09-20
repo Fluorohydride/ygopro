@@ -4112,7 +4112,7 @@ bool DuelClient::LookupSRV(char *hostname, HostResult* result) {
 	if(status < 0)
 		return false;
 	ns_msg nsMsg;
-  ns_initparse(answer, status, &nsMsg);
+	ns_initparse(answer, status, &nsMsg);
 	bool found = false;
 	std::vector<RetrivedSRVRecord> records;
 	unsigned short minPriority = 0xffff;
