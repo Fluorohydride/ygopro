@@ -94,7 +94,7 @@ bool DataManager::LoadStrings(const char* file) {
 		ReadStringConfLine(linebuf);
 	}
 	fclose(fp);
-	for(int i = 0; i < 255; ++i)
+	for(int i = 0; i < 301; ++i)
 		myswprintf(numStrings[i], L"%d", i);
 	return true;
 }
