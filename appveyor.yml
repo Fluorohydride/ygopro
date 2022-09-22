@@ -15,7 +15,7 @@ install:
   
   - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.lua.org/ftp/lua-5.4.4.tar.gz ; exit 0"
   - tar xf lua-5.4.4.tar.gz
-  - move lua-5.4.4\src lua
+  - move lua-5.4.4 lua
   
   - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.sqlite.org/2022/sqlite-amalgamation-3390300.zip  ; exit 0"
   - 7z x sqlite-amalgamation-3390300.zip
