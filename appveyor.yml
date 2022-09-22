@@ -5,21 +5,21 @@ install:
   - git submodule update --init --recursive
 
   # environment and system dependency
-  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/premake/premake-core/releases/download/v5.0.0-beta1/premake-5.0.0-beta1-windows.zip ; exit 0"
-  - 7z x premake-5.0.0-beta1-windows.zip
+  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/premake/premake-core/releases/download/v5.0.0-beta2/premake-5.0.0-beta2-windows.zip ; exit 0"
+  - 7z x premake-5.0.0-beta2-windows.zip
   
   - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/libevent/libevent/releases/download/release-2.0.22-stable/libevent-2.0.22-stable.tar.gz ; exit 0"
   - tar xf libevent-2.0.22-stable.tar.gz
   - move libevent-2.0.22-stable event
   - xcopy /E event\WIN32-Code event\include
   
-  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.lua.org/ftp/lua-5.3.6.tar.gz ; exit 0"
-  - tar xf lua-5.3.6.tar.gz
-  - move lua-5.3.6\src lua
+  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.lua.org/ftp/lua-5.4.4.tar.gz ; exit 0"
+  - tar xf lua-5.4.4.tar.gz
+  - move lua-5.4.4\src lua
   
-  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.sqlite.org/2020/sqlite-amalgamation-3310100.zip  ; exit 0"
-  - 7z x sqlite-amalgamation-3310100.zip
-  - move sqlite-amalgamation-3310100 sqlite3
+  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.sqlite.org/2022/sqlite-amalgamation-3390300.zip  ; exit 0"
+  - 7z x sqlite-amalgamation-3390300.zip
+  - move sqlite-amalgamation-3390300 sqlite3
   
   # let premake happy
   - xcopy /E premake\* .
@@ -30,20 +30,20 @@ install:
 configuration: Release
 
 build: 
-    project: build/ygo.sln
+    project: build/YGOPro.sln
     parallel: true
 
 after_build:
-  - ps: move bin\release\ygopro.exe .
+  - ps: move bin\release\YGOPro.exe .
 
 test: off
 
 artifacts:
-  - path: ygopro.exe
-    name: ygopro(server)
+  - path: YGOPro.exe
+    name: YGOPro(server)
 
 cache:
-  - premake-5.0.0-beta1-windows.zip
+  - premake-5.0.0-beta2-windows.zip
   - libevent-2.0.22-stable.tar.gz
-  - lua-5.3.6.tar.gz
-  - sqlite-amalgamation-3310100.zip
+  - lua-5.4.4.tar.gz
+  - sqlite-amalgamation-3390300.zip
