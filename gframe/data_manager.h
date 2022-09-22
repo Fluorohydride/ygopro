@@ -50,7 +50,7 @@ public:
 	std::unordered_map<unsigned int, std::wstring> _setnameStrings;
 	std::unordered_map<unsigned int, std::wstring> _sysStrings;
 
-	wchar_t numStrings[256][4];
+	wchar_t numStrings[301][4];
 	wchar_t numBuffer[6];
 	wchar_t attBuffer[128];
 	wchar_t racBuffer[128];
