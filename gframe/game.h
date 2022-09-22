@@ -38,6 +38,7 @@ struct Config {
 	int chkRandomPos;
 	int chkAutoChain;
 	int chkWaitChain;
+	int chkDefaultShowChain;
 	int chkIgnore1;
 	int chkIgnore2;
 	int use_lflist;
@@ -303,6 +304,7 @@ public:
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
+	irr::gui::IGUICheckBox* chkDefaultShowChain;
 	irr::gui::IGUICheckBox* chkQuickAnimation;
 	irr::gui::IGUICheckBox* chkAutoSaveReplay;
 	irr::gui::IGUICheckBox* chkDrawSingleChain;

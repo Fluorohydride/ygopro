@@ -116,6 +116,7 @@ bool NetServer::StartBroadcast() {
 	SOCKET udp = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	BOOL opt = TRUE;
 	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(BOOL));
+	setsockopt(udp, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof(BOOL));
 	sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;

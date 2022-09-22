@@ -363,7 +363,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CMD_ACTIVATE:
 			case BUTTON_CMD_RESET: {
-				mainGame->wCmdMenu->setVisible(false);
+				HideMenu();
 				ShowCancelOrFinishButton(0);
 				if(!list_command) {
 					if(!menu_card)
@@ -449,7 +449,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CMD_SUMMON: {
-				mainGame->wCmdMenu->setVisible(false);
+				HideMenu();
 				if(!menu_card)
 					break;
 				for(size_t i = 0; i < summonable_cards.size(); ++i) {
@@ -463,7 +463,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CMD_SPSUMMON: {
-				mainGame->wCmdMenu->setVisible(false);
+				HideMenu();
 				if(!list_command) {
 					if(!menu_card)
 						break;
@@ -506,7 +506,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CMD_MSET: {
-				mainGame->wCmdMenu->setVisible(false);
+				HideMenu();
 				if(!menu_card)
 					break;
 				for(size_t i = 0; i < msetable_cards.size(); ++i) {
@@ -519,7 +519,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CMD_SSET: {
-				mainGame->wCmdMenu->setVisible(false);
+				HideMenu();
 				if(!menu_card)
 					break;
 				for(size_t i = 0; i < ssetable_cards.size(); ++i) {
@@ -532,7 +532,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CMD_REPOS: {
-				mainGame->wCmdMenu->setVisible(false);
+				HideMenu();
 				if(!menu_card)
 					break;
 				for(size_t i = 0; i < reposable_cards.size(); ++i) {
@@ -545,7 +545,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CMD_ATTACK: {
-				mainGame->wCmdMenu->setVisible(false);
+				HideMenu();
 				if(!menu_card)
 					break;
 				for(size_t i = 0; i < attackable_cards.size(); ++i) {
@@ -558,7 +558,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CMD_SHOWLIST: {
-				mainGame->wCmdMenu->setVisible(false);
+				HideMenu();
 				selectable_cards.clear();
 				wchar_t formatBuffer[2048];
 				switch(command_location) {
@@ -1074,7 +1074,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				UpdateChainButtons();
 			}
 			if(mainGame->wCmdMenu->isVisible() && !mainGame->wCmdMenu->getRelativePosition().isPointInside(mousepos))
-				mainGame->wCmdMenu->setVisible(false);
+				HideMenu();
+			if(mainGame->btnBP->isVisible() && mainGame->btnBP->getAbsolutePosition().isPointInside(mousepos))
+				break;
+			if(mainGame->btnM2->isVisible() && mainGame->btnM2->getAbsolutePosition().isPointInside(mousepos))
+				break;
 			if(panel && panel->isVisible())
 				break;
 			GetHoverField(x, y);
@@ -1480,7 +1484,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				UpdateChainButtons();
 			}
 			mainGame->HideElement(mainGame->wSurrender);
-			mainGame->wCmdMenu->setVisible(false);
+			HideMenu();
 			if(mainGame->fadingList.size())
 				break;
 			CancelOrFinish();
@@ -1563,7 +1567,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				if(mcard) {
 					if(mcard != menu_card)
-						mainGame->wCmdMenu->setVisible(false);
+						HideMenu();
 					if(hovered_location == LOCATION_HAND) {
 						mcard->is_hovered = true;
 						MoveCard(mcard, 5);
@@ -2248,7 +2252,7 @@ void ClientField::GetHoverField(int x, int y) {
 }
 void ClientField::ShowMenu(int flag, int x, int y) {
 	if(!flag) {
-		mainGame->wCmdMenu->setVisible(false);
+		HideMenu();
 		return;
 	}
 	menu_card = clicked_card;
@@ -2316,10 +2320,19 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 	} else mainGame->btnReset->setVisible(false);
 	panel = mainGame->wCmdMenu;
 	mainGame->wCmdMenu->setVisible(true);
+	mainGame->btnBP->setEnabled(false);
+	mainGame->btnM2->setEnabled(false);
+	mainGame->btnEP->setEnabled(false);
 	if(mainGame->gameConf.resize_popup_menu)
 		mainGame->wCmdMenu->setRelativePosition(mainGame->Resize(x - 20, y - 20, x + 80, y - 20, 0, -height, 0, 0));
 	else
 		mainGame->wCmdMenu->setRelativePosition(mainGame->Resize(x, y, x, y, -20, -(20 + height), 80, -20));
+}
+void ClientField::HideMenu() {
+	mainGame->wCmdMenu->setVisible(false);
+	mainGame->btnBP->setEnabled(true);
+	mainGame->btnM2->setEnabled(true);
+	mainGame->btnEP->setEnabled(true);
 }
 void ClientField::UpdateChainButtons() {
 	if(mainGame->btnChainAlways->isVisible()) {

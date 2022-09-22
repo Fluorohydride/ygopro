@@ -4,6 +4,7 @@
 #include "config.h"
 #include <vector>
 #include <set>
+#include <utility>
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
@@ -76,7 +77,7 @@ protected:
 	static bool is_refreshing;
 	static int match_kill;
 	static event* resp_event;
-	static std::set<unsigned int> remotes;
+	static std::set<std::pair<unsigned int, unsigned short>> remotes;
 public:
 	static std::vector<HostPacket> hosts;
 	static void BeginRefreshHost();
