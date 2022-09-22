@@ -23,7 +23,7 @@ namespace ygo {
 Game* mainGame;
 
 #ifdef YGOPRO_SERVER_MODE
-unsigned short aServerPort;
+unsigned short server_port;
 unsigned short replay_mode;
 unsigned int pre_seed[3];
 HostInfo game_info;
@@ -33,9 +33,9 @@ void Game::MainServerLoop() {
 	dataManager.LoadDB(L"cards.cdb");
 	LoadExpansions();
 	
-	aServerPort = NetServer::StartServer(aServerPort);
+	server_port = NetServer::StartServer(server_port);
 	NetServer::InitDuel();
-	printf("%u\n", aServerPort);
+	printf("%u\n", server_port);
 	fflush(stdout);
 	
 	while(NetServer::net_evbase) {

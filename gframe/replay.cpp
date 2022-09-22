@@ -6,7 +6,7 @@
 namespace ygo {
 
 #ifdef YGOPRO_SERVER_MODE
-extern unsigned short aServerPort;
+extern unsigned short server_port;
 extern unsigned short replay_mode;
 #endif
 Replay::Replay()
@@ -36,7 +36,7 @@ void Replay::BeginRecord() {
 	wchar_t tmppath[80];
 	wcsftime(tmppath, 80, L"./replay/%Y-%m-%d %H-%M-%S %%u.yrp", localedtime);
 	wchar_t path[80];
-	myswprintf(path, tmppath, aServerPort);
+	myswprintf(path, tmppath, server_port);
 	recording_fp = CreateFileW(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
 #else
 	recording_fp = CreateFileW(L"./replay/_LastReplay.yrp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
@@ -52,7 +52,7 @@ void Replay::BeginRecord() {
 	char tmppath[40];
 	strftime(tmppath, 40, "./replay/%Y-%m-%d %H-%M-%S %%u.yrp", localedtime);
 	char path[40];
-	sprintf(path, tmppath, aServerPort);
+	sprintf(path, tmppath, server_port);
 	fp = fopen(path, "wb");
 #else
 	fp = fopen("./replay/_LastReplay.yrp", "wb");

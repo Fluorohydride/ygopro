@@ -602,7 +602,7 @@ public:
 
 extern Game* mainGame;
 #ifdef YGOPRO_SERVER_MODE
-extern unsigned short aServerPort;
+extern unsigned short server_port;
 extern unsigned short replay_mode;
 extern HostInfo game_info;
 extern unsigned int pre_seed[3];
