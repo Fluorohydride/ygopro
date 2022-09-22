@@ -62,7 +62,7 @@ public:
 	bool CreateCategory(const wchar_t* name);
 	bool RenameCategory(const wchar_t* oldname, const wchar_t* newname);
 	bool DeleteCategory(const wchar_t* name);
-#endif
+#endif //YGOPRO_SERVER_MODE
 };
 
 extern DeckManager deckManager;

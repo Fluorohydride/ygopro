@@ -23,7 +23,7 @@ public:
 #else
 	void ReadStringConfLine(const char* linebuf);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = 0);
-#endif
+#endif //YGOPRO_SERVER_MODE
 	bool GetData(int code, CardData* pData);
 	code_pointer GetCodePointer(int code);
 	bool GetString(int code, CardString* pStr);

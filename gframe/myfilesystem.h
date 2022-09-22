@@ -209,8 +209,7 @@ public:
 #ifndef YGOPRO_SERVER_MODE
 		std::vector<file_unit> file_list;
 #endif
-		while ((dirp = readdir(dir)) != nullptr)
-		{
+		while((dirp = readdir(dir)) != nullptr) {
 #ifndef YGOPRO_SERVER_MODE
 			file_unit funit;
 #endif

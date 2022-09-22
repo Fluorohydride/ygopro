@@ -372,5 +372,5 @@ bool DeckManager::DeleteCategory(const wchar_t* name) {
 		return false;
 	return FileSystem::DeleteDir(localname);
 }
-#endif
+#endif //YGOPRO_SERVER_MODE
 }
