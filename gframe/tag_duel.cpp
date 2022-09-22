@@ -1867,7 +1867,7 @@ void TagDuel::EndDuel() {
 	NetServer::ReSendToPlayer(players[2]);
 	NetServer::ReSendToPlayer(players[3]);
 #ifdef YGOPRO_SERVER_MODE
-	if(!(replay_mode & 0x2)) {
+	if(!(replay_mode & REPLAY_MODE_WATCHER_NO_SEND)) {
 		for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 			NetServer::ReSendToPlayer(*oit);
 		NetServer::ReSendToPlayers(cache_recorder, replay_recorder);

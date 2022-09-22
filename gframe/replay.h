@@ -17,6 +17,11 @@ namespace ygo {
 #define MAX_REPLAY_SIZE	0x20000
 #define MAX_COMP_SIZE	0x2000
 
+#ifdef YGOPRO_SERVER_MODE
+#define REPLAY_MODE_SAVE_IN_SERVER		0x1
+#define REPLAY_MODE_WATCHER_NO_SEND		0x2
+#endif // YGOPRO_SERVER_MODE
+
 struct ReplayHeader {
 	unsigned int id;
 	unsigned int version;
