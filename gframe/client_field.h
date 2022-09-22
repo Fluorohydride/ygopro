@@ -141,6 +141,7 @@ public:
 	virtual bool OnCommonEvent(const irr::SEvent& event);
 	void GetHoverField(int x, int y);
 	void ShowMenu(int flag, int x, int y);
+	void HideMenu();
 	void UpdateChainButtons();
 	void ShowCancelOrFinishButton(int buttonOp);
 	void SetShowMark(ClientCard* pcard, bool enable);
