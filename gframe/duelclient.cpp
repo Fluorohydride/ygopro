@@ -601,6 +601,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnShuffle->setVisible(false);
 		if(!mainGame->chkIgnore1->isChecked())
 			mainGame->wChat->setVisible(true);
+		if(mainGame->chkDefaultShowChain->isChecked()) {
+			mainGame->always_chain = true;
+			mainGame->ignore_chain = false;
+			mainGame->chain_when_avail = false;
+		}
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		if(!mainGame->dInfo.isTag) {
 			if(selftype > 1) {
