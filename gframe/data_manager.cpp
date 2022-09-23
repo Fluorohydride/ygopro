@@ -52,7 +52,9 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 #endif
 	CardDataC cd;
 	CardString cs;
+#ifndef YGOPRO_SERVER_MODE
 	wchar_t strBuffer[4096];
+#endif
 	int step = 0;
 	do {
 		step = sqlite3_step(pStmt);
