@@ -13,7 +13,6 @@ DataManager dataManager;
 
 bool DataManager::LoadDB(const wchar_t* wfile) {
 	char file[256];
-	wchar_t strBuffer[4096];
 	BufferIO::EncodeUTF8(wfile, file);
 #ifdef YGOPRO_SERVER_MODE
 	sqlite3* pDB;
@@ -53,6 +52,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 #endif
 	CardDataC cd;
 	CardString cs;
+	wchar_t strBuffer[4096];
 	int step = 0;
 	do {
 		step = sqlite3_step(pStmt);
