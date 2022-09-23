@@ -11,7 +11,6 @@ DataManager dataManager;
 
 bool DataManager::LoadDB(const wchar_t* wfile) {
 	char file[256];
-	wchar_t strBuffer[4096];
 	BufferIO::EncodeUTF8(wfile, file);
 #ifdef _WIN32
 	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
@@ -37,6 +36,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 		return Error(&db);
 	CardDataC cd;
 	CardString cs;
+	wchar_t strBuffer[4096];
 	int step = 0;
 	do {
 		step = sqlite3_step(pStmt);
