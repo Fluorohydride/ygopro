@@ -1351,6 +1351,11 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "lasthost")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.lasthost, 100);
+		} else if(!strcmp(strbuf, "lastport")) { // for config migration
+			BufferIO::DecodeUTF8(valbuf, wstr);
+			wchar_t tmpLastHost[100];
+			BufferIO::CopyWStr(gameConf.lasthost, tmpLastHost, 100);
+			myswprintf(gameConf.lasthost, L"%ls:%ls", tmpLastHost, wstr);
 		} else if(!strcmp(strbuf, "roompass")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
