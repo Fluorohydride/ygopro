@@ -33,6 +33,7 @@ struct Config {
 	int chkRandomPos;
 	int chkAutoChain;
 	int chkWaitChain;
+	int chkDefaultShowChain;
 	int chkIgnore1;
 	int chkIgnore2;
 	int use_lflist;
@@ -123,7 +124,7 @@ public:
 	void LoadExpansions();
 	void RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck, bool selectlastused = true);
 	void RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
-	void RefreshDeck(const wchar_t* deckpath, irr::gui::IGUIComboBox* cbDeck);
+	void RefreshDeck(const wchar_t* deckpath, const std::function<void(const wchar_t*)>& additem);
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void RefreshBot();
@@ -290,6 +291,7 @@ public:
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
+	irr::gui::IGUICheckBox* chkDefaultShowChain;
 	irr::gui::IGUICheckBox* chkQuickAnimation;
 	irr::gui::IGUICheckBox* chkAutoSaveReplay;
 	irr::gui::IGUICheckBox* chkDrawSingleChain;
@@ -525,6 +527,7 @@ public:
 	irr::gui::IGUIComboBox* cbDMCategory;
 	irr::gui::IGUIButton* btnDMOK;
 	irr::gui::IGUIButton* btnDMCancel;
+	irr::gui::IGUIScrollBar* scrPackCards;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
 	irr::gui::IGUIScrollBar* scrFilter;

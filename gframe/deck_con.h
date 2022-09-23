@@ -24,6 +24,7 @@ public:
 
 	void RefreshDeckList();
 	void RefreshReadonly(int catesel);
+	void RefreshPackListScroll();
 	void ChangeCategory(int catesel);
 	void ShowDeckManage();
 	void ShowBigCard(int code, float zoom);
@@ -77,11 +78,13 @@ public:
 	int prev_sel;
 	bool is_modified;
 	bool readonly;
+	bool showing_pack;
 	mt19937 rnd;
 
 	const std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;
 	wchar_t result_string[8];
+	std::vector<std::wstring> expansionPacks;
 };
 
 }

@@ -368,6 +368,9 @@ bool Game::Initialize() {
 	chkWaitChain = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1277));
 	chkWaitChain->setChecked(gameConf.chkWaitChain != 0);
 	posY += 30;
+	chkDefaultShowChain = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1354));
+	chkDefaultShowChain->setChecked(gameConf.chkDefaultShowChain != 0);
+	posY += 30;
 	chkQuickAnimation = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299));
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
 	posY += 30;
@@ -644,6 +647,10 @@ bool Game::Initialize() {
 	cbDMCategory->setMaxSelectionRows(10);
 	btnDMOK = env->addButton(rect<s32>(70, 80, 140, 105), wDMQuery, BUTTON_DM_OK, dataManager.GetSysString(1211));
 	btnDMCancel = env->addButton(rect<s32>(170, 80, 240, 105), wDMQuery, BUTTON_DM_CANCEL, dataManager.GetSysString(1212));
+	scrPackCards = env->addScrollBar(false, recti(775, 161, 795, 629), 0, SCROLL_FILTER);
+	scrPackCards->setLargeStep(1);
+	scrPackCards->setSmallStep(1);
+	scrPackCards->setVisible(false);
 
 	stDBCategory = env->addStaticText(dataManager.GetSysString(1300), rect<s32>(10, 9, 100, 29), false, false, wDeckEdit);
 	cbDBCategory = env->addComboBox(rect<s32>(80, 5, 220, 30), wDeckEdit, COMBOBOX_DBCATEGORY);
@@ -1137,6 +1144,9 @@ void Game::LoadExpansions() {
 #endif
 				dataManager.LoadStrings(reader);
 			}
+			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".ydk", 4)) {
+				deckBuilder.expansionPacks.push_back(fname);
+			}
 		}
 	}
 }
@@ -1171,19 +1181,29 @@ void Game::RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGU
 	}
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+	if(cbCategory != cbDBCategory && cbCategory->getSelected() == 0) {
+		// can't use pack list in duel
+		cbDeck->clear();
+		return;
+	}
 	wchar_t catepath[256];
 	deckManager.GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
-	RefreshDeck(catepath, cbDeck);
-}
-void Game::RefreshDeck(const wchar_t* deckpath, irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
-	FileSystem::TraversalDir(deckpath, [cbDeck](const wchar_t* name, bool isdir) {
+	RefreshDeck(catepath, [cbDeck](const wchar_t* item) { cbDeck->addItem(item); });
+}
+void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const wchar_t*)>& additem) {
+	if(!mywcsncasecmp(deckpath, L"./pack", 6)) {
+		for(auto pack : deckBuilder.expansionPacks) {
+			additem(pack.substr(5, pack.size() - 9).c_str());
+		}
+	}
+	FileSystem::TraversalDir(deckpath, [additem](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
 			size_t len = wcslen(name);
 			wchar_t deckname[256];
 			wcsncpy(deckname, name, len - 4);
 			deckname[len - 4] = 0;
-			cbDeck->addItem(deckname);
+			additem(deckname);
 		}
 	});
 }
@@ -1281,6 +1301,7 @@ void Game::LoadConfig() {
 	gameConf.chkRandomPos = 0;
 	gameConf.chkAutoChain = 0;
 	gameConf.chkWaitChain = 0;
+	gameConf.chkDefaultShowChain = 0;
 	gameConf.chkIgnore1 = 0;
 	gameConf.chkIgnore2 = 0;
 	gameConf.use_lflist = 1;
@@ -1349,6 +1370,8 @@ void Game::LoadConfig() {
 			gameConf.chkAutoChain = atoi(valbuf);
 		} else if(!strcmp(strbuf, "waitchain")) {
 			gameConf.chkWaitChain = atoi(valbuf);
+		} else if(!strcmp(strbuf, "showchain")) {
+			gameConf.chkDefaultShowChain = atoi(valbuf);
 		} else if(!strcmp(strbuf, "mute_opponent")) {
 			gameConf.chkIgnore1 = atoi(valbuf);
 		} else if(!strcmp(strbuf, "mute_spectators")) {
@@ -1464,6 +1487,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "randompos = %d\n", (chkRandomPos->isChecked() ? 1 : 0));
 	fprintf(fp, "autochain = %d\n", (chkAutoChain->isChecked() ? 1 : 0));
 	fprintf(fp, "waitchain = %d\n", (chkWaitChain->isChecked() ? 1 : 0));
+	fprintf(fp, "showchain = %d\n", (chkDefaultShowChain->isChecked() ? 1 : 0));
 	fprintf(fp, "mute_opponent = %d\n", (chkIgnore1->isChecked() ? 1 : 0));
 	fprintf(fp, "mute_spectators = %d\n", (chkIgnore2->isChecked() ? 1 : 0));
 	fprintf(fp, "use_lflist = %d\n", gameConf.use_lflist);
@@ -1514,7 +1538,6 @@ void Game::ShowCardInfo(int code, bool resize) {
 	if(!dataManager.GetData(code, &cd))
 		memset(&cd, 0, sizeof(CardData));
 	imgCard->setImage(imageManager.GetTexture(code, true));
-	imgCard->setScaleImage(true);
 	if(cd.alias != 0 && (cd.alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd.alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
@@ -1688,9 +1711,7 @@ void Game::ErrorLog(const char* msg) {
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
-	imgCard->setImage(imageManager.tCover[0]);
-	scrCardText->setVisible(false);
-	imgCard->setScaleImage(true);
+	ClearCardInfo(0);
 	btnPSAU->setImage();
 	btnPSDU->setImage();
 	for(int i=0; i<=4; ++i) {
@@ -1798,6 +1819,7 @@ void Game::OnResize() {
 	cbDBCategory->setRelativePosition(Resize(80, 5, 220, 30));
 	btnManageDeck->setRelativePosition(Resize(225, 5, 290, 30));
 	wDeckManage->setRelativePosition(ResizeWin(310, 135, 800, 465));
+	scrPackCards->setRelativePosition(Resize(775, 161, 795, 629));
 
 	wSort->setRelativePosition(Resize(930, 132, 1020, 156));
 	cbSortType->setRelativePosition(Resize(10, 2, 85, 22));

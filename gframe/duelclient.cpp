@@ -34,7 +34,7 @@ mt19937 DuelClient::rnd;
 bool DuelClient::is_refreshing = false;
 int DuelClient::match_kill = 0;
 std::vector<HostPacket> DuelClient::hosts;
-std::set<unsigned int> DuelClient::remotes;
+std::set<std::pair<unsigned int, unsigned short>> DuelClient::remotes;
 event* DuelClient::resp_event = 0;
 
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
@@ -391,6 +391,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->deckBuilder.hovered_code = 0;
 		mainGame->deckBuilder.is_draging = false;
 		mainGame->deckBuilder.is_starting_dragging = false;
+		mainGame->deckBuilder.readonly = false;
+		mainGame->deckBuilder.showing_pack = false;
 		mainGame->deckBuilder.pre_mainc = deckManager.current_deck.main.size();
 		mainGame->deckBuilder.pre_extrac = deckManager.current_deck.extra.size();
 		mainGame->deckBuilder.pre_sidec = deckManager.current_deck.side.size();
@@ -601,6 +603,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnShuffle->setVisible(false);
 		if(!mainGame->chkIgnore1->isChecked())
 			mainGame->wChat->setVisible(true);
+		if(mainGame->chkDefaultShowChain->isChecked()) {
+			mainGame->always_chain = true;
+			mainGame->ignore_chain = false;
+			mainGame->chain_when_avail = false;
+		}
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		if(!mainGame->dInfo.isTag) {
 			if(selftype > 1) {
@@ -872,7 +879,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		memcpy(last_successful_msg, msg, len);
 		last_successful_msg_length = len;
 	}
-	mainGame->wCmdMenu->setVisible(false);
+	mainGame->dField.HideMenu();
 	if(!mainGame->dInfo.isReplay && mainGame->dInfo.curMsg != MSG_WAITING && mainGame->dInfo.curMsg != MSG_CARD_SELECTED) {
 		mainGame->waitFrame = -1;
 		mainGame->stHintMsg->setVisible(false);
@@ -4031,11 +4038,16 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 		socklen_t sz = sizeof(sockaddr_in);
 		char buf[256];
 		/*int ret = */recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
-		unsigned int ipaddr = bc_addr.sin_addr.s_addr;
 		HostPacket* pHP = (HostPacket*)buf;
-		if(!is_closing && pHP->identifier == NETWORK_SERVER_ID && pHP->version == PRO_VERSION && remotes.find(ipaddr) == remotes.end() ) {
+		if(is_closing || pHP->identifier != NETWORK_SERVER_ID)
+			return;
+		if(pHP->version != PRO_VERSION)
+			return;
+		unsigned int ipaddr = bc_addr.sin_addr.s_addr;
+		const auto remote = std::make_pair(ipaddr, pHP->port);
+		if(remotes.find(remote) == remotes.end()) {
 			mainGame->gMutex.lock();
-			remotes.insert(ipaddr);
+			remotes.insert(remote);
 			pHP->ipaddr = ipaddr;
 			hosts.push_back(*pHP);
 			std::wstring hoststr;
