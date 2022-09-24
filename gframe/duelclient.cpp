@@ -4155,8 +4155,8 @@ bool DuelClient::CheckHostnameSplitter(char* hostname, HostResult* result) {
 	auto hostLength = trySplitter - hostname;
 	strncpy(host, hostname, hostLength);
 	host[hostLength] = '\0';
-	result.host = LookupHost(host);
-	result.port = atoi(trySplitter + 1);
+	result->host = LookupHost(host);
+	result->port = atoi(trySplitter + 1);
 	return true;
 }
 
