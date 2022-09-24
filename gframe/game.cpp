@@ -1292,7 +1292,7 @@ void Game::LoadConfig() {
 	gameConf.numfont[0] = 0;
 	gameConf.textfont[0] = 0;
 	gameConf.lasthost[0] = 0;
-	gameConf.lastport[0] = 0;
+	gameConf.lastport = 0;
 	gameConf.roompass[0] = 0;
 	gameConf.bot_deck_path[0] = 0;
 	//settings
