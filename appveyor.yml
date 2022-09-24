@@ -1,5 +1,9 @@
 version: '{build}'
 image: Visual Studio 2019
+environment:
+  matrix:
+    - SERVER_MODE: true
+    - SERVER_PRO2_SUPPORT: true
 
 install:
   - git submodule update --init --recursive
@@ -20,11 +24,9 @@ install:
   - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.sqlite.org/2022/sqlite-amalgamation-3390300.zip  ; exit 0"
   - 7z x sqlite-amalgamation-3390300.zip
   - move sqlite-amalgamation-3390300 sqlite3
-  
-  # let premake happy
+
+before_build:
   - xcopy /E premake\* .
-  
-  # premake
   - premake5 vs2019
   
 configuration: Release
@@ -33,17 +35,37 @@ build:
     project: build/YGOPro.sln
     parallel: true
 
-after_build:
-  - ps: move bin\release\YGOPro.exe .
-
 test: off
 
-artifacts:
-  - path: YGOPro.exe
-    name: YGOPro(server)
+for:
+-
+  matrix:
+    only:
+      - SERVER_PRO2_SUPPORT: true
+
+  before_build:
+    - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name http://downloads.sourceforge.net/irrlicht/irrlicht-1.8.5.zip ; exit 0"
+    - 7z x irrlicht-1.8.5.zip
+    - move irrlicht-1.8.5 irrlicht
+
+    - xcopy /E premake\* .
+
+    - cd irrlicht
+    - patch -p1 < irrlicht.patch
+    - cd ..
+
+    - premake5 vs2019
+
+  after_build:
+    - ps: move bin\release\AI.Server.exe .
+
+  artifacts:
+    - path: AI.Server.exe
+      name: YGOPro server for YGOPro2 AI
 
 cache:
   - premake-5.0.0-beta2-windows.zip
   - libevent-2.0.22-stable.tar.gz
+  - irrlicht-1.8.5.zip
   - lua-5.4.4.tar.gz
   - sqlite-amalgamation-3390300.zip

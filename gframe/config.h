@@ -91,6 +91,12 @@ using namespace io;
 using namespace gui;
 #endif //YGOPRO_SERVER_MODE
 
+#ifdef SERVER_ZIP_SUPPORT
+#include <irrlicht.h>
+using namespace irr;
+using namespace io;
+#endif
+
 extern const unsigned short PRO_VERSION;
 extern int enable_log;
 extern bool exit_on_return;

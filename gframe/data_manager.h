@@ -3,7 +3,7 @@
 
 #include "config.h"
 #include "sqlite3.h"
-#ifndef YGOPRO_SERVER_MODE
+#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 #include "spmemvfs/spmemvfs.h"
 #endif
 #include "client_card.h"
@@ -18,10 +18,11 @@ public:
 	bool LoadStrings(const char* file);
 #ifndef YGOPRO_SERVER_MODE
 	bool LoadStrings(IReadFile* reader);
+#endif
 	void ReadStringConfLine(const char* linebuf);
+#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 	bool Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt = 0);
 #else
-	void ReadStringConfLine(const char* linebuf);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = 0);
 #endif //YGOPRO_SERVER_MODE
 	bool GetData(int code, CardData* pData);
@@ -63,7 +64,7 @@ public:
 	static int CardReader(int, void*);
 	static byte* ScriptReaderEx(const char* script_name, int* slen);
 	static byte* ScriptReader(const char* script_name, int* slen);
-#ifndef YGOPRO_SERVER_MODE
+#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 	static IFileSystem* FileSystem;
 #endif
 };

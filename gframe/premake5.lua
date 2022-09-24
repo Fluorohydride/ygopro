@@ -1,5 +1,5 @@
 include "lzma/."
-if not SERVER_MODE then
+if (SERVER_ZIP_SUPPORT or not SERVER_MODE) then
 include "spmemvfs/."
 end
 
@@ -19,6 +19,16 @@ if SERVER_MODE then
             "tag_duel.cpp", "tag_duel.h" }
     includedirs { "../ocgcore" }
     links { "ocgcore", "clzma", LUA_LIB_NAME, "sqlite3", "event" }
+    if SERVER_ZIP_SUPPORT then
+        defines { "SERVER_ZIP_SUPPORT" }
+        links { "irrlicht", "cspmemvfs" }
+        if BUILD_IRRLICHT then
+            includedirs { "../irrlicht/source/Irrlicht" }
+        end
+    end
+    if SERVER_PRO2_SUPPORT then
+        defines { "SERVER_PRO2_SUPPORT" }
+    end
 else
     kind "WindowedApp"
 
@@ -72,6 +82,9 @@ end
         files "ygopro.rc"
 if not SERVER_MODE then
         libdirs { "$(DXSDK_DIR)Lib/x86" }
+end
+if SERVER_PRO2_SUPPORT then
+        targetname ("AI.Server")
 end
         if USE_IRRKLANG then
             links { "irrKlang" }

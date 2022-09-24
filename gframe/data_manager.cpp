@@ -6,7 +6,7 @@ namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
 byte DataManager::scriptBuffer[0x20000];
-#ifndef YGOPRO_SERVER_MODE
+#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 IFileSystem* DataManager::FileSystem;
 #endif
 DataManager dataManager;
@@ -14,7 +14,7 @@ DataManager dataManager;
 bool DataManager::LoadDB(const wchar_t* wfile) {
 	char file[256];
 	BufferIO::EncodeUTF8(wfile, file);
-#ifdef YGOPRO_SERVER_MODE
+#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
 	sqlite3* pDB;
 	if(sqlite3_open_v2(file, &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
 		return Error(pDB);
@@ -45,7 +45,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 #endif
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
-#ifdef YGOPRO_SERVER_MODE
+#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
 		return Error(pDB);
 #else
 		return Error(&db);
@@ -59,7 +59,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	do {
 		step = sqlite3_step(pStmt);
 		if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
-#ifdef YGOPRO_SERVER_MODE
+#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
 			return Error(pDB, pStmt);
 #else
 			return Error(&db, pStmt);
@@ -168,7 +168,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 		_setnameStrings[value] = strBuffer;
 	}
 }
-#ifdef YGOPRO_SERVER_MODE
+#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	wchar_t strBuffer[4096];
 	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB), strBuffer);
@@ -424,7 +424,7 @@ byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 #endif //YGOPRO_SERVER_MODE
 }
 byte* DataManager::ScriptReader(const char* script_name, int* slen) {
-#ifdef YGOPRO_SERVER_MODE
+#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
 	FILE* fp = fopen(script_name, "rb");
 	if(!fp)
 		return 0;
