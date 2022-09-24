@@ -49,13 +49,13 @@ mat_linux:
     - linux
   script:
     - apt update; apt -y install git wget tar
-    #- git clone --depth=1 https://code.mycard.moe/mycard/irrlicht-new irrlicht
+    - git clone --depth=1 https://code.mycard.moe/mycard/irrlicht-new irrlicht
     - wget -O - https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-beta2-linux.tar.gz | tar zfx -
     - env PROCESSOR_COUNT=$(nproc) ./.ci/libevent-prebuild.sh
   artifacts:
     paths:
       - premake5
-      #- irrlicht
+      - irrlicht
       - libevent-stable
 
 mat_windows:
@@ -71,11 +71,12 @@ mat_windows:
     - wget -O - https://cdn01.moecube.com/ygopro-build-materials/libevent-2.0.22-stable.tar.gz | tar zfx -
     - mv libevent-2.0.22-stable event
     # irrlicht
-    #- git clone --depth=1 https://code.mycard.moe/mycard/irrlicht-new irrlicht
+    - git clone --depth=1 https://code.mycard.moe/mycard/irrlicht-new irrlicht
   artifacts:
     paths:
       - premake5.exe
       - event
+      - irrlicht
 
 ._exec_build:
   stage: build
@@ -114,7 +115,7 @@ exec_linux:
     - mat_submodules
   script:
     - apt update; apt -y install git build-essential
-    - ./premake5 gmake --build-sqlite
+    - ./premake5 gmake --build-sqlite --server-zip-support
     - cd build
     - make config=release -j$(nproc)
     - cd ..
