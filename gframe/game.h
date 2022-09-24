@@ -18,6 +18,7 @@ struct Config {
 	unsigned short serverport;
 	unsigned char textfontsize;
 	wchar_t lasthost[100];
+	unsigned short lastport;
 	wchar_t nickname[20];
 	wchar_t gamename[20];
 	wchar_t lastcategory[64];
@@ -326,6 +327,7 @@ public:
 	irr::gui::IGUIListBox* lstHostList;
 	irr::gui::IGUIButton* btnLanRefresh;
 	irr::gui::IGUIEditBox* ebJoinHost;
+	irr::gui::IGUIEditBox* ebJoinPort;
 	irr::gui::IGUIEditBox* ebJoinPass;
 	irr::gui::IGUIButton* btnJoinHost;
 	irr::gui::IGUIButton* btnJoinCancel;

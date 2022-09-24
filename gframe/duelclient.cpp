@@ -4147,8 +4147,13 @@ bool DuelClient::LookupSRV(char *hostname, HostResult* result) {
 	return true;
 }
 
-HostResult DuelClient::ParseHost(char *hostname) {
+HostResult DuelClient::ParseHost(char *hostname, unsigned short port) {
 	HostResult result;
+	if(port) {
+		result.host = LookupHost(hostname);
+		result.port = port;
+		return result;
+	}
 	unsigned int tryAddress = htonl(inet_addr(hostname));
 	if(tryAddress != -1) {
 		result.host = tryAddress;

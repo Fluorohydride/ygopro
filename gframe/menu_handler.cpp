@@ -68,7 +68,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				char hostname[100];
 				const wchar_t* pstr = mainGame->ebJoinHost->getText();
 				BufferIO::CopyWStr(pstr, hostname, 100);
-				HostResult remote = DuelClient::ParseHost(hostname);
+				auto port = (unsigned short)_wtoi(mainGame->ebJoinPort->getText());
+				HostResult remote = DuelClient::ParseHost(hostname, port);
 				if(!remote.isValid()) {
 					mainGame->gMutex.lock();
 					soundManager.PlaySoundEffect(SOUND_INFO);
@@ -77,6 +78,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				BufferIO::CopyWStr(pstr, mainGame->gameConf.lasthost, 100);
+				mainGame->gameConf.lastport = port;
 				if(DuelClient::StartClient(remote.host, remote.port, false)) {
 					mainGame->btnCreateHost->setEnabled(false);
 					mainGame->btnJoinHost->setEnabled(false);
@@ -476,9 +478,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				int addr = DuelClient::hosts[sel].ipaddr;
 				int port = DuelClient::hosts[sel].port;
-				wchar_t buf[26];
-				myswprintf(buf, L"%d.%d.%d.%d:%d", addr & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff, port);
+				wchar_t buf[20];
+				myswprintf(buf, L"%d.%d.%d.%d", addr & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
 				mainGame->ebJoinHost->setText(buf);
+				myswprintf(buf, L"%d", port);
+				mainGame->ebJoinPort->setText(buf);
 				break;
 			}
 			case LISTBOX_REPLAY_LIST: {
