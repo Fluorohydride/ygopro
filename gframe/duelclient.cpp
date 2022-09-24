@@ -4147,35 +4147,52 @@ bool DuelClient::LookupSRV(char *hostname, HostResult* result) {
 	return true;
 }
 
+bool DuelClient::CheckHostnameSplitter(char* hostname, HostResult* result) {
+	auto trySplitter = strchr(hostname, ':');
+	if(trySplitter == NULL)
+		return false;
+	char host[100];
+	auto hostLength = trySplitter - hostname;
+	strncpy(host, hostname, hostLength);
+	host[hostLength] = '\0';
+	result.host = LookupHost(host);
+	result.port = atoi(trySplitter + 1);
+	return true;
+}
+
 HostResult DuelClient::ParseHost(char *hostname, unsigned short port) {
 	HostResult result;
+	// if port found, use port directly
 	if(port) {
-		result.host = LookupHost(hostname);
-		result.port = port;
+		// if hostname contains splitter, use port after splitter in priority
+		if(!CheckHostnameSplitter(hostname, &result)) {
+			result.host = LookupHost(hostname);
+			result.port = port;
+		}
 		return result;
 	}
+	
+	// if hostname is an IP, use it directly and use default port
 	unsigned int tryAddress = htonl(inet_addr(hostname));
 	if(tryAddress != -1) {
 		result.host = tryAddress;
 		result.port = 7911;
 		return result;
 	}
-	auto trySplitter = strchr(hostname, ':');
-	if(trySplitter == NULL) {
-		char srvHostname[114];
-		sprintf(srvHostname, "_ygopro._tcp.%s", hostname);
-		if(!LookupSRV(srvHostname, &result)) {
-			result.host = LookupHost(hostname);
-			result.port = 7911;
-		}
-	} else {
-		char host[100];
-		auto hostLength = trySplitter - hostname;
-		strncpy(host, hostname, hostLength);
-		host[hostLength] = '\0';
-		result.host = LookupHost(host);
-		result.port = atoi(trySplitter + 1);
-	}
+
+	// if hostname contains splitter, use it first
+	if(CheckHostnameSplitter(hostname, &result))
+		return result;
+	
+	// lookup SRV record
+	char srvHostname[114];
+	sprintf(srvHostname, "_ygopro._tcp.%s", hostname);
+	if(LookupSRV(srvHostname, &result))
+		return result;
+
+	// finally, use default port
+	result.host = LookupHost(hostname);
+	result.port = 7911;
 	return result;
 }
 }
