@@ -98,7 +98,7 @@ exec_windows:
     - mat_submodules
   script:
     - bash -c 'cp -rf premake/* .'
-    - '.\premake5.exe vs2019'
+    - '.\premake5.exe vs2019 --server-zip-support'
     - cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe" build\YGOPro.sln /m /p:Configuration=Release'
     - copy bin\release\ygopro.exe .
   artifacts:
