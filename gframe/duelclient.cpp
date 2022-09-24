@@ -495,6 +495,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->wChat->setVisible(true);
 		mainGame->gMutex.unlock();
 		mainGame->dInfo.duel_rule = pkt->info.duel_rule;
+		mainGame->dInfo.start_lp = pkt->info.start_lp;
 		watching = 0;
 		connect_state |= 0x4;
 		break;

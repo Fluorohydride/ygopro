@@ -44,6 +44,7 @@ int SingleMode::SinglePlayThread() {
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
 	mainGame->dInfo.lp[0] = start_lp;
 	mainGame->dInfo.lp[1] = start_lp;
+	mainGame->dInfo.start_lp = start_lp;
 	myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
 	BufferIO::CopyWStr(mainGame->ebNickName->getText(), mainGame->dInfo.hostname, 20);
