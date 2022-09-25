@@ -685,10 +685,10 @@ void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 	}
 }
 void Game::DrawGUI() {
-	if(imageLoading.size()) {
-		for(auto mit = imageLoading.begin(); mit != imageLoading.end(); ++mit)
-			mit->first->setImage(imageManager.GetTexture(mit->second));
-		imageLoading.clear();
+	while (imageLoading.size()) {
+		auto mit = imageLoading.cbegin();
+		mit->first->setImage(imageManager.GetTexture(mit->second));
+		imageLoading.erase(imageLoading.begin());
 	}
 	for(auto fit = fadingList.begin(); fit != fadingList.end();) {
 		auto fthis = fit++;
