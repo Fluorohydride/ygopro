@@ -41,13 +41,13 @@ void Game::MainServerLoop() {
 #ifdef SERVER_ZIP_SUPPORT
 	dataManager.FileSystem = new irr::io::CFileSystem();
 #endif
-#ifdef SERVER_PRO2_SUPPORT
-	dataManager.FileSystem->addFileArchive("data/script.zip");
-#endif
 	deckManager.LoadLFList();
 	dataManager.LoadDB(L"cards.cdb");
 	LoadExpansions();
-	
+#ifdef SERVER_PRO2_SUPPORT
+	dataManager.FileSystem->addFileArchive("data/script.zip", true, false, EFAT_ZIP);
+#endif
+
 	server_port = NetServer::StartServer(server_port);
 	NetServer::InitDuel();
 	printf("%u\n", server_port);
