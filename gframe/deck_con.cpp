@@ -118,6 +118,7 @@ void DeckBuilder::Terminate() {
 	mainGame->showingcode = 0;
 	mainGame->scrFilter->setVisible(false);
 	mainGame->scrPackCards->setVisible(false);
+	mainGame->scrPackCards->setPos(0);
 	int catesel = mainGame->cbDBCategory->getSelected();
 	if(catesel >= 0)
 		BufferIO::CopyWStr(mainGame->cbDBCategory->getItem(catesel), mainGame->gameConf.lastcategory, 64);
@@ -1637,6 +1638,7 @@ void DeckBuilder::RefreshPackListScroll() {
 		}
 	} else {
 		mainGame->scrPackCards->setVisible(false);
+		mainGame->scrPackCards->setPos(0);
 	}
 }
 void DeckBuilder::ChangeCategory(int catesel) {
