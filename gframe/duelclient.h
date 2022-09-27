@@ -4,6 +4,7 @@
 #include "config.h"
 #include <vector>
 #include <set>
+#include <utility>
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
@@ -36,7 +37,7 @@ private:
 	static char last_successful_msg[0x2000];
 	static unsigned int last_successful_msg_length;
 	static wchar_t event_string[256];
-	static mtrandom rnd;
+	static mt19937 rnd;
 public:
 	static bool StartClient(unsigned int ip, unsigned short port, bool create_game = true);
 	static void ConnectTimeout(evutil_socket_t fd, short events, void* arg);
@@ -76,7 +77,7 @@ protected:
 	static bool is_refreshing;
 	static int match_kill;
 	static event* resp_event;
-	static std::set<unsigned int> remotes;
+	static std::set<std::pair<unsigned int, unsigned short>> remotes;
 public:
 	static std::vector<HostPacket> hosts;
 	static void BeginRefreshHost();
