@@ -1692,7 +1692,7 @@ int TagDuel::MessageHandler(long fduel, int type) {
 void TagDuel::TagTimer(evutil_socket_t fd, short events, void* arg) {
 	TagDuel* sd = static_cast<TagDuel*>(arg);
 	sd->time_elapsed++;
-	if(sd->time_elapsed >= sd->time_limit[sd->last_response]) {
+	if(sd->time_elapsed >= sd->time_limit[sd->last_response] || sd->time_limit[sd->last_response] <= 0) {
 		unsigned char wbuf[3];
 		uint32 player = sd->last_response;
 		wbuf[0] = MSG_WIN;
