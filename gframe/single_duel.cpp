@@ -484,6 +484,11 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	RefreshExtra(0);
 	RefreshExtra(1);
 	start_duel(pduel, opt);
+	if(host_info.time_limit) {
+		time_elapsed = 0;
+		timeval timeout = { 1, 0 };
+		event_add(etimer, &timeout);
+	}
 	Process();
 }
 void SingleDuel::Process() {
@@ -1410,7 +1415,7 @@ void SingleDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 		if(time_limit[dp->type] >= time_elapsed)
 			time_limit[dp->type] -= time_elapsed;
 		else time_limit[dp->type] = 0;
-		event_del(etimer);
+		time_elapsed = 0;
 	}
 	Process();
 }
@@ -1427,6 +1432,7 @@ void SingleDuel::EndDuel() {
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::ReSendToPlayer(*oit);
 	end_duel(pduel);
+	event_del(etimer);
 	pduel = 0;
 }
 void SingleDuel::WaitforResponse(int playerid) {
@@ -1449,9 +1455,8 @@ void SingleDuel::TimeConfirm(DuelPlayer* dp) {
 	if(dp->type != last_response)
 		return;
 	players[last_response]->state = CTOS_RESPONSE;
-	time_elapsed = 0;
-	timeval timeout = {1, 0};
-	event_add(etimer, &timeout);
+	if(time_elapsed < 10)
+		time_elapsed = 0;
 }
 void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 	char query_buffer[0x2000];
@@ -1571,7 +1576,7 @@ int SingleDuel::MessageHandler(long fduel, int type) {
 void SingleDuel::SingleTimer(evutil_socket_t fd, short events, void* arg) {
 	SingleDuel* sd = static_cast<SingleDuel*>(arg);
 	sd->time_elapsed++;
-	if(sd->time_elapsed >= sd->time_limit[sd->last_response]) {
+	if(sd->time_elapsed >= sd->time_limit[sd->last_response] || sd->time_limit[sd->last_response] <= 0) {
 		unsigned char wbuf[3];
 		uint32 player = sd->last_response;
 		wbuf[0] = MSG_WIN;
@@ -1591,7 +1596,10 @@ void SingleDuel::SingleTimer(evutil_socket_t fd, short events, void* arg) {
 		sd->EndDuel();
 		sd->DuelEndProc();
 		event_del(sd->etimer);
+		return;
 	}
+	timeval timeout = { 1, 0 };
+	event_add(sd->etimer, &timeout);
 }
 
 }
