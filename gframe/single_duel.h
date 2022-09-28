@@ -38,7 +38,7 @@ public:
 	void RefreshExtra(int player, int flag = 0xe81fff, int use_cache = 1);
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 
-	static int MessageHandler(long fduel, int type);
+	static int MessageHandler(intptr_t fduel, int type);
 	static void SingleTimer(evutil_socket_t fd, short events, void* arg);
 	
 protected:
