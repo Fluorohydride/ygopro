@@ -7,7 +7,7 @@ namespace ygo {
 
 class SingleMode {
 private:
-	static long pduel;
+	static intptr_t pduel;
 	static bool is_closing;
 	static bool is_continuing;
 
@@ -26,7 +26,7 @@ public:
 	static void SinglePlayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 	static void SinglePlayReload();
 
-	static int MessageHandler(long fduel, int type);
+	static int MessageHandler(intptr_t fduel, int type);
 
 protected:
 	static Replay last_replay;

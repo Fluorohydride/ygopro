@@ -144,7 +144,7 @@ public:
 	DuelPlayer* host_player;
 	HostInfo host_info;
 	int duel_stage;
-	unsigned long pduel;
+	intptr_t pduel;
 	wchar_t name[20];
 	wchar_t pass[20];
 };

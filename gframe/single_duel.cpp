@@ -2183,7 +2183,7 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 #endif
 	}
 }
-int SingleDuel::MessageHandler(long fduel, int type) {
+int SingleDuel::MessageHandler(intptr_t fduel, int type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
