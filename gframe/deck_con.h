@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 #include "client_card.h"
+#include "../ocgcore/mtrandom.h"
 
 namespace ygo {
 
@@ -20,6 +21,15 @@ public:
 	void InstantSearch();
 	void ClearSearch();
 	void SortList();
+
+	void RefreshDeckList();
+	void RefreshReadonly(int catesel);
+	void RefreshPackListScroll();
+	void ChangeCategory(int catesel);
+	void ShowDeckManage();
+	void ShowBigCard(int code, float zoom);
+	void ZoomBigCard(s32 centerx = -1, s32 centery = -1);
+	void CloseBigCard();
 
 	bool CardNameContains(const wchar_t *haystack, const wchar_t *needle);
 
@@ -56,18 +66,25 @@ public:
 	bool is_starting_dragging;
 	int dragx;
 	int dragy;
+	int bigcard_code;
+	float bigcard_zoom;
 	size_t pre_mainc;
 	size_t pre_extrac;
 	size_t pre_sidec;
 	code_pointer draging_pointer;
+	int prev_category;
 	int prev_deck;
 	s32 prev_operation;
 	int prev_sel;
 	bool is_modified;
+	bool readonly;
+	bool showing_pack;
+	mt19937 rnd;
 
 	const std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;
 	wchar_t result_string[8];
+	std::vector<std::wstring> expansionPacks;
 };
 
 }

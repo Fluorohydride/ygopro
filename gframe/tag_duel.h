@@ -33,12 +33,12 @@ public:
 	void WaitforResponse(int playerid);
 	void RefreshMzone(int player, int flag = 0x881fff, int use_cache = 1);
 	void RefreshSzone(int player, int flag = 0x681fff, int use_cache = 1);
-	void RefreshHand(int player, int flag = 0x781fff, int use_cache = 1);
+	void RefreshHand(int player, int flag = 0x681fff, int use_cache = 1);
 	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1);
-	void RefreshExtra(int player, int flag = 0x81fff, int use_cache = 1);
+	void RefreshExtra(int player, int flag = 0xe81fff, int use_cache = 1);
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 
-	static int MessageHandler(long fduel, int type);
+	static int MessageHandler(intptr_t fduel, int type);
 	static void TagTimer(evutil_socket_t fd, short events, void* arg);
 	
 protected:
@@ -53,8 +53,8 @@ protected:
 	unsigned char last_response;
 	Replay last_replay;
 	unsigned char turn_count;
-	unsigned short time_limit[2];
-	unsigned short time_elapsed;
+	short time_limit[2];
+	short time_elapsed;
 };
 
 }

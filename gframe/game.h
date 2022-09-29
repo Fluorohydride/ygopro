@@ -21,18 +21,23 @@ struct Config {
 	wchar_t lastport[10];
 	wchar_t nickname[20];
 	wchar_t gamename[20];
+	wchar_t lastcategory[64];
 	wchar_t lastdeck[64];
 	wchar_t textfont[256];
 	wchar_t numfont[256];
 	wchar_t roompass[20];
+	wchar_t bot_deck_path[64];
 	//settings
 	int chkMAutoPos;
 	int chkSTAutoPos;
 	int chkRandomPos;
 	int chkAutoChain;
 	int chkWaitChain;
+	int chkDefaultShowChain;
 	int chkIgnore1;
 	int chkIgnore2;
+	int use_lflist;
+	int default_lflist;
 	int default_rule;
 	int hide_setname;
 	int hide_hint_button;
@@ -46,6 +51,7 @@ struct Config {
 	int enable_bot_mode;
 	int quick_animation;
 	int auto_save_replay;
+	int draw_single_chain;
 	int prefer_expansion_script;
 	bool enable_sound;
 	bool enable_music;
@@ -69,6 +75,7 @@ struct DuelInfo {
 	bool is_shuffling;
 	bool tag_player[2];
 	int lp[2];
+	int start_lp;
 	int duel_rule;
 	int turn;
 	short curMsg;
@@ -92,6 +99,7 @@ struct BotInfo {
 	bool support_master_rule_3;
 	bool support_new_master_rule;
 	bool support_master_rule_2020;
+	bool select_deckfile;
 };
 
 struct FadingUnit {
@@ -113,9 +121,11 @@ public:
 	void MainLoop();
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
 	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
-	void SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos = 0);
+	std::wstring SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos = 0);
 	void LoadExpansions();
-	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
+	void RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck, bool selectlastused = true);
+	void RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	void RefreshDeck(const wchar_t* deckpath, const std::function<void(const wchar_t*)>& additem);
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void RefreshBot();
@@ -148,6 +158,8 @@ public:
 	void AddDebugMsg(const char* msgbuf);
 	void ErrorLog(const char* msgbuf);
 	void ClearTextures();
+	void CloseGameButtons();
+	void CloseGameWindow();
 	void CloseDuelWindow();
 
 	int LocalPlayer(int player);
@@ -156,6 +168,12 @@ public:
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();
 		return focus && focus->hasType(type);
+	}
+
+	void TrimText(irr::gui::IGUIElement* editbox) const {
+		irr::core::stringw text(editbox->getText());
+		text.trim();
+		editbox->setText(text.c_str());
 	}
 
 	void OnResize();
@@ -274,8 +292,10 @@ public:
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
+	irr::gui::IGUICheckBox* chkDefaultShowChain;
 	irr::gui::IGUICheckBox* chkQuickAnimation;
 	irr::gui::IGUICheckBox* chkAutoSaveReplay;
+	irr::gui::IGUICheckBox* chkDrawSingleChain;
 	irr::gui::IGUIWindow* tabSystem;
 	irr::gui::IGUIElement* elmTabSystemLast;
 	irr::gui::IGUIScrollBar* scrTabSystem;
@@ -283,6 +303,8 @@ public:
 	irr::gui::IGUICheckBox* chkAutoSearch;
 	irr::gui::IGUICheckBox* chkMultiKeywords;
 	irr::gui::IGUICheckBox* chkPreferExpansionScript;
+	irr::gui::IGUICheckBox* chkLFlist;
+	irr::gui::IGUIComboBox* cbLFlist;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIScrollBar* scrSoundVolume;
@@ -313,7 +335,7 @@ public:
 	irr::gui::IGUIButton* btnCreateHost;
 	//create host
 	irr::gui::IGUIWindow* wCreateHost;
-	irr::gui::IGUIComboBox* cbLFlist;
+	irr::gui::IGUIComboBox* cbHostLFlist;
 	irr::gui::IGUIComboBox* cbMatchMode;
 	irr::gui::IGUIComboBox* cbRule;
 	irr::gui::IGUIEditBox* ebTimeLimit;
@@ -334,6 +356,7 @@ public:
 	irr::gui::IGUIStaticText* stHostPrepDuelist[4];
 	irr::gui::IGUICheckBox* chkHostPrepReady[4];
 	irr::gui::IGUIButton* btnHostPrepKick[4];
+	irr::gui::IGUIComboBox* cbCategorySelect;
 	irr::gui::IGUIComboBox* cbDeckSelect;
 	irr::gui::IGUIStaticText* stHostPrepRule;
 	irr::gui::IGUIStaticText* stHostPrepOB;
@@ -349,6 +372,7 @@ public:
 	irr::gui::IGUIButton* btnDeleteReplay;
 	irr::gui::IGUIButton* btnRenameReplay;
 	irr::gui::IGUIButton* btnReplayCancel;
+	irr::gui::IGUIButton* btnExportDeck;
 	irr::gui::IGUIEditBox* ebRepStartTurn;
 	//single play
 	irr::gui::IGUIWindow* wSinglePlay;
@@ -356,12 +380,15 @@ public:
 	irr::gui::IGUIStaticText* stBotInfo;
 	irr::gui::IGUIButton* btnStartBot;
 	irr::gui::IGUIButton* btnBotCancel;
+	irr::gui::IGUIComboBox* cbBotDeckCategory;
+	irr::gui::IGUIComboBox* cbBotDeck;
 	irr::gui::IGUIComboBox* cbBotRule;
 	irr::gui::IGUICheckBox* chkBotHand;
 	irr::gui::IGUICheckBox* chkBotNoCheckDeck;
 	irr::gui::IGUICheckBox* chkBotNoShuffleDeck;
 	irr::gui::IGUIListBox* lstSinglePlayList;
 	irr::gui::IGUIStaticText* stSinglePlayInfo;
+	irr::gui::IGUICheckBox* chkSinglePlayReturnDeckTop;
 	irr::gui::IGUIButton* btnLoadSinglePlay;
 	irr::gui::IGUIButton* btnSinglePlayCancel;
 	//hand
@@ -457,8 +484,9 @@ public:
 	irr::gui::IGUIButton* btnEP;
 	//deck edit
 	irr::gui::IGUIStaticText* wDeckEdit;
-	irr::gui::IGUIComboBox* cbDBLFList;
+	irr::gui::IGUIComboBox* cbDBCategory;
 	irr::gui::IGUIComboBox* cbDBDecks;
+	irr::gui::IGUIButton* btnManageDeck;
 	irr::gui::IGUIButton* btnClearDeck;
 	irr::gui::IGUIButton* btnSortDeck;
 	irr::gui::IGUIButton* btnShuffleDeck;
@@ -470,7 +498,7 @@ public:
 	irr::gui::IGUIButton* btnSideSort;
 	irr::gui::IGUIButton* btnSideReload;
 	irr::gui::IGUIEditBox* ebDeckname;
-	irr::gui::IGUIStaticText* stBanlist;
+	irr::gui::IGUIStaticText* stDBCategory;
 	irr::gui::IGUIStaticText* stDeck;
 	irr::gui::IGUIStaticText* stCategory;
 	irr::gui::IGUIStaticText* stLimit;
@@ -481,6 +509,26 @@ public:
 	irr::gui::IGUIStaticText* stStar;
 	irr::gui::IGUIStaticText* stSearch;
 	irr::gui::IGUIStaticText* stScale;
+	//deck manage
+	irr::gui::IGUIWindow* wDeckManage;
+	irr::gui::IGUIListBox* lstCategories;
+	irr::gui::IGUIListBox* lstDecks;
+	irr::gui::IGUIButton* btnNewCategory;
+	irr::gui::IGUIButton* btnRenameCategory;
+	irr::gui::IGUIButton* btnDeleteCategory;
+	irr::gui::IGUIButton* btnNewDeck;
+	irr::gui::IGUIButton* btnRenameDeck;
+	irr::gui::IGUIButton* btnDMDeleteDeck;
+	irr::gui::IGUIButton* btnMoveDeck;
+	irr::gui::IGUIButton* btnCopyDeck;
+	irr::gui::IGUIWindow* wDMQuery;
+	irr::gui::IGUIStaticText* stDMMessage;
+	irr::gui::IGUIStaticText* stDMMessage2;
+	irr::gui::IGUIEditBox* ebDMName;
+	irr::gui::IGUIComboBox* cbDMCategory;
+	irr::gui::IGUIButton* btnDMOK;
+	irr::gui::IGUIButton* btnDMCancel;
+	irr::gui::IGUIScrollBar* scrPackCards;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
 	irr::gui::IGUIScrollBar* scrFilter;
@@ -530,6 +578,13 @@ public:
 	irr::gui::IGUIButton* btnChainWhenAvail;
 	//cancel or finish
 	irr::gui::IGUIButton* btnCancelOrFinish;
+	//big picture
+	irr::gui::IGUIWindow* wBigCard;
+	irr::gui::IGUIImage* imgBigCard;
+	irr::gui::IGUIButton* btnBigCardOriginalSize;
+	irr::gui::IGUIButton* btnBigCardZoomIn;
+	irr::gui::IGUIButton* btnBigCardZoomOut;
+	irr::gui::IGUIButton* btnBigCardClose;
 };
 
 extern Game* mainGame;
@@ -578,11 +633,13 @@ extern Game* mainGame;
 #define CHECKBOX_HP_READY			125
 #define BUTTON_HP_READY				126
 #define BUTTON_HP_NOTREADY			127
+#define COMBOBOX_HP_CATEGORY		128
 #define LISTBOX_REPLAY_LIST			130
 #define BUTTON_LOAD_REPLAY			131
 #define BUTTON_CANCEL_REPLAY		132
 #define BUTTON_DELETE_REPLAY		133
 #define BUTTON_RENAME_REPLAY		134
+#define BUTTON_EXPORT_DECK			135
 #define BUTTON_REPLAY_START			140
 #define BUTTON_REPLAY_PAUSE			141
 #define BUTTON_REPLAY_STEP			142
@@ -597,6 +654,7 @@ extern Game* mainGame;
 #define LISTBOX_BOT_LIST			153
 #define BUTTON_BOT_START			154
 #define COMBOBOX_BOT_RULE			155
+#define COMBOBOX_BOT_DECKCATEGORY	156
 #define EDITBOX_CHAT				199
 
 #define BUTTON_MSG_OK				200
@@ -675,7 +733,8 @@ extern Game* mainGame;
 #define BUTTON_SURRENDER_YES		297
 #define BUTTON_SURRENDER_NO			298
 
-#define COMBOBOX_DBLFLIST			301
+#define BUTTON_MANAGE_DECK			300
+#define COMBOBOX_DBCATEGORY			301
 #define COMBOBOX_DBDECKS			302
 #define BUTTON_CLEAR_DECK			303
 #define BUTTON_SAVE_DECK			304
@@ -699,6 +758,22 @@ extern Game* mainGame;
 #define BUTTON_MARKS_FILTER			322
 #define BUTTON_MARKERS_OK			323
 #define COMBOBOX_SORTTYPE			324
+#define EDITBOX_INPUTS				325
+#define WINDOW_DECK_MANAGE			330
+#define BUTTON_NEW_CATEGORY			331
+#define BUTTON_RENAME_CATEGORY		332
+#define BUTTON_DELETE_CATEGORY		333
+#define BUTTON_NEW_DECK				334
+#define BUTTON_RENAME_DECK			335
+#define BUTTON_DELETE_DECK_DM		336
+#define BUTTON_MOVE_DECK			337
+#define BUTTON_COPY_DECK			338
+#define LISTBOX_CATEGORIES			339
+#define LISTBOX_DECKS				340
+#define BUTTON_DM_OK				341
+#define BUTTON_DM_CANCEL			342
+#define COMBOBOX_LFLIST				349
+
 #define BUTTON_CLEAR_LOG			350
 #define LISTBOX_LOG					351
 #define SCROLL_CARDTEXT				352
@@ -716,6 +791,18 @@ extern Game* mainGame;
 #define SCROLL_TAB_SYSTEM			371
 #define CHECKBOX_MULTI_KEYWORDS		372
 #define CHECKBOX_PREFER_EXPANSION	373
+#define CHECKBOX_DRAW_SINGLE_CHAIN	374
+#define CHECKBOX_LFLIST				375
+#define BUTTON_BIG_CARD_CLOSE		380
+#define BUTTON_BIG_CARD_ZOOM_IN		381
+#define BUTTON_BIG_CARD_ZOOM_OUT	382
+#define BUTTON_BIG_CARD_ORIG_SIZE	383
+
+#define AVAIL_OCG					0x1
+#define AVAIL_TCG					0x2
+#define AVAIL_CUSTOM				0x4
+#define AVAIL_SC					0x8
+#define AVAIL_OCGTCG				(AVAIL_OCG|AVAIL_TCG)
 
 #define DEFAULT_DUEL_RULE			5
 

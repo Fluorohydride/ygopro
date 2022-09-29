@@ -11,7 +11,7 @@ namespace ygo {
 
 class ReplayMode {
 private:
-	static long pduel;
+	static intptr_t pduel;
 	static bool is_continuing;
 	static bool is_closing;
 	static bool is_pausing;
@@ -47,7 +47,7 @@ public:
 	static void ReplayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 	static void ReplayReload();
 
-	static int MessageHandler(long fduel, int type);
+	static int MessageHandler(intptr_t fduel, int type);
 };
 
 }

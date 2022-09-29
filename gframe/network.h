@@ -141,7 +141,7 @@ public:
 	DuelPlayer* host_player;
 	HostInfo host_info;
 	int duel_stage;
-	unsigned long pduel;
+	intptr_t pduel;
 	wchar_t name[20];
 	wchar_t pass[20];
 };
@@ -185,6 +185,7 @@ public:
 #define STOC_TP_RESULT		0x6
 #define STOC_CHANGE_SIDE	0x7
 #define STOC_WAITING_SIDE	0x8
+#define STOC_DECK_COUNT		0x9
 #define STOC_CREATE_GAME	0x11
 #define STOC_JOIN_GAME		0x12
 #define STOC_TYPE_CHANGE	0x13
@@ -216,6 +217,7 @@ public:
 #define DECKERROR_MAINCOUNT		0x6
 #define DECKERROR_EXTRACOUNT	0x7
 #define DECKERROR_SIDECOUNT		0x8
+#define DECKERROR_NOTAVAIL		0x9
 
 #define MODE_SINGLE		0x0
 #define MODE_MATCH		0x1

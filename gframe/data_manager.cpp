@@ -5,7 +5,6 @@
 namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
-wchar_t DataManager::strBuffer[4096];
 byte DataManager::scriptBuffer[0x20000];
 IFileSystem* DataManager::FileSystem;
 DataManager dataManager;
@@ -37,6 +36,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 		return Error(&db);
 	CardDataC cd;
 	CardString cs;
+	wchar_t strBuffer[4096];
 	int step = 0;
 	do {
 		step = sqlite3_step(pStmt);
@@ -62,7 +62,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.race = sqlite3_column_int(pStmt, 8);
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
-			_datas.insert(std::make_pair(cd.code, cd));
+			_datas[cd.code] = cd;
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.name = strBuffer;
@@ -77,7 +77,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 					cs.desc[i] = strBuffer;
 				}
 			}
-			_strings.emplace(cd.code, cs);
+			_strings[cd.code] = cs;
 		}
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
@@ -94,7 +94,7 @@ bool DataManager::LoadStrings(const char* file) {
 		ReadStringConfLine(linebuf);
 	}
 	fclose(fp);
-	for(int i = 0; i < 255; ++i)
+	for(int i = 0; i < 301; ++i)
 		myswprintf(numStrings[i], L"%d", i);
 	return true;
 }
@@ -118,6 +118,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 		return;
 	char strbuf[256];
 	int value;
+	wchar_t strBuffer[4096];
 	sscanf(linebuf, "!%s", strbuf);
 	if(!strcmp(strbuf, "system")) {
 		sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf);
@@ -138,6 +139,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 	}
 }
 bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
+	wchar_t strBuffer[4096];
 	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB->handle), strBuffer);
 	if(pStmt)
 		sqlite3_finalize(pStmt);
@@ -182,11 +184,11 @@ const wchar_t* DataManager::GetText(int code) {
 		return csit->second.text.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetDesc(int strCode) {
-	if(strCode < 10000)
+const wchar_t* DataManager::GetDesc(unsigned int strCode) {
+	if(strCode < 10000u)
 		return GetSysString(strCode);
-	int code = strCode >> 4;
-	int offset = strCode & 0xf;
+	unsigned int code = (strCode >> 4) & 0x0fffffff;
+	unsigned int offset = strCode & 0xf;
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;

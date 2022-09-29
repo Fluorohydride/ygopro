@@ -6,7 +6,7 @@
 
 namespace ygo {
 
-long SingleMode::pduel = 0;
+intptr_t SingleMode::pduel = 0;
 bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
 Replay SingleMode::last_replay;
@@ -32,10 +32,10 @@ int SingleMode::SinglePlayThread() {
 	const int start_lp = 8000;
 	const int start_hand = 5;
 	const int draw_count = 1;
-	const int opt = 0;
-	mtrandom rnd;
-	time_t seed = time(0);
-	rnd.reset(seed);
+	int opt = 0;
+	std::random_device rd;
+	unsigned int seed = rd();
+	mt19937 rnd(seed);
 	set_script_reader((script_reader)DataManager::ScriptReaderEx);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
@@ -44,12 +44,15 @@ int SingleMode::SinglePlayThread() {
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
 	mainGame->dInfo.lp[0] = start_lp;
 	mainGame->dInfo.lp[1] = start_lp;
+	mainGame->dInfo.start_lp = start_lp;
 	myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
 	BufferIO::CopyWStr(mainGame->ebNickName->getText(), mainGame->dInfo.hostname, 20);
 	mainGame->dInfo.clientname[0] = 0;
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
+	if(mainGame->chkSinglePlayReturnDeckTop->isChecked())
+		opt |= DUEL_RETURN_DECK_TOP;
 	char filename[256];
 	size_t slen = 0;
 	if(open_file) {
@@ -77,8 +80,9 @@ int SingleMode::SinglePlayThread() {
 	ReplayHeader rh;
 	rh.id = 0x31707279;
 	rh.version = PRO_VERSION;
-	rh.flag = REPLAY_SINGLE_MODE;
+	rh.flag = REPLAY_UNIFORM | REPLAY_SINGLE_MODE;
 	rh.seed = seed;
+	rh.start_time = (unsigned int)time(nullptr);
 	mainGame->gMutex.lock();
 	mainGame->HideElement(mainGame->wSinglePlay);
 	mainGame->ClearCardInfo();
@@ -728,7 +732,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 				}
 				pbuf += 6;
 			}
-			pbuf++;
+			count = BufferIO::ReadInt8(pbuf);
+			pbuf += count * 15;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			SinglePlayReload();
 			mainGame->gMutex.lock();
@@ -839,7 +844,7 @@ void SingleMode::SinglePlayReload() {
 	/*len = */query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
 }
-int SingleMode::MessageHandler(long fduel, int type) {
+int SingleMode::MessageHandler(intptr_t fduel, int type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];

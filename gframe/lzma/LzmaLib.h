@@ -125,7 +125,7 @@ Returns:
   SZ_ERROR_INPUT_EOF   - it needs more bytes in input buffer (src)
 */
 
-MY_STDAPI LzmaUncompress(unsigned char *dest, size_t *destLen, const unsigned char *src, SizeT *srcLen,
+MY_STDAPI LzmaUncompress(unsigned char *dest, size_t *destLen, const unsigned char *src, size_t *srcLen,
   const unsigned char *props, size_t propsSize);
 
 #ifdef __cplusplus

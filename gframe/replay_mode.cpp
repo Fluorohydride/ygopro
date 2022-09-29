@@ -7,7 +7,7 @@
 
 namespace ygo {
 
-long ReplayMode::pduel = 0;
+intptr_t ReplayMode::pduel = 0;
 Replay ReplayMode::cur_replay;
 bool ReplayMode::is_continuing = true;
 bool ReplayMode::is_closing = false;
@@ -138,13 +138,23 @@ int ReplayMode::ReplayThread() {
 		mainGame->gMutex.unlock();
 	}
 	EndDuel();
+	pduel = 0;
+	is_continuing = true;
+	is_closing = false;
+	is_pausing = false;
+	is_paused = false;
+	is_swaping = false;
+	is_restarting = false;
+	exit_pending = false;
+	skip_turn = 0;
+	current_step = 0;
+	skip_step = 0;
 	return 0;
 }
 bool ReplayMode::StartDuel() {
 	const ReplayHeader& rh = cur_replay.pheader;
-	mtrandom rnd;
-	int seed = rh.seed;
-	rnd.reset(seed);
+	unsigned int seed = rh.seed;
+	std::mt19937 rnd(seed);
 	if(mainGame->dInfo.isTag) {
 		cur_replay.ReadName(mainGame->dInfo.hostname);
 		cur_replay.ReadName(mainGame->dInfo.hostname_tag);
@@ -154,7 +164,7 @@ bool ReplayMode::StartDuel() {
 		cur_replay.ReadName(mainGame->dInfo.hostname);
 		cur_replay.ReadName(mainGame->dInfo.clientname);
 	}
-	pduel = create_duel(rnd.rand());
+	pduel = create_duel(rnd());
 	int start_lp = cur_replay.ReadInt32();
 	int start_hand = cur_replay.ReadInt32();
 	int draw_count = cur_replay.ReadInt32();
@@ -165,6 +175,7 @@ bool ReplayMode::StartDuel() {
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
 	mainGame->dInfo.lp[0] = start_lp;
 	mainGame->dInfo.lp[1] = start_lp;
+	mainGame->dInfo.start_lp = start_lp;
 	myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
 	mainGame->dInfo.turn = 0;
@@ -214,13 +225,18 @@ bool ReplayMode::StartDuel() {
 		}
 	} else {
 		char filename[256];
-		size_t slen = cur_replay.ReadInt16();
+		int slen = cur_replay.ReadInt16();
+		if (slen < 0 || slen > 255) {
+			return false;
+		}
 		cur_replay.ReadData(filename, slen);
 		filename[slen] = 0;
 		if(!preload_script(pduel, filename, 0)) {
 			return false;
 		}
 	}
+	if (!(rh.flag & REPLAY_UNIFORM))
+		opt |= DUEL_OLD_REPLAY;
 	start_duel(pduel, opt);
 	return true;
 }
@@ -230,8 +246,7 @@ void ReplayMode::EndDuel() {
 		mainGame->actionSignal.Reset();
 		mainGame->gMutex.lock();
 		mainGame->stMessage->setText(dataManager.GetSysString(1501));
-		if(mainGame->wCardSelect->isVisible())
-			mainGame->HideElement(mainGame->wCardSelect);
+		mainGame->HideElement(mainGame->wCardSelect);
 		mainGame->PopupElement(mainGame->wMessage);
 		mainGame->gMutex.unlock();
 		mainGame->actionSignal.Wait();
@@ -531,6 +546,8 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			if(cl && !(cl & 0x80) && (pl != cl || pc != cc))
 				ReplayRefreshSingle(cc, cl, cs);
+			else if(pl == cl && cl == LOCATION_DECK)
+				ReplayRefreshDeck(cc);
 			break;
 		}
 		case MSG_POS_CHANGE: {
@@ -927,7 +944,7 @@ void ReplayMode::ReplayReload() {
 	/*len = */query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
 }
-int ReplayMode::MessageHandler(long fduel, int type) {
+int ReplayMode::MessageHandler(intptr_t fduel, int type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
