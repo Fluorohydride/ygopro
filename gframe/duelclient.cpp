@@ -1760,10 +1760,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				respbuf[0] = mainGame->LocalPlayer(0);
 				respbuf[1] = LOCATION_MZONE;
 				filter = mainGame->dField.selectable_field & 0x7f;
-			} else if (mainGame->dField.selectable_field & 0x1f00) {
+			} else if (mainGame->dField.selectable_field & 0x3f00) {
 				respbuf[0] = mainGame->LocalPlayer(0);
 				respbuf[1] = LOCATION_SZONE;
-				filter = (mainGame->dField.selectable_field >> 8) & 0x1f;
+				filter = (mainGame->dField.selectable_field >> 8) & 0x3f;
 			} else if (mainGame->dField.selectable_field & 0xc000) {
 				respbuf[0] = mainGame->LocalPlayer(0);
 				respbuf[1] = LOCATION_SZONE;
@@ -1773,10 +1773,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				respbuf[0] = mainGame->LocalPlayer(1);
 				respbuf[1] = LOCATION_MZONE;
 				filter = (mainGame->dField.selectable_field >> 16) & 0x7f;
-			} else if (mainGame->dField.selectable_field & 0x1f000000) {
+			} else if (mainGame->dField.selectable_field & 0x3f000000) {
 				respbuf[0] = mainGame->LocalPlayer(1);
 				respbuf[1] = LOCATION_SZONE;
-				filter = (mainGame->dField.selectable_field >> 24) & 0x1f;
+				filter = (mainGame->dField.selectable_field >> 24) & 0x3f;
 			} else {
 				respbuf[0] = mainGame->LocalPlayer(1);
 				respbuf[1] = LOCATION_SZONE;
