@@ -2511,6 +2511,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else if(reason & REASON_DESTROY && pl != cl)
 				soundManager.PlaySoundEffect(SOUND_DESTROYED);
 		}
+		int appear = mainGame->gameConf.quick_animation ? 12 : 20;
 		if (pl == 0) {
 			ClientCard* pcard = new ClientCard();
 			pcard->position = cp;
@@ -2521,8 +2522,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->gMutex.unlock();
 				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
 				pcard->curAlpha = 5;
-				mainGame->dField.FadeCard(pcard, 255, 20);
-				mainGame->WaitFrameSignal(20);
+				mainGame->dField.FadeCard(pcard, 255, appear);
+				mainGame->WaitFrameSignal(appear);
 			} else
 				mainGame->dField.AddCard(pcard, cc, cl, cs);
 		} else if (cl == 0) {
@@ -2533,8 +2534,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			for(auto eqit = pcard->equipped.begin(); eqit != pcard->equipped.end(); ++eqit)
 				(*eqit)->equipTarget = 0;
 			if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-				mainGame->dField.FadeCard(pcard, 5, 20);
-				mainGame->WaitFrameSignal(20);
+				mainGame->dField.FadeCard(pcard, 5, appear);
+				mainGame->WaitFrameSignal(appear);
 				mainGame->gMutex.lock();
 				mainGame->dField.RemoveCard(pc, pl, ps);
 				mainGame->gMutex.unlock();
