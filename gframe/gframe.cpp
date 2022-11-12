@@ -76,6 +76,7 @@ int main(int argc, char* argv[]) {
 
 	bool keep_on_return = false;
 	bool deckCategorySpecified = false;
+	bool portSpecified = false;
 	for(int i = 1; i < wargc; ++i) {
 		if(wargv[i][0] == L'-' && wargv[i][1] == L'e' && wargv[i][2] != L'\0') {
 			ygo::dataManager.LoadDB(&wargv[i][2]);
@@ -94,13 +95,25 @@ int main(int argc, char* argv[]) {
 			continue;
 		} else if(!wcscmp(wargv[i], L"-h")) { // Host address
 			++i;
-			if(i < wargc)
+			if(i < wargc) {
 				ygo::mainGame->ebJoinHost->setText(wargv[i]);
+				if(!portSpecified)
+					ygo::mainGame->ebJoinPort->setText(L"");
+			}
 			continue;
 		} else if(!wcscmp(wargv[i], L"-p")) { // host Port
 			++i;
-			if(i < wargc)
-				ygo::mainGame->ebJoinPort->setText(wargv[i]);
+			if(i < wargc) {
+				portSpecified = true;
+				auto port = _wtoi(wargv[i]);
+				if(port) {
+					wchar_t portStr[6];
+					myswprintf(portStr, L"%d", port);
+					ygo::mainGame->ebJoinPort->setText(portStr);
+				} else {
+					ygo::mainGame->ebJoinPort->setText(L"");
+				}
+			}
 			continue;
 		} else if(!wcscmp(wargv[i], L"-w")) { // host passWord
 			++i;

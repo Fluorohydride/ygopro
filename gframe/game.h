@@ -18,7 +18,7 @@ struct Config {
 	unsigned short serverport;
 	unsigned char textfontsize;
 	wchar_t lasthost[100];
-	wchar_t lastport[10];
+	unsigned short lastport;
 	wchar_t nickname[20];
 	wchar_t gamename[20];
 	wchar_t lastcategory[64];
