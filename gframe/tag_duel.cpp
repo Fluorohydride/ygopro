@@ -34,6 +34,8 @@ void TagDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 #ifdef YGOPRO_SERVER_MODE
 	if(cache_recorder)
 		NetServer::ReSendToPlayer(cache_recorder);
+	if(replay_recorder && replay_mode & REPLAY_MODE_INCLUDE_CHAT)
+		NetServer::ReSendToPlayer(replay_recorder);
 #endif
 }
 void TagDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
