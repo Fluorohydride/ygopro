@@ -544,7 +544,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			/*int cp = pbuf[11];*/
 			pbuf += 16;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
-			if(cl && !(cl & 0x80) && (pl != cl || pc != cc))
+			if(cl && !(cl & LOCATION_OVERLAY) && (pl != cl || pc != cc))
 				ReplayRefreshSingle(cc, cl, cs);
 			else if(pl == cl && cl == LOCATION_DECK)
 				ReplayRefreshDeck(cc);
