@@ -1666,6 +1666,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						myswprintf(formatBuffer, L"\n*%ls", dataManager.GetDesc(iter->first));
 						str.append(formatBuffer);
 					}
+					if(mainGame->dInfo.turn == 1) {
+						if(mplayer == 0 && mainGame->dInfo.isFirst || mplayer != 0 && !mainGame->dInfo.isFirst)
+							myswprintf(formatBuffer, L"\n*%ls", dataManager.GetSysString(100));
+						else
+							myswprintf(formatBuffer, L"\n*%ls", dataManager.GetSysString(101));
+						str.append(formatBuffer);
+					}
 					should_show_tip = true;
 					irr::core::dimension2d<unsigned int> dtip = mainGame->guiFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
 					mainGame->stTip->setRelativePosition(recti(mousepos.X - 10 - dtip.Width, mousepos.Y + 10, mousepos.X - 10, mousepos.Y + 10 + dtip.Height));
