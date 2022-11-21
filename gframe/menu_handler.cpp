@@ -169,6 +169,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HP_READY: {
 				if(mainGame->cbCategorySelect->getSelected() == -1 || mainGame->cbDeckSelect->getSelected() == -1 ||
 					!deckManager.LoadDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect)) {
+					mainGame->gMutex.lock();
+					soundManager.PlaySoundEffect(SOUND_INFO);
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
+					mainGame->gMutex.unlock();
 					break;
 				}
 				UpdateDeck();
@@ -607,7 +611,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
 					if(mainGame->cbCategorySelect->getSelected() == -1 || mainGame->cbDeckSelect->getSelected() == -1 ||
 						!deckManager.LoadDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect)) {
+						mainGame->gMutex.lock();
 						static_cast<irr::gui::IGUICheckBox*>(caller)->setChecked(false);
+						soundManager.PlaySoundEffect(SOUND_INFO);
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
+						mainGame->gMutex.unlock();
 						break;
 					}
 					UpdateDeck();
