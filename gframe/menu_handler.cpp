@@ -93,6 +93,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
 						evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
 						remote_addr = htonl(inet_addr(ip));
+						evutil_freeaddrinfo(answer);
 					}
 				}
 				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
