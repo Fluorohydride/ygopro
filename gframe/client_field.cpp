@@ -1294,9 +1294,8 @@ bool ClientField::check_sel_sum_s(const std::set<ClientCard*>& left, int index, 
 		check_sel_sum_t(left, acc);
 		return false;
 	}
-	int l = selected_cards[index]->opParam;
-	int l1 = l & 0xffff;
-	int l2 = l >> 16;
+	int l1, l2;
+	get_sum_params(selected_cards[index]->opParam, l1, l2);
 	bool res1 = false, res2 = false;
 	res1 = check_sel_sum_s(left, index + 1, acc - l1);
 	if (l2 > 0)
@@ -1310,9 +1309,8 @@ void ClientField::check_sel_sum_t(const std::set<ClientCard*>& left, int acc) {
 			continue;
 		std::set<ClientCard*> testlist(left);
 		testlist.erase(*sit);
-		int l = (*sit)->opParam;
-		int l1 = l & 0xffff;
-		int l2 = l >> 16;
+		int l1, l2;
+		get_sum_params((*sit)->opParam, l1, l2);
 		if (check_sum(testlist.begin(), testlist.end(), acc - l1, count)
 		        || (l2 > 0 && check_sum(testlist.begin(), testlist.end(), acc - l2, count))) {
 			selectsum_cards.insert(*sit);
@@ -1324,9 +1322,8 @@ bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::se
 		return count >= select_min && count <= select_max;
 	if (acc < 0 || index == end)
 		return false;
-	int l = (*index)->opParam;
-	int l1 = l & 0xffff;
-	int l2 = l >> 16;
+	int l1, l2;
+	get_sum_params((*index)->opParam, l1, l2);
 	if ((l1 == acc || (l2 > 0 && l2 == acc)) && (count + 1 >= select_min) && (count + 1 <= select_max))
 		return true;
 	++index;
@@ -1341,9 +1338,8 @@ bool ClientField::check_sel_sum_trib_s(const std::set<ClientCard*>& left, int in
 		check_sel_sum_trib_t(left, acc);
 		return acc >= select_min && acc <= select_max;
 	}
-	int l = selected_cards[index]->opParam;
-	int l1 = l & 0xffff;
-	int l2 = l >> 16;
+	int l1, l2;
+	get_sum_params(selected_cards[index]->opParam, l1, l2);
 	bool res1 = false, res2 = false;
 	res1 = check_sel_sum_trib_s(left, index + 1, acc + l1);
 	if(l2 > 0)
@@ -1356,9 +1352,8 @@ void ClientField::check_sel_sum_trib_t(const std::set<ClientCard*>& left, int ac
 			continue;
 		std::set<ClientCard*> testlist(left);
 		testlist.erase(*sit);
-		int l = (*sit)->opParam;
-		int l1 = l & 0xffff;
-		int l2 = l >> 16;
+		int l1, l2;
+		get_sum_params((*sit)->opParam, l1, l2);
 		if(check_sum_trib(testlist.begin(), testlist.end(), acc + l1)
 			|| (l2 > 0 && check_sum_trib(testlist.begin(), testlist.end(), acc + l2))) {
 			selectsum_cards.insert(*sit);
@@ -1370,9 +1365,8 @@ bool ClientField::check_sum_trib(std::set<ClientCard*>::const_iterator index, st
 		return true;
 	if(acc > select_max || index == end)
 		return false;
-	int l = (*index)->opParam;
-	int l1 = l & 0xffff;
-	int l2 = l >> 16;
+	int l1, l2;
+	get_sum_params((*index)->opParam, l1, l2);
 	if((acc + l1 >= select_min && acc + l1 <= select_max) || (acc + l2 >= select_min && acc + l2 <= select_max))
 		return true;
 	++index;
