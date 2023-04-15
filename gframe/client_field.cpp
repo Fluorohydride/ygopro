@@ -1155,6 +1155,14 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 	}
 	return false;
 }
+static void get_sum_params(irr::u32 opParam, int& op1, int& op2) {
+	op1 = opParam & 0xffff;
+	op2 = (opParam >> 16) & 0xffff;
+	if(op2 & 0x8000) {
+		op1 = opParam & 0x7fffffff;
+		op2 = 0;
+	}
+}
 bool ClientField::CheckSelectSum() {
 	std::set<ClientCard*> selable;
 	for(auto sit = selectsum_all.begin(); sit != selectsum_all.end(); ++sit) {
@@ -1183,8 +1191,8 @@ bool ClientField::CheckSelectSum() {
 		int mm = -1, mx = -1, max = 0, sumc = 0;
 		bool ret = false;
 		for (auto sit = selected_cards.begin(); sit != selected_cards.end(); ++sit) {
-			int op1 = (*sit)->opParam & 0xffff;
-			int op2 = (*sit)->opParam >> 16;
+			int op1, op2;
+			get_sum_params((*sit)->opParam, op1, op2);
 			int opmin = (op2 > 0 && op1 > op2) ? op2 : op1;
 			int opmax = op2 > op1 ? op2 : op1;
 			if (mm == -1 || opmin < mm)
@@ -1199,8 +1207,8 @@ bool ClientField::CheckSelectSum() {
 		if (select_sumval <= max && select_sumval > max - mx)
 			ret = true;
 		for(auto sit = selable.begin(); sit != selable.end(); ++sit) {
-			int op1 = (*sit)->opParam & 0xffff;
-			int op2 = (*sit)->opParam >> 16;
+			int op1, op2;
+			get_sum_params((*sit)->opParam, op1, op2);
 			int m = op1;
 			int sums = sumc;
 			sums += m;
@@ -1266,8 +1274,8 @@ bool ClientField::CheckSelectTribute() {
 bool ClientField::check_min(const std::set<ClientCard*>& left, std::set<ClientCard*>::const_iterator index, int min, int max) {
 	if (index == left.end())
 		return false;
-	int op1 = (*index)->opParam & 0xffff;
-	int op2 = (*index)->opParam >> 16;
+	int op1, op2;
+	get_sum_params((*index)->opParam, op1, op2);
 	int m = (op2 > 0 && op1 > op2) ? op2 : op1;
 	if (m >= min && m <= max)
 		return true;
