@@ -36,6 +36,10 @@ void SoundManager::RefreshBGMList() {
 	RefershBGMDir(L"win", BGM_WIN);
 	RefershBGMDir(L"lose", BGM_LOSE);
 }
+inline static bool IsDuelScene(int scene)
+{
+	return scene == BGM_DUEL || scene == BGM_ADVANTAGE || scene == BGM_DISADVANTAGE;
+}
 void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 	std::wstring search = L"./sound/BGM/" + path;
 	FileSystem::TraversalDir(search.c_str(), [this, &path, scene](const wchar_t* name, bool isdir) {
@@ -43,6 +47,9 @@ void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 			std::wstring filename = path + L"/" + name;
 			BGMList[BGM_ALL].push_back(filename);
 			BGMList[scene].push_back(filename);
+			if (IsDuelScene(scene)) {
+				BGMList[BGM_DUEL_ALL].push_back(filename);
+			}
 		}
 	});
 }
@@ -217,6 +224,8 @@ void SoundManager::PlayBGM(int scene) {
 		return;
 	if(!mainGame->chkMusicMode->isChecked())
 		scene = BGM_ALL;
+	if (IsDuelScene(scene) && !mainGame->chkMusicLpMode->isChecked())
+		scene = BGM_DUEL_ALL;
 	char BGMName[1024];
 	if(scene != bgm_scene || (soundBGM && soundBGM->isFinished())) {
 		int count = BGMList[scene].size();

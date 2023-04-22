@@ -11,7 +11,7 @@ namespace ygo {
 
 class SoundManager {
 private:
-	std::vector<std::wstring> BGMList[8];
+	std::vector<std::wstring> BGMList[9];
 	int bgm_scene;
 	mt19937 rnd;
 #ifdef YGOPRO_USE_IRRKLANG
@@ -76,6 +76,7 @@ extern SoundManager soundManager;
 #define BGM_DISADVANTAGE			5
 #define BGM_WIN						6
 #define BGM_LOSE					7
+#define BGM_DUEL_ALL				8
 
 }
 

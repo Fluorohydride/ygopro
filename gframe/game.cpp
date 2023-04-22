@@ -446,7 +446,10 @@ bool Game::Initialize() {
 	posY += 30;
 	chkMusicMode = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1281));
 	chkMusicMode->setChecked(gameConf.music_mode != 0);
-	elmTabSystemLast = chkMusicMode;
+	posY += 30;
+	chkMusicLpMode = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(2000));
+	chkMusicLpMode->setChecked(gameConf.music_lp_mode);
+	elmTabSystemLast = chkMusicLpMode;
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -920,6 +923,8 @@ bool Game::Initialize() {
 		scrMusicVolume->setVisible(false);
 		chkMusicMode->setEnabled(false);
 		chkMusicMode->setVisible(false);
+		chkMusicLpMode->setEnabled(false);
+		chkMusicLpMode->setVisible(false);
 	}
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
@@ -1326,6 +1331,7 @@ void Game::LoadConfig() {
 	gameConf.enable_music = true;
 	gameConf.music_volume = 0.5;
 	gameConf.music_mode = 1;
+	gameConf.music_lp_mode = 0;
 	gameConf.window_maximized = false;
 	gameConf.window_width = 1024;
 	gameConf.window_height = 640;
@@ -1431,6 +1437,8 @@ void Game::LoadConfig() {
 			gameConf.music_volume = atof(valbuf) / 100;
 		} else if(!strcmp(strbuf, "music_mode")) {
 			gameConf.music_mode = atoi(valbuf);
+		} else if (!strcmp(strbuf, "music_lp_mode")) {
+			gameConf.music_lp_mode = atoi(valbuf);
 #endif
 		} else {
 			// options allowing multiple words
@@ -1527,6 +1535,7 @@ void Game::SaveConfig() {
 	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
 	fprintf(fp, "music_volume = %d\n", vol);
 	fprintf(fp, "music_mode = %d\n", (chkMusicMode->isChecked() ? 1 : 0));
+	fprintf(fp, "music_lp_mode = %d\n", (chkMusicLpMode->isChecked() ? 1 : 0));
 #endif
 	fclose(fp);
 }

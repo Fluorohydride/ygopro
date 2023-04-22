@@ -58,6 +58,7 @@ struct Config {
 	double sound_volume;
 	double music_volume;
 	int music_mode;
+	int music_lp_mode;
 	bool window_maximized;
 	int window_width;
 	int window_height;
@@ -310,6 +311,7 @@ public:
 	irr::gui::IGUIScrollBar* scrSoundVolume;
 	irr::gui::IGUIScrollBar* scrMusicVolume;
 	irr::gui::IGUICheckBox* chkMusicMode;
+	irr::gui::IGUICheckBox* chkMusicLpMode;
 	irr::gui::IGUIButton* btnWinResizeS;
 	irr::gui::IGUIButton* btnWinResizeM;
 	irr::gui::IGUIButton* btnWinResizeL;
