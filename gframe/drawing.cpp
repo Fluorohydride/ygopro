@@ -564,20 +564,22 @@ void Game::DrawMisc() {
 	DrawShadowText(numFont, dInfo.strLP[0], Resize(330, 12, 631, 30), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true, false, 0);
 	DrawShadowText(numFont, dInfo.strLP[1], Resize(691, 12, 992, 30), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true, false, 0);
 
-	recti p1size = Resize(335, 31, 629, 50);
-	recti p2size = Resize(986, 31, 986, 50);
-	if(!dInfo.isTag || !dInfo.tag_player[0])
-		textFont->draw(dInfo.hostname, p1size, 0xffffffff, false, false, 0);
-	else
-		textFont->draw(dInfo.hostname_tag, p1size, 0xffffffff, false, false, 0);
-	if(!dInfo.isTag || !dInfo.tag_player[1]) {
-		auto cld = textFont->getDimension(dInfo.clientname);
-		p2size.UpperLeftCorner.X -= cld.Width;
-		textFont->draw(dInfo.clientname, p2size, 0xffffffff, false, false, 0);
-	} else {
-		auto cld = textFont->getDimension(dInfo.clientname_tag);
-		p2size.UpperLeftCorner.X -= cld.Width;
-		textFont->draw(dInfo.clientname_tag, p2size, 0xffffffff, false, false, 0);
+	if(!gameConf.hide_player_name) {
+		recti p1size = Resize(335, 31, 629, 50);
+		recti p2size = Resize(986, 31, 986, 50);
+		if(!dInfo.isTag || !dInfo.tag_player[0])
+			textFont->draw(dInfo.hostname, p1size, 0xffffffff, false, false, 0);
+		else
+			textFont->draw(dInfo.hostname_tag, p1size, 0xffffffff, false, false, 0);
+		if(!dInfo.isTag || !dInfo.tag_player[1]) {
+			auto cld = textFont->getDimension(dInfo.clientname);
+			p2size.UpperLeftCorner.X -= cld.Width;
+			textFont->draw(dInfo.clientname, p2size, 0xffffffff, false, false, 0);
+		} else {
+			auto cld = textFont->getDimension(dInfo.clientname_tag);
+			p2size.UpperLeftCorner.X -= cld.Width;
+			textFont->draw(dInfo.clientname_tag, p2size, 0xffffffff, false, false, 0);
+		}
 	}
 	driver->draw2DRectangle(Resize(632, 10, 688, 30), 0x00000000, 0x00000000, 0xffffffff, 0xffffffff);
 	driver->draw2DRectangle(Resize(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);
