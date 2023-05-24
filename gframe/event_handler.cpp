@@ -837,7 +837,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case CHECK_RACE: {
 				int rac = 0, filter = 0x1, count = 0;
-				for(int i = 0; i < 25; ++i, filter <<= 1) {
+				for(int i = 0; i < RACES_COUNT; ++i, filter <<= 1) {
 					if(mainGame->chkRace[i]->isChecked()) {
 						rac |= filter;
 						count++;
@@ -1666,6 +1666,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						myswprintf(formatBuffer, L"\n*%ls", dataManager.GetDesc(iter->first));
 						str.append(formatBuffer);
 					}
+					if(mainGame->dInfo.turn == 1) {
+						if(mplayer == 0 && mainGame->dInfo.isFirst || mplayer != 0 && !mainGame->dInfo.isFirst)
+							myswprintf(formatBuffer, L"\n*%ls", dataManager.GetSysString(100));
+						else
+							myswprintf(formatBuffer, L"\n*%ls", dataManager.GetSysString(101));
+						str.append(formatBuffer);
+					}
 					should_show_tip = true;
 					irr::core::dimension2d<unsigned int> dtip = mainGame->guiFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
 					mainGame->stTip->setRelativePosition(recti(mousepos.X - 10 - dtip.Width, mousepos.Y + 10, mousepos.X - 10, mousepos.Y + 10 + dtip.Height));
@@ -1910,6 +1917,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			case CHECKBOX_DRAW_SINGLE_CHAIN: {
 				mainGame->gameConf.draw_single_chain = mainGame->chkDrawSingleChain->isChecked() ? 1 : 0;
+				return true;
+				break;
+			}
+			case CHECKBOX_HIDE_PLAYER_NAME: {
+				mainGame->gameConf.hide_player_name = mainGame->chkHidePlayerName->isChecked() ? 1 : 0;
+				if(mainGame->gameConf.hide_player_name)
+					mainGame->ClearChatMsg();
 				return true;
 				break;
 			}
