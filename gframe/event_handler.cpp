@@ -2067,7 +2067,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_V: {
 			IGUIElement* focus = mainGame->env->getFocus();
-			if(focus->getType() == EGUIET_EDIT_BOX && event.KeyInput.Control) {
+			if(focus && focus->getType() == EGUIET_EDIT_BOX && event.KeyInput.Control) {
 				irr::core::stringw t(focus->getText());
 				t.trim();
 				focus->setText(t.c_str());
