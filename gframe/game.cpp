@@ -25,7 +25,7 @@ namespace irr {
 #include "single_mode.h"
 #endif //YGOPRO_SERVER_MODE
 
-const unsigned short PRO_VERSION = 0x1354;
+const unsigned short PRO_VERSION = 0x1360;
 
 namespace ygo {
 
@@ -441,6 +441,9 @@ bool Game::Initialize() {
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1291));
 	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
 	posY += 30;
+	chkHidePlayerName = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_HIDE_PLAYER_NAME, dataManager.GetSysString(1289));
+	chkHidePlayerName->setChecked(gameConf.hide_player_name != 0);
+	posY += 30;
 	chkIgnoreDeckChanges = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1357));
 	chkIgnoreDeckChanges->setChecked(gameConf.chkIgnoreDeckChanges != 0);
 	posY += 30;
@@ -625,7 +628,7 @@ bool Game::Initialize() {
 	wANRace = env->addWindow(rect<s32>(480, 200, 850, 410), false, dataManager.GetSysString(563));
 	wANRace->getCloseButton()->setVisible(false);
 	wANRace->setVisible(false);
-	for(int filter = 0x1, i = 0; i < 25; filter <<= 1, ++i)
+	for(int filter = 0x1, i = 0; i < RACES_COUNT; filter <<= 1, ++i)
 		chkRace[i] = env->addCheckBox(false, rect<s32>(10 + (i % 4) * 90, 25 + (i / 4) * 25, 100 + (i % 4) * 90, 50 + (i / 4) * 25),
 		                              wANRace, CHECK_RACE, dataManager.FormatRace(filter));
 	//selection hint
@@ -762,7 +765,7 @@ bool Game::Initialize() {
 	cbRace = env->addComboBox(rect<s32>(60, 40 + 75 / 6, 190, 60 + 75 / 6), wFilter, COMBOBOX_RACE);
 	cbRace->setMaxSelectionRows(10);
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
-	for(int filter = 0x1; filter != 0x2000000; filter <<= 1)
+	for(int filter = 0x1; filter < (1 << RACES_COUNT); filter <<= 1)
 		cbRace->addItem(dataManager.FormatRace(filter), filter);
 	stAttack = env->addStaticText(dataManager.GetSysString(1322), rect<s32>(205, 22 + 50 / 6, 280, 42 + 50 / 6), false, false, wFilter);
 	ebAttack = env->addEditBox(L"", rect<s32>(260, 20 + 50 / 6, 340, 40 + 50 / 6), true, wFilter, EDITBOX_INPUTS);
@@ -1381,6 +1384,7 @@ void Game::LoadConfig() {
 	gameConf.quick_animation = 0;
 	gameConf.auto_save_replay = 0;
 	gameConf.draw_single_chain = 0;
+	gameConf.hide_player_name = 0;
 	gameConf.prefer_expansion_script = 0;
 	gameConf.enable_sound = true;
 	gameConf.sound_volume = 0.5;
@@ -1471,6 +1475,8 @@ void Game::LoadConfig() {
 			gameConf.auto_save_replay = atoi(valbuf);
 		} else if(!strcmp(strbuf, "draw_single_chain")) {
 			gameConf.draw_single_chain = atoi(valbuf);
+		} else if(!strcmp(strbuf, "hide_player_name")) {
+			gameConf.hide_player_name = atoi(valbuf);
 		} else if(!strcmp(strbuf, "prefer_expansion_script")) {
 			gameConf.prefer_expansion_script = atoi(valbuf);
 		} else if(!strcmp(strbuf, "window_maximized")) {
@@ -1572,6 +1578,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
 	fprintf(fp, "draw_single_chain = %d\n", gameConf.draw_single_chain);
+	fprintf(fp, "hide_player_name = %d\n", gameConf.hide_player_name);
 	fprintf(fp, "prefer_expansion_script = %d\n", gameConf.prefer_expansion_script);
 	fprintf(fp, "window_maximized = %d\n", (gameConf.window_maximized ? 1 : 0));
 	fprintf(fp, "window_width = %d\n", gameConf.window_width);
@@ -1705,6 +1712,8 @@ void Game::AddChatMsg(const wchar_t* msg, int player) {
 	chatMsg[0].clear();
 	chatTiming[0] = 1200;
 	chatType[0] = player;
+	if(gameConf.hide_player_name && player < 4)
+		player = 10;
 	switch(player) {
 	case 0: //from host
 		chatMsg[0].append(dInfo.hostname);
@@ -1735,6 +1744,9 @@ void Game::AddChatMsg(const wchar_t* msg, int player) {
 		break;
 	case 9: //error message
 		chatMsg[0].append(L"[Script Error]: ");
+		break;
+	case 10: //hidden name
+		chatMsg[0].append(L"[********]: ");
 		break;
 	default: //from watcher or unknown
 		if(player < 11 || player > 19)

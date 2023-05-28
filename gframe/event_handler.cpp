@@ -837,7 +837,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case CHECK_RACE: {
 				int rac = 0, filter = 0x1, count = 0;
-				for(int i = 0; i < 25; ++i, filter <<= 1) {
+				for(int i = 0; i < RACES_COUNT; ++i, filter <<= 1) {
 					if(mainGame->chkRace[i]->isChecked()) {
 						rac |= filter;
 						count++;
@@ -1917,6 +1917,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			case CHECKBOX_DRAW_SINGLE_CHAIN: {
 				mainGame->gameConf.draw_single_chain = mainGame->chkDrawSingleChain->isChecked() ? 1 : 0;
+				return true;
+				break;
+			}
+			case CHECKBOX_HIDE_PLAYER_NAME: {
+				mainGame->gameConf.hide_player_name = mainGame->chkHidePlayerName->isChecked() ? 1 : 0;
+				if(mainGame->gameConf.hide_player_name)
+					mainGame->ClearChatMsg();
 				return true;
 				break;
 			}

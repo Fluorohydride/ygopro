@@ -320,7 +320,7 @@ const wchar_t* DataManager::FormatRace(int race) {
 	wchar_t* p = racBuffer;
 	unsigned filter = 1;
 	int i = 1020;
-	for(; filter != 0x2000000; filter <<= 1, ++i) {
+	for(; filter < (1 << RACES_COUNT); filter <<= 1, ++i) {
 		if(race & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';
