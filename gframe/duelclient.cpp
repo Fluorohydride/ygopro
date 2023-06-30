@@ -1146,21 +1146,22 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		wchar_t vic_buf[256];
 		if(player == 2)
 			mainGame->showcardcode = 3;
-		else if(mainGame->LocalPlayer(player) == 0) {
-			mainGame->showcardcode = 1;
+		else {
+			wchar_t vic_name[20];
+			if(mainGame->LocalPlayer(player) == 0) {
+				mainGame->showcardcode = 1;
+				myswprintf(vic_name, L"%ls", mainGame->dInfo.clientname);
+			}
+			else {
+				mainGame->showcardcode = 2;
+				myswprintf(vic_name, L"%ls", mainGame->dInfo.hostname);
+			}
+			if(mainGame->gameConf.hide_player_name)
+				myswprintf(vic_name, L"********");
 			if(match_kill)
 				myswprintf(vic_buf, dataManager.GetVictoryString(0xffff), dataManager.GetName(match_kill));
 			else if(type < 0x10)
-				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.clientname, dataManager.GetVictoryString(type));
-			else
-				myswprintf(vic_buf, L"%ls", dataManager.GetVictoryString(type));
-			mainGame->dInfo.vic_string = vic_buf;
-		} else {
-			mainGame->showcardcode = 2;
-			if(match_kill)
-				myswprintf(vic_buf, dataManager.GetVictoryString(0xffff), dataManager.GetName(match_kill));
-			else if(type < 0x10)
-				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.hostname, dataManager.GetVictoryString(type));
+				myswprintf(vic_buf, L"[%ls] %ls", vic_name, dataManager.GetVictoryString(type));
 			else
 				myswprintf(vic_buf, L"%ls", dataManager.GetVictoryString(type));
 			mainGame->dInfo.vic_string = vic_buf;
