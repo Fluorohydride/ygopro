@@ -135,6 +135,7 @@ public:
 	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {}
 	virtual void TimeConfirm(DuelPlayer* dp) {}
 	virtual void EndDuel() {};
+	virtual void AiRequest(DuelPlayer* dp, void* pdata, unsigned int len) {}
 
 public:
 	event* etimer;
@@ -176,6 +177,7 @@ public:
 #define CTOS_HS_NOTREADY	0x23
 #define CTOS_HS_KICK		0x24
 #define CTOS_HS_START		0x25
+#define CTOS_AI_REQUEST		0x26
 
 #define STOC_GAME_MSG		0x1
 #define STOC_ERROR_MSG		0x2
@@ -198,6 +200,7 @@ public:
 #define STOC_HS_PLAYER_ENTER	0x20
 #define STOC_HS_PLAYER_CHANGE	0x21
 #define STOC_HS_WATCH_CHANGE	0x22
+#define STOC_AI_RECEIVE		0x23
 
 #define PLAYERCHANGE_OBSERVE	0x8
 #define PLAYERCHANGE_READY		0x9

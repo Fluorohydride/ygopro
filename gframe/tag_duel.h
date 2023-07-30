@@ -25,6 +25,7 @@ public:
 	virtual void Process();
 	virtual void Surrender(DuelPlayer* dp);
 	virtual int Analyze(char* msgbuffer, unsigned int len);
+	virtual void AiRequest(DuelPlayer* dp, void* pdata, unsigned int len);
 	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len);
 	virtual void TimeConfirm(DuelPlayer* dp);
 	virtual void EndDuel();

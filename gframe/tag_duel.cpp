@@ -1484,6 +1484,45 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 	}
 	return 0;
 }
+void TagDuel::AiRequest(DuelPlayer* dp, void* pdata, unsigned int len) {
+#define RECEIVE_NULL 0
+#define RECEIVE_LUA_ERROR 2
+#define RECEIVE_CORE_ERROR 3
+	byte ai_resb[64];
+	memcpy(ai_resb, pdata, len);
+	uint32 index = 0;
+	uint8 func_type = ai_resb[index];
+	index++;
+	uint16 func_code =  *reinterpret_cast<uint16*>(&ai_resb[index]);
+	index += 2;
+	byte engineBuffer[0x1000];
+	byte* pbuffer = engineBuffer;
+	uint32 plen = 0;
+	pbuffer += 4;
+	plen += 4;
+	uint32 result = ai_request(pduel,index,func_type,func_code,ai_resb,pbuffer,plen);
+	pbuffer = engineBuffer;
+	std::memcpy(pbuffer,&result,sizeof(result));
+	switch (result)
+	{
+	case RECEIVE_NULL:
+	case RECEIVE_LUA_ERROR:
+	case RECEIVE_CORE_ERROR:
+		pbuffer += 4;
+		plen = 4;
+		std::memcpy(pbuffer,&func_type,sizeof(func_type));
+		pbuffer += 1;
+		plen += 1;
+		std::memcpy(pbuffer,&func_code,sizeof(func_code));
+		pbuffer += 2;
+		plen += 2;
+		break;
+	default:
+		break;
+	}
+	pbuffer = engineBuffer;
+	NetServer::SendBufferToPlayer(dp, STOC_AI_RECEIVE, pbuffer, plen);
+}
 void TagDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 	byte resb[64];
 	memcpy(resb, pdata, len);
