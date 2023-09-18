@@ -3052,7 +3052,7 @@ namespace unicode {
 
 //! Hashing algorithm for hashing a ustring.  Used for things like unordered_maps.
 //! Algorithm taken from std::hash<std::string>.
-class hash : public std::unary_function<core::ustring, size_t> {
+class hash {
 public:
 	size_t operator()(const core::ustring& s) const {
 		size_t ret = 2166136261U;
