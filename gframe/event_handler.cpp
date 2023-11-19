@@ -2232,24 +2232,61 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_sequence = sequence;
 			} else if(boardy >= matManager.vFieldMzone[0][5][0].Pos.Y && boardy <= matManager.vFieldMzone[0][5][2].Pos.Y) {
 				if(sequence == 1) {
-					if(!mzone[1][6]) {
+					if (mzone[0][5]) {
 						hovered_controler = 0;
 						hovered_location = LOCATION_MZONE;
 						hovered_sequence = 5;
-					} else {
+					}
+					else if(mzone[1][6]) {
 						hovered_controler = 1;
 						hovered_location = LOCATION_MZONE;
 						hovered_sequence = 6;
 					}
-				} else if(sequence == 3) {
-					if(!mzone[1][5]) {
+					else if((mainGame->dInfo.curMsg == MSG_SELECT_PLACE || mainGame->dInfo.curMsg == MSG_SELECT_DISFIELD)) {
+						if (mainGame->dField.selectable_field & (0x1 << (16 + 6))) {
+							hovered_controler = 1;
+							hovered_location = LOCATION_MZONE;
+							hovered_sequence = 6;
+						}
+						else {
+							hovered_controler = 0;
+							hovered_location = LOCATION_MZONE;
+							hovered_sequence = 5;
+						}
+					}
+					else{
+						hovered_controler = 0;
+						hovered_location = LOCATION_MZONE;
+						hovered_sequence = 5;
+					}
+				}
+				else if(sequence == 3) {
+					if (mzone[0][6]) {
 						hovered_controler = 0;
 						hovered_location = LOCATION_MZONE;
 						hovered_sequence = 6;
-					} else {
+					}
+					else if (mzone[1][5]) {
 						hovered_controler = 1;
 						hovered_location = LOCATION_MZONE;
 						hovered_sequence = 5;
+					}
+					else if ((mainGame->dInfo.curMsg == MSG_SELECT_PLACE || mainGame->dInfo.curMsg == MSG_SELECT_DISFIELD)) {
+						if (mainGame->dField.selectable_field & (0x1 << (16 + 5))) {
+							hovered_controler = 1;
+							hovered_location = LOCATION_MZONE;
+							hovered_sequence = 5;
+						}
+						else {
+							hovered_controler = 0;
+							hovered_location = LOCATION_MZONE;
+							hovered_sequence = 6;
+						}
+					}
+					else {
+						hovered_controler = 0;
+						hovered_location = LOCATION_MZONE;
+						hovered_sequence = 6;
 					}
 				}
 			} else if(boardy >= matManager.vFieldMzone[1][0][2].Pos.Y && boardy <= matManager.vFieldMzone[1][0][0].Pos.Y) {
