@@ -318,8 +318,21 @@ void Game::DrawCards() {
 		for(auto it = dField.extra[p].begin(); it != dField.extra[p].end(); ++it)
 			DrawCard(*it);
 	}
-	for(auto cit = dField.overlay_cards.begin(); cit != dField.overlay_cards.end(); ++cit)
-		DrawCard(*cit);
+	for (auto cit = dField.overlay_cards.begin(); cit != dField.overlay_cards.end(); ++cit) {
+		auto pcard = (*cit);
+		auto olcard = pcard->overlayTarget;
+		if (pcard->aniFrame) {
+			DrawCard(pcard);
+		}
+		else if (olcard && olcard->location == LOCATION_MZONE) {
+			if (pcard->sequence < MAX_LAYER_COUNT) {
+				DrawCard(pcard);
+			}
+		}
+		else {
+			DrawCard(pcard);
+		}
+	}
 }
 void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->aniFrame) {

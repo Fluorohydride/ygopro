@@ -807,7 +807,8 @@ extern Game* mainGame;
 #define AVAIL_SC					0x8
 #define AVAIL_OCGTCG				(AVAIL_OCG|AVAIL_TCG)
 
-#define DEFAULT_DUEL_RULE			5
+#define DEFAULT_DUEL_RULE	5
 
 #define CARD_ARTWORK_VERSIONS_OFFSET	10
+#define MAX_LAYER_COUNT	6
 #endif // GAME_H
