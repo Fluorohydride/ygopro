@@ -87,6 +87,8 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
+typedef int BOOL;
+
 extern const unsigned short PRO_VERSION;
 extern int enable_log;
 extern bool exit_on_return;
