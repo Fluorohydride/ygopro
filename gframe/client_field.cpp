@@ -35,7 +35,7 @@ ClientField::ClientField() {
 		mzone[p].resize(7, 0);
 		szone[p].resize(8, 0);
 	}
-	rnd.reset(std::random_device()());
+	rnd.reset((uint_fast32_t)std::random_device()());
 }
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {

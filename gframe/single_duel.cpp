@@ -410,8 +410,8 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	dp->state = CTOS_RESPONSE;
 	std::random_device rd;
 	unsigned int seed = rd();
-	mt19937 rnd(seed);
-	unsigned int duel_seed = rnd.rand();
+	mt19937 rnd((uint_fast32_t)seed);
+	auto duel_seed = rnd.rand();
 	ReplayHeader rh;
 	rh.id = 0x31707279;
 	rh.version = PRO_VERSION;
