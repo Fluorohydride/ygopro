@@ -74,13 +74,14 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.isFinished = false;
 	mainGame->dInfo.isReplay = true;
 	mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
-	char engineBuffer[0x1000];
+	std::vector<char> engineBuffer;
+	engineBuffer.resize(MESSAGE_BUFFER_SIZE);
 	is_continuing = true;
 	skip_step = 0;
 	if(mainGame->dInfo.isSingleMode) {
-		int len = get_message(pduel, (byte*)engineBuffer);
+		int len = get_message(pduel, (byte*)engineBuffer.data());
 		if (len > 0)
-			is_continuing = ReplayAnalyze(engineBuffer, len);
+			is_continuing = ReplayAnalyze(engineBuffer.data(), len);
 	} else {
 		ReplayRefreshDeck(0);
 		ReplayRefreshDeck(1);
@@ -92,12 +93,13 @@ int ReplayMode::ReplayThread() {
 	if(mainGame->dInfo.isReplaySkiping)
 		mainGame->gMutex.lock();
 	while (is_continuing && !exit_pending) {
-		int result = process(pduel);
-		int len = result & 0xffff;
-		/*int flag = result >> 16;*/
+		unsigned int result = process(pduel);
+		int len = result & PROCESSOR_BUFFER_LEN;
 		if (len > 0) {
-			get_message(pduel, (byte*)engineBuffer);
-			is_continuing = ReplayAnalyze(engineBuffer, len);
+			if (len > (int)engineBuffer.size())
+				engineBuffer.resize(len);
+			get_message(pduel, (byte*)engineBuffer.data());
+			is_continuing = ReplayAnalyze(engineBuffer.data(), len);
 			if(is_restarting) {
 				mainGame->gMutex.lock();
 				is_restarting = false;
@@ -109,9 +111,9 @@ int ReplayMode::ReplayThread() {
 				if(mainGame->dInfo.isSingleMode) {
 					is_continuing = true;
 					skip_step = 0;
-					int len = get_message(pduel, (byte*)engineBuffer);
+					int len = get_message(pduel, (byte*)engineBuffer.data());
 					if (len > 0) {
-						is_continuing = ReplayAnalyze(engineBuffer, len);
+						is_continuing = ReplayAnalyze(engineBuffer.data(), len);
 					}
 				} else {
 					ReplayRefreshDeck(0);

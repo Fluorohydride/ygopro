@@ -492,18 +492,22 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	Process();
 }
 void SingleDuel::Process() {
-	char engineBuffer[0x1000];
-	unsigned int engFlag = 0, engLen = 0;
+	std::vector<char> engineBuffer;
+	engineBuffer.reserve(MESSAGE_BUFFER_SIZE);
+	unsigned int engFlag = 0;
+	int engLen = 0;
 	int stop = 0;
 	while (!stop) {
-		if (engFlag == 2)
+		if (engFlag == PROCESSOR_END)
 			break;
-		int result = process(pduel);
-		engLen = result & 0xffff;
-		engFlag = result >> 16;
+		unsigned int result = process(pduel);
+		engLen = result & PROCESSOR_BUFFER_LEN;
+		engFlag = result & PROCESSOR_FLAG;
 		if (engLen > 0) {
-			get_message(pduel, (byte*)&engineBuffer);
-			stop = Analyze(engineBuffer, engLen);
+			if (engLen > (int)engineBuffer.size())
+				engineBuffer.resize(engLen);
+			get_message(pduel, (byte*)engineBuffer.data());
+			stop = Analyze(engineBuffer.data(), engLen);
 		}
 	}
 	if(stop == 2)

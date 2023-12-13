@@ -98,12 +98,13 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dInfo.isSingleMode = true;
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.unlock();
-	char engineBuffer[0x1000];
+	std::vector<char> engineBuffer;
+	engineBuffer.resize(MESSAGE_BUFFER_SIZE);
 	is_closing = false;
 	is_continuing = true;
-	int len = get_message(pduel, (byte*)engineBuffer);
+	int len = get_message(pduel, (byte*)engineBuffer.data());
 	if (len > 0)
-		is_continuing = SinglePlayAnalyze(engineBuffer, len);
+		is_continuing = SinglePlayAnalyze(engineBuffer.data(), len);
 	last_replay.BeginRecord();
 	last_replay.WriteHeader(rh);
 	unsigned short buffer[20];
@@ -120,12 +121,13 @@ int SingleMode::SinglePlayThread() {
 	last_replay.Flush();
 	start_duel(pduel, opt);
 	while (is_continuing) {
-		int result = process(pduel);
-		len = result & 0xffff;
-		/* int flag = result >> 16; */
+		unsigned int result = process(pduel);
+		len = result & PROCESSOR_BUFFER_LEN;
 		if (len > 0) {
-			get_message(pduel, (byte*)engineBuffer);
-			is_continuing = SinglePlayAnalyze(engineBuffer, len);
+			if (len > (int)engineBuffer.size())
+				engineBuffer.resize(len);
+			get_message(pduel, (byte*)engineBuffer.data());
+			is_continuing = SinglePlayAnalyze(engineBuffer.data(), len);
 		}
 	}
 	last_replay.EndRecord();
