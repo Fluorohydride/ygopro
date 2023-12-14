@@ -1,6 +1,8 @@
 #ifndef SINGLE_MODE_H
 #define SINGLE_MODE_H
 
+#include <stdint.h>
+#include <vector>
 #include "replay.h"
 
 namespace ygo {
@@ -18,6 +20,8 @@ public:
 	static int SinglePlayThread();
 	static bool SinglePlayAnalyze(char* msg, unsigned int len);
 	
+	inline static void ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer);
+	inline static void RefreshLocation(int player, int location, int flag);
 	static void SinglePlayRefresh(int flag = 0xf81fff);
 	static void SinglePlayRefreshHand(int player, int flag = 0x781fff);
 	static void SinglePlayRefreshGrave(int player, int flag = 0x181fff);
