@@ -493,7 +493,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 }
 void SingleDuel::Process() {
 	std::vector<char> engineBuffer;
-	engineBuffer.reserve(MESSAGE_BUFFER_SIZE);
+	engineBuffer.reserve(SIZE_MESSAGE_BUFFER);
 	unsigned int engFlag = 0;
 	int engLen = 0;
 	int stop = 0;
