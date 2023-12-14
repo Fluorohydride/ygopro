@@ -2,7 +2,6 @@
 #define REPLAY_H
 
 #include "config.h"
-#include <time.h>
 
 namespace ygo {
 
@@ -53,7 +52,7 @@ public:
 	static bool RenameReplay(const wchar_t* oldname, const wchar_t* newname);
 	bool ReadNextResponse(unsigned char resp[64]);
 	void ReadName(wchar_t* data);
-	void ReadHeader(ReplayHeader& header);
+	//void ReadHeader(ReplayHeader& header);
 	void ReadData(void* data, int length);
 	int ReadInt32();
 	short ReadInt16();

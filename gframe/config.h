@@ -69,7 +69,6 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory.h>
 #include <time.h>
 #include <thread>
 #include <mutex>
