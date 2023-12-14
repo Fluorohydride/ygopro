@@ -35,7 +35,7 @@ public:
 	static void EndDuel();
 	static void Restart(bool refresh);
 	static void Undo();
-	static bool ReplayAnalyze(char* msg, unsigned int len);
+	static bool ReplayAnalyze(unsigned char* msg, unsigned int len);
 	
 	inline static void ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer);
 	inline static void RefreshLocation(int player, int location, int flag);

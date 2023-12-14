@@ -257,7 +257,7 @@ void TagDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 void TagDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
 	if(dp->type > 3 || ready[dp->type])
 		return;
-	char* deckbuf = (char*)pdata;
+	unsigned char* deckbuf = (unsigned char*)pdata;
 	int mainc = BufferIO::ReadInt32(deckbuf);
 	int sidec = BufferIO::ReadInt32(deckbuf);
 	// verify data
@@ -284,8 +284,8 @@ void TagDuel::StartDuel(DuelPlayer* dp) {
 		(*oit)->state = CTOS_LEAVE_GAME;
 		NetServer::ReSendToPlayer(*oit);
 	}
-	char deckbuff[12];
-	char* pbuf = deckbuff;
+	unsigned char deckbuff[12];
+	auto pbuf = deckbuff;
 	BufferIO::WriteInt16(pbuf, pdeck[0].main.size());
 	BufferIO::WriteInt16(pbuf, pdeck[0].extra.size());
 	BufferIO::WriteInt16(pbuf, pdeck[0].side.size());
@@ -457,7 +457,8 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		last_replay.WriteInt32(pdeck[2].extra[i]->first, false);
 	}
 	last_replay.Flush();
-	char startbuf[32], *pbuf = startbuf;
+	unsigned char startbuf[32];
+	auto pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, 0);
 	BufferIO::WriteInt8(pbuf, host_info.duel_rule);
@@ -488,7 +489,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	Process();
 }
 void TagDuel::Process() {
-	std::vector<char> engineBuffer;
+	std::vector<unsigned char> engineBuffer;
 	engineBuffer.reserve(SIZE_MESSAGE_BUFFER);
 	unsigned int engFlag = 0;
 	int engLen = 0;
@@ -502,7 +503,7 @@ void TagDuel::Process() {
 		if (engLen > 0) {
 			if (engLen > (int)engineBuffer.size())
 				engineBuffer.resize(engLen);
-			get_message(pduel, (byte*)engineBuffer.data());
+			get_message(pduel, engineBuffer.data());
 			stop = Analyze(engineBuffer.data(), engLen);
 		}
 	}
@@ -521,8 +522,8 @@ void TagDuel::DuelEndProc() {
 void TagDuel::Surrender(DuelPlayer* dp) {
 	return;
 }
-int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
-	char* offset, *pbufw, *pbuf = msgbuffer;
+int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
+	unsigned char* offset, *pbufw, *pbuf = msgbuffer;
 	int player, count, type;
 	while (pbuf - msgbuffer < (int)len) {
 		offset = pbuf;
@@ -1550,8 +1551,8 @@ void TagDuel::TimeConfirm(DuelPlayer* dp) {
 		time_elapsed = 0;
 }
 void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
-	char query_buffer[0x4000];
-	char* qbuf = query_buffer;
+	unsigned char query_buffer[0x4000];
+	auto qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_MZONE);
@@ -1576,8 +1577,8 @@ void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
-	char query_buffer[0x4000];
-	char* qbuf = query_buffer;
+	unsigned char query_buffer[0x4000];
+	auto qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_SZONE);
@@ -1602,8 +1603,8 @@ void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshHand(int player, int flag, int use_cache) {
-	char query_buffer[0x4000];
-	char* qbuf = query_buffer;
+	unsigned char query_buffer[0x4000];
+	auto qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_HAND);
@@ -1629,8 +1630,8 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshGrave(int player, int flag, int use_cache) {
-	char query_buffer[0x4000];
-	char* qbuf = query_buffer;
+	unsigned char query_buffer[0x4000];
+	auto qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_GRAVE);
@@ -1643,8 +1644,8 @@ void TagDuel::RefreshGrave(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshExtra(int player, int flag, int use_cache) {
-	char query_buffer[0x4000];
-	char* qbuf = query_buffer;
+	unsigned char query_buffer[0x4000];
+	auto qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_EXTRA);
@@ -1652,8 +1653,8 @@ void TagDuel::RefreshExtra(int player, int flag, int use_cache) {
 	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer, len + 3);
 }
 void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
-	char query_buffer[0x4000];
-	char* qbuf = query_buffer;
+	unsigned char query_buffer[0x4000];
+	auto qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_CARD);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, location);

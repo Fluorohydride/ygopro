@@ -112,7 +112,7 @@ public:
 
 	ClientCard();
 	void SetCode(int code);
-	void UpdateInfo(char* buf);
+	void UpdateInfo(unsigned char* buf);
 	void ClearTarget();
 	static bool client_card_sort(ClientCard* c1, ClientCard* c2);
 	static bool deck_sort_lv(code_pointer l1, code_pointer l2);

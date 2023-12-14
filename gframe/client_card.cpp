@@ -57,7 +57,7 @@ void ClientCard::SetCode(int code) {
 	} else
 		this->code = code;
 }
-void ClientCard::UpdateInfo(char* buf) {
+void ClientCard::UpdateInfo(unsigned char* buf) {
 	int flag = BufferIO::ReadInt32(buf);
 	if(flag == 0)
 		return;

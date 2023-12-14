@@ -98,11 +98,11 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dInfo.isSingleMode = true;
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.unlock();
-	std::vector<char> engineBuffer;
+	std::vector<unsigned char> engineBuffer;
 	engineBuffer.resize(SIZE_MESSAGE_BUFFER);
 	is_closing = false;
 	is_continuing = true;
-	int len = get_message(pduel, (byte*)engineBuffer.data());
+	int len = get_message(pduel, engineBuffer.data());
 	if (len > 0)
 		is_continuing = SinglePlayAnalyze(engineBuffer.data(), len);
 	last_replay.BeginRecord();
@@ -126,7 +126,7 @@ int SingleMode::SinglePlayThread() {
 		if (len > 0) {
 			if (len > (int)engineBuffer.size())
 				engineBuffer.resize(len);
-			get_message(pduel, (byte*)engineBuffer.data());
+			get_message(pduel, engineBuffer.data());
 			is_continuing = SinglePlayAnalyze(engineBuffer.data(), len);
 		}
 	}
@@ -174,8 +174,8 @@ int SingleMode::SinglePlayThread() {
 	}
 	return 0;
 }
-bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
-	char* offset, *pbuf = msg;
+bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
+	unsigned char* offset, * pbuf = msg;
 	int player, count;
 	while (pbuf - msg < (int)len) {
 		if(is_closing || !is_continuing)
@@ -747,7 +747,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			char namebuf[128];
 			wchar_t wname[128];
 			int len = BufferIO::ReadInt16(pbuf);
-			char* begin = pbuf;
+			auto begin = pbuf;
 			pbuf += len + 1;
 			memcpy(namebuf, begin, len + 1);
 			BufferIO::DecodeUTF8(namebuf, wname);
@@ -758,7 +758,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			char msgbuf[1024];
 			wchar_t msg[1024];
 			int len = BufferIO::ReadInt16(pbuf);
-			char* begin = pbuf;
+			auto begin = pbuf;
 			pbuf += len + 1;
 			memcpy(msgbuf, begin, len + 1);
 			BufferIO::DecodeUTF8(msgbuf, msg);
@@ -776,7 +776,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 }
 void SingleMode::ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer) {
 	query_field_card(pduel, player, location, flag, queryBuffer.data(), 0);
-	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)queryBuffer.data());
+	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, queryBuffer.data());
 }
 void SingleMode::RefreshLocation(int player, int location, int flag) {
 	std::vector<unsigned char> queryBuffer;
@@ -808,7 +808,7 @@ void SingleMode::SinglePlayRefreshExtra(int player, int flag) {
 void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence, int flag) {
 	unsigned char queryBuffer[0x2000];
 	/*int len = */query_card(pduel, player, location, sequence, flag, queryBuffer, 0);
-	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)queryBuffer);
+	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, queryBuffer);
 }
 void SingleMode::SinglePlayReload() {
 	std::vector<byte> queryBuffer;

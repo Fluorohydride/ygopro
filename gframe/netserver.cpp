@@ -9,8 +9,8 @@ event_base* NetServer::net_evbase = 0;
 event* NetServer::broadcast_ev = 0;
 evconnlistener* NetServer::listener = 0;
 DuelMode* NetServer::duel_mode = 0;
-char NetServer::net_server_read[0x2000];
-char NetServer::net_server_write[0x2000];
+unsigned char NetServer::net_server_read[0x2000];
+unsigned char NetServer::net_server_write[0x2000];
 unsigned short NetServer::last_sent = 0;
 
 bool NetServer::StartServer(unsigned short port) {
@@ -171,8 +171,8 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 		users.erase(bit);
 	}
 }
-void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
-	char* pdata = data;
+void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, unsigned int len) {
+	auto pdata = data;
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
 	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
 		return;

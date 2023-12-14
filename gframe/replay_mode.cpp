@@ -73,12 +73,12 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.isFinished = false;
 	mainGame->dInfo.isReplay = true;
 	mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
-	std::vector<char> engineBuffer;
+	std::vector<unsigned char> engineBuffer;
 	engineBuffer.resize(SIZE_MESSAGE_BUFFER);
 	is_continuing = true;
 	skip_step = 0;
 	if(mainGame->dInfo.isSingleMode) {
-		int len = get_message(pduel, (byte*)engineBuffer.data());
+		int len = get_message(pduel, engineBuffer.data());
 		if (len > 0)
 			is_continuing = ReplayAnalyze(engineBuffer.data(), len);
 	} else {
@@ -97,7 +97,7 @@ int ReplayMode::ReplayThread() {
 		if (len > 0) {
 			if (len > (int)engineBuffer.size())
 				engineBuffer.resize(len);
-			get_message(pduel, (byte*)engineBuffer.data());
+			get_message(pduel, engineBuffer.data());
 			is_continuing = ReplayAnalyze(engineBuffer.data(), len);
 			if(is_restarting) {
 				mainGame->gMutex.lock();
@@ -110,7 +110,7 @@ int ReplayMode::ReplayThread() {
 				if(mainGame->dInfo.isSingleMode) {
 					is_continuing = true;
 					skip_step = 0;
-					int len = get_message(pduel, (byte*)engineBuffer.data());
+					int len = get_message(pduel, engineBuffer.data());
 					if (len > 0) {
 						is_continuing = ReplayAnalyze(engineBuffer.data(), len);
 					}
@@ -296,8 +296,8 @@ void ReplayMode::Undo() {
 	is_restarting = true;
 	Pause(false, false);
 }
-bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
-	char* pbuf = msg;
+bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
+	unsigned char* pbuf = msg;
 	int player, count;
 	is_restarting = false;
 	while (pbuf - msg < (int)len) {
@@ -313,7 +313,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			mainGame->gMutex.unlock();
 			is_swaping = false;
 		}
-		char* offset = pbuf;
+		auto offset = pbuf;
 		bool pauseable = true;
 		mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 		switch (mainGame->dInfo.curMsg) {
@@ -875,7 +875,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 }
 void ReplayMode::ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer) {
 	query_field_card(pduel, player, location, flag, queryBuffer.data(), 0);
-	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)queryBuffer.data());
+	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, queryBuffer.data());
 }
 void ReplayMode::RefreshLocation(int player, int location, int flag) {
 	std::vector<unsigned char> queryBuffer;
@@ -908,7 +908,7 @@ void ReplayMode::ReplayRefreshSingle(int player, int location, int sequence, int
 	std::vector<unsigned char> queryBuffer;
 	queryBuffer.reserve(SIZE_QUERY_BUFFER);
 	/*int len = */query_card(pduel, player, location, sequence, flag, queryBuffer.data(), 0);
-	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)queryBuffer.data());
+	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, queryBuffer.data());
 }
 void ReplayMode::ReplayReload() {
 	std::vector<unsigned char> queryBuffer;

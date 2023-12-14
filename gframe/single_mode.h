@@ -18,7 +18,7 @@ public:
 	static void StopPlay(bool is_exiting = false);
 	static void SetResponse(unsigned char* resp, unsigned int len);
 	static int SinglePlayThread();
-	static bool SinglePlayAnalyze(char* msg, unsigned int len);
+	static bool SinglePlayAnalyze(unsigned char* msg, unsigned int len);
 	
 	inline static void ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer);
 	inline static void RefreshLocation(int player, int location, int flag);
