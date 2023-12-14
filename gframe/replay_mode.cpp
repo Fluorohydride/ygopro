@@ -879,12 +879,12 @@ void ReplayMode::ReloadLocation(int player, int location, int flag, std::vector<
 }
 void ReplayMode::RefreshLocation(int player, int location, int flag) {
 	std::vector<unsigned char> queryBuffer;
-	queryBuffer.reserve(SIZE_QUERY_BUFFER);
+	queryBuffer.resize(SIZE_QUERY_BUFFER);
 	ReloadLocation(player, location, flag, queryBuffer);
 }
 void ReplayMode::ReplayRefresh(int flag) {
 	std::vector<byte> queryBuffer;
-	queryBuffer.reserve(SIZE_QUERY_BUFFER);
+	queryBuffer.resize(SIZE_QUERY_BUFFER);
 	ReloadLocation(0, LOCATION_MZONE, flag, queryBuffer);
 	ReloadLocation(1, LOCATION_MZONE, flag, queryBuffer);
 	ReloadLocation(0, LOCATION_SZONE, flag, queryBuffer);
@@ -905,14 +905,13 @@ void ReplayMode::ReplayRefreshExtra(int player, int flag) {
 	RefreshLocation(player, LOCATION_EXTRA, flag);
 }
 void ReplayMode::ReplayRefreshSingle(int player, int location, int sequence, int flag) {
-	std::vector<unsigned char> queryBuffer;
-	queryBuffer.reserve(SIZE_QUERY_BUFFER);
-	/*int len = */query_card(pduel, player, location, sequence, flag, queryBuffer.data(), 0);
-	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, queryBuffer.data());
+	unsigned char queryBuffer[0x1000];
+	/*int len = */query_card(pduel, player, location, sequence, flag, queryBuffer, 0);
+	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, queryBuffer);
 }
 void ReplayMode::ReplayReload() {
 	std::vector<unsigned char> queryBuffer;
-	queryBuffer.reserve(SIZE_QUERY_BUFFER);
+	queryBuffer.resize(SIZE_QUERY_BUFFER);
 	unsigned int flag = 0xffdfff;
 	ReloadLocation(0, LOCATION_MZONE, flag, queryBuffer);
 	ReloadLocation(1, LOCATION_MZONE, flag, queryBuffer);
