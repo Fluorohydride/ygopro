@@ -305,8 +305,9 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 }
 void ClientField::UpdateCard(int controler, int location, int sequence, unsigned char* data) {
 	ClientCard* pcard = GetCard(controler, location, sequence);
-	if(pcard)
-		pcard->UpdateInfo(data + 4);
+	int len = BufferIO::ReadInt32(data);
+	if (pcard && len > LEN_HEADER)
+		pcard->UpdateInfo(data);
 }
 void ClientField::UpdateFieldCard(int controler, int location, unsigned char* data) {
 	std::vector<ClientCard*>* lst = 0;
@@ -338,7 +339,7 @@ void ClientField::UpdateFieldCard(int controler, int location, unsigned char* da
 	int len;
 	for(auto cit = lst->begin(); cit != lst->end(); ++cit) {
 		len = BufferIO::ReadInt32(data);
-		if(len > 8)
+		if(len > LEN_HEADER)
 			(*cit)->UpdateInfo(data);
 		data += len - 4;
 	}

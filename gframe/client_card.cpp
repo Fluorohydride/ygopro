@@ -5,51 +5,7 @@
 
 namespace ygo {
 
-ClientCard::ClientCard() {
-	curAlpha = 255;
-	dAlpha = 0;
-	aniFrame = 0;
-	is_moving = false;
-	is_fading = false;
-	is_hovered = false;
-	is_selectable = false;
-	is_selected = false;
-	is_showequip = false;
-	is_showtarget = false;
-	is_showchaintarget = false;
-	is_highlighting = false;
-	status = 0;
-	is_reversed = false;
-	cmdFlag = 0;
-	code = 0;
-	chain_code = 0;
-	location = 0;
-	type = 0;
-	alias = 0;
-	level = 0;
-	rank = 0;
-	link = 0;
-	race = 0;
-	attribute = 0;
-	attack = 0;
-	defense = 0;
-	base_attack = 0;
-	base_defense = 0;
-	lscale = 0;
-	rscale = 0;
-	link_marker = 0;
-	position = 0;
-	cHint = 0;
-	chValue = 0;
-	atkstring[0] = 0;
-	defstring[0] = 0;
-	lvstring[0] = 0;
-	linkstring[0] = 0;
-	rscstring[0] = 0;
-	lscstring[0] = 0;
-	overlayTarget = 0;
-	equipTarget = 0;
-}
+ClientCard::ClientCard() {}
 void ClientCard::SetCode(int code) {
 	if((location == LOCATION_HAND) && (this->code != (unsigned int)code)) {
 		this->code = code;
@@ -59,8 +15,10 @@ void ClientCard::SetCode(int code) {
 }
 void ClientCard::UpdateInfo(unsigned char* buf) {
 	int flag = BufferIO::ReadInt32(buf);
-	if(flag == 0)
+	if (flag == 0) {
+		ClearData();
 		return;
+	}
 	int pdata;
 	if(flag & QUERY_CODE) {
 		pdata = BufferIO::ReadInt32(buf);
@@ -133,8 +91,10 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 		int s = BufferIO::ReadInt8(buf);
 		BufferIO::ReadInt8(buf);
 		ClientCard* ecard = mainGame->dField.GetCard(mainGame->LocalPlayer(c), l, s);
-		equipTarget = ecard;
-		ecard->equipped.insert(this);
+		if (ecard) {
+			equipTarget = ecard;
+			ecard->equipped.insert(this);
+		}
 	}
 	if(flag & QUERY_TARGET_CARD) {
 		int count = BufferIO::ReadInt32(buf);
@@ -144,8 +104,10 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 			int s = BufferIO::ReadInt8(buf);
 			BufferIO::ReadInt8(buf);
 			ClientCard* tcard = mainGame->dField.GetCard(mainGame->LocalPlayer(c), l, s);
-			cardTarget.insert(tcard);
-			tcard->ownerTarget.insert(this);
+			if (tcard) {
+				cardTarget.insert(tcard);
+				tcard->ownerTarget.insert(this);
+			}
 		}
 	}
 	if(flag & QUERY_OVERLAY_CARD) {
@@ -197,6 +159,32 @@ void ClientCard::ClearTarget() {
 	}
 	cardTarget.clear();
 	ownerTarget.clear();
+}
+void ClientCard::ClearData() {
+	alias = 0;
+	type = 0;
+	level = 0;
+	rank = 0;
+	race = 0;
+	attribute = 0;
+	attack = 0;
+	defense = 0;
+	base_attack = 0;
+	base_defense = 0;
+	lscale = 0;
+	rscale = 0;
+	link = 0;
+	link_marker = 0;
+	status = 0;
+	
+	atkstring[0] = 0;
+	defstring[0] = 0;
+	lvstring[0] = 0;
+	linkstring[0] = 0;
+	rscstring[0] = 0;
+	lscstring[0] = 0;
+	counters.clear();
+	equipped.clear();
 }
 bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 	if(c1->is_selected != c2->is_selected)
