@@ -882,6 +882,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 	}
 	}
 }
+// Analyze STOC_GAME_MSG packet
 int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 	unsigned char* pbuf = msg;
 	wchar_t textBuffer[256];

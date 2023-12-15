@@ -579,6 +579,7 @@ void SingleDuel::Surrender(DuelPlayer* dp) {
 	DuelEndProc();
 	event_del(etimer);
 }
+// Analyze ocgcore message
 int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 	unsigned char* offset, *pbufw, *pbuf = msgbuffer;
 	int player, count, type;
