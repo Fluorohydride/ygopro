@@ -5,7 +5,28 @@
 
 namespace ygo {
 
-ClientCard::ClientCard() {}
+ClientCard::~ClientCard() {
+	ClearTarget();
+	if (equipTarget)
+		equipTarget->equipped.erase(this);
+	for (auto card : equipped) {
+		card->equipTarget = nullptr;
+	}
+	equipped.clear();
+	if (overlayTarget) {
+		for (auto it = overlayTarget->overlayed.begin(); it != overlayTarget->overlayed.end(); ) {
+			if (*it == this) {
+				it = overlayTarget->overlayed.erase(it);
+			}
+			else
+				++it;
+		}
+	}
+	for (auto card : overlayed) {
+		card->overlayTarget = nullptr;
+	}
+	overlayed.clear();
+}
 void ClientCard::SetCode(int code) {
 	if((location == LOCATION_HAND) && (this->code != (unsigned int)code)) {
 		this->code = code;
@@ -184,6 +205,9 @@ void ClientCard::ClearData() {
 	rscstring[0] = 0;
 	lscstring[0] = 0;
 	counters.clear();
+	for (auto card : equipped) {
+		card->equipTarget = nullptr;
+	}
 	equipped.clear();
 }
 bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {

@@ -111,7 +111,8 @@ public:
 	wchar_t lscstring[16]{ 0 };
 	wchar_t rscstring[16]{ 0 };
 
-	ClientCard();
+	ClientCard() = default;
+	~ClientCard();
 	void SetCode(int code);
 	void UpdateInfo(unsigned char* buf);
 	void ClearTarget();
