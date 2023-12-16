@@ -40,6 +40,9 @@ public:
 
 	static int MessageHandler(intptr_t fduel, int type);
 	static void SingleTimer(evutil_socket_t fd, short events, void* arg);
+
+private:
+	int WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache);
 	
 protected:
 	DuelPlayer* players[2];
