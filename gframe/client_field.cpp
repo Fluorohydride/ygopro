@@ -11,26 +11,6 @@
 namespace ygo {
 
 ClientField::ClientField() {
-	panel = 0;
-	hovered_card = 0;
-	clicked_card = 0;
-	highlighting_card = 0;
-	menu_card = 0;
-	hovered_controler = 0;
-	hovered_location = 0;
-	hovered_sequence = 0;
-	selectable_field = 0;
-	selected_field = 0;
-	deck_act = false;
-	grave_act = false;
-	remove_act = false;
-	extra_act = false;
-	pzone_act[0] = false;
-	pzone_act[1] = false;
-	conti_act = false;
-	deck_reversed = false;
-	conti_selecting = false;
-	cant_check_grave = false;
 	for(int p = 0; p < 2; ++p) {
 		mzone[p].resize(7, 0);
 		szone[p].resize(8, 0);

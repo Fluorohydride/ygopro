@@ -2525,7 +2525,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 		}
 		int appear = mainGame->gameConf.quick_animation ? 12 : 20;
 		if (pl == 0) {
-			ClientCard* pcard = new ClientCard();
+			ClientCard* pcard = new ClientCard;
 			pcard->position = cp;
 			pcard->SetCode(code);
 			if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
@@ -3744,7 +3744,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 			}
 		} else {
 			while(mainGame->dField.deck[player].size() < mcount) {
-				ClientCard* ccard = new ClientCard();
+				ClientCard* ccard = new ClientCard;
 				ccard->controler = player;
 				ccard->location = LOCATION_DECK;
 				ccard->sequence = mainGame->dField.deck[player].size();
@@ -3759,7 +3759,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 			}
 		} else {
 			while(mainGame->dField.hand[player].size() < hcount) {
-				ClientCard* ccard = new ClientCard();
+				ClientCard* ccard = new ClientCard;
 				ccard->controler = player;
 				ccard->location = LOCATION_HAND;
 				ccard->sequence = mainGame->dField.hand[player].size();
@@ -3774,7 +3774,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 			}
 		} else {
 			while(mainGame->dField.extra[player].size() < ecount) {
-				ClientCard* ccard = new ClientCard();
+				ClientCard* ccard = new ClientCard;
 				ccard->controler = player;
 				ccard->location = LOCATION_EXTRA;
 				ccard->sequence = mainGame->dField.extra[player].size();
