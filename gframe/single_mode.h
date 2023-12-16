@@ -12,6 +12,7 @@ private:
 	static intptr_t pduel;
 	static bool is_closing;
 	static bool is_continuing;
+	static void ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer);
 
 public:
 	static bool StartPlay();
@@ -20,9 +21,8 @@ public:
 	static int SinglePlayThread();
 	static bool SinglePlayAnalyze(unsigned char* msg, unsigned int len);
 	
-	inline static void ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer);
-	inline static void RefreshLocation(int player, int location, int flag);
 	static void SinglePlayRefresh(int flag = 0xf81fff);
+	static void SingleRefreshLocation(int player, int location, int flag);
 	static void SinglePlayRefreshHand(int player, int flag = 0x781fff);
 	static void SinglePlayRefreshGrave(int player, int flag = 0x181fff);
 	static void SinglePlayRefreshDeck(int player, int flag = 0x181fff);

@@ -774,14 +774,9 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 	}
 	return is_continuing;
 }
-void SingleMode::ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer) {
+inline void SingleMode::ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer) {
 	query_field_card(pduel, player, location, flag, queryBuffer.data(), 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, queryBuffer.data());
-}
-void SingleMode::RefreshLocation(int player, int location, int flag) {
-	std::vector<unsigned char> queryBuffer;
-	queryBuffer.resize(SIZE_QUERY_BUFFER);
-	ReloadLocation(player, location, flag, queryBuffer);
 }
 void SingleMode::SinglePlayRefresh(int flag) {
 	std::vector<unsigned char> queryBuffer;
@@ -793,17 +788,22 @@ void SingleMode::SinglePlayRefresh(int flag) {
 	ReloadLocation(0, LOCATION_HAND, flag, queryBuffer);
 	ReloadLocation(1, LOCATION_HAND, flag, queryBuffer);
 }
-void SingleMode::SinglePlayRefreshHand(int player, int flag) {
-	RefreshLocation(player, LOCATION_HAND, flag);
+void SingleMode::SingleRefreshLocation(int player, int location, int flag) {
+	std::vector<unsigned char> queryBuffer;
+	queryBuffer.resize(SIZE_QUERY_BUFFER);
+	ReloadLocation(player, location, flag, queryBuffer);
 }
-void SingleMode::SinglePlayRefreshGrave(int player, int flag) {
-	RefreshLocation(player, LOCATION_GRAVE, flag);
+inline void SingleMode::SinglePlayRefreshHand(int player, int flag) {
+	SingleRefreshLocation(player, LOCATION_HAND, flag);
 }
-void SingleMode::SinglePlayRefreshDeck(int player, int flag) {
-	RefreshLocation(player, LOCATION_DECK, flag);
+inline void SingleMode::SinglePlayRefreshGrave(int player, int flag) {
+	SingleRefreshLocation(player, LOCATION_GRAVE, flag);
 }
-void SingleMode::SinglePlayRefreshExtra(int player, int flag) {
-	RefreshLocation(player, LOCATION_EXTRA, flag);
+inline void SingleMode::SinglePlayRefreshDeck(int player, int flag) {
+	SingleRefreshLocation(player, LOCATION_DECK, flag);
+}
+inline void SingleMode::SinglePlayRefreshExtra(int player, int flag) {
+	SingleRefreshLocation(player, LOCATION_EXTRA, flag);
 }
 void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence, int flag) {
 	unsigned char queryBuffer[0x1000];

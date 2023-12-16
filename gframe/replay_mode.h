@@ -20,6 +20,7 @@ private:
 	static int skip_turn;
 	static int current_step;
 	static int skip_step;
+	static void ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer);
 
 public:
 	static Replay cur_replay;
@@ -37,9 +38,8 @@ public:
 	static void Undo();
 	static bool ReplayAnalyze(unsigned char* msg, unsigned int len);
 	
-	inline static void ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer);
-	inline static void RefreshLocation(int player, int location, int flag);
 	static void ReplayRefresh(int flag = 0xf81fff);
+	static void ReplayRefreshLocation(int player, int location, int flag);
 	static void ReplayRefreshHand(int player, int flag = 0x781fff);
 	static void ReplayRefreshGrave(int player, int flag = 0x181fff);
 	static void ReplayRefreshDeck(int player, int flag = 0x181fff);

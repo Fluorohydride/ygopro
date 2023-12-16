@@ -873,14 +873,9 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 	}
 	return true;
 }
-void ReplayMode::ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer) {
+inline void ReplayMode::ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer) {
 	query_field_card(pduel, player, location, flag, queryBuffer.data(), 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, queryBuffer.data());
-}
-void ReplayMode::RefreshLocation(int player, int location, int flag) {
-	std::vector<unsigned char> queryBuffer;
-	queryBuffer.resize(SIZE_QUERY_BUFFER);
-	ReloadLocation(player, location, flag, queryBuffer);
 }
 void ReplayMode::ReplayRefresh(int flag) {
 	std::vector<byte> queryBuffer;
@@ -892,17 +887,22 @@ void ReplayMode::ReplayRefresh(int flag) {
 	ReloadLocation(0, LOCATION_HAND, flag, queryBuffer);
 	ReloadLocation(1, LOCATION_HAND, flag, queryBuffer);
 }
-void ReplayMode::ReplayRefreshHand(int player, int flag) {
-	RefreshLocation(player, LOCATION_HAND, flag);
+void ReplayMode::ReplayRefreshLocation(int player, int location, int flag) {
+	std::vector<unsigned char> queryBuffer;
+	queryBuffer.resize(SIZE_QUERY_BUFFER);
+	ReloadLocation(player, location, flag, queryBuffer);
 }
-void ReplayMode::ReplayRefreshGrave(int player, int flag) {
-	RefreshLocation(player, LOCATION_GRAVE, flag);
+inline void ReplayMode::ReplayRefreshHand(int player, int flag) {
+	ReplayRefreshLocation(player, LOCATION_HAND, flag);
 }
-void ReplayMode::ReplayRefreshDeck(int player, int flag) {
-	RefreshLocation(player, LOCATION_DECK, flag);
+inline void ReplayMode::ReplayRefreshGrave(int player, int flag) {
+	ReplayRefreshLocation(player, LOCATION_GRAVE, flag);
 }
-void ReplayMode::ReplayRefreshExtra(int player, int flag) {
-	RefreshLocation(player, LOCATION_EXTRA, flag);
+inline void ReplayMode::ReplayRefreshDeck(int player, int flag) {
+	ReplayRefreshLocation(player, LOCATION_DECK, flag);
+}
+inline void ReplayMode::ReplayRefreshExtra(int player, int flag) {
+	ReplayRefreshLocation(player, LOCATION_EXTRA, flag);
 }
 void ReplayMode::ReplayRefreshSingle(int player, int location, int sequence, int flag) {
 	unsigned char queryBuffer[0x1000];
