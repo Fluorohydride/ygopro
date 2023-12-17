@@ -428,7 +428,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
-	set_script_reader((script_reader)DataManager::ScriptReaderEx);
+	set_script_reader(DataManager::ScriptReaderEx);
 	set_card_reader(DataManager::CardReader);
 	set_message_handler((message_handler)SingleDuel::MessageHandler);
 	pduel = create_duel(duel_seed);
