@@ -63,7 +63,7 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.tag_player[0] = false;
 	mainGame->dInfo.tag_player[1] = false;
 	set_script_reader((script_reader)DataManager::ScriptReaderEx);
-	set_card_reader((card_reader)DataManager::CardReader);
+	set_card_reader(DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
 	if(!StartDuel()) {
 		EndDuel();

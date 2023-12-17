@@ -2,6 +2,7 @@
 #define CLIENT_CARD_H
 
 #include "config.h"
+#include "../ocgcore/card_data.h"
 #include <vector>
 #include <set>
 #include <map>
@@ -9,20 +10,7 @@
 
 namespace ygo {
 
-struct CardData {
-	unsigned int code;
-	unsigned int alias;
-	unsigned long long setcode;
-	unsigned int type;
-	unsigned int level;
-	unsigned int attribute;
-	unsigned int race;
-	int attack;
-	int defense;
-	unsigned int lscale;
-	unsigned int rscale;
-	unsigned int link_marker;
-};
+using CardData = card_data;
 struct CardDataC {
 	unsigned int code;
 	unsigned int alias;

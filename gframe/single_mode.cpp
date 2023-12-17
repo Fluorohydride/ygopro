@@ -37,7 +37,7 @@ int SingleMode::SinglePlayThread() {
 	unsigned int seed = rd();
 	mt19937 rnd((uint_fast32_t)seed);
 	set_script_reader((script_reader)DataManager::ScriptReaderEx);
-	set_card_reader((card_reader)DataManager::CardReader);
+	set_card_reader(DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
 	pduel = create_duel(rnd.rand());
 	set_player_info(pduel, 0, start_lp, start_hand, draw_count);

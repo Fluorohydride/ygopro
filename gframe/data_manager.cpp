@@ -147,12 +147,25 @@ bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
 	spmemvfs_env_fini();
 	return false;
 }
-bool DataManager::GetData(int code, CardData* pData) {
+bool DataManager::GetData(unsigned int code, CardData* pData) {
 	auto cdit = _datas.find(code);
 	if(cdit == _datas.end())
 		return false;
-	if(pData)
-		*pData = *((CardData*)&cdit->second);
+	auto data = cdit->second;
+	if (pData) {
+		pData->code = data.code;
+		pData->alias = data.alias;
+		pData->setcode = data.setcode;
+		pData->type = data.type;
+		pData->level = data.level;
+		pData->attribute = data.attribute;
+		pData->race = data.race;
+		pData->attack = data.attack;
+		pData->defense = data.defense;
+		pData->lscale = data.lscale;
+		pData->rscale = data.rscale;
+		pData->link_marker = data.link_marker;
+	}
 	return true;
 }
 code_pointer DataManager::GetCodePointer(int code) {
@@ -346,9 +359,9 @@ const wchar_t* DataManager::FormatLinkMarker(int link_marker) {
 		BufferIO::CopyWStrRef(L"[\u2198]", p, 4);
 	return lmBuffer;
 }
-int DataManager::CardReader(int code, void* pData) {
-	if(!dataManager.GetData(code, (CardData*)pData))
-		memset(pData, 0, sizeof(CardData));
+uint32 DataManager::CardReader(uint32 code, card_data* pData) {
+	if (!dataManager.GetData(code, pData))
+		pData->clear();
 	return 0;
 }
 byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {

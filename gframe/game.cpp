@@ -1541,8 +1541,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		return;
 	CardData cd;
 	wchar_t formatBuffer[256];
-	if(!dataManager.GetData(code, &cd))
-		memset(&cd, 0, sizeof(CardData));
+	dataManager.GetData(code, &cd);
 	imgCard->setImage(imageManager.GetTexture(code, true));
 	if(cd.alias != 0 && (cd.alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd.alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
