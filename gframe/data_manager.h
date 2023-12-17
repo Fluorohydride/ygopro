@@ -11,7 +11,7 @@ namespace ygo {
 
 class DataManager {
 public:
-	DataManager(): _datas(8192), _strings(8192) {}
+	DataManager(): _datas(16384), _strings(16384) {}
 	bool LoadDB(const wchar_t* wfile);
 	bool LoadStrings(const char* file);
 	bool LoadStrings(IReadFile* reader);
