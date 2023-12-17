@@ -17,7 +17,6 @@ namespace ygo {
 Game* mainGame;
 
 bool Game::Initialize() {
-	srand(time(0));
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
