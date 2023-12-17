@@ -49,8 +49,9 @@ bool Game::Initialize() {
 	is_building = false;
 	menuHandler.prev_operation = 0;
 	menuHandler.prev_sel = -1;
-	memset(&dInfo, 0, sizeof(DuelInfo));
-	memset(chatTiming, 0, sizeof(chatTiming));
+	for (auto i : chatTiming) {
+		i = 0;
+	}
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
