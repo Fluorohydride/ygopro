@@ -45,22 +45,22 @@ private:
 	int WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache);
 	
 protected:
-	DuelPlayer* players[2];
-	DuelPlayer* pplayer[2];
-	bool ready[2];
+	DuelPlayer* players[2]{ nullptr };
+	DuelPlayer* pplayer[2]{nullptr};
+	bool ready[2]{ false };
 	Deck pdeck[2];
-	int deck_error[2];
-	unsigned char hand_result[2];
-	unsigned char last_response;
+	int deck_error[2]{ 0 };
+	unsigned char hand_result[2]{ 0 };
+	unsigned char last_response{ 0 };
 	std::set<DuelPlayer*> observers;
 	Replay last_replay;
-	bool match_mode;
-	int match_kill;
-	unsigned char duel_count;
-	unsigned char tp_player;
-	unsigned char match_result[3];
-	short time_limit[2];
-	short time_elapsed;
+	bool match_mode{ false };
+	int match_kill{ 0 };
+	unsigned char duel_count{ 0 };
+	unsigned char tp_player{ 0 };
+	unsigned char match_result[3]{ 0 };
+	short time_limit[2]{ 0 };
+	short time_elapsed{ 0 };
 };
 
 }
