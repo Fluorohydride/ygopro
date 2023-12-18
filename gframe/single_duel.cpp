@@ -9,13 +9,6 @@ namespace ygo {
 
 SingleDuel::SingleDuel(bool is_match) {
 	match_mode = is_match;
-	match_kill = 0;
-	for(int i = 0; i < 2; ++i) {
-		players[i] = 0;
-		ready[i] = false;
-	}
-	duel_count = 0;
-	memset(match_result, 0, 3);
 }
 SingleDuel::~SingleDuel() {
 }
