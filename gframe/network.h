@@ -12,16 +12,16 @@
 namespace ygo {
 
 struct HostInfo {
-	unsigned int lflist;
-	unsigned char rule;
-	unsigned char mode;
-	unsigned char duel_rule;
-	bool no_check_deck;
-	bool no_shuffle_deck;
-	unsigned int start_lp;
-	unsigned char start_hand;
-	unsigned char draw_count;
-	unsigned short time_limit;
+	unsigned int lflist{ 0 };
+	unsigned char rule{ 0 };
+	unsigned char mode{ 0 };
+	unsigned char duel_rule{ 0 };
+	bool no_check_deck{ false };
+	bool no_shuffle_deck{ false };
+	unsigned int start_lp{ 0 };
+	unsigned char start_hand{ 0 };
+	unsigned char draw_count{ 0 };
+	unsigned short time_limit{ 0 };
 };
 struct HostPacket {
 	unsigned short identifier;
@@ -99,22 +99,17 @@ struct STOC_HS_WatchChange {
 class DuelMode;
 
 struct DuelPlayer {
-	unsigned short name[20];
-	DuelMode* game;
-	unsigned char type;
-	unsigned char state;
-	bufferevent* bev;
-	DuelPlayer() {
-		game = 0;
-		type = 0;
-		state = 0;
-		bev = 0;
-	}
+	unsigned short name[20]{ 0 };
+	DuelMode* game{ nullptr };
+	unsigned char player_id{ 0xff };
+	unsigned char type{ 0 };
+	unsigned char state{ 0 };
+	bufferevent* bev{ 0 };
 };
 
 class DuelMode {
 public:
-	DuelMode(): host_player(0), pduel(0), duel_stage(0) {}
+	DuelMode(): host_player(nullptr), pduel(0), duel_stage(0) {}
 	virtual ~DuelMode() {}
 	virtual void Chat(DuelPlayer* dp, void* pdata, int len) {}
 	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {}
