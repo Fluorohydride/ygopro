@@ -13,13 +13,13 @@ class ClientCard;
 
 struct ChainInfo {
 	irr::core::vector3df chain_pos;
-	ClientCard* chain_card;
-	int code;
-	int desc;
-	int controler;
-	int location;
-	int sequence;
-	bool solved;
+	ClientCard* chain_card{ nullptr };
+	int code{ 0 };
+	int desc{ 0 };
+	int controler{ 0 };
+	int location{ 0 };
+	int sequence{ 0 };
+	bool solved{ false };
 	std::set<ClientCard*> target;
 };
 
