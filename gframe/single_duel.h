@@ -46,7 +46,6 @@ private:
 	
 protected:
 	DuelPlayer* players[2]{ nullptr };
-	DuelPlayer* pplayer[2]{nullptr};
 	bool ready[2]{ false };
 	Deck pdeck[2];
 	int deck_error[2]{ 0 };
