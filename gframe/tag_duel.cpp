@@ -399,7 +399,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	time_limit[1] = host_info.time_limit;
 	set_script_reader(DataManager::ScriptReaderEx);
 	set_card_reader(DataManager::CardReader);
-	set_message_handler((message_handler)TagDuel::MessageHandler);
+	set_message_handler(TagDuel::MessageHandler);
 	pduel = create_duel(duel_seed);
 	set_player_info(pduel, 0, host_info.start_lp, host_info.start_hand, host_info.draw_count);
 	set_player_info(pduel, 1, host_info.start_lp, host_info.start_hand, host_info.draw_count);
@@ -1690,7 +1690,7 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 		}
 	}
 }
-int TagDuel::MessageHandler(intptr_t fduel, int type) {
+uint32 TagDuel::MessageHandler(intptr_t fduel, uint32 type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
