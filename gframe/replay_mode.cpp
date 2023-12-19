@@ -277,7 +277,6 @@ void ReplayMode::Restart(bool refresh) {
 	mainGame->dField.Clear();
 	//mainGame->device->setEventReceiver(&mainGame->dField);
 	cur_replay.Rewind();
-	//mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.tag_player[0] = false;
 	mainGame->dInfo.tag_player[1] = false;
 	if(!StartDuel()) {
@@ -287,9 +286,14 @@ void ReplayMode::Restart(bool refresh) {
 		mainGame->dField.RefreshAllCards();
 		mainGame->dInfo.isStarted = true;
 		mainGame->dInfo.isFinished = false;
-		//mainGame->dInfo.isReplay = true;
 	}
-	skip_turn = 0;
+	if (mainGame->dInfo.isReplaySwapped){
+		std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
+		std::swap(mainGame->dInfo.strLP[0], mainGame->dInfo.strLP[1]);
+		std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
+		std::swap(mainGame->dInfo.hostname_tag, mainGame->dInfo.clientname_tag);
+	}
+		skip_turn = 0;
 }
 void ReplayMode::Undo() {
 	if(skip_step > 0 || current_step == 0)
