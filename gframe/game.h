@@ -91,6 +91,8 @@ struct DuelInfo {
 	unsigned char time_player{ 0 };
 	unsigned short time_limit{ 0 };
 	unsigned short time_left[2]{ 0 };
+
+	void Clear();
 };
 
 struct BotInfo {

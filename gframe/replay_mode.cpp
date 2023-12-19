@@ -57,6 +57,7 @@ bool ReplayMode::ReadReplayResponse() {
 }
 int ReplayMode::ReplayThread() {
 	const ReplayHeader& rh = cur_replay.pheader;
+	mainGame->dInfo.Clear();
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
 	mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);

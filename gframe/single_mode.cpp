@@ -92,6 +92,7 @@ int SingleMode::SinglePlayThread() {
 	mainGame->btnLeaveGame->setText(dataManager.GetSysString(1210));
 	mainGame->wPhase->setVisible(true);
 	mainGame->dField.Clear();
+	mainGame->dInfo.Clear();
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isFinished = false;
