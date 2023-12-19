@@ -88,6 +88,7 @@ public:
 	mt19937 rnd;
 
 	ClientField();
+	~ClientField();
 	void Clear();
 	void Initial(int player, int deckc, int extrac);
 	ClientCard* GetCard(int controler, int location, int sequence, int sub_seq = 0);

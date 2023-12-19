@@ -17,6 +17,45 @@ ClientField::ClientField() {
 	}
 	rnd.reset((uint_fast32_t)std::random_device()());
 }
+ClientField::~ClientField() {
+	for (int i = 0; i < 2; ++i) {
+		for (auto card : deck[i]) {
+			delete card;
+		}
+		deck[i].clear();
+		for (auto card : hand[i]) {
+			delete card;
+		}
+		hand[i].clear();
+		for (auto card : mzone[i]) {
+			if (card)
+				delete card;
+			card = nullptr;
+		}
+		for (auto card : szone[i]) {
+			if (card)
+				delete card;
+			card = nullptr;
+		}
+		for (auto card : grave[i]) {
+			delete card;
+		}
+		grave[i].clear();
+		for (auto card : remove[i]) {
+			delete card;
+		}
+		remove[i].clear();
+
+		for (auto card : extra[i]) {
+			delete card;
+		}
+		extra[i].clear();
+	}
+	for (auto card : overlay_cards) {
+		delete card;
+	}
+	overlay_cards.clear();
+}
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
 		for(auto cit = deck[i].begin(); cit != deck[i].end(); ++cit)
