@@ -40,9 +40,10 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 		ClearData();
 		return;
 	}
-	int pdata;
 	if(flag & QUERY_CODE) {
-		pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::ReadInt32(buf);
+		if (!pdata)
+			ClearData();
 		if((location == LOCATION_HAND) && ((unsigned int)pdata != code)) {
 			code = pdata;
 			mainGame->dField.MoveCard(this, 5);
@@ -50,7 +51,7 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 			code = pdata;
 	}
 	if(flag & QUERY_POSITION) {
-		pdata = (BufferIO::ReadInt32(buf) >> 24) & 0xff;
+		int pdata = (BufferIO::ReadInt32(buf) >> 24) & 0xff;
 		if((location & (LOCATION_EXTRA | LOCATION_REMOVED)) && (u8)pdata != position) {
 			position = pdata;
 			mainGame->dField.MoveCard(this, 1);
@@ -62,14 +63,14 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 	if(flag & QUERY_TYPE)
 		type = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_LEVEL) {
-		pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::ReadInt32(buf);
 		if(level != (unsigned int)pdata) {
 			level = pdata;
 			myswprintf(lvstring, L"L%d", level);
 		}
 	}
 	if(flag & QUERY_RANK) {
-		pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::ReadInt32(buf);
 		if(pdata && rank != (unsigned int)pdata) {
 			rank = pdata;
 			myswprintf(lvstring, L"R%d", rank);
@@ -158,7 +159,7 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 		myswprintf(rscstring, L"%d", rscale);
 	}
 	if(flag & QUERY_LINK) {
-		pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::ReadInt32(buf);
 		if (link != (unsigned int)pdata) {
 			link = pdata;
 		}

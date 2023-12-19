@@ -463,16 +463,17 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	BufferIO::WriteInt8(pbuf, host_info.duel_rule);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
-	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 0, 0x1));
-	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 0, 0x40));
-	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x1));
-	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x40));
+	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 0, LOCATION_DECK));
+	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 0, LOCATION_EXTRA));
+	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, LOCATION_DECK));
+	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, LOCATION_EXTRA));
 	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, startbuf, 19);
 	startbuf[1] = 1;
 	NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, startbuf, 19);
 	if(!swapped)
 		startbuf[1] = 0x10;
-	else startbuf[1] = 0x11;
+	else
+		startbuf[1] = 0x11;
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::SendBufferToPlayer(*oit, STOC_GAME_MSG, startbuf, 19);
 	RefreshExtra(0);
@@ -1547,14 +1548,16 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 4);
 	if (len <= LEN_HEADER)
 		return;
-	auto position = GetPosition(qbuf, 12);
-	if(location == LOCATION_REMOVED && (position & POS_FACEDOWN))
-		return;
-	if ((location & 0x90) || ((location & 0x2c) && (position & POS_FACEUP))) {
-		NetServer::ReSendToPlayer(players[1 - player]);
-		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
-			NetServer::ReSendToPlayer(*pit);
+	const int clen = BufferIO::ReadInt32(qbuf);
+	auto position = GetPosition(qbuf, 8);
+	if (position & POS_FACEDOWN) {
+		BufferIO::WriteInt32(qbuf, QUERY_CODE);
+		BufferIO::WriteInt32(qbuf, 0);
+		memset(qbuf, 0, clen - 12);
 	}
+	NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer, len + 4);
+	for (auto pit = observers.begin(); pit != observers.end(); ++pit)
+		NetServer::ReSendToPlayer(*pit);
 }
 uint32 SingleDuel::MessageHandler(intptr_t fduel, uint32 type) {
 	if(!enable_log)
