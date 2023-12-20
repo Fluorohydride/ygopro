@@ -32,6 +32,7 @@ int SingleMode::SinglePlayThread() {
 	const int start_lp = 8000;
 	const int start_hand = 5;
 	const int draw_count = 1;
+	mainGame->dInfo.Clear();
 	int opt = 0;
 	std::random_device rd;
 	unsigned int seed = rd();
@@ -92,7 +93,6 @@ int SingleMode::SinglePlayThread() {
 	mainGame->btnLeaveGame->setText(dataManager.GetSysString(1210));
 	mainGame->wPhase->setVisible(true);
 	mainGame->dField.Clear();
-	mainGame->dInfo.Clear();
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isFinished = false;

@@ -1190,7 +1190,6 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 		mainGame->showcard = 0;
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();
-		mainGame->dInfo.Clear();
 		int playertype = BufferIO::ReadInt8(pbuf);
 		mainGame->dInfo.isFirst =  (playertype & 0xf) ? false : true;
 		if(playertype & 0xf0)
