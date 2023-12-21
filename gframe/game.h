@@ -26,6 +26,7 @@ struct Config {
 	wchar_t textfont[256];
 	wchar_t numfont[256];
 	wchar_t roompass[20];
+	wchar_t startupcmd[256];
 	wchar_t bot_deck_path[64];
 	//settings
 	int chkMAutoPos;
@@ -197,6 +198,7 @@ public:
 	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(ECURSOR_ICON icon);
+	bool StartProcess(const wchar_t* cmd, const wchar_t* param1 = L"", const wchar_t* param2 = L"");
 
 	std::mutex gMutex;
 	Signal frameSignal;

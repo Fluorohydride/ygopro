@@ -1329,6 +1329,7 @@ void Game::LoadConfig() {
 	gameConf.lasthost[0] = 0;
 	gameConf.lastport[0] = 0;
 	gameConf.roompass[0] = 0;
+	gameConf.startupcmd[0] = 0;
 	gameConf.bot_deck_path[0] = 0;
 	//settings
 	gameConf.chkMAutoPos = 0;
@@ -1485,6 +1486,9 @@ void Game::LoadConfig() {
 			} else if (!strcmp(strbuf, "lastdeck")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
+			} else if(!strcmp(strbuf, "startupcmd")) {
+				BufferIO::DecodeUTF8(valbuf, wstr);
+				BufferIO::CopyWStr(wstr, gameConf.startupcmd, 256);
 			} else if(!strcmp(strbuf, "bot_deck_path")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.bot_deck_path, 64);
@@ -1567,6 +1571,8 @@ void Game::SaveConfig() {
 	fprintf(fp, "music_volume = %d\n", vol);
 	fprintf(fp, "music_mode = %d\n", (chkMusicMode->isChecked() ? 1 : 0));
 #endif
+	BufferIO::EncodeUTF8(gameConf.startupcmd, linebuf);
+	fprintf(fp, "startupcmd = %s\n", linebuf);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code, bool resize) {
@@ -2146,6 +2152,25 @@ void Game::SetCursor(ECURSOR_ICON icon) {
 	if(cursor->getActiveIcon() != icon) {
 		cursor->setActiveIcon(icon);
 	}
+}
+bool Game::StartProcess(const wchar_t* cmd, const wchar_t* param1, const wchar_t* param2) {
+	if(cmd[0] == 0)
+		return;
+#ifdef _WIN32
+	STARTUPINFOW si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+	wchar_t command[MAX_PATH];
+	myswprintf(command, L"%ls \"%ls\" \"%ls\"", cmd, param1, param2);
+	return CreateProcessW(NULL, command, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+#else
+	return true;
+//	if(fork() == 0) {
+//		exit(0);
+//	}
+#endif
 }
 
 }
