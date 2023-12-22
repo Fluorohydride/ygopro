@@ -595,6 +595,8 @@ extern Game* mainGame;
 
 }
 
+#define SIZE_QUERY_BUFFER	0x4000
+
 #define CARD_IMG_WIDTH		177
 #define CARD_IMG_HEIGHT		254
 #define CARD_THUMB_WIDTH	44
