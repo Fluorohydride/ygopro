@@ -613,7 +613,11 @@ extern unsigned int pre_seed[3];
 #endif
 }
 
+#ifdef YGOPRO_SERVER_MODE
+#define SIZE_QUERY_BUFFER	0x40000
+#else
 #define SIZE_QUERY_BUFFER	0x4000
+#endif
 
 #define CARD_IMG_WIDTH		177
 #define CARD_IMG_HEIGHT		254
