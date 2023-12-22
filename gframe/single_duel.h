@@ -27,15 +27,27 @@ public:
 	virtual int Analyze(unsigned char* msgbuffer, unsigned int len);
 	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len);
 	virtual void TimeConfirm(DuelPlayer* dp);
+#ifdef YGOPRO_SERVER_MODE
+	virtual void RequestField(DuelPlayer* dp);
+#endif
 	virtual void EndDuel();
 	
 	void DuelEndProc();
 	void WaitforResponse(int playerid);
+#ifdef YGOPRO_SERVER_MODE
+	void RefreshMzone(int player, int flag = 0x881fff, int use_cache = 1, DuelPlayer* dp = 0);
+	void RefreshSzone(int player, int flag = 0x681fff, int use_cache = 1, DuelPlayer* dp = 0);
+	void RefreshHand(int player, int flag = 0x681fff, int use_cache = 1, DuelPlayer* dp = 0);
+	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1, DuelPlayer* dp = 0);
+	void RefreshExtra(int player, int flag = 0xe81fff, int use_cache = 1, DuelPlayer* dp = 0);
+	void RefreshRemoved(int player, int flag = 0x81fff, int use_cache = 1, DuelPlayer* dp = 0);
+#else
 	void RefreshMzone(int player, int flag = 0x881fff, int use_cache = 1);
 	void RefreshSzone(int player, int flag = 0x681fff, int use_cache = 1);
 	void RefreshHand(int player, int flag = 0x681fff, int use_cache = 1);
 	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1);
 	void RefreshExtra(int player, int flag = 0xe81fff, int use_cache = 1);
+#endif
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 
 	static uint32 MessageHandler(intptr_t fduel, uint32 type);
@@ -52,6 +64,12 @@ protected:
 	unsigned char hand_result[2]{ 0 };
 	unsigned char last_response{ 0 };
 	std::set<DuelPlayer*> observers;
+#ifdef YGOPRO_SERVER_MODE
+	DuelPlayer* cache_recorder;
+	DuelPlayer* replay_recorder;
+	unsigned char turn_player;
+	unsigned short phase;
+#endif
 	Replay last_replay;
 	bool match_mode{ false };
 	int match_kill{ 0 };
@@ -60,9 +78,13 @@ protected:
 	unsigned char match_result[3]{ 0 };
 	short time_limit[2]{ 0 };
 	short time_elapsed{ 0 };
+#ifdef YGOPRO_SERVER_MODE
+	short time_compensator[2];
+	short time_backed[2];
+	unsigned char last_game_msg;
+#endif
 };
 
 }
 
 #endif //SINGLE_DUEL_H
-

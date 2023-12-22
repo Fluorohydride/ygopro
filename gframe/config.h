@@ -56,6 +56,7 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 	return swprintf(buf, N, fmt, args...);
 }
 
+#ifndef YGOPRO_SERVER_MODE
 #include <irrlicht.h>
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -66,6 +67,7 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #endif //__APPLE__
 #include "CGUITTFont.h"
 #include "CGUIImageButton.h"
+#endif //YGOPRO_SERVER_MODE
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,12 +81,20 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/common.h"
 
+#ifndef YGOPRO_SERVER_MODE
 using namespace irr;
 using namespace core;
 using namespace scene;
 using namespace video;
 using namespace io;
 using namespace gui;
+#endif //YGOPRO_SERVER_MODE
+
+#ifdef SERVER_ZIP_SUPPORT
+#include <irrlicht.h>
+using namespace irr;
+using namespace io;
+#endif
 
 typedef int BOOL;
 

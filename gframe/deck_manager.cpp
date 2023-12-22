@@ -5,7 +5,9 @@
 
 namespace ygo {
 
+#ifndef YGOPRO_SERVER_MODE
 char DeckManager::deckBuffer[0x10000];
+#endif
 DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
@@ -49,6 +51,9 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	}
 }
 void DeckManager::LoadLFList() {
+#ifdef SERVER_PRO2_SUPPORT
+	LoadLFListSingle("config/lflist.conf");
+#endif
 	LoadLFListSingle("expansions/lflist.conf");
 	LoadLFListSingle("lflist.conf");
 	LFList nolimit;
@@ -204,6 +209,7 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	deck = ndeck;
 	return true;
 }
+#ifndef YGOPRO_SERVER_MODE
 void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) {
 	wchar_t catepath[256];
 	switch(index) {
@@ -369,4 +375,5 @@ bool DeckManager::DeleteCategory(const wchar_t* name) {
 		return false;
 	return FileSystem::DeleteDir(localname);
 }
+#endif //YGOPRO_SERVER_MODE
 }

@@ -9,6 +9,11 @@ USE_IRRKLANG = true
 IRRKLANG_PRO = false
 LUA_LIB_NAME = "lua"
 
+SERVER_MODE = true
+SERVER_ZIP_SUPPORT = false
+SERVER_PRO2_SUPPORT = false
+USE_IRRKLANG = false
+
 -- read settings from command line or environment variables
 
 newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
@@ -16,6 +21,7 @@ newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "
 newoption { trigger = "lua-include-dir", category = "YGOPro - lua", description = "", value = "PATH" }
 newoption { trigger = "lua-lib-dir", category = "YGOPro - lua", description = "", value = "PATH" }
 newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME", default = "lua" }
+newoption { trigger = "lua-deb", category = "YGOPro - lua", description = "" }
 
 newoption { trigger = "build-event", category = "YGOPro - event", description = "" }
 newoption { trigger = "no-build-event", category = "YGOPro - event", description = "" }
@@ -51,6 +57,10 @@ newoption { trigger = 'build-ikpmp3', category = "YGOPro - irrklang - ikpmp3", d
 newoption { trigger = "winxp-support", category = "YGOPro", description = "" }
 newoption { trigger = "mac-arm", category = "YGOPro", description = "M1" }
 
+newoption { trigger = "server-mode", category = "YGOPro - server", description = "" }
+newoption { trigger = "server-zip-support", category = "YGOPro - server", description = "" }
+newoption { trigger = "server-pro2-support", category = "YGOPro - server", description = "" }
+
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
 end
@@ -66,6 +76,13 @@ if not BUILD_LUA then
     LUA_INCLUDE_DIR = GetParam("lua-include-dir") or "/usr/local/include/lua"
     LUA_LIB_DIR = GetParam("lua-lib-dir") or "/usr/local/lib"
     LUA_LIB_NAME = GetParam("lua-lib-name")
+end
+
+if GetParam("lua-deb") then
+    BUILD_LUA = false
+    LUA_LIB_DIR = "/usr/lib/x86_64-linux-gnu"
+    LUA_LIB_NAME = "lua5.3-c++"
+    LUA_INCLUDE_DIR = "/usr/include/lua5.3"
 end
 
 if GetParam("build-event") then
@@ -150,6 +167,17 @@ end
 if GetParam("mac-arm") and os.istarget("macosx") then
     MAC_ARM = true
 end
+if GetParam("server-mode") then
+    SERVER_MODE = true
+    SERVER_ZIP_SUPPORT = false
+end
+if GetParam("server-zip-support") then
+    SERVER_ZIP_SUPPORT = true
+end
+if GetParam("server-pro2-support") then
+    SERVER_PRO2_SUPPORT = true
+    SERVER_ZIP_SUPPORT = true
+end
 
 workspace "YGOPro"
     location "build"
@@ -176,7 +204,9 @@ workspace "YGOPro"
         if MAC_ARM then
             buildoptions { "--target=arm64-apple-macos12" }
         end
+if not SERVER_MODE then
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
+end
 
     filter "system:linux"
         buildoptions { "-U_FORTIFY_SOURCE" }
@@ -223,15 +253,18 @@ workspace "YGOPro"
     if BUILD_EVENT then
         include "event"
     end
-    if BUILD_FREETYPE then
+    if BUILD_FREETYPE and not SERVER_MODE then
         include "freetype"
     end
-    if BUILD_IRRLICHT then
+    if BUILD_IRRLICHT and not SERVER_MODE then
         include "irrlicht"
+    end
+    if BUILD_IRRLICHT and SERVER_MODE and SERVER_ZIP_SUPPORT then
+        include "irrlicht/premake5-only-zipreader.lua"
     end
     if BUILD_SQLITE then
         include "sqlite3"
     end
-    if BUILD_IKPMP3 then
+    if BUILD_IKPMP3 and not SERVER_MODE then
         include "ikpmp3"
     end

@@ -1,0 +1,156 @@
+stages:
+  - prepare
+  - build
+  - combine
+  - pack
+  - deploy
+
+variables:
+  GIT_DEPTH: "1"
+
+mat_common:
+  stage: prepare
+  tags: 
+    - linux
+  script:
+    # lua
+    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/lua-5.4.4.tar.gz | tar zfx -
+    - mv lua-5.4.4 lua
+    # sqlite3
+    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/sqlite-autoconf-3390300.tar.gz | tar zfx -
+    - mv sqlite-autoconf-3390300 sqlite3
+    # freetype
+    #- wget -O - https://cdn01.moecube.com/ygopro-build-materials/freetype-2.11.1.tar.gz | tar zfx -
+    #- mv freetype-2.11.1 freetype
+    # premake
+    - cp -rf premake/* .;
+  artifacts:
+    paths:
+      - lua
+      #- freetype
+      - sqlite3
+
+mat_submodules:
+  stage: prepare
+  tags: 
+    - linux
+  script:
+    - rm -rf ocgcore script
+    - mkdir ocgcore script
+    - git submodule update --init
+  artifacts:
+    paths:
+      - ocgcore
+      - script
+
+mat_linux:
+  stage: prepare
+  tags:
+    - linux
+  script:
+    - apt update; apt -y install git wget tar
+    - git clone --depth=1 https://code.mycard.moe/mycard/irrlicht-new irrlicht
+    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-beta2-linux.tar.gz | tar zfx -
+    - env PROCESSOR_COUNT=$(nproc) ./.ci/libevent-prebuild.sh
+  artifacts:
+    paths:
+      - premake5
+      - irrlicht
+      - libevent-stable
+
+mat_windows:
+  stage: prepare
+  tags:
+    - linux
+  script:
+    - apt update; apt -y install wget tar patch p7zip-full
+    # premake5.exe
+    - wget https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-beta2-windows.zip
+    - 7z x -y premake-5.0.0-beta2-windows.zip
+    # event
+    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/libevent-2.0.22-stable.tar.gz | tar zfx -
+    - mv libevent-2.0.22-stable event
+    # irrlicht
+    - git clone --depth=1 https://code.mycard.moe/mycard/irrlicht-new irrlicht
+  artifacts:
+    paths:
+      - premake5.exe
+      - event
+      - irrlicht
+
+._exec_build:
+  stage: build
+  #variables:
+  #  NO_LUA_SAFE: '1' # on client no lua safe
+  cache:
+    key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths:
+      - bin/
+      - obj/
+
+exec_windows:
+  extends: ._exec_build
+  tags:
+    - vs
+  dependencies:
+    - mat_common
+    - mat_windows
+    - mat_submodules
+  script:
+    - bash -c 'cp -rf premake/* .'
+    - '.\premake5.exe vs2019 --server-zip-support'
+    - cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe" build\YGOPro.sln /m /p:Configuration=Release'
+    - copy bin\release\ygopro.exe .
+  artifacts:
+    paths:
+      - ygopro.exe
+
+exec_linux:
+  extends: ._exec_build
+  tags:
+    - linux
+  dependencies:
+    - mat_common
+    - mat_linux
+    - mat_submodules
+  script:
+    - apt update; apt -y install git build-essential
+    - ./premake5 gmake --build-sqlite --server-zip-support
+    - cd build
+    - make config=release -j$(nproc)
+    - cd ..
+    - mv bin/release/ygopro ./ygopro
+    - strip ygopro
+  artifacts:
+    paths:
+      - ygopro
+
+exec_debian:
+  extends: ._exec_build
+  tags:
+    - linux
+  dependencies:
+    - mat_common
+    - mat_linux
+    - mat_submodules
+  script:
+    - apt update; apt -y install git build-essential liblua5.3-dev libsqlite3-dev libevent-dev
+    - ./premake5 gmake --lua-deb
+    - cd build
+    - make config=release -j$(nproc)
+    - cd ..
+    - mv bin/release/ygopro ./ygopro
+    - strip ygopro
+  artifacts:
+    paths:
+      - ygopro
+
+#win_server_pack:
+#  stage: pack
+#  dependencies:
+#    - exec_windows
+#  tags:
+#    - linux
+#  script:
+#    - apt update; apt -y install p7zip-full wget
+#    - wget https://nodejs.org/dist/v14.17.0/node-v14.17.0-win-x64.7z
