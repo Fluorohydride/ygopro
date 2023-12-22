@@ -2201,9 +2201,10 @@ if(!dp || dp == cur_player[player])
 	while(qlen < len) {
 		int clen = BufferIO::ReadInt32(qbuf);
 		qlen += clen;
-		if (clen == 4)
+		if (clen <= LEN_HEADER)
 			continue;
-		if (qbuf[11] & POS_FACEDOWN)
+		auto position = GetPosition(qbuf, 8);
+		if (position & POS_FACEDOWN)
 			memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
@@ -2220,34 +2221,33 @@ if(!dp || dp == cur_player[player])
 }
 #ifdef YGOPRO_SERVER_MODE
 void TagDuel::RefreshRemoved(int player, int flag, int use_cache, DuelPlayer* dp) {
-	char query_buffer[0x40000];
-	char* qbuf = query_buffer;
-	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
-	BufferIO::WriteInt8(qbuf, player);
-	BufferIO::WriteInt8(qbuf, LOCATION_REMOVED);
-	int len = query_field_card(pduel, player, LOCATION_REMOVED, flag, (unsigned char*)qbuf, use_cache);
+	std::vector<unsigned char> query_buffer;
+	query_buffer.resize(SIZE_QUERY_BUFFER);
+	auto qbuf = query_buffer.data();
+	auto len = WriteUpdateData(player, LOCATION_REMOVED, flag, qbuf, use_cache);
 	int pid = (player == 0) ? 0 : 2;
 	if(!dp || dp == players[pid])
-		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
+		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	if(!dp || dp == players[pid + 1])
-		NetServer::SendBufferToPlayer(players[pid + 1], STOC_GAME_MSG, query_buffer, len + 3);
+		NetServer::SendBufferToPlayer(players[pid + 1], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	if(!dp)
 		NetServer::ReSendToPlayer(replay_recorder);
 	int qlen = 0;
 	while(qlen < len) {
 		int clen = BufferIO::ReadInt32(qbuf);
 		qlen += clen;
-		if (clen == 4)
+		if (clen <= LEN_HEADER)
 			continue;
-		if (qbuf[11] & POS_FACEDOWN)
+		auto position = GetPosition(qbuf, 8);
+		if (position & POS_FACEDOWN)
 			memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
 	pid = 2 - pid;
 	if(!dp || dp == players[pid])
-		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
+		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	if(!dp || dp == players[pid + 1])
-		NetServer::SendBufferToPlayer(players[pid + 1], STOC_GAME_MSG, query_buffer, len + 3);
+		NetServer::SendBufferToPlayer(players[pid + 1], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	if(!dp)
 		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 			NetServer::ReSendToPlayer(*pit);
