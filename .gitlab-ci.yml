@@ -71,12 +71,12 @@ mat_windows:
     - wget -O - https://cdn01.moecube.com/ygopro-build-materials/libevent-2.0.22-stable.tar.gz | tar zfx -
     - mv libevent-2.0.22-stable event
     # irrlicht
-    - git clone --depth=1 https://code.mycard.moe/mycard/irrlicht-new irrlicht
+    # - git clone --depth=1 https://code.mycard.moe/mycard/irrlicht-new irrlicht
   artifacts:
     paths:
       - premake5.exe
       - event
-      - irrlicht
+      # - irrlicht
 
 ._exec_build:
   stage: build
@@ -98,7 +98,7 @@ exec_windows:
     - mat_submodules
   script:
     - bash -c 'cp -rf premake/* .'
-    - '.\premake5.exe vs2019 --server-zip-support'
+    - '.\premake5.exe vs2019'
     - cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe" build\YGOPro.sln /m /p:Configuration=Release'
     - copy bin\release\ygopro.exe .
   artifacts:
