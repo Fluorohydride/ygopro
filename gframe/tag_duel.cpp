@@ -1912,7 +1912,7 @@ void TagDuel::RequestField(DuelPlayer* dp) {
 	int player = (dp->type > 1) ? 1 : 0;
 	NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 
-	char startbuf[32], *pbuf = startbuf;
+	unsigned char startbuf[32], *pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, player);
 	BufferIO::WriteInt8(pbuf, host_info.duel_rule);
@@ -1928,18 +1928,18 @@ void TagDuel::RequestField(DuelPlayer* dp) {
 	if(newturn_count == 0)
 		newturn_count = 4;
 	for(int i = 0; i < newturn_count; i++) {
-		char turnbuf[2], *pbuf_t = turnbuf;
+		unsigned char turnbuf[2], *pbuf_t = turnbuf;
 		BufferIO::WriteInt8(pbuf_t, MSG_NEW_TURN);
 		BufferIO::WriteInt8(pbuf_t, i % 2);
 		NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, turnbuf, 2);		
 	}	
 
-	char phasebuf[4], *pbuf_p = phasebuf;
+	unsigned char phasebuf[4], *pbuf_p = phasebuf;
 	BufferIO::WriteInt8(pbuf_p, MSG_NEW_PHASE);
 	BufferIO::WriteInt16(pbuf_p, phase);
 	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, phasebuf, 3);
 
-	char query_buffer[1024];
+	unsigned char query_buffer[1024];
 	int length = query_field_info(pduel, (unsigned char*)query_buffer);
 	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, query_buffer, length);
 	RefreshMzone(1 - player, 0xefffff, 0, dp);

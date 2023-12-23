@@ -1820,7 +1820,7 @@ void SingleDuel::RequestField(DuelPlayer* dp) {
 	int player = dp->type;
 	NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 
-	char startbuf[32], *pbuf = startbuf;
+	unsigned char startbuf[32], *pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, player);
 	BufferIO::WriteInt8(pbuf, host_info.duel_rule);
@@ -1836,18 +1836,18 @@ void SingleDuel::RequestField(DuelPlayer* dp) {
 	if(turn_player == 1)
 		newturn_count = 2;
 	for(int i = 0; i < newturn_count; i++) {
-		char turnbuf[2], *pbuf_t = turnbuf;
+		unsigned char turnbuf[2], *pbuf_t = turnbuf;
 		BufferIO::WriteInt8(pbuf_t, MSG_NEW_TURN);
 		BufferIO::WriteInt8(pbuf_t, i);
 		NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, turnbuf, 2);		
 	}
 
-	char phasebuf[4], *pbuf_p = phasebuf;
+	unsigned char phasebuf[4], *pbuf_p = phasebuf;
 	BufferIO::WriteInt8(pbuf_p, MSG_NEW_PHASE);
 	BufferIO::WriteInt16(pbuf_p, phase);
 	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, phasebuf, 3);
 
-	char query_buffer[1024];
+	unsigned char query_buffer[1024];
 	int length = query_field_info(pduel, (unsigned char*)query_buffer);
 	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, query_buffer, length);
 	RefreshMzone(1 - player, 0xefffff, 0, dp);
@@ -2095,7 +2095,7 @@ if(!dp || dp == players[player])
 		qbuf += clen - 4;
 	}
 	if(!dp || dp == players[1 - player])
-		NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer, len + 3);
+		NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	if(!dp)
 		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 			NetServer::ReSendToPlayer(*pit);

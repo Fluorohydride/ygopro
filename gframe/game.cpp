@@ -31,6 +31,7 @@ namespace ygo {
 
 Game* mainGame;
 
+#ifndef YGOPRO_SERVER_MODE
 void DuelInfo::Clear() {
 	isStarted = false;
 	isFinished = false;
@@ -62,6 +63,7 @@ void DuelInfo::Clear() {
 	time_left[0] = 0;
 	time_left[1] = 0;
 }
+#endif
 
 #ifdef YGOPRO_SERVER_MODE
 unsigned short server_port;
