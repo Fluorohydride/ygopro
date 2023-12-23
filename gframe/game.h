@@ -57,6 +57,7 @@ struct Config {
 	int quick_animation;
 	int auto_save_replay;
 	int draw_single_chain;
+	int hide_player_name;
 	int prefer_expansion_script;
 	bool enable_sound;
 	bool enable_music;
@@ -70,31 +71,33 @@ struct Config {
 };
 
 struct DuelInfo {
-	bool isStarted;
-	bool isFinished;
-	bool isReplay;
-	bool isReplaySkiping;
-	bool isFirst;
-	bool isTag;
-	bool isSingleMode;
-	bool is_shuffling;
-	bool tag_player[2];
-	int lp[2];
-	int start_lp;
-	int duel_rule;
-	int turn;
-	short curMsg;
-	wchar_t hostname[20];
-	wchar_t clientname[20];
-	wchar_t hostname_tag[20];
-	wchar_t clientname_tag[20];
-	wchar_t strLP[2][16];
-	wchar_t* vic_string;
-	unsigned char player_type;
-	unsigned char time_player;
-	unsigned short time_limit;
-	unsigned short time_left[2];
-	bool isReplaySwapped;
+	bool isStarted{ false };
+	bool isFinished{ false };
+	bool isReplay{ false };
+	bool isReplaySkiping{ false };
+	bool isFirst{ false };
+	bool isTag{ false };
+	bool isSingleMode{ false };
+	bool is_shuffling{ false };
+	bool tag_player[2]{ false };
+	bool isReplaySwapped{ false };
+	int lp[2]{ 0 };
+	int start_lp{ 0 };
+	int duel_rule{ 0 };
+	int turn{ 0 };
+	short curMsg{ 0 };
+	wchar_t hostname[20]{ 0 };
+	wchar_t clientname[20]{ 0 };
+	wchar_t hostname_tag[20]{ 0 };
+	wchar_t clientname_tag[20]{ 0 };
+	wchar_t strLP[2][16]{ 0 };
+	wchar_t* vic_string{ 0 };
+	unsigned char player_type{ 0 };
+	unsigned char time_player{ 0 };
+	unsigned short time_limit{ 0 };
+	unsigned short time_left[2]{ 0 };
+
+	void Clear();
 };
 
 struct BotInfo {
@@ -307,6 +310,7 @@ public:
 	irr::gui::IGUICheckBox* chkQuickAnimation;
 	irr::gui::IGUICheckBox* chkAutoSaveReplay;
 	irr::gui::IGUICheckBox* chkDrawSingleChain;
+	irr::gui::IGUICheckBox* chkHidePlayerName;
 	irr::gui::IGUIWindow* tabSystem;
 	irr::gui::IGUIElement* elmTabSystemLast;
 	irr::gui::IGUIScrollBar* scrTabSystem;
@@ -467,7 +471,7 @@ public:
 	irr::gui::IGUICheckBox* chkAttribute[7];
 	//announce race
 	irr::gui::IGUIWindow* wANRace;
-	irr::gui::IGUICheckBox* chkRace[25];
+	irr::gui::IGUICheckBox* chkRace[RACES_COUNT];
 	//cmd menu
 	irr::gui::IGUIWindow* wCmdMenu;
 	irr::gui::IGUIButton* btnActivate;
@@ -608,6 +612,12 @@ extern HostInfo game_info;
 extern unsigned int pre_seed[3];
 #endif
 }
+
+#ifdef YGOPRO_SERVER_MODE
+#define SIZE_QUERY_BUFFER	0x40000
+#else
+#define SIZE_QUERY_BUFFER	0x4000
+#endif
 
 #define CARD_IMG_WIDTH		177
 #define CARD_IMG_HEIGHT		254
@@ -811,10 +821,24 @@ extern unsigned int pre_seed[3];
 #define CHECKBOX_PREFER_EXPANSION	373
 #define CHECKBOX_DRAW_SINGLE_CHAIN	374
 #define CHECKBOX_LFLIST				375
+#define CHECKBOX_HIDE_PLAYER_NAME	376
 #define BUTTON_BIG_CARD_CLOSE		380
 #define BUTTON_BIG_CARD_ZOOM_IN		381
 #define BUTTON_BIG_CARD_ZOOM_OUT	382
 #define BUTTON_BIG_CARD_ORIG_SIZE	383
+
+//STOC_GAME_MSG messages
+#define MSG_WAITING				3
+#define MSG_START				4
+#define MSG_UPDATE_DATA			6	// flag=0: clear
+#define MSG_UPDATE_CARD			7	// flag=QUERY_CODE, code=0: clear
+#define MSG_REQUEST_DECK		8
+#define MSG_REFRESH_DECK		34
+#define MSG_CARD_SELECTED		80
+#define MSG_UNEQUIP				95
+#define MSG_BE_CHAIN_TARGET		121
+#define MSG_CREATE_RELATION		122
+#define MSG_RELEASE_RELATION	123
 
 #define AVAIL_OCG					0x1
 #define AVAIL_TCG					0x2
@@ -822,7 +846,8 @@ extern unsigned int pre_seed[3];
 #define AVAIL_SC					0x8
 #define AVAIL_OCGTCG				(AVAIL_OCG|AVAIL_TCG)
 
-#define DEFAULT_DUEL_RULE			5
+#define DEFAULT_DUEL_RULE	5
 
 #define CARD_ARTWORK_VERSIONS_OFFSET	10
+#define MAX_LAYER_COUNT	6
 #endif // GAME_H

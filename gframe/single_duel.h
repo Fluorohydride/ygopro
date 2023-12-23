@@ -24,7 +24,7 @@ public:
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp);
 	virtual void Process();
 	virtual void Surrender(DuelPlayer* dp);
-	virtual int Analyze(char* msgbuffer, unsigned int len);
+	virtual int Analyze(unsigned char* msgbuffer, unsigned int len);
 	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len);
 	virtual void TimeConfirm(DuelPlayer* dp);
 #ifdef YGOPRO_SERVER_MODE
@@ -50,17 +50,19 @@ public:
 #endif
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 
-	static int MessageHandler(intptr_t fduel, int type);
+	static uint32 MessageHandler(intptr_t fduel, uint32 type);
 	static void SingleTimer(evutil_socket_t fd, short events, void* arg);
+
+private:
+	int WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache);
 	
 protected:
-	DuelPlayer* players[2];
-	DuelPlayer* pplayer[2];
-	bool ready[2];
+	DuelPlayer* players[2]{ nullptr };
+	bool ready[2]{ false };
 	Deck pdeck[2];
-	int deck_error[2];
-	unsigned char hand_result[2];
-	unsigned char last_response;
+	int deck_error[2]{ 0 };
+	unsigned char hand_result[2]{ 0 };
+	unsigned char last_response{ 0 };
 	std::set<DuelPlayer*> observers;
 #ifdef YGOPRO_SERVER_MODE
 	DuelPlayer* cache_recorder;
@@ -69,13 +71,13 @@ protected:
 	unsigned short phase;
 #endif
 	Replay last_replay;
-	bool match_mode;
-	int match_kill;
-	unsigned char duel_count;
-	unsigned char tp_player;
-	unsigned char match_result[3];
-	short time_limit[2];
-	short time_elapsed;
+	bool match_mode{ false };
+	int match_kill{ 0 };
+	unsigned char duel_count{ 0 };
+	unsigned char tp_player{ 0 };
+	unsigned char match_result[3]{ 0 };
+	short time_limit[2]{ 0 };
+	short time_elapsed{ 0 };
 #ifdef YGOPRO_SERVER_MODE
 	short time_compensator[2];
 	short time_backed[2];

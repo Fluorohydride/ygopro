@@ -16,8 +16,8 @@ void UpdateDeck() {
 		mainGame->gameConf.lastcategory, 64);
 	BufferIO::CopyWStr(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()),
 		mainGame->gameConf.lastdeck, 64);
-	char deckbuf[1024];
-	char* pdeck = deckbuf;
+	unsigned char deckbuf[1024];
+	auto pdeck = deckbuf;
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
 	for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
@@ -93,6 +93,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
 						evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
 						remote_addr = htonl(inet_addr(ip));
+						evutil_freeaddrinfo(answer);
 					}
 				}
 				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
@@ -126,10 +127,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HOST_CONFIRM: {
 				bot_mode = false;
 				BufferIO::CopyWStr(mainGame->ebServerName->getText(), mainGame->gameConf.gamename, 20);
-				if(!NetServer::StartServer(mainGame->gameConf.serverport))
+				if(!NetServer::StartServer(mainGame->gameConf.serverport)) {
+					soundManager.PlaySoundEffect(SOUND_INFO);
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 					break;
+				}
 				if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
 					NetServer::StopServer();
+					soundManager.PlaySoundEffect(SOUND_INFO);
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 					break;
 				}
 				mainGame->btnHostConfirm->setEnabled(false);
@@ -169,6 +175,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HP_READY: {
 				if(mainGame->cbCategorySelect->getSelected() == -1 || mainGame->cbDeckSelect->getSelected() == -1 ||
 					!deckManager.LoadDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect)) {
+					mainGame->gMutex.lock();
+					soundManager.PlaySoundEffect(SOUND_INFO);
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
+					mainGame->gMutex.unlock();
 					break;
 				}
 				UpdateDeck();
@@ -323,10 +333,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				bot_mode = true;
 #ifdef _WIN32
-				if(!NetServer::StartServer(mainGame->gameConf.serverport))
+				if(!NetServer::StartServer(mainGame->gameConf.serverport)) {
+					soundManager.PlaySoundEffect(SOUND_INFO);
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 					break;
+				}
 				if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
 					NetServer::StopServer();
+					soundManager.PlaySoundEffect(SOUND_INFO);
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 					break;
 				}
 				STARTUPINFOW si;
@@ -373,10 +388,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					execl("./bot", "bot", arg1, arg2, arg3, NULL);
 					exit(0);
 				} else {
-					if(!NetServer::StartServer(mainGame->gameConf.serverport))
+					if(!NetServer::StartServer(mainGame->gameConf.serverport)) {
+						soundManager.PlaySoundEffect(SOUND_INFO);
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 						break;
+					}
 					if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
 						NetServer::StopServer();
+						soundManager.PlaySoundEffect(SOUND_INFO);
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 						break;
 					}
 				}
@@ -607,7 +627,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
 					if(mainGame->cbCategorySelect->getSelected() == -1 || mainGame->cbDeckSelect->getSelected() == -1 ||
 						!deckManager.LoadDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect)) {
+						mainGame->gMutex.lock();
 						static_cast<irr::gui::IGUICheckBox*>(caller)->setChecked(false);
+						soundManager.PlaySoundEffect(SOUND_INFO);
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
+						mainGame->gMutex.unlock();
 						break;
 					}
 					UpdateDeck();

@@ -79,7 +79,7 @@ void DeckBuilder::Initialize() {
 	mainGame->btnSideReload->setVisible(false);
 	filterList = &deckManager._lfList[mainGame->gameConf.use_lflist ? mainGame->gameConf.default_lflist : deckManager._lfList.size() - 1].content;
 	ClearSearch();
-	rnd.reset((unsigned int)time(nullptr));
+	rnd.reset((uint_fast32_t)time(nullptr));
 	mouse_pos.set(0, 0);
 	hovered_code = 0;
 	hovered_pos = 0;
@@ -652,8 +652,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				mainGame->ClearCardInfo();
-				char deckbuf[1024];
-				char* pdeck = deckbuf;
+				unsigned char deckbuf[1024];
+				auto pdeck = deckbuf;
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
 				for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)

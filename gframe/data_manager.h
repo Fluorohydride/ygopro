@@ -13,7 +13,7 @@ namespace ygo {
 
 class DataManager {
 public:
-	DataManager(): _datas(8192), _strings(8192) {}
+	DataManager(): _datas(16384), _strings(16384) {}
 	bool LoadDB(const wchar_t* wfile);
 	bool LoadStrings(const char* file);
 #ifndef YGOPRO_SERVER_MODE
@@ -25,7 +25,7 @@ public:
 #else
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = 0);
 #endif //YGOPRO_SERVER_MODE
-	bool GetData(int code, CardData* pData);
+	bool GetData(unsigned int code, CardData* pData);
 	code_pointer GetCodePointer(int code);
 	bool GetString(int code, CardString* pStr);
 	const wchar_t* GetName(int code);
@@ -61,7 +61,7 @@ public:
 
 	static byte scriptBuffer[0x20000];
 	static const wchar_t* unknown_string;
-	static int CardReader(int, void*);
+	static uint32 CardReader(uint32, card_data*);
 	static byte* ScriptReaderEx(const char* script_name, int* slen);
 	static byte* ScriptReader(const char* script_name, int* slen);
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)

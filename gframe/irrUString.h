@@ -111,9 +111,9 @@ inline uchar16_t swapEndian16(const uchar16_t& c) {
 //! \return The new value.
 inline uchar32_t swapEndian32(const uchar32_t& c) {
 	return  ((c >> 24) & 0x000000FF) |
-	        ((c >> 8)  & 0x0000FF00) |
-	        ((c << 8)  & 0x00FF0000) |
-	        ((c << 24) & 0xFF000000);
+			((c >> 8)  & 0x0000FF00) |
+			((c << 8)  & 0x00FF0000) |
+			((c << 24) & 0xFF000000);
 }
 
 //! The Unicode byte order mark.
@@ -138,21 +138,21 @@ const u8 BOM_ENCODE_UTF32_LEN = 4;
 
 //! Unicode encoding type.
 enum EUTF_ENCODE {
-    EUTFE_NONE		= 0,
-    EUTFE_UTF8,
-    EUTFE_UTF16,
-    EUTFE_UTF16_LE,
-    EUTFE_UTF16_BE,
-    EUTFE_UTF32,
-    EUTFE_UTF32_LE,
-    EUTFE_UTF32_BE
+	EUTFE_NONE		= 0,
+	EUTFE_UTF8,
+	EUTFE_UTF16,
+	EUTFE_UTF16_LE,
+	EUTFE_UTF16_BE,
+	EUTFE_UTF32,
+	EUTFE_UTF32_LE,
+	EUTFE_UTF32_BE
 };
 
 //! Unicode endianness.
 enum EUTF_ENDIAN {
-    EUTFEE_NATIVE	= 0,
-    EUTFEE_LITTLE,
-    EUTFEE_BIG
+	EUTFEE_NATIVE	= 0,
+	EUTFEE_LITTLE,
+	EUTFEE_BIG
 };
 
 //! Returns the specified unicode byte order mark in a byte array.
@@ -2234,7 +2234,7 @@ public:
 			for (u32 j = 0; j < count; ++j) {
 				if (ch == c[j]) {
 					if ((!ignoreEmptyTokens || pos - lastpos != 0) &&
-					        !lastWasSeparator)
+							!lastWasSeparator)
 						ret.push_back(ustring16<TAlloc>(&array[lastpospos], pos - lastpos));
 					foundSeparator = true;
 					lastpos = (keepSeparators ? pos : pos + 1);
@@ -2836,7 +2836,7 @@ public:
 	//! \return An enum describing the endianness of this string.
 	const unicode::EUTF_ENDIAN getEndianness() const {
 		if (encoding == unicode::EUTFE_UTF16_LE ||
-		        encoding == unicode::EUTFE_UTF32_LE)
+				encoding == unicode::EUTFE_UTF32_LE)
 			return unicode::EUTFEE_LITTLE;
 		else return unicode::EUTFEE_BIG;
 	}
@@ -2964,7 +2964,7 @@ template <typename TAlloc>
 inline ustring16<TAlloc> && operator+(ustring16<TAlloc> && left, ustring16<TAlloc> && right) {
 	//std::cout << "MOVE operator+(&&, &&)" << std::endl;
 	if ((right.size_raw() <= left.capacity() - left.size_raw()) ||
-	        (right.capacity() - right.size_raw() < left.size_raw())) {
+			(right.capacity() - right.size_raw() < left.size_raw())) {
 		left.append(right);
 		return std::move(left);
 	} else {
@@ -3052,7 +3052,7 @@ namespace unicode {
 
 //! Hashing algorithm for hashing a ustring.  Used for things like unordered_maps.
 //! Algorithm taken from std::hash<std::string>.
-class hash : public std::unary_function<core::ustring, size_t> {
+class uhash {
 public:
 	size_t operator()(const core::ustring& s) const {
 		size_t ret = 2166136261U;
