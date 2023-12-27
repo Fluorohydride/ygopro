@@ -96,13 +96,13 @@ struct DuelInfo {
 };
 
 struct BotInfo {
-	wchar_t name[256];
-	wchar_t command[256];
-	wchar_t desc[256];
-	bool support_master_rule_3;
-	bool support_new_master_rule;
-	bool support_master_rule_2020;
-	bool select_deckfile;
+	wchar_t name[256]{};
+	wchar_t command[256]{};
+	wchar_t desc[256]{};
+	bool support_master_rule_3{ false };
+	bool support_new_master_rule{ false };
+	bool support_master_rule_2020{ false };
+	bool select_deckfile{ false };
 };
 
 struct FadingUnit {
@@ -215,8 +215,8 @@ public:
 
 	int hideChatTimer;
 	bool hideChat;
-	int chatTiming[8];
-	int chatType[8];
+	int chatTiming[8]{};
+	int chatType[8]{};
 	unsigned short linePatternD3D;
 	unsigned short linePatternGL;
 	int waitFrame;
