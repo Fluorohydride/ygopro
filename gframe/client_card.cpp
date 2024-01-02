@@ -7,9 +7,13 @@ namespace ygo {
 
 ClientCard::~ClientCard() {
 	ClearTarget();
-	if (equipTarget)
+	if (equipTarget) {
+		equipTarget->is_showequip = false;
 		equipTarget->equipped.erase(this);
-	for (auto card : equipped) {
+		equipTarget = nullptr;
+	}
+	for (auto& card : equipped) {
+		card->is_showequip = false;
 		card->equipTarget = nullptr;
 	}
 	equipped.clear();
@@ -21,8 +25,9 @@ ClientCard::~ClientCard() {
 			else
 				++it;
 		}
+		overlayTarget = nullptr;
 	}
-	for (auto card : overlayed) {
+	for (auto& card : overlayed) {
 		card->overlayTarget = nullptr;
 	}
 	overlayed.clear();
@@ -206,10 +211,6 @@ void ClientCard::ClearData() {
 	rscstring[0] = 0;
 	lscstring[0] = 0;
 	counters.clear();
-	for (auto card : equipped) {
-		card->equipTarget = nullptr;
-	}
-	equipped.clear();
 }
 bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 	if(c1->is_selected != c2->is_selected)
