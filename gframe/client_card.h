@@ -93,12 +93,12 @@ public:
 	std::set<ClientCard*> ownerTarget;
 	std::map<int, int> counters;
 	std::map<int, int> desc_hints;
-	wchar_t atkstring[16]{ 0 };
-	wchar_t defstring[16]{ 0 };
-	wchar_t lvstring[16]{ 0 };
-	wchar_t linkstring[16]{ 0 };
-	wchar_t lscstring[16]{ 0 };
-	wchar_t rscstring[16]{ 0 };
+	wchar_t atkstring[16]{};
+	wchar_t defstring[16]{};
+	wchar_t lvstring[16]{};
+	wchar_t linkstring[16]{};
+	wchar_t lscstring[16]{};
+	wchar_t rscstring[16]{};
 
 	ClientCard() = default;
 	~ClientCard();

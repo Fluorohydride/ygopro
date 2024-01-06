@@ -99,9 +99,8 @@ struct STOC_HS_WatchChange {
 class DuelMode;
 
 struct DuelPlayer {
-	unsigned short name[20]{ 0 };
+	unsigned short name[20]{};
 	DuelMode* game{ nullptr };
-	unsigned char player_id{ 0xff };
 	unsigned char type{ 0 };
 	unsigned char state{ 0 };
 	bufferevent* bev{ 0 };

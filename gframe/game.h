@@ -13,61 +13,63 @@
 #include <vector>
 #include <list>
 
+#define DEFAULT_DUEL_RULE 5
+
 namespace ygo {
 
 #ifndef YGOPRO_SERVER_MODE
 struct Config {
-	bool use_d3d;
-	bool use_image_scale;
-	unsigned short antialias;
-	unsigned short serverport;
-	unsigned char textfontsize;
-	wchar_t lasthost[100];
-	wchar_t lastport[10];
-	wchar_t nickname[20];
-	wchar_t gamename[20];
-	wchar_t lastcategory[64];
-	wchar_t lastdeck[64];
-	wchar_t textfont[256];
-	wchar_t numfont[256];
-	wchar_t roompass[20];
-	wchar_t bot_deck_path[64];
+	bool use_d3d{ false };
+	bool use_image_scale{ true };
+	unsigned short antialias{ 0 };
+	unsigned short serverport{ 7911 };
+	unsigned char textfontsize{ 14 };
+	wchar_t lasthost[100]{};
+	wchar_t lastport[10]{};
+	wchar_t nickname[20]{};
+	wchar_t gamename[20]{};
+	wchar_t lastcategory[64]{};
+	wchar_t lastdeck[64]{};
+	wchar_t textfont[256]{};
+	wchar_t numfont[256]{};
+	wchar_t roompass[20]{};
+	wchar_t bot_deck_path[64]{};
 	//settings
-	int chkMAutoPos;
-	int chkSTAutoPos;
-	int chkRandomPos;
-	int chkAutoChain;
-	int chkWaitChain;
-	int chkDefaultShowChain;
-	int chkIgnore1;
-	int chkIgnore2;
-	int use_lflist;
-	int default_lflist;
-	int default_rule;
-	int hide_setname;
-	int hide_hint_button;
-	int control_mode;
-	int draw_field_spell;
-	int separate_clear_button;
-	int auto_search_limit;
-	int search_multiple_keywords;
-	int chkIgnoreDeckChanges;
-	int defaultOT;
-	int enable_bot_mode;
-	int quick_animation;
-	int auto_save_replay;
-	int draw_single_chain;
-	int hide_player_name;
-	int prefer_expansion_script;
-	bool enable_sound;
-	bool enable_music;
-	double sound_volume;
-	double music_volume;
-	int music_mode;
-	bool window_maximized;
-	int window_width;
-	int window_height;
-	bool resize_popup_menu;
+	int chkMAutoPos{ 0 };
+	int chkSTAutoPos{ 1 };
+	int chkRandomPos{ 0 };
+	int chkAutoChain{ 0 };
+	int chkWaitChain{ 0 };
+	int chkDefaultShowChain{ 0 };
+	int chkIgnore1{ 0 };
+	int chkIgnore2{ 0 };
+	int use_lflist{ 1 };
+	int default_lflist{ 0 };
+	int default_rule{ DEFAULT_DUEL_RULE };
+	int hide_setname{ 0 };
+	int hide_hint_button{ 0 };
+	int control_mode{ 0 };
+	int draw_field_spell{ 1 };
+	int separate_clear_button{ 1 };
+	int auto_search_limit{ -1 };
+	int search_multiple_keywords{ 1 };
+	int chkIgnoreDeckChanges{ 0 };
+	int defaultOT{ 1 };
+	int enable_bot_mode{ 0 };
+	int quick_animation{ 0 };
+	int auto_save_replay{ 0 };
+	int draw_single_chain{ 0 };
+	int hide_player_name{ 0 };
+	int prefer_expansion_script{ 0 };
+	bool enable_sound{ true };
+	bool enable_music{ true };
+	double sound_volume{ 0.5 };
+	double music_volume{ 0.5 };
+	int music_mode{ 1 };
+	bool window_maximized{ false };
+	int window_width{ 1024 };
+	int window_height{ 640 };
+	bool resize_popup_menu{ false };
 };
 
 struct DuelInfo {
@@ -79,35 +81,35 @@ struct DuelInfo {
 	bool isTag{ false };
 	bool isSingleMode{ false };
 	bool is_shuffling{ false };
-	bool tag_player[2]{ false };
+	bool tag_player[2]{};
 	bool isReplaySwapped{ false };
-	int lp[2]{ 0 };
+	int lp[2]{};
 	int start_lp{ 0 };
 	int duel_rule{ 0 };
 	int turn{ 0 };
 	short curMsg{ 0 };
-	wchar_t hostname[20]{ 0 };
-	wchar_t clientname[20]{ 0 };
-	wchar_t hostname_tag[20]{ 0 };
-	wchar_t clientname_tag[20]{ 0 };
-	wchar_t strLP[2][16]{ 0 };
-	wchar_t* vic_string{ 0 };
+	wchar_t hostname[20]{};
+	wchar_t clientname[20]{};
+	wchar_t hostname_tag[20]{};
+	wchar_t clientname_tag[20]{};
+	wchar_t strLP[2][16]{};
+	wchar_t* vic_string{ nullptr };
 	unsigned char player_type{ 0 };
 	unsigned char time_player{ 0 };
 	unsigned short time_limit{ 0 };
-	unsigned short time_left[2]{ 0 };
+	unsigned short time_left[2]{};
 
 	void Clear();
 };
 
 struct BotInfo {
-	wchar_t name[256];
-	wchar_t command[256];
-	wchar_t desc[256];
-	bool support_master_rule_3;
-	bool support_new_master_rule;
-	bool support_master_rule_2020;
-	bool select_deckfile;
+	wchar_t name[256]{};
+	wchar_t command[256]{};
+	wchar_t desc[256]{};
+	bool support_master_rule_3{ false };
+	bool support_new_master_rule{ false };
+	bool support_master_rule_2020{ false };
+	bool select_deckfile{ false };
 };
 
 struct FadingUnit {
@@ -226,8 +228,8 @@ public:
 
 	int hideChatTimer;
 	bool hideChat;
-	int chatTiming[8];
-	int chatType[8];
+	int chatTiming[8]{};
+	int chatType[8]{};
 	unsigned short linePatternD3D;
 	unsigned short linePatternGL;
 	int waitFrame;
@@ -845,8 +847,6 @@ extern unsigned int pre_seed[3];
 #define AVAIL_CUSTOM				0x4
 #define AVAIL_SC					0x8
 #define AVAIL_OCGTCG				(AVAIL_OCG|AVAIL_TCG)
-
-#define DEFAULT_DUEL_RULE	5
 
 #define CARD_ARTWORK_VERSIONS_OFFSET	10
 #define MAX_LAYER_COUNT	6
