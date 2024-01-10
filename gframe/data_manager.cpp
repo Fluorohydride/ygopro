@@ -172,10 +172,10 @@ bool DataManager::GetData(unsigned int code, CardData* pData) {
 	}
 	return true;
 }
-code_pointer DataManager::GetCodePointer(unsigned int code) {
+code_pointer DataManager::GetCodePointer(unsigned int code) const {
 	return _datas.find(code);
 }
-string_pointer DataManager::GetStringPointer(unsigned int code) {
+string_pointer DataManager::GetStringPointer(unsigned int code) const {
 	return _strings.find(code);
 }
 bool DataManager::GetString(int code, CardString* pStr) {
