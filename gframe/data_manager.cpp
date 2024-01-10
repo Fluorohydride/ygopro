@@ -85,6 +85,8 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	spmemvfs_env_fini();
 	datas_begin = _datas.begin();
 	datas_end = _datas.end();
+	strings_begin = _strings.begin();
+	strings_end = _strings.end();
 	return true;
 }
 bool DataManager::LoadStrings(const char* file) {
@@ -170,8 +172,11 @@ bool DataManager::GetData(unsigned int code, CardData* pData) {
 	}
 	return true;
 }
-code_pointer DataManager::GetCodePointer(int code) {
+code_pointer DataManager::GetCodePointer(unsigned int code) {
 	return _datas.find(code);
+}
+string_pointer DataManager::GetStringPointer(unsigned int code) {
+	return _strings.find(code);
 }
 bool DataManager::GetString(int code, CardString* pStr) {
 	auto csit = _strings.find(code);

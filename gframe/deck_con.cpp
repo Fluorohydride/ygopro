@@ -1423,9 +1423,11 @@ void DeckBuilder::FilterCards() {
 			query_elements.push_back(element);
 		}
 	}
-	auto strpointer = dataManager._strings.begin();
-	for(code_pointer ptr = dataManager.datas_begin; ptr != dataManager.datas_end; ++ptr, ++strpointer) {
+	for(code_pointer ptr = dataManager.datas_begin; ptr != dataManager.datas_end; ++ptr) {
 		const CardDataC& data = ptr->second;
+		auto strpointer = dataManager.GetStringPointer(ptr->first);
+		if (strpointer == dataManager.strings_end)
+			continue;
 		const CardString& text = strpointer->second;
 		if(data.type & TYPE_TOKEN)
 			continue;
