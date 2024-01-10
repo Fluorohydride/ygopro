@@ -1530,8 +1530,8 @@ void Game::ShowCardInfo(int code, bool resize) {
 	if(!gameConf.hide_setname) {
 		unsigned long long sc = cd.setcode;
 		if(cd.alias) {
-			auto aptr = dataManager._datas.find(cd.alias);
-			if(aptr != dataManager._datas.end())
+			auto aptr = dataManager.GetCodePointer(cd.alias);
+			if(aptr != dataManager.datas_end)
 				sc = aptr->second.setcode;
 		}
 		if(sc) {

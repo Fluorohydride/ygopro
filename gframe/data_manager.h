@@ -36,12 +36,13 @@ public:
 	const wchar_t* FormatSetName(unsigned long long setcode);
 	const wchar_t* FormatLinkMarker(int link_marker);
 
-	std::unordered_map<unsigned int, CardDataC> _datas;
 	std::unordered_map<unsigned int, CardString> _strings;
 	std::unordered_map<unsigned int, std::wstring> _counterStrings;
 	std::unordered_map<unsigned int, std::wstring> _victoryStrings;
 	std::unordered_map<unsigned int, std::wstring> _setnameStrings;
 	std::unordered_map<unsigned int, std::wstring> _sysStrings;
+	code_pointer datas_begin;
+	code_pointer datas_end;
 
 	wchar_t numStrings[301][4];
 	wchar_t numBuffer[6];
@@ -57,6 +58,9 @@ public:
 	static byte* ScriptReaderEx(const char* script_name, int* slen);
 	static byte* ScriptReader(const char* script_name, int* slen);
 	static IFileSystem* FileSystem;
+
+private:
+	std::unordered_map<unsigned int, CardDataC> _datas;
 };
 
 extern DataManager dataManager;

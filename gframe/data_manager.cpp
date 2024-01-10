@@ -83,6 +83,8 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	sqlite3_finalize(pStmt);
 	spmemvfs_close_db(&db);
 	spmemvfs_env_fini();
+	datas_begin = _datas.begin();
+	datas_end = _datas.end();
 	return true;
 }
 bool DataManager::LoadStrings(const char* file) {
