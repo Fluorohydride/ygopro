@@ -152,10 +152,10 @@ bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
 	return false;
 }
 bool DataManager::GetData(unsigned int code, CardData* pData) {
-	auto cdit = _datas.find(code);
+	code_pointer cdit = _datas.find(code);
 	if(cdit == _datas.end())
 		return false;
-	auto data = cdit->second;
+	auto& data = cdit->second;
 	if (pData) {
 		pData->code = data.code;
 		pData->alias = data.alias;
