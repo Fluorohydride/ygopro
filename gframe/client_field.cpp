@@ -1555,9 +1555,11 @@ void ClientField::UpdateDeclarableList() {
 	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
-	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
+	for(auto cit = dataManager.strings_begin; cit != dataManager.strings_end; ++cit) {
 		if(cit->second.name.find(pname) != std::wstring::npos) {
-			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
+			auto cp = dataManager.GetCodePointer(cit->first);
+			if (cp == dataManager.datas_end)
+				continue;
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, declare_opcodes)) {
 				if(pname == cit->second.name || trycode == cit->first) { //exact match or last used

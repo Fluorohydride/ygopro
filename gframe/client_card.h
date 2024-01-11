@@ -33,6 +33,7 @@ struct CardString {
 	std::wstring desc[16];
 };
 typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer;
+typedef std::unordered_map<unsigned int, CardString>::const_iterator string_pointer;
 
 class ClientCard {
 public:
