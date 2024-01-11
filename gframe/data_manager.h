@@ -39,7 +39,7 @@ public:
 	const wchar_t* FormatAttribute(int attribute);
 	const wchar_t* FormatRace(int race);
 	const wchar_t* FormatType(int type);
-	const wchar_t* FormatSetName(unsigned long long setcode);
+	const wchar_t* FormatSetName(const std::vector<uint16_t>& setcode);
 	const wchar_t* FormatLinkMarker(int link_marker);
 
 	std::unordered_map<unsigned int, std::wstring> _counterStrings;

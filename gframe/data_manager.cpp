@@ -34,11 +34,11 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
 		return Error(&db);
-	CardDataC cd;
-	CardString cs;
 	wchar_t strBuffer[4096];
 	int step = 0;
 	do {
+		CardDataC cd;
+		CardString cs;
 		step = sqlite3_step(pStmt);
 		if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
 			return Error(&db, pStmt);
@@ -46,7 +46,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
-			cd.setcode = sqlite3_column_int64(pStmt, 3);
+			cd.set_setcode(sqlite3_column_int64(pStmt, 3));
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defense = sqlite3_column_int(pStmt, 6);
@@ -159,7 +159,7 @@ bool DataManager::GetData(unsigned int code, CardData* pData) {
 	if (pData) {
 		pData->code = data.code;
 		pData->alias = data.alias;
-		pData->setcode = data.setcode;
+		pData->setcode.assign(data.setcode.begin(), data.setcode.end());
 		pData->type = data.type;
 		pData->level = data.level;
 		pData->attribute = data.attribute;
@@ -329,10 +329,13 @@ const wchar_t* DataManager::FormatType(int type) {
 		return unknown_string;
 	return tpBuffer;
 }
-const wchar_t* DataManager::FormatSetName(unsigned long long setcode) {
+const wchar_t* DataManager::FormatSetName(const std::vector<uint16_t>& setcode) {
 	wchar_t* p = scBuffer;
-	for(int i = 0; i < 4; ++i) {
-		const wchar_t* setname = GetSetName((setcode >> i * 16) & 0xffff);
+	int len = setcode.size();
+	if (len > 10)
+		len = 10;
+	for(int i = 0; i < len; ++i) {
+		const wchar_t* setname = GetSetName(setcode[i]);
 		if(setname) {
 			BufferIO::CopyWStrRef(setname, p, 32);
 			*p = L'|';
