@@ -65,6 +65,7 @@ public:
 	static byte* ScriptReaderEx(const char* script_name, int* slen);
 	static byte* ScriptReader(const char* script_name, int* slen);
 	static IFileSystem* FileSystem;
+	static std::unordered_map<unsigned int, std::vector<uint16_t>> extra_setcode;
 
 private:
 	std::unordered_map<unsigned int, CardDataC> _datas;

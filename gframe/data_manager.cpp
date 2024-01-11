@@ -7,6 +7,9 @@ namespace ygo {
 const wchar_t* DataManager::unknown_string = L"???";
 byte DataManager::scriptBuffer[0x20000];
 IFileSystem* DataManager::FileSystem;
+std::unordered_map<unsigned int, std::vector<uint16_t>> DataManager::extra_setcode{
+	{8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}},
+};
 DataManager dataManager;
 
 bool DataManager::LoadDB(const wchar_t* wfile) {
@@ -46,7 +49,11 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
-			cd.set_setcode(sqlite3_column_int64(pStmt, 3));
+			auto it = extra_setcode.find(cd.code);
+			if (it != extra_setcode.end())
+				cd.setcode.assign(it->second.begin(), it->second.end());
+			else
+				cd.set_setcode(sqlite3_column_int64(pStmt, 3));
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defense = sqlite3_column_int(pStmt, 6);
