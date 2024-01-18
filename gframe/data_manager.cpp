@@ -7,11 +7,15 @@ namespace ygo {
 const wchar_t* DataManager::unknown_string = L"???";
 byte DataManager::scriptBuffer[0x20000];
 IFileSystem* DataManager::FileSystem;
-std::unordered_map<unsigned int, std::vector<uint16_t>> DataManager::extra_setcode{
-	{8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}},
-};
 DataManager dataManager;
 
+DataManager::DataManager() : _datas(16384), _strings(16384) {
+	datas_begin = _datas.begin();
+	datas_end = _datas.end();
+	strings_begin = _strings.begin();
+	strings_end = _strings.end();
+	extra_setcode = { {8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}}, };
+}
 bool DataManager::LoadDB(const wchar_t* wfile) {
 	char file[256];
 	BufferIO::EncodeUTF8(wfile, file);
@@ -50,8 +54,13 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
 			auto it = extra_setcode.find(cd.code);
-			if (it != extra_setcode.end())
-				cd.setcode.assign(it->second.begin(), it->second.end());
+			if (it != extra_setcode.end()) {
+				int len = it->second.size();
+				if (len > SIZE_SETCODE)
+					len = SIZE_SETCODE;
+				if (len)
+					std::memcpy(cd.setcode, it->second.data(), len * sizeof(uint16_t));
+			}
 			else
 				cd.set_setcode(sqlite3_column_int64(pStmt, 3));
 			cd.type = sqlite3_column_int(pStmt, 4);
@@ -166,7 +175,7 @@ bool DataManager::GetData(unsigned int code, CardData* pData) {
 	if (pData) {
 		pData->code = data.code;
 		pData->alias = data.alias;
-		pData->setcode.assign(data.setcode.begin(), data.setcode.end());
+		std::memcpy(pData->setcode, data.setcode, SIZE_SETCODE);
 		pData->type = data.type;
 		pData->level = data.level;
 		pData->attribute = data.attribute;
@@ -336,12 +345,11 @@ const wchar_t* DataManager::FormatType(int type) {
 		return unknown_string;
 	return tpBuffer;
 }
-const wchar_t* DataManager::FormatSetName(const std::vector<uint16_t>& setcode) {
+const wchar_t* DataManager::FormatSetName(const uint16_t setcode[]) {
 	wchar_t* p = scBuffer;
-	int len = setcode.size();
-	if (len > 10)
-		len = 10;
-	for(int i = 0; i < len; ++i) {
+	for(int i = 0; i < 10; ++i) {
+		if (!setcode[i])
+			break;
 		const wchar_t* setname = GetSetName(setcode[i]);
 		if(setname) {
 			BufferIO::CopyWStrRef(setname, p, 32);

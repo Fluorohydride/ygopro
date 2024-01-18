@@ -1540,7 +1540,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		if (cd.alias && dataManager.GetCodePointer(cd.alias) != dataManager.datas_end) {
 			target = dataManager.GetCodePointer(cd.alias);
 		}
-		if (target->second.setcode.size()) {
+		if (target->second.setcode[0]) {
 			offset = 23;// *yScale;
 			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(target->second.setcode));
 			stSetName->setText(formatBuffer);
