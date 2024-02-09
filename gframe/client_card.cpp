@@ -7,9 +7,13 @@ namespace ygo {
 
 ClientCard::~ClientCard() {
 	ClearTarget();
-	if (equipTarget)
+	if (equipTarget) {
+		equipTarget->is_showequip = false;
 		equipTarget->equipped.erase(this);
-	for (auto card : equipped) {
+		equipTarget = nullptr;
+	}
+	for (auto& card : equipped) {
+		card->is_showequip = false;
 		card->equipTarget = nullptr;
 	}
 	equipped.clear();
@@ -21,8 +25,9 @@ ClientCard::~ClientCard() {
 			else
 				++it;
 		}
+		overlayTarget = nullptr;
 	}
-	for (auto card : overlayed) {
+	for (auto& card : overlayed) {
 		card->overlayTarget = nullptr;
 	}
 	overlayed.clear();
@@ -206,10 +211,6 @@ void ClientCard::ClearData() {
 	rscstring[0] = 0;
 	lscstring[0] = 0;
 	counters.clear();
-	for (auto card : equipped) {
-		card->equipTarget = nullptr;
-	}
-	equipped.clear();
 }
 bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 	if(c1->is_selected != c2->is_selected)
@@ -220,23 +221,26 @@ bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 		return cp1 < cp2;
 	if(c1->location != c2->location)
 		return c1->location < c2->location;
-	if(c1->location & LOCATION_OVERLAY)
-		if(c1->overlayTarget != c2->overlayTarget)
+	if (c1->location & LOCATION_OVERLAY) {
+		if (c1->overlayTarget != c2->overlayTarget)
 			return c1->overlayTarget->sequence < c2->overlayTarget->sequence;
-		else return c1->sequence < c2->sequence;
+		else
+			return c1->sequence < c2->sequence;
+	}
 	else {
 		if(c1->location & (LOCATION_DECK | LOCATION_GRAVE | LOCATION_REMOVED | LOCATION_EXTRA)) {
-			auto it1 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c1](const auto& ch) {
+			auto it1 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c1](const ChainInfo& ch) {
 				return c1 == ch.chain_card || ch.target.find(c1) != ch.target.end();
 				});
-			auto it2 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c2](const auto& ch) {
+			auto it2 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c2](const ChainInfo& ch) {
 				return c2 == ch.chain_card || ch.target.find(c2) != ch.target.end();
 				});
 			if(it1 != mainGame->dField.chains.rend() || it2 != mainGame->dField.chains.rend()) {
 				return it1 < it2;
 			}
 			return c1->sequence > c2->sequence;
-		} else
+		}
+		else
 			return c1->sequence < c2->sequence;
 	}
 }

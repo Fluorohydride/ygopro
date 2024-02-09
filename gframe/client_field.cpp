@@ -19,39 +19,39 @@ ClientField::ClientField() {
 }
 ClientField::~ClientField() {
 	for (int i = 0; i < 2; ++i) {
-		for (auto card : deck[i]) {
+		for (auto& card : deck[i]) {
 			delete card;
 		}
 		deck[i].clear();
-		for (auto card : hand[i]) {
+		for (auto& card : hand[i]) {
 			delete card;
 		}
 		hand[i].clear();
-		for (auto card : mzone[i]) {
+		for (auto& card : mzone[i]) {
 			if (card)
 				delete card;
 			card = nullptr;
 		}
-		for (auto card : szone[i]) {
+		for (auto& card : szone[i]) {
 			if (card)
 				delete card;
 			card = nullptr;
 		}
-		for (auto card : grave[i]) {
+		for (auto& card : grave[i]) {
 			delete card;
 		}
 		grave[i].clear();
-		for (auto card : remove[i]) {
+		for (auto& card : remove[i]) {
 			delete card;
 		}
 		remove[i].clear();
 
-		for (auto card : extra[i]) {
+		for (auto& card : extra[i]) {
 			delete card;
 		}
 		extra[i].clear();
 	}
-	for (auto card : overlay_cards) {
+	for (auto& card : overlay_cards) {
 		delete card;
 	}
 	overlay_cards.clear();
@@ -1555,9 +1555,11 @@ void ClientField::UpdateDeclarableList() {
 	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
-	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
+	for(auto cit = dataManager.strings_begin; cit != dataManager.strings_end; ++cit) {
 		if(cit->second.name.find(pname) != std::wstring::npos) {
-			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
+			auto cp = dataManager.GetCodePointer(cit->first);
+			if (cp == dataManager.datas_end)
+				continue;
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, declare_opcodes)) {
 				if(pname == cit->second.name || trycode == cit->first) { //exact match or last used

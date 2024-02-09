@@ -314,11 +314,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				for(int i = 0; i < max; ++i) {
 					int main = replay.ReadInt32();
 					Deck tmp_deck;
-					for(int j = 0; j < main; ++j)
-						tmp_deck.main.push_back(dataManager.GetCodePointer(replay.ReadInt32()));
+					for (int j = 0; j < main; ++j) {
+						auto card = dataManager.GetCodePointer(replay.ReadInt32());
+						if (card != dataManager.datas_end)
+							tmp_deck.main.push_back(card);
+					}
 					int extra = replay.ReadInt32();
-					for(int j = 0; j < extra; ++j)
-						tmp_deck.extra.push_back(dataManager.GetCodePointer(replay.ReadInt32()));
+					for (int j = 0; j < extra; ++j) {
+						auto card = dataManager.GetCodePointer(replay.ReadInt32());
+						if (card != dataManager.datas_end)
+							tmp_deck.extra.push_back(card);
+					}
 					FileSystem::SafeFileName(namebuf[i]);
 					myswprintf(filename, L"deck/%ls-%d %ls.ydk", ex_filename, i + 1, namebuf[i]);
 					deckManager.SaveDeck(tmp_deck, filename);
