@@ -46,7 +46,7 @@ public:
 	std::vector<int> select_options;
 	std::vector<int> select_options_index;
 	std::vector<ChainInfo> chains;
-	int extra_p_count[2]{ 0 };
+	int extra_p_count[2]{};
 
 	size_t selected_option{ 0 };
 	ClientCard* attacker{ nullptr };
@@ -77,7 +77,7 @@ public:
 	bool remove_act{ false };
 	bool deck_act{ false };
 	bool extra_act{ false };
-	bool pzone_act[2]{ false };
+	bool pzone_act[2]{};
 	bool conti_act{ false };
 	bool chain_forced{ false };
 	ChainInfo current_chain;

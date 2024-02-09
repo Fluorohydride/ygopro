@@ -111,6 +111,10 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	spmemvfs_close_db(&db);
 	spmemvfs_env_fini();
 #endif
+	datas_begin = _datas.begin();
+	datas_end = _datas.end();
+	strings_begin = _strings.begin();
+	strings_end = _strings.end();
 	return true;
 }
 bool DataManager::LoadStrings(const char* file) {
@@ -189,10 +193,10 @@ bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
 }
 #endif //YGOPRO_SERVER_MODE
 bool DataManager::GetData(unsigned int code, CardData* pData) {
-	auto cdit = _datas.find(code);
+	code_pointer cdit = _datas.find(code);
 	if(cdit == _datas.end())
 		return false;
-	auto data = cdit->second;
+	auto& data = cdit->second;
 	if (pData) {
 		pData->code = data.code;
 		pData->alias = data.alias;
@@ -209,8 +213,11 @@ bool DataManager::GetData(unsigned int code, CardData* pData) {
 	}
 	return true;
 }
-code_pointer DataManager::GetCodePointer(int code) {
+code_pointer DataManager::GetCodePointer(unsigned int code) const {
 	return _datas.find(code);
+}
+string_pointer DataManager::GetStringPointer(unsigned int code) const {
+	return _strings.find(code);
 }
 bool DataManager::GetString(int code, CardString* pStr) {
 	auto csit = _strings.find(code);

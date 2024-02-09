@@ -33,6 +33,7 @@ struct CardString {
 	std::wstring desc[16];
 };
 typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer;
+typedef std::unordered_map<unsigned int, CardString>::const_iterator string_pointer;
 
 class ClientCard {
 public:
@@ -93,12 +94,12 @@ public:
 	std::set<ClientCard*> ownerTarget;
 	std::map<int, int> counters;
 	std::map<int, int> desc_hints;
-	wchar_t atkstring[16]{ 0 };
-	wchar_t defstring[16]{ 0 };
-	wchar_t lvstring[16]{ 0 };
-	wchar_t linkstring[16]{ 0 };
-	wchar_t lscstring[16]{ 0 };
-	wchar_t rscstring[16]{ 0 };
+	wchar_t atkstring[16]{};
+	wchar_t defstring[16]{};
+	wchar_t lvstring[16]{};
+	wchar_t linkstring[16]{};
+	wchar_t lscstring[16]{};
+	wchar_t rscstring[16]{};
 
 	ClientCard() = default;
 	~ClientCard();

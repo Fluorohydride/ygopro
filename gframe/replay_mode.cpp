@@ -293,7 +293,7 @@ void ReplayMode::Restart(bool refresh) {
 		std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
 		std::swap(mainGame->dInfo.hostname_tag, mainGame->dInfo.clientname_tag);
 	}
-		skip_turn = 0;
+	skip_turn = 0;
 }
 void ReplayMode::Undo() {
 	if(skip_step > 0 || current_step == 0)
