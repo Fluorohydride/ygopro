@@ -81,7 +81,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 				if (len > SIZE_SETCODE)
 					len = SIZE_SETCODE;
 				if (len)
-					std::memcpy(cd.setcode, it->second.data(), len * sizeof(uint16_t));
+					memcpy(cd.setcode, it->second.data(), len * sizeof(uint16_t));
 			}
 			else
 				cd.set_setcode(sqlite3_column_int64(pStmt, 3));
@@ -216,7 +216,7 @@ bool DataManager::GetData(unsigned int code, CardData* pData) {
 	if (pData) {
 		pData->code = data.code;
 		pData->alias = data.alias;
-		std::memcpy(pData->setcode, data.setcode, SIZE_SETCODE);
+		memcpy(pData->setcode, data.setcode, SIZE_SETCODE);
 		pData->type = data.type;
 		pData->level = data.level;
 		pData->attribute = data.attribute;
