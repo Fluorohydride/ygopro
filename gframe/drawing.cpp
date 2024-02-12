@@ -318,8 +318,21 @@ void Game::DrawCards() {
 		for(auto it = dField.extra[p].begin(); it != dField.extra[p].end(); ++it)
 			DrawCard(*it);
 	}
-	for(auto cit = dField.overlay_cards.begin(); cit != dField.overlay_cards.end(); ++cit)
-		DrawCard(*cit);
+	for (auto cit = dField.overlay_cards.begin(); cit != dField.overlay_cards.end(); ++cit) {
+		auto pcard = (*cit);
+		auto olcard = pcard->overlayTarget;
+		if (pcard->aniFrame) {
+			DrawCard(pcard);
+		}
+		else if (olcard && olcard->location == LOCATION_MZONE) {
+			if (pcard->sequence < MAX_LAYER_COUNT) {
+				DrawCard(pcard);
+			}
+		}
+		else {
+			DrawCard(pcard);
+		}
+	}
 }
 void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->aniFrame) {
@@ -518,12 +531,29 @@ void Game::DrawMisc() {
 	driver->draw2DImage(imageManager.tLPFrame, Resize(330, 10, 629, 30), recti(0, 0, 200, 20), 0, 0, true);
 	driver->draw2DImage(imageManager.tLPFrame, Resize(691, 10, 990, 30), recti(0, 0, 200, 20), 0, 0, true);
 	if(dInfo.start_lp) {
-		if(dInfo.lp[0] >= dInfo.start_lp)
-			driver->draw2DImage(imageManager.tLPBar, Resize(335, 12, 625, 28), recti(0, 0, 16, 16), 0, 0, true);
-		else driver->draw2DImage(imageManager.tLPBar, Resize(335, 12, 335 + 290 * dInfo.lp[0] / dInfo.start_lp, 28), recti(0, 0, 16, 16), 0, 0, true);
-		if(dInfo.lp[1] >= dInfo.start_lp)
-			driver->draw2DImage(imageManager.tLPBar, Resize(696, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
-		else driver->draw2DImage(imageManager.tLPBar, Resize(986 - 290 * dInfo.lp[1] / dInfo.start_lp, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
+		auto maxLP = dInfo.isTag ? dInfo.start_lp / 2 : dInfo.start_lp;
+		if(dInfo.lp[0] >= maxLP) {
+			auto layerCount = dInfo.lp[0] / maxLP;
+			auto partialLP = dInfo.lp[0] % maxLP;
+			auto bgColorPos = (layerCount - 1) % 5;
+			auto fgColorPos = layerCount % 5; 
+			driver->draw2DImage(imageManager.tLPBar, Resize(335 + 290 * partialLP / maxLP, 12, 625, 28), recti(0, bgColorPos * 16, 16, (bgColorPos + 1) * 16), 0, 0, true);
+			if(partialLP > 0) {
+				driver->draw2DImage(imageManager.tLPBar, Resize(335, 12, 335 + 290 * partialLP / maxLP, 28), recti(0, fgColorPos * 16, 16, (fgColorPos + 1) * 16), 0, 0, true);
+			}
+		}
+		else driver->draw2DImage(imageManager.tLPBar, Resize(335, 12, 335 + 290 * dInfo.lp[0] / maxLP, 28), recti(0, 0, 16, 16), 0, 0, true);
+		if(dInfo.lp[1] >= maxLP) {
+			auto layerCount = dInfo.lp[1] / maxLP;
+			auto partialLP = dInfo.lp[1] % maxLP;
+			auto bgColorPos = (layerCount - 1) % 5;
+			auto fgColorPos = layerCount % 5;
+			driver->draw2DImage(imageManager.tLPBar, Resize(696, 12, 986 - 290 * partialLP / maxLP, 28), recti(0, bgColorPos * 16, 16, (bgColorPos + 1) * 16), 0, 0, true);
+			if(partialLP > 0) {
+				driver->draw2DImage(imageManager.tLPBar, Resize(986 - 290 * partialLP / maxLP, 12, 986, 28), recti(0, fgColorPos * 16, 16, (fgColorPos + 1) * 16), 0, 0, true);
+			}
+		}
+		else driver->draw2DImage(imageManager.tLPBar, Resize(986 - 290 * dInfo.lp[1] / maxLP, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
 	}
 	if(lpframe) {
 		dInfo.lp[lpplayer] -= lpd;
@@ -547,20 +577,22 @@ void Game::DrawMisc() {
 	DrawShadowText(numFont, dInfo.strLP[0], Resize(330, 12, 631, 30), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true, false, 0);
 	DrawShadowText(numFont, dInfo.strLP[1], Resize(691, 12, 992, 30), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true, false, 0);
 
-	recti p1size = Resize(335, 31, 629, 50);
-	recti p2size = Resize(986, 31, 986, 50);
-	if(!dInfo.isTag || !dInfo.tag_player[0])
-		textFont->draw(dInfo.hostname, p1size, 0xffffffff, false, false, 0);
-	else
-		textFont->draw(dInfo.hostname_tag, p1size, 0xffffffff, false, false, 0);
-	if(!dInfo.isTag || !dInfo.tag_player[1]) {
-		auto cld = textFont->getDimension(dInfo.clientname);
-		p2size.UpperLeftCorner.X -= cld.Width;
-		textFont->draw(dInfo.clientname, p2size, 0xffffffff, false, false, 0);
-	} else {
-		auto cld = textFont->getDimension(dInfo.clientname_tag);
-		p2size.UpperLeftCorner.X -= cld.Width;
-		textFont->draw(dInfo.clientname_tag, p2size, 0xffffffff, false, false, 0);
+	if(!gameConf.hide_player_name) {
+		recti p1size = Resize(335, 31, 629, 50);
+		recti p2size = Resize(986, 31, 986, 50);
+		if(!dInfo.isTag || !dInfo.tag_player[0])
+			textFont->draw(dInfo.hostname, p1size, 0xffffffff, false, false, 0);
+		else
+			textFont->draw(dInfo.hostname_tag, p1size, 0xffffffff, false, false, 0);
+		if(!dInfo.isTag || !dInfo.tag_player[1]) {
+			auto cld = textFont->getDimension(dInfo.clientname);
+			p2size.UpperLeftCorner.X -= cld.Width;
+			textFont->draw(dInfo.clientname, p2size, 0xffffffff, false, false, 0);
+		} else {
+			auto cld = textFont->getDimension(dInfo.clientname_tag);
+			p2size.UpperLeftCorner.X -= cld.Width;
+			textFont->draw(dInfo.clientname_tag, p2size, 0xffffffff, false, false, 0);
+		}
 	}
 	driver->draw2DRectangle(Resize(632, 10, 688, 30), 0x00000000, 0x00000000, 0xffffffff, 0xffffffff);
 	driver->draw2DRectangle(Resize(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);

@@ -27,14 +27,14 @@ private:
 	static bool is_host;
 	static event_base* client_base;
 	static bufferevent* client_bev;
-	static char duel_client_read[0x2000];
-	static char duel_client_write[0x2000];
+	static unsigned char duel_client_read[0x2000];
+	static unsigned char duel_client_write[0x2000];
 	static bool is_closing;
 	static bool is_swapping;
 	static int select_hint;
 	static int select_unselect_hint;
 	static int last_select_hint;
-	static char last_successful_msg[0x2000];
+	static unsigned char last_successful_msg[0x2000];
 	static unsigned int last_successful_msg_length;
 	static wchar_t event_string[256];
 	static mt19937 rnd;
@@ -45,28 +45,28 @@ public:
 	static void ClientRead(bufferevent* bev, void* ctx);
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread();
-	static void HandleSTOCPacketLan(char* data, unsigned int len);
-	static int ClientAnalyze(char* msg, unsigned int len);
+	static void HandleSTOCPacketLan(unsigned char* data, unsigned int len);
+	static int ClientAnalyze(unsigned char* msg, unsigned int len);
 	static void SwapField();
 	static void SetResponseI(int respI);
 	static void SetResponseB(void* respB, unsigned char len);
 	static void SendResponse();
 	static void SendPacketToServer(unsigned char proto) {
-		char* p = duel_client_write;
+		auto p = duel_client_write;
 		BufferIO::WriteInt16(p, 1);
 		BufferIO::WriteInt8(p, proto);
 		bufferevent_write(client_bev, duel_client_write, 3);
 	}
 	template<typename ST>
 	static void SendPacketToServer(unsigned char proto, ST& st) {
-		char* p = duel_client_write;
+		auto p = duel_client_write;
 		BufferIO::WriteInt16(p, 1 + sizeof(ST));
 		BufferIO::WriteInt8(p, proto);
 		memcpy(p, &st, sizeof(ST));
 		bufferevent_write(client_bev, duel_client_write, sizeof(ST) + 3);
 	}
 	static void SendBufferToServer(unsigned char proto, void* buffer, size_t len) {
-		char* p = duel_client_write;
+		auto p = duel_client_write;
 		BufferIO::WriteInt16(p, 1 + len);
 		BufferIO::WriteInt8(p, proto);
 		memcpy(p, buffer, len);

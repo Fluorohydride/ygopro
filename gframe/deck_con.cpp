@@ -40,23 +40,6 @@ static int parse_filter(const wchar_t* pstr, unsigned int* type) {
 	return 0;
 }
 
-static bool check_set_code(const CardDataC& data, int set_code) {
-	unsigned long long sc = data.setcode;
-	if (data.alias) {
-		auto aptr = dataManager._datas.find(data.alias);
-		if (aptr != dataManager._datas.end())
-			sc = aptr->second.setcode;
-	}
-	bool res = false;
-	int settype = set_code & 0xfff;
-	int setsubtype = set_code & 0xf000;
-	while (sc) {
-		if ((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype)
-			res = true;
-		sc = sc >> 16;
-	}
-	return res;
-}
 
 static inline bool havePopupWindow() {
 	return mainGame->wQuery->isVisible() || mainGame->wCategories->isVisible() || mainGame->wLinkMarks->isVisible() || mainGame->wDeckManage->isVisible() || mainGame->wDMQuery->isVisible();
@@ -79,7 +62,7 @@ void DeckBuilder::Initialize() {
 	mainGame->btnSideReload->setVisible(false);
 	filterList = &deckManager._lfList[mainGame->gameConf.use_lflist ? mainGame->gameConf.default_lflist : deckManager._lfList.size() - 1].content;
 	ClearSearch();
-	rnd.reset((unsigned int)time(nullptr));
+	rnd.reset((uint_fast32_t)time(nullptr));
 	mouse_pos.set(0, 0);
 	hovered_code = 0;
 	hovered_pos = 0;
@@ -652,8 +635,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				mainGame->ClearCardInfo();
-				char deckbuf[1024];
-				char* pdeck = deckbuf;
+				unsigned char deckbuf[1024];
+				auto pdeck = deckbuf;
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
 				for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
@@ -1030,7 +1013,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			dragx = event.MouseInput.X;
 			dragy = event.MouseInput.Y;
 			draging_pointer = dataManager.GetCodePointer(hovered_code);
-			if(draging_pointer == dataManager._datas.end())
+			if(draging_pointer == dataManager.datas_end)
 				break;
 			if(hovered_pos == 4) {
 				if(!check_limit(draging_pointer))
@@ -1084,7 +1067,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(hovered_pos == 0 || hovered_seq == -1)
 					break;
 				auto pointer = dataManager.GetCodePointer(hovered_code);
-				if(pointer == dataManager._datas.end())
+				if(pointer == dataManager.datas_end)
 					break;
 				soundManager.PlaySoundEffect(SOUND_CARD_DROP);
 				if(hovered_pos == 1) {
@@ -1119,7 +1102,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					pop_side(hovered_seq);
 				} else {
 					auto pointer = dataManager.GetCodePointer(hovered_code);
-					if(pointer == dataManager._datas.end())
+					if(pointer == dataManager.datas_end)
 						break;
 					if(!check_limit(pointer))
 						break;
@@ -1154,6 +1137,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if (is_draging)
 				break;
 			auto pointer = dataManager.GetCodePointer(hovered_code);
+			if (pointer == dataManager.datas_end)
+				break;
 			if(!check_limit(pointer))
 				break;
 			soundManager.PlaySoundEffect(SOUND_CARD_PICK);
@@ -1351,7 +1336,7 @@ void DeckBuilder::FilterCards() {
 	results.clear();
 	struct element_t {
 		std::wstring keyword;
-		int setcode;
+		unsigned int setcode;
 		enum class type_t {
 			all,
 			name,
@@ -1421,9 +1406,11 @@ void DeckBuilder::FilterCards() {
 			query_elements.push_back(element);
 		}
 	}
-	auto strpointer = dataManager._strings.begin();
-	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
+	for(code_pointer ptr = dataManager.datas_begin; ptr != dataManager.datas_end; ++ptr) {
 		const CardDataC& data = ptr->second;
+		auto strpointer = dataManager.GetStringPointer(ptr->first);
+		if (strpointer == dataManager.strings_end)
+			continue;
 		const CardString& text = strpointer->second;
 		if(data.type & TYPE_TOKEN)
 			continue;
@@ -1502,14 +1489,14 @@ void DeckBuilder::FilterCards() {
 			if (elements_iterator->type == element_t::type_t::name) {
 				match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str());
 			} else if (elements_iterator->type == element_t::type_t::setcode) {
-				match = elements_iterator->setcode && check_set_code(data, elements_iterator->setcode);
+				match = elements_iterator->setcode && data.is_setcode(elements_iterator->setcode);
 			} else {
 				int trycode = BufferIO::GetVal(elements_iterator->keyword.c_str());
 				bool tryresult = dataManager.GetData(trycode, 0);
 				if(!tryresult) {
 					match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str())
 						|| text.text.find(elements_iterator->keyword) != std::wstring::npos
-						|| (elements_iterator->setcode && check_set_code(data, elements_iterator->setcode));
+						|| (elements_iterator->setcode && data.is_setcode(elements_iterator->setcode));
 				} else {
 					match = data.code == trycode || data.alias == trycode;
 				}
