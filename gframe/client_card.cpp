@@ -5,50 +5,32 @@
 
 namespace ygo {
 
-ClientCard::ClientCard() {
-	curAlpha = 255;
-	dAlpha = 0;
-	aniFrame = 0;
-	is_moving = false;
-	is_fading = false;
-	is_hovered = false;
-	is_selectable = false;
-	is_selected = false;
-	is_showequip = false;
-	is_showtarget = false;
-	is_showchaintarget = false;
-	is_highlighting = false;
-	status = 0;
-	is_reversed = false;
-	cmdFlag = 0;
-	code = 0;
-	chain_code = 0;
-	location = 0;
-	type = 0;
-	alias = 0;
-	level = 0;
-	rank = 0;
-	link = 0;
-	race = 0;
-	attribute = 0;
-	attack = 0;
-	defense = 0;
-	base_attack = 0;
-	base_defense = 0;
-	lscale = 0;
-	rscale = 0;
-	link_marker = 0;
-	position = 0;
-	cHint = 0;
-	chValue = 0;
-	atkstring[0] = 0;
-	defstring[0] = 0;
-	lvstring[0] = 0;
-	linkstring[0] = 0;
-	rscstring[0] = 0;
-	lscstring[0] = 0;
-	overlayTarget = 0;
-	equipTarget = 0;
+ClientCard::~ClientCard() {
+	ClearTarget();
+	if (equipTarget) {
+		equipTarget->is_showequip = false;
+		equipTarget->equipped.erase(this);
+		equipTarget = nullptr;
+	}
+	for (auto& card : equipped) {
+		card->is_showequip = false;
+		card->equipTarget = nullptr;
+	}
+	equipped.clear();
+	if (overlayTarget) {
+		for (auto it = overlayTarget->overlayed.begin(); it != overlayTarget->overlayed.end(); ) {
+			if (*it == this) {
+				it = overlayTarget->overlayed.erase(it);
+			}
+			else
+				++it;
+		}
+		overlayTarget = nullptr;
+	}
+	for (auto& card : overlayed) {
+		card->overlayTarget = nullptr;
+	}
+	overlayed.clear();
 }
 void ClientCard::SetCode(int code) {
 	if((location == LOCATION_HAND) && (this->code != (unsigned int)code)) {
@@ -57,13 +39,16 @@ void ClientCard::SetCode(int code) {
 	} else
 		this->code = code;
 }
-void ClientCard::UpdateInfo(char* buf) {
+void ClientCard::UpdateInfo(unsigned char* buf) {
 	int flag = BufferIO::ReadInt32(buf);
-	if(flag == 0)
+	if (flag == 0) {
+		ClearData();
 		return;
-	int pdata;
+	}
 	if(flag & QUERY_CODE) {
-		pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::ReadInt32(buf);
+		if (!pdata)
+			ClearData();
 		if((location == LOCATION_HAND) && ((unsigned int)pdata != code)) {
 			code = pdata;
 			mainGame->dField.MoveCard(this, 5);
@@ -71,7 +56,7 @@ void ClientCard::UpdateInfo(char* buf) {
 			code = pdata;
 	}
 	if(flag & QUERY_POSITION) {
-		pdata = (BufferIO::ReadInt32(buf) >> 24) & 0xff;
+		int pdata = (BufferIO::ReadInt32(buf) >> 24) & 0xff;
 		if((location & (LOCATION_EXTRA | LOCATION_REMOVED)) && (u8)pdata != position) {
 			position = pdata;
 			mainGame->dField.MoveCard(this, 1);
@@ -83,14 +68,14 @@ void ClientCard::UpdateInfo(char* buf) {
 	if(flag & QUERY_TYPE)
 		type = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_LEVEL) {
-		pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::ReadInt32(buf);
 		if(level != (unsigned int)pdata) {
 			level = pdata;
 			myswprintf(lvstring, L"L%d", level);
 		}
 	}
 	if(flag & QUERY_RANK) {
-		pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::ReadInt32(buf);
 		if(pdata && rank != (unsigned int)pdata) {
 			rank = pdata;
 			myswprintf(lvstring, L"R%d", rank);
@@ -133,8 +118,10 @@ void ClientCard::UpdateInfo(char* buf) {
 		int s = BufferIO::ReadInt8(buf);
 		BufferIO::ReadInt8(buf);
 		ClientCard* ecard = mainGame->dField.GetCard(mainGame->LocalPlayer(c), l, s);
-		equipTarget = ecard;
-		ecard->equipped.insert(this);
+		if (ecard) {
+			equipTarget = ecard;
+			ecard->equipped.insert(this);
+		}
 	}
 	if(flag & QUERY_TARGET_CARD) {
 		int count = BufferIO::ReadInt32(buf);
@@ -144,8 +131,10 @@ void ClientCard::UpdateInfo(char* buf) {
 			int s = BufferIO::ReadInt8(buf);
 			BufferIO::ReadInt8(buf);
 			ClientCard* tcard = mainGame->dField.GetCard(mainGame->LocalPlayer(c), l, s);
-			cardTarget.insert(tcard);
-			tcard->ownerTarget.insert(this);
+			if (tcard) {
+				cardTarget.insert(tcard);
+				tcard->ownerTarget.insert(this);
+			}
 		}
 	}
 	if(flag & QUERY_OVERLAY_CARD) {
@@ -175,7 +164,7 @@ void ClientCard::UpdateInfo(char* buf) {
 		myswprintf(rscstring, L"%d", rscale);
 	}
 	if(flag & QUERY_LINK) {
-		pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::ReadInt32(buf);
 		if (link != (unsigned int)pdata) {
 			link = pdata;
 		}
@@ -198,6 +187,31 @@ void ClientCard::ClearTarget() {
 	cardTarget.clear();
 	ownerTarget.clear();
 }
+void ClientCard::ClearData() {
+	alias = 0;
+	type = 0;
+	level = 0;
+	rank = 0;
+	race = 0;
+	attribute = 0;
+	attack = 0;
+	defense = 0;
+	base_attack = 0;
+	base_defense = 0;
+	lscale = 0;
+	rscale = 0;
+	link = 0;
+	link_marker = 0;
+	status = 0;
+	
+	atkstring[0] = 0;
+	defstring[0] = 0;
+	lvstring[0] = 0;
+	linkstring[0] = 0;
+	rscstring[0] = 0;
+	lscstring[0] = 0;
+	counters.clear();
+}
 bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 	if(c1->is_selected != c2->is_selected)
 		return c1->is_selected < c2->is_selected;
@@ -207,23 +221,26 @@ bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 		return cp1 < cp2;
 	if(c1->location != c2->location)
 		return c1->location < c2->location;
-	if(c1->location & LOCATION_OVERLAY)
-		if(c1->overlayTarget != c2->overlayTarget)
+	if (c1->location & LOCATION_OVERLAY) {
+		if (c1->overlayTarget != c2->overlayTarget)
 			return c1->overlayTarget->sequence < c2->overlayTarget->sequence;
-		else return c1->sequence < c2->sequence;
+		else
+			return c1->sequence < c2->sequence;
+	}
 	else {
 		if(c1->location & (LOCATION_DECK | LOCATION_GRAVE | LOCATION_REMOVED | LOCATION_EXTRA)) {
-			auto it1 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c1](const auto& ch) {
+			auto it1 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c1](const ChainInfo& ch) {
 				return c1 == ch.chain_card || ch.target.find(c1) != ch.target.end();
 				});
-			auto it2 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c2](const auto& ch) {
+			auto it2 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c2](const ChainInfo& ch) {
 				return c2 == ch.chain_card || ch.target.find(c2) != ch.target.end();
 				});
 			if(it1 != mainGame->dField.chains.rend() || it2 != mainGame->dField.chains.rend()) {
 				return it1 < it2;
 			}
 			return c1->sequence > c2->sequence;
-		} else
+		}
+		else
 			return c1->sequence < c2->sequence;
 	}
 }

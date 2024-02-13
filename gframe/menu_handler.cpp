@@ -16,8 +16,8 @@ void UpdateDeck() {
 		mainGame->gameConf.lastcategory, 64);
 	BufferIO::CopyWStr(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()),
 		mainGame->gameConf.lastdeck, 64);
-	char deckbuf[1024];
-	char* pdeck = deckbuf;
+	unsigned char deckbuf[1024];
+	auto pdeck = deckbuf;
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
 	for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
@@ -314,11 +314,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				for(int i = 0; i < max; ++i) {
 					int main = replay.ReadInt32();
 					Deck tmp_deck;
-					for(int j = 0; j < main; ++j)
-						tmp_deck.main.push_back(dataManager.GetCodePointer(replay.ReadInt32()));
+					for (int j = 0; j < main; ++j) {
+						auto card = dataManager.GetCodePointer(replay.ReadInt32());
+						if (card != dataManager.datas_end)
+							tmp_deck.main.push_back(card);
+					}
 					int extra = replay.ReadInt32();
-					for(int j = 0; j < extra; ++j)
-						tmp_deck.extra.push_back(dataManager.GetCodePointer(replay.ReadInt32()));
+					for (int j = 0; j < extra; ++j) {
+						auto card = dataManager.GetCodePointer(replay.ReadInt32());
+						if (card != dataManager.datas_end)
+							tmp_deck.extra.push_back(card);
+					}
 					FileSystem::SafeFileName(namebuf[i]);
 					myswprintf(filename, L"deck/%ls-%d %ls.ydk", ex_filename, i + 1, namebuf[i]);
 					deckManager.SaveDeck(tmp_deck, filename);
