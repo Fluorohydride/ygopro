@@ -20,8 +20,8 @@ namespace ygo {
 class DuelClient {
 private:
 	static unsigned int connect_state;
-	static unsigned char response_buf[64];
-	static unsigned char response_len;
+	static unsigned char response_buf[SIZE_RETURN_VALUE];
+	static unsigned int response_len;
 	static unsigned int watching;
 	static unsigned char selftype;
 	static bool is_host;
@@ -49,7 +49,7 @@ public:
 	static int ClientAnalyze(unsigned char* msg, unsigned int len);
 	static void SwapField();
 	static void SetResponseI(int respI);
-	static void SetResponseB(void* respB, unsigned char len);
+	static void SetResponseB(void* respB, unsigned int len);
 	static void SendResponse();
 	static void SendPacketToServer(unsigned char proto) {
 		auto p = duel_client_write;
