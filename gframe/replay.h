@@ -50,7 +50,7 @@ public:
 	static bool CheckReplay(const wchar_t* name);
 	static bool DeleteReplay(const wchar_t* name);
 	static bool RenameReplay(const wchar_t* oldname, const wchar_t* newname);
-	bool ReadNextResponse(unsigned char resp[64]);
+	bool ReadNextResponse(unsigned char resp[]);
 	void ReadName(wchar_t* data);
 	//void ReadHeader(ReplayHeader& header);
 	void ReadData(void* data, int length);
