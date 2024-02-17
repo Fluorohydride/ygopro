@@ -13,12 +13,7 @@ namespace ygo {
 
 class DataManager {
 public:
-	DataManager(): _datas(16384), _strings(16384) {
-		datas_begin = _datas.begin();
-		datas_end = _datas.end();
-		strings_begin = _strings.begin();
-		strings_end = _strings.end();
-	}
+	DataManager();
 	bool LoadDB(const wchar_t* wfile);
 	bool LoadStrings(const char* file);
 #ifndef YGOPRO_SERVER_MODE
@@ -47,7 +42,7 @@ public:
 	const wchar_t* FormatAttribute(int attribute);
 	const wchar_t* FormatRace(int race);
 	const wchar_t* FormatType(int type);
-	const wchar_t* FormatSetName(unsigned long long setcode);
+	const wchar_t* FormatSetName(const uint16_t setcode[]);
 	const wchar_t* FormatLinkMarker(int link_marker);
 
 	std::unordered_map<unsigned int, std::wstring> _counterStrings;
@@ -79,6 +74,7 @@ public:
 private:
 	std::unordered_map<unsigned int, CardDataC> _datas;
 	std::unordered_map<unsigned int, CardString> _strings;
+	std::unordered_map<unsigned int, std::vector<uint16_t>> extra_setcode;
 };
 
 extern DataManager dataManager;

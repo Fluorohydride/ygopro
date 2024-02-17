@@ -1768,7 +1768,9 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 	return 0;
 }
 void SingleDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
-	byte resb[64];
+	byte resb[SIZE_RETURN_VALUE];
+	if (len > SIZE_RETURN_VALUE)
+		len = SIZE_RETURN_VALUE;
 	memcpy(resb, pdata, len);
 	last_replay.WriteInt8(len);
 	last_replay.WriteData(resb, len);
