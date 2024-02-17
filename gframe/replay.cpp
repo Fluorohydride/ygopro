@@ -314,11 +314,11 @@ bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 	return result == 0;
 #endif
 }
-bool Replay::ReadNextResponse(unsigned char resp[64]) {
+bool Replay::ReadNextResponse(unsigned char resp[]) {
 	if(pdata - replay_data >= (int)replay_size)
 		return false;
 	int len = *pdata++;
-	if(len > 64)
+	if(len > SIZE_RETURN_VALUE)
 		return false;
 	memcpy(resp, pdata, len);
 	pdata += len;

@@ -75,16 +75,19 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
-			auto it = extra_setcode.find(cd.code);
-			if (it != extra_setcode.end()) {
-				int len = it->second.size();
-				if (len > SIZE_SETCODE)
-					len = SIZE_SETCODE;
-				if (len)
-					memcpy(cd.setcode, it->second.data(), len * sizeof(uint16_t));
+			auto setcode = sqlite3_column_int64(pStmt, 3);
+			if (setcode) {
+				auto it = extra_setcode.find(cd.code);
+				if (it != extra_setcode.end()) {
+					int len = it->second.size();
+					if (len > SIZE_SETCODE)
+						len = SIZE_SETCODE;
+					if (len)
+						memcpy(cd.setcode, it->second.data(), len * sizeof(uint16_t));
+				}
+				else
+					cd.set_setcode(setcode);
 			}
-			else
-				cd.set_setcode(sqlite3_column_int64(pStmt, 3));
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defense = sqlite3_column_int(pStmt, 6);
