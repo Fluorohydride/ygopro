@@ -9,8 +9,8 @@ event_base* NetServer::net_evbase = 0;
 event* NetServer::broadcast_ev = 0;
 evconnlistener* NetServer::listener = 0;
 DuelMode* NetServer::duel_mode = 0;
-unsigned char NetServer::net_server_read[0x2000];
-unsigned char NetServer::net_server_write[0x2000];
+unsigned char NetServer::net_server_read[SIZE_NETWORK_BUFFER];
+unsigned char NetServer::net_server_write[SIZE_NETWORK_BUFFER];
 unsigned short NetServer::last_sent = 0;
 
 bool NetServer::StartServer(unsigned short port) {
