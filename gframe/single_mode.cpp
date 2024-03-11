@@ -55,7 +55,7 @@ int SingleMode::SinglePlayThread() {
 	if(mainGame->chkSinglePlayReturnDeckTop->isChecked())
 		opt |= DUEL_RETURN_DECK_TOP;
 	char filename[256];
-	size_t slen = 0;
+	int slen = 0;
 	if(open_file) {
 		open_file = false;
 		slen = BufferIO::EncodeUTF8(open_file_name, filename);
