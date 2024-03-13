@@ -12,15 +12,15 @@
 namespace ygo {
 
 unsigned DuelClient::connect_state = 0;
-unsigned char DuelClient::response_buf[64];
-unsigned char DuelClient::response_len = 0;
+unsigned char DuelClient::response_buf[SIZE_RETURN_VALUE];
+unsigned int DuelClient::response_len = 0;
 unsigned int DuelClient::watching = 0;
 unsigned char DuelClient::selftype = 0;
 bool DuelClient::is_host = false;
 event_base* DuelClient::client_base = 0;
 bufferevent* DuelClient::client_bev = 0;
-unsigned char DuelClient::duel_client_read[0x2000];
-unsigned char DuelClient::duel_client_write[0x2000];
+unsigned char DuelClient::duel_client_read[SIZE_NETWORK_BUFFER];
+unsigned char DuelClient::duel_client_write[SIZE_NETWORK_BUFFER];
 bool DuelClient::is_closing = false;
 bool DuelClient::is_swapping = false;
 int DuelClient::select_hint = 0;
@@ -1748,7 +1748,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 		if(selecting_player == mainGame->LocalPlayer(1))
 			mainGame->dField.selectable_field = (mainGame->dField.selectable_field >> 16) | (mainGame->dField.selectable_field << 16);
 		mainGame->dField.selected_field = 0;
-		unsigned char respbuf[64];
+		unsigned char respbuf[SIZE_RETURN_VALUE];
 		int pzone = 0;
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE) {
 			if (select_hint) {
@@ -3935,7 +3935,9 @@ void DuelClient::SetResponseI(int respI) {
 	*((int*)response_buf) = respI;
 	response_len = 4;
 }
-void DuelClient::SetResponseB(void* respB, unsigned char len) {
+void DuelClient::SetResponseB(void* respB, unsigned int len) {
+	if (len > SIZE_RETURN_VALUE)
+		len = SIZE_RETURN_VALUE;
 	memcpy(response_buf, respB, len);
 	response_len = len;
 }

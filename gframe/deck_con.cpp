@@ -40,23 +40,6 @@ static int parse_filter(const wchar_t* pstr, unsigned int* type) {
 	return 0;
 }
 
-static bool check_set_code(const CardDataC& data, int set_code) {
-	unsigned long long sc = data.setcode;
-	if (data.alias) {
-		auto aptr = dataManager.GetCodePointer(data.alias);
-		if (aptr != dataManager.datas_end)
-			sc = aptr->second.setcode;
-	}
-	bool res = false;
-	int settype = set_code & 0xfff;
-	int setsubtype = set_code & 0xf000;
-	while (sc) {
-		if ((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype)
-			res = true;
-		sc = sc >> 16;
-	}
-	return res;
-}
 
 static inline bool havePopupWindow() {
 	return mainGame->wQuery->isVisible() || mainGame->wCategories->isVisible() || mainGame->wLinkMarks->isVisible() || mainGame->wDeckManage->isVisible() || mainGame->wDMQuery->isVisible();
@@ -1353,7 +1336,7 @@ void DeckBuilder::FilterCards() {
 	results.clear();
 	struct element_t {
 		std::wstring keyword;
-		int setcode;
+		unsigned int setcode;
 		enum class type_t {
 			all,
 			name,
@@ -1506,14 +1489,14 @@ void DeckBuilder::FilterCards() {
 			if (elements_iterator->type == element_t::type_t::name) {
 				match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str());
 			} else if (elements_iterator->type == element_t::type_t::setcode) {
-				match = elements_iterator->setcode && check_set_code(data, elements_iterator->setcode);
+				match = elements_iterator->setcode && data.is_setcode(elements_iterator->setcode);
 			} else {
 				int trycode = BufferIO::GetVal(elements_iterator->keyword.c_str());
 				bool tryresult = dataManager.GetData(trycode, 0);
 				if(!tryresult) {
 					match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str())
 						|| text.text.find(elements_iterator->keyword) != std::wstring::npos
-						|| (elements_iterator->setcode && check_set_code(data, elements_iterator->setcode));
+						|| (elements_iterator->setcode && data.is_setcode(elements_iterator->setcode));
 				} else {
 					match = data.code == trycode || data.alias == trycode;
 				}

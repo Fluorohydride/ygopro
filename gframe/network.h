@@ -10,6 +10,8 @@
 #include <event2/thread.h>
 
 namespace ygo {
+	constexpr int SIZE_NETWORK_BUFFER = 0x2000;
+	constexpr int MAX_DATA_SIZE = SIZE_NETWORK_BUFFER - 3;
 
 struct HostInfo {
 	unsigned int lflist{ 0 };

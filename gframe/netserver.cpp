@@ -9,8 +9,8 @@ event_base* NetServer::net_evbase = 0;
 event* NetServer::broadcast_ev = 0;
 evconnlistener* NetServer::listener = 0;
 DuelMode* NetServer::duel_mode = 0;
-unsigned char NetServer::net_server_read[0x2000];
-unsigned char NetServer::net_server_write[0x2000];
+unsigned char NetServer::net_server_read[SIZE_NETWORK_BUFFER];
+unsigned char NetServer::net_server_write[SIZE_NETWORK_BUFFER];
 unsigned short NetServer::last_sent = 0;
 
 #ifdef YGOPRO_SERVER_MODE
@@ -267,7 +267,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, unsigned i
 	case CTOS_RESPONSE: {
 		if(!dp->game || !duel_mode->pduel)
 			return;
-		duel_mode->GetResponse(dp, pdata, len > 64 ? 64 : len - 1);
+		duel_mode->GetResponse(dp, pdata, len - 1);
 		break;
 	}
 	case CTOS_TIME_CONFIRM: {
