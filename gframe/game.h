@@ -199,6 +199,7 @@ public:
 	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(ECURSOR_ICON icon);
+	bool OnCommonEvent(const irr::SEvent& event);
 
 	std::mutex gMutex;
 	Signal frameSignal;

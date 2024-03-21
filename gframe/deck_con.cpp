@@ -112,7 +112,7 @@ void DeckBuilder::Terminate() {
 		mainGame->device->closeDevice();
 }
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
-	if(mainGame->dField.OnCommonEvent(event))
+	if(mainGame->OnCommonEvent(event))
 		return false;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
