@@ -40,9 +40,9 @@ bool NetServer::StartBroadcast() {
 	if(!net_evbase)
 		return false;
 	SOCKET udp = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	BOOL opt = TRUE;
-	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(BOOL));
-	setsockopt(udp, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof(BOOL));
+	int opt = TRUE;
+	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof opt);
+	setsockopt(udp, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof opt);
 	sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
