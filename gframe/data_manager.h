@@ -46,13 +46,13 @@ public:
 	string_pointer strings_begin;
 	string_pointer strings_end;
 
-	wchar_t numStrings[301][4];
-	wchar_t numBuffer[6];
-	wchar_t attBuffer[128];
-	wchar_t racBuffer[128];
-	wchar_t tpBuffer[128];
-	wchar_t scBuffer[128];
-	wchar_t lmBuffer[32];
+	wchar_t numStrings[301][4]{};
+	wchar_t numBuffer[6]{};
+	wchar_t attBuffer[128]{};
+	wchar_t racBuffer[128]{};
+	wchar_t tpBuffer[128]{};
+	wchar_t scBuffer[128]{};
+	wchar_t lmBuffer[32]{};
 
 	static byte scriptBuffer[0x20000];
 	static const wchar_t* unknown_string;
