@@ -15,6 +15,7 @@ const unsigned short PRO_VERSION = 0x1360;
 namespace ygo {
 
 Game* mainGame;
+constexpr int stLimitX1 = 205;
 
 void DuelInfo::Clear() {
 	isStarted = false;
@@ -730,7 +731,7 @@ bool Game::Initialize() {
 	cbCardType2 = env->addComboBox(rect<s32>(125, 25 / 6, 200, 20 + 25 / 6), wFilter, COMBOBOX_SECONDTYPE);
 	cbCardType2->setMaxSelectionRows(10);
 	cbCardType2->addItem(dataManager.GetSysString(1310), 0);
-	stLimit = env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 2 + 25 / 6, 280, 22 + 25 / 6), false, false, wFilter);
+	stLimit = env->addStaticText(dataManager.GetSysString(1315), rect<s32>(stLimitX1, 2 + 25 / 6, 280, 22 + 25 / 6), false, false, wFilter);
 	cbLimit = env->addComboBox(rect<s32>(260, 25 / 6, 390, 20 + 25 / 6), wFilter, COMBOBOX_LIMIT);
 	cbLimit->setMaxSelectionRows(10);
 	cbLimit->addItem(dataManager.GetSysString(1310));
@@ -754,10 +755,10 @@ bool Game::Initialize() {
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter < (1 << RACES_COUNT); filter <<= 1)
 		cbRace->addItem(dataManager.FormatRace(filter), filter);
-	stAttack = env->addStaticText(dataManager.GetSysString(1322), rect<s32>(205, 22 + 50 / 6, 280, 42 + 50 / 6), false, false, wFilter);
+	stAttack = env->addStaticText(dataManager.GetSysString(1322), rect<s32>(stLimitX1, 22 + 50 / 6, 280, 42 + 50 / 6), false, false, wFilter);
 	ebAttack = env->addEditBox(L"", rect<s32>(260, 20 + 50 / 6, 340, 40 + 50 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebAttack->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stDefense = env->addStaticText(dataManager.GetSysString(1323), rect<s32>(205, 42 + 75 / 6, 280, 62 + 75 / 6), false, false, wFilter);
+	stDefense = env->addStaticText(dataManager.GetSysString(1323), rect<s32>(stLimitX1, 42 + 75 / 6, 280, 62 + 75 / 6), false, false, wFilter);
 	ebDefense = env->addEditBox(L"", rect<s32>(260, 40 + 75 / 6, 340, 60 + 75 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebDefense->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stStar = env->addStaticText(dataManager.GetSysString(1324), rect<s32>(10, 62 + 100 / 6, 80, 82 + 100 / 6), false, false, wFilter);
@@ -766,14 +767,14 @@ bool Game::Initialize() {
 	stScale = env->addStaticText(dataManager.GetSysString(1336), rect<s32>(101, 62 + 100 / 6, 150, 82 + 100 / 6), false, false, wFilter);
 	ebScale = env->addEditBox(L"", rect<s32>(150, 60 + 100 / 6, 190, 80 + 100 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stSearch = env->addStaticText(dataManager.GetSysString(1325), rect<s32>(205, 62 + 100 / 6, 280, 82 + 100 / 6), false, false, wFilter);
+	stSearch = env->addStaticText(dataManager.GetSysString(1325), rect<s32>(stLimitX1, 62 + 100 / 6, 280, 82 + 100 / 6), false, false, wFilter);
 	ebCardName = env->addEditBox(L"", rect<s32>(260, 60 + 100 / 6, 390, 80 + 100 / 6), true, wFilter, EDITBOX_KEYWORD);
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnEffectFilter = env->addButton(rect<s32>(345, 20 + 50 / 6, 390, 60 + 75 / 6), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
-	btnStartFilter = env->addButton(rect<s32>(205, 80 + 125 / 6, 390, 100 + 125 / 6), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
+	btnStartFilter = env->addButton(rect<s32>(stLimitX1, 80 + 125 / 6, 390, 100 + 125 / 6), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
 	if(gameConf.separate_clear_button) {
 		btnStartFilter->setRelativePosition(rect<s32>(260, 80 + 125 / 6, 390, 100 + 125 / 6));
-		btnClearFilter = env->addButton(rect<s32>(205, 80 + 125 / 6, 255, 100 + 125 / 6), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
+		btnClearFilter = env->addButton(rect<s32>(stLimitX1, 80 + 125 / 6, 255, 100 + 125 / 6), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
 	}
 	wCategories = env->addWindow(rect<s32>(600, 60, 1000, 305), false, L"");
 	wCategories->getCloseButton()->setVisible(false);
@@ -1840,7 +1841,7 @@ void Game::OnResize() {
 	btnEffectFilter->setRelativePosition(Resize(345, 20 + 50 / 6, 390, 60 + 75 / 6));
 	btnStartFilter->setRelativePosition(Resize(260, 80 + 125 / 6, 390, 100 + 125 / 6));
 	if(btnClearFilter)
-		btnClearFilter->setRelativePosition(Resize(205, 80 + 125 / 6, 255, 100 + 125 / 6));
+		btnClearFilter->setRelativePosition(Resize(stLimitX1, 80 + 125 / 6, 255, 100 + 125 / 6));
 	btnMarksFilter->setRelativePosition(Resize(60, 80 + 125 / 6, 190, 100 + 125 / 6));
 
 	recti btncatepos = btnEffectFilter->getAbsolutePosition();
@@ -1849,18 +1850,17 @@ void Game::OnResize() {
 		btncatepos.LowerRightCorner.Y - btncatepos.getHeight() / 2,
 		btncatepos.LowerRightCorner.X,
 		btncatepos.LowerRightCorner.Y - btncatepos.getHeight() / 2 + 245));
-
 	wLinkMarks->setRelativePosition(ResizeWin(700, 30, 820, 150));
 	stDBCategory->setRelativePosition(Resize(10, 9, 100, 29));
 	stDeck->setRelativePosition(Resize(10, 39, 100, 59));
 	stCategory->setRelativePosition(Resize(10, 2 + 25 / 6, 70, 22 + 25 / 6));
-	stLimit->setRelativePosition(Resize(205, 2 + 25 / 6, 280, 22 + 25 / 6));
+	stLimit->setRelativePosition(Resize(stLimitX1, 2 + 25 / 6, 280, 22 + 25 / 6));
 	stAttribute->setRelativePosition(Resize(10, 22 + 50 / 6, 70, 42 + 50 / 6));
 	stRace->setRelativePosition(Resize(10, 42 + 75 / 6, 70, 62 + 75 / 6));
-	stAttack->setRelativePosition(Resize(205, 22 + 50 / 6, 280, 42 + 50 / 6));
-	stDefense->setRelativePosition(Resize(205, 42 + 75 / 6, 280, 62 + 75 / 6));
+	stAttack->setRelativePosition(Resize(stLimitX1, 22 + 50 / 6, 280, 42 + 50 / 6));
+	stDefense->setRelativePosition(Resize(stLimitX1, 42 + 75 / 6, 280, 62 + 75 / 6));
 	stStar->setRelativePosition(Resize(10, 62 + 100 / 6, 70, 82 + 100 / 6));
-	stSearch->setRelativePosition(Resize(205, 62 + 100 / 6, 280, 82 + 100 / 6));
+	stSearch->setRelativePosition(Resize(stLimitX1, 62 + 100 / 6, 280, 82 + 100 / 6));
 	stScale->setRelativePosition(Resize(105, 62 + 100 / 6, 165, 82 + 100 / 6));
 	btnSideOK->setRelativePosition(Resize(510, 40, 820, 80));
 	btnSideShuffle->setRelativePosition(Resize(310, 100, 370, 130));
