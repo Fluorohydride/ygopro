@@ -15,8 +15,8 @@ const unsigned short PRO_VERSION = 0x1360;
 namespace ygo {
 
 Game* mainGame;
-constexpr int cbCardType2X1 = 130;
-constexpr int cbCardType2X2 = 190;
+constexpr int cbCardType2X1 = 125;
+constexpr int cbCardType2X2 = 195;
 constexpr int stLimitX1 = 205;
 
 void DuelInfo::Clear() {
