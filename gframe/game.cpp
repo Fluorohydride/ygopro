@@ -827,7 +827,7 @@ bool Game::Initialize() {
 	btnCategoryOK = env->addButton(rect<s32>(150, 210, 250, 235), wCategories, BUTTON_CATEGORY_OK, dataManager.GetSysString(1211));
 	int catewidth = 0;
 	for(int i = 0; i < 32; ++i) {
-		irr::core::dimension2d<unsigned int> dtxt = mainGame->guiFont->getDimension(dataManager.GetSysString(1100 + i));
+		irr::core::dimension2d<unsigned int> dtxt = guiFont->getDimension(dataManager.GetSysString(1100 + i));
 		if((int)dtxt.Width + 40 > catewidth)
 			catewidth = dtxt.Width + 40;
 	}
@@ -1619,7 +1619,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
 		int offset_info = 0;
-		irr::core::dimension2d<unsigned int> dtxt = mainGame->guiFont->getDimension(formatBuffer);
+		irr::core::dimension2d<unsigned int> dtxt = guiFont->getDimension(formatBuffer);
 		if(dtxt.Width > (300 * xScale - 13) - 15)
 			offset_info = 15;
 		if(!(cd.type & TYPE_LINK)) {
@@ -1653,7 +1653,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		}
 		stDataInfo->setText(formatBuffer);
 		int offset_arrows = offset_info;
-		dtxt = mainGame->guiFont->getDimension(formatBuffer);
+		dtxt = guiFont->getDimension(formatBuffer);
 		if(dtxt.Width > (300 * xScale - 13) - 15)
 			offset_arrows += 15;
 		stInfo->setRelativePosition(rect<s32>(15, 37, 300 * xScale - 13, (60 + offset_info)));
@@ -1989,8 +1989,8 @@ void Game::OnResize() {
 		scrTabSystem->setVisible(false);
 
 	if(gameConf.resize_popup_menu) {
-		int width = 100 * mainGame->xScale;
-		int height = (mainGame->yScale >= 0.666) ? 21 * mainGame->yScale : 14;
+		int width = 100 * xScale;
+		int height = (yScale >= 0.666) ? 21 * yScale : 14;
 		wCmdMenu->setRelativePosition(recti(1, 1, width + 1, 1));
 		btnActivate->setRelativePosition(recti(1, 1, width, height));
 		btnSummon->setRelativePosition(recti(1, 1, width, height));
@@ -2170,7 +2170,7 @@ void Game::FlashWindow() {
 #endif
 }
 void Game::SetCursor(ECURSOR_ICON icon) {
-	ICursorControl* cursor = mainGame->device->getCursorControl();
+	ICursorControl* cursor = device->getCursorControl();
 	if(cursor->getActiveIcon() != icon) {
 		cursor->setActiveIcon(icon);
 	}
