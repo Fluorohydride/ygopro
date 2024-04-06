@@ -8,35 +8,39 @@
 class BufferIO {
 public:
 	inline static int ReadInt32(unsigned char*& p) {
-		int ret = *(int*)p;
+		int ret = 0;
+		memcpy(&ret, p, sizeof ret);
 		p += 4;
 		return ret;
 	}
 	inline static short ReadInt16(unsigned char*& p) {
-		short ret = *(short*)p;
+		short ret = 0;
+		memcpy(&ret, p, sizeof ret);
 		p += 2;
 		return ret;
 	}
 	inline static char ReadInt8(unsigned char*& p) {
-		char ret = *(char*)p;
+		char ret = 0;
+		memcpy(&ret, p, sizeof ret);
 		p++;
 		return ret;
 	}
 	inline static unsigned char ReadUInt8(unsigned char*& p) {
-		unsigned char ret = *(unsigned char*)p;
+		unsigned char ret = 0;
+		memcpy(&ret, p, sizeof ret);
 		p++;
 		return ret;
 	}
 	inline static void WriteInt32(unsigned char*& p, int val) {
-		(*(int*)p) = val;
+		memcpy(p, &val, sizeof val);
 		p += 4;
 	}
 	inline static void WriteInt16(unsigned char*& p, short val) {
-		(*(short*)p) = val;
+		memcpy(p, &val, sizeof val);
 		p += 2;
 	}
 	inline static void WriteInt8(unsigned char*& p, char val) {
-		*p = val;
+		memcpy(p, &val, sizeof val);
 		p++;
 	}
 	template<typename T1, typename T2>
