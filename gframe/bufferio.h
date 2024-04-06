@@ -5,6 +5,8 @@
 #pragma warning(disable: 4244)
 #endif
 
+#include <cstring>
+
 class BufferIO {
 public:
 	inline static int ReadInt32(unsigned char*& p) {
