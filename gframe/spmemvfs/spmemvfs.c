@@ -239,7 +239,6 @@ typedef struct spmemvfs_cb_t {
 } spmemvfs_cb_t;
 
 typedef struct spmemvfs_t {
-	sqlite3_vfs base;
 	spmemvfs_cb_t cb;
 	sqlite3_vfs * parent;
 } spmemvfs_t;
@@ -256,33 +255,34 @@ static int spmemvfsRandomness( sqlite3_vfs * vfs, int len, char * buffer );
 static int spmemvfsSleep( sqlite3_vfs * vfs, int microseconds );
 static int spmemvfsCurrentTime( sqlite3_vfs * vfs, double * result );
 
+static sqlite3_vfs spmemvfs = {
+	1,                                           /* iVersion */
+	0,                                           /* szOsFile */
+	0,                                           /* mxPathname */
+	0,                                           /* pNext */
+	SPMEMVFS_NAME,                               /* zName */
+	0,                                           /* pAppData */
+	spmemvfsOpen,                                /* xOpen */
+	spmemvfsDelete,                              /* xDelete */
+	spmemvfsAccess,                              /* xAccess */
+	spmemvfsFullPathname,                        /* xFullPathname */
+	spmemvfsDlOpen,                              /* xDlOpen */
+	spmemvfsDlError,                             /* xDlError */
+	spmemvfsDlSym,                               /* xDlSym */
+	spmemvfsDlClose,                             /* xDlClose */
+	spmemvfsRandomness,                          /* xRandomness */
+	spmemvfsSleep,                               /* xSleep */
+	spmemvfsCurrentTime                          /* xCurrentTime */
+};
+
 static spmemvfs_t g_spmemvfs = {
-	{
-		1,                                           /* iVersion */
-		0,                                           /* szOsFile */
-		0,                                           /* mxPathname */
-		0,                                           /* pNext */
-		SPMEMVFS_NAME,                               /* zName */
-		0,                                           /* pAppData */
-		spmemvfsOpen,                                /* xOpen */
-		spmemvfsDelete,                              /* xDelete */
-		spmemvfsAccess,                              /* xAccess */
-		spmemvfsFullPathname,                        /* xFullPathname */
-		spmemvfsDlOpen,                              /* xDlOpen */
-		spmemvfsDlError,                             /* xDlError */
-		spmemvfsDlSym,                               /* xDlSym */
-		spmemvfsDlClose,                             /* xDlClose */
-		spmemvfsRandomness,                          /* xRandomness */
-		spmemvfsSleep,                               /* xSleep */
-		spmemvfsCurrentTime                          /* xCurrentTime */
-	}, 
 	{ 0 },
 	0                                                /* pParent */
 };
 
 int spmemvfsOpen( sqlite3_vfs * vfs, const char * path, sqlite3_file * file, int flags, int * outflags )
 {
-	spmemvfs_t * memvfs = (spmemvfs_t*)vfs;
+	spmemvfs_t * memvfs = &g_spmemvfs;
 	spmemfile_t * memfile = (spmemfile_t*)file;
 
 	spmemvfsDebug( "call %s( %p(%p), %s, %p, %x, %p )\n",
@@ -372,12 +372,12 @@ int spmemvfs_init( spmemvfs_cb_t * cb )
 
 	g_spmemvfs.parent = parent;
 
-	g_spmemvfs.base.mxPathname = parent->mxPathname;
-	g_spmemvfs.base.szOsFile = sizeof( spmemfile_t );
+	spmemvfs.mxPathname = parent->mxPathname;
+	spmemvfs.szOsFile = sizeof(spmemfile_t);
 
 	g_spmemvfs.cb = * cb;
 
-	return sqlite3_vfs_register( (sqlite3_vfs*)&g_spmemvfs, 0 );
+	return sqlite3_vfs_register(&spmemvfs, 0);
 }
 
 //===========================================================================
@@ -470,7 +470,7 @@ void spmemvfs_env_fini()
 	if( NULL != g_spmemvfs_env ) {
 		spmembuffer_link_t * iter = NULL;
 
-		sqlite3_vfs_unregister( (sqlite3_vfs*)&g_spmemvfs );
+		sqlite3_vfs_unregister(&spmemvfs);
 		g_spmemvfs.parent = NULL;
 
 		sqlite3_mutex_free( g_spmemvfs_env->mutex );
