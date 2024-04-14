@@ -1,6 +1,4 @@
 #include "replay.h"
-#include "../ocgcore/ocgapi.h"
-#include "../ocgcore/common.h"
 #include "lzma/LzmaLib.h"
 
 namespace ygo {
@@ -54,7 +52,7 @@ void Replay::WriteData(const void* data, int length, bool flush) {
 		return;
 	if (length < 0 || (pdata - replay_data) + length > MAX_REPLAY_SIZE)
 		return;
-	memcpy(pdata, data, length);
+	std::memcpy(pdata, data, length);
 	pdata += length;
 #ifdef _WIN32
 	DWORD size;
@@ -70,8 +68,7 @@ void Replay::WriteInt32(int data, bool flush) {
 		return;
 	if ((pdata - replay_data) + 4 > MAX_REPLAY_SIZE)
 		return;
-	*((int*)(pdata)) = data;
-	pdata += 4;
+	BufferIO::WriteInt32(pdata, data);
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, &data, sizeof(int), &size, NULL);
@@ -86,8 +83,7 @@ void Replay::WriteInt16(short data, bool flush) {
 		return;
 	if ((pdata - replay_data) + 2 > MAX_REPLAY_SIZE)
 		return;
-	*((short*)(pdata)) = data;
-	pdata += 2;
+	BufferIO::WriteInt16(pdata, data);
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, &data, sizeof(short), &size, NULL);
@@ -102,8 +98,7 @@ void Replay::WriteInt8(char data, bool flush) {
 		return;
 	if ((pdata - replay_data) + 1 > MAX_REPLAY_SIZE)
 		return;
-	*pdata = data;
-	pdata++;
+	BufferIO::WriteInt8(pdata, data);
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, &data, sizeof(char), &size, NULL);
@@ -266,7 +261,7 @@ bool Replay::ReadNextResponse(unsigned char resp[]) {
 	int len = *pdata++;
 	if(len > SIZE_RETURN_VALUE)
 		return false;
-	memcpy(resp, pdata, len);
+	std::memcpy(resp, pdata, len);
 	pdata += len;
 	return true;
 }
@@ -280,27 +275,26 @@ void Replay::ReadName(wchar_t* data) {
 void Replay::ReadData(void* data, int length) {
 	if(!is_replaying)
 		return;
-	memcpy(data, pdata, length);
+	std::memcpy(data, pdata, length);
 	pdata += length;
 }
 int Replay::ReadInt32() {
 	if(!is_replaying)
 		return -1;
-	int ret = *((int*)pdata);
-	pdata += 4;
+	int ret = BufferIO::ReadInt32(pdata);
 	return ret;
 }
 short Replay::ReadInt16() {
 	if(!is_replaying)
 		return -1;
-	short ret = *((short*)pdata);
-	pdata += 2;
+	short ret = BufferIO::ReadInt16(pdata);
 	return ret;
 }
 char Replay::ReadInt8() {
 	if(!is_replaying)
 		return -1;
-	return *pdata++;
+	char ret= BufferIO::ReadInt8(pdata);
+	return ret;
 }
 void Replay::Rewind() {
 	pdata = replay_data;
