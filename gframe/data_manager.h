@@ -59,6 +59,7 @@ public:
 	static uint32 CardReader(uint32, card_data*);
 	static byte* ScriptReaderEx(const char* script_name, int* slen);
 	static byte* ScriptReader(const char* script_name, int* slen);
+	static bool MentionHandler(uint32 text_code, uint32 name_code);
 	static IFileSystem* FileSystem;
 
 private:
