@@ -40,6 +40,7 @@ int SingleMode::SinglePlayThread() {
 	set_script_reader(DataManager::ScriptReaderEx);
 	set_card_reader(DataManager::CardReader);
 	set_message_handler(SingleMode::MessageHandler);
+	set_mention_handler(DataManager::MentionHandler);
 	pduel = create_duel(rnd.rand());
 	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);

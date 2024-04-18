@@ -66,6 +66,7 @@ int ReplayMode::ReplayThread() {
 	set_script_reader(DataManager::ScriptReaderEx);
 	set_card_reader(DataManager::CardReader);
 	set_message_handler(ReplayMode::MessageHandler);
+	set_mention_handler(DataManager::MentionHandler);
 	if(!StartDuel()) {
 		EndDuel();
 		return 0;
