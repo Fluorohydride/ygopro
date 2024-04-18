@@ -7,6 +7,8 @@ namespace ygo {
 const wchar_t* DataManager::unknown_string = L"???";
 byte DataManager::scriptBuffer[0x20000];
 IFileSystem* DataManager::FileSystem;
+std::wstring DataManager::left_border;
+std::wstring DataManager::right_border;
 DataManager dataManager;
 
 DataManager::DataManager() : _datas(16384), _strings(16384) {
@@ -428,6 +430,18 @@ byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 	*slen = size;
 	return scriptBuffer;
 }
+void DataManager::SetNameBorder() {
+	auto it_left = dataManager._sysStrings.find(50);
+	if (it_left != dataManager._sysStrings.end())
+		DataManager::left_border = it_left->second;
+	else
+		DataManager::left_border = L"\"";
+	auto it_right = dataManager._sysStrings.find(51);
+	if (it_right != dataManager._sysStrings.end())
+		DataManager::right_border = it_right->second;
+	else
+		DataManager::right_border = L"\"";
+}
 bool DataManager::MentionHandler(uint32 text_code, uint32 name_code) {
 	auto it1 = dataManager._strings.find(text_code);
 	if (it1 == dataManager._strings.end())
@@ -435,15 +449,7 @@ bool DataManager::MentionHandler(uint32 text_code, uint32 name_code) {
 	auto it2 = dataManager._strings.find(name_code);
 	if (it2 == dataManager._strings.end())
 		return false;
-	auto it_left = dataManager._sysStrings.find(50);
-	if (it_left == dataManager._sysStrings.end())
-		return false;
-	auto it_right = dataManager._sysStrings.find(51);
-	if (it_right == dataManager._sysStrings.end())
-		return false;
 	auto& text = it1->second.text;
-	auto& left_border = it_left->second;
-	auto& right_border = it_right->second;
 	auto& name = it2->second.name;
 	std::wstring str_name;
 	str_name.append(left_border);

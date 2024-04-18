@@ -59,6 +59,7 @@ public:
 	static uint32 CardReader(uint32, card_data*);
 	static byte* ScriptReaderEx(const char* script_name, int* slen);
 	static byte* ScriptReader(const char* script_name, int* slen);
+	static void SetNameBorder();
 	static bool MentionHandler(uint32 text_code, uint32 name_code);
 	static IFileSystem* FileSystem;
 
@@ -66,6 +67,8 @@ private:
 	std::unordered_map<unsigned int, CardDataC> _datas;
 	std::unordered_map<unsigned int, CardString> _strings;
 	std::unordered_map<unsigned int, std::vector<uint16_t>> extra_setcode;
+	static std::wstring left_border;
+	static std::wstring right_border;
 };
 
 extern DataManager dataManager;

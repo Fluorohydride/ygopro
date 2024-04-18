@@ -100,6 +100,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	LoadExpansions();
+	DataManager::SetNameBorder();
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	if(!numFont) {
