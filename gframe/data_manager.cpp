@@ -2,6 +2,9 @@
 #include "game.h"
 #include <stdio.h>
 
+#define LEFT_NAME_BORDER "\""
+#define RIGHT_NAME_BORDER "\""
+
 namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
@@ -435,6 +438,10 @@ byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 	return scriptBuffer;
 }
 void DataManager::SetNameBorder() {
+#ifdef NO_SYSYEM_STRINGS
+	DataManager::left_border = LEFT_NAME_BORDER;
+	DataManager::right_border = RIGHT_NAME_BORDER;
+#else
 	char strbuf[256] = "";
 	auto it_left = dataManager._sysStrings.find(50);
 	if (it_left != dataManager._sysStrings.end()) {
@@ -442,14 +449,15 @@ void DataManager::SetNameBorder() {
 		DataManager::left_border = strbuf;
 	}
 	else
-		DataManager::left_border = "\"";
+		DataManager::left_border = LEFT_NAME_BORDER;
 	auto it_right = dataManager._sysStrings.find(51);
 	if (it_right != dataManager._sysStrings.end()) {
 		BufferIO::EncodeUTF8(it_right->second.c_str(), strbuf);
 		DataManager::right_border = strbuf;
 	}
 	else
-		DataManager::right_border = "\"";
+		DataManager::right_border = RIGHT_NAME_BORDER;
+#endif // NO_SYSYEM_STRINGS
 }
 bool DataManager::MentionHandler(uint32 text_code, uint32 name_code) {
 	auto it1 = dataManager._records.find(text_code);
