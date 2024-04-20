@@ -7,8 +7,8 @@ namespace ygo {
 const wchar_t* DataManager::unknown_string = L"???";
 byte DataManager::scriptBuffer[0x20000];
 IFileSystem* DataManager::FileSystem;
-std::wstring DataManager::left_border;
-std::wstring DataManager::right_border;
+std::string DataManager::left_border;
+std::string DataManager::right_border;
 DataManager dataManager;
 
 DataManager::DataManager() : _datas(16384), _strings(16384) {
@@ -48,6 +48,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	do {
 		CardDataC cd;
 		CardString cs;
+		CardRecord cr;
 		step = sqlite3_step(pStmt);
 		if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
 			return Error(&db, pStmt);
@@ -85,10 +86,12 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.category = sqlite3_column_int(pStmt, 10);
 			_datas[cd.code] = cd;
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+				cr.name = text;
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.name = strBuffer;
 			}
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
+				cr.text = text;
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.text = strBuffer;
 			}
@@ -98,6 +101,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 					cs.desc[i] = strBuffer;
 				}
 			}
+			_records[cd.code] = cr;
 			_strings[cd.code] = cs;
 		}
 	} while(step != SQLITE_DONE);
@@ -431,31 +435,36 @@ byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 	return scriptBuffer;
 }
 void DataManager::SetNameBorder() {
+	char strbuf[256] = "";
 	auto it_left = dataManager._sysStrings.find(50);
-	if (it_left != dataManager._sysStrings.end())
-		DataManager::left_border = it_left->second;
+	if (it_left != dataManager._sysStrings.end()) {
+		BufferIO::EncodeUTF8(it_left->second.c_str(), strbuf);
+		DataManager::left_border = strbuf;
+	}
 	else
-		DataManager::left_border = L"\"";
+		DataManager::left_border = "\"";
 	auto it_right = dataManager._sysStrings.find(51);
-	if (it_right != dataManager._sysStrings.end())
-		DataManager::right_border = it_right->second;
+	if (it_right != dataManager._sysStrings.end()) {
+		BufferIO::EncodeUTF8(it_right->second.c_str(), strbuf);
+		DataManager::right_border = strbuf;
+	}
 	else
-		DataManager::right_border = L"\"";
+		DataManager::right_border = "\"";
 }
 bool DataManager::MentionHandler(uint32 text_code, uint32 name_code) {
-	auto it1 = dataManager._strings.find(text_code);
-	if (it1 == dataManager._strings.end())
+	auto it1 = dataManager._records.find(text_code);
+	if (it1 == dataManager._records.end())
 		return false;
-	auto it2 = dataManager._strings.find(name_code);
-	if (it2 == dataManager._strings.end())
+	auto it2 = dataManager._records.find(name_code);
+	if (it2 == dataManager._records.end())
 		return false;
 	auto& text = it1->second.text;
 	auto& name = it2->second.name;
-	std::wstring str_name;
+	std::string str_name;
 	str_name.append(left_border);
 	str_name.append(name);
 	str_name.append(right_border);
-	if (text.find(str_name) != std::wstring::npos)
+	if (text.find(str_name) != std::string::npos)
 		return true;
 	else
 		return false;

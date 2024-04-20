@@ -9,6 +9,11 @@
 
 namespace ygo {
 
+struct CardRecord {
+	std::string name;
+	std::string text;
+};
+
 class DataManager {
 public:
 	DataManager();
@@ -67,8 +72,9 @@ private:
 	std::unordered_map<unsigned int, CardDataC> _datas;
 	std::unordered_map<unsigned int, CardString> _strings;
 	std::unordered_map<unsigned int, std::vector<uint16_t>> extra_setcode;
-	static std::wstring left_border;
-	static std::wstring right_border;
+	std::unordered_map<unsigned int, CardRecord> _records;
+	static std::string left_border;
+	static std::string right_border;
 };
 
 extern DataManager dataManager;
