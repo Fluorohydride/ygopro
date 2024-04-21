@@ -131,12 +131,12 @@ public:
 		return wp - wstr;
 	}
 	static int GetVal(const wchar_t* pstr) {
-		int ret = 0;
+		unsigned int ret = 0;
 		while(*pstr >= L'0' && *pstr <= L'9') {
 			ret = ret * 10 + (*pstr - L'0');
 			pstr++;
 		}
-		return ret;
+		return (int)ret;
 	}
 };
 
