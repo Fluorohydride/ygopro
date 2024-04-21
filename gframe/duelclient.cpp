@@ -2641,7 +2641,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 					mainGame->dField.overlay_cards.insert(pcard);
 					pcard->overlayTarget = olcard;
 					pcard->location = LOCATION_OVERLAY;
-					pcard->sequence = olcard->overlayed.size() - 1;
+					pcard->sequence = (unsigned char)(olcard->overlayed.size() - 1);
 				} else {
 					mainGame->gMutex.lock();
 					mainGame->dField.RemoveCard(pc, pl, ps);
@@ -2650,7 +2650,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 					mainGame->gMutex.unlock();
 					pcard->overlayTarget = olcard;
 					pcard->location = LOCATION_OVERLAY;
-					pcard->sequence = olcard->overlayed.size() - 1;
+					pcard->sequence = (unsigned char)(olcard->overlayed.size() - 1);
 					if (olcard->location == LOCATION_MZONE) {
 						mainGame->gMutex.lock();
 						mainGame->dField.MoveCard(pcard, 10);
@@ -2671,7 +2671,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 					mainGame->dField.AddCard(pcard, cc, cl, cs);
 					mainGame->dField.overlay_cards.erase(pcard);
 					for (size_t i = 0; i < olcard->overlayed.size(); ++i)
-						olcard->overlayed[i]->sequence = i;
+						olcard->overlayed[i]->sequence = (unsigned char)i;
 				} else {
 					mainGame->gMutex.lock();
 					olcard->overlayed.erase(olcard->overlayed.begin() + pcard->sequence);
@@ -2680,7 +2680,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 					mainGame->dField.AddCard(pcard, cc, cl, cs);
 					mainGame->dField.overlay_cards.erase(pcard);
 					for (size_t i = 0; i < olcard->overlayed.size(); ++i) {
-						olcard->overlayed[i]->sequence = i;
+						olcard->overlayed[i]->sequence = (unsigned char)i;
 						mainGame->dField.MoveCard(olcard->overlayed[i], 2);
 					}
 					mainGame->gMutex.unlock();
@@ -2697,21 +2697,21 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 					olcard1->overlayed.erase(olcard1->overlayed.begin() + pcard->sequence);
 					olcard2->overlayed.push_back(pcard);
-					pcard->sequence = olcard2->overlayed.size() - 1;
+					pcard->sequence = (unsigned char)(olcard2->overlayed.size() - 1);
 					pcard->location = LOCATION_OVERLAY;
 					pcard->overlayTarget = olcard2;
 					for (size_t i = 0; i < olcard1->overlayed.size(); ++i) {
-						olcard1->overlayed[i]->sequence = i;
+						olcard1->overlayed[i]->sequence = (unsigned char)i;
 					}
 				} else {
 					mainGame->gMutex.lock();
 					olcard1->overlayed.erase(olcard1->overlayed.begin() + pcard->sequence);
 					olcard2->overlayed.push_back(pcard);
-					pcard->sequence = olcard2->overlayed.size() - 1;
+					pcard->sequence = (unsigned char)(olcard2->overlayed.size() - 1);
 					pcard->location = LOCATION_OVERLAY;
 					pcard->overlayTarget = olcard2;
 					for (size_t i = 0; i < olcard1->overlayed.size(); ++i) {
-						olcard1->overlayed[i]->sequence = i;
+						olcard1->overlayed[i]->sequence = (unsigned char)i;
 						mainGame->dField.MoveCard(olcard1->overlayed[i], 2);
 					}
 					mainGame->dField.MoveCard(pcard, 10);
@@ -3747,7 +3747,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 				ClientCard* ccard = new ClientCard;
 				ccard->controler = player;
 				ccard->location = LOCATION_DECK;
-				ccard->sequence = mainGame->dField.deck[player].size();
+				ccard->sequence = (unsigned char)mainGame->dField.deck[player].size();
 				mainGame->dField.deck[player].push_back(ccard);
 			}
 		}
@@ -3762,7 +3762,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 				ClientCard* ccard = new ClientCard;
 				ccard->controler = player;
 				ccard->location = LOCATION_HAND;
-				ccard->sequence = mainGame->dField.hand[player].size();
+				ccard->sequence = (unsigned char)mainGame->dField.hand[player].size();
 				mainGame->dField.hand[player].push_back(ccard);
 			}
 		}
@@ -3777,7 +3777,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 				ClientCard* ccard = new ClientCard;
 				ccard->controler = player;
 				ccard->location = LOCATION_EXTRA;
-				ccard->sequence = mainGame->dField.extra[player].size();
+				ccard->sequence = (unsigned char)mainGame->dField.extra[player].size();
 				mainGame->dField.extra[player].push_back(ccard);
 			}
 		}
@@ -3838,7 +3838,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 							mainGame->dField.overlay_cards.insert(xcard);
 							xcard->overlayTarget = ccard;
 							xcard->location = LOCATION_OVERLAY;
-							xcard->sequence = ccard->overlayed.size() - 1;
+							xcard->sequence = (unsigned char)(ccard->overlayed.size() - 1);
 							xcard->owner = p;
 							xcard->controler = p;
 						}
