@@ -87,7 +87,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 		dp->type = NETPLAYER_TYPE_OBSERVER;
 		sctc.type |= NETPLAYER_TYPE_OBSERVER;
 		STOC_HS_WatchChange scwc;
-		scwc.watch_count = observers.size();
+		scwc.watch_count = (unsigned short)observers.size();
 		if(players[0])
 			NetServer::SendPacketToPlayer(players[0], STOC_HS_WATCH_CHANGE, scwc);
 		if(players[1])
@@ -121,7 +121,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 	}
 	if(observers.size()) {
 		STOC_HS_WatchChange scwc;
-		scwc.watch_count = observers.size();
+		scwc.watch_count = (unsigned short)observers.size();
 		NetServer::SendPacketToPlayer(dp, STOC_HS_WATCH_CHANGE, scwc);
 	}
 }
@@ -133,7 +133,7 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 		observers.erase(dp);
 		if(duel_stage == DUEL_STAGE_BEGIN) {
 			STOC_HS_WatchChange scwc;
-			scwc.watch_count = observers.size();
+			scwc.watch_count = (unsigned short)observers.size();
 			if(players[0])
 				NetServer::SendPacketToPlayer(players[0], STOC_HS_WATCH_CHANGE, scwc);
 			if(players[1])
@@ -199,7 +199,7 @@ void SingleDuel::ToDuelist(DuelPlayer* dp) {
 		scpe.pos = 1;
 	}
 	STOC_HS_WatchChange scwc;
-	scwc.watch_count = observers.size();
+	scwc.watch_count = (unsigned short)observers.size();
 	NetServer::SendPacketToPlayer(players[0], STOC_HS_PLAYER_ENTER, scpe);
 	NetServer::SendPacketToPlayer(players[0], STOC_HS_WATCH_CHANGE, scwc);
 	if(players[1]) {
@@ -322,12 +322,12 @@ void SingleDuel::StartDuel(DuelPlayer* dp) {
 	}
 	unsigned char deckbuff[12];
 	auto pbuf = deckbuff;
-	BufferIO::WriteInt16(pbuf, pdeck[0].main.size());
-	BufferIO::WriteInt16(pbuf, pdeck[0].extra.size());
-	BufferIO::WriteInt16(pbuf, pdeck[0].side.size());
-	BufferIO::WriteInt16(pbuf, pdeck[1].main.size());
-	BufferIO::WriteInt16(pbuf, pdeck[1].extra.size());
-	BufferIO::WriteInt16(pbuf, pdeck[1].side.size());
+	BufferIO::WriteInt16(pbuf, (short)pdeck[0].main.size());
+	BufferIO::WriteInt16(pbuf, (short)pdeck[0].extra.size());
+	BufferIO::WriteInt16(pbuf, (short)pdeck[0].side.size());
+	BufferIO::WriteInt16(pbuf, (short)pdeck[1].main.size());
+	BufferIO::WriteInt16(pbuf, (short)pdeck[1].extra.size());
+	BufferIO::WriteInt16(pbuf, (short)pdeck[1].side.size());
 	NetServer::SendBufferToPlayer(players[0], STOC_DECK_COUNT, deckbuff, 12);
 	char tempbuff[6];
 	memcpy(tempbuff, deckbuff, 6);
