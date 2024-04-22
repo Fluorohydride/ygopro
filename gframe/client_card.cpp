@@ -222,7 +222,7 @@ bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 	if(c1->location != c2->location)
 		return c1->location < c2->location;
 	if (c1->location & LOCATION_OVERLAY) {
-		if (c1->overlayTarget != c2->overlayTarget)
+		if (c1->overlayTarget && c2->overlayTarget && c1->overlayTarget != c2->overlayTarget)
 			return c1->overlayTarget->sequence < c2->overlayTarget->sequence;
 		else
 			return c1->sequence < c2->sequence;
