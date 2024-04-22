@@ -1259,23 +1259,29 @@ void Game::RefreshBot() {
 		return;
 	botInfo.clear();
 	FILE* fp = fopen("bot.conf", "r");
-	char linebuf[256];
-	char strbuf[256];
+	char linebuf[256]{};
+	char strbuf[256]{};
 	if(fp) {
 		while(fgets(linebuf, 256, fp)) {
 			if(linebuf[0] == '#')
 				continue;
 			if(linebuf[0] == '!') {
 				BotInfo newinfo;
-				sscanf(linebuf, "!%240[^\n]", strbuf);
+				if (sscanf(linebuf, "!%240[^\n]", strbuf) != 1)
+					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.name);
-				fgets(linebuf, 256, fp);
-				sscanf(linebuf, "%240[^\n]", strbuf);
+				if (!fgets(linebuf, 256, fp))
+					break;
+				if (sscanf(linebuf, "%240[^\n]", strbuf) != 1)
+					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.command);
-				fgets(linebuf, 256, fp);
-				sscanf(linebuf, "%240[^\n]", strbuf);
+				if (!fgets(linebuf, 256, fp))
+					break;
+				if (sscanf(linebuf, "%240[^\n]", strbuf) != 1)
+					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.desc);
-				fgets(linebuf, 256, fp);
+				if (!fgets(linebuf, 256, fp))
+					break;
 				newinfo.support_master_rule_3 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_3");
 				newinfo.support_new_master_rule = !!strstr(linebuf, "SUPPORT_NEW_MASTER_RULE");
 				newinfo.support_master_rule_2020 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_2020");
@@ -1308,12 +1314,13 @@ void Game::LoadConfig() {
 	FILE* fp = fopen("system.conf", "r");
 	if(!fp)
 		return;
-	char linebuf[256];
-	char strbuf[32];
-	char valbuf[256];
-	wchar_t wstr[256];
+	char linebuf[256]{};
+	char strbuf[64]{};
+	char valbuf[256]{};
+	wchar_t wstr[256]{};
 	while(fgets(linebuf, 256, fp)) {
-		sscanf(linebuf, "%s = %s", strbuf, valbuf);
+		if (sscanf(linebuf, "%63s = %255s", strbuf, valbuf) != 2)
+			continue;
 		if(!strcmp(strbuf, "antialias")) {
 			gameConf.antialias = atoi(valbuf);
 		} else if(!strcmp(strbuf, "use_d3d")) {
@@ -1323,10 +1330,11 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "errorlog")) {
 			enable_log = atoi(valbuf);
 		} else if(!strcmp(strbuf, "textfont")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
 			int textfontsize = gameConf.textfontsize;
-			sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &textfontsize);
+			if (sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &textfontsize) != 3)
+				continue;
 			gameConf.textfontsize = textfontsize;
+			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
 		} else if(!strcmp(strbuf, "numfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
@@ -1418,7 +1426,8 @@ void Game::LoadConfig() {
 #endif
 		} else {
 			// options allowing multiple words
-			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
+			if (sscanf(linebuf, "%63s = %240[^\n]", strbuf, valbuf) != 2)
+				continue;
 			if (!strcmp(strbuf, "nickname")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
