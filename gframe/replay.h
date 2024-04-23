@@ -56,7 +56,7 @@ public:
 	void ReadData(void* data, int length);
 	int ReadInt32();
 	short ReadInt16();
-	char ReadInt8();
+	char ReadUInt8();
 	void Rewind();
 
 	FILE* fp;
