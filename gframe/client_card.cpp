@@ -114,7 +114,7 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 		buf += 4;
 	if(flag & QUERY_EQUIP_CARD) {
 		int c = BufferIO::ReadInt8(buf);
-		int l = BufferIO::ReadInt8(buf);
+		unsigned int l = BufferIO::ReadInt8(buf);
 		int s = BufferIO::ReadInt8(buf);
 		BufferIO::ReadInt8(buf);
 		ClientCard* ecard = mainGame->dField.GetCard(mainGame->LocalPlayer(c), l, s);
@@ -127,7 +127,7 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 		int count = BufferIO::ReadInt32(buf);
 		for(int i = 0; i < count; ++i) {
 			int c = BufferIO::ReadInt8(buf);
-			int l = BufferIO::ReadInt8(buf);
+			unsigned int l = BufferIO::ReadInt8(buf);
 			int s = BufferIO::ReadInt8(buf);
 			BufferIO::ReadInt8(buf);
 			ClientCard* tcard = mainGame->dField.GetCard(mainGame->LocalPlayer(c), l, s);
