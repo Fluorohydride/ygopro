@@ -1,9 +1,6 @@
 #ifndef BUFFERIO_H
 #define BUFFERIO_H
 
-#ifdef _MSC_VER
-#pragma warning(disable: 4244)
-#endif
 
 #include <cstring>
 
@@ -49,7 +46,7 @@ public:
 	inline static int CopyWStr(T1* src, T2* pstr, int bufsize) {
 		int l = 0;
 		while(src[l] && l < bufsize - 1) {
-			pstr[l] = src[l];
+			pstr[l] = (T2)src[l];
 			l++;
 		}
 		pstr[l] = 0;
@@ -59,7 +56,7 @@ public:
 	inline static int CopyWStrRef(T1* src, T2*& pstr, int bufsize) {
 		int l = 0;
 		while(src[l] && l < bufsize - 1) {
-			pstr[l] = src[l];
+			pstr[l] = (T2)src[l];
 			l++;
 		}
 		pstr += l;
@@ -71,7 +68,7 @@ public:
 		char* pstr = str;
 		while(*wsrc != 0) {
 			if(*wsrc < 0x80) {
-				*str = *wsrc;
+				*str = (char)*wsrc;
 				++str;
 			} else if(*wsrc < 0x800) {
 				str[0] = ((*wsrc >> 6) & 0x1f) | 0xc0;
