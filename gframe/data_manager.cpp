@@ -224,7 +224,7 @@ const wchar_t* DataManager::GetText(unsigned int code) {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetDesc(unsigned int strCode) {
-	if(strCode < 10000u)
+	if (strCode < (MIN_CARD_ID << 4))
 		return GetSysString(strCode);
 	unsigned int code = (strCode >> 4) & 0x0fffffff;
 	unsigned int offset = strCode & 0xf;
@@ -236,7 +236,7 @@ const wchar_t* DataManager::GetDesc(unsigned int strCode) {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetSysString(int code) {
-	if(code < 0 || code >= 2048)
+	if (code < 0 || code > MAX_STRING_ID)
 		return unknown_string;
 	auto csit = _sysStrings.find(code);
 	if(csit == _sysStrings.end())
