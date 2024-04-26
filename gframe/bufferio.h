@@ -1,6 +1,7 @@
 #ifndef BUFFERIO_H
 #define BUFFERIO_H
 
+#include <cstdint>
 #include "../ocgcore/buffer.h"
 
 class BufferIO {
