@@ -1328,7 +1328,8 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "use_image_scale")) {
 			gameConf.use_image_scale = strtol(valbuf, nullptr, 10) > 0;
 		} else if(!strcmp(strbuf, "errorlog")) {
-			enable_log = strtol(valbuf, nullptr, 10);
+			unsigned int val = strtol(valbuf, nullptr, 10);
+			enable_log = val & 0xff;
 		} else if(!strcmp(strbuf, "textfont")) {
 			int textfontsize = 0;
 			if (sscanf(linebuf, "%63s = %255s %d", strbuf, valbuf, &textfontsize) != 3)
@@ -1465,7 +1466,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
 	fprintf(fp, "use_image_scale = %d\n", gameConf.use_image_scale ? 1 : 0);
 	fprintf(fp, "antialias = %d\n", gameConf.antialias);
-	fprintf(fp, "errorlog = %d\n", enable_log);
+	fprintf(fp, "errorlog = %u\n", enable_log);
 	BufferIO::CopyWStr(ebNickName->getText(), gameConf.nickname, 20);
 	BufferIO::EncodeUTF8(gameConf.nickname, linebuf);
 	fprintf(fp, "nickname = %s\n", linebuf);
