@@ -133,7 +133,9 @@ public:
 			ret = ret * 10 + (*pstr - L'0');
 			pstr++;
 		}
-		return (int)ret;
+		if (*pstr == 0)
+			return (int)ret;
+		return 0;
 	}
 };
 
