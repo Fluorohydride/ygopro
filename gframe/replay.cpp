@@ -297,7 +297,7 @@ short Replay::ReadInt16() {
 	pdata += 2;
 	return ret;
 }
-char Replay::ReadUInt8() {
+char Replay::ReadInt8() {
 	if(!is_replaying)
 		return -1;
 	return *pdata++;
