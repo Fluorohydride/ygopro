@@ -61,34 +61,31 @@ public:
 	static int EncodeUTF8(const wchar_t * wsrc, char * str) {
 		char* pstr = str;
 		while(*wsrc != 0) {
-			if(*wsrc < 0x80) {
-				*str = (char)*wsrc;
+			unsigned cur = *wsrc;
+			if(cur < 0x80) {
+				*str = (char)cur;
 				++str;
-			} else if(*wsrc < 0x800) {
-				str[0] = ((*wsrc >> 6) & 0x1f) | 0xc0;
-				str[1] = ((*wsrc) & 0x3f) | 0x80;
+			} else if(cur < 0x800) {
+				str[0] = ((cur >> 6) & 0x1f) | 0xc0;
+				str[1] = (cur & 0x3f) | 0x80;
 				str += 2;
-			} else if(*wsrc < 0x10000 && (*wsrc < 0xd800 || *wsrc > 0xdfff)) {
-				str[0] = ((*wsrc >> 12) & 0xf) | 0xe0;
-				str[1] = ((*wsrc >> 6) & 0x3f) | 0x80;
-				str[2] = ((*wsrc) & 0x3f) | 0x80;
+			} else if(cur < 0x10000 && (cur < 0xd800 || cur > 0xdfff)) {
+				str[0] = ((cur >> 12) & 0xf) | 0xe0;
+				str[1] = ((cur >> 6) & 0x3f) | 0x80;
+				str[2] = (cur & 0x3f) | 0x80;
 				str += 3;
 			} else {
 				if (sizeof(wchar_t) == 2) {
-					unsigned unicode = 0;
-					unicode |= (*wsrc++ & 0x3ff) << 10;
-					unicode |= *wsrc & 0x3ff;
-					unicode += 0x10000;
-					str[0] = ((unicode >> 18) & 0x7) | 0xf0;
-					str[1] = ((unicode >> 12) & 0x3f) | 0x80;
-					str[2] = ((unicode >> 6) & 0x3f) | 0x80;
-					str[3] = ((unicode) & 0x3f) | 0x80;
-				} else {
-					str[0] = ((*wsrc >> 18) & 0x7) | 0xf0;
-					str[1] = ((*wsrc >> 12) & 0x3f) | 0x80;
-					str[2] = ((*wsrc >> 6) & 0x3f) | 0x80;
-					str[3] = ((*wsrc) & 0x3f) | 0x80;
+					cur = 0;
+					cur |= ((unsigned)*wsrc & 0x3ff) << 10;
+					++wsrc;
+					cur |= (unsigned)*wsrc & 0x3ff;
+					cur += 0x10000;
 				}
+				str[0] = ((cur >> 18) & 0x7) | 0xf0;
+				str[1] = ((cur >> 12) & 0x3f) | 0x80;
+				str[2] = ((cur >> 6) & 0x3f) | 0x80;
+				str[3] = (cur & 0x3f) | 0x80;
 				str += 4;
 			}
 			wsrc++;
