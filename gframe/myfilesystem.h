@@ -176,7 +176,7 @@ public:
 		bool success = true;
 		TraversalDir(dir, [dir, &success](const char *name, bool isdir) {
 			char full_path[256];
-			sprintf(full_path, "%s/%s", dir, name);
+			snprintf(full_path, sizeof full_path, "%s/%s", dir, name);
 			if (isdir)
 			{
 				if(!DeleteDir(full_path))

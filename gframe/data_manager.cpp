@@ -397,11 +397,11 @@ byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 	char first[256];
 	char second[256];
 	if(mainGame->gameConf.prefer_expansion_script) {
-		sprintf(first, "expansions/%s", script_name + 2);
-		sprintf(second, "%s", script_name + 2);
+		snprintf(first, sizeof first, "expansions/%s", script_name + 2);
+		snprintf(second, sizeof second, "%s", script_name + 2);
 	} else {
-		sprintf(first, "%s", script_name + 2);
-		sprintf(second, "expansions/%s", script_name + 2);
+		snprintf(first, sizeof first, "%s", script_name + 2);
+		snprintf(second, sizeof second, "expansions/%s", script_name + 2);
 	}
 	if(ScriptReader(first, slen))
 		return scriptBuffer;
