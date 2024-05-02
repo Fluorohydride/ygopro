@@ -1775,8 +1775,9 @@ void Game::CloseDuelWindow() {
 	ClearTextures();
 	closeDoneSignal.Set();
 }
-int Game::LocalPlayer(int player) {
-	return dInfo.isFirst ? player : 1 - player;
+int Game::LocalPlayer(int player) const {
+	int pid = player ? 1 : 0;
+	return dInfo.isFirst ? pid : 1 - pid;
 }
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
