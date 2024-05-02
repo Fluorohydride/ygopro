@@ -58,40 +58,56 @@ public:
 		return l;
 	}
 	// UTF-16/UTF-32 to UTF-8
-	static int EncodeUTF8(const wchar_t * wsrc, char * str) {
+	template<size_t N>
+	static int EncodeUTF8(const wchar_t* wsrc, char(&str)[N]) {
 		char* pstr = str;
-		while(*wsrc != 0) {
+		while (*wsrc != 0) {
 			unsigned cur = *wsrc;
-			if(cur < 0x80) {
-				*str = (char)cur;
-				++str;
-			} else if(cur < 0x800) {
-				str[0] = ((cur >> 6) & 0x1f) | 0xc0;
-				str[1] = (cur & 0x3f) | 0x80;
-				str += 2;
-			} else if(cur < 0x10000 && (cur < 0xd800 || cur > 0xdfff)) {
-				str[0] = ((cur >> 12) & 0xf) | 0xe0;
-				str[1] = ((cur >> 6) & 0x3f) | 0x80;
-				str[2] = (cur & 0x3f) | 0x80;
-				str += 3;
-			} else {
-				if (sizeof(wchar_t) == 2) {
-					cur = 0;
-					cur |= ((unsigned)*wsrc & 0x3ff) << 10;
-					++wsrc;
-					cur |= (unsigned)*wsrc & 0x3ff;
-					cur += 0x10000;
-				}
-				str[0] = ((cur >> 18) & 0x7) | 0xf0;
-				str[1] = ((cur >> 12) & 0x3f) | 0x80;
-				str[2] = ((cur >> 6) & 0x3f) | 0x80;
-				str[3] = (cur & 0x3f) | 0x80;
-				str += 4;
+			int codepoint_size = 0;
+			if (cur < 0x80U)
+				codepoint_size = 1;
+			else if (cur < 0x800U)
+				codepoint_size = 2;
+			else if (cur < 0x10000U && (cur < 0xd800U || cur > 0xdfffU))
+				codepoint_size = 3;
+			else
+				codepoint_size = 4;
+			if (pstr - str + codepoint_size > N - 1)
+				break;
+			switch (codepoint_size) {
+				case 1:
+					*pstr = (char)cur;
+					break;
+				case 2:
+					pstr[0] = ((cur >> 6) & 0x1f) | 0xc0;
+					pstr[1] = (cur & 0x3f) | 0x80;
+					break;
+				case 3:
+					pstr[0] = ((cur >> 12) & 0xf) | 0xe0;
+					pstr[1] = ((cur >> 6) & 0x3f) | 0x80;
+					pstr[2] = (cur & 0x3f) | 0x80;
+					break;
+				case 4:
+					if (sizeof(wchar_t) == 2) {
+						cur = 0;
+						cur |= ((unsigned)*wsrc & 0x3ff) << 10;
+						++wsrc;
+						cur |= (unsigned)*wsrc & 0x3ff;
+						cur += 0x10000;
+					}
+					pstr[0] = ((cur >> 18) & 0x7) | 0xf0;
+					pstr[1] = ((cur >> 12) & 0x3f) | 0x80;
+					pstr[2] = ((cur >> 6) & 0x3f) | 0x80;
+					pstr[3] = (cur & 0x3f) | 0x80;
+					break;
+				default:
+					break;
 			}
+			pstr += codepoint_size;
 			wsrc++;
 		}
-		*str = 0;
-		return str - pstr;
+		*pstr = 0;
+		return pstr - str;
 	}
 	// UTF-8 to UTF-16/UTF-32
 	static int DecodeUTF8(const char * src, wchar_t * wstr) {
