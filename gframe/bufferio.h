@@ -110,20 +110,33 @@ public:
 		return pstr - str;
 	}
 	// UTF-8 to UTF-16/UTF-32
-	static int DecodeUTF8(const char * src, wchar_t * wstr) {
+	template<size_t N>
+	static int DecodeUTF8(const char* src, wchar_t(&wstr)[N]) {
 		const char* p = src;
 		wchar_t* wp = wstr;
 		while(*p != 0) {
-			if(((unsigned)*p & 0x80) == 0) {
+			const unsigned cur = (unsigned)*p & 0xff;
+			int codepoint_size = 0;
+			if ((cur & 0xf8) == 0xf0) {
+				if (sizeof(wchar_t) == 2)
+					codepoint_size = 2;
+				else
+					codepoint_size = 1;
+			}
+			else
+				codepoint_size = 1;
+			if (wp - wstr + codepoint_size > N - 1)
+				break;
+			if((cur & 0x80) == 0) {
 				*wp = *p;
 				p++;
-			} else if(((unsigned)*p & 0xe0) == 0xc0) {
+			} else if((cur & 0xe0) == 0xc0) {
 				*wp = (((unsigned)p[0] & 0x1f) << 6) | ((unsigned)p[1] & 0x3f);
 				p += 2;
-			} else if(((unsigned)*p & 0xf0) == 0xe0) {
+			} else if((cur & 0xf0) == 0xe0) {
 				*wp = (((unsigned)p[0] & 0xf) << 12) | (((unsigned)p[1] & 0x3f) << 6) | ((unsigned)p[2] & 0x3f);
 				p += 3;
-			} else if(((unsigned)*p & 0xf8) == 0xf0) {
+			} else if((cur & 0xf8) == 0xf0) {
 				if (sizeof(wchar_t) == 2) {
 					unsigned unicode = (((unsigned)p[0] & 0x7) << 18) | (((unsigned)p[1] & 0x3f) << 12) | (((unsigned)p[2] & 0x3f) << 6) | ((unsigned)p[3] & 0x3f);
 					unicode -= 0x10000;
