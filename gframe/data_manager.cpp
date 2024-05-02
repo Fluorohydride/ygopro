@@ -394,8 +394,8 @@ uint32 DataManager::CardReader(uint32 code, card_data* pData) {
 }
 byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 	// default script name: ./script/c%d.lua
-	char first[256];
-	char second[256];
+	char first[256]{};
+	char second[256]{};
 	if(mainGame->gameConf.prefer_expansion_script) {
 		snprintf(first, sizeof first, "expansions/%s", script_name + 2);
 		snprintf(second, sizeof second, "%s", script_name + 2);
@@ -410,7 +410,7 @@ byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 }
 byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 #ifdef _WIN32
-	wchar_t fname[256];
+	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
 	IReadFile* reader = FileSystem->createAndOpenFile(fname);
 #else
