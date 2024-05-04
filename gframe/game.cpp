@@ -1803,7 +1803,7 @@ int Game::ChatLocalPlayer(int player) const {
 		else {
 			// when changing side or waiting tp result
 			auto selftype_boundary = dInfo.isTag ? 2 : 1;
-			if(DuelClient::selftype >= selftype_boundary)
+			if(DuelClient::selftype >= selftype_boundary && DuelClient::selftype < 4)
 				player = OppositePlayer(player);
 		}
 		if(dInfo.isTag) {
