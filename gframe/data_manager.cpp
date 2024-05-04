@@ -238,7 +238,7 @@ code_pointer DataManager::GetCodePointer(unsigned int code) const {
 string_pointer DataManager::GetStringPointer(unsigned int code) const {
 	return _strings.find(code);
 }
-bool DataManager::GetString(int code, CardString* pStr) {
+bool DataManager::GetString(unsigned int code, CardString* pStr) {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end()) {
 		pStr->name = unknown_string;
@@ -248,7 +248,7 @@ bool DataManager::GetString(int code, CardString* pStr) {
 	*pStr = csit->second;
 	return true;
 }
-const wchar_t* DataManager::GetName(int code) {
+const wchar_t* DataManager::GetName(unsigned int code) {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -256,7 +256,7 @@ const wchar_t* DataManager::GetName(int code) {
 		return csit->second.name.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetText(int code) {
+const wchar_t* DataManager::GetText(unsigned int code) {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -265,7 +265,7 @@ const wchar_t* DataManager::GetText(int code) {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetDesc(unsigned int strCode) {
-	if(strCode < 10000u)
+	if (strCode < (MIN_CARD_ID << 4))
 		return GetSysString(strCode);
 	unsigned int code = (strCode >> 4) & 0x0fffffff;
 	unsigned int offset = strCode & 0xf;
@@ -277,7 +277,7 @@ const wchar_t* DataManager::GetDesc(unsigned int strCode) {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetSysString(int code) {
-	if(code < 0 || code >= 2048)
+	if (code < 0 || code > MAX_STRING_ID)
 		return unknown_string;
 	auto csit = _sysStrings.find(code);
 	if(csit == _sysStrings.end())

@@ -771,7 +771,7 @@ bool Game::Initialize() {
 	cbCardType->addItem(dataManager.GetSysString(1312));
 	cbCardType->addItem(dataManager.GetSysString(1313));
 	cbCardType->addItem(dataManager.GetSysString(1314));
-	cbCardType2 = env->addComboBox(rect<s32>(125, 25 / 6, 200, 20 + 25 / 6), wFilter, COMBOBOX_SECONDTYPE);
+	cbCardType2 = env->addComboBox(rect<s32>(125, 25 / 6, 195, 20 + 25 / 6), wFilter, COMBOBOX_SECONDTYPE);
 	cbCardType2->setMaxSelectionRows(10);
 	cbCardType2->addItem(dataManager.GetSysString(1310), 0);
 	stLimit = env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 2 + 25 / 6, 280, 22 + 25 / 6), false, false, wFilter);
@@ -787,13 +787,13 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1484));
 	cbLimit->addItem(dataManager.GetSysString(1485));
 	stAttribute = env->addStaticText(dataManager.GetSysString(1319), rect<s32>(10, 22 + 50 / 6, 70, 42 + 50 / 6), false, false, wFilter);
-	cbAttribute = env->addComboBox(rect<s32>(60, 20 + 50 / 6, 190, 40 + 50 / 6), wFilter, COMBOBOX_ATTRIBUTE);
+	cbAttribute = env->addComboBox(rect<s32>(60, 20 + 50 / 6, 195, 40 + 50 / 6), wFilter, COMBOBOX_ATTRIBUTE);
 	cbAttribute->setMaxSelectionRows(10);
 	cbAttribute->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter != 0x80; filter <<= 1)
 		cbAttribute->addItem(dataManager.FormatAttribute(filter), filter);
 	stRace = env->addStaticText(dataManager.GetSysString(1321), rect<s32>(10, 42 + 75 / 6, 70, 62 + 75 / 6), false, false, wFilter);
-	cbRace = env->addComboBox(rect<s32>(60, 40 + 75 / 6, 190, 60 + 75 / 6), wFilter, COMBOBOX_RACE);
+	cbRace = env->addComboBox(rect<s32>(60, 40 + 75 / 6, 195, 60 + 75 / 6), wFilter, COMBOBOX_RACE);
 	cbRace->setMaxSelectionRows(10);
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter < (1 << RACES_COUNT); filter <<= 1)
@@ -808,7 +808,7 @@ bool Game::Initialize() {
 	ebStar = env->addEditBox(L"", rect<s32>(60, 60 + 100 / 6, 100, 80 + 100 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stScale = env->addStaticText(dataManager.GetSysString(1336), rect<s32>(101, 62 + 100 / 6, 150, 82 + 100 / 6), false, false, wFilter);
-	ebScale = env->addEditBox(L"", rect<s32>(150, 60 + 100 / 6, 190, 80 + 100 / 6), true, wFilter, EDITBOX_INPUTS);
+	ebScale = env->addEditBox(L"", rect<s32>(150, 60 + 100 / 6, 195, 80 + 100 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stSearch = env->addStaticText(dataManager.GetSysString(1325), rect<s32>(205, 62 + 100 / 6, 280, 82 + 100 / 6), false, false, wFilter);
 	ebCardName = env->addEditBox(L"", rect<s32>(260, 60 + 100 / 6, 390, 80 + 100 / 6), true, wFilter, EDITBOX_KEYWORD);
@@ -836,7 +836,7 @@ bool Game::Initialize() {
 	int wcatewidth = catewidth * 4 + 16;
 	wCategories->setRelativePosition(rect<s32>(1000 - wcatewidth, 60, 1000, 305));
 	btnCategoryOK->setRelativePosition(recti(wcatewidth / 2 - 50, 210, wcatewidth / 2 + 50, 235));
-	btnMarksFilter = env->addButton(rect<s32>(60, 80 + 125 / 6, 190, 100 + 125 / 6), wFilter, BUTTON_MARKS_FILTER, dataManager.GetSysString(1374));
+	btnMarksFilter = env->addButton(rect<s32>(60, 80 + 125 / 6, 195, 100 + 125 / 6), wFilter, BUTTON_MARKS_FILTER, dataManager.GetSysString(1374));
 	wLinkMarks = env->addWindow(rect<s32>(700, 30, 820, 150), false, L"");
 	wLinkMarks->getCloseButton()->setVisible(false);
 	wLinkMarks->setDrawTitlebar(false);
@@ -1111,7 +1111,7 @@ void Game::MainLoop() {
 		SingleMode::StopPlay(true);
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	SaveConfig();
-//	device->drop();
+	device->drop();
 }
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
 	for(int i = 0; i < 16; ++i)
@@ -1844,8 +1844,9 @@ void Game::CloseDuelWindow() {
 	ClearTextures();
 	closeDoneSignal.Set();
 }
-int Game::LocalPlayer(int player) {
-	return dInfo.isFirst ? player : 1 - player;
+int Game::LocalPlayer(int player) const {
+	int pid = player ? 1 : 0;
+	return dInfo.isFirst ? pid : 1 - pid;
 }
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
@@ -1897,12 +1898,12 @@ void Game::OnResize() {
 	wFilter->setRelativePosition(Resize(610, 5, 1020, 130));
 	scrFilter->setRelativePosition(Resize(999, 161, 1019, 629));
 	cbCardType->setRelativePosition(Resize(60, 25 / 6, 120, 20 + 25 / 6));
-	cbCardType2->setRelativePosition(Resize(130, 25 / 6, 190, 20 + 25 / 6));
-	cbRace->setRelativePosition(Resize(60, 40 + 75 / 6, 190, 60 + 75 / 6));
-	cbAttribute->setRelativePosition(Resize(60, 20 + 50 / 6, 190, 40 + 50 / 6));
+	cbCardType2->setRelativePosition(Resize(125, 25 / 6, 195, 20 + 25 / 6));
+	cbRace->setRelativePosition(Resize(60, 40 + 75 / 6, 195, 60 + 75 / 6));
+	cbAttribute->setRelativePosition(Resize(60, 20 + 50 / 6, 195, 40 + 50 / 6));
 	cbLimit->setRelativePosition(Resize(260, 25 / 6, 390, 20 + 25 / 6));
 	ebStar->setRelativePosition(Resize(60, 60 + 100 / 6, 95, 80 + 100 / 6));
-	ebScale->setRelativePosition(Resize(155, 60 + 100 / 6, 190, 80 + 100 / 6));
+	ebScale->setRelativePosition(Resize(155, 60 + 100 / 6, 195, 80 + 100 / 6));
 	ebAttack->setRelativePosition(Resize(260, 20 + 50 / 6, 340, 40 + 50 / 6));
 	ebDefense->setRelativePosition(Resize(260, 40 + 75 / 6, 340, 60 + 75 / 6));
 	ebCardName->setRelativePosition(Resize(260, 60 + 100 / 6, 390, 80 + 100 / 6));
@@ -1910,7 +1911,7 @@ void Game::OnResize() {
 	btnStartFilter->setRelativePosition(Resize(260, 80 + 125 / 6, 390, 100 + 125 / 6));
 	if(btnClearFilter)
 		btnClearFilter->setRelativePosition(Resize(205, 80 + 125 / 6, 255, 100 + 125 / 6));
-	btnMarksFilter->setRelativePosition(Resize(60, 80 + 125 / 6, 190, 100 + 125 / 6));
+	btnMarksFilter->setRelativePosition(Resize(60, 80 + 125 / 6, 195, 100 + 125 / 6));
 
 	recti btncatepos = btnEffectFilter->getAbsolutePosition();
 	wCategories->setRelativePosition(recti(
