@@ -403,6 +403,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		break;
 	}
 	case STOC_WAITING_SIDE: {
+		mainGame->dInfo.isInDuel = false;
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();
 		mainGame->stHintMsg->setText(dataManager.GetSysString(1409));
