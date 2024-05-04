@@ -254,6 +254,7 @@ void ReplayMode::EndDuel() {
 		mainGame->actionSignal.Wait();
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isStarted = false;
+		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isFinished = true;
 		mainGame->dInfo.isReplay = false;
 		mainGame->dInfo.isSingleMode = false;
@@ -272,7 +273,9 @@ void ReplayMode::EndDuel() {
 }
 void ReplayMode::Restart(bool refresh) {
 	end_duel(pduel);
+	mainGame->dInfo.isInDuel = false;
 	mainGame->dInfo.isStarted = false;
+	mainGame->dInfo.isInDuel = false;
 	mainGame->dInfo.isFinished = true;
 	mainGame->dField.Clear();
 	//mainGame->device->setEventReceiver(&mainGame->dField);

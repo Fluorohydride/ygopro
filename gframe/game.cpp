@@ -34,6 +34,7 @@ Game* mainGame;
 #ifndef YGOPRO_SERVER_MODE
 void DuelInfo::Clear() {
 	isStarted = false;
+	isInDuel = false;
 	isFinished = false;
 	isReplay = false;
 	isReplaySkiping = false;
