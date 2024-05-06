@@ -7,7 +7,7 @@
 #import <CoreFoundation/CoreFoundation.h>
 #endif
 
-int enable_log = 0;
+unsigned int enable_log = 0x3;
 bool exit_on_return = false;
 bool open_file = false;
 wchar_t open_file_name[256] = L"";
