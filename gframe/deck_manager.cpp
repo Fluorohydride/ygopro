@@ -6,7 +6,7 @@
 namespace ygo {
 
 #ifndef YGOPRO_SERVER_MODE
-char DeckManager::deckBuffer[0x10000];
+char DeckManager::deckBuffer[0x10000]{};
 #endif
 DeckManager deckManager;
 

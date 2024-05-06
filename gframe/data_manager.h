@@ -10,6 +10,8 @@
 #include <unordered_map>
 
 namespace ygo {
+	constexpr int MAX_STRING_ID = 0x7ff;
+	constexpr unsigned int MIN_CARD_ID = (unsigned int)(MAX_STRING_ID + 1) >> 4;
 
 class DataManager {
 public:
@@ -28,9 +30,9 @@ public:
 	bool GetData(unsigned int code, CardData* pData);
 	code_pointer GetCodePointer(unsigned int code) const;
 	string_pointer GetStringPointer(unsigned int code) const;
-	bool GetString(int code, CardString* pStr);
-	const wchar_t* GetName(int code);
-	const wchar_t* GetText(int code);
+	bool GetString(unsigned int code, CardString* pStr);
+	const wchar_t* GetName(unsigned int code);
+	const wchar_t* GetText(unsigned int code);
 	const wchar_t* GetDesc(unsigned int strCode);
 	const wchar_t* GetSysString(int code);
 	const wchar_t* GetVictoryString(int code);

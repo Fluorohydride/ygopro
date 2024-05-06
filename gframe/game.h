@@ -178,7 +178,7 @@ public:
 	void CloseGameWindow();
 	void CloseDuelWindow();
 
-	int LocalPlayer(int player);
+	int LocalPlayer(int player) const;
 	const wchar_t* LocalName(int local_player);
 
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
