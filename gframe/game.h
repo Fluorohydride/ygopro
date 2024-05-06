@@ -169,8 +169,8 @@ public:
 	void CloseDuelWindow();
 
 	int LocalPlayer(int player) const;
-	int OppositePlayer(int player) const;
-	int ChatLocalPlayer(int player) const;
+	int OppositePlayer(int player);
+	int ChatLocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
 
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
