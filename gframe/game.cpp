@@ -1779,10 +1779,8 @@ int Game::LocalPlayer(int player) const {
 	return dInfo.isFirst ? pid : 1 - pid;
 }
 int Game::OppositePlayer(int player) {
-	if(dInfo.isTag)
-		return (player & 0x2) | (1 - (player & 0x1));
-	else
-		return 1 - player;
+	auto player_side_bit = dInfo.isTag ? 0x2 : 0x1;
+	return player ^ player_side_bit;
 }
 int Game::ChatLocalPlayer(int player) {
 	if(player > 3)
