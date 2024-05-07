@@ -159,6 +159,7 @@ int SingleMode::SinglePlayThread() {
 	if(!is_closing) {
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isStarted = false;
+		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isFinished = true;
 		mainGame->dInfo.isSingleMode = false;
 		mainGame->gMutex.unlock();
