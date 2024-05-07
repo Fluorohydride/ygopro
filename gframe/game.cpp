@@ -1814,8 +1814,10 @@ int Game::ChatLocalPlayer(int player) {
 			if(DuelClient::selftype >= selftype_boundary && DuelClient::selftype < 4)
 				player = OppositePlayer(player);
 		}
-		if(dInfo.isTag) {
-			is_self = (player & 0x2) == 0 && (player & 0x1) == (DuelClient::selftype & 0x1);
+		if (DuelClient::selftype >= 4) {
+			is_self = false;
+		} else if (dInfo.isTag) {
+			is_self =  (player & 0x2) == 0 && (player & 0x1) == (DuelClient::selftype & 0x1);
 		} else {
 			is_self = player == 0;
 		}
