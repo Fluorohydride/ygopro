@@ -1323,23 +1323,29 @@ void Game::RefreshBot() {
 		return;
 	botInfo.clear();
 	FILE* fp = fopen("bot.conf", "r");
-	char linebuf[256];
-	char strbuf[256];
+	char linebuf[256]{};
+	char strbuf[256]{};
 	if(fp) {
 		while(fgets(linebuf, 256, fp)) {
 			if(linebuf[0] == '#')
 				continue;
 			if(linebuf[0] == '!') {
 				BotInfo newinfo;
-				sscanf(linebuf, "!%240[^\n]", strbuf);
+				if (sscanf(linebuf, "!%240[^\n]", strbuf) != 1)
+					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.name);
-				fgets(linebuf, 256, fp);
-				sscanf(linebuf, "%240[^\n]", strbuf);
+				if (!fgets(linebuf, 256, fp))
+					break;
+				if (sscanf(linebuf, "%240[^\n]", strbuf) != 1)
+					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.command);
-				fgets(linebuf, 256, fp);
-				sscanf(linebuf, "%240[^\n]", strbuf);
+				if (!fgets(linebuf, 256, fp))
+					break;
+				if (sscanf(linebuf, "%240[^\n]", strbuf) != 1)
+					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.desc);
-				fgets(linebuf, 256, fp);
+				if (!fgets(linebuf, 256, fp))
+					break;
 				newinfo.support_master_rule_3 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_3");
 				newinfo.support_new_master_rule = !!strstr(linebuf, "SUPPORT_NEW_MASTER_RULE");
 				newinfo.support_master_rule_2020 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_2020");
@@ -1372,31 +1378,34 @@ void Game::LoadConfig() {
 	FILE* fp = fopen("system.conf", "r");
 	if(!fp)
 		return;
-	char linebuf[256];
-	char strbuf[32];
-	char valbuf[256];
-	wchar_t wstr[256];
+	char linebuf[256]{};
+	char strbuf[64]{};
+	char valbuf[256]{};
+	wchar_t wstr[256]{};
 	while(fgets(linebuf, 256, fp)) {
-		sscanf(linebuf, "%s = %s", strbuf, valbuf);
+		if (sscanf(linebuf, "%63s = %255s", strbuf, valbuf) != 2)
+			continue;
 		if(!strcmp(strbuf, "antialias")) {
-			gameConf.antialias = atoi(valbuf);
+			gameConf.antialias = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "use_d3d")) {
-			gameConf.use_d3d = atoi(valbuf) > 0;
+			gameConf.use_d3d = strtol(valbuf, nullptr, 10) > 0;
 		} else if(!strcmp(strbuf, "use_image_scale")) {
-			gameConf.use_image_scale = atoi(valbuf) > 0;
+			gameConf.use_image_scale = strtol(valbuf, nullptr, 10) > 0;
 		} else if(!strcmp(strbuf, "errorlog")) {
-			enable_log = atoi(valbuf);
+			unsigned int val = strtol(valbuf, nullptr, 10);
+			enable_log = val & 0xff;
 		} else if(!strcmp(strbuf, "textfont")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			int textfontsize = gameConf.textfontsize;
-			sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &textfontsize);
+			int textfontsize = 0;
+			if (sscanf(linebuf, "%63s = %255s %d", strbuf, valbuf, &textfontsize) != 3)
+				continue;
 			gameConf.textfontsize = textfontsize;
+			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
 		} else if(!strcmp(strbuf, "numfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.numfont, 256);
 		} else if(!strcmp(strbuf, "serverport")) {
-			gameConf.serverport = atoi(valbuf);
+			gameConf.serverport = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "lasthost")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.lasthost, 100);
@@ -1407,82 +1416,93 @@ void Game::LoadConfig() {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
 		} else if(!strcmp(strbuf, "automonsterpos")) {
-			gameConf.chkMAutoPos = atoi(valbuf);
+			gameConf.chkMAutoPos = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "autospellpos")) {
-			gameConf.chkSTAutoPos = atoi(valbuf);
+			gameConf.chkSTAutoPos = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "randompos")) {
-			gameConf.chkRandomPos = atoi(valbuf);
+			gameConf.chkRandomPos = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "autochain")) {
-			gameConf.chkAutoChain = atoi(valbuf);
+			gameConf.chkAutoChain = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "waitchain")) {
-			gameConf.chkWaitChain = atoi(valbuf);
+			gameConf.chkWaitChain = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "showchain")) {
-			gameConf.chkDefaultShowChain = atoi(valbuf);
+			gameConf.chkDefaultShowChain = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "mute_opponent")) {
-			gameConf.chkIgnore1 = atoi(valbuf);
+			gameConf.chkIgnore1 = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "mute_spectators")) {
-			gameConf.chkIgnore2 = atoi(valbuf);
+			gameConf.chkIgnore2 = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "use_lflist")) {
-			gameConf.use_lflist = atoi(valbuf);
+			gameConf.use_lflist = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "default_lflist")) {
-			gameConf.default_lflist = atoi(valbuf);
+			gameConf.default_lflist = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "default_rule")) {
-			gameConf.default_rule = atoi(valbuf);
+			gameConf.default_rule = strtol(valbuf, nullptr, 10);
 			if(gameConf.default_rule <= 0)
 				gameConf.default_rule = DEFAULT_DUEL_RULE;
 		} else if(!strcmp(strbuf, "hide_setname")) {
-			gameConf.hide_setname = atoi(valbuf);
+			gameConf.hide_setname = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "hide_hint_button")) {
-			gameConf.hide_hint_button = atoi(valbuf);
+			gameConf.hide_hint_button = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "control_mode")) {
-			gameConf.control_mode = atoi(valbuf);
+			gameConf.control_mode = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "draw_field_spell")) {
-			gameConf.draw_field_spell = atoi(valbuf);
+			gameConf.draw_field_spell = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "separate_clear_button")) {
-			gameConf.separate_clear_button = atoi(valbuf);
+			gameConf.separate_clear_button = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "auto_search_limit")) {
-			gameConf.auto_search_limit = atoi(valbuf);
+			gameConf.auto_search_limit = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "search_multiple_keywords")) {
-			gameConf.search_multiple_keywords = atoi(valbuf);
+			gameConf.search_multiple_keywords = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "ignore_deck_changes")) {
-			gameConf.chkIgnoreDeckChanges = atoi(valbuf);
+			gameConf.chkIgnoreDeckChanges = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "default_ot")) {
-			gameConf.defaultOT = atoi(valbuf);
+			gameConf.defaultOT = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "enable_bot_mode")) {
-			gameConf.enable_bot_mode = atoi(valbuf);
+			gameConf.enable_bot_mode = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "quick_animation")) {
-			gameConf.quick_animation = atoi(valbuf);
+			gameConf.quick_animation = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "auto_save_replay")) {
-			gameConf.auto_save_replay = atoi(valbuf);
+			gameConf.auto_save_replay = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "draw_single_chain")) {
-			gameConf.draw_single_chain = atoi(valbuf);
+			gameConf.draw_single_chain = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "hide_player_name")) {
-			gameConf.hide_player_name = atoi(valbuf);
+			gameConf.hide_player_name = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "prefer_expansion_script")) {
-			gameConf.prefer_expansion_script = atoi(valbuf);
+			gameConf.prefer_expansion_script = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "window_maximized")) {
-			gameConf.window_maximized = atoi(valbuf) > 0;
+			gameConf.window_maximized = strtol(valbuf, nullptr, 10) > 0;
 		} else if(!strcmp(strbuf, "window_width")) {
-			gameConf.window_width = atoi(valbuf);
+			gameConf.window_width = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "window_height")) {
-			gameConf.window_height = atoi(valbuf);
+			gameConf.window_height = strtol(valbuf, nullptr, 10);
 		} else if(!strcmp(strbuf, "resize_popup_menu")) {
-			gameConf.resize_popup_menu = atoi(valbuf) > 0;
+			gameConf.resize_popup_menu = strtol(valbuf, nullptr, 10) > 0;
 #ifdef YGOPRO_USE_IRRKLANG
 		} else if(!strcmp(strbuf, "enable_sound")) {
-			gameConf.enable_sound = atoi(valbuf) > 0;
+			gameConf.enable_sound = strtol(valbuf, nullptr, 10) > 0;
 		} else if(!strcmp(strbuf, "sound_volume")) {
-			gameConf.sound_volume = atof(valbuf) / 100;
+			int vol = strtol(valbuf, nullptr, 10);
+			if (vol < 0)
+				vol = 0;
+			else if (vol > 100)
+				vol = 100;
+			gameConf.sound_volume = (double)vol / 100;
 		} else if(!strcmp(strbuf, "enable_music")) {
-			gameConf.enable_music = atoi(valbuf) > 0;
+			gameConf.enable_music = strtol(valbuf, nullptr, 10) > 0;
 		} else if(!strcmp(strbuf, "music_volume")) {
-			gameConf.music_volume = atof(valbuf) / 100;
+			int vol = strtol(valbuf, nullptr, 10);
+			if (vol < 0)
+				vol = 0;
+			else if (vol > 100)
+				vol = 100;
+			gameConf.music_volume = (double)vol / 100;
 		} else if(!strcmp(strbuf, "music_mode")) {
-			gameConf.music_mode = atoi(valbuf);
+			gameConf.music_mode = strtol(valbuf, nullptr, 10);
 #endif
 		} else {
 			// options allowing multiple words
-			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
+			if (sscanf(linebuf, "%63s = %240[^\n]", strbuf, valbuf) != 2)
+				continue;
 			if (!strcmp(strbuf, "nickname")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
@@ -1510,7 +1530,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
 	fprintf(fp, "use_image_scale = %d\n", gameConf.use_image_scale ? 1 : 0);
 	fprintf(fp, "antialias = %d\n", gameConf.antialias);
-	fprintf(fp, "errorlog = %d\n", enable_log);
+	fprintf(fp, "errorlog = %u\n", enable_log);
 	BufferIO::CopyWStr(ebNickName->getText(), gameConf.nickname, 20);
 	BufferIO::EncodeUTF8(gameConf.nickname, linebuf);
 	fprintf(fp, "nickname = %s\n", linebuf);
@@ -1570,10 +1590,8 @@ void Game::SaveConfig() {
 	fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
 	fprintf(fp, "#Volume of sound and music, between 0 and 100\n");
 	int vol = gameConf.sound_volume * 100;
-	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
 	fprintf(fp, "sound_volume = %d\n", vol);
 	vol = gameConf.music_volume * 100;
-	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
 	fprintf(fp, "music_volume = %d\n", vol);
 	fprintf(fp, "music_mode = %d\n", (chkMusicMode->isChecked() ? 1 : 0));
 #endif
@@ -1696,7 +1714,7 @@ void Game::AddLog(const wchar_t* msg, int param) {
 		lstLog->setSelected(-1);
 	}
 }
-void Game::AddChatMsg(const wchar_t* msg, int player) {
+void Game::AddChatMsg(const wchar_t* msg, int player, bool play_sound) {
 	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
 		chatTiming[i] = chatTiming[i - 1];
@@ -1707,23 +1725,22 @@ void Game::AddChatMsg(const wchar_t* msg, int player) {
 	chatType[0] = player;
 	if(gameConf.hide_player_name && player < 4)
 		player = 10;
+	if(play_sound)
+		soundManager.PlaySoundEffect(SOUND_CHAT);
 	switch(player) {
 	case 0: //from host
 		chatMsg[0].append(dInfo.hostname);
 		chatMsg[0].append(L": ");
 		break;
 	case 1: //from client
-		soundManager.PlaySoundEffect(SOUND_CHAT);
 		chatMsg[0].append(dInfo.clientname);
 		chatMsg[0].append(L": ");
 		break;
 	case 2: //host tag
-		soundManager.PlaySoundEffect(SOUND_CHAT);
 		chatMsg[0].append(dInfo.hostname_tag);
 		chatMsg[0].append(L": ");
 		break;
 	case 3: //client tag
-		soundManager.PlaySoundEffect(SOUND_CHAT);
 		chatMsg[0].append(dInfo.clientname_tag);
 		chatMsg[0].append(L": ");
 		break;
@@ -1732,7 +1749,6 @@ void Game::AddChatMsg(const wchar_t* msg, int player) {
 		chatMsg[0].append(L": ");
 		break;
 	case 8: //system custom message, no prefix.
-		soundManager.PlaySoundEffect(SOUND_CHAT);
 		chatMsg[0].append(L"[System]: ");
 		break;
 	case 9: //error message
@@ -1848,6 +1864,40 @@ void Game::CloseDuelWindow() {
 int Game::LocalPlayer(int player) const {
 	int pid = player ? 1 : 0;
 	return dInfo.isFirst ? pid : 1 - pid;
+}
+int Game::OppositePlayer(int player) {
+	auto player_side_bit = dInfo.isTag ? 0x2 : 0x1;
+	return player ^ player_side_bit;
+}
+int Game::ChatLocalPlayer(int player) {
+	if(player > 3)
+		return player;
+	bool is_self;
+	if(dInfo.isStarted || is_siding) {
+		if(dInfo.isInDuel)
+			// when in duel
+			player = mainGame->dInfo.isFirst ? player : OppositePlayer(player);
+		else {
+			// when changing side or waiting tp result
+			auto selftype_boundary = dInfo.isTag ? 2 : 1;
+			if(DuelClient::selftype >= selftype_boundary && DuelClient::selftype < 4)
+				player = OppositePlayer(player);
+		}
+		if (DuelClient::selftype >= 4) {
+			is_self = false;
+		} else if (dInfo.isTag) {
+			is_self =  (player & 0x2) == 0 && (player & 0x1) == (DuelClient::selftype & 0x1);
+		} else {
+			is_self = player == 0;
+		}
+	} else {
+		// when in lobby
+		is_self = player == DuelClient::selftype;
+	}
+	if(dInfo.isTag && (player == 1 || player == 2)) {
+		player = 3 - player;
+	}
+	return player | (is_self ? 0x10 : 0);
 }
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
