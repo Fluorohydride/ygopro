@@ -1790,6 +1790,7 @@ void Game::CloseDuelWindow() {
 	lstHostList->clear();
 	DuelClient::hosts.clear();
 	ClearTextures();
+	ResizeChatInputWindow();
 	closeDoneSignal.Set();
 }
 int Game::LocalPlayer(int player) const {
