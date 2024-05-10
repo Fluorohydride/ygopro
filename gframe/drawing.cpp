@@ -1002,15 +1002,15 @@ void Game::DrawSpec() {
 					continue;
 			}
 
-			std::wstring msg(chatMsg[i]);
 			int x = wChat->getRelativePosition().UpperLeftCorner.X;
 			int y = window_size.Height - 25;
-
+			int maxwidth = 705 * xScale;
 			if(is_building) {
-				msg = SetStaticText(nullptr, 205 * xScale, guiFont, msg.c_str());
 				x = 810 * xScale;
+				maxwidth = 205 * xScale;
 			}
 
+			std::wstring msg = SetStaticText(nullptr, maxwidth, guiFont, chatMsg[i].c_str());
 			int w = guiFont->getDimension(msg).Width;
 			int h = guiFont->getDimension(msg).Height + 2;
 
