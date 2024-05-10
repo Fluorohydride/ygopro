@@ -377,7 +377,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		mainGame->is_building = true;
 		mainGame->is_siding = true;
 		mainGame->CloseGameWindow();
-		mainGame->ResizeChatInputWindow(802);
+		mainGame->ResizeChatInputWindow();
 		mainGame->wDeckEdit->setVisible(false);
 		mainGame->wFilter->setVisible(false);
 		mainGame->wSort->setVisible(false);

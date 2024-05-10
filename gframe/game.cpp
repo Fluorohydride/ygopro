@@ -2028,11 +2028,9 @@ void Game::OnResize() {
 	btnBigCardZoomOut->setRelativePosition(Resize(205, 180, 295, 215));
 	btnBigCardClose->setRelativePosition(Resize(205, 230, 295, 265));
 }
-void Game::ResizeChatInputWindow(s32 x) {
-	if (x == -1)
-		x = wInfos->getRelativePosition().LowerRightCorner.X + 6;
-	else
-		x = x * xScale;
+void Game::ResizeChatInputWindow() {
+	s32 x = wInfos->getRelativePosition().LowerRightCorner.X + 6;
+	if(is_building) x = 802 * xScale;
 	wChat->setRelativePosition(recti(x, window_size.Height - 25, window_size.Width, window_size.Height));
 	ebChatInput->setRelativePosition(recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 }
