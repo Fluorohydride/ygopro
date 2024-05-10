@@ -995,7 +995,7 @@ void Game::DrawSpec() {
 		                                   0xffff4040, 0xff40ff40, 0xff4040ff, 0xff40ffff, 0xffff40ff, 0xffffff40, 0xffffffff, 0xff808080, 0xff404040};
 		if(chatTiming[i]) {
 			chatTiming[i]--;
-			if(is_building) {
+			if(!is_building) {
 				if(dInfo.isStarted && i >= 5)
 					continue;
 				if(!showChat && i > 2)
