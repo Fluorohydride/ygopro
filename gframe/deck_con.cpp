@@ -1341,7 +1341,8 @@ void DeckBuilder::FilterCards() {
 		enum class type_t {
 			all,
 			name,
-			setcode
+			setcode,
+			text
 		} type;
 		bool exclude;
 		element_t(): setcode(0), type(type_t::all), exclude(false) {}
@@ -1371,6 +1372,9 @@ void DeckBuilder::FilterCards() {
 			} else if(str[element_start] == L'@') {
 				element.type = element_t::type_t::setcode;
 				element_start++;
+			} else if(str[element_start] == L'%') {
+				element.type = element_t::type_t::text;
+				element_start++;
 			}
 			if(element_start >= str.size())
 				break;
@@ -1399,6 +1403,9 @@ void DeckBuilder::FilterCards() {
 			element_start++;
 		} else if(str[element_start] == L'@') {
 			element.type = element_t::type_t::setcode;
+			element_start++;
+		} else if(str[element_start] == L'%') {
+			element.type = element_t::type_t::text;
 			element_start++;
 		}
 		if(element_start < str.size()) {
@@ -1491,6 +1498,8 @@ void DeckBuilder::FilterCards() {
 				match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str());
 			} else if (elements_iterator->type == element_t::type_t::setcode) {
 				match = elements_iterator->setcode && data.is_setcode(elements_iterator->setcode);
+			} else if (elements_iterator->type == element_t::type_t::text) {
+				match = text.text.find(elements_iterator->keyword) != std::wstring::npos;
 			} else {
 				int trycode = BufferIO::GetVal(elements_iterator->keyword.c_str());
 				bool tryresult = dataManager.GetData(trycode, 0);
