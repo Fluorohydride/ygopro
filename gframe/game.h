@@ -74,7 +74,8 @@ struct Config {
 
 struct DuelInfo {
 	bool isStarted{ false };
-	bool isFinished{ false };
+	bool isInDuel{ false };
+	bool isFinished{false};
 	bool isReplay{ false };
 	bool isReplaySkiping{ false };
 	bool isFirst{ false };
@@ -169,7 +170,7 @@ public:
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
 	void AddLog(const wchar_t* msg, int param = 0);
-	void AddChatMsg(const wchar_t* msg, int player);
+	void AddChatMsg(const wchar_t* msg, int player, bool play_sound = false);
 	void ClearChatMsg();
 	void AddDebugMsg(const char* msgbuf);
 	void ErrorLog(const char* msgbuf);
@@ -179,6 +180,8 @@ public:
 	void CloseDuelWindow();
 
 	int LocalPlayer(int player) const;
+	int OppositePlayer(int player);
+	int ChatLocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
 
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
@@ -193,6 +196,7 @@ public:
 	}
 
 	void OnResize();
+	void ResizeChatInputWindow();
 	recti Resize(s32 x, s32 y, s32 x2, s32 y2);
 	recti Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2);
 	position2di Resize(s32 x, s32 y);
