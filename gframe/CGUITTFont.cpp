@@ -527,29 +527,28 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 	core::ustring::const_iterator iter(utext);
 	while (!iter.atEnd()) {
 		uchar32_t currentChar = *iter;
+
+		bool lineBreak = false;
+		if (currentChar == L'\r') { // Mac or Windows breaks
+			lineBreak = true;
+			if (*(iter + 1) == L'\n')	// Windows line breaks.
+				currentChar = *(++iter);
+		} else if (currentChar == L'\n') { // Unix breaks
+			lineBreak = true;
+		}
+		if (lineBreak) {
+			previousChar = 0;
+			offset.Y += supposed_line_height; //font_metrics.ascender / 64;
+			offset.X = position.UpperLeftCorner.X;
+			if (hcenter)
+				offset.X += (position.getWidth() - textDimension.Width) >> 1;
+			++iter;
+			continue;
+		}
+
 		n = getGlyphIndexByChar(currentChar);
 		bool visible = (Invisible.findFirst(currentChar) == -1);
 		if (n > 0 && visible) {
-			bool lineBreak = false;
-			if (currentChar == L'\r') { // Mac or Windows breaks
-				lineBreak = true;
-				if (*(iter + 1) == (uchar32_t)'\n')	// Windows line breaks.
-					currentChar = *(++iter);
-			} else if (currentChar == (uchar32_t)'\n') { // Unix breaks
-				lineBreak = true;
-			}
-
-			if (lineBreak) {
-				previousChar = 0;
-				offset.Y += supposed_line_height; //font_metrics.ascender / 64;
-				offset.X = position.UpperLeftCorner.X;
-
-				if (hcenter)
-					offset.X += (position.getWidth() - textDimension.Width) >> 1;
-				++iter;
-				continue;
-			}
-
 			// Calculate the glyph offset.
 			s32 offx = Glyphs[n - 1].offset.X;
 			s32 offy = (font_metrics.ascender / 64) - Glyphs[n - 1].offset.Y;

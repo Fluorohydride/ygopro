@@ -1904,7 +1904,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				break;
 			}
 			case CHECKBOX_DISABLE_CHAT: {
-				bool show = mainGame->is_building ? false : !mainGame->chkIgnore1->isChecked();
+				bool show = (mainGame->is_building && !mainGame->is_siding) ? false : !mainGame->chkIgnore1->isChecked();
 				mainGame->wChat->setVisible(show);
 				if(!show)
 					mainGame->ClearChatMsg();
