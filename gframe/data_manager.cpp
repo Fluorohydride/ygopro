@@ -171,24 +171,30 @@ bool DataManager::LoadStrings(IReadFile* reader) {
 void DataManager::ReadStringConfLine(const char* linebuf) {
 	if(linebuf[0] != '!')
 		return;
-	char strbuf[256];
-	int value;
-	wchar_t strBuffer[4096];
-	sscanf(linebuf, "!%s", strbuf);
+	char strbuf[256]{};
+	int value{};
+	wchar_t strBuffer[4096]{};
+	if (sscanf(linebuf, "!%63s", strbuf) != 1)
+		return;
 	if(!strcmp(strbuf, "system")) {
-		sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf);
+		if (sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf) != 2)
+			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_sysStrings[value] = strBuffer;
 	} else if(!strcmp(strbuf, "victory")) {
-		sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
+		if (sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
+			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_victoryStrings[value] = strBuffer;
 	} else if(!strcmp(strbuf, "counter")) {
-		sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
+		if (sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
+			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_counterStrings[value] = strBuffer;
 	} else if(!strcmp(strbuf, "setname")) {
-		sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf);//using tab for comment
+		//using tab for comment
+		if (sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf) != 2)
+			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_setnameStrings[value] = strBuffer;
 	}
@@ -240,7 +246,7 @@ code_pointer DataManager::GetCodePointer(unsigned int code) const {
 string_pointer DataManager::GetStringPointer(unsigned int code) const {
 	return _strings.find(code);
 }
-bool DataManager::GetString(int code, CardString* pStr) {
+bool DataManager::GetString(unsigned int code, CardString* pStr) {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end()) {
 		pStr->name = unknown_string;
@@ -250,7 +256,7 @@ bool DataManager::GetString(int code, CardString* pStr) {
 	*pStr = csit->second;
 	return true;
 }
-const wchar_t* DataManager::GetName(int code) {
+const wchar_t* DataManager::GetName(unsigned int code) {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -258,7 +264,7 @@ const wchar_t* DataManager::GetName(int code) {
 		return csit->second.name.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetText(int code) {
+const wchar_t* DataManager::GetText(unsigned int code) {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -267,7 +273,7 @@ const wchar_t* DataManager::GetText(int code) {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetDesc(unsigned int strCode) {
-	if(strCode < 10000u)
+	if (strCode < (MIN_CARD_ID << 4))
 		return GetSysString(strCode);
 	unsigned int code = (strCode >> 4) & 0x0fffffff;
 	unsigned int offset = strCode & 0xf;
@@ -279,7 +285,7 @@ const wchar_t* DataManager::GetDesc(unsigned int strCode) {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetSysString(int code) {
-	if(code < 0 || code >= 2048)
+	if (code < 0 || code > MAX_STRING_ID)
 		return unknown_string;
 	auto csit = _sysStrings.find(code);
 	if(csit == _sysStrings.end())

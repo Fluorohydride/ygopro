@@ -6,22 +6,23 @@
 namespace ygo {
 
 #ifndef YGOPRO_SERVER_MODE
-char DeckManager::deckBuffer[0x10000];
+char DeckManager::deckBuffer[0x10000]{};
 #endif
 DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
 	LFList* cur = nullptr;
 	FILE* fp = fopen(path, "r");
-	char linebuf[256];
-	wchar_t strBuffer[256];
+	char linebuf[256]{};
+	wchar_t strBuffer[256]{};
 	if(fp) {
 		while(fgets(linebuf, 256, fp)) {
 			if(linebuf[0] == '#')
 				continue;
 			if(linebuf[0] == '!') {
 				int sa = BufferIO::DecodeUTF8(&linebuf[1], strBuffer);
-				while(strBuffer[sa - 1] == L'\r' || strBuffer[sa - 1] == L'\n' ) sa--;
+				while(strBuffer[sa - 1] == L'\r' || strBuffer[sa - 1] == L'\n' )
+					sa--;
 				strBuffer[sa] = 0;
 				LFList newlist;
 				_lfList.push_back(newlist);
@@ -30,20 +31,18 @@ void DeckManager::LoadLFListSingle(const char* path) {
 				cur->hash = 0x7dfcee6a;
 				continue;
 			}
-			int p = 0;
-			while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
-			if(linebuf[p] == 0)
+			if(linebuf[0] == 0)
 				continue;
-			linebuf[p++] = 0;
-			int sa = p;
-			int code = atoi(linebuf);
-			if(code == 0)
+			int code = 0;
+			int count = -1;
+			if (sscanf(linebuf, "%d %d", &code, &count) != 2)
 				continue;
-			while(linebuf[p] == ' ' || linebuf[p] == '\t') p++;
-			while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
-			linebuf[p] = 0;
-			int count = atoi(&linebuf[sa]);
-			if(!cur) continue;
+			if (code <= 0 || code > 99999999)
+				continue;
+			if (count < 0 || count > 2)
+				continue;
+			if (!cur)
+				continue;
 			cur->content[code] = count;
 			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 		}
