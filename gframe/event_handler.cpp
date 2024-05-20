@@ -143,7 +143,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(exit_on_return)
 						mainGame->device->closeDevice();
 				} else {
-					mainGame->PopupElement(mainGame->wSurrender);
+					if(!(mainGame->dInfo.isTag && mainGame->dField.tag_surrender))
+						mainGame->PopupElement(mainGame->wSurrender);
 				}
 				break;
 			}
@@ -151,10 +152,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				DuelClient::SendPacketToServer(CTOS_SURRENDER);
 				mainGame->HideElement(mainGame->wSurrender);
+				mainGame->dField.tag_surrender = true;
 				break;
 			}
 			case BUTTON_SURRENDER_NO: {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
+				mainGame->dField.tag_teammate_surrender = false;
 				mainGame->HideElement(mainGame->wSurrender);
 				break;
 			}

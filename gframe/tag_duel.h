@@ -68,6 +68,7 @@ protected:
 	int phase;
 #endif
 	bool ready[4];
+	bool surrender[4];
 	Deck pdeck[4];
 	int deck_error[4];
 	unsigned char hand_result[2];
