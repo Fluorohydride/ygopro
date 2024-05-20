@@ -3,11 +3,7 @@
 
 namespace ygo {
 
-Replay::Replay()
-	: fp(nullptr), pheader(), pdata(nullptr), replay_size(0), comp_size(0), is_recording(false), is_replaying(false) {
-	#ifdef _WIN32
-		recording_fp = nullptr;
-	#endif
+Replay::Replay() {
 	replay_data = new unsigned char[MAX_REPLAY_SIZE];
 	comp_data = new unsigned char[MAX_COMP_SIZE];
 }
@@ -134,8 +130,8 @@ void Replay::EndRecord() {
 	comp_size = MAX_COMP_SIZE;
 	int ret = LzmaCompress(comp_data, &comp_size, replay_data, replay_size, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
 	if (ret != SZ_OK) {
-		*((int*)(comp_data)) = ret;
-		comp_size = sizeof(ret);
+		std::memcpy(comp_data, &ret, sizeof ret);
+		comp_size = sizeof ret;
 	}
 	is_recording = false;
 }
