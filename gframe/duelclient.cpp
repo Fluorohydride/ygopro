@@ -631,7 +631,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 			}
 		} else {
 			if(selftype > 3) {
-				mainGame->dInfo.player_type = 7;
+				mainGame->dInfo.player_type = NETPLAYER_TYPE_OBSERVER;
 				mainGame->btnLeaveGame->setText(dataManager.GetSysString(1350));
 				mainGame->btnLeaveGame->setVisible(true);
 				mainGame->btnSpectatorSwap->setVisible(true);
@@ -876,6 +876,11 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		mainGame->stHostPrepOB->setText(watchbuf);
 		mainGame->gMutex.unlock();
 		break;
+	}
+	case STOC_TEAMMATE_SURRENDER: {
+		if(!mainGame->dField.tag_surrender)
+			mainGame->dField.tag_teammate_surrender = true;
+		mainGame->btnLeaveGame->setText(dataManager.GetSysString(1355));
 	}
 	}
 }
@@ -2433,7 +2438,9 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 	case MSG_NEW_TURN: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
 		mainGame->dInfo.turn++;
-		if(!mainGame->dInfo.isTag && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
+		if(!mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
+			mainGame->dField.tag_surrender = false;
+			mainGame->dField.tag_teammate_surrender = false;
 			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1351));
 			mainGame->btnLeaveGame->setVisible(true);
 		}

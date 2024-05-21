@@ -1,40 +1,31 @@
 #ifndef BUFFERIO_H
 #define BUFFERIO_H
 
+#include <cstdint>
+#include "../ocgcore/buffer.h"
 
 class BufferIO {
 public:
 	inline static int ReadInt32(unsigned char*& p) {
-		int ret = *(int*)p;
-		p += 4;
-		return ret;
+		return buffer_read<int32_t>(p);
 	}
 	inline static short ReadInt16(unsigned char*& p) {
-		short ret = *(short*)p;
-		p += 2;
-		return ret;
+		return buffer_read<int16_t>(p);
 	}
 	inline static char ReadInt8(unsigned char*& p) {
-		char ret = *(char*)p;
-		p++;
-		return ret;
+		return buffer_read<char>(p);
 	}
 	inline static unsigned char ReadUInt8(unsigned char*& p) {
-		unsigned char ret = *(unsigned char*)p;
-		p++;
-		return ret;
+		return buffer_read<unsigned char>(p);
 	}
 	inline static void WriteInt32(unsigned char*& p, int val) {
-		(*(int*)p) = val;
-		p += 4;
+		buffer_write<int32_t>(p, val);
 	}
 	inline static void WriteInt16(unsigned char*& p, short val) {
-		(*(short*)p) = val;
-		p += 2;
+		buffer_write<int16_t>(p, val);
 	}
 	inline static void WriteInt8(unsigned char*& p, char val) {
-		*p = val;
-		p++;
+		buffer_write<char>(p, val);
 	}
 	template<typename T1, typename T2>
 	inline static int CopyWStr(T1* src, T2* pstr, int bufsize) {
@@ -58,67 +49,93 @@ public:
 		return l;
 	}
 	// UTF-16/UTF-32 to UTF-8
-	static int EncodeUTF8(const wchar_t * wsrc, char * str) {
+	template<size_t N>
+	static int EncodeUTF8(const wchar_t* wsrc, char(&str)[N]) {
 		char* pstr = str;
-		while(*wsrc != 0) {
-			if(*wsrc < 0x80) {
-				*str = (char)*wsrc;
-				++str;
-			} else if(*wsrc < 0x800) {
-				str[0] = ((*wsrc >> 6) & 0x1f) | 0xc0;
-				str[1] = ((*wsrc) & 0x3f) | 0x80;
-				str += 2;
-			} else if(*wsrc < 0x10000 && (*wsrc < 0xd800 || *wsrc > 0xdfff)) {
-				str[0] = ((*wsrc >> 12) & 0xf) | 0xe0;
-				str[1] = ((*wsrc >> 6) & 0x3f) | 0x80;
-				str[2] = ((*wsrc) & 0x3f) | 0x80;
-				str += 3;
-			} else {
-#ifdef _WIN32
-				unsigned unicode = 0;
-				unicode |= (*wsrc++ & 0x3ff) << 10;
-				unicode |= *wsrc & 0x3ff;
-				unicode += 0x10000;
-				str[0] = ((unicode >> 18) & 0x7) | 0xf0;
-				str[1] = ((unicode >> 12) & 0x3f) | 0x80;
-				str[2] = ((unicode >> 6) & 0x3f) | 0x80;
-				str[3] = ((unicode) & 0x3f) | 0x80;
-#else
-				str[0] = ((*wsrc >> 18) & 0x7) | 0xf0;
-				str[1] = ((*wsrc >> 12) & 0x3f) | 0x80;
-				str[2] = ((*wsrc >> 6) & 0x3f) | 0x80;
-				str[3] = ((*wsrc) & 0x3f) | 0x80;
-#endif // _WIN32
-				str += 4;
+		while (*wsrc != 0) {
+			unsigned cur = *wsrc;
+			int codepoint_size = 0;
+			if (cur < 0x80U)
+				codepoint_size = 1;
+			else if (cur < 0x800U)
+				codepoint_size = 2;
+			else if (cur < 0x10000U && (cur < 0xd800U || cur > 0xdfffU))
+				codepoint_size = 3;
+			else
+				codepoint_size = 4;
+			if (pstr - str + codepoint_size > N - 1)
+				break;
+			switch (codepoint_size) {
+				case 1:
+					*pstr = (char)cur;
+					break;
+				case 2:
+					pstr[0] = ((cur >> 6) & 0x1f) | 0xc0;
+					pstr[1] = (cur & 0x3f) | 0x80;
+					break;
+				case 3:
+					pstr[0] = ((cur >> 12) & 0xf) | 0xe0;
+					pstr[1] = ((cur >> 6) & 0x3f) | 0x80;
+					pstr[2] = (cur & 0x3f) | 0x80;
+					break;
+				case 4:
+					if (sizeof(wchar_t) == 2) {
+						cur = 0;
+						cur |= ((unsigned)*wsrc & 0x3ff) << 10;
+						++wsrc;
+						cur |= (unsigned)*wsrc & 0x3ff;
+						cur += 0x10000;
+					}
+					pstr[0] = ((cur >> 18) & 0x7) | 0xf0;
+					pstr[1] = ((cur >> 12) & 0x3f) | 0x80;
+					pstr[2] = ((cur >> 6) & 0x3f) | 0x80;
+					pstr[3] = (cur & 0x3f) | 0x80;
+					break;
+				default:
+					break;
 			}
+			pstr += codepoint_size;
 			wsrc++;
 		}
-		*str = 0;
-		return str - pstr;
+		*pstr = 0;
+		return pstr - str;
 	}
 	// UTF-8 to UTF-16/UTF-32
-	static int DecodeUTF8(const char * src, wchar_t * wstr) {
+	template<size_t N>
+	static int DecodeUTF8(const char* src, wchar_t(&wstr)[N]) {
 		const char* p = src;
 		wchar_t* wp = wstr;
 		while(*p != 0) {
-			if((*p & 0x80) == 0) {
+			const unsigned cur = (unsigned)*p & 0xff;
+			int codepoint_size = 0;
+			if ((cur & 0xf8) == 0xf0) {
+				if (sizeof(wchar_t) == 2)
+					codepoint_size = 2;
+				else
+					codepoint_size = 1;
+			}
+			else
+				codepoint_size = 1;
+			if (wp - wstr + codepoint_size > N - 1)
+				break;
+			if((cur & 0x80) == 0) {
 				*wp = *p;
 				p++;
-			} else if((*p & 0xe0) == 0xc0) {
+			} else if((cur & 0xe0) == 0xc0) {
 				*wp = (((unsigned)p[0] & 0x1f) << 6) | ((unsigned)p[1] & 0x3f);
 				p += 2;
-			} else if((*p & 0xf0) == 0xe0) {
+			} else if((cur & 0xf0) == 0xe0) {
 				*wp = (((unsigned)p[0] & 0xf) << 12) | (((unsigned)p[1] & 0x3f) << 6) | ((unsigned)p[2] & 0x3f);
 				p += 3;
-			} else if((*p & 0xf8) == 0xf0) {
-#ifdef _WIN32
-				unsigned unicode = (((unsigned)p[0] & 0x7) << 18) | (((unsigned)p[1] & 0x3f) << 12) | (((unsigned)p[2] & 0x3f) << 6) | ((unsigned)p[3] & 0x3f);
-				unicode -= 0x10000;
-				*wp++ = (unicode >> 10) | 0xd800;
-				*wp = (unicode & 0x3ff) | 0xdc00;
-#else
-				*wp = (((unsigned)p[0] & 0x7) << 18) | (((unsigned)p[1] & 0x3f) << 12) | (((unsigned)p[2] & 0x3f) << 6) | ((unsigned)p[3] & 0x3f);
-#endif // _WIN32
+			} else if((cur & 0xf8) == 0xf0) {
+				if (sizeof(wchar_t) == 2) {
+					unsigned unicode = (((unsigned)p[0] & 0x7) << 18) | (((unsigned)p[1] & 0x3f) << 12) | (((unsigned)p[2] & 0x3f) << 6) | ((unsigned)p[3] & 0x3f);
+					unicode -= 0x10000;
+					*wp++ = (unicode >> 10) | 0xd800;
+					*wp = (unicode & 0x3ff) | 0xdc00;
+				} else {
+					*wp = (((unsigned)p[0] & 0x7) << 18) | (((unsigned)p[1] & 0x3f) << 12) | (((unsigned)p[2] & 0x3f) << 6) | ((unsigned)p[3] & 0x3f);
+				}
 				p += 4;
 			} else
 				p++;

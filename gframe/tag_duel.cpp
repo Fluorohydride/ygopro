@@ -14,6 +14,7 @@ TagDuel::TagDuel() {
 	for(int i = 0; i < 4; ++i) {
 		players[i] = 0;
 		ready[i] = false;
+		surrender[i] = false;
 	}
 #ifdef YGOPRO_SERVER_MODE
 	cache_recorder = 0;
@@ -675,7 +676,33 @@ void TagDuel::DuelEndProc() {
 #endif
 }
 void TagDuel::Surrender(DuelPlayer* dp) {
-	return;
+	if(dp->type > 3 || !pduel)
+		return;
+	uint32 player = dp->type;
+	if(surrender[player])
+		return;
+	static const uint32 teammatemap[] = { 1, 0, 3, 2 };
+	uint32 teammate = teammatemap[player];
+	if(!surrender[teammate]) {
+		surrender[player] = true;
+		NetServer::SendPacketToPlayer(players[player], STOC_TEAMMATE_SURRENDER);
+		NetServer::SendPacketToPlayer(players[teammate], STOC_TEAMMATE_SURRENDER);
+		return;
+	}
+	static const uint32 winplayermap[] = { 1, 1, 0, 0 };
+	unsigned char wbuf[3];
+	wbuf[0] = MSG_WIN;
+	wbuf[1] = winplayermap[player];
+	wbuf[2] = 0;
+	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, wbuf, 3);
+	NetServer::ReSendToPlayer(players[1]);
+	NetServer::ReSendToPlayer(players[2]);
+	NetServer::ReSendToPlayer(players[3]);
+	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+		NetServer::ReSendToPlayer(*oit);
+	EndDuel();
+	DuelEndProc();
+	event_del(etimer);
 }
 int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 	unsigned char* offset, *pbufw, *pbuf = msgbuffer;
@@ -1120,6 +1147,9 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 				}
 			}
 			turn_count++;
+			for(int i = 0; i < 4; ++i) {
+				surrender[i] = false;
+			}
 			break;
 		}
 		case MSG_NEW_PHASE: {

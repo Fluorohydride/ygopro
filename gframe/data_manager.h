@@ -38,7 +38,7 @@ public:
 	const wchar_t* GetVictoryString(int code);
 	const wchar_t* GetCounterName(int code);
 	const wchar_t* GetSetName(int code);
-	unsigned int GetSetCode(const wchar_t* setname);
+	std::vector<unsigned int> GetSetCodes(std::wstring setname);
 	const wchar_t* GetNumString(int num, bool bracket = false);
 	const wchar_t* FormatLocation(int location, int sequence);
 	const wchar_t* FormatAttribute(int attribute);

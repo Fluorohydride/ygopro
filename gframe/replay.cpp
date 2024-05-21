@@ -1,6 +1,4 @@
 #include "replay.h"
-#include "../ocgcore/ocgapi.h"
-#include "../ocgcore/common.h"
 #include "lzma/LzmaLib.h"
 
 namespace ygo {
@@ -9,11 +7,7 @@ namespace ygo {
 extern unsigned short server_port;
 extern unsigned short replay_mode;
 #endif
-Replay::Replay()
-	: fp(nullptr), pheader(), pdata(nullptr), replay_size(0), comp_size(0), is_recording(false), is_replaying(false) {
-	#ifdef _WIN32
-		recording_fp = nullptr;
-	#endif
+Replay::Replay() {
 	replay_data = new unsigned char[MAX_REPLAY_SIZE];
 	comp_data = new unsigned char[MAX_COMP_SIZE];
 }
@@ -87,7 +81,7 @@ void Replay::WriteData(const void* data, int length, bool flush) {
 		return;
 	if (length < 0 || (pdata - replay_data) + length > MAX_REPLAY_SIZE)
 		return;
-	memcpy(pdata, data, length);
+	std::memcpy(pdata, data, length);
 	pdata += length;
 #ifdef YGOPRO_SERVER_MODE
 	if(!(replay_mode & REPLAY_MODE_SAVE_IN_SERVER)) return;
@@ -106,8 +100,7 @@ void Replay::WriteInt32(int data, bool flush) {
 		return;
 	if ((pdata - replay_data) + 4 > MAX_REPLAY_SIZE)
 		return;
-	*((int*)(pdata)) = data;
-	pdata += 4;
+	BufferIO::WriteInt32(pdata, data);
 #ifdef YGOPRO_SERVER_MODE
 	if(!(replay_mode & REPLAY_MODE_SAVE_IN_SERVER)) return;
 #endif
@@ -125,8 +118,7 @@ void Replay::WriteInt16(short data, bool flush) {
 		return;
 	if ((pdata - replay_data) + 2 > MAX_REPLAY_SIZE)
 		return;
-	*((short*)(pdata)) = data;
-	pdata += 2;
+	BufferIO::WriteInt16(pdata, data);
 #ifdef YGOPRO_SERVER_MODE
 	if(!(replay_mode & REPLAY_MODE_SAVE_IN_SERVER)) return;
 #endif
@@ -144,8 +136,7 @@ void Replay::WriteInt8(char data, bool flush) {
 		return;
 	if ((pdata - replay_data) + 1 > MAX_REPLAY_SIZE)
 		return;
-	*pdata = data;
-	pdata++;
+	BufferIO::WriteInt8(pdata, data);
 #ifdef YGOPRO_SERVER_MODE
 	if(!(replay_mode & REPLAY_MODE_SAVE_IN_SERVER)) return;
 #endif
@@ -193,8 +184,8 @@ void Replay::EndRecord() {
 	comp_size = MAX_COMP_SIZE;
 	int ret = LzmaCompress(comp_data, &comp_size, replay_data, replay_size, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
 	if (ret != SZ_OK) {
-		*((int*)(comp_data)) = ret;
-		comp_size = sizeof(ret);
+		std::memcpy(comp_data, &ret, sizeof ret);
+		comp_size = sizeof ret;
 	}
 	is_recording = false;
 }
@@ -320,7 +311,7 @@ bool Replay::ReadNextResponse(unsigned char resp[]) {
 	int len = *pdata++;
 	if(len > SIZE_RETURN_VALUE)
 		return false;
-	memcpy(resp, pdata, len);
+	std::memcpy(resp, pdata, len);
 	pdata += len;
 	return true;
 }
@@ -334,27 +325,26 @@ void Replay::ReadName(wchar_t* data) {
 void Replay::ReadData(void* data, int length) {
 	if(!is_replaying)
 		return;
-	memcpy(data, pdata, length);
+	std::memcpy(data, pdata, length);
 	pdata += length;
 }
 int Replay::ReadInt32() {
 	if(!is_replaying)
 		return -1;
-	int ret = *((int*)pdata);
-	pdata += 4;
+	int ret = BufferIO::ReadInt32(pdata);
 	return ret;
 }
 short Replay::ReadInt16() {
 	if(!is_replaying)
 		return -1;
-	short ret = *((short*)pdata);
-	pdata += 2;
+	short ret = BufferIO::ReadInt16(pdata);
 	return ret;
 }
 char Replay::ReadInt8() {
 	if(!is_replaying)
 		return -1;
-	return *pdata++;
+	char ret= BufferIO::ReadInt8(pdata);
+	return ret;
 }
 void Replay::Rewind() {
 	pdata = replay_data;

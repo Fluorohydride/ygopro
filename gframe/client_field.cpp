@@ -117,6 +117,8 @@ void ClientField::Clear() {
 	conti_act = false;
 	deck_reversed = false;
 	cant_check_grave = false;
+	tag_surrender = false;
+	tag_teammate_surrender = false;
 }
 void ClientField::Initial(int player, int deckc, int extrac) {
 	ClientCard* pcard;
@@ -680,8 +682,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + newheight;
 		mainGame->wOptions->setRelativePosition(pos);
 	} else {
-		mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->guiFont,
-			(wchar_t*)dataManager.GetDesc(select_options[0]));
+		mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->guiFont, dataManager.GetDesc(select_options[0]));
 		mainGame->stOptions->setVisible(true);
 		mainGame->btnOptionp->setVisible(false);
 		mainGame->btnOptionn->setVisible(count > 1);
