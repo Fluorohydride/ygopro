@@ -267,13 +267,22 @@ const wchar_t* DataManager::GetSetName(int code) {
 		return NULL;
 	return csit->second.c_str();
 }
-unsigned int DataManager::GetSetCode(const wchar_t* setname) {
+std::vector<unsigned int> DataManager::GetSetCodes(std::wstring setname) {
+	std::vector<unsigned int> matchingCodes;
 	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
 		auto xpos = csit->second.find_first_of(L'|');//setname|another setname or extra info
-		if(csit->second.compare(0, xpos, setname) == 0 || csit->second.compare(xpos + 1, csit->second.length(), setname) == 0)
-			return csit->first;
+		if(setname.size() < 2) {
+			if(csit->second.compare(0, xpos, setname) == 0
+				|| csit->second.compare(xpos + 1, csit->second.length(), setname) == 0)
+				matchingCodes.push_back(csit->first);
+		} else {
+			if(csit->second.substr(0, xpos).find(setname) != std::wstring::npos
+				|| csit->second.substr(xpos + 1).find(setname) != std::wstring::npos) {
+				matchingCodes.push_back(csit->first);
+			}
+		}
 	}
-	return 0;
+	return matchingCodes;
 }
 const wchar_t* DataManager::GetNumString(int num, bool bracket) {
 	if(!bracket)
