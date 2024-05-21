@@ -91,11 +91,11 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 	if(!list)
 		return 0;
 	int dc = 0;
-	if(deck.main.size() < 40 || deck.main.size() > 60)
+	if(deck.main.size() < YGOPRO_MIN_DECK || deck.main.size() > YGOPRO_MAX_DECK)
 		return (DECKERROR_MAINCOUNT << 28) + deck.main.size();
-	if(deck.extra.size() > 15)
+	if(deck.extra.size() > YGOPRO_MAX_EXTRA)
 		return (DECKERROR_EXTRACOUNT << 28) + deck.extra.size();
-	if(deck.side.size() > 15)
+	if(deck.side.size() > YGOPRO_MAX_SIDE)
 		return (DECKERROR_SIDECOUNT << 28) + deck.side.size();
 	const int rule_map[6] = { AVAIL_OCG, AVAIL_TCG, AVAIL_SC, AVAIL_CUSTOM, AVAIL_OCGTCG, 0 };
 	int avail = rule_map[rule];
@@ -163,10 +163,10 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 			continue;
 		}
 		else if(cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) {
-			if(deck.extra.size() >= 15)
+			if(deck.extra.size() >= YGOPRO_MAX_EXTRA)
 				continue;
 			deck.extra.push_back(dataManager.GetCodePointer(code));
-		} else if(deck.main.size() < 60) {
+		} else if(deck.main.size() < YGOPRO_MAX_DECK) {
 			deck.main.push_back(dataManager.GetCodePointer(code));
 		}
 	}
@@ -178,7 +178,7 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 		}
 		if(cd.type & TYPE_TOKEN)
 			continue;
-		if(deck.side.size() < 15)
+		if(deck.side.size() < YGOPRO_MAX_SIDE)
 			deck.side.push_back(dataManager.GetCodePointer(code));
 	}
 	return errorcode;
@@ -194,17 +194,21 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 		pcount[deck.side[i]->first]++;
 	Deck ndeck;
 	LoadDeck(ndeck, dbuf, mainc, sidec);
+#ifndef YGOPRO_NO_SIDE_CHECK
 	if(ndeck.main.size() != deck.main.size() || ndeck.extra.size() != deck.extra.size())
 		return false;
+#endif
 	for(size_t i = 0; i < ndeck.main.size(); ++i)
 		ncount[ndeck.main[i]->first]++;
 	for(size_t i = 0; i < ndeck.extra.size(); ++i)
 		ncount[ndeck.extra[i]->first]++;
 	for(size_t i = 0; i < ndeck.side.size(); ++i)
 		ncount[ndeck.side[i]->first]++;
+#ifndef YGOPRO_NO_SIDE_CHECK
 	for(auto cdit = ncount.begin(); cdit != ncount.end(); ++cdit)
 		if(cdit->second != pcount[cdit->first])
 			return false;
+#endif
 	deck = ndeck;
 	return true;
 }

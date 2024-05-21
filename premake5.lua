@@ -61,8 +61,44 @@ newoption { trigger = "server-mode", category = "YGOPro - server", description =
 newoption { trigger = "server-zip-support", category = "YGOPro - server", description = "" }
 newoption { trigger = "server-pro2-support", category = "YGOPro - server", description = "" }
 
+boolOptions = {
+    "no-lua-safe",
+    "no-side-check",
+    "tag-surrender-confirm"
+}
+
+for _, boolOption in ipairs(boolOptions) do
+    newoption { trigger = boolOption, category = "YGOPro - options", description = "" }
+end
+
+numberOptions = {
+    "default-duel-rule",
+    "max-deck",
+    "min-deck",
+    "max-extra",
+    "max-side",
+}
+for _, numberOption in ipairs(numberOptions) do
+    newoption { trigger = numberOption, category = "YGOPro - options", description = "", value = "NUMBER" }
+end
+
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
+end
+
+function ApplyBoolean(param)
+    if GetParam(param) then
+        defines { "YGOPRO_" .. string.upper(string.gsub(param,"-","_")) }
+    end
+end
+
+function ApplyNumber(param)
+    local value = GetParam(param)
+    if not value then return end
+    local numberValue = tonumber(value)
+    if numberValue then
+        defines { "YGOPRO_" .. string.upper(string.gsub(param,"-","_")) .. "=" .. numberValue }
+    end
 end
 
 if GetParam("build-lua") then
@@ -185,6 +221,14 @@ workspace "YGOPro"
     objdir "obj"
 
     configurations { "Release", "Debug" }
+
+    for _, numberOption in ipairs(numberOptions) do
+        ApplyNumber(numberOption)
+    end
+
+    for _, boolOption in ipairs(boolOptions) do
+        ApplyBoolean(boolOption)
+    end
 
     filter "system:windows"
         defines { "WIN32", "_WIN32" }
