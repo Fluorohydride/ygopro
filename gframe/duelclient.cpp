@@ -714,7 +714,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		mainGame->CloseGameButtons();
 		auto prep = pdata;
 		Replay new_replay;
-		memcpy(&new_replay.pheader, prep, sizeof(ReplayHeader));
+		std::memcpy(&new_replay.pheader, prep, sizeof(ReplayHeader));
 		time_t starttime;
 		if (new_replay.pheader.flag & REPLAY_UNIFORM)
 			starttime = new_replay.pheader.start_time;
@@ -743,7 +743,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		}
 		if(mainGame->actionParam || !is_host) {
 			prep += sizeof(ReplayHeader);
-			memcpy(new_replay.comp_data, prep, len - sizeof(ReplayHeader) - 1);
+			std::memcpy(new_replay.comp_data, prep, len - sizeof(ReplayHeader) - 1);
 			new_replay.comp_size = len - sizeof(ReplayHeader) - 1;
 			if(mainGame->actionParam)
 				new_replay.SaveReplay(mainGame->ebRSName->getText());
@@ -915,7 +915,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 	wchar_t textBuffer[256];
 	mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 	if(mainGame->dInfo.curMsg != MSG_RETRY) {
-		memcpy(last_successful_msg, msg, len);
+		std::memcpy(last_successful_msg, msg, len);
 		last_successful_msg_length = len;
 	}
 	mainGame->dField.HideMenu();
@@ -3977,7 +3977,7 @@ void DuelClient::SetResponseI(int respI) {
 void DuelClient::SetResponseB(void* respB, unsigned int len) {
 	if (len > SIZE_RETURN_VALUE)
 		len = SIZE_RETURN_VALUE;
-	memcpy(response_buf, respB, len);
+	std::memcpy(response_buf, respB, len);
 	response_len = len;
 }
 void DuelClient::SendResponse() {

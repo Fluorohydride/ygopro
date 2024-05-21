@@ -330,9 +330,9 @@ void SingleDuel::StartDuel(DuelPlayer* dp) {
 	BufferIO::WriteInt16(pbuf, (short)pdeck[1].side.size());
 	NetServer::SendBufferToPlayer(players[0], STOC_DECK_COUNT, deckbuff, 12);
 	char tempbuff[6];
-	memcpy(tempbuff, deckbuff, 6);
-	memcpy(deckbuff, deckbuff + 6, 6);
-	memcpy(deckbuff + 6, tempbuff, 6);
+	std::memcpy(tempbuff, deckbuff, 6);
+	std::memcpy(deckbuff, deckbuff + 6, 6);
+	std::memcpy(deckbuff + 6, tempbuff, 6);
 	NetServer::SendBufferToPlayer(players[1], STOC_DECK_COUNT, deckbuff, 12);
 	NetServer::SendPacketToPlayer(players[0], STOC_SELECT_HAND);
 	NetServer::ReSendToPlayer(players[1]);
@@ -1408,7 +1408,7 @@ void SingleDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 	byte resb[SIZE_RETURN_VALUE];
 	if (len > SIZE_RETURN_VALUE)
 		len = SIZE_RETURN_VALUE;
-	memcpy(resb, pdata, len);
+	std::memcpy(resb, pdata, len);
 	last_replay.WriteInt8(len);
 	last_replay.WriteData(resb, len);
 	set_responseb(pduel, resb);
@@ -1426,9 +1426,9 @@ void SingleDuel::EndDuel() {
 		return;
 	last_replay.EndRecord();
 	char replaybuf[0x2000], *pbuf = replaybuf;
-	memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
+	std::memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
 	pbuf += sizeof(ReplayHeader);
-	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
+	std::memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
 	NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size);
 	NetServer::ReSendToPlayer(players[1]);
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)

@@ -751,7 +751,7 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 			int len = BufferIO::ReadInt16(pbuf);
 			auto begin = pbuf;
 			pbuf += len + 1;
-			memcpy(namebuf, begin, len + 1);
+			std::memcpy(namebuf, begin, len + 1);
 			BufferIO::DecodeUTF8(namebuf, wname);
 			BufferIO::CopyWStr(wname, mainGame->dInfo.clientname, 20);
 			break;
@@ -762,7 +762,7 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 			int len = BufferIO::ReadInt16(pbuf);
 			auto begin = pbuf;
 			pbuf += len + 1;
-			memcpy(msgbuf, begin, len + 1);
+			std::memcpy(msgbuf, begin, len + 1);
 			BufferIO::DecodeUTF8(msgbuf, msg);
 			mainGame->gMutex.lock();
 			mainGame->SetStaticText(mainGame->stMessage, 310, mainGame->guiFont, msg);

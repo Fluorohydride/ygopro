@@ -54,7 +54,7 @@ public:
 			return;
 		BufferIO::WriteInt16(p, (short)(1 + blen));
 		BufferIO::WriteInt8(p, proto);
-		memcpy(p, &st, blen);
+		std::memcpy(p, &st, blen);
 		last_sent = blen + 3;
 		if (dp)
 			bufferevent_write(dp->bev, net_server_write, blen + 3);
@@ -68,7 +68,7 @@ public:
 			blen = MAX_DATA_SIZE;
 		BufferIO::WriteInt16(p, (short)(1 + blen));
 		BufferIO::WriteInt8(p, proto);
-		memcpy(p, buffer, blen);
+		std::memcpy(p, buffer, blen);
 		last_sent = blen + 3;
 		if (dp)
 			bufferevent_write(dp->bev, net_server_write, blen + 3);

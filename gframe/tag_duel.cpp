@@ -296,9 +296,9 @@ void TagDuel::StartDuel(DuelPlayer* dp) {
 	NetServer::SendBufferToPlayer(players[0], STOC_DECK_COUNT, deckbuff, 12);
 	NetServer::ReSendToPlayer(players[1]);
 	char tempbuff[6];
-	memcpy(tempbuff, deckbuff, 6);
-	memcpy(deckbuff, deckbuff + 6, 6);
-	memcpy(deckbuff + 6, tempbuff, 6);
+	std::memcpy(tempbuff, deckbuff, 6);
+	std::memcpy(deckbuff, deckbuff + 6, 6);
+	std::memcpy(deckbuff + 6, tempbuff, 6);
 	NetServer::SendBufferToPlayer(players[2], STOC_DECK_COUNT, deckbuff, 12);
 	NetServer::ReSendToPlayer(players[3]);
 	NetServer::SendPacketToPlayer(players[0], STOC_SELECT_HAND);
@@ -1523,7 +1523,7 @@ void TagDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 	byte resb[SIZE_RETURN_VALUE];
 	if (len > SIZE_RETURN_VALUE)
 		len = SIZE_RETURN_VALUE;
-	memcpy(resb, pdata, len);
+	std::memcpy(resb, pdata, len);
 	last_replay.WriteInt8(len);
 	last_replay.WriteData(resb, len);
 	set_responseb(pduel, resb);
@@ -1542,9 +1542,9 @@ void TagDuel::EndDuel() {
 		return;
 	last_replay.EndRecord();
 	char replaybuf[0x2000], *pbuf = replaybuf;
-	memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
+	std::memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
 	pbuf += sizeof(ReplayHeader);
-	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
+	std::memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
 	NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size);
 	NetServer::ReSendToPlayer(players[1]);
 	NetServer::ReSendToPlayer(players[2]);
