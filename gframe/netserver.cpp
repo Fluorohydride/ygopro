@@ -10,6 +10,7 @@ event* NetServer::broadcast_ev = 0;
 evconnlistener* NetServer::listener = 0;
 DuelMode* NetServer::duel_mode = 0;
 unsigned char NetServer::net_server_read[SIZE_NETWORK_BUFFER];
+int NetServer::read_len = 0;
 unsigned char NetServer::net_server_write[SIZE_NETWORK_BUFFER];
 unsigned short NetServer::last_sent = 0;
 
@@ -124,9 +125,15 @@ void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 		evbuffer_copyout(input, &packet_len, 2);
 		if(len < (size_t)packet_len + 2)
 			return;
-		evbuffer_remove(input, net_server_read, packet_len + 2);
-		if(packet_len)
-			HandleCTOSPacket(&users[bev], &net_server_read[2], packet_len);
+		if (packet_len + 2 > SIZE_NETWORK_BUFFER) {
+			evbuffer_drain(input, packet_len + 2);
+			read_len = 0;
+		}
+		else {
+			read_len = evbuffer_remove(input, net_server_read, packet_len + 2);
+		}
+		if (read_len > 0)
+			HandleCTOSPacket(&users[bev], &net_server_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}
 }
