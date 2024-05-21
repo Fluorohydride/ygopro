@@ -74,15 +74,9 @@ typedef unsigned long UInt64;
 
 #else
 
-#if defined(_MSC_VER) || defined(__BORLANDC__)
-typedef __int64 Int64;
-typedef unsigned __int64 UInt64;
-#define UINT64_CONST(n) n
-#else
 typedef long long int Int64;
 typedef unsigned long long int UInt64;
 #define UINT64_CONST(n) n ## ULL
-#endif
 
 #endif
 
