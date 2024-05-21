@@ -19,6 +19,7 @@ private:
 	static evconnlistener* listener;
 	static DuelMode* duel_mode;
 	static unsigned char net_server_read[SIZE_NETWORK_BUFFER];
+	static int read_len;
 	static unsigned char net_server_write[SIZE_NETWORK_BUFFER];
 	static unsigned short last_sent;
 
@@ -50,7 +51,7 @@ public:
 		auto p = net_server_write;
 		int blen = sizeof(ST);
 		if (blen > MAX_DATA_SIZE)
-			blen = MAX_DATA_SIZE;
+			return;
 		BufferIO::WriteInt16(p, (short)(1 + blen));
 		BufferIO::WriteInt8(p, proto);
 		memcpy(p, &st, blen);
