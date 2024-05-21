@@ -85,6 +85,8 @@ public:
 	bool deck_reversed{ false };
 	bool conti_selecting{ false };
 	bool cant_check_grave{ false };
+	bool tag_surrender{ false };
+	bool tag_teammate_surrender{ false };
 	mt19937 rnd;
 
 	ClientField();
