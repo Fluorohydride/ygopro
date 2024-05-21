@@ -84,7 +84,9 @@ void NetServer::BroadcastEvent(evutil_socket_t fd, short events, void* arg) {
 	int ret = recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
 	if(ret == -1)
 		return;
-	HostRequest* pHR = (HostRequest*)buf;
+	HostRequest packet;
+	std::memcpy(&packet, buf, sizeof packet);
+	const HostRequest* pHR = &packet;
 	if(pHR->identifier == NETWORK_CLIENT_ID) {
 		SOCKADDR_IN sockTo;
 		sockTo.sin_addr.s_addr = bc_addr.sin_addr.s_addr;
@@ -204,26 +206,34 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, unsigned i
 	case CTOS_HAND_RESULT: {
 		if(!dp->game)
 			return;
-		CTOS_HandResult* pkt = (CTOS_HandResult*)pdata;
+		CTOS_HandResult packet;
+		std::memcpy(&packet, pdata, sizeof packet);
+		const auto* pkt = &packet;
 		dp->game->HandResult(dp, pkt->res);
 		break;
 	}
 	case CTOS_TP_RESULT: {
 		if(!dp->game)
 			return;
-		CTOS_TPResult* pkt = (CTOS_TPResult*)pdata;
+		CTOS_TPResult packet;
+		std::memcpy(&packet, pdata, sizeof packet);
+		const auto* pkt = &packet;
 		dp->game->TPResult(dp, pkt->res);
 		break;
 	}
 	case CTOS_PLAYER_INFO: {
-		CTOS_PlayerInfo* pkt = (CTOS_PlayerInfo*)pdata;
+		CTOS_PlayerInfo packet;
+		std::memcpy(&packet, pdata, sizeof packet);
+		const auto* pkt = &packet;
 		BufferIO::CopyWStr(pkt->name, dp->name, 20);
 		break;
 	}
 	case CTOS_CREATE_GAME: {
 		if(dp->game || duel_mode)
 			return;
-		CTOS_CreateGame* pkt = (CTOS_CreateGame*)pdata;
+		CTOS_CreateGame packet;
+		std::memcpy(&packet, pdata, sizeof packet);
+		auto pkt = &packet;
 		if(pkt->info.mode == MODE_SINGLE) {
 			duel_mode = new SingleDuel(false);
 			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
@@ -247,6 +257,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, unsigned i
 		}
 		if(hash == 1)
 			pkt->info.lflist = deckManager._lfList[0].hash;
+		std::memcpy(pdata, &packet, sizeof packet);
 		duel_mode->host_info = pkt->info;
 		BufferIO::CopyWStr(pkt->name, duel_mode->name, 20);
 		BufferIO::CopyWStr(pkt->pass, duel_mode->pass, 20);
@@ -294,7 +305,9 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, unsigned i
 	case CTOS_HS_KICK: {
 		if(!duel_mode || duel_mode->pduel)
 			break;
-		CTOS_Kick* pkt = (CTOS_Kick*)pdata;
+		CTOS_Kick packet;
+		std::memcpy(&packet, pdata, sizeof packet);
+		const auto* pkt = &packet;
 		duel_mode->PlayerKick(dp, pkt->pos);
 		break;
 	}
