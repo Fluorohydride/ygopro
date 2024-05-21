@@ -20,6 +20,7 @@ bool DuelClient::is_host = false;
 event_base* DuelClient::client_base = 0;
 bufferevent* DuelClient::client_bev = 0;
 unsigned char DuelClient::duel_client_read[SIZE_NETWORK_BUFFER];
+int DuelClient::read_len = 0;
 unsigned char DuelClient::duel_client_write[SIZE_NETWORK_BUFFER];
 bool DuelClient::is_closing = false;
 bool DuelClient::is_swapping = false;
@@ -106,9 +107,15 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 		evbuffer_copyout(input, &packet_len, 2);
 		if(len < (size_t)packet_len + 2)
 			return;
-		evbuffer_remove(input, duel_client_read, packet_len + 2);
-		if(packet_len)
-			HandleSTOCPacketLan(&duel_client_read[2], packet_len);
+		if (packet_len + 2 > SIZE_NETWORK_BUFFER) {
+			evbuffer_drain(input, packet_len + 2);
+			read_len = 0;
+		}
+		else {
+			read_len = evbuffer_remove(input, duel_client_read, packet_len + 2);
+		}
+		if (read_len > 0)
+			HandleSTOCPacketLan(&duel_client_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}
 }

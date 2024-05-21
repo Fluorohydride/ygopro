@@ -27,6 +27,7 @@ private:
 	static event_base* client_base;
 	static bufferevent* client_bev;
 	static unsigned char duel_client_read[SIZE_NETWORK_BUFFER];
+	static int read_len;
 	static unsigned char duel_client_write[SIZE_NETWORK_BUFFER];
 	static bool is_closing;
 	static bool is_swapping;
@@ -62,7 +63,7 @@ public:
 		auto p = duel_client_write;
 		int blen = sizeof(ST);
 		if (blen > MAX_DATA_SIZE)
-			blen = MAX_DATA_SIZE;
+			return;
 		BufferIO::WriteInt16(p, (short)(1 + blen));
 		BufferIO::WriteInt8(p, proto);
 		memcpy(p, &st, blen);
