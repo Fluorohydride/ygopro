@@ -388,9 +388,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					int flag = 0;
 					flag += (mainGame->chkBotHand->isChecked() ? 0x1 : 0);
 					char arg2[8];
-					sprintf(arg2, "%d", flag);
+					snprintf(arg2, sizeof arg2, "%d", flag);
 					char arg3[8];
-					sprintf(arg3, "%d", mainGame->gameConf.serverport);
+					snprintf(arg3, sizeof arg3, "%d", mainGame->gameConf.serverport);
 					execl("./bot", "bot", arg1, arg2, arg3, NULL);
 					exit(0);
 				} else {

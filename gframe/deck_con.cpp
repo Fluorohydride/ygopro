@@ -1337,14 +1337,14 @@ void DeckBuilder::FilterCards() {
 	results.clear();
 	struct element_t {
 		std::wstring keyword;
-		unsigned int setcode;
+		std::vector<unsigned int> setcodes;
 		enum class type_t {
 			all,
 			name,
 			setcode
 		} type;
 		bool exclude;
-		element_t(): setcode(0), type(type_t::all), exclude(false) {}
+		element_t(): type(type_t::all), exclude(false) {}
 	};
 	const wchar_t* pstr = mainGame->ebCardName->getText();
 	std::wstring str = std::wstring(pstr);
@@ -1385,7 +1385,7 @@ void DeckBuilder::FilterCards() {
 				element.keyword = str.substr(element_start, length);
 			} else
 				element.keyword = str.substr(element_start);
-			element.setcode = dataManager.GetSetCode(element.keyword.c_str());
+			element.setcodes = dataManager.GetSetCodes(element.keyword);
 			query_elements.push_back(element);
 			if(element_end == std::wstring::npos)
 				break;
@@ -1403,7 +1403,7 @@ void DeckBuilder::FilterCards() {
 		}
 		if(element_start < str.size()) {
 			element.keyword = str.substr(element_start);
-			element.setcode = dataManager.GetSetCode(element.keyword.c_str());
+			element.setcodes = dataManager.GetSetCodes(element.keyword);
 			query_elements.push_back(element);
 		}
 	}
@@ -1490,14 +1490,14 @@ void DeckBuilder::FilterCards() {
 			if (elements_iterator->type == element_t::type_t::name) {
 				match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str());
 			} else if (elements_iterator->type == element_t::type_t::setcode) {
-				match = elements_iterator->setcode && data.is_setcode(elements_iterator->setcode);
+				match = data.is_setcodes(elements_iterator->setcodes);
 			} else {
 				int trycode = BufferIO::GetVal(elements_iterator->keyword.c_str());
 				bool tryresult = dataManager.GetData(trycode, 0);
 				if(!tryresult) {
 					match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str())
 						|| text.text.find(elements_iterator->keyword) != std::wstring::npos
-						|| (elements_iterator->setcode && data.is_setcode(elements_iterator->setcode));
+						|| data.is_setcodes(elements_iterator->setcodes);
 				} else {
 					match = data.code == trycode || data.alias == trycode;
 				}
@@ -1757,7 +1757,7 @@ bool DeckBuilder::push_main(code_pointer pointer, int seq) {
 	if(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK))
 		return false;
 	auto& container = deckManager.current_deck.main;
-	int maxc = mainGame->is_siding ? 64 : 60;
+	int maxc = mainGame->is_siding ? YGOPRO_MAX_DECK + 5 : YGOPRO_MAX_DECK;
 	if((int)container.size() >= maxc)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
@@ -1772,7 +1772,7 @@ bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
 	if(!(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)))
 		return false;
 	auto& container = deckManager.current_deck.extra;
-	int maxc = mainGame->is_siding ? 20 : 15;
+	int maxc = mainGame->is_siding ? YGOPRO_MAX_EXTRA + 5 : YGOPRO_MAX_EXTRA;
 	if((int)container.size() >= maxc)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
@@ -1785,7 +1785,7 @@ bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
 }
 bool DeckBuilder::push_side(code_pointer pointer, int seq) {
 	auto& container = deckManager.current_deck.side;
-	int maxc = mainGame->is_siding ? 20 : 15;
+	int maxc = mainGame->is_siding ? YGOPRO_MAX_SIDE + 5 : YGOPRO_MAX_SIDE;
 	if((int)container.size() >= maxc)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())

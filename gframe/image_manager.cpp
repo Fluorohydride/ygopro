@@ -233,10 +233,10 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	auto tit = tMap[fit ? 1 : 0].find(code);
 	if(tit == tMap[fit ? 1 : 0].end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/%d.jpg", code);
+		snprintf(file, sizeof file, "expansions/pics/%d.jpg", code);
 		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
 		if(img == NULL) {
-			sprintf(file, "pics/%d.jpg", code);
+			snprintf(file, sizeof file, "pics/%d.jpg", code);
 			img = GetTextureFromFile(file, width, height);
 		}
 		if(img == NULL && !mainGame->gameConf.use_image_scale) {
@@ -260,10 +260,10 @@ irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 	}
 	irr::video::ITexture* texture;
 	char file[256];
-	sprintf(file, "expansions/pics/%d.jpg", code);
+	snprintf(file, sizeof file, "expansions/pics/%d.jpg", code);
 	irr::video::IImage* srcimg = driver->createImageFromFile(file);
 	if(srcimg == NULL) {
-		sprintf(file, "pics/%d.jpg", code);
+		snprintf(file, sizeof file, "pics/%d.jpg", code);
 		srcimg = driver->createImageFromFile(file);
 	}
 	if(srcimg == NULL) {
@@ -289,18 +289,18 @@ int ImageManager::LoadThumbThread() {
 		imageManager.tThumbLoadingCodes.pop();
 		imageManager.tThumbLoadingMutex.unlock();
 		char file[256];
-		sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
+		snprintf(file, sizeof file, "expansions/pics/thumbnail/%d.jpg", code);
 		irr::video::IImage* img = imageManager.driver->createImageFromFile(file);
 		if(img == NULL) {
-			sprintf(file, "pics/thumbnail/%d.jpg", code);
+			snprintf(file, sizeof file, "pics/thumbnail/%d.jpg", code);
 			img = imageManager.driver->createImageFromFile(file);
 		}
 		if(img == NULL && mainGame->gameConf.use_image_scale) {
-			sprintf(file, "expansions/pics/%d.jpg", code);
+			snprintf(file, sizeof file, "expansions/pics/%d.jpg", code);
 			img = imageManager.driver->createImageFromFile(file);
 		}
 		if(img == NULL && mainGame->gameConf.use_image_scale) {
-			sprintf(file, "pics/%d.jpg", code);
+			snprintf(file, sizeof file, "pics/%d.jpg", code);
 			img = imageManager.driver->createImageFromFile(file);
 		}
 		if(img != NULL) {
@@ -345,7 +345,7 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(lit != tThumbLoading.end()) {
 		if(lit->second != NULL) {
 			char file[256];
-			sprintf(file, "pics/thumbnail/%d.jpg", code);
+			snprintf(file, sizeof file, "pics/thumbnail/%d.jpg", code);
 			irr::video::ITexture* texture = driver->addTexture(file, lit->second); // textures must be added in the main thread due to OpenGL
 			lit->second->drop();
 			tThumb[code] = texture;
@@ -378,18 +378,18 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/field/%d.png", code);
+		snprintf(file, sizeof file, "expansions/pics/field/%d.png", code);
 		irr::video::ITexture* img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 		if(img == NULL) {
-			sprintf(file, "expansions/pics/field/%d.jpg", code);
+			snprintf(file, sizeof file, "expansions/pics/field/%d.jpg", code);
 			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 		}
 		if(img == NULL) {
-			sprintf(file, "pics/field/%d.png", code);
+			snprintf(file, sizeof file, "pics/field/%d.png", code);
 			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 		}
 		if(img == NULL) {
-			sprintf(file, "pics/field/%d.jpg", code);
+			snprintf(file, sizeof file, "pics/field/%d.jpg", code);
 			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 			if(img == NULL) {
 				tFields[code] = NULL;
