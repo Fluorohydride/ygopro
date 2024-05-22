@@ -29,6 +29,9 @@ if SERVER_MODE then
     if SERVER_PRO2_SUPPORT then
         defines { "SERVER_PRO2_SUPPORT" }
     end
+    if SERVER_TAG_SURRENDER_CONFIRM then
+        defines { "SERVER_TAG_SURRENDER_CONFIRM" }
+    end
 else
     kind "WindowedApp"
 
