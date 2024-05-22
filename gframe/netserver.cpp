@@ -117,21 +117,19 @@ void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {
 }
 void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
-	size_t len = evbuffer_get_length(input);
+	int len = evbuffer_get_length(input);
 	unsigned short packet_len = 0;
 	while(true) {
 		if(len < 2)
 			return;
 		evbuffer_copyout(input, &packet_len, 2);
-		if(len < (size_t)packet_len + 2)
-			return;
 		if (packet_len + 2 > SIZE_NETWORK_BUFFER) {
-			evbuffer_drain(input, packet_len + 2);
-			read_len = 0;
+			ServerEchoEvent(bev, BEV_EVENT_ERROR, 0);
+			return;
 		}
-		else {
-			read_len = evbuffer_remove(input, net_server_read, packet_len + 2);
-		}
+		if (len < packet_len + 2)
+			return;
+		read_len = evbuffer_remove(input, net_server_read, packet_len + 2);
 		if (read_len > 0)
 			HandleCTOSPacket(&users[bev], &net_server_read[2], read_len - 2);
 		len -= packet_len + 2;
@@ -143,7 +141,8 @@ void NetServer::ServerEchoEvent(bufferevent* bev, short events, void* ctx) {
 		DuelMode* dm = dp->game;
 		if(dm)
 			dm->LeaveGame(dp);
-		else DisconnectPlayer(dp);
+		else
+			DisconnectPlayer(dp);
 	}
 }
 int NetServer::ServerThread() {
