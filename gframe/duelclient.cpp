@@ -111,8 +111,10 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 		}
 		if(len < packet_len + 2)
 			return;
+		if (packet_len < 1)
+			return;
 		read_len = evbuffer_remove(input, duel_client_read, packet_len + 2);
-		if (read_len > 0)
+		if (read_len >= 3)
 			HandleSTOCPacketLan(&duel_client_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}
