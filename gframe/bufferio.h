@@ -27,6 +27,7 @@ public:
 	inline static void WriteInt8(unsigned char*& p, char val) {
 		buffer_write<char>(p, val);
 	}
+	// return: string length
 	template<typename T1, typename T2>
 	inline static int CopyWStr(T1* src, T2* pstr, int bufsize) {
 		int l = 0;
@@ -49,8 +50,8 @@ public:
 		return l;
 	}
 	// UTF-16/UTF-32 to UTF-8
-	template<size_t N>
-	static int EncodeUTF8(const wchar_t* wsrc, char(&str)[N]) {
+	// return: string length
+	static int EncodeUTF8String(const wchar_t* wsrc, char* str, int size) {
 		char* pstr = str;
 		while (*wsrc != 0) {
 			unsigned cur = *wsrc;
@@ -63,7 +64,7 @@ public:
 				codepoint_size = 3;
 			else
 				codepoint_size = 4;
-			if (pstr - str + codepoint_size > N - 1)
+			if (pstr - str + codepoint_size > size - 1)
 				break;
 			switch (codepoint_size) {
 				case 1:
@@ -101,8 +102,8 @@ public:
 		return pstr - str;
 	}
 	// UTF-8 to UTF-16/UTF-32
-	template<size_t N>
-	static int DecodeUTF8(const char* src, wchar_t(&wstr)[N]) {
+	// return: string length
+	static int DecodeUTF8String(const char* src, wchar_t* wstr, int size) {
 		const char* p = src;
 		wchar_t* wp = wstr;
 		while(*p != 0) {
@@ -116,7 +117,7 @@ public:
 			}
 			else
 				codepoint_size = 1;
-			if (wp - wstr + codepoint_size > N - 1)
+			if (wp - wstr + codepoint_size > size - 1)
 				break;
 			if((cur & 0x80) == 0) {
 				*wp = *p;
@@ -143,6 +144,14 @@ public:
 		}
 		*wp = 0;
 		return wp - wstr;
+	}
+	template<size_t N>
+	static int EncodeUTF8(const wchar_t* src, char(&dst)[N]) {
+		return EncodeUTF8String(src, dst, N);
+	}
+	template<size_t N>
+	static int DecodeUTF8(const char* src, wchar_t(&dst)[N]) {
+		return DecodeUTF8String(src, dst, N);
 	}
 	static int GetVal(const wchar_t* pstr) {
 		unsigned int ret = 0;
