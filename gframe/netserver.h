@@ -36,7 +36,7 @@ public:
 	static void ServerEchoEvent(bufferevent* bev, short events, void* ctx);
 	static int ServerThread();
 	static void DisconnectPlayer(DuelPlayer* dp);
-	static void HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, unsigned int len);
+	static void HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len);
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto) {
 		auto p = net_server_write;
 		BufferIO::WriteInt16(p, 1);
