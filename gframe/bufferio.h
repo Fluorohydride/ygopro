@@ -67,33 +67,33 @@ public:
 			if (pstr - str + codepoint_size > size - 1)
 				break;
 			switch (codepoint_size) {
-				case 1:
-					*pstr = (char)cur;
-					break;
-				case 2:
-					pstr[0] = ((cur >> 6) & 0x1f) | 0xc0;
-					pstr[1] = (cur & 0x3f) | 0x80;
-					break;
-				case 3:
-					pstr[0] = ((cur >> 12) & 0xf) | 0xe0;
-					pstr[1] = ((cur >> 6) & 0x3f) | 0x80;
-					pstr[2] = (cur & 0x3f) | 0x80;
-					break;
-				case 4:
-					if (sizeof(wchar_t) == 2) {
-						cur = 0;
-						cur |= ((unsigned)*wsrc & 0x3ff) << 10;
-						++wsrc;
-						cur |= (unsigned)*wsrc & 0x3ff;
-						cur += 0x10000;
-					}
-					pstr[0] = ((cur >> 18) & 0x7) | 0xf0;
-					pstr[1] = ((cur >> 12) & 0x3f) | 0x80;
-					pstr[2] = ((cur >> 6) & 0x3f) | 0x80;
-					pstr[3] = (cur & 0x3f) | 0x80;
-					break;
-				default:
-					break;
+			case 1:
+				*pstr = (char)cur;
+				break;
+			case 2:
+				pstr[0] = ((cur >> 6) & 0x1f) | 0xc0;
+				pstr[1] = (cur & 0x3f) | 0x80;
+				break;
+			case 3:
+				pstr[0] = ((cur >> 12) & 0xf) | 0xe0;
+				pstr[1] = ((cur >> 6) & 0x3f) | 0x80;
+				pstr[2] = (cur & 0x3f) | 0x80;
+				break;
+			case 4:
+				if (sizeof(wchar_t) == 2) {
+					cur = 0;
+					cur |= ((unsigned)*wsrc & 0x3ff) << 10;
+					++wsrc;
+					cur |= (unsigned)*wsrc & 0x3ff;
+					cur += 0x10000;
+				}
+				pstr[0] = ((cur >> 18) & 0x7) | 0xf0;
+				pstr[1] = ((cur >> 12) & 0x3f) | 0x80;
+				pstr[2] = ((cur >> 6) & 0x3f) | 0x80;
+				pstr[3] = (cur & 0x3f) | 0x80;
+				break;
+			default:
+				break;
 			}
 			pstr += codepoint_size;
 			wsrc++;
