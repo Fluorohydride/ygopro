@@ -242,15 +242,19 @@ int DuelClient::ClientThread() {
 	connect_state = 0;
 	return 0;
 }
-void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
+void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 	unsigned char* pdata = data;
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
 	switch(pktType) {
 	case STOC_GAME_MSG: {
+		if (len < 1 + (int)sizeof(unsigned char))
+			return;
 		ClientAnalyze(pdata, len - 1);
 		break;
 	}
 	case STOC_ERROR_MSG: {
+		if (len < 1 + (int)sizeof(STOC_ErrorMsg))
+			return;
 		STOC_ErrorMsg packet;
 		std::memcpy(&packet, pdata, sizeof packet);
 		const auto* pkt = &packet;
@@ -367,6 +371,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		break;
 	}
 	case STOC_HAND_RESULT: {
+		if (len < 1 + (int)sizeof(STOC_HandResult))
+			return;
 		STOC_HandResult packet;
 		std::memcpy(&packet, pdata, sizeof packet);
 		const auto* pkt = &packet;
@@ -424,6 +430,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		break;
 	}
 	case STOC_DECK_COUNT: {
+		if (len < 1 + (int)sizeof(int16_t) * 6)
+			return;
 		mainGame->gMutex.lock();
 		int deckc = BufferIO::ReadInt16(pdata);
 		int extrac = BufferIO::ReadInt16(pdata);
@@ -437,6 +445,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		break;
 	}
 	case STOC_JOIN_GAME: {
+		if (len < 1 + (int)sizeof(STOC_JoinGame))
+			return;
 		STOC_JoinGame packet;
 		std::memcpy(&packet, pdata, sizeof packet);
 		const auto* pkt = &packet;
@@ -518,6 +528,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		break;
 	}
 	case STOC_TYPE_CHANGE: {
+		if (len < 1 + (int)sizeof(STOC_TypeChange))
+			return;
 		STOC_TypeChange packet;
 		std::memcpy(&packet, pdata, sizeof packet);
 		const auto* pkt = &packet;
@@ -707,6 +719,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		break;
 	}
 	case STOC_REPLAY: {
+		if (len < 1 + (int)sizeof(ReplayHeader))
+			return;
 		mainGame->gMutex.lock();
 		mainGame->wPhase->setVisible(false);
 		if(mainGame->dInfo.player_type < 7)
@@ -714,7 +728,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		mainGame->CloseGameButtons();
 		auto prep = pdata;
 		Replay new_replay;
-		memcpy(&new_replay.pheader, prep, sizeof(ReplayHeader));
+		std::memcpy(&new_replay.pheader, prep, sizeof(new_replay.pheader));
 		time_t starttime;
 		if (new_replay.pheader.flag & REPLAY_UNIFORM)
 			starttime = new_replay.pheader.start_time;
@@ -753,6 +767,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		break;
 	}
 	case STOC_TIME_LIMIT: {
+		if (len < 1 + (int)sizeof(STOC_TimeLimit))
+			return;
 		STOC_TimeLimit packet;
 		std::memcpy(&packet, pdata, sizeof packet);
 		const auto* pkt = &packet;
@@ -764,6 +780,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		break;
 	}
 	case STOC_CHAT: {
+		if (len < 1 + (int)sizeof(STOC_Chat))
+			return;
 		STOC_Chat packet;
 		std::memcpy(&packet, pdata, sizeof packet);
 		const auto* pkt = &packet;
@@ -795,6 +813,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		break;
 	}
 	case STOC_HS_PLAYER_ENTER: {
+		if (len < 1 + (int)sizeof(STOC_HS_PlayerEnter))
+			return;
 		soundManager.PlaySoundEffect(SOUND_PLAYER_ENTER);
 		STOC_HS_PlayerEnter packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -829,6 +849,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		break;
 	}
 	case STOC_HS_PLAYER_CHANGE: {
+		if (len < 1 + (int)sizeof(STOC_HS_PlayerChange))
+			return;
 		STOC_HS_PlayerChange packet;
 		std::memcpy(&packet, pdata, sizeof packet);
 		const auto* pkt = &packet;
@@ -891,6 +913,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		break;
 	}
 	case STOC_HS_WATCH_CHANGE: {
+		if (len < 1 + (int)sizeof(STOC_HS_WatchChange))
+			return;
 		STOC_HS_WatchChange packet;
 		std::memcpy(&packet, pdata, sizeof packet);
 		const auto* pkt = &packet;
@@ -906,6 +930,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, unsigned int len) {
 		if(!mainGame->dField.tag_surrender)
 			mainGame->dField.tag_teammate_surrender = true;
 		mainGame->btnLeaveGame->setText(dataManager.GetSysString(1355));
+		break;
 	}
 	}
 }

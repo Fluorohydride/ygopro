@@ -46,7 +46,7 @@ public:
 	static void ClientRead(bufferevent* bev, void* ctx);
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread();
-	static void HandleSTOCPacketLan(unsigned char* data, unsigned int len);
+	static void HandleSTOCPacketLan(unsigned char* data, int len);
 	static int ClientAnalyze(unsigned char* msg, unsigned int len);
 	static void SwapField();
 	static void SetResponseI(int respI);
