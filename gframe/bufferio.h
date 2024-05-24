@@ -28,7 +28,7 @@ public:
 		buffer_write<char>(p, val);
 	}
 	template<typename T1, typename T2>
-	inline static int CopyWStr(T1* src, T2* pstr, int bufsize) {
+	inline static int CopyWStr(const T1* src, T2* pstr, int bufsize) {
 		int l = 0;
 		while(src[l] && l < bufsize - 1) {
 			pstr[l] = (T2)src[l];
@@ -38,7 +38,7 @@ public:
 		return l;
 	}
 	template<typename T1, typename T2>
-	inline static int CopyWStrRef(T1* src, T2*& pstr, int bufsize) {
+	inline static int CopyWStrRef(const T1* src, T2*& pstr, int bufsize) {
 		int l = 0;
 		while(src[l] && l < bufsize - 1) {
 			pstr[l] = (T2)src[l];
