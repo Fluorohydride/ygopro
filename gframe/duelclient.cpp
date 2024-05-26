@@ -253,7 +253,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_ERROR_MSG: {
-		if (len < 1 + (int)sizeof(STOC_ErrorMsg))
+		if (len != 1 + (int)sizeof(STOC_ErrorMsg))
 			return;
 		STOC_ErrorMsg packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -371,7 +371,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_HAND_RESULT: {
-		if (len < 1 + (int)sizeof(STOC_HandResult))
+		if (len != 1 + (int)sizeof(STOC_HandResult))
 			return;
 		STOC_HandResult packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -430,7 +430,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_DECK_COUNT: {
-		if (len < 1 + (int)sizeof(int16_t) * 6)
+		if (len != 1 + (int)sizeof(int16_t) * 6)
 			return;
 		mainGame->gMutex.lock();
 		int deckc = BufferIO::ReadInt16(pdata);
@@ -445,7 +445,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_JOIN_GAME: {
-		if (len < 1 + (int)sizeof(STOC_JoinGame))
+		if (len != 1 + (int)sizeof(STOC_JoinGame))
 			return;
 		STOC_JoinGame packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -528,7 +528,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_TYPE_CHANGE: {
-		if (len < 1 + (int)sizeof(STOC_TypeChange))
+		if (len != 1 + (int)sizeof(STOC_TypeChange))
 			return;
 		STOC_TypeChange packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -767,7 +767,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_TIME_LIMIT: {
-		if (len < 1 + (int)sizeof(STOC_TimeLimit))
+		if (len != 1 + (int)sizeof(STOC_TimeLimit))
 			return;
 		STOC_TimeLimit packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -780,7 +780,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_CHAT: {
-		if (len < 1 + (int)sizeof(STOC_Chat))
+		if (len != 1 + (int)sizeof(STOC_Chat))
 			return;
 		STOC_Chat packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -813,7 +813,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_HS_PLAYER_ENTER: {
-		if (len < 1 + (int)sizeof(STOC_HS_PlayerEnter))
+		if (len != 1 + (int)sizeof(STOC_HS_PlayerEnter))
 			return;
 		soundManager.PlaySoundEffect(SOUND_PLAYER_ENTER);
 		STOC_HS_PlayerEnter packet;
@@ -849,7 +849,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_HS_PLAYER_CHANGE: {
-		if (len < 1 + (int)sizeof(STOC_HS_PlayerChange))
+		if (len != 1 + (int)sizeof(STOC_HS_PlayerChange))
 			return;
 		STOC_HS_PlayerChange packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -913,7 +913,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_HS_WATCH_CHANGE: {
-		if (len < 1 + (int)sizeof(STOC_HS_WatchChange))
+		if (len != 1 + (int)sizeof(STOC_HS_WatchChange))
 			return;
 		STOC_HS_WatchChange packet;
 		std::memcpy(&packet, pdata, sizeof packet);
