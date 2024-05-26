@@ -14,16 +14,16 @@ namespace ygo {
 	constexpr int MAX_DATA_SIZE = SIZE_NETWORK_BUFFER - 3;
 
 struct HostInfo {
-	unsigned int lflist{ 0 };
-	unsigned char rule{ 0 };
-	unsigned char mode{ 0 };
-	unsigned char duel_rule{ 0 };
-	bool no_check_deck{ false };
-	bool no_shuffle_deck{ false };
-	unsigned int start_lp{ 0 };
-	unsigned char start_hand{ 0 };
-	unsigned char draw_count{ 0 };
-	unsigned short time_limit{ 0 };
+	unsigned int lflist{};
+	unsigned char rule{};
+	unsigned char mode{};
+	unsigned char duel_rule{};
+	unsigned char no_check_deck{};
+	unsigned char no_shuffle_deck{};
+	unsigned int start_lp{};
+	unsigned char start_hand{};
+	unsigned char draw_count{};
+	unsigned short time_limit{};
 };
 struct HostPacket {
 	unsigned short identifier;
