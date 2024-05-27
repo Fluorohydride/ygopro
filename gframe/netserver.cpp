@@ -350,5 +350,19 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	}
 	}
 }
+size_t NetServer::CreateChatPacket(unsigned char* src, int src_size, unsigned char* dst, uint16_t dst_player_type) {
+	if (!check_msg_size(src_size))
+		return 0;
+	uint16_t src_msg[LEN_CHAT_MSG];
+	std::memcpy(src_msg, src, src_size);
+	const int src_len = src_size / sizeof(uint16_t);
+	if (src_msg[src_len - 1] != 0)
+		return 0;
+	// STOC_Chat packet
+	auto pdst = dst;
+	buffer_write<uint16_t>(pdst, dst_player_type);
+	buffer_write_block(pdst, src_msg, src_size);
+	return sizeof(dst_player_type) + src_size;
+}
 
 }

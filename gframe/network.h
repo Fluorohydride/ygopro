@@ -58,6 +58,8 @@ struct CTOS_JoinGame {
 struct CTOS_Kick {
 	unsigned char pos;
 };
+
+// STOC
 struct STOC_ErrorMsg {
 	unsigned char msg;
 	unsigned int code;
@@ -82,10 +84,14 @@ struct STOC_TimeLimit {
 	unsigned char player;
 	unsigned short left_time;
 };
-struct STOC_Chat {
-	unsigned short player;
-	unsigned short msg[256];
-};
+/*
+* STOC_Chat
+* uint16_t player_type;
+* uint16_t msg[256]; (UTF-16 string)
+*/
+constexpr int LEN_CHAT_PLAYER = 1;
+constexpr int LEN_CHAT_MSG = 256;
+constexpr int SIZE_STOC_CHAT = (LEN_CHAT_PLAYER + LEN_CHAT_MSG) * sizeof(uint16_t);
 struct STOC_HS_PlayerEnter {
 	unsigned short name[20];
 	unsigned char pos;
@@ -108,11 +114,22 @@ struct DuelPlayer {
 	bufferevent* bev{ 0 };
 };
 
+inline bool check_msg_size(int size) {
+	// empty string is not allowed
+	if (size < 2* sizeof(uint16_t))
+		return false;
+	if (size > LEN_CHAT_MSG * sizeof(uint16_t))
+		return false;
+	if (size % sizeof(uint16_t) != 0)
+		return false;
+	return true;
+}
+
 class DuelMode {
 public:
 	DuelMode(): host_player(nullptr), pduel(0), duel_stage(0) {}
 	virtual ~DuelMode() {}
-	virtual void Chat(DuelPlayer* dp, void* pdata, int len) {}
+	virtual void Chat(DuelPlayer* dp, unsigned char* pdata, int len) {}
 	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {}
 	virtual void LeaveGame(DuelPlayer* dp) {}
 	virtual void ToDuelist(DuelPlayer* dp) {}
