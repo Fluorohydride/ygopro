@@ -12,12 +12,12 @@ SingleDuel::SingleDuel(bool is_match) {
 }
 SingleDuel::~SingleDuel() {
 }
-void SingleDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
-	STOC_Chat scc;
-	scc.player = dp->type;
-	unsigned short* msg = (unsigned short*)pdata;
-	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
-	NetServer::SendBufferToPlayer(players[0], STOC_CHAT, &scc, 4 + msglen * 2);
+void SingleDuel::Chat(DuelPlayer* dp, unsigned char* pdata, int len) {
+	unsigned char scc[SIZE_STOC_CHAT];
+	const auto scc_size = NetServer::CreateChatPacket(pdata, len, scc, dp->type);
+	if (!scc_size)
+		return;
+	NetServer::SendBufferToPlayer(players[0], STOC_CHAT, scc, scc_size);
 	NetServer::ReSendToPlayer(players[1]);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);

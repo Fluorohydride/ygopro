@@ -780,12 +780,16 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_CHAT: {
-		if (len != 1 + (int)sizeof(STOC_Chat))
+		const int chat_msg_size = len - 1 - sizeof(uint16_t);
+		if (!check_msg_size(chat_msg_size))
 			return;
-		STOC_Chat packet;
-		std::memcpy(&packet, pdata, sizeof packet);
-		const auto* pkt = &packet;
-		int player = pkt->player;
+		uint16_t chat_player_type = buffer_read<uint16_t>(pdata);
+		uint16_t chat_msg[LEN_CHAT_MSG];
+		buffer_read_block(pdata, chat_msg, chat_msg_size);
+		const int chat_msg_len = chat_msg_size / sizeof(uint16_t);
+		if (chat_msg[chat_msg_len - 1] != 0)
+			return;
+		int player = chat_player_type;
 		auto play_sound = false;
 		if(player < 4) {
 			if(mainGame->chkIgnore1->isChecked())
@@ -805,8 +809,9 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 				player = 10;
 			}
 		}
-		wchar_t msg[256];
-		BufferIO::CopyWStr(pkt->msg, msg, 256);
+		// UTF-16 to wchar_t
+		wchar_t msg[LEN_CHAT_MSG];
+		BufferIO::CopyWStr(chat_msg, msg, LEN_CHAT_MSG);
 		mainGame->gMutex.lock();
 		mainGame->AddChatMsg(msg, player, play_sound);
 		mainGame->gMutex.unlock();
