@@ -274,25 +274,35 @@ void SingleDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 		return;
 	LeaveGame(players[pos]);
 }
-void SingleDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
+void SingleDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 	if(dp->type > 1 || ready[dp->type])
 		return;
-	unsigned char* deckbuf = (unsigned char*)pdata;
+	if (len <= 8 || len % sizeof(int32_t) != 0)
+		return;
+	bool valid = true;
+	auto deckbuf = pdata;
 	int mainc = BufferIO::ReadInt32(deckbuf);
 	int sidec = BufferIO::ReadInt32(deckbuf);
-	// verify data
-	const unsigned int possibleMaxLength = (len - 8) / 4;
-	if((unsigned)mainc > possibleMaxLength || (unsigned)sidec > possibleMaxLength || (unsigned)mainc + (unsigned)sidec > possibleMaxLength) {
+	const int deck_size = len - 2 * sizeof(int32_t);
+	if (mainc < DECK_MIN_SIZE || mainc > DECK_MAX_SIZE + EXTRA_MAX_SIZE)
+		valid = false;
+	else if (sidec < 0 || sidec > SIDE_MAX_SIZE)
+		valid = false;
+	else if (deck_size != (mainc + sidec) * (int)sizeof(int32_t))
+		valid = false;
+	if (!valid) {
 		STOC_ErrorMsg scem;
 		scem.msg = ERRMSG_DECKERROR;
 		scem.code = 0;
 		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 		return;
 	}
+	int deck_list[DECK_MAX_SIZE + EXTRA_MAX_SIZE + SIDE_MAX_SIZE];
+	std::memcpy(deck_list, deckbuf, deck_size);
 	if(duel_count == 0) {
-		deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec);
+		deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], deck_list, mainc, sidec);
 	} else {
-		if(deckManager.LoadSide(pdeck[dp->type], (int*)deckbuf, mainc, sidec)) {
+		if(deckManager.LoadSide(pdeck[dp->type], deck_list, mainc, sidec)) {
 			ready[dp->type] = true;
 			NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 			if(ready[0] && ready[1]) {
