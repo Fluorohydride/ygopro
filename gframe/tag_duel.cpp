@@ -1531,7 +1531,7 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 	}
 	return 0;
 }
-void TagDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
+void TagDuel::GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {
 	byte resb[SIZE_RETURN_VALUE];
 	if (len > SIZE_RETURN_VALUE)
 		len = SIZE_RETURN_VALUE;
