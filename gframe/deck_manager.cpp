@@ -246,7 +246,9 @@ bool DeckManager::LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUICom
 }
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 #ifdef WIN32
-	FILE* fp = _wfopen(file, (wchar_t*)mode);
+	wchar_t wmode[20]{};
+	BufferIO::CopyWStr(mode, wmode, sizeof(wmode) / sizeof(wchar_t));
+	FILE* fp = _wfopen(file, wmode);
 #else
 	char file2[256];
 	BufferIO::EncodeUTF8(file, file2);
