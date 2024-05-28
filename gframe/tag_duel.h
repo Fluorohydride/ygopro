@@ -12,7 +12,7 @@ public:
 	TagDuel();
 	virtual ~TagDuel();
 	virtual void Chat(DuelPlayer* dp, unsigned char* pdata, int len);
-	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater);
+	virtual void JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater);
 	virtual void LeaveGame(DuelPlayer* dp);
 	virtual void ToDuelist(DuelPlayer* dp);
 	virtual void ToObserver(DuelPlayer* dp);
