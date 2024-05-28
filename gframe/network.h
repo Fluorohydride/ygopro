@@ -144,7 +144,7 @@ public:
 		return 0;
 	}
 	virtual void Surrender(DuelPlayer* dp) {}
-	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {}
+	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {}
 	virtual void TimeConfirm(DuelPlayer* dp) {}
 	virtual void EndDuel() {}
 
