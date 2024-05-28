@@ -26,7 +26,7 @@ void TagDuel::Chat(DuelPlayer* dp, unsigned char* pdata, int len) {
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 }
-void TagDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
+void TagDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {
 	if(!is_creater) {
 		if(dp->game && dp->type != 0xff) {
 			STOC_ErrorMsg scem;
