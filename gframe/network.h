@@ -125,6 +125,12 @@ inline bool check_msg_size(int size) {
 	return true;
 }
 
+inline unsigned int GetPosition(unsigned char* qbuf, int offset) {
+	unsigned int info = 0;
+	std::memcpy(&info, qbuf + offset, sizeof info);
+	return info >> 24;
+}
+
 class DuelMode {
 public:
 	virtual ~DuelMode() {}

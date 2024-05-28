@@ -1602,10 +1602,6 @@ inline int TagDuel::WriteUpdateData(int& player, int location, int& flag, unsign
 	int len = query_field_card(pduel, player, location, flag, qbuf, use_cache);
 	return len;
 }
-inline unsigned int GetPosition(unsigned char*& qbuf, int offset) {
-	unsigned int info = *(unsigned int*)(qbuf + offset);
-	return info >> 24;
-}
 void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 	std::vector<unsigned char> query_buffer;
 	query_buffer.resize(SIZE_QUERY_BUFFER);
