@@ -127,7 +127,6 @@ inline bool check_msg_size(int size) {
 
 class DuelMode {
 public:
-	DuelMode(): host_player(nullptr), pduel(0), duel_stage(0) {}
 	virtual ~DuelMode() {}
 	virtual void Chat(DuelPlayer* dp, unsigned char* pdata, int len) {}
 	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {}
@@ -147,16 +146,16 @@ public:
 	virtual void Surrender(DuelPlayer* dp) {}
 	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {}
 	virtual void TimeConfirm(DuelPlayer* dp) {}
-	virtual void EndDuel() {};
+	virtual void EndDuel() {}
 
 public:
-	event* etimer;
-	DuelPlayer* host_player;
+	event* etimer { nullptr };
+	DuelPlayer* host_player{ nullptr };
 	HostInfo host_info;
-	int duel_stage;
-	intptr_t pduel;
-	wchar_t name[20];
-	wchar_t pass[20];
+	int duel_stage{};
+	intptr_t pduel{};
+	wchar_t name[20]{};
+	wchar_t pass[20]{};
 };
 
 }
