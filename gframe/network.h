@@ -20,70 +20,111 @@ struct HostInfo {
 	unsigned char duel_rule{};
 	unsigned char no_check_deck{};
 	unsigned char no_shuffle_deck{};
+	// byte padding[3]
+
 	unsigned int start_lp{};
 	unsigned char start_hand{};
 	unsigned char draw_count{};
 	unsigned short time_limit{};
 };
+static_assert(sizeof(HostInfo) == 20, "size mismatch: HostInfo");
+
 struct HostPacket {
 	unsigned short identifier;
 	unsigned short version;
 	unsigned short port;
+	// byte padding[2]
+
 	unsigned int ipaddr;
 	unsigned short name[20];
 	HostInfo host;
 };
+static_assert(sizeof(HostPacket) == 72, "size mismatch: HostPacket");
+
 struct HostRequest {
 	unsigned short identifier;
 };
+static_assert(sizeof(HostRequest) == 2, "size mismatch: HostRequest");
+
 struct CTOS_HandResult {
 	unsigned char res;
 };
+static_assert(sizeof(CTOS_HandResult) == 1, "size mismatch: CTOS_HandResult");
+
 struct CTOS_TPResult {
 	unsigned char res;
 };
+static_assert(sizeof(CTOS_TPResult) == 1, "size mismatch: CTOS_TPResult");
+
 struct CTOS_PlayerInfo {
 	unsigned short name[20];
 };
+static_assert(sizeof(CTOS_PlayerInfo) == 40, "size mismatch: CTOS_PlayerInfo");
+
 struct CTOS_CreateGame {
 	HostInfo info;
 	unsigned short name[20];
 	unsigned short pass[20];
 };
+static_assert(sizeof(CTOS_CreateGame) == 100, "size mismatch: CTOS_CreateGame");
+
 struct CTOS_JoinGame {
 	unsigned short version;
+	// byte padding[2]
+
 	unsigned int gameid;
 	unsigned short pass[20];
 };
+static_assert(sizeof(CTOS_JoinGame) == 48, "size mismatch: CTOS_JoinGame");
+
 struct CTOS_Kick {
 	unsigned char pos;
 };
+static_assert(sizeof(CTOS_Kick) == 1, "size mismatch: CTOS_Kick");
 
 // STOC
 struct STOC_ErrorMsg {
 	unsigned char msg;
+	// byte padding[3]
+
 	unsigned int code;
 };
+static_assert(sizeof(STOC_ErrorMsg) == 8, "size mismatch: STOC_ErrorMsg");
+
 struct STOC_HandResult {
 	unsigned char res1;
 	unsigned char res2;
 };
+static_assert(sizeof(STOC_HandResult) == 2, "size mismatch: STOC_HandResult");
+
 struct STOC_CreateGame {
 	unsigned int gameid;
 };
+static_assert(sizeof(STOC_CreateGame) == 4, "size mismatch: STOC_CreateGame");
+
 struct STOC_JoinGame {
 	HostInfo info;
 };
+static_assert(sizeof(STOC_JoinGame) == 20, "size mismatch: STOC_JoinGame");
+
 struct STOC_TypeChange {
 	unsigned char type;
 };
+static_assert(sizeof(STOC_TypeChange) == 1, "size mismatch: STOC_TypeChange");
+
 struct STOC_ExitGame {
 	unsigned char pos;
 };
+static_assert(sizeof(STOC_ExitGame) == 1, "size mismatch: STOC_ExitGame");
+
 struct STOC_TimeLimit {
 	unsigned char player;
+	// byte padding[1]
+
 	unsigned short left_time;
 };
+static_assert(sizeof(STOC_TimeLimit) == 4, "size mismatch: STOC_TimeLimit");
+
 /*
 * STOC_Chat
 * uint16_t player_type;
@@ -92,17 +133,24 @@ struct STOC_TimeLimit {
 constexpr int LEN_CHAT_PLAYER = 1;
 constexpr int LEN_CHAT_MSG = 256;
 constexpr int SIZE_STOC_CHAT = (LEN_CHAT_PLAYER + LEN_CHAT_MSG) * sizeof(uint16_t);
+
 struct STOC_HS_PlayerEnter {
 	unsigned short name[20];
 	unsigned char pos;
+	// byte padding[1]
 };
+static_assert(sizeof(STOC_HS_PlayerEnter) == 42, "size mismatch: STOC_HS_PlayerEnter");
+
 struct STOC_HS_PlayerChange {
 	//pos<<4 | state
 	unsigned char status;
 };
+static_assert(sizeof(STOC_HS_PlayerChange) == 1, "size mismatch: STOC_HS_PlayerChange");
+
 struct STOC_HS_WatchChange {
 	unsigned short watch_count;
 };
+static_assert(sizeof(STOC_HS_WatchChange) == 2, "size mismatch: STOC_HS_WatchChange");
 
 class DuelMode;
 
