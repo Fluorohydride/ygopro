@@ -14,16 +14,16 @@ namespace ygo {
 	constexpr int MAX_DATA_SIZE = SIZE_NETWORK_BUFFER - 3;
 
 struct HostInfo {
-	unsigned int lflist{ 0 };
-	unsigned char rule{ 0 };
-	unsigned char mode{ 0 };
-	unsigned char duel_rule{ 0 };
-	bool no_check_deck{ false };
-	bool no_shuffle_deck{ false };
-	unsigned int start_lp{ 0 };
-	unsigned char start_hand{ 0 };
-	unsigned char draw_count{ 0 };
-	unsigned short time_limit{ 0 };
+	unsigned int lflist{};
+	unsigned char rule{};
+	unsigned char mode{};
+	unsigned char duel_rule{};
+	unsigned char no_check_deck{};
+	unsigned char no_shuffle_deck{};
+	unsigned int start_lp{};
+	unsigned char start_hand{};
+	unsigned char draw_count{};
+	unsigned short time_limit{};
 };
 struct HostPacket {
 	unsigned short identifier;
@@ -58,6 +58,8 @@ struct CTOS_JoinGame {
 struct CTOS_Kick {
 	unsigned char pos;
 };
+
+// STOC
 struct STOC_ErrorMsg {
 	unsigned char msg;
 	unsigned int code;
@@ -82,10 +84,14 @@ struct STOC_TimeLimit {
 	unsigned char player;
 	unsigned short left_time;
 };
-struct STOC_Chat {
-	unsigned short player;
-	unsigned short msg[256];
-};
+/*
+* STOC_Chat
+* uint16_t player_type;
+* uint16_t msg[256]; (UTF-16 string)
+*/
+constexpr int LEN_CHAT_PLAYER = 1;
+constexpr int LEN_CHAT_MSG = 256;
+constexpr int SIZE_STOC_CHAT = (LEN_CHAT_PLAYER + LEN_CHAT_MSG) * sizeof(uint16_t);
 struct STOC_HS_PlayerEnter {
 	unsigned short name[20];
 	unsigned char pos;
@@ -108,18 +114,34 @@ struct DuelPlayer {
 	bufferevent* bev{ 0 };
 };
 
+inline bool check_msg_size(int size) {
+	// empty string is not allowed
+	if (size < 2* sizeof(uint16_t))
+		return false;
+	if (size > LEN_CHAT_MSG * sizeof(uint16_t))
+		return false;
+	if (size % sizeof(uint16_t) != 0)
+		return false;
+	return true;
+}
+
+inline unsigned int GetPosition(unsigned char* qbuf, int offset) {
+	unsigned int info = 0;
+	std::memcpy(&info, qbuf + offset, sizeof info);
+	return info >> 24;
+}
+
 class DuelMode {
 public:
-	DuelMode(): host_player(nullptr), pduel(0), duel_stage(0) {}
 	virtual ~DuelMode() {}
-	virtual void Chat(DuelPlayer* dp, void* pdata, int len) {}
-	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {}
+	virtual void Chat(DuelPlayer* dp, unsigned char* pdata, int len) {}
+	virtual void JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {}
 	virtual void LeaveGame(DuelPlayer* dp) {}
 	virtual void ToDuelist(DuelPlayer* dp) {}
 	virtual void ToObserver(DuelPlayer* dp) {}
 	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) {}
 	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) {}
-	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {}
+	virtual void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {}
 	virtual void StartDuel(DuelPlayer* dp) {}
 	virtual void HandResult(DuelPlayer* dp, unsigned char res) {}
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {}
@@ -128,21 +150,21 @@ public:
 		return 0;
 	}
 	virtual void Surrender(DuelPlayer* dp) {}
-	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {}
+	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {}
 	virtual void TimeConfirm(DuelPlayer* dp) {}
 #ifdef YGOPRO_SERVER_MODE
 	virtual void RequestField(DuelPlayer* dp) {}
 #endif
-	virtual void EndDuel() {};
+	virtual void EndDuel() {}
 
 public:
-	event* etimer;
-	DuelPlayer* host_player;
+	event* etimer { nullptr };
+	DuelPlayer* host_player{ nullptr };
 	HostInfo host_info;
-	int duel_stage;
-	intptr_t pduel;
-	wchar_t name[20];
-	wchar_t pass[20];
+	int duel_stage{};
+	intptr_t pduel{};
+	wchar_t name[20]{};
+	wchar_t pass[20]{};
 };
 
 }
