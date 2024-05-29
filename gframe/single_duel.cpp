@@ -1933,7 +1933,6 @@ inline int SingleDuel::WriteUpdateData(int& player, int location, int& flag, uns
 	int len = query_field_card(pduel, player, location, flag, qbuf, use_cache);
 	return len;
 }
-void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 #ifdef YGOPRO_SERVER_MODE
 void SingleDuel::RefreshMzone(int player, int flag, int use_cache, DuelPlayer* dp)
 #else

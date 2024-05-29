@@ -2043,7 +2043,6 @@ inline int TagDuel::WriteUpdateData(int& player, int location, int& flag, unsign
 	int len = query_field_card(pduel, player, location, flag, qbuf, use_cache);
 	return len;
 }
-void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 #ifdef YGOPRO_SERVER_MODE
 void TagDuel::RefreshMzone(int player, int flag, int use_cache, DuelPlayer* dp)
 #else
