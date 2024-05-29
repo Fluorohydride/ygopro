@@ -17,22 +17,6 @@
 #define YGOPRO_DEFAULT_DUEL_RULE			5
 #endif
 
-#ifndef YGOPRO_MAX_DECK
-#define YGOPRO_MAX_DECK					60
-#endif
-
-#ifndef YGOPRO_MIN_DECK
-#define YGOPRO_MIN_DECK					40
-#endif
-
-#ifndef YGOPRO_MAX_EXTRA
-#define YGOPRO_MAX_EXTRA					15
-#endif
-
-#ifndef YGOPRO_MAX_SIDE
-#define YGOPRO_MAX_SIDE					15
-#endif
-
 #define DEFAULT_DUEL_RULE YGOPRO_DEFAULT_DUEL_RULE
 
 namespace ygo {
