@@ -19,7 +19,7 @@ namespace ygo {
 	constexpr int SIDEC_MAX = MAINC_MAX;
 
 struct HostInfo {
-	unsigned int lflist{};
+	uint32_t lflist{};
 	unsigned char rule{};
 	unsigned char mode{};
 	unsigned char duel_rule{};
@@ -27,7 +27,7 @@ struct HostInfo {
 	unsigned char no_shuffle_deck{};
 	// byte padding[3]
 
-	unsigned int start_lp{};
+	uint32_t start_lp{};
 	unsigned char start_hand{};
 	unsigned char draw_count{};
 	uint16_t time_limit{};
@@ -41,7 +41,7 @@ struct HostPacket {
 	uint16_t port;
 	// byte padding[2]
 
-	unsigned int ipaddr;
+	uint32_t ipaddr;
 	uint16_t name[20];
 	HostInfo host;
 };
@@ -84,7 +84,7 @@ struct CTOS_JoinGame {
 	uint16_t version;
 	// byte padding[2]
 
-	unsigned int gameid;
+	uint32_t gameid;
 	uint16_t pass[20];
 };
 check_trivially_copyable(CTOS_JoinGame);
@@ -101,7 +101,7 @@ struct STOC_ErrorMsg {
 	unsigned char msg;
 	// byte padding[3]
 
-	unsigned int code;
+	uint32_t code;
 };
 check_trivially_copyable(STOC_ErrorMsg);
 static_assert(sizeof(STOC_ErrorMsg) == 8, "size mismatch: STOC_ErrorMsg");
@@ -114,7 +114,7 @@ check_trivially_copyable(STOC_HandResult);
 static_assert(sizeof(STOC_HandResult) == 2, "size mismatch: STOC_HandResult");
 
 struct STOC_CreateGame {
-	unsigned int gameid;
+	uint32_t gameid;
 };
 check_trivially_copyable(STOC_CreateGame);
 static_assert(sizeof(STOC_CreateGame) == 4, "size mismatch: STOC_CreateGame");
