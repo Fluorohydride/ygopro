@@ -30,26 +30,26 @@ struct HostInfo {
 	unsigned int start_lp{};
 	unsigned char start_hand{};
 	unsigned char draw_count{};
-	unsigned short time_limit{};
+	uint16_t time_limit{};
 };
 check_trivially_copyable(HostInfo);
 static_assert(sizeof(HostInfo) == 20, "size mismatch: HostInfo");
 
 struct HostPacket {
-	unsigned short identifier;
-	unsigned short version;
-	unsigned short port;
+	uint16_t identifier;
+	uint16_t version;
+	uint16_t port;
 	// byte padding[2]
 
 	unsigned int ipaddr;
-	unsigned short name[20];
+	uint16_t name[20];
 	HostInfo host;
 };
 check_trivially_copyable(HostPacket);
 static_assert(sizeof(HostPacket) == 72, "size mismatch: HostPacket");
 
 struct HostRequest {
-	unsigned short identifier;
+	uint16_t identifier;
 };
 check_trivially_copyable(HostRequest);
 static_assert(sizeof(HostRequest) == 2, "size mismatch: HostRequest");
@@ -67,25 +67,25 @@ check_trivially_copyable(CTOS_TPResult);
 static_assert(sizeof(CTOS_TPResult) == 1, "size mismatch: CTOS_TPResult");
 
 struct CTOS_PlayerInfo {
-	unsigned short name[20];
+	uint16_t name[20];
 };
 check_trivially_copyable(CTOS_PlayerInfo);
 static_assert(sizeof(CTOS_PlayerInfo) == 40, "size mismatch: CTOS_PlayerInfo");
 
 struct CTOS_CreateGame {
 	HostInfo info;
-	unsigned short name[20];
-	unsigned short pass[20];
+	uint16_t name[20];
+	uint16_t pass[20];
 };
 check_trivially_copyable(CTOS_CreateGame);
 static_assert(sizeof(CTOS_CreateGame) == 100, "size mismatch: CTOS_CreateGame");
 
 struct CTOS_JoinGame {
-	unsigned short version;
+	uint16_t version;
 	// byte padding[2]
 
 	unsigned int gameid;
-	unsigned short pass[20];
+	uint16_t pass[20];
 };
 check_trivially_copyable(CTOS_JoinGame);
 static_assert(sizeof(CTOS_JoinGame) == 48, "size mismatch: CTOS_JoinGame");
@@ -141,7 +141,7 @@ struct STOC_TimeLimit {
 	unsigned char player;
 	// byte padding[1]
 
-	unsigned short left_time;
+	uint16_t left_time;
 };
 check_trivially_copyable(STOC_TimeLimit);
 static_assert(sizeof(STOC_TimeLimit) == 4, "size mismatch: STOC_TimeLimit");
@@ -156,7 +156,7 @@ constexpr int LEN_CHAT_MSG = 256;
 constexpr int SIZE_STOC_CHAT = (LEN_CHAT_PLAYER + LEN_CHAT_MSG) * sizeof(uint16_t);
 
 struct STOC_HS_PlayerEnter {
-	unsigned short name[20];
+	uint16_t name[20];
 	unsigned char pos;
 	// byte padding[1]
 };
@@ -171,7 +171,7 @@ check_trivially_copyable(STOC_HS_PlayerChange);
 static_assert(sizeof(STOC_HS_PlayerChange) == 1, "size mismatch: STOC_HS_PlayerChange");
 
 struct STOC_HS_WatchChange {
-	unsigned short watch_count;
+	uint16_t watch_count;
 };
 check_trivially_copyable(STOC_HS_WatchChange);
 static_assert(sizeof(STOC_HS_WatchChange) == 2, "size mismatch: STOC_HS_WatchChange");
