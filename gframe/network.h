@@ -158,10 +158,11 @@ constexpr int SIZE_STOC_CHAT = (LEN_CHAT_PLAYER + LEN_CHAT_MSG) * sizeof(uint16_
 struct STOC_HS_PlayerEnter {
 	uint16_t name[20];
 	unsigned char pos;
-	unsigned char padding;	// only for padding
+	// byte padding[1]
 };
 check_trivially_copyable(STOC_HS_PlayerEnter);
-static_assert(sizeof(STOC_HS_PlayerEnter) == 42, "size mismatch: STOC_HS_PlayerEnter");
+//static_assert(sizeof(STOC_HS_PlayerEnter) == 42, "size mismatch: STOC_HS_PlayerEnter");
+constexpr int STOC_HS_PlayerEnter_size = 41;	//workwround
 
 struct STOC_HS_PlayerChange {
 	//pos<<4 | state
