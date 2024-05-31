@@ -8,6 +8,10 @@
 #include <sstream>
 
 namespace ygo {
+	constexpr int DECK_MAX_SIZE = 60;
+	constexpr int DECK_MIN_SIZE = 40;
+	constexpr int EXTRA_MAX_SIZE = 15;
+	constexpr int SIDE_MAX_SIZE = 15;
 
 struct LFList {
 	unsigned int hash{};

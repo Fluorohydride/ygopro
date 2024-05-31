@@ -19,6 +19,7 @@ private:
 	static evconnlistener* listener;
 	static DuelMode* duel_mode;
 	static unsigned char net_server_read[SIZE_NETWORK_BUFFER];
+	static int read_len;
 	static unsigned char net_server_write[SIZE_NETWORK_BUFFER];
 	static unsigned short last_sent;
 
@@ -35,7 +36,8 @@ public:
 	static void ServerEchoEvent(bufferevent* bev, short events, void* ctx);
 	static int ServerThread();
 	static void DisconnectPlayer(DuelPlayer* dp);
-	static void HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, unsigned int len);
+	static void HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len);
+	static size_t CreateChatPacket(unsigned char* src, int src_size, unsigned char* dst, uint16_t dst_player_type);
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto) {
 		auto p = net_server_write;
 		BufferIO::WriteInt16(p, 1);
@@ -50,10 +52,10 @@ public:
 		auto p = net_server_write;
 		int blen = sizeof(ST);
 		if (blen > MAX_DATA_SIZE)
-			blen = MAX_DATA_SIZE;
+			return;
 		BufferIO::WriteInt16(p, (short)(1 + blen));
 		BufferIO::WriteInt8(p, proto);
-		memcpy(p, &st, blen);
+		std::memcpy(p, &st, blen);
 		last_sent = blen + 3;
 		if (dp)
 			bufferevent_write(dp->bev, net_server_write, blen + 3);
@@ -67,7 +69,7 @@ public:
 			blen = MAX_DATA_SIZE;
 		BufferIO::WriteInt16(p, (short)(1 + blen));
 		BufferIO::WriteInt8(p, proto);
-		memcpy(p, buffer, blen);
+		std::memcpy(p, buffer, blen);
 		last_sent = blen + 3;
 		if (dp)
 			bufferevent_write(dp->bev, net_server_write, blen + 3);

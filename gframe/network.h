@@ -8,95 +8,174 @@
 #include <event2/bufferevent.h>
 #include <event2/buffer.h>
 #include <event2/thread.h>
+#include <type_traits>
+
+#define check_trivially_copyable(T) static_assert(std::is_trivially_copyable<T>::value == true, "not trivially copyable")
 
 namespace ygo {
 	constexpr int SIZE_NETWORK_BUFFER = 0x2000;
 	constexpr int MAX_DATA_SIZE = SIZE_NETWORK_BUFFER - 3;
+	constexpr int MAINC_MAX = 250;	// the limit of card_state
+	constexpr int SIDEC_MAX = MAINC_MAX;
 
 struct HostInfo {
-	unsigned int lflist{ 0 };
-	unsigned char rule{ 0 };
-	unsigned char mode{ 0 };
-	unsigned char duel_rule{ 0 };
-	bool no_check_deck{ false };
-	bool no_shuffle_deck{ false };
-	unsigned int start_lp{ 0 };
-	unsigned char start_hand{ 0 };
-	unsigned char draw_count{ 0 };
-	unsigned short time_limit{ 0 };
+	uint32_t lflist{};
+	unsigned char rule{};
+	unsigned char mode{};
+	unsigned char duel_rule{};
+	unsigned char no_check_deck{};
+	unsigned char no_shuffle_deck{};
+	// byte padding[3]
+
+	uint32_t start_lp{};
+	unsigned char start_hand{};
+	unsigned char draw_count{};
+	uint16_t time_limit{};
 };
+check_trivially_copyable(HostInfo);
+static_assert(sizeof(HostInfo) == 20, "size mismatch: HostInfo");
+
 struct HostPacket {
-	unsigned short identifier;
-	unsigned short version;
-	unsigned short port;
-	unsigned int ipaddr;
-	unsigned short name[20];
+	uint16_t identifier;
+	uint16_t version;
+	uint16_t port;
+	// byte padding[2]
+
+	uint32_t ipaddr;
+	uint16_t name[20];
 	HostInfo host;
 };
+check_trivially_copyable(HostPacket);
+static_assert(sizeof(HostPacket) == 72, "size mismatch: HostPacket");
+
 struct HostRequest {
-	unsigned short identifier;
+	uint16_t identifier;
 };
+check_trivially_copyable(HostRequest);
+static_assert(sizeof(HostRequest) == 2, "size mismatch: HostRequest");
+
 struct CTOS_HandResult {
 	unsigned char res;
 };
+check_trivially_copyable(CTOS_HandResult);
+static_assert(sizeof(CTOS_HandResult) == 1, "size mismatch: CTOS_HandResult");
+
 struct CTOS_TPResult {
 	unsigned char res;
 };
+check_trivially_copyable(CTOS_TPResult);
+static_assert(sizeof(CTOS_TPResult) == 1, "size mismatch: CTOS_TPResult");
+
 struct CTOS_PlayerInfo {
-	unsigned short name[20];
+	uint16_t name[20];
 };
+check_trivially_copyable(CTOS_PlayerInfo);
+static_assert(sizeof(CTOS_PlayerInfo) == 40, "size mismatch: CTOS_PlayerInfo");
+
 struct CTOS_CreateGame {
 	HostInfo info;
-	unsigned short name[20];
-	unsigned short pass[20];
+	uint16_t name[20];
+	uint16_t pass[20];
 };
+check_trivially_copyable(CTOS_CreateGame);
+static_assert(sizeof(CTOS_CreateGame) == 100, "size mismatch: CTOS_CreateGame");
+
 struct CTOS_JoinGame {
-	unsigned short version;
-	unsigned int gameid;
-	unsigned short pass[20];
+	uint16_t version;
+	// byte padding[2]
+
+	uint32_t gameid;
+	uint16_t pass[20];
 };
+check_trivially_copyable(CTOS_JoinGame);
+static_assert(sizeof(CTOS_JoinGame) == 48, "size mismatch: CTOS_JoinGame");
+
 struct CTOS_Kick {
 	unsigned char pos;
 };
+check_trivially_copyable(CTOS_Kick);
+static_assert(sizeof(CTOS_Kick) == 1, "size mismatch: CTOS_Kick");
+
+// STOC
 struct STOC_ErrorMsg {
 	unsigned char msg;
-	unsigned int code;
+	// byte padding[3]
+
+	uint32_t code;
 };
+check_trivially_copyable(STOC_ErrorMsg);
+static_assert(sizeof(STOC_ErrorMsg) == 8, "size mismatch: STOC_ErrorMsg");
+
 struct STOC_HandResult {
 	unsigned char res1;
 	unsigned char res2;
 };
+check_trivially_copyable(STOC_HandResult);
+static_assert(sizeof(STOC_HandResult) == 2, "size mismatch: STOC_HandResult");
+
 struct STOC_CreateGame {
-	unsigned int gameid;
+	uint32_t gameid;
 };
+check_trivially_copyable(STOC_CreateGame);
+static_assert(sizeof(STOC_CreateGame) == 4, "size mismatch: STOC_CreateGame");
+
 struct STOC_JoinGame {
 	HostInfo info;
 };
+check_trivially_copyable(STOC_JoinGame);
+static_assert(sizeof(STOC_JoinGame) == 20, "size mismatch: STOC_JoinGame");
+
 struct STOC_TypeChange {
 	unsigned char type;
 };
+check_trivially_copyable(STOC_TypeChange);
+static_assert(sizeof(STOC_TypeChange) == 1, "size mismatch: STOC_TypeChange");
+
 struct STOC_ExitGame {
 	unsigned char pos;
 };
+check_trivially_copyable(STOC_ExitGame);
+static_assert(sizeof(STOC_ExitGame) == 1, "size mismatch: STOC_ExitGame");
+
 struct STOC_TimeLimit {
 	unsigned char player;
-	unsigned short left_time;
+	// byte padding[1]
+
+	uint16_t left_time;
 };
-struct STOC_Chat {
-	unsigned short player;
-	unsigned short msg[256];
-};
+check_trivially_copyable(STOC_TimeLimit);
+static_assert(sizeof(STOC_TimeLimit) == 4, "size mismatch: STOC_TimeLimit");
+
+/*
+* STOC_Chat
+* uint16_t player_type;
+* uint16_t msg[256]; (UTF-16 string)
+*/
+constexpr int LEN_CHAT_PLAYER = 1;
+constexpr int LEN_CHAT_MSG = 256;
+constexpr int SIZE_STOC_CHAT = (LEN_CHAT_PLAYER + LEN_CHAT_MSG) * sizeof(uint16_t);
+
 struct STOC_HS_PlayerEnter {
-	unsigned short name[20];
+	uint16_t name[20];
 	unsigned char pos;
+	// byte padding[1]
 };
+check_trivially_copyable(STOC_HS_PlayerEnter);
+//static_assert(sizeof(STOC_HS_PlayerEnter) == 42, "size mismatch: STOC_HS_PlayerEnter");
+constexpr int STOC_HS_PlayerEnter_size = 41;	//workwround
+
 struct STOC_HS_PlayerChange {
 	//pos<<4 | state
 	unsigned char status;
 };
+check_trivially_copyable(STOC_HS_PlayerChange);
+static_assert(sizeof(STOC_HS_PlayerChange) == 1, "size mismatch: STOC_HS_PlayerChange");
+
 struct STOC_HS_WatchChange {
-	unsigned short watch_count;
+	uint16_t watch_count;
 };
+check_trivially_copyable(STOC_HS_WatchChange);
+static_assert(sizeof(STOC_HS_WatchChange) == 2, "size mismatch: STOC_HS_WatchChange");
 
 class DuelMode;
 
@@ -108,18 +187,34 @@ struct DuelPlayer {
 	bufferevent* bev{ 0 };
 };
 
+inline bool check_msg_size(int size) {
+	// empty string is not allowed
+	if (size < 2* sizeof(uint16_t))
+		return false;
+	if (size > LEN_CHAT_MSG * sizeof(uint16_t))
+		return false;
+	if (size % sizeof(uint16_t) != 0)
+		return false;
+	return true;
+}
+
+inline unsigned int GetPosition(unsigned char* qbuf, int offset) {
+	unsigned int info = 0;
+	std::memcpy(&info, qbuf + offset, sizeof info);
+	return info >> 24;
+}
+
 class DuelMode {
 public:
-	DuelMode(): host_player(nullptr), pduel(0), duel_stage(0) {}
 	virtual ~DuelMode() {}
-	virtual void Chat(DuelPlayer* dp, void* pdata, int len) {}
-	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {}
+	virtual void Chat(DuelPlayer* dp, unsigned char* pdata, int len) {}
+	virtual void JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {}
 	virtual void LeaveGame(DuelPlayer* dp) {}
 	virtual void ToDuelist(DuelPlayer* dp) {}
 	virtual void ToObserver(DuelPlayer* dp) {}
 	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) {}
 	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) {}
-	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {}
+	virtual void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {}
 	virtual void StartDuel(DuelPlayer* dp) {}
 	virtual void HandResult(DuelPlayer* dp, unsigned char res) {}
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {}
@@ -128,18 +223,18 @@ public:
 		return 0;
 	}
 	virtual void Surrender(DuelPlayer* dp) {}
-	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {}
+	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {}
 	virtual void TimeConfirm(DuelPlayer* dp) {}
-	virtual void EndDuel() {};
+	virtual void EndDuel() {}
 
 public:
-	event* etimer;
-	DuelPlayer* host_player;
+	event* etimer { nullptr };
+	DuelPlayer* host_player{ nullptr };
 	HostInfo host_info;
-	int duel_stage;
-	intptr_t pduel;
-	wchar_t name[20];
-	wchar_t pass[20];
+	int duel_stage{};
+	intptr_t pduel{};
+	wchar_t name[20]{};
+	wchar_t pass[20]{};
 };
 
 }
