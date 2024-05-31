@@ -2349,7 +2349,7 @@ uint32 TagDuel::MessageHandler(intptr_t fduel, uint32 type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
-	get_log_message(fduel, (byte*)msgbuf);
+	get_log_message(fduel, msgbuf);
 	mainGame->AddDebugMsg(msgbuf);
 	return 0;
 }
