@@ -1249,7 +1249,7 @@ void DeckBuilder::GetHoveredCard() {
 		} else if(y >= 164 && y <= 435) {
 			int lx = 10, px, py = (y - 164) / 68;
 			hovered_pos = 1;
-			if(deckManager.current_deck.main.size() > 40)
+			if(deckManager.current_deck.main.size() > DECK_MIN_SIZE)
 				lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
 			if(x >= 750)
 				px = lx - 1;
@@ -1757,7 +1757,7 @@ bool DeckBuilder::push_main(code_pointer pointer, int seq) {
 	if(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK))
 		return false;
 	auto& container = deckManager.current_deck.main;
-	int maxc = mainGame->is_siding ? YGOPRO_MAX_DECK + 5 : YGOPRO_MAX_DECK;
+	int maxc = mainGame->is_siding ? DECK_MAX_SIZE + 4 : DECK_MAX_SIZE;
 	if((int)container.size() >= maxc)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
@@ -1772,7 +1772,7 @@ bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
 	if(!(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)))
 		return false;
 	auto& container = deckManager.current_deck.extra;
-	int maxc = mainGame->is_siding ? YGOPRO_MAX_EXTRA + 5 : YGOPRO_MAX_EXTRA;
+	int maxc = mainGame->is_siding ? EXTRA_MAX_SIZE + 5 : EXTRA_MAX_SIZE;
 	if((int)container.size() >= maxc)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
@@ -1785,7 +1785,7 @@ bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
 }
 bool DeckBuilder::push_side(code_pointer pointer, int seq) {
 	auto& container = deckManager.current_deck.side;
-	int maxc = mainGame->is_siding ? YGOPRO_MAX_SIDE + 5 : YGOPRO_MAX_SIDE;
+	int maxc = mainGame->is_siding ? SIDE_MAX_SIZE + 5 : SIDE_MAX_SIZE;
 	if((int)container.size() >= maxc)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())

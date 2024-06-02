@@ -11,21 +11,21 @@ class SingleDuel: public DuelMode {
 public:
 	SingleDuel(bool is_match);
 	virtual ~SingleDuel();
-	virtual void Chat(DuelPlayer* dp, void* pdata, int len);
-	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater);
+	virtual void Chat(DuelPlayer* dp, unsigned char* pdata, int len);
+	virtual void JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater);
 	virtual void LeaveGame(DuelPlayer* dp);
 	virtual void ToDuelist(DuelPlayer* dp);
 	virtual void ToObserver(DuelPlayer* dp);
 	virtual void PlayerReady(DuelPlayer* dp, bool ready);
 	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos);
-	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len);
+	virtual void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len);
 	virtual void StartDuel(DuelPlayer* dp);
 	virtual void HandResult(DuelPlayer* dp, unsigned char res);
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp);
 	virtual void Process();
 	virtual void Surrender(DuelPlayer* dp);
 	virtual int Analyze(unsigned char* msgbuffer, unsigned int len);
-	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len);
+	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len);
 	virtual void TimeConfirm(DuelPlayer* dp);
 #ifdef YGOPRO_SERVER_MODE
 	virtual void RequestField(DuelPlayer* dp);

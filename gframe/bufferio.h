@@ -27,8 +27,9 @@ public:
 	inline static void WriteInt8(unsigned char*& p, char val) {
 		buffer_write<char>(p, val);
 	}
+	// return: string length
 	template<typename T1, typename T2>
-	inline static int CopyWStr(T1* src, T2* pstr, int bufsize) {
+	inline static int CopyWStr(const T1* src, T2* pstr, int bufsize) {
 		int l = 0;
 		while(src[l] && l < bufsize - 1) {
 			pstr[l] = (T2)src[l];
@@ -38,7 +39,7 @@ public:
 		return l;
 	}
 	template<typename T1, typename T2>
-	inline static int CopyWStrRef(T1* src, T2*& pstr, int bufsize) {
+	inline static int CopyWStrRef(const T1* src, T2*& pstr, int bufsize) {
 		int l = 0;
 		while(src[l] && l < bufsize - 1) {
 			pstr[l] = (T2)src[l];
@@ -49,8 +50,8 @@ public:
 		return l;
 	}
 	// UTF-16/UTF-32 to UTF-8
-	template<size_t N>
-	static int EncodeUTF8(const wchar_t* wsrc, char(&str)[N]) {
+	// return: string length
+	static int EncodeUTF8String(const wchar_t* wsrc, char* str, int size) {
 		char* pstr = str;
 		while (*wsrc != 0) {
 			unsigned cur = *wsrc;
@@ -63,36 +64,36 @@ public:
 				codepoint_size = 3;
 			else
 				codepoint_size = 4;
-			if (pstr - str + codepoint_size > N - 1)
+			if (pstr - str + codepoint_size > size - 1)
 				break;
 			switch (codepoint_size) {
-				case 1:
-					*pstr = (char)cur;
-					break;
-				case 2:
-					pstr[0] = ((cur >> 6) & 0x1f) | 0xc0;
-					pstr[1] = (cur & 0x3f) | 0x80;
-					break;
-				case 3:
-					pstr[0] = ((cur >> 12) & 0xf) | 0xe0;
-					pstr[1] = ((cur >> 6) & 0x3f) | 0x80;
-					pstr[2] = (cur & 0x3f) | 0x80;
-					break;
-				case 4:
-					if (sizeof(wchar_t) == 2) {
-						cur = 0;
-						cur |= ((unsigned)*wsrc & 0x3ff) << 10;
-						++wsrc;
-						cur |= (unsigned)*wsrc & 0x3ff;
-						cur += 0x10000;
-					}
-					pstr[0] = ((cur >> 18) & 0x7) | 0xf0;
-					pstr[1] = ((cur >> 12) & 0x3f) | 0x80;
-					pstr[2] = ((cur >> 6) & 0x3f) | 0x80;
-					pstr[3] = (cur & 0x3f) | 0x80;
-					break;
-				default:
-					break;
+			case 1:
+				*pstr = (char)cur;
+				break;
+			case 2:
+				pstr[0] = ((cur >> 6) & 0x1f) | 0xc0;
+				pstr[1] = (cur & 0x3f) | 0x80;
+				break;
+			case 3:
+				pstr[0] = ((cur >> 12) & 0xf) | 0xe0;
+				pstr[1] = ((cur >> 6) & 0x3f) | 0x80;
+				pstr[2] = (cur & 0x3f) | 0x80;
+				break;
+			case 4:
+				if (sizeof(wchar_t) == 2) {
+					cur = 0;
+					cur |= ((unsigned)*wsrc & 0x3ff) << 10;
+					++wsrc;
+					cur |= (unsigned)*wsrc & 0x3ff;
+					cur += 0x10000;
+				}
+				pstr[0] = ((cur >> 18) & 0x7) | 0xf0;
+				pstr[1] = ((cur >> 12) & 0x3f) | 0x80;
+				pstr[2] = ((cur >> 6) & 0x3f) | 0x80;
+				pstr[3] = (cur & 0x3f) | 0x80;
+				break;
+			default:
+				break;
 			}
 			pstr += codepoint_size;
 			wsrc++;
@@ -101,8 +102,8 @@ public:
 		return pstr - str;
 	}
 	// UTF-8 to UTF-16/UTF-32
-	template<size_t N>
-	static int DecodeUTF8(const char* src, wchar_t(&wstr)[N]) {
+	// return: string length
+	static int DecodeUTF8String(const char* src, wchar_t* wstr, int size) {
 		const char* p = src;
 		wchar_t* wp = wstr;
 		while(*p != 0) {
@@ -116,7 +117,7 @@ public:
 			}
 			else
 				codepoint_size = 1;
-			if (wp - wstr + codepoint_size > N - 1)
+			if (wp - wstr + codepoint_size > size - 1)
 				break;
 			if((cur & 0x80) == 0) {
 				*wp = *p;
@@ -143,6 +144,14 @@ public:
 		}
 		*wp = 0;
 		return wp - wstr;
+	}
+	template<size_t N>
+	static int EncodeUTF8(const wchar_t* src, char(&dst)[N]) {
+		return EncodeUTF8String(src, dst, N);
+	}
+	template<size_t N>
+	static int DecodeUTF8(const char* src, wchar_t(&dst)[N]) {
+		return DecodeUTF8String(src, dst, N);
 	}
 	static int GetVal(const wchar_t* pstr) {
 		unsigned int ret = 0;
