@@ -23,13 +23,13 @@ TagDuel::TagDuel() {
 }
 TagDuel::~TagDuel() {
 }
-void TagDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
-	STOC_Chat scc;
-	scc.player = dp->type;
-	unsigned short* msg = (unsigned short*)pdata;
-	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
+void TagDuel::Chat(DuelPlayer* dp, unsigned char* pdata, int len) {
+	unsigned char scc[SIZE_STOC_CHAT];
+	const auto scc_size = NetServer::CreateChatPacket(pdata, len, scc, dp->type);
+	if (!scc_size)
+		return;
 	for(int i = 0; i < 4; ++i)
-		NetServer::SendBufferToPlayer(players[i], STOC_CHAT, &scc, 4 + msglen * 2);
+		NetServer::SendBufferToPlayer(players[i], STOC_CHAT, scc, scc_size);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 #ifdef YGOPRO_SERVER_MODE
@@ -39,7 +39,7 @@ void TagDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 		NetServer::ReSendToPlayer(replay_recorder);
 #endif
 }
-void TagDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
+void TagDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {
 #ifdef YGOPRO_SERVER_MODE
 	bool is_recorder = false;
 #endif
@@ -52,7 +52,9 @@ void TagDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			NetServer::DisconnectPlayer(dp);
 			return;
 		}
-		CTOS_JoinGame* pkt = (CTOS_JoinGame*)pdata;
+		CTOS_JoinGame packet;
+		std::memcpy(&packet, pdata, sizeof packet);
+		const auto* pkt = &packet;
 		if(pkt->version != PRO_VERSION) {
 			STOC_ErrorMsg scem;
 			scem.msg = ERRMSG_VERERROR;
@@ -372,22 +374,32 @@ void TagDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 		return;
 	LeaveGame(players[pos]);
 }
-void TagDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
+void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 	if(dp->type > 3 || ready[dp->type])
 		return;
-	unsigned char* deckbuf = (unsigned char*)pdata;
+	if (len < 8)
+		return;
+	bool valid = true;
+	auto deckbuf = pdata;
 	int mainc = BufferIO::ReadInt32(deckbuf);
 	int sidec = BufferIO::ReadInt32(deckbuf);
-	// verify data
-	const unsigned int possibleMaxLength = (len - 8) / 4;
-	if((unsigned)mainc > possibleMaxLength || (unsigned)sidec > possibleMaxLength || (unsigned)mainc + (unsigned)sidec > possibleMaxLength) {
+	const int deck_size = len - 2 * sizeof(int32_t);
+	if (mainc < 0 || mainc > MAINC_MAX)
+		valid = false;
+	else if (sidec < 0 || sidec > SIDEC_MAX)
+		valid = false;
+	else if (deck_size != (mainc + sidec) * (int)sizeof(int32_t))
+		valid = false;
+	if (!valid) {
 		STOC_ErrorMsg scem;
 		scem.msg = ERRMSG_DECKERROR;
 		scem.code = 0;
 		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 		return;
 	}
-	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec);
+	int deck_list[SIZE_NETWORK_BUFFER / sizeof(int32_t)];
+	std::memcpy(deck_list, deckbuf, deck_size);
+	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], deck_list, mainc, sidec);
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)
@@ -420,9 +432,9 @@ void TagDuel::StartDuel(DuelPlayer* dp) {
 	NetServer::SendBufferToPlayer(players[0], STOC_DECK_COUNT, deckbuff, 12);
 	NetServer::ReSendToPlayer(players[1]);
 	char tempbuff[6];
-	memcpy(tempbuff, deckbuff, 6);
-	memcpy(deckbuff, deckbuff + 6, 6);
-	memcpy(deckbuff + 6, tempbuff, 6);
+	std::memcpy(tempbuff, deckbuff, 6);
+	std::memcpy(deckbuff, deckbuff + 6, 6);
+	std::memcpy(deckbuff + 6, tempbuff, 6);
 	NetServer::SendBufferToPlayer(players[2], STOC_DECK_COUNT, deckbuff, 12);
 	NetServer::ReSendToPlayer(players[3]);
 	NetServer::SendPacketToPlayer(players[0], STOC_SELECT_HAND);
@@ -679,7 +691,7 @@ void TagDuel::Surrender(DuelPlayer* dp) {
 	if(dp->type > 3 || !pduel)
 		return;
 	uint32 player = dp->type;
-#if !defined(YGOPRO_SERVER_MODE) || defined(YGOPRO_TAG_SURRENDER_CONFIRM)
+#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_TAG_SURRENDER_CONFIRM)
 	if(surrender[player])
 		return;
 	static const uint32 teammatemap[] = { 1, 0, 3, 2 };
@@ -1870,11 +1882,11 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 	}
 	return 0;
 }
-void TagDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
+void TagDuel::GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {
 	byte resb[SIZE_RETURN_VALUE];
 	if (len > SIZE_RETURN_VALUE)
 		len = SIZE_RETURN_VALUE;
-	memcpy(resb, pdata, len);
+	std::memcpy(resb, pdata, len);
 	last_replay.WriteInt8(len);
 	last_replay.WriteData(resb, len);
 	set_responseb(pduel, resb);
@@ -1900,9 +1912,9 @@ void TagDuel::EndDuel() {
 		return;
 	last_replay.EndRecord();
 	char replaybuf[0x2000], *pbuf = replaybuf;
-	memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
+	std::memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
 	pbuf += sizeof(ReplayHeader);
-	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
+	std::memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
 	NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size);
 	NetServer::ReSendToPlayer(players[1]);
 	NetServer::ReSendToPlayer(players[2]);
@@ -2030,10 +2042,6 @@ inline int TagDuel::WriteUpdateData(int& player, int location, int& flag, unsign
 	BufferIO::WriteInt8(qbuf, location);
 	int len = query_field_card(pduel, player, location, flag, qbuf, use_cache);
 	return len;
-}
-inline unsigned int GetPosition(unsigned char*& qbuf, int offset) {
-	unsigned int info = *(unsigned int*)(qbuf + offset);
-	return info >> 24;
 }
 #ifdef YGOPRO_SERVER_MODE
 void TagDuel::RefreshMzone(int player, int flag, int use_cache, DuelPlayer* dp)
@@ -2341,7 +2349,7 @@ uint32 TagDuel::MessageHandler(intptr_t fduel, uint32 type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
-	get_log_message(fduel, (byte*)msgbuf);
+	get_log_message(fduel, msgbuf);
 	mainGame->AddDebugMsg(msgbuf);
 	return 0;
 }

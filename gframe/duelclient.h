@@ -5,11 +5,6 @@
 #include <vector>
 #include <set>
 #include <utility>
-#include <event2/event.h>
-#include <event2/listener.h>
-#include <event2/bufferevent.h>
-#include <event2/buffer.h>
-#include <event2/thread.h>
 #include "network.h"
 #include "data_manager.h"
 #include "deck_manager.h"
@@ -27,6 +22,7 @@ private:
 	static event_base* client_base;
 	static bufferevent* client_bev;
 	static unsigned char duel_client_read[SIZE_NETWORK_BUFFER];
+	static int read_len;
 	static unsigned char duel_client_write[SIZE_NETWORK_BUFFER];
 	static bool is_closing;
 	static bool is_swapping;
@@ -45,7 +41,7 @@ public:
 	static void ClientRead(bufferevent* bev, void* ctx);
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread();
-	static void HandleSTOCPacketLan(unsigned char* data, unsigned int len);
+	static void HandleSTOCPacketLan(unsigned char* data, int len);
 	static int ClientAnalyze(unsigned char* msg, unsigned int len);
 	static void SwapField();
 	static void SetResponseI(int respI);
@@ -62,10 +58,10 @@ public:
 		auto p = duel_client_write;
 		int blen = sizeof(ST);
 		if (blen > MAX_DATA_SIZE)
-			blen = MAX_DATA_SIZE;
+			return;
 		BufferIO::WriteInt16(p, (short)(1 + blen));
 		BufferIO::WriteInt8(p, proto);
-		memcpy(p, &st, blen);
+		std::memcpy(p, &st, blen);
 		bufferevent_write(client_bev, duel_client_write, blen + 3);
 	}
 	static void SendBufferToServer(unsigned char proto, void* buffer, size_t len) {
@@ -77,7 +73,7 @@ public:
 			blen = MAX_DATA_SIZE;
 		BufferIO::WriteInt16(p, (short)(1 + blen));
 		BufferIO::WriteInt8(p, proto);
-		memcpy(p, buffer, blen);
+		std::memcpy(p, buffer, blen);
 		bufferevent_write(client_bev, duel_client_write, blen + 3);
 	}
 	

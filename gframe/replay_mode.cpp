@@ -273,6 +273,7 @@ void ReplayMode::EndDuel() {
 }
 void ReplayMode::Restart(bool refresh) {
 	end_duel(pduel);
+	mainGame->dInfo.isInDuel = false;
 	mainGame->dInfo.isStarted = false;
 	mainGame->dInfo.isInDuel = false;
 	mainGame->dInfo.isFinished = true;
@@ -940,7 +941,7 @@ uint32 ReplayMode::MessageHandler(intptr_t fduel, uint32 type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
-	get_log_message(fduel, (byte*)msgbuf);
+	get_log_message(fduel, msgbuf);
 	mainGame->AddDebugMsg(msgbuf);
 	return 0;
 }

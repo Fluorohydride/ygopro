@@ -83,7 +83,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 					if (len > SIZE_SETCODE)
 						len = SIZE_SETCODE;
 					if (len)
-						memcpy(cd.setcode, it->second.data(), len * sizeof(uint16_t));
+						std::memcpy(cd.setcode, it->second.data(), len * sizeof(uint16_t));
 				}
 				else
 					cd.set_setcode(setcode);
@@ -225,7 +225,7 @@ bool DataManager::GetData(unsigned int code, CardData* pData) {
 	if (pData) {
 		pData->code = data.code;
 		pData->alias = data.alias;
-		memcpy(pData->setcode, data.setcode, SIZE_SETCODE);
+		std::memcpy(pData->setcode, data.setcode, SIZE_SETCODE);
 		pData->type = data.type;
 		pData->level = data.level;
 		pData->attribute = data.attribute;
