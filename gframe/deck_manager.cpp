@@ -37,7 +37,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			int count = -1;
 			if (sscanf(linebuf, "%d %d", &code, &count) != 2)
 				continue;
-			if (code <= 0 || code > 99999999)
+			if (code <= 0 || code > 0xfffffff)
 				continue;
 			if (count < 0 || count > 2)
 				continue;

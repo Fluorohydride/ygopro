@@ -25,7 +25,7 @@ namespace irr {
 #include "single_mode.h"
 #endif //YGOPRO_SERVER_MODE
 
-const unsigned short PRO_VERSION = 0x1360;
+const unsigned short PRO_VERSION = 0x1361;
 
 namespace ygo {
 
