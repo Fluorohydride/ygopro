@@ -823,10 +823,11 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		soundManager.PlaySoundEffect(SOUND_PLAYER_ENTER);
 		STOC_HS_PlayerEnter packet;
 		std::memcpy(&packet, pdata, STOC_HS_PlayerEnter_size);
-		const auto* pkt = &packet;
+		auto pkt = &packet;
 		if(pkt->pos > 3)
 			break;
 		wchar_t name[20];
+		BufferIO::NullTerminate(pkt->name);
 		BufferIO::CopyWStr(pkt->name, name, 20);
 		if(mainGame->dInfo.isTag) {
 			if(pkt->pos == 0)

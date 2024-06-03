@@ -153,6 +153,10 @@ public:
 	static int DecodeUTF8(const char* src, wchar_t(&dst)[N]) {
 		return DecodeUTF8String(src, dst, N);
 	}
+	template<size_t N, typename T>
+	static void NullTerminate(T(&str)[N]) {
+		str[N - 1] = 0;
+	}
 	static int GetVal(const wchar_t* pstr) {
 		unsigned int ret = 0;
 		while(*pstr >= L'0' && *pstr <= L'9') {

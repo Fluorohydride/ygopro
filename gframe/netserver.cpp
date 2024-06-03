@@ -250,7 +250,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 		CTOS_PlayerInfo packet;
 		std::memcpy(&packet, pdata, sizeof packet);
 		auto pkt = &packet;
-		pkt->name[19] = 0;
+		BufferIO::NullTerminate(pkt->name);
 		BufferIO::CopyWStr(pkt->name, dp->name, 20);
 		break;
 	}
@@ -286,8 +286,8 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 		if(hash == 1)
 			pkt->info.lflist = deckManager._lfList[0].hash;
 		duel_mode->host_info = pkt->info;
-		pkt->name[19] = 0;
-		pkt->pass[19] = 0;
+		BufferIO::NullTerminate(pkt->name);
+		BufferIO::NullTerminate(pkt->pass);
 		BufferIO::CopyWStr(pkt->name, duel_mode->name, 20);
 		BufferIO::CopyWStr(pkt->pass, duel_mode->pass, 20);
 		duel_mode->JoinGame(dp, 0, true);
