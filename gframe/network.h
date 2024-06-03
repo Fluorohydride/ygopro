@@ -10,7 +10,7 @@
 #include <event2/thread.h>
 #include <type_traits>
 
-#define check_trivially_copyable(T) static_assert(std::is_trivially_copyable<T>::value == true, "not trivially copyable")
+#define check_trivially_copyable(T) static_assert(std::is_trivially_copyable<T>::value == true && std::is_standard_layout<T>::value == true, "not trivially copyable")
 
 namespace ygo {
 	constexpr int SIZE_NETWORK_BUFFER = 0x2000;
@@ -113,6 +113,7 @@ struct STOC_HandResult {
 check_trivially_copyable(STOC_HandResult);
 static_assert(sizeof(STOC_HandResult) == 2, "size mismatch: STOC_HandResult");
 
+// reserved for STOC_CREATE_GAME
 struct STOC_CreateGame {
 	uint32_t gameid;
 };
@@ -131,6 +132,7 @@ struct STOC_TypeChange {
 check_trivially_copyable(STOC_TypeChange);
 static_assert(sizeof(STOC_TypeChange) == 1, "size mismatch: STOC_TypeChange");
 
+// reserved for STOC_LEAVE_GAME
 struct STOC_ExitGame {
 	unsigned char pos;
 };
@@ -253,52 +255,48 @@ public:
 #define NETPLAYER_TYPE_PLAYER6		5
 #define NETPLAYER_TYPE_OBSERVER		7
 
-#define CTOS_RESPONSE		0x1
-#define CTOS_UPDATE_DECK	0x2
-#define CTOS_HAND_RESULT	0x3
-#define CTOS_TP_RESULT		0x4
-#define CTOS_PLAYER_INFO	0x10
-#define CTOS_CREATE_GAME	0x11
-#define CTOS_JOIN_GAME		0x12
-#define CTOS_LEAVE_GAME		0x13
-#define CTOS_SURRENDER		0x14
-#define CTOS_TIME_CONFIRM	0x15
-#define CTOS_CHAT			0x16
-#define CTOS_HS_TODUELIST	0x20
-#define CTOS_HS_TOOBSERVER	0x21
-#define CTOS_HS_READY		0x22
-#define CTOS_HS_NOTREADY	0x23
-#define CTOS_HS_KICK		0x24
-#define CTOS_HS_START		0x25
-#ifdef YGOPRO_SERVER_MODE
-#define CTOS_REQUEST_FIELD		0x30
-#endif
+#define CTOS_RESPONSE		0x1		// byte array
+#define CTOS_UPDATE_DECK	0x2		// int32_t array
+#define CTOS_HAND_RESULT	0x3		// CTOS_HandResult
+#define CTOS_TP_RESULT		0x4		// CTOS_TPResult
+#define CTOS_PLAYER_INFO	0x10	// CTOS_PlayerInfo
+#define CTOS_CREATE_GAME	0x11	// CTOS_CreateGame
+#define CTOS_JOIN_GAME		0x12	// CTOS_JoinGame
+#define CTOS_LEAVE_GAME		0x13	// no data
+#define CTOS_SURRENDER		0x14	// no data
+#define CTOS_TIME_CONFIRM	0x15	// no data
+#define CTOS_CHAT			0x16	// uint16_t array
+#define CTOS_HS_TODUELIST	0x20	// no data
+#define CTOS_HS_TOOBSERVER	0x21	// no data
+#define CTOS_HS_READY		0x22	// no data
+#define CTOS_HS_NOTREADY	0x23	// no data
+#define CTOS_HS_KICK		0x24	// CTOS_Kick
+#define CTOS_HS_START		0x25	// no data
+#define CTOS_REQUEST_FIELD	0x30
 
-#define STOC_GAME_MSG		0x1
-#define STOC_ERROR_MSG		0x2
-#define STOC_SELECT_HAND	0x3
-#define STOC_SELECT_TP		0x4
-#define STOC_HAND_RESULT	0x5
-#define STOC_TP_RESULT		0x6
-#define STOC_CHANGE_SIDE	0x7
-#define STOC_WAITING_SIDE	0x8
-#define STOC_DECK_COUNT		0x9
-#define STOC_CREATE_GAME	0x11
-#define STOC_JOIN_GAME		0x12
-#define STOC_TYPE_CHANGE	0x13
-#define STOC_LEAVE_GAME		0x14
-#define STOC_DUEL_START		0x15
-#define STOC_DUEL_END		0x16
-#define STOC_REPLAY			0x17
-#define STOC_TIME_LIMIT		0x18
-#define STOC_CHAT			0x19
-#define STOC_HS_PLAYER_ENTER	0x20
-#define STOC_HS_PLAYER_CHANGE	0x21
-#define STOC_HS_WATCH_CHANGE	0x22
-#define STOC_TEAMMATE_SURRENDER	0x23
-#ifdef YGOPRO_SERVER_MODE
-#define STOC_FIELD_FINISH	0x30
-#endif
+#define STOC_GAME_MSG		0x1		// byte array
+#define STOC_ERROR_MSG		0x2		// STOC_ErrorMsg
+#define STOC_SELECT_HAND	0x3		// no data
+#define STOC_SELECT_TP		0x4		// no data
+#define STOC_HAND_RESULT	0x5		// STOC_HandResult
+#define STOC_TP_RESULT		0x6		// reserved
+#define STOC_CHANGE_SIDE	0x7		// no data
+#define STOC_WAITING_SIDE	0x8		// no data
+#define STOC_DECK_COUNT		0x9		// int16_t[6]
+#define STOC_CREATE_GAME	0x11	// reserved
+#define STOC_JOIN_GAME		0x12	// STOC_JoinGame
+#define STOC_TYPE_CHANGE	0x13	// STOC_TypeChange
+#define STOC_LEAVE_GAME		0x14	// reserved
+#define STOC_DUEL_START		0x15	// no data
+#define STOC_DUEL_END		0x16	// no data
+#define STOC_REPLAY			0x17	// ReplayHeader + byte array
+#define STOC_TIME_LIMIT		0x18	// STOC_TimeLimit
+#define STOC_CHAT			0x19	// uint16_t + uint16_t array
+#define STOC_HS_PLAYER_ENTER	0x20	// STOC_HS_PlayerEnter
+#define STOC_HS_PLAYER_CHANGE	0x21	// STOC_HS_PlayerChange
+#define STOC_HS_WATCH_CHANGE	0x22	// STOC_HS_WatchChange
+#define STOC_TEAMMATE_SURRENDER	0x23	// no data
+#define STOC_FIELD_FINISH		0x30
 
 #define PLAYERCHANGE_OBSERVE	0x8
 #define PLAYERCHANGE_READY		0x9
