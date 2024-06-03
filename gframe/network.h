@@ -269,6 +269,7 @@ public:
 #define CTOS_HS_NOTREADY	0x23	// no data
 #define CTOS_HS_KICK		0x24	// CTOS_Kick
 #define CTOS_HS_START		0x25	// no data
+#define CTOS_REQUEST_FIELD	0x30
 
 #define STOC_GAME_MSG		0x1		// byte array
 #define STOC_ERROR_MSG		0x2		// STOC_ErrorMsg
@@ -292,6 +293,7 @@ public:
 #define STOC_HS_PLAYER_CHANGE	0x21	// STOC_HS_PlayerChange
 #define STOC_HS_WATCH_CHANGE	0x22	// STOC_HS_WatchChange
 #define STOC_TEAMMATE_SURRENDER	0x23	// no data
+#define STOC_FIELD_FINISH		0x30
 
 #define PLAYERCHANGE_OBSERVE	0x8
 #define PLAYERCHANGE_READY		0x9
