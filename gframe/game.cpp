@@ -982,8 +982,8 @@ bool Game::Initialize() {
 		col.setAlpha(224);
 		env->getSkin()->setColor((EGUI_DEFAULT_COLOR)i, col);
 	}
-	for (auto it = editbox_list.begin(); it != editbox_list.end(); ++it)
-		(*it)->setMax(MAX_INPUT_LENGTH);
+	for (auto ptr : editbox_list)
+		ptr->setMax(LEN_CHAT_MSG - 1);
 	dimension2du size = driver->getScreenSize();
 	if(window_size != size) {
 		window_size = size;
