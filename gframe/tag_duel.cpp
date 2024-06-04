@@ -394,7 +394,6 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 #else
 (deck_size != (mainc + sidec) * (int)sizeof(int32_t))
 #endif
-	(mainc + sidec) * (int)sizeof(int32_t))
 		valid = false;
 	if (!valid) {
 		STOC_ErrorMsg scem;
