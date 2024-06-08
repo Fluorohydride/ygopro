@@ -272,10 +272,10 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 			duel_mode = new TagDuel();
 			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, TagDuel::TagTimer, duel_mode);
 		}
-		if(pkt->info.rule > 5)
-			pkt->info.rule = 5;
-		if(pkt->info.mode > 2)
-			pkt->info.mode = 0;
+		if(pkt->info.rule > CURRENT_RULE)
+			pkt->info.rule = CURRENT_RULE;
+		if(pkt->info.mode > MODE_TAG)
+			pkt->info.mode = MODE_SINGLE;
 		unsigned int hash = 1;
 		for(auto lfit = deckManager._lfList.begin(); lfit != deckManager._lfList.end(); ++lfit) {
 			if(pkt->info.lflist == lfit->hash) {
