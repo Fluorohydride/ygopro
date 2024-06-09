@@ -173,7 +173,7 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 		}
 		if(cd.type & TYPE_TOKEN)
 			continue;
-		if(deck.side.size() < 15)
+		if(deck.side.size() < SIDE_MAX_SIZE)
 			deck.side.push_back(dataManager.GetCodePointer(code));
 	}
 	return errorcode;
