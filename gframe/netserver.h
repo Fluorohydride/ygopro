@@ -18,8 +18,6 @@ private:
 	static event* broadcast_ev;
 	static evconnlistener* listener;
 	static DuelMode* duel_mode;
-	static unsigned char net_server_read[SIZE_NETWORK_BUFFER];
-	static int read_len;
 	static unsigned char net_server_write[SIZE_NETWORK_BUFFER];
 	static unsigned short last_sent;
 
@@ -50,15 +48,14 @@ public:
 	template<typename ST>
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, ST& st) {
 		auto p = net_server_write;
-		int blen = sizeof(ST);
-		if (blen > MAX_DATA_SIZE)
+		if ((int)sizeof(ST) > MAX_DATA_SIZE)
 			return;
-		BufferIO::WriteInt16(p, (short)(1 + blen));
+		BufferIO::WriteInt16(p, (short)(1 + sizeof(ST)));
 		BufferIO::WriteInt8(p, proto);
-		std::memcpy(p, &st, blen);
-		last_sent = blen + 3;
+		std::memcpy(p, &st, sizeof(ST));
+		last_sent = sizeof(ST) + 3;
 		if (dp)
-			bufferevent_write(dp->bev, net_server_write, blen + 3);
+			bufferevent_write(dp->bev, net_server_write, sizeof(ST) + 3);
 	}
 	static void SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* buffer, size_t len) {
 		auto p = net_server_write;
