@@ -242,6 +242,8 @@ bool DeckManager::LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUICom
 	bool res = LoadDeck(filepath, is_packlist);
 	if(res && mainGame->is_building)
 		mainGame->deckBuilder.RefreshPackListScroll();
+	if (!res)
+		current_deck.clear();
 	return res;
 }
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
