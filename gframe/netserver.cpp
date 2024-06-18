@@ -9,8 +9,6 @@ event_base* NetServer::net_evbase = 0;
 event* NetServer::broadcast_ev = 0;
 evconnlistener* NetServer::listener = 0;
 DuelMode* NetServer::duel_mode = 0;
-unsigned char NetServer::net_server_read[SIZE_NETWORK_BUFFER];
-int NetServer::read_len = 0;
 unsigned char NetServer::net_server_write[SIZE_NETWORK_BUFFER];
 unsigned short NetServer::last_sent = 0;
 
@@ -109,6 +107,7 @@ void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, socka
 	dp.type = 0xff;
 	dp.bev = bev;
 	users[bev] = dp;
+	bufferevent_setwatermark(bev, EV_READ, 3, 0);
 	bufferevent_setcb(bev, ServerEchoRead, NULL, ServerEchoEvent, NULL);
 	bufferevent_enable(bev, EV_READ);
 }
@@ -123,24 +122,23 @@ void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {
 void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
 	int len = evbuffer_get_length(input);
-	unsigned short packet_len = 0;
-	while(true) {
-		if(len < 2)
-			return;
-		evbuffer_copyout(input, &packet_len, 2);
+	unsigned char* net_server_read = new unsigned char[std::min(len, SIZE_NETWORK_BUFFER)];
+	unsigned short packet_len;
+	while (len >= 2) {
+		evbuffer_copyout(input, &packet_len, sizeof packet_len);
 		if (packet_len + 2 > SIZE_NETWORK_BUFFER) {
+			delete[] net_server_read;
 			ServerEchoEvent(bev, BEV_EVENT_ERROR, 0);
 			return;
 		}
 		if (len < packet_len + 2)
-			return;
-		if (packet_len < 1)
-			return;
-		read_len = evbuffer_remove(input, net_server_read, packet_len + 2);
+			break;
+		int read_len = evbuffer_remove(input, net_server_read, packet_len + 2);
 		if (read_len >= 3)
 			HandleCTOSPacket(&users[bev], &net_server_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}
+	delete[] net_server_read;
 }
 void NetServer::ServerEchoEvent(bufferevent* bev, short events, void* ctx) {
 	if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
