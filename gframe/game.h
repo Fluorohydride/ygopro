@@ -267,6 +267,7 @@ public:
 	HWND hWnd;
 #endif
 
+	std::vector<irr::gui::IGUIEditBox* > editbox_list;
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;
