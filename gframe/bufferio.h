@@ -82,9 +82,9 @@ public:
 			case 4:
 				if (sizeof(wchar_t) == 2) {
 					cur = 0;
-					cur |= ((unsigned)*wsrc & 0x3ff) << 10;
+					cur |= (*wsrc & 0x3ffU) << 10;
 					++wsrc;
-					cur |= (unsigned)*wsrc & 0x3ff;
+					cur |= *wsrc & 0x3ffU;
 					cur += 0x10000;
 				}
 				pstr[0] = ((cur >> 18) & 0x7) | 0xf0;
@@ -107,7 +107,7 @@ public:
 		const char* p = src;
 		wchar_t* wp = wstr;
 		while(*p != 0) {
-			const unsigned cur = (unsigned)*p & 0xff;
+			const unsigned cur = *p & 0xffU;
 			int codepoint_size = 0;
 			if ((cur & 0xf8) == 0xf0) {
 				if (sizeof(wchar_t) == 2)
@@ -123,19 +123,19 @@ public:
 				*wp = *p;
 				p++;
 			} else if((cur & 0xe0) == 0xc0) {
-				*wp = (((unsigned)p[0] & 0x1f) << 6) | ((unsigned)p[1] & 0x3f);
+				*wp = ((p[0] & 0x1fU) << 6) | (p[1] & 0x3fU);
 				p += 2;
 			} else if((cur & 0xf0) == 0xe0) {
-				*wp = (((unsigned)p[0] & 0xf) << 12) | (((unsigned)p[1] & 0x3f) << 6) | ((unsigned)p[2] & 0x3f);
+				*wp = ((p[0] & 0xfU) << 12) | ((p[1] & 0x3fU) << 6) | (p[2] & 0x3fU);
 				p += 3;
 			} else if((cur & 0xf8) == 0xf0) {
 				if (sizeof(wchar_t) == 2) {
-					unsigned unicode = (((unsigned)p[0] & 0x7) << 18) | (((unsigned)p[1] & 0x3f) << 12) | (((unsigned)p[2] & 0x3f) << 6) | ((unsigned)p[3] & 0x3f);
+					unsigned unicode = ((p[0] & 0x7U) << 18) | ((p[1] & 0x3fU) << 12) | ((p[2] & 0x3fU) << 6) | (p[3] & 0x3fU);
 					unicode -= 0x10000;
 					*wp++ = (unicode >> 10) | 0xd800;
 					*wp = (unicode & 0x3ff) | 0xdc00;
 				} else {
-					*wp = (((unsigned)p[0] & 0x7) << 18) | (((unsigned)p[1] & 0x3f) << 12) | (((unsigned)p[2] & 0x3f) << 6) | ((unsigned)p[3] & 0x3f);
+					*wp = ((p[0] & 0x7U) << 18) | ((p[1] & 0x3fU) << 12) | ((p[2] & 0x3fU) << 6) | (p[3] & 0x3fU);
 				}
 				p += 4;
 			} else
