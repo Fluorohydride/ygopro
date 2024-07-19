@@ -63,12 +63,9 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif //__APPLE__
-#include "CGUITTFont.h"
-#include "CGUIImageButton.h"
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <thread>
 #include <mutex>
 #include <algorithm>

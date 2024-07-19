@@ -2,9 +2,12 @@
 #define GAME_H
 
 #include "config.h"
+#include "CGUIImageButton.h"
+#include "CGUITTFont.h"
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
+#include <time.h>
 #include <unordered_map>
 #include <vector>
 #include <list>
