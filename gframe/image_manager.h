@@ -5,6 +5,7 @@
 #include "data_manager.h"
 #include <unordered_map>
 #include <queue>
+#include <mutex>
 
 namespace ygo {
 

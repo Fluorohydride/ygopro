@@ -4,6 +4,7 @@
 #include "config.h"
 #include "CGUIImageButton.h"
 #include "CGUITTFont.h"
+#include "mysignal.h"
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
@@ -11,6 +12,7 @@
 #include <unordered_map>
 #include <vector>
 #include <list>
+#include <mutex>
 
 #define DEFAULT_DUEL_RULE 5
 
