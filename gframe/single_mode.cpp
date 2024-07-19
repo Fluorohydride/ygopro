@@ -3,6 +3,7 @@
 #include "game.h"
 #include "../ocgcore/common.h"
 #include "../ocgcore/mtrandom.h"
+#include <thread>
 
 namespace ygo {
 
