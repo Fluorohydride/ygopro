@@ -13,6 +13,7 @@
 #include <vector>
 #include <list>
 #include <mutex>
+#include <functional>
 
 #define DEFAULT_DUEL_RULE 5
 

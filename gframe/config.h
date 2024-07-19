@@ -69,7 +69,6 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include <thread>
 #include <algorithm>
 #include "bufferio.h"
-#include "myfilesystem.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/common.h"
 

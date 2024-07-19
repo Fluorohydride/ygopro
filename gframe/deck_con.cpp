@@ -1,5 +1,6 @@
 #include "config.h"
 #include "deck_con.h"
+#include "myfilesystem.h"
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "image_manager.h"
