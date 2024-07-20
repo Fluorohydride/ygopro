@@ -1,4 +1,11 @@
 #include "game.h"
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else //__APPLE__
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif //__APPLE__
 #include "materials.h"
 #include "image_manager.h"
 #include "deck_manager.h"
