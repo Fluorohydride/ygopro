@@ -138,8 +138,11 @@ void Replay::EndRecord() {
 void Replay::SaveReplay(const wchar_t* name) {
 	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
 		return;
+	wchar_t safe_name[256];
 	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls.yrp", name);
+	BufferIO::CopyWStr(name, safe_name, 256);
+	FileSystem::SafeFileName(safe_name);
+	myswprintf(fname, L"./replay/%ls.yrp", safe_name);
 #ifdef WIN32
 	fp = _wfopen(fname, L"wb");
 #else
