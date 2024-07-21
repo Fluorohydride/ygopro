@@ -151,8 +151,10 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 			errorcode = code;
 			continue;
 		}
-		if(cd.type & TYPE_TOKEN)
+		if (cd.type & TYPE_TOKEN) {
+			errorcode = code;
 			continue;
+		}
 		if(is_packlist) {
 			deck.main.push_back(dataManager.GetCodePointer(code));
 			continue;
@@ -172,8 +174,10 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 			errorcode = code;
 			continue;
 		}
-		if(cd.type & TYPE_TOKEN)
+		if (cd.type & TYPE_TOKEN) {
+			errorcode = code;
 			continue;
+		}
 		if(deck.side.size() < SIDE_MAX_SIZE)
 			deck.side.push_back(dataManager.GetCodePointer(code));
 	}
