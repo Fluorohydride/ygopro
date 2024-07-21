@@ -179,7 +179,7 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 	}
 	return errorcode;
 }
-bool DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
+int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
 	int sp = 0, ct = 0, mainc = 0, sidec = 0, code;
 	int cardlist[300]{};
 	bool is_side = false;
@@ -202,8 +202,7 @@ bool DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_p
 		else
 			mainc++;
 	}
-	LoadDeck(current_deck, cardlist, mainc, sidec, is_packlist);
-	return true; // the above LoadDeck has return value but we ignore it here for now
+	return LoadDeck(current_deck, cardlist, mainc, sidec, is_packlist);
 }
 bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	std::unordered_map<int, int> pcount;
@@ -308,7 +307,8 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	reader->read(deckBuffer, size);
 	reader->drop();
 	std::istringstream deckStream(deckBuffer);
-	return LoadDeck(current_deck, deckStream, is_packlist);
+	LoadDeck(current_deck, deckStream, is_packlist);
+	return true;  // the above LoadDeck has return value but we ignore it here for now
 }
 bool DeckManager::LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
 	wchar_t filepath[256];

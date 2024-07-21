@@ -48,7 +48,7 @@ public:
 	const std::unordered_map<int, int>* GetLFListContent(int lfhash);
 	int CheckDeck(Deck& deck, int lfhash, int rule);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_packlist = false);
-	bool LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist = false);
+	int LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist = false);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
 	void GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
