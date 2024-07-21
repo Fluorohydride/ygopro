@@ -153,16 +153,17 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 		}
 		if(cd.type & TYPE_TOKEN)
 			continue;
-		else if(is_packlist) {
+		if(is_packlist) {
 			deck.main.push_back(dataManager.GetCodePointer(code));
 			continue;
 		}
-		else if(cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) {
-			if(deck.extra.size() >= EXTRA_MAX_SIZE)
-				continue;
-			deck.extra.push_back(dataManager.GetCodePointer(code));
-		} else if(deck.main.size() < DECK_MAX_SIZE) {
-			deck.main.push_back(dataManager.GetCodePointer(code));
+		if (cd.type & TYPES_EXTRA_DECK) {
+			if ((int)deck.extra.size() < EXTRA_MAX_SIZE)
+				deck.extra.push_back(dataManager.GetCodePointer(code));
+		}
+		else {
+			if ((int)deck.main.size() < DECK_MAX_SIZE)
+				deck.main.push_back(dataManager.GetCodePointer(code));
 		}
 	}
 	for(int i = 0; i < sidec; ++i) {
