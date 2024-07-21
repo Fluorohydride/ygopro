@@ -262,11 +262,11 @@ void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, 
 		BufferIO::CopyWStr(L"", ret, 256);
 	}
 }
-bool DeckManager::LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+bool DeckManager::LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
 	wchar_t filepath[256];
 	GetDeckFile(filepath, cbCategory, cbDeck);
 	bool is_packlist = cbCategory->getSelected() == 0;
-	bool res = LoadDeck(filepath, is_packlist);
+	bool res = LoadCurrentDeck(filepath, is_packlist);
 	if(res && mainGame->is_building)
 		mainGame->deckBuilder.RefreshPackListScroll();
 	if (!res)
@@ -295,7 +295,7 @@ IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
 #endif
 	return reader;
 }
-bool DeckManager::LoadDeck(const wchar_t* file, bool is_packlist) {
+bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	IReadFile* reader = OpenDeckReader(file);
 	if(!reader) {
 		wchar_t localfile[64];
