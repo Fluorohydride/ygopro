@@ -227,8 +227,8 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 		ncount[ndeck.extra[i]->first]++;
 	for(size_t i = 0; i < ndeck.side.size(); ++i)
 		ncount[ndeck.side[i]->first]++;
-	for(auto cdit = ncount.begin(); cdit != ncount.end(); ++cdit)
-		if(cdit->second != pcount[cdit->first])
+	for (auto& cdit : ncount)
+		if (cdit.second != pcount[cdit.first])
 			return false;
 	deck = ndeck;
 	return true;

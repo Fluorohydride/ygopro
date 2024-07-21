@@ -546,7 +546,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				tm* st = localtime(&curtime);
 				wcsftime(infobuf, 256, L"%Y/%m/%d %H:%M:%S\n", st);
 				repinfo.append(infobuf);
-				wchar_t namebuf[4][20];
+				wchar_t namebuf[4][20]{};
 				ReplayMode::cur_replay.ReadName(namebuf[0]);
 				ReplayMode::cur_replay.ReadName(namebuf[1]);
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG) {
