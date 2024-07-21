@@ -179,6 +179,32 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 	}
 	return errorcode;
 }
+bool DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
+	int sp = 0, ct = 0, mainc = 0, sidec = 0, code;
+	int cardlist[300]{};
+	bool is_side = false;
+	std::string linebuf;
+	while (std::getline(deckStream, linebuf, '\n') && ct < 300) {
+		if (linebuf[0] == '!') {
+			is_side = true;
+			continue;
+		}
+		if (linebuf[0] < '0' || linebuf[0] > '9')
+			continue;
+		sp = 0;
+		while (linebuf[sp] >= '0' && linebuf[sp] <= '9')
+			sp++;
+		linebuf[sp] = 0;
+		code = std::stoi(linebuf);
+		cardlist[ct++] = code;
+		if (is_side)
+			sidec++;
+		else
+			mainc++;
+	}
+	LoadDeck(current_deck, cardlist, mainc, sidec, is_packlist);
+	return true; // the above LoadDeck has return value but we ignore it here for now
+}
 bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	std::unordered_map<int, int> pcount;
 	std::unordered_map<int, int> ncount;
@@ -293,32 +319,6 @@ bool DeckManager::LoadDeck(const wchar_t* file, bool is_packlist) {
 	reader->drop();
 	std::istringstream deckStream(deckBuffer);
 	return LoadDeck(current_deck, deckStream, is_packlist);
-}
-bool DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
-	int sp = 0, ct = 0, mainc = 0, sidec = 0, code;
-	int cardlist[300]{};
-	bool is_side = false;
-	std::string linebuf;
-	while(std::getline(deckStream, linebuf, '\n') && ct < 300) {
-		if(linebuf[0] == '!') {
-			is_side = true;
-			continue;
-		}
-		if(linebuf[0] < '0' || linebuf[0] > '9')
-			continue;
-		sp = 0;
-		while(linebuf[sp] >= '0' && linebuf[sp] <= '9')
-			sp++;
-		linebuf[sp] = 0;
-		code = std::stoi(linebuf);
-		cardlist[ct++] = code;
-		if(is_side)
-			sidec++;
-		else
-			mainc++;
-	}
-	LoadDeck(current_deck, cardlist, mainc, sidec, is_packlist);
-	return true; // the above LoadDeck has return value but we ignore it here for now
 }
 bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
 	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
