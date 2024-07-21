@@ -294,9 +294,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(mainGame->lstReplayList->getSelected() == -1)
 					break;
 				Replay replay;
-				wchar_t ex_filename[256];
-				wchar_t namebuf[4][20];
-				wchar_t filename[256];
+				wchar_t ex_filename[256]{};
+				wchar_t namebuf[4][20]{};
+				wchar_t filename[256]{};
 				myswprintf(ex_filename, L"%ls", mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected()));
 				if(!replay.OpenReplay(ex_filename))
 					break;
@@ -311,20 +311,20 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				for(int i = 0; i < 4; ++i)
 					replay.ReadInt32();
 				//deck
+				std::vector<int> deckbuf;
+				Deck tmp_deck;
 				for(int i = 0; i < max; ++i) {
 					int main = replay.ReadInt32();
-					Deck tmp_deck;
+					tmp_deck.clear();
+					deckbuf.clear();
 					for (int j = 0; j < main; ++j) {
-						auto card = dataManager.GetCodePointer(replay.ReadInt32());
-						if (card != dataManager.datas_end)
-							tmp_deck.main.push_back(card);
+						deckbuf.push_back(replay.ReadInt32());
 					}
 					int extra = replay.ReadInt32();
 					for (int j = 0; j < extra; ++j) {
-						auto card = dataManager.GetCodePointer(replay.ReadInt32());
-						if (card != dataManager.datas_end)
-							tmp_deck.extra.push_back(card);
+						deckbuf.push_back(replay.ReadInt32());
 					}
+					deckManager.LoadDeck(tmp_deck, deckbuf.data(), deckbuf.size(), 0);
 					FileSystem::SafeFileName(namebuf[i]);
 					myswprintf(filename, L"deck/%ls-%d %ls.ydk", ex_filename, i + 1, namebuf[i]);
 					deckManager.SaveDeck(tmp_deck, filename);
