@@ -262,15 +262,6 @@ void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, 
 		BufferIO::CopyWStr(L"", ret, 256);
 	}
 }
-bool DeckManager::LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
-	wchar_t filepath[256];
-	GetDeckFile(filepath, cbCategory, cbDeck);
-	bool is_packlist = cbCategory->getSelected() == 0;
-	bool res = LoadCurrentDeck(filepath, is_packlist);
-	if(res && mainGame->is_building)
-		mainGame->deckBuilder.RefreshPackListScroll();
-	return res;
-}
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 #ifdef WIN32
 	wchar_t wmode[20]{};
@@ -318,6 +309,15 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	reader->drop();
 	std::istringstream deckStream(deckBuffer);
 	return LoadDeck(current_deck, deckStream, is_packlist);
+}
+bool DeckManager::LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+	wchar_t filepath[256];
+	GetDeckFile(filepath, cbCategory, cbDeck);
+	bool is_packlist = cbCategory->getSelected() == 0;
+	bool res = LoadCurrentDeck(filepath, is_packlist);
+	if (res && mainGame->is_building)
+		mainGame->deckBuilder.RefreshPackListScroll();
+	return res;
 }
 bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
 	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
