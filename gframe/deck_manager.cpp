@@ -269,8 +269,6 @@ bool DeckManager::LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::
 	bool res = LoadCurrentDeck(filepath, is_packlist);
 	if(res && mainGame->is_building)
 		mainGame->deckBuilder.RefreshPackListScroll();
-	if (!res)
-		current_deck.clear();
 	return res;
 }
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
@@ -296,6 +294,7 @@ IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
 	return reader;
 }
 bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
+	current_deck.clear();
 	IReadFile* reader = OpenDeckReader(file);
 	if(!reader) {
 		wchar_t localfile[64];
