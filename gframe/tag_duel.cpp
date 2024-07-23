@@ -165,6 +165,13 @@ void TagDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {
 	}
 }
 void TagDuel::LeaveGame(DuelPlayer* dp) {
+#ifdef YGOPRO_SERVER_MODE
+	if(dp->type == 0 && duel_stage != DUEL_STAGE_BEGIN) {
+			EndDuel();
+			NetServer::StopServer();
+			return;
+	}
+#endif
 	if(dp == host_player) {
 #ifdef YGOPRO_SERVER_MODE
 		int host_pos;
