@@ -56,10 +56,7 @@ public:
 	char ReadInt8();
 	void Rewind();
 
-	FILE* fp{ nullptr };
-#ifdef _WIN32
-	HANDLE recording_fp{ nullptr };
-#endif
+	FILE* recording_fp{ nullptr };
 
 	ReplayHeader pheader;
 	unsigned char* replay_data;

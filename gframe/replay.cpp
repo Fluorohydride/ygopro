@@ -14,19 +14,11 @@ Replay::~Replay() {
 void Replay::BeginRecord() {
 	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
 		return;
-#ifdef _WIN32
 	if(is_recording)
-		CloseHandle(recording_fp);
-	recording_fp = CreateFileW(L"./replay/_LastReplay.yrp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
-	if(recording_fp == INVALID_HANDLE_VALUE)
+		fclose(recording_fp);
+	recording_fp = fopen("./replay/_LastReplay.yrp", "wb");
+	if(!recording_fp)
 		return;
-#else
-	if(is_recording)
-		fclose(fp);
-	fp = fopen("./replay/_LastReplay.yrp", "wb");
-	if(!fp)
-		return;
-#endif
 	pdata = replay_data;
 	replay_size = 0;
 	comp_size = 0;
@@ -34,14 +26,11 @@ void Replay::BeginRecord() {
 	is_recording = true;
 }
 void Replay::WriteHeader(ReplayHeader& header) {
+	if (!is_recording)
+		return;
 	pheader = header;
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &header, sizeof(header), &size, NULL);
-#else
-	fwrite(&header, sizeof(header), 1, fp);
-	fflush(fp);
-#endif
+	fwrite(&header, sizeof(header), 1, recording_fp);
+	fflush(recording_fp);
 }
 void Replay::WriteData(const void* data, int length, bool flush) {
 	if(!is_recording)
@@ -50,14 +39,9 @@ void Replay::WriteData(const void* data, int length, bool flush) {
 		return;
 	std::memcpy(pdata, data, length);
 	pdata += length;
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, data, length, &size, NULL);
-#else
-	fwrite(data, length, 1, fp);
+	fwrite(data, length, 1, recording_fp);
 	if(flush)
-		fflush(fp);
-#endif
+		fflush(recording_fp);
 }
 void Replay::WriteInt32(int data, bool flush) {
 	if(!is_recording)
@@ -65,14 +49,9 @@ void Replay::WriteInt32(int data, bool flush) {
 	if ((pdata - replay_data) + 4 > MAX_REPLAY_SIZE)
 		return;
 	BufferIO::WriteInt32(pdata, data);
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(int), &size, NULL);
-#else
-	fwrite(&data, sizeof(int), 1, fp);
+	fwrite(&data, sizeof(int), 1, recording_fp);
 	if(flush)
-		fflush(fp);
-#endif
+		fflush(recording_fp);
 }
 void Replay::WriteInt16(short data, bool flush) {
 	if(!is_recording)
@@ -80,14 +59,9 @@ void Replay::WriteInt16(short data, bool flush) {
 	if ((pdata - replay_data) + 2 > MAX_REPLAY_SIZE)
 		return;
 	BufferIO::WriteInt16(pdata, data);
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(short), &size, NULL);
-#else
-	fwrite(&data, sizeof(short), 1, fp);
+	fwrite(&data, sizeof(short), 1, recording_fp);
 	if(flush)
-		fflush(fp);
-#endif
+		fflush(recording_fp);
 }
 void Replay::WriteInt8(char data, bool flush) {
 	if(!is_recording)
@@ -95,31 +69,19 @@ void Replay::WriteInt8(char data, bool flush) {
 	if ((pdata - replay_data) + 1 > MAX_REPLAY_SIZE)
 		return;
 	BufferIO::WriteInt8(pdata, data);
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(char), &size, NULL);
-#else
-	fwrite(&data, sizeof(char), 1, fp);
+	fwrite(&data, sizeof(char), 1, recording_fp);
 	if(flush)
-		fflush(fp);
-#endif
+		fflush(recording_fp);
 }
 void Replay::Flush() {
 	if(!is_recording)
 		return;
-#ifdef _WIN32
-#else
-	fflush(fp);
-#endif
+	fflush(recording_fp);
 }
 void Replay::EndRecord() {
 	if(!is_recording)
 		return;
-#ifdef _WIN32
-	CloseHandle(recording_fp);
-#else
-	fclose(fp);
-#endif
+	fclose(recording_fp);
 	if(pdata - replay_data > 0 && pdata - replay_data <= MAX_REPLAY_SIZE)
 		replay_size = pdata - replay_data;
 	else
