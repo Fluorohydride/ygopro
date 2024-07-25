@@ -9,7 +9,7 @@ char DeckManager::deckBuffer[0x10000]{};
 DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
-	LFList* cur = nullptr;
+	auto cur = _lfList.rend();
 	FILE* fp = fopen(path, "r");
 	char linebuf[256]{};
 	wchar_t strBuffer[256]{};
@@ -24,7 +24,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 				strBuffer[sa] = 0;
 				LFList newlist;
 				_lfList.push_back(newlist);
-				cur = &_lfList[_lfList.size() - 1];
+				cur = _lfList.rbegin();
 				cur->listName = strBuffer;
 				cur->hash = 0x7dfcee6a;
 				continue;
@@ -39,10 +39,11 @@ void DeckManager::LoadLFListSingle(const char* path) {
 				continue;
 			if (count < 0 || count > 2)
 				continue;
-			if (!cur)
+			if (cur == _lfList.rend())
 				continue;
+			unsigned int hcode = code;
 			cur->content[code] = count;
-			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
+			cur->hash = cur->hash ^ ((hcode << 18) | (hcode >> 14)) ^ ((hcode << (27 + count)) | (hcode >> (5 - count)));
 		}
 		fclose(fp);
 	}
