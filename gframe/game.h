@@ -2,6 +2,13 @@
 #define GAME_H
 
 #include "config.h"
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else //__APPLE__
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif //__APPLE__
 #include "CGUIImageButton.h"
 #include "CGUITTFont.h"
 #include "mysignal.h"
