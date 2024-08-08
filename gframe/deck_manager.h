@@ -61,6 +61,7 @@ public:
 	bool CreateCategory(const wchar_t* name);
 	bool RenameCategory(const wchar_t* oldname, const wchar_t* newname);
 	bool DeleteCategory(const wchar_t* name);
+	bool SaveDeckBuffer(const int deckbuf[], const wchar_t* name);
 };
 
 extern DeckManager deckManager;

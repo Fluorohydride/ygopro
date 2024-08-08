@@ -303,31 +303,31 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				const ReplayHeader& rh = replay.pheader;
 				if(rh.flag & REPLAY_SINGLE_MODE)
 					break;
-				int max = (rh.flag & REPLAY_TAG) ? 4 : 2;
+				int player_count = (rh.flag & REPLAY_TAG) ? 4 : 2;
 				//player name
-				for(int i = 0; i < max; ++i)
+				for(int i = 0; i < player_count; ++i)
 					replay.ReadName(namebuf[i]);
 				//skip pre infos
 				for(int i = 0; i < 4; ++i)
 					replay.ReadInt32();
 				//deck
 				std::vector<int> deckbuf;
-				Deck tmp_deck;
-				for(int i = 0; i < max; ++i) {
-					int main = replay.ReadInt32();
-					tmp_deck.clear();
+				for(int i = 0; i < player_count; ++i) {
 					deckbuf.clear();
+					int main = replay.ReadInt32();
+					deckbuf.push_back(main);
 					for (int j = 0; j < main; ++j) {
 						deckbuf.push_back(replay.ReadInt32());
 					}
 					int extra = replay.ReadInt32();
+					deckbuf.push_back(extra);
 					for (int j = 0; j < extra; ++j) {
 						deckbuf.push_back(replay.ReadInt32());
 					}
-					deckManager.LoadDeck(tmp_deck, deckbuf.data(), deckbuf.size(), 0);
+					deckbuf.push_back(0);
 					FileSystem::SafeFileName(namebuf[i]);
 					myswprintf(filename, L"deck/%ls-%d %ls.ydk", ex_filename, i + 1, namebuf[i]);
-					deckManager.SaveDeck(tmp_deck, filename);
+					deckManager.SaveDeckBuffer(deckbuf.data(), filename);
 				}
 				mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 				mainGame->PopupElement(mainGame->wACMessage, 20);
