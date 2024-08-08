@@ -184,27 +184,23 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 	return errorcode;
 }
 int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
-	int sp = 0, ct = 0, mainc = 0, sidec = 0, code;
+	int ct = 0, mainc = 0, sidec = 0, code = 0;
 	int cardlist[300]{};
 	bool is_side = false;
 	std::string linebuf;
-	while (std::getline(deckStream, linebuf, '\n') && ct < 300) {
+	while (std::getline(deckStream, linebuf, '\n') && ct < (int)(sizeof cardlist / sizeof cardlist[0])) {
 		if (linebuf[0] == '!') {
 			is_side = true;
 			continue;
 		}
 		if (linebuf[0] < '0' || linebuf[0] > '9')
 			continue;
-		sp = 0;
-		while (linebuf[sp] >= '0' && linebuf[sp] <= '9')
-			sp++;
-		linebuf[sp] = 0;
 		code = std::stoi(linebuf);
 		cardlist[ct++] = code;
 		if (is_side)
-			sidec++;
+			++sidec;
 		else
-			mainc++;
+			++mainc;
 	}
 	return LoadDeck(current_deck, cardlist, mainc, sidec, is_packlist);
 }
