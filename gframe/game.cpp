@@ -1284,10 +1284,10 @@ void Game::RefreshBot() {
 				BufferIO::DecodeUTF8(strbuf, newinfo.desc);
 				if (!fgets(linebuf, 256, fp))
 					break;
-				newinfo.support_master_rule_3 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_3");
-				newinfo.support_new_master_rule = !!strstr(linebuf, "SUPPORT_NEW_MASTER_RULE");
-				newinfo.support_master_rule_2020 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_2020");
-				newinfo.select_deckfile = !!strstr(linebuf, "SELECT_DECKFILE");
+				newinfo.support_master_rule_3 = !!std::strstr(linebuf, "SUPPORT_MASTER_RULE_3");
+				newinfo.support_new_master_rule = !!std::strstr(linebuf, "SUPPORT_NEW_MASTER_RULE");
+				newinfo.support_master_rule_2020 = !!std::strstr(linebuf, "SUPPORT_MASTER_RULE_2020");
+				newinfo.select_deckfile = !!std::strstr(linebuf, "SELECT_DECKFILE");
 				int rule = cbBotRule->getSelected() + 3;
 				if((rule == 3 && newinfo.support_master_rule_3)
 					|| (rule == 4 && newinfo.support_new_master_rule)
@@ -1323,137 +1323,137 @@ void Game::LoadConfig() {
 	while(fgets(linebuf, 256, fp)) {
 		if (sscanf(linebuf, "%63s = %255s", strbuf, valbuf) != 2)
 			continue;
-		if(!strcmp(strbuf, "antialias")) {
+		if(!std::strcmp(strbuf, "antialias")) {
 			gameConf.antialias = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "use_d3d")) {
+		} else if(!std::strcmp(strbuf, "use_d3d")) {
 			gameConf.use_d3d = strtol(valbuf, nullptr, 10) > 0;
-		} else if(!strcmp(strbuf, "use_image_scale")) {
+		} else if(!std::strcmp(strbuf, "use_image_scale")) {
 			gameConf.use_image_scale = strtol(valbuf, nullptr, 10) > 0;
-		} else if(!strcmp(strbuf, "errorlog")) {
+		} else if(!std::strcmp(strbuf, "errorlog")) {
 			unsigned int val = strtol(valbuf, nullptr, 10);
 			enable_log = val & 0xff;
-		} else if(!strcmp(strbuf, "textfont")) {
+		} else if(!std::strcmp(strbuf, "textfont")) {
 			int textfontsize = 0;
 			if (sscanf(linebuf, "%63s = %255s %d", strbuf, valbuf, &textfontsize) != 3)
 				continue;
 			gameConf.textfontsize = textfontsize;
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
-		} else if(!strcmp(strbuf, "numfont")) {
+		} else if(!std::strcmp(strbuf, "numfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.numfont, 256);
-		} else if(!strcmp(strbuf, "serverport")) {
+		} else if(!std::strcmp(strbuf, "serverport")) {
 			gameConf.serverport = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "lasthost")) {
+		} else if(!std::strcmp(strbuf, "lasthost")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.lasthost, 100);
-		} else if(!strcmp(strbuf, "lastport")) {
+		} else if(!std::strcmp(strbuf, "lastport")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.lastport, 20);
-		} else if(!strcmp(strbuf, "roompass")) {
+		} else if(!std::strcmp(strbuf, "roompass")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
-		} else if(!strcmp(strbuf, "automonsterpos")) {
+		} else if(!std::strcmp(strbuf, "automonsterpos")) {
 			gameConf.chkMAutoPos = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "autospellpos")) {
+		} else if(!std::strcmp(strbuf, "autospellpos")) {
 			gameConf.chkSTAutoPos = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "randompos")) {
+		} else if(!std::strcmp(strbuf, "randompos")) {
 			gameConf.chkRandomPos = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "autochain")) {
+		} else if(!std::strcmp(strbuf, "autochain")) {
 			gameConf.chkAutoChain = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "waitchain")) {
+		} else if(!std::strcmp(strbuf, "waitchain")) {
 			gameConf.chkWaitChain = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "showchain")) {
+		} else if(!std::strcmp(strbuf, "showchain")) {
 			gameConf.chkDefaultShowChain = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "mute_opponent")) {
+		} else if(!std::strcmp(strbuf, "mute_opponent")) {
 			gameConf.chkIgnore1 = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "mute_spectators")) {
+		} else if(!std::strcmp(strbuf, "mute_spectators")) {
 			gameConf.chkIgnore2 = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "use_lflist")) {
+		} else if(!std::strcmp(strbuf, "use_lflist")) {
 			gameConf.use_lflist = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "default_lflist")) {
+		} else if(!std::strcmp(strbuf, "default_lflist")) {
 			gameConf.default_lflist = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "default_rule")) {
+		} else if(!std::strcmp(strbuf, "default_rule")) {
 			gameConf.default_rule = strtol(valbuf, nullptr, 10);
 			if(gameConf.default_rule <= 0)
 				gameConf.default_rule = DEFAULT_DUEL_RULE;
-		} else if(!strcmp(strbuf, "hide_setname")) {
+		} else if(!std::strcmp(strbuf, "hide_setname")) {
 			gameConf.hide_setname = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "hide_hint_button")) {
+		} else if(!std::strcmp(strbuf, "hide_hint_button")) {
 			gameConf.hide_hint_button = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "control_mode")) {
+		} else if(!std::strcmp(strbuf, "control_mode")) {
 			gameConf.control_mode = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "draw_field_spell")) {
+		} else if(!std::strcmp(strbuf, "draw_field_spell")) {
 			gameConf.draw_field_spell = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "separate_clear_button")) {
+		} else if(!std::strcmp(strbuf, "separate_clear_button")) {
 			gameConf.separate_clear_button = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "auto_search_limit")) {
+		} else if(!std::strcmp(strbuf, "auto_search_limit")) {
 			gameConf.auto_search_limit = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "search_multiple_keywords")) {
+		} else if(!std::strcmp(strbuf, "search_multiple_keywords")) {
 			gameConf.search_multiple_keywords = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "ignore_deck_changes")) {
+		} else if(!std::strcmp(strbuf, "ignore_deck_changes")) {
 			gameConf.chkIgnoreDeckChanges = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "default_ot")) {
+		} else if(!std::strcmp(strbuf, "default_ot")) {
 			gameConf.defaultOT = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "enable_bot_mode")) {
+		} else if(!std::strcmp(strbuf, "enable_bot_mode")) {
 			gameConf.enable_bot_mode = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "quick_animation")) {
+		} else if(!std::strcmp(strbuf, "quick_animation")) {
 			gameConf.quick_animation = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "auto_save_replay")) {
+		} else if(!std::strcmp(strbuf, "auto_save_replay")) {
 			gameConf.auto_save_replay = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "draw_single_chain")) {
+		} else if(!std::strcmp(strbuf, "draw_single_chain")) {
 			gameConf.draw_single_chain = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "hide_player_name")) {
+		} else if(!std::strcmp(strbuf, "hide_player_name")) {
 			gameConf.hide_player_name = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "prefer_expansion_script")) {
+		} else if(!std::strcmp(strbuf, "prefer_expansion_script")) {
 			gameConf.prefer_expansion_script = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "window_maximized")) {
+		} else if(!std::strcmp(strbuf, "window_maximized")) {
 			gameConf.window_maximized = strtol(valbuf, nullptr, 10) > 0;
-		} else if(!strcmp(strbuf, "window_width")) {
+		} else if(!std::strcmp(strbuf, "window_width")) {
 			gameConf.window_width = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "window_height")) {
+		} else if(!std::strcmp(strbuf, "window_height")) {
 			gameConf.window_height = strtol(valbuf, nullptr, 10);
-		} else if(!strcmp(strbuf, "resize_popup_menu")) {
+		} else if(!std::strcmp(strbuf, "resize_popup_menu")) {
 			gameConf.resize_popup_menu = strtol(valbuf, nullptr, 10) > 0;
 #ifdef YGOPRO_USE_IRRKLANG
-		} else if(!strcmp(strbuf, "enable_sound")) {
+		} else if(!std::strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = strtol(valbuf, nullptr, 10) > 0;
-		} else if(!strcmp(strbuf, "sound_volume")) {
+		} else if(!std::strcmp(strbuf, "sound_volume")) {
 			int vol = strtol(valbuf, nullptr, 10);
 			if (vol < 0)
 				vol = 0;
 			else if (vol > 100)
 				vol = 100;
 			gameConf.sound_volume = (double)vol / 100;
-		} else if(!strcmp(strbuf, "enable_music")) {
+		} else if(!std::strcmp(strbuf, "enable_music")) {
 			gameConf.enable_music = strtol(valbuf, nullptr, 10) > 0;
-		} else if(!strcmp(strbuf, "music_volume")) {
+		} else if(!std::strcmp(strbuf, "music_volume")) {
 			int vol = strtol(valbuf, nullptr, 10);
 			if (vol < 0)
 				vol = 0;
 			else if (vol > 100)
 				vol = 100;
 			gameConf.music_volume = (double)vol / 100;
-		} else if(!strcmp(strbuf, "music_mode")) {
+		} else if(!std::strcmp(strbuf, "music_mode")) {
 			gameConf.music_mode = strtol(valbuf, nullptr, 10);
 #endif
 		} else {
 			// options allowing multiple words
 			if (sscanf(linebuf, "%63s = %240[^\n]", strbuf, valbuf) != 2)
 				continue;
-			if (!strcmp(strbuf, "nickname")) {
+			if (!std::strcmp(strbuf, "nickname")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
-			} else if (!strcmp(strbuf, "gamename")) {
+			} else if (!std::strcmp(strbuf, "gamename")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.gamename, 20);
-			} else if (!strcmp(strbuf, "lastcategory")) {
+			} else if (!std::strcmp(strbuf, "lastcategory")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.lastcategory, 64);
-			} else if (!strcmp(strbuf, "lastdeck")) {
+			} else if (!std::strcmp(strbuf, "lastdeck")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
-			} else if(!strcmp(strbuf, "bot_deck_path")) {
+			} else if(!std::strcmp(strbuf, "bot_deck_path")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.bot_deck_path, 64);
 			}

@@ -587,9 +587,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				std::wstring message = L"";
 				bool in_message = false;
 				while(fgets(linebuf, 1024, fp)) {
-					if(!strncmp(linebuf, "--[[message", 11)) {
-						size_t len = strlen(linebuf);
-						char* msgend = strrchr(linebuf, ']');
+					if(!std::strncmp(linebuf, "--[[message", 11)) {
+						size_t len = std::strlen(linebuf);
+						char* msgend = std::strrchr(linebuf, ']');
 						if(len <= 13) {
 							in_message = true;
 							continue;
@@ -600,7 +600,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 							break;
 						}
 					}
-					if(!strncmp(linebuf, "]]", 2)) {
+					if(!std::strncmp(linebuf, "]]", 2)) {
 						in_message = false;
 						break;
 					}
