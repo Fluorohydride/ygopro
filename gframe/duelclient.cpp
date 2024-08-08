@@ -145,10 +145,10 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
 				cscg.info.rule = mainGame->cbRule->getSelected();
 				cscg.info.mode = mainGame->cbMatchMode->getSelected();
-				cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());
-				cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
-				cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
-				cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
+				cscg.info.start_hand = wcstol(mainGame->ebStartHand->getText(),nullptr,10);
+				cscg.info.start_lp = wcstol(mainGame->ebStartLP->getText(),nullptr,10);
+				cscg.info.draw_count = wcstol(mainGame->ebDrawCount->getText(),nullptr,10);
+				cscg.info.time_limit = wcstol(mainGame->ebTimeLimit->getText(),nullptr,10);
 				cscg.info.lflist = mainGame->cbHostLFlist->getItemData(mainGame->cbHostLFlist->getSelected());
 				cscg.info.duel_rule = mainGame->cbDuelRule->getSelected() + 1;
 				cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();

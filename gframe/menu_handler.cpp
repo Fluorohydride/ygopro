@@ -97,7 +97,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						evutil_freeaddrinfo(answer);
 					}
 				}
-				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
+				unsigned int remote_port = wcstol(mainGame->ebJoinPort->getText(), nullptr, 10);
 				BufferIO::CopyWStr(pstr, mainGame->gameConf.lasthost, 100);
 				BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), mainGame->gameConf.lastport, 20);
 				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
@@ -253,7 +253,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->dField.Clear();
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->device->setEventReceiver(&mainGame->dField);
-				unsigned int start_turn = _wtoi(mainGame->ebRepStartTurn->getText());
+				unsigned int start_turn = wcstol(mainGame->ebRepStartTurn->getText(), nullptr, 10);
 				if(start_turn == 1)
 					start_turn = 0;
 				ReplayMode::StartReplay(start_turn);

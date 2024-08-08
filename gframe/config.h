@@ -39,13 +39,8 @@
 #define SOCKADDR sockaddr
 #define SOCKET_ERRNO() (errno)
 
-#include <wchar.h>
 #define mywcsncasecmp wcsncasecmp
 #define mystrncasecmp strncasecmp
-inline int _wtoi(const wchar_t * s) {
-	wchar_t * endptr;
-	return (int)wcstol(s, &endptr, 10);
-}
 #endif
 
 template<size_t N, typename... TR>
@@ -56,6 +51,7 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include <irrlicht.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <wchar.h>
 #include <iostream>
 #include <algorithm>
 #include <string>
