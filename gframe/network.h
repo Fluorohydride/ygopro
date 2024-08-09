@@ -253,7 +253,7 @@ public:
 #define NETPLAYER_TYPE_OBSERVER		7
 
 #define CTOS_RESPONSE		0x1		// byte array
-#define CTOS_UPDATE_DECK	0x2		// int32_t array
+#define CTOS_UPDATE_DECK	0x2		// mainc, sidec, int32_t[mainc + sidec]
 #define CTOS_HAND_RESULT	0x3		// CTOS_HandResult
 #define CTOS_TP_RESULT		0x4		// CTOS_TPResult
 #define CTOS_PLAYER_INFO	0x10	// CTOS_PlayerInfo
