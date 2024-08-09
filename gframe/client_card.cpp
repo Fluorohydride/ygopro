@@ -32,12 +32,12 @@ ClientCard::~ClientCard() {
 	}
 	overlayed.clear();
 }
-void ClientCard::SetCode(int code) {
-	if((location == LOCATION_HAND) && (this->code != (unsigned int)code)) {
-		this->code = code;
+void ClientCard::SetCode(int x) {
+	if((location == LOCATION_HAND) && (code != (unsigned int)x)) {
+		code = x;
 		mainGame->dField.MoveCard(this, 5);
 	} else
-		this->code = code;
+		code = x;
 }
 void ClientCard::UpdateInfo(unsigned char* buf) {
 	int flag = BufferIO::ReadInt32(buf);

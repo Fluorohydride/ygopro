@@ -1,5 +1,6 @@
 #include "config.h"
 #include "deck_con.h"
+#include "myfilesystem.h"
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "image_manager.h"
@@ -1300,12 +1301,12 @@ void DeckBuilder::GetHoveredCard() {
 	} else if(x >= 810 && x <= 995 && y >= 165 && y <= 626) {
 		hovered_pos = 4;
 		hovered_seq = (y - 165) / 66;
-		int pos = mainGame->scrFilter->getPos() + hovered_seq;
-		if(pos >= (int)results.size()) {
+		int current_pos = mainGame->scrFilter->getPos() + hovered_seq;
+		if(current_pos >= (int)results.size()) {
 			hovered_seq = -1;
 			hovered_code = 0;
 		} else {
-			hovered_code = results[pos]->first;
+			hovered_code = results[current_pos]->first;
 		}
 	}
 	if(is_draging) {

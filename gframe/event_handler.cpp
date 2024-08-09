@@ -1456,7 +1456,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					DuelClient::SetResponseB(respbuf, selectable_cards.size() * 2);
 					DuelClient::SendResponse();
 				} else {
-					wchar_t formatBuffer[2048];
 					myswprintf(formatBuffer, dataManager.GetSysString(204), select_counter_count, dataManager.GetCounterName(select_counter_type));
 					mainGame->stHintMsg->setText(formatBuffer);
 				}
@@ -1665,8 +1664,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							player_name = mainGame->dInfo.clientname_tag;
 					}
 					std::wstring str(player_name);
-					const auto& player_desc_hints = mainGame->dField.player_desc_hints[mplayer];
-					for(auto iter = player_desc_hints.begin(); iter != player_desc_hints.end(); ++iter) {
+					const auto& mplayer_hints = mainGame->dField.player_desc_hints[mplayer];
+					for(auto iter = mplayer_hints.begin(); iter != mplayer_hints.end(); ++iter) {
 						myswprintf(formatBuffer, L"\n*%ls", dataManager.GetDesc(iter->first));
 						str.append(formatBuffer);
 					}

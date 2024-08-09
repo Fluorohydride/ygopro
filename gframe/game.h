@@ -2,12 +2,25 @@
 #define GAME_H
 
 #include "config.h"
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else //__APPLE__
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif //__APPLE__
+#include "CGUIImageButton.h"
+#include "CGUITTFont.h"
+#include "mysignal.h"
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
+#include <time.h>
 #include <unordered_map>
 #include <vector>
 #include <list>
+#include <mutex>
+#include <functional>
 
 #define DEFAULT_DUEL_RULE 5
 

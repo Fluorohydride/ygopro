@@ -127,7 +127,7 @@ bool DataManager::LoadStrings(IReadFile* reader) {
 	while(reader->read(&ch[0], 1)) {
 		if(ch[0] == '\0')
 			break;
-		strcat(linebuf, ch);
+		std::strcat(linebuf, ch);
 		if(ch[0] == '\n') {
 			ReadStringConfLine(linebuf);
 			linebuf[0] = '\0';
@@ -144,22 +144,22 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 	wchar_t strBuffer[4096]{};
 	if (sscanf(linebuf, "!%63s", strbuf) != 1)
 		return;
-	if(!strcmp(strbuf, "system")) {
+	if(!std::strcmp(strbuf, "system")) {
 		if (sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_sysStrings[value] = strBuffer;
-	} else if(!strcmp(strbuf, "victory")) {
+	} else if(!std::strcmp(strbuf, "victory")) {
 		if (sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_victoryStrings[value] = strBuffer;
-	} else if(!strcmp(strbuf, "counter")) {
+	} else if(!std::strcmp(strbuf, "counter")) {
 		if (sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_counterStrings[value] = strBuffer;
-	} else if(!strcmp(strbuf, "setname")) {
+	} else if(!std::strcmp(strbuf, "setname")) {
 		//using tab for comment
 		if (sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf) != 2)
 			return;
