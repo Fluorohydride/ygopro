@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
 #ifdef _WIN32
 #ifndef _DEBUG
 	char* pstrext;
-	if(argc == 2 && (pstrext = strrchr(argv[1], '.'))
+	if(argc == 2 && (pstrext = std::strrchr(argv[1], '.'))
 		&& (!mystrncasecmp(pstrext, ".ydk", 4) || !mystrncasecmp(pstrext, ".yrp", 4))) {
 		wchar_t exepath[MAX_PATH];
 		GetModuleFileNameW(NULL, exepath, MAX_PATH);
