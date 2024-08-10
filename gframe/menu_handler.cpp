@@ -175,7 +175,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_HP_READY: {
 				if(mainGame->cbCategorySelect->getSelected() == -1 || mainGame->cbDeckSelect->getSelected() == -1 ||
-					!deckManager.LoadDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect)) {
+					!deckManager.LoadCurrentDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect)) {
 					mainGame->gMutex.lock();
 					soundManager.PlaySoundEffect(SOUND_INFO);
 					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
@@ -295,40 +295,40 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(mainGame->lstReplayList->getSelected() == -1)
 					break;
 				Replay replay;
-				wchar_t ex_filename[256];
-				wchar_t namebuf[4][20];
-				wchar_t filename[256];
+				wchar_t ex_filename[256]{};
+				wchar_t namebuf[4][20]{};
+				wchar_t filename[256]{};
 				myswprintf(ex_filename, L"%ls", mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected()));
 				if(!replay.OpenReplay(ex_filename))
 					break;
 				const ReplayHeader& rh = replay.pheader;
 				if(rh.flag & REPLAY_SINGLE_MODE)
 					break;
-				int max = (rh.flag & REPLAY_TAG) ? 4 : 2;
+				int player_count = (rh.flag & REPLAY_TAG) ? 4 : 2;
 				//player name
-				for(int i = 0; i < max; ++i)
+				for(int i = 0; i < player_count; ++i)
 					replay.ReadName(namebuf[i]);
 				//skip pre infos
 				for(int i = 0; i < 4; ++i)
 					replay.ReadInt32();
 				//deck
-				for(int i = 0; i < max; ++i) {
+				std::vector<int> deckbuf;
+				for(int i = 0; i < player_count; ++i) {
+					deckbuf.clear();
 					int main = replay.ReadInt32();
-					Deck tmp_deck;
+					deckbuf.push_back(main);
 					for (int j = 0; j < main; ++j) {
-						auto card = dataManager.GetCodePointer(replay.ReadInt32());
-						if (card != dataManager.datas_end)
-							tmp_deck.main.push_back(card);
+						deckbuf.push_back(replay.ReadInt32());
 					}
 					int extra = replay.ReadInt32();
+					deckbuf.push_back(extra);
 					for (int j = 0; j < extra; ++j) {
-						auto card = dataManager.GetCodePointer(replay.ReadInt32());
-						if (card != dataManager.datas_end)
-							tmp_deck.extra.push_back(card);
+						deckbuf.push_back(replay.ReadInt32());
 					}
+					deckbuf.push_back(0);
 					FileSystem::SafeFileName(namebuf[i]);
 					myswprintf(filename, L"deck/%ls-%d %ls.ydk", ex_filename, i + 1, namebuf[i]);
-					deckManager.SaveDeck(tmp_deck, filename);
+					deckManager.SaveDeckBuffer(deckbuf.data(), filename);
 				}
 				mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 				mainGame->PopupElement(mainGame->wACMessage, 20);
@@ -426,7 +426,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_DECK_EDIT: {
 				mainGame->RefreshCategoryDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
-				if(open_file && deckManager.LoadDeck(open_file_name)) {
+				if(open_file && deckManager.LoadCurrentDeck(open_file_name)) {
 #ifdef WIN32
 					wchar_t *dash = wcsrchr(open_file_name, L'\\');
 #else
@@ -464,7 +464,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					}
 					open_file = false;
 				} else if(mainGame->cbDBCategory->getSelected() != -1 && mainGame->cbDBDecks->getSelected() != -1) {
-					deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
+					deckManager.LoadCurrentDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
 					mainGame->ebDeckname->setText(L"");
 				}
 				mainGame->HideElement(mainGame->wMainMenu);
@@ -547,7 +547,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				tm* st = localtime(&curtime);
 				wcsftime(infobuf, 256, L"%Y/%m/%d %H:%M:%S\n", st);
 				repinfo.append(infobuf);
-				wchar_t namebuf[4][20];
+				wchar_t namebuf[4][20]{};
 				ReplayMode::cur_replay.ReadName(namebuf[0]);
 				ReplayMode::cur_replay.ReadName(namebuf[1]);
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG) {
@@ -633,7 +633,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->env->setFocus(mainGame->wHostPrepare);
 				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
 					if(mainGame->cbCategorySelect->getSelected() == -1 || mainGame->cbDeckSelect->getSelected() == -1 ||
-						!deckManager.LoadDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect)) {
+						!deckManager.LoadCurrentDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect)) {
 						mainGame->gMutex.lock();
 						static_cast<irr::gui::IGUICheckBox*>(caller)->setChecked(false);
 						soundManager.PlaySoundEffect(SOUND_INFO);
