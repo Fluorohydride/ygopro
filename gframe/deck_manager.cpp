@@ -284,6 +284,10 @@ IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
 #endif
 	return reader;
 }
+bool DeckManager::LoadCurrentDeck(std::istringstream& deckStream, bool is_packlist) {
+	LoadDeck(current_deck, deckStream, is_packlist);
+	return true;  // the above LoadDeck has return value but we ignore it here for now
+}
 bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	current_deck.clear();
 	IReadFile* reader = OpenDeckReader(file);
@@ -308,8 +312,7 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	reader->read(deckBuffer, size);
 	reader->drop();
 	std::istringstream deckStream(deckBuffer);
-	LoadDeck(current_deck, deckStream, is_packlist);
-	return true;  // the above LoadDeck has return value but we ignore it here for now
+	return LoadCurrentDeck(deckStream, is_packlist);
 }
 bool DeckManager::LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
 	wchar_t filepath[256];
@@ -320,21 +323,27 @@ bool DeckManager::LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::
 		mainGame->deckBuilder.RefreshPackListScroll();
 	return res;
 }
+void DeckManager::SaveDeck(Deck& deck, std::stringstream& deckStream) {
+	deckStream << "#created by ..." << std::endl;
+	deckStream << "#main" << std::endl;
+	for(size_t i = 0; i < deck.main.size(); ++i)
+		deckStream << deck.main[i]->first << std::endl;
+	deckStream << "#extra" << std::endl;
+	for(size_t i = 0; i < deck.extra.size(); ++i)
+		deckStream << deck.extra[i]->first << std::endl;
+	deckStream << "!side" << std::endl;
+	for(size_t i = 0; i < deck.side.size(); ++i)
+		deckStream << deck.side[i]->first << std::endl;
+}
 bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
 	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
 		return false;
 	FILE* fp = OpenDeckFile(file, "w");
 	if(!fp)
 		return false;
-	fprintf(fp, "#created by ...\n#main\n");
-	for(size_t i = 0; i < deck.main.size(); ++i)
-		fprintf(fp, "%d\n", deck.main[i]->first);
-	fprintf(fp, "#extra\n");
-	for(size_t i = 0; i < deck.extra.size(); ++i)
-		fprintf(fp, "%d\n", deck.extra[i]->first);
-	fprintf(fp, "!side\n");
-	for(size_t i = 0; i < deck.side.size(); ++i)
-		fprintf(fp, "%d\n", deck.side[i]->first);
+	std::stringstream deckStream;
+	SaveDeck(deck, deckStream);
+	fwrite(deckStream.str().c_str(), 1, deckStream.str().length(), fp);
 	fclose(fp);
 	return true;
 }
