@@ -99,7 +99,7 @@ public:
 
 	ClientCard() = default;
 	~ClientCard();
-	void SetCode(int code);
+	void SetCode(int x);
 	void UpdateInfo(unsigned char* buf);
 	void ClearTarget();
 	void ClearData();

@@ -3,15 +3,28 @@
 
 #include "config.h"
 #ifndef YGOPRO_SERVER_MODE
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else //__APPLE__
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif //__APPLE__
+#include "CGUIImageButton.h"
+#include "CGUITTFont.h"
+#include "mysignal.h"
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
+#include <time.h>
 #else
 #include "netserver.h"
 #endif //YGOPRO_SERVER_MODE
 #include <unordered_map>
 #include <vector>
 #include <list>
+#include <mutex>
+#include <functional>
 
 #ifndef YGOPRO_DEFAULT_DUEL_RULE
 #define YGOPRO_DEFAULT_DUEL_RULE			5

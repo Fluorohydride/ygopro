@@ -5,9 +5,7 @@
 #include "client_card.h"
 #include <unordered_map>
 #include <vector>
-#ifndef YGOPRO_SERVER_MODE
 #include <sstream>
-#endif
 
 #ifndef YGOPRO_MAX_DECK
 #define YGOPRO_MAX_DECK					60
@@ -68,20 +66,21 @@ public:
 	const std::unordered_map<int, int>* GetLFListContent(int lfhash);
 	int CheckDeck(Deck& deck, int lfhash, int rule);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_packlist = false);
+	int LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist = false);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 #ifndef YGOPRO_SERVER_MODE
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
 	void GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
-	bool LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
 	FILE* OpenDeckFile(const wchar_t* file, const char* mode);
 	IReadFile* OpenDeckReader(const wchar_t* file);
-	bool LoadDeck(const wchar_t* file, bool is_packlist = false);
-	bool LoadDeck(std::istringstream* deckStream, bool is_packlist = false);
+	bool LoadCurrentDeck(const wchar_t* file, bool is_packlist = false);
+	bool LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
 	bool SaveDeck(Deck& deck, const wchar_t* file);
 	bool DeleteDeck(const wchar_t* file);
 	bool CreateCategory(const wchar_t* name);
 	bool RenameCategory(const wchar_t* oldname, const wchar_t* newname);
 	bool DeleteCategory(const wchar_t* name);
+	bool SaveDeckBuffer(const int deckbuf[], const wchar_t* name);
 #endif //YGOPRO_SERVER_MODE
 };
 
