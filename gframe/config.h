@@ -43,22 +43,22 @@
 #define mystrncasecmp strncasecmp
 #endif
 
+#include <string>
 template<size_t N, typename... TR>
 inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 	return swprintf(buf, N, fmt, args...);
 }
 
-#include <irrlicht.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include <iostream>
 #include <algorithm>
-#include <string>
 #include "bufferio.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/common.h"
 
+#include <irrlicht.h>
 using namespace irr;
 using namespace core;
 using namespace scene;
