@@ -20,7 +20,7 @@ bool NetServer::StartServer(unsigned short port) {
 	if(!net_evbase)
 		return false;
 	sockaddr_in sin;
-	memset(&sin, 0, sizeof(sin));
+	std::memset(&sin, 0, sizeof sin);
 	server_port = port;
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -44,7 +44,7 @@ bool NetServer::StartBroadcast() {
 	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof opt);
 	setsockopt(udp, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof opt);
 	sockaddr_in addr;
-	memset(&addr, 0, sizeof(addr));
+	std::memset(&addr, 0, sizeof addr);
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(7920);
 	addr.sin_addr.s_addr = 0;
