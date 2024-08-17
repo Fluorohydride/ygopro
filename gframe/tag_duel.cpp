@@ -1619,7 +1619,7 @@ void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if (position & POS_FACEDOWN)
-			memset(qbuf, 0, clen - 4);
+			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
 	pid = 2 - pid;
@@ -1644,7 +1644,7 @@ void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if (position & POS_FACEDOWN)
-			memset(qbuf, 0, clen - 4);
+			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
 	pid = 2 - pid;
@@ -1667,7 +1667,7 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache) {
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if(!(position & POS_FACEUP))
-			memset(qbuf, 0, slen - 4);
+			std::memset(qbuf, 0, slen - 4);
 		qbuf += slen - 4;
 	}
 	for(int i = 0; i < 4; ++i)

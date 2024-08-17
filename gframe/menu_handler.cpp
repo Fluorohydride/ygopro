@@ -78,7 +78,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), port, 6);
 					struct evutil_addrinfo hints;
 					struct evutil_addrinfo *answer = NULL;
-					memset(&hints, 0, sizeof(hints));
+					std::memset(&hints, 0, sizeof hints);
 					hints.ai_family = AF_INET;
 					hints.ai_socktype = SOCK_STREAM;
 					hints.ai_protocol = IPPROTO_TCP;
