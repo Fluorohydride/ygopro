@@ -28,7 +28,7 @@ void Replay::BeginRecord() {
 	if(!fp)
 		return;
 #endif
-	pdata = replay_data;
+	pwrite = replay_data;
 	replay_size = 0;
 	comp_size = 0;
 	is_replaying = false;
@@ -47,10 +47,10 @@ void Replay::WriteHeader(ReplayHeader& header) {
 void Replay::WriteData(const void* data, int length, bool flush) {
 	if(!is_recording)
 		return;
-	if (length < 0 || (pdata - replay_data) + length > MAX_REPLAY_SIZE)
+	if (length < 0 || (int)(pwrite - replay_data) + length > MAX_REPLAY_SIZE)
 		return;
-	std::memcpy(pdata, data, length);
-	pdata += length;
+	std::memcpy(pwrite, data, length);
+	pwrite += length;
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, data, length, &size, NULL);
@@ -85,10 +85,7 @@ void Replay::EndRecord() {
 #else
 	fclose(fp);
 #endif
-	if(pdata - replay_data > 0 && pdata - replay_data <= MAX_REPLAY_SIZE)
-		replay_size = pdata - replay_data;
-	else
-		replay_size = 0;
+	replay_size = pwrite - replay_data;
 	pheader.datasize = replay_size;
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;

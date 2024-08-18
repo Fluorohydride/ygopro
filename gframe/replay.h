@@ -62,12 +62,13 @@ public:
 #endif
 
 	ReplayHeader pheader;
-	unsigned char* replay_data;
 	unsigned char* comp_data;
-	size_t replay_size{};
 	size_t comp_size{};
 
 private:
+	unsigned char* replay_data;
+	size_t replay_size{};
+	unsigned char* pwrite{};
 	unsigned char* pdata{ nullptr };
 	bool is_recording{};
 	bool is_replaying{};
