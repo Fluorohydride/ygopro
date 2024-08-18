@@ -246,23 +246,21 @@ bool Replay::ReadData(void* data, int length) {
 	pdata += length;
 	return true;
 }
-int Replay::ReadInt32() {
-	if(!is_replaying)
+template<typename T>
+T Replay::ReadValue() {
+	T ret{};
+	if (!ReadData(&ret, sizeof ret))
 		return -1;
-	int ret = BufferIO::ReadInt32(pdata);
 	return ret;
+}
+int Replay::ReadInt32() {
+	return ReadValue<int32_t>();
 }
 short Replay::ReadInt16() {
-	if(!is_replaying)
-		return -1;
-	short ret = BufferIO::ReadInt16(pdata);
-	return ret;
+	return ReadValue<int16_t>();
 }
 char Replay::ReadInt8() {
-	if(!is_replaying)
-		return -1;
-	char ret= BufferIO::ReadInt8(pdata);
-	return ret;
+	return ReadValue<char>();
 }
 void Replay::Rewind() {
 	pdata = replay_data;

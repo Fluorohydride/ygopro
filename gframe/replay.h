@@ -51,6 +51,8 @@ public:
 	void ReadName(wchar_t* data);
 	//void ReadHeader(ReplayHeader& header);
 	bool ReadData(void* data, int length);
+	template<typename T>
+	T ReadValue();
 	int ReadInt32();
 	short ReadInt16();
 	char ReadInt8();
