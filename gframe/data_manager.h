@@ -14,11 +14,13 @@ namespace ygo {
 class DataManager {
 public:
 	DataManager();
+	bool ReadDB(sqlite3* pDB);
 	bool LoadDB(const wchar_t* wfile);
 	bool LoadStrings(const char* file);
 	bool LoadStrings(IReadFile* reader);
 	void ReadStringConfLine(const char* linebuf);
-	bool Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt = 0);
+	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = nullptr);
+
 	bool GetData(unsigned int code, CardData* pData) const;
 	code_pointer GetCodePointer(unsigned int code) const;
 	string_pointer GetStringPointer(unsigned int code) const;
@@ -47,6 +49,7 @@ public:
 	code_pointer datas_end;
 	string_pointer strings_begin;
 	string_pointer strings_end;
+	char errmsg[512]{};
 
 	wchar_t numStrings[301][4]{};
 	wchar_t numBuffer[6]{};
