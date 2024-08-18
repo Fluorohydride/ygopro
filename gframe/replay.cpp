@@ -214,27 +214,37 @@ bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 #endif
 }
 bool Replay::ReadNextResponse(unsigned char resp[]) {
-	if(pdata - replay_data >= (int)replay_size)
+	unsigned char len{};
+	if (!ReadData(&len, sizeof len))
 		return false;
-	int len = *pdata++;
-	if(len > SIZE_RETURN_VALUE)
+	if (len > SIZE_RETURN_VALUE) {
+		is_replaying = false;
 		return false;
-	std::memcpy(resp, pdata, len);
-	pdata += len;
+	}
+	if (!ReadData(resp, len))
+		return false;
 	return true;
 }
 void Replay::ReadName(wchar_t* data) {
-	if(!is_replaying)
+	uint16_t buffer[20]{};
+	if (!ReadData(buffer, sizeof buffer)) {
+		data[0] = 0;
 		return;
-	unsigned short buffer[20];
-	ReadData(buffer, 40);
+	}
 	BufferIO::CopyWStr(buffer, data, 20);
 }
-void Replay::ReadData(void* data, int length) {
+bool Replay::ReadData(void* data, int length) {
 	if(!is_replaying)
-		return;
+		return false;
+	if (length < 0)
+		return false;
+	if ((int)(pdata - replay_data) + length > (int)replay_size) {
+		is_replaying = false;
+		return false;
+	}
 	std::memcpy(data, pdata, length);
 	pdata += length;
+	return true;
 }
 int Replay::ReadInt32() {
 	if(!is_replaying)

@@ -50,7 +50,7 @@ public:
 	bool ReadNextResponse(unsigned char resp[]);
 	void ReadName(wchar_t* data);
 	//void ReadHeader(ReplayHeader& header);
-	void ReadData(void* data, int length);
+	bool ReadData(void* data, int length);
 	int ReadInt32();
 	short ReadInt16();
 	char ReadInt8();
@@ -69,7 +69,7 @@ private:
 	unsigned char* replay_data;
 	size_t replay_size{};
 	unsigned char* pwrite{};
-	unsigned char* pdata{ nullptr };
+	unsigned char* pdata{};
 	bool is_recording{};
 	bool is_replaying{};
 };
