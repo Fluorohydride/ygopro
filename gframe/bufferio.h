@@ -75,19 +75,49 @@ public:
 	// UTF-16/UTF-32 to UTF-8
 	// return: string length
 	static int EncodeUTF8String(const wchar_t* wsrc, char* str, int size) {
-		char* pstr = str;
-		while (*wsrc != 0) {
-			unsigned cur = *wsrc;
+		auto pw = wsrc;
+		auto pstr = str;
+		while (*pw != 0) {
+			unsigned cur = 0;
 			int codepoint_size = 0;
+			if (sizeof(wchar_t) == 2) {
+				if (IsHighSurrogate(pw[0])) {
+					if (!CheckStringSize(pw, 2))
+						break;
+					if (IsLowSurrogate(pw[1])) {
+						cur = ((pw[0] & 0x3ffU) << 10) | (pw[1] & 0x3ffU);
+						cur += 0x10000;
+						pw += 2;
+					}
+					else {
+						pw++;
+						continue;
+					}
+				}
+				else if (IsLowSurrogate(pw[0])) {
+					pw++;
+					continue;
+				}
+				else {
+					cur = *pw;
+					pw++;
+				}
+			}
+			else {
+				cur = *pw;
+				pw++;
+			}
+			if (!IsUnicodeChar(cur))
+				continue;
 			if (cur < 0x80U)
 				codepoint_size = 1;
 			else if (cur < 0x800U)
 				codepoint_size = 2;
-			else if (cur < 0x10000U && (cur < 0xd800U || cur > 0xdfffU))
+			else if (cur < 0x10000U)
 				codepoint_size = 3;
 			else
 				codepoint_size = 4;
-			if (pstr - str + codepoint_size > size - 1)
+			if ((int)(pstr - str) + codepoint_size > size - 1)
 				break;
 			switch (codepoint_size) {
 			case 1:
@@ -103,13 +133,6 @@ public:
 				pstr[2] = (cur & 0x3f) | 0x80;
 				break;
 			case 4:
-				if (sizeof(wchar_t) == 2) {
-					cur = 0;
-					cur |= (*wsrc & 0x3ffU) << 10;
-					++wsrc;
-					cur |= *wsrc & 0x3ffU;
-					cur += 0x10000;
-				}
 				pstr[0] = ((cur >> 18) & 0x7) | 0xf0;
 				pstr[1] = ((cur >> 12) & 0x3f) | 0x80;
 				pstr[2] = ((cur >> 6) & 0x3f) | 0x80;
@@ -119,10 +142,9 @@ public:
 				break;
 			}
 			pstr += codepoint_size;
-			wsrc++;
 		}
 		*pstr = 0;
-		return pstr - str;
+		return (int)(pstr - str);
 	}
 	// UTF-8 to UTF-16/UTF-32
 	// return: string length
