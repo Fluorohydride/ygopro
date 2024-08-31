@@ -100,7 +100,7 @@ void DuelClient::StopClient(bool is_exiting) {
 void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
 	int len = evbuffer_get_length(input);
-	unsigned char* duel_client_read = new unsigned char[std::min(len, SIZE_NETWORK_BUFFER)];
+	unsigned char* duel_client_read = new unsigned char[SIZE_NETWORK_BUFFER];
 	unsigned short packet_len;
 	while (len >= 2) {
 		evbuffer_copyout(input, &packet_len, sizeof packet_len);

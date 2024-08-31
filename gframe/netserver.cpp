@@ -123,7 +123,7 @@ void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {
 void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
 	int len = evbuffer_get_length(input);
-	unsigned char* net_server_read = new unsigned char[std::min(len, SIZE_NETWORK_BUFFER)];
+	unsigned char* net_server_read = new unsigned char[SIZE_NETWORK_BUFFER];
 	unsigned short packet_len;
 	while (len >= 2) {
 		evbuffer_copyout(input, &packet_len, sizeof packet_len);
