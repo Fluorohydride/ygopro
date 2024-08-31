@@ -57,6 +57,21 @@ public:
 		}
 		return true;
 	}
+	static bool IsHighSurrogate(unsigned int c) {
+		return (c >= 0xd800U && c <= 0xdbffU);
+	}
+	static bool IsLowSurrogate(unsigned int c) {
+		return (c >= 0xdc00U && c <= 0xdfffU);
+	}
+	static bool IsUnicodeChar(unsigned int c) {
+		if(IsHighSurrogate(c))
+			return false;
+		if (IsLowSurrogate(c))
+			return false;
+		if (c > 0x10ffffU)
+			return false;
+		return true;
+	}
 	// UTF-16/UTF-32 to UTF-8
 	// return: string length
 	static int EncodeUTF8String(const wchar_t* wsrc, char* str, int size) {
