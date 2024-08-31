@@ -49,6 +49,14 @@ public:
 		*pstr = 0;
 		return l;
 	}
+	template<typename T>
+	static bool CheckStringSize(const T* str, int len) {
+		for (int i = 0; i < len; ++i) {
+			if (str[i] == 0)
+				return false;
+		}
+		return true;
+	}
 	// UTF-16/UTF-32 to UTF-8
 	// return: string length
 	static int EncodeUTF8String(const wchar_t* wsrc, char* str, int size) {
