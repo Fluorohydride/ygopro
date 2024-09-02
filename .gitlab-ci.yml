@@ -37,6 +37,7 @@ mat_submodules:
   script:
     - rm -rf ocgcore script
     - mkdir ocgcore script
+    - git config --global --add safe.directory $CI_PROJECT_DIR
     - git submodule update --init
   artifacts:
     paths:
