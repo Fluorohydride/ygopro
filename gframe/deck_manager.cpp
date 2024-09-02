@@ -314,7 +314,7 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 		reader->drop();
 		return false;
 	}
-	memset(deckBuffer, 0, sizeof(deckBuffer));
+	std::memset(deckBuffer, 0, sizeof deckBuffer);
 	reader->read(deckBuffer, size);
 	reader->drop();
 	std::istringstream deckStream(deckBuffer);

@@ -44,7 +44,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 	client_base = event_base_new();
 	if(!client_base)
 		return false;
-	memset(&sin, 0, sizeof(sin));
+	std::memset(&sin, 0, sizeof sin);
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = htonl(ip);
 	sin.sin_port = htons(port);
@@ -100,7 +100,7 @@ void DuelClient::StopClient(bool is_exiting) {
 void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
 	int len = evbuffer_get_length(input);
-	unsigned char* duel_client_read = new unsigned char[std::min(len, SIZE_NETWORK_BUFFER)];
+	unsigned char* duel_client_read = new unsigned char[SIZE_NETWORK_BUFFER];
 	unsigned short packet_len;
 	while (len >= 2) {
 		evbuffer_copyout(input, &packet_len, sizeof packet_len);
@@ -4062,7 +4062,7 @@ void DuelClient::BeginRefreshHost() {
 		return;
 	SOCKET reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	sockaddr_in reply_addr;
-	memset(&reply_addr, 0, sizeof(reply_addr));
+	std::memset(&reply_addr, 0, sizeof reply_addr);
 	reply_addr.sin_family = AF_INET;
 	reply_addr.sin_port = htons(7921);
 	reply_addr.sin_addr.s_addr = 0;
