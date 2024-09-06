@@ -6,30 +6,30 @@
 
 class BufferIO {
 public:
-	inline static int ReadInt32(unsigned char*& p) {
+	static int ReadInt32(unsigned char*& p) {
 		return buffer_read<int32_t>(p);
 	}
-	inline static short ReadInt16(unsigned char*& p) {
+	static short ReadInt16(unsigned char*& p) {
 		return buffer_read<int16_t>(p);
 	}
-	inline static char ReadInt8(unsigned char*& p) {
+	static char ReadInt8(unsigned char*& p) {
 		return buffer_read<char>(p);
 	}
-	inline static unsigned char ReadUInt8(unsigned char*& p) {
+	static unsigned char ReadUInt8(unsigned char*& p) {
 		return buffer_read<unsigned char>(p);
 	}
-	inline static void WriteInt32(unsigned char*& p, int val) {
+	static void WriteInt32(unsigned char*& p, int val) {
 		buffer_write<int32_t>(p, val);
 	}
-	inline static void WriteInt16(unsigned char*& p, short val) {
+	static void WriteInt16(unsigned char*& p, short val) {
 		buffer_write<int16_t>(p, val);
 	}
-	inline static void WriteInt8(unsigned char*& p, char val) {
+	static void WriteInt8(unsigned char*& p, char val) {
 		buffer_write<char>(p, val);
 	}
 	// return: string length
 	template<typename T1, typename T2>
-	inline static int CopyWStr(const T1* src, T2* pstr, int bufsize) {
+	static int CopyWStr(const T1* src, T2* pstr, int bufsize) {
 		int l = 0;
 		while(src[l] && l < bufsize - 1) {
 			pstr[l] = (T2)src[l];
@@ -39,7 +39,7 @@ public:
 		return l;
 	}
 	template<typename T1, typename T2>
-	inline static int CopyWStrRef(const T1* src, T2*& pstr, int bufsize) {
+	static int CopyWStrRef(const T1* src, T2*& pstr, int bufsize) {
 		int l = 0;
 		while(src[l] && l < bufsize - 1) {
 			pstr[l] = (T2)src[l];
