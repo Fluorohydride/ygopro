@@ -263,15 +263,9 @@ void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, 
 	}
 }
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
-#ifdef WIN32
-	wchar_t wmode[20]{};
-	BufferIO::CopyWStr(mode, wmode, sizeof wmode / sizeof wmode[0]);
-	FILE* fp = _wfopen(file, wmode);
-#else
-	char file2[256];
-	BufferIO::EncodeUTF8(file, file2);
-	FILE* fp = fopen(file2, mode);
-#endif
+	char fullname[256]{};
+	BufferIO::EncodeUTF8(file, fullname);
+	FILE* fp = myfopen(fullname, mode);
 	return fp;
 }
 IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
