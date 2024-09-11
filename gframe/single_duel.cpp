@@ -1965,7 +1965,7 @@ if(!dp || dp == players[player])
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if (position & POS_FACEDOWN)
-			memset(qbuf, 0, clen - 4);
+			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
 #ifdef YGOPRO_SERVER_MODE
@@ -2008,7 +2008,7 @@ if(!dp || dp == players[player])
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if (position & POS_FACEDOWN)
-			memset(qbuf, 0, clen - 4);
+			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
 #ifdef YGOPRO_SERVER_MODE
@@ -2051,7 +2051,7 @@ if(!dp || dp == players[player])
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if(!(position & POS_FACEUP))
-			memset(qbuf, 0, slen - 4);
+			std::memset(qbuf, 0, slen - 4);
 		qbuf += slen - 4;
 	}
 #ifdef YGOPRO_SERVER_MODE
@@ -2180,7 +2180,7 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	if (position & POS_FACEDOWN) {
 		BufferIO::WriteInt32(qbuf, QUERY_CODE);
 		BufferIO::WriteInt32(qbuf, 0);
-		memset(qbuf, 0, clen - 12);
+		std::memset(qbuf, 0, clen - 12);
 	}
 	NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer, len + 4);
 	for (auto pit = observers.begin(); pit != observers.end(); ++pit)

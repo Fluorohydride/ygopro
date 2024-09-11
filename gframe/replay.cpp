@@ -58,7 +58,7 @@ void Replay::BeginRecord() {
 #ifdef YGOPRO_SERVER_MODE
 	}
 #endif //YGOPRO_SERVER_MODE
-	pdata = replay_data;
+	pwrite = replay_data;
 	replay_size = 0;
 	comp_size = 0;
 	is_replaying = false;
@@ -80,10 +80,10 @@ void Replay::WriteHeader(ReplayHeader& header) {
 void Replay::WriteData(const void* data, int length, bool flush) {
 	if(!is_recording)
 		return;
-	if (length < 0 || (pdata - replay_data) + length > MAX_REPLAY_SIZE)
+	if (length < 0 || (int)(pwrite - replay_data) + length > MAX_REPLAY_SIZE)
 		return;
-	std::memcpy(pdata, data, length);
-	pdata += length;
+	std::memcpy(pwrite, data, length);
+	pwrite += length;
 #ifdef YGOPRO_SERVER_MODE
 	if(!(replay_mode & REPLAY_MODE_SAVE_IN_SERVER)) return;
 #endif
@@ -97,58 +97,13 @@ void Replay::WriteData(const void* data, int length, bool flush) {
 #endif
 }
 void Replay::WriteInt32(int data, bool flush) {
-	if(!is_recording)
-		return;
-	if ((pdata - replay_data) + 4 > MAX_REPLAY_SIZE)
-		return;
-	BufferIO::WriteInt32(pdata, data);
-#ifdef YGOPRO_SERVER_MODE
-	if(!(replay_mode & REPLAY_MODE_SAVE_IN_SERVER)) return;
-#endif
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(int), &size, NULL);
-#else
-	fwrite(&data, sizeof(int), 1, fp);
-	if(flush)
-		fflush(fp);
-#endif
+	WriteData(&data, sizeof data, flush);
 }
 void Replay::WriteInt16(short data, bool flush) {
-	if(!is_recording)
-		return;
-	if ((pdata - replay_data) + 2 > MAX_REPLAY_SIZE)
-		return;
-	BufferIO::WriteInt16(pdata, data);
-#ifdef YGOPRO_SERVER_MODE
-	if(!(replay_mode & REPLAY_MODE_SAVE_IN_SERVER)) return;
-#endif
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(short), &size, NULL);
-#else
-	fwrite(&data, sizeof(short), 1, fp);
-	if(flush)
-		fflush(fp);
-#endif
+	WriteData(&data, sizeof data, flush);
 }
 void Replay::WriteInt8(char data, bool flush) {
-	if(!is_recording)
-		return;
-	if ((pdata - replay_data) + 1 > MAX_REPLAY_SIZE)
-		return;
-	BufferIO::WriteInt8(pdata, data);
-#ifdef YGOPRO_SERVER_MODE
-	if(!(replay_mode & REPLAY_MODE_SAVE_IN_SERVER)) return;
-#endif
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(char), &size, NULL);
-#else
-	fwrite(&data, sizeof(char), 1, fp);
-	if(flush)
-		fflush(fp);
-#endif
+	WriteData(&data, sizeof data, flush);
 }
 void Replay::Flush() {
 	if(!is_recording)
@@ -175,10 +130,7 @@ void Replay::EndRecord() {
 #ifdef YGOPRO_SERVER_MODE
 	}
 #endif
-	if(pdata - replay_data > 0 && pdata - replay_data <= MAX_REPLAY_SIZE)
-		replay_size = pdata - replay_data;
-	else
-		replay_size = 0;
+	replay_size = pwrite - replay_data;
 	pheader.datasize = replay_size;
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
@@ -195,39 +147,26 @@ void Replay::SaveReplay(const wchar_t* name) {
 		return;
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls.yrp", name);
-#ifdef WIN32
-	fp = _wfopen(fname, L"wb");
-#else
-	char fname2[256];
-	BufferIO::EncodeUTF8(fname, fname2);
-	fp = fopen(fname2, "wb");
-#endif
-	if(!fp)
+	char fullname[256]{};
+	BufferIO::EncodeUTF8(fname, fullname);
+	FILE* rfp = myfopen(fullname, "wb");
+	if(!rfp)
 		return;
-	fwrite(&pheader, sizeof(pheader), 1, fp);
-	fwrite(comp_data, comp_size, 1, fp);
-	fclose(fp);
+	fwrite(&pheader, sizeof pheader, 1, rfp);
+	fwrite(comp_data, comp_size, 1, rfp);
+	fclose(rfp);
 }
 bool Replay::OpenReplay(const wchar_t* name) {
-#ifdef WIN32
-	fp = _wfopen(name, L"rb");
-#else
-	char name2[256];
-	BufferIO::EncodeUTF8(name, name2);
-	fp = fopen(name2, "rb");
-#endif
-	if(!fp) {
+	char fullname[256]{};
+	BufferIO::EncodeUTF8(name, fullname);
+	FILE* rfp = myfopen(fullname, "rb");
+	if(!rfp) {
 		wchar_t fname[256];
 		myswprintf(fname, L"./replay/%ls", name);
-#ifdef WIN32
-		fp = _wfopen(fname, L"rb");
-#else
-		char fname2[256];
-		BufferIO::EncodeUTF8(fname, fname2);
-		fp = fopen(fname2, "rb");
-#endif
+		BufferIO::EncodeUTF8(fname, fullname);
+		rfp = myfopen(fullname, "rb");
 	}
-	if(!fp)
+	if(!rfp)
 		return false;
 
 	pdata = replay_data;
@@ -235,13 +174,13 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	is_replaying = false;
 	replay_size = 0;
 	comp_size = 0;
-	if(fread(&pheader, sizeof(pheader), 1, fp) < 1) {
-		fclose(fp);
+	if(fread(&pheader, sizeof pheader, 1, rfp) < 1) {
+		fclose(rfp);
 		return false;
 	}
 	if(pheader.flag & REPLAY_COMPRESSED) {
-		comp_size = fread(comp_data, 1, MAX_COMP_SIZE, fp);
-		fclose(fp);
+		comp_size = fread(comp_data, 1, MAX_COMP_SIZE, rfp);
+		fclose(rfp);
 		if ((int)pheader.datasize < 0 && (int)pheader.datasize > MAX_REPLAY_SIZE)
 			return false;
 		replay_size = pheader.datasize;
@@ -252,8 +191,8 @@ bool Replay::OpenReplay(const wchar_t* name) {
 			return false;
 		}
 	} else {
-		replay_size = fread(replay_data, 1, MAX_REPLAY_SIZE, fp);
-		fclose(fp);
+		replay_size = fread(replay_data, 1, MAX_REPLAY_SIZE, rfp);
+		fclose(rfp);
 		comp_size = 0;
 	}
 	is_replaying = true;
@@ -262,24 +201,20 @@ bool Replay::OpenReplay(const wchar_t* name) {
 bool Replay::CheckReplay(const wchar_t* name) {
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls", name);
-#ifdef WIN32
-	FILE* rfp = _wfopen(fname, L"rb");
-#else
-	char fname2[256];
-	BufferIO::EncodeUTF8(fname, fname2);
-	FILE* rfp = fopen(fname2, "rb");
-#endif
+	char fullname[256]{};
+	BufferIO::EncodeUTF8(fname, fullname);
+	FILE* rfp = myfopen(fullname, "rb");
 	if(!rfp)
 		return false;
 	ReplayHeader rheader;
-	size_t count = fread(&rheader, sizeof(ReplayHeader), 1, rfp);
+	size_t count = fread(&rheader, sizeof rheader, 1, rfp);
 	fclose(rfp);
 	return count == 1 && rheader.id == 0x31707279 && rheader.version >= 0x12d0u && (rheader.version < 0x1353u || (rheader.flag & REPLAY_UNIFORM));
 }
 bool Replay::DeleteReplay(const wchar_t* name) {
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls", name);
-#ifdef WIN32
+#ifdef _WIN32
 	BOOL result = DeleteFileW(fname);
 	return !!result;
 #else
@@ -294,7 +229,7 @@ bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 	wchar_t newfname[256];
 	myswprintf(oldfname, L"./replay/%ls", oldname);
 	myswprintf(newfname, L"./replay/%ls", newname);
-#ifdef WIN32
+#ifdef _WIN32
 	BOOL result = MoveFileW(oldfname, newfname);
 	return !!result;
 #else
@@ -307,45 +242,53 @@ bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 #endif
 }
 bool Replay::ReadNextResponse(unsigned char resp[]) {
-	if(pdata - replay_data >= (int)replay_size)
+	unsigned char len{};
+	if (!ReadData(&len, sizeof len))
 		return false;
-	int len = *pdata++;
-	if(len > SIZE_RETURN_VALUE)
+	if (len > SIZE_RETURN_VALUE) {
+		is_replaying = false;
 		return false;
-	std::memcpy(resp, pdata, len);
-	pdata += len;
+	}
+	if (!ReadData(resp, len))
+		return false;
 	return true;
 }
 void Replay::ReadName(wchar_t* data) {
-	if(!is_replaying)
+	uint16_t buffer[20]{};
+	if (!ReadData(buffer, sizeof buffer)) {
+		data[0] = 0;
 		return;
-	unsigned short buffer[20];
-	ReadData(buffer, 40);
+	}
 	BufferIO::CopyWStr(buffer, data, 20);
 }
-void Replay::ReadData(void* data, int length) {
+bool Replay::ReadData(void* data, int length) {
 	if(!is_replaying)
-		return;
+		return false;
+	if (length < 0)
+		return false;
+	if ((int)(pdata - replay_data) + length > (int)replay_size) {
+		is_replaying = false;
+		return false;
+	}
 	std::memcpy(data, pdata, length);
 	pdata += length;
+	return true;
+}
+template<typename T>
+T Replay::ReadValue() {
+	T ret{};
+	if (!ReadData(&ret, sizeof ret))
+		return -1;
+	return ret;
 }
 int Replay::ReadInt32() {
-	if(!is_replaying)
-		return -1;
-	int ret = BufferIO::ReadInt32(pdata);
-	return ret;
+	return ReadValue<int32_t>();
 }
 short Replay::ReadInt16() {
-	if(!is_replaying)
-		return -1;
-	short ret = BufferIO::ReadInt16(pdata);
-	return ret;
+	return ReadValue<int16_t>();
 }
 char Replay::ReadInt8() {
-	if(!is_replaying)
-		return -1;
-	char ret= BufferIO::ReadInt8(pdata);
-	return ret;
+	return ReadValue<char>();
 }
 void Replay::Rewind() {
 	pdata = replay_data;

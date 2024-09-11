@@ -1,7 +1,6 @@
 #include "config.h"
 #include "game.h"
 #ifdef YGOPRO_SERVER_MODE
-#include <thread>
 #include "myfilesystem.h"
 #include "data_manager.h"
 #include "deck_manager.h"
@@ -27,6 +26,7 @@ namespace irr {
 #include "netserver.h"
 #include "single_mode.h"
 #endif //YGOPRO_SERVER_MODE
+#include <thread>
 
 const unsigned short PRO_VERSION = 0x1361;
 
