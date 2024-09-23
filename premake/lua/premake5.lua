@@ -10,6 +10,9 @@ project "lua"
     filter "not action:vs*"
         buildoptions { "-x c++" }
 
+    filter "configurations:Debug"
+        defines { "LUA_USE_APICHECK" }
+
     filter "system:bsd"
         defines { "LUA_USE_POSIX" }
 
