@@ -270,8 +270,8 @@ std::vector<unsigned int> DataManager::GetSetCodes(std::wstring setname) const {
 	}
 	return matchingCodes;
 }
-const wchar_t* DataManager::FormatLocation(int location, int sequence) {
-	if(location == 0x8) {
+const wchar_t* DataManager::FormatLocation(int location, int sequence) const {
+	if(location == LOCATION_SZONE) {
 		if(sequence < 5)
 			return GetSysString(1003);
 		else if(sequence == 5)
@@ -279,12 +279,16 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) {
 		else
 			return GetSysString(1009);
 	}
-	unsigned filter = 1;
 	int i = 1000;
-	for(; filter != 0x100 && filter != location; filter <<= 1)
-		++i;
-	if(filter == location)
-		return GetSysString(i);
+	int string_id = 0;
+	for (unsigned filter = LOCATION_DECK; filter <= LOCATION_PZONE; filter <<= 1, ++i) {
+		if (filter == location) {
+			string_id = i;
+			break;
+		}
+	}
+	if (string_id)
+		return GetSysString(string_id);
 	else
 		return unknown_string;
 }
