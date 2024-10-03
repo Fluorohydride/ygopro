@@ -31,7 +31,6 @@ public:
 	const wchar_t* GetCounterName(int code) const;
 	const wchar_t* GetSetName(int code) const;
 	std::vector<unsigned int> GetSetCodes(std::wstring setname) const;
-	const wchar_t* GetNumString(int num, bool bracket = false);
 	const wchar_t* FormatLocation(int location, int sequence);
 	const wchar_t* FormatAttribute(int attribute);
 	const wchar_t* FormatRace(int race);
@@ -48,8 +47,6 @@ public:
 	string_pointer strings_begin;
 	string_pointer strings_end;
 
-	wchar_t numStrings[301][4]{};
-	wchar_t numBuffer[6]{};
 	wchar_t attBuffer[128]{};
 	wchar_t racBuffer[128]{};
 	wchar_t tpBuffer[128]{};
