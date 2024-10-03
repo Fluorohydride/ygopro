@@ -176,24 +176,12 @@ bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
 	spmemvfs_env_fini();
 	return false;
 }
-bool DataManager::GetData(unsigned int code, CardData* pData) {
-	code_pointer cdit = _datas.find(code);
+bool DataManager::GetData(unsigned int code, CardData* pData) const {
+	auto cdit = _datas.find(code);
 	if(cdit == _datas.end())
 		return false;
-	auto& data = cdit->second;
 	if (pData) {
-		pData->code = data.code;
-		pData->alias = data.alias;
-		std::memcpy(pData->setcode, data.setcode, SIZE_SETCODE);
-		pData->type = data.type;
-		pData->level = data.level;
-		pData->attribute = data.attribute;
-		pData->race = data.race;
-		pData->attack = data.attack;
-		pData->defense = data.defense;
-		pData->lscale = data.lscale;
-		pData->rscale = data.rscale;
-		pData->link_marker = data.link_marker;
+		*pData = cdit->second;
 	}
 	return true;
 }
