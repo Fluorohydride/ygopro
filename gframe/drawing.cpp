@@ -662,9 +662,11 @@ void Game::DrawMisc() {
 		}
 	}
 	if(dField.extra[0].size()) {
-		int offset = (dField.extra[0].size() >= 10) ? 0 : numFont->getDimension(dataManager.GetNumString(1)).Width;
+		int offset = (dField.extra[0].size() >= 10) ? 0 : numFont->getDimension(L"1").Width;
+		wchar_t pendulum_count[8];
+		myswprintf(pendulum_count, L"(%d)", dField.extra_p_count[0]);
 		DrawShadowText(numFont, dField.extra[0].size(), Resize(320, 563, 373, 553, offset, 0, 0, 0), Resize(0, 1, 2, 1), 0xffffff00, 0xff000000, true, false, 0);
-		DrawShadowText(numFont, dataManager.GetNumString(dField.extra_p_count[0], true), Resize(340, 563, 393, 553), Resize(0, 1, 2, 1), 0xffffff00, 0xff000000, true, false, 0);
+		DrawShadowText(numFont, pendulum_count, Resize(340, 563, 393, 553), Resize(0, 1, 2, 1), 0xffffff00, 0xff000000, true, false, 0);
 	}
 	if(dField.deck[0].size()) {
 		DrawShadowText(numFont, dField.deck[0].size(), Resize(908, 563, 1023, 553), Resize(0, 1, 2, 1), 0xffffff00, 0xff000000, true, false, 0);
@@ -685,9 +687,11 @@ void Game::DrawMisc() {
 		}
 	}
 	if(dField.extra[1].size()) {
-		int offset = (dField.extra[1].size() >= 10) ? 0 : numFont->getDimension(dataManager.GetNumString(1)).Width;
+		int offset = (dField.extra[1].size() >= 10) ? 0 : numFont->getDimension(L"1").Width;
+		wchar_t pendulum_count[8];
+		myswprintf(pendulum_count, L"(%d)", dField.extra_p_count[1]);
 		DrawShadowText(numFont, dField.extra[1].size(), Resize(808, 208, 900, 233, offset, 0, 0, 0), Resize(0, 1, 2, 1), 0xffffff00, 0xff000000, true, false, 0);
-		DrawShadowText(numFont, dataManager.GetNumString(dField.extra_p_count[1], true), Resize(828, 208, 920, 233), Resize(0, 1, 2, 1), 0xffffff00, 0xff000000, true, false, 0);
+		DrawShadowText(numFont, pendulum_count, Resize(828, 208, 920, 233), Resize(0, 1, 2, 1), 0xffffff00, 0xff000000, true, false, 0);
 	}
 	if(dField.deck[1].size()) {
 		DrawShadowText(numFont, dField.deck[1].size(), Resize(465, 208, 483, 233), Resize(0, 1, 2, 1), 0xffffff00, 0xff000000, true, false, 0);
