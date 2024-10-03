@@ -186,7 +186,7 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 }
 int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
 	int ct = 0, mainc = 0, sidec = 0, code = 0;
-	int cardlist[300]{};
+	int cardlist[PACK_MAX_SIZE]{};
 	bool is_side = false;
 	std::string linebuf;
 	while (std::getline(deckStream, linebuf, '\n') && ct < (int)(sizeof cardlist / sizeof cardlist[0])) {
