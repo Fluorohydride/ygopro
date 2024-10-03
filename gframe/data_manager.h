@@ -32,7 +32,7 @@ public:
 	const wchar_t* GetSetName(int code) const;
 	std::vector<unsigned int> GetSetCodes(std::wstring setname) const;
 	const wchar_t* GetNumString(int num, bool bracket = false);
-	const wchar_t* FormatLocation(int location, int sequence);
+	const wchar_t* FormatLocation(int location, int sequence) const;
 	const wchar_t* FormatAttribute(int attribute);
 	const wchar_t* FormatRace(int race);
 	const wchar_t* FormatType(int type);
