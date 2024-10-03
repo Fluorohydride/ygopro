@@ -411,14 +411,15 @@ void Game::DrawCard(ClientCard* pcard) {
 		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
 	}
 }
-void Game::DrawShadowText(CGUITTFont * font, const core::stringw & text, const core::rect<s32>& position, const core::rect<s32>& padding,
-						  video::SColor color, video::SColor shadowcolor, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
+void Game::DrawShadowText(irr::gui::CGUITTFont* font, const core::stringw & text, const core::rect<s32>& position, const core::rect<s32>& padding,
+						video::SColor color, video::SColor shadowcolor, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
 	core::rect<s32> shadowposition = recti(position.UpperLeftCorner.X - padding.UpperLeftCorner.X, position.UpperLeftCorner.Y - padding.UpperLeftCorner.Y, 
 										   position.LowerRightCorner.X - padding.LowerRightCorner.X, position.LowerRightCorner.Y - padding.LowerRightCorner.Y);
 	font->draw(text, shadowposition, shadowcolor, hcenter, vcenter, clip);
 	font->draw(text, position, color, hcenter, vcenter, clip);
 }
-void Game::DrawShadowText(irr::gui::CGUITTFont* font, int number, const core::rect<s32>& position, const core::rect<s32>& padding, video::SColor color, video::SColor shadowcolor, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
+void Game::DrawShadowText(irr::gui::CGUITTFont* font, int number, const core::rect<s32>& position, const core::rect<s32>& padding,
+						video::SColor color, video::SColor shadowcolor, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
 	core::stringw text(number);
 	DrawShadowText(font, text, position, padding, color, shadowcolor, hcenter, vcenter, clip);
 }
