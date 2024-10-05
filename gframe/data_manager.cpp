@@ -304,39 +304,31 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) const {
 	else
 		return unknown_string;
 }
-const wchar_t* DataManager::FormatAttribute(int attribute) {
-	wchar_t* p = attBuffer;
-	unsigned filter = 1;
-	int i = 1010;
-	for(; filter != 0x80; filter <<= 1, ++i) {
-		if(attribute & filter) {
-			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
-			*p = L'|';
-			*++p = 0;
+std::wstring DataManager::FormatAttribute(unsigned int attribute) const {
+	std::wstring buffer;
+	for (int i = 0; i < ATTRIBUTES_COUNT; ++i) {
+		if (attribute & (0x1U << i)) {
+			buffer.append(GetSysString(1010 + i));
+			buffer.push_back(L'|');
 		}
 	}
-	if(p != attBuffer)
-		*(p - 1) = 0;
-	else
-		return unknown_string;
-	return attBuffer;
+	if (buffer.empty())
+		return std::wstring(unknown_string);
+	buffer.pop_back();
+	return buffer;
 }
-const wchar_t* DataManager::FormatRace(int race) {
-	wchar_t* p = racBuffer;
-	unsigned filter = 1;
-	int i = 1020;
-	for(; filter < (1 << RACES_COUNT); filter <<= 1, ++i) {
-		if(race & filter) {
-			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
-			*p = L'|';
-			*++p = 0;
+std::wstring DataManager::FormatRace(unsigned int race) const {
+	std::wstring buffer;
+	for(int i = 0; i < RACES_COUNT; ++i) {
+		if(race & (0x1U << i)) {
+			buffer.append(GetSysString(1020 + i));
+			buffer.push_back(L'|');
 		}
 	}
-	if(p != racBuffer)
-		*(p - 1) = 0;
-	else
-		return unknown_string;
-	return racBuffer;
+	if (buffer.empty())
+		return std::wstring(unknown_string);
+	buffer.pop_back();
+	return buffer;
 }
 const wchar_t* DataManager::FormatType(int type) {
 	wchar_t* p = tpBuffer;
