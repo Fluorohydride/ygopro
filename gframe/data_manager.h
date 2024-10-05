@@ -33,8 +33,8 @@ public:
 	std::vector<unsigned int> GetSetCodes(std::wstring setname) const;
 	const wchar_t* GetNumString(int num, bool bracket = false);
 	const wchar_t* FormatLocation(int location, int sequence) const;
-	const wchar_t* FormatAttribute(int attribute);
-	const wchar_t* FormatRace(int race);
+	std::wstring FormatAttribute(unsigned int attribute) const;
+	std::wstring FormatRace(unsigned int race) const;
 	const wchar_t* FormatType(int type);
 	const wchar_t* FormatSetName(const uint16_t setcode[]);
 	const wchar_t* FormatLinkMarker(int link_marker);
@@ -50,8 +50,6 @@ public:
 
 	wchar_t numStrings[301][4]{};
 	wchar_t numBuffer[6]{};
-	wchar_t attBuffer[128]{};
-	wchar_t racBuffer[128]{};
 	wchar_t tpBuffer[128]{};
 	wchar_t scBuffer[128]{};
 	wchar_t lmBuffer[32]{};
