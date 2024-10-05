@@ -1602,7 +1602,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 			else
 				myswprintf(adBuffer, L"%d/-   ", cd.attack);
 			wcscat(formatBuffer, adBuffer);
-			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker));
+			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker).c_str());
 		}
 		if(cd.type & TYPE_PENDULUM) {
 			wchar_t scaleBuffer[16];
