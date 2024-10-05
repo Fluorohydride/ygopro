@@ -35,7 +35,7 @@ public:
 	const wchar_t* FormatLocation(int location, int sequence) const;
 	std::wstring FormatAttribute(unsigned int attribute) const;
 	std::wstring FormatRace(unsigned int race) const;
-	const wchar_t* FormatType(int type);
+	std::wstring FormatType(unsigned int type) const;
 	const wchar_t* FormatSetName(const uint16_t setcode[]);
 	const wchar_t* FormatLinkMarker(int link_marker);
 
@@ -50,7 +50,6 @@ public:
 
 	wchar_t numStrings[301][4]{};
 	wchar_t numBuffer[6]{};
-	wchar_t tpBuffer[128]{};
 	wchar_t scBuffer[128]{};
 	wchar_t lmBuffer[32]{};
 

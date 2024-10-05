@@ -330,22 +330,19 @@ std::wstring DataManager::FormatRace(unsigned int race) const {
 	buffer.pop_back();
 	return buffer;
 }
-const wchar_t* DataManager::FormatType(int type) {
-	wchar_t* p = tpBuffer;
-	unsigned filter = 1;
+std::wstring DataManager::FormatType(unsigned int type) const {
+	std::wstring buffer;
 	int i = 1050;
-	for(; filter != 0x8000000; filter <<= 1, ++i) {
-		if(type & filter) {
-			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
-			*p = L'|';
-			*++p = 0;
+	for (unsigned filter = TYPE_MONSTER; filter <= TYPE_LINK; filter <<= 1, ++i) {
+		if (type & filter) {
+			buffer.append(GetSysString(i));
+			buffer.push_back(L'|');
 		}
 	}
-	if(p != tpBuffer)
-		*(p - 1) = 0;
-	else
-		return unknown_string;
-	return tpBuffer;
+	if (buffer.empty())
+		return std::wstring(unknown_string);
+	buffer.pop_back();
+	return buffer;
 }
 const wchar_t* DataManager::FormatSetName(const uint16_t setcode[]) {
 	wchar_t* p = scBuffer;
