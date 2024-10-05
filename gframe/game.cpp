@@ -1574,7 +1574,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 	}
 	if(is_valid && cit->second.type & TYPE_MONSTER) {
 		auto& cd = cit->second;
-		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race).c_str(), dataManager.FormatAttribute(cd.attribute).c_str());
+		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type).c_str(), dataManager.FormatRace(cd.race).c_str(), dataManager.FormatAttribute(cd.attribute).c_str());
 		stInfo->setText(formatBuffer);
 		int offset_info = 0;
 		irr::core::dimension2d<unsigned int> dtxt = guiFont->getDimension(formatBuffer);
@@ -1618,9 +1618,9 @@ void Game::ShowCardInfo(int code, bool resize) {
 	}
 	else {
 		if (is_valid)
-			myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cit->second.type));
+			myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cit->second.type).c_str());
 		else
-			myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(0));
+			myswprintf(formatBuffer, L"[%ls]", dataManager.unknown_string);
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
 		stSetName->setRelativePosition(rect<s32>(15, 60, 296 * xScale, 60 + offset));
