@@ -360,26 +360,25 @@ std::wstring DataManager::FormatSetName(const uint16_t setcode[]) const {
 		return std::wstring(unknown_string);
 	return buffer;
 }
-const wchar_t* DataManager::FormatLinkMarker(int link_marker) {
-	wchar_t* p = lmBuffer;
-	*p = 0;
-	if(link_marker & LINK_MARKER_TOP_LEFT)
-		BufferIO::CopyWStrRef(L"[\u2196]", p, 4);
-	if(link_marker & LINK_MARKER_TOP)
-		BufferIO::CopyWStrRef(L"[\u2191]", p, 4);
-	if(link_marker & LINK_MARKER_TOP_RIGHT)
-		BufferIO::CopyWStrRef(L"[\u2197]", p, 4);
-	if(link_marker & LINK_MARKER_LEFT)
-		BufferIO::CopyWStrRef(L"[\u2190]", p, 4);
-	if(link_marker & LINK_MARKER_RIGHT)
-		BufferIO::CopyWStrRef(L"[\u2192]", p, 4);
-	if(link_marker & LINK_MARKER_BOTTOM_LEFT)
-		BufferIO::CopyWStrRef(L"[\u2199]", p, 4);
-	if(link_marker & LINK_MARKER_BOTTOM)
-		BufferIO::CopyWStrRef(L"[\u2193]", p, 4);
-	if(link_marker & LINK_MARKER_BOTTOM_RIGHT)
-		BufferIO::CopyWStrRef(L"[\u2198]", p, 4);
-	return lmBuffer;
+std::wstring DataManager::FormatLinkMarker(unsigned int link_marker) const {
+	std::wstring buffer;
+	if (link_marker & LINK_MARKER_TOP_LEFT)
+		buffer.append(L"[\u2196]");
+	if (link_marker & LINK_MARKER_TOP)
+		buffer.append(L"[\u2191]");
+	if (link_marker & LINK_MARKER_TOP_RIGHT)
+		buffer.append(L"[\u2197]");
+	if (link_marker & LINK_MARKER_LEFT)
+		buffer.append(L"[\u2190]");
+	if (link_marker & LINK_MARKER_RIGHT)
+		buffer.append(L"[\u2192]");
+	if (link_marker & LINK_MARKER_BOTTOM_LEFT)
+		buffer.append(L"[\u2199]");
+	if (link_marker & LINK_MARKER_BOTTOM)
+		buffer.append(L"[\u2193]");
+	if (link_marker & LINK_MARKER_BOTTOM_RIGHT)
+		buffer.append(L"[\u2198]");
+	return buffer;
 }
 uint32 DataManager::CardReader(uint32 code, card_data* pData) {
 	if (!dataManager.GetData(code, pData))
