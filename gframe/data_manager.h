@@ -37,7 +37,7 @@ public:
 	std::wstring FormatRace(unsigned int race) const;
 	std::wstring FormatType(unsigned int type) const;
 	std::wstring FormatSetName(const uint16_t setcode[]) const;
-	const wchar_t* FormatLinkMarker(int link_marker);
+	std::wstring FormatLinkMarker(unsigned int link_marker) const;
 
 	std::unordered_map<unsigned int, std::wstring> _counterStrings;
 	std::unordered_map<unsigned int, std::wstring> _victoryStrings;
@@ -50,7 +50,6 @@ public:
 
 	wchar_t numStrings[301][4]{};
 	wchar_t numBuffer[6]{};
-	wchar_t lmBuffer[32]{};
 
 	static byte scriptBuffer[0x20000];
 	static const wchar_t* unknown_string;
