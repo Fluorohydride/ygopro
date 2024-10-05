@@ -344,23 +344,21 @@ std::wstring DataManager::FormatType(unsigned int type) const {
 		return std::wstring(unknown_string);
 	return buffer;
 }
-const wchar_t* DataManager::FormatSetName(const uint16_t setcode[]) {
-	wchar_t* p = scBuffer;
+std::wstring DataManager::FormatSetName(const uint16_t setcode[]) const {
+	std::wstring buffer;
 	for(int i = 0; i < 10; ++i) {
 		if (!setcode[i])
 			break;
 		const wchar_t* setname = GetSetName(setcode[i]);
 		if(setname) {
-			BufferIO::CopyWStrRef(setname, p, 32);
-			*p = L'|';
-			*++p = 0;
+			if (!buffer.empty())
+				buffer.push_back(L'|');
+			buffer.append(setname);
 		}
 	}
-	if(p != scBuffer)
-		*(p - 1) = 0;
-	else
-		return unknown_string;
-	return scBuffer;
+	if (buffer.empty())
+		return std::wstring(unknown_string);
+	return buffer;
 }
 const wchar_t* DataManager::FormatLinkMarker(int link_marker) {
 	wchar_t* p = lmBuffer;
