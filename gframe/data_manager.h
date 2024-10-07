@@ -32,11 +32,11 @@ public:
 	const wchar_t* GetSetName(int code) const;
 	std::vector<unsigned int> GetSetCodes(std::wstring setname) const;
 	const wchar_t* FormatLocation(int location, int sequence) const;
-	const wchar_t* FormatAttribute(int attribute);
-	const wchar_t* FormatRace(int race);
-	const wchar_t* FormatType(int type);
-	const wchar_t* FormatSetName(const uint16_t setcode[]);
-	const wchar_t* FormatLinkMarker(int link_marker);
+	std::wstring FormatAttribute(unsigned int attribute) const;
+	std::wstring FormatRace(unsigned int race) const;
+	std::wstring FormatType(unsigned int type) const;
+	std::wstring FormatSetName(const uint16_t setcode[]) const;
+	std::wstring FormatLinkMarker(unsigned int link_marker) const;
 
 	std::unordered_map<unsigned int, std::wstring> _counterStrings;
 	std::unordered_map<unsigned int, std::wstring> _victoryStrings;
@@ -46,12 +46,6 @@ public:
 	code_pointer datas_end;
 	string_pointer strings_begin;
 	string_pointer strings_end;
-
-	wchar_t attBuffer[128]{};
-	wchar_t racBuffer[128]{};
-	wchar_t tpBuffer[128]{};
-	wchar_t scBuffer[128]{};
-	wchar_t lmBuffer[32]{};
 
 	static byte scriptBuffer[0x20000];
 	static const wchar_t* unknown_string;

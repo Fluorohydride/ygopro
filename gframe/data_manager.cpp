@@ -292,95 +292,81 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) const {
 	else
 		return unknown_string;
 }
-const wchar_t* DataManager::FormatAttribute(int attribute) {
-	wchar_t* p = attBuffer;
-	unsigned filter = 1;
-	int i = 1010;
-	for(; filter != 0x80; filter <<= 1, ++i) {
-		if(attribute & filter) {
-			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
-			*p = L'|';
-			*++p = 0;
+std::wstring DataManager::FormatAttribute(unsigned int attribute) const {
+	std::wstring buffer;
+	for (int i = 0; i < ATTRIBUTES_COUNT; ++i) {
+		if (attribute & (0x1U << i)) {
+			buffer.append(GetSysString(1010 + i));
+			buffer.push_back(L'|');
 		}
 	}
-	if(p != attBuffer)
-		*(p - 1) = 0;
-	else
-		return unknown_string;
-	return attBuffer;
+	if (buffer.empty())
+		return std::wstring(unknown_string);
+	buffer.pop_back();
+	return buffer;
 }
-const wchar_t* DataManager::FormatRace(int race) {
-	wchar_t* p = racBuffer;
-	unsigned filter = 1;
-	int i = 1020;
-	for(; filter < (1 << RACES_COUNT); filter <<= 1, ++i) {
-		if(race & filter) {
-			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
-			*p = L'|';
-			*++p = 0;
+std::wstring DataManager::FormatRace(unsigned int race) const {
+	std::wstring buffer;
+	for(int i = 0; i < RACES_COUNT; ++i) {
+		if(race & (0x1U << i)) {
+			buffer.append(GetSysString(1020 + i));
+			buffer.push_back(L'|');
 		}
 	}
-	if(p != racBuffer)
-		*(p - 1) = 0;
-	else
-		return unknown_string;
-	return racBuffer;
+	if (buffer.empty())
+		return std::wstring(unknown_string);
+	buffer.pop_back();
+	return buffer;
 }
-const wchar_t* DataManager::FormatType(int type) {
-	wchar_t* p = tpBuffer;
-	unsigned filter = 1;
+std::wstring DataManager::FormatType(unsigned int type) const {
+	std::wstring buffer;
 	int i = 1050;
-	for(; filter != 0x8000000; filter <<= 1, ++i) {
-		if(type & filter) {
-			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
-			*p = L'|';
-			*++p = 0;
+	for (unsigned filter = TYPE_MONSTER; filter <= TYPE_LINK; filter <<= 1, ++i) {
+		if (type & filter) {
+			buffer.append(GetSysString(i));
+			buffer.push_back(L'|');
 		}
 	}
-	if(p != tpBuffer)
-		*(p - 1) = 0;
-	else
-		return unknown_string;
-	return tpBuffer;
+	if (buffer.empty())
+		return std::wstring(unknown_string);
+	buffer.pop_back();
+	return buffer;
 }
-const wchar_t* DataManager::FormatSetName(const uint16_t setcode[]) {
-	wchar_t* p = scBuffer;
+std::wstring DataManager::FormatSetName(const uint16_t setcode[]) const {
+	std::wstring buffer;
 	for(int i = 0; i < 10; ++i) {
 		if (!setcode[i])
 			break;
 		const wchar_t* setname = GetSetName(setcode[i]);
 		if(setname) {
-			BufferIO::CopyWStrRef(setname, p, 32);
-			*p = L'|';
-			*++p = 0;
+			buffer.append(setname);
+			buffer.push_back(L'|');
 		}
 	}
-	if(p != scBuffer)
-		*(p - 1) = 0;
-	else
-		return unknown_string;
-	return scBuffer;
+	if (buffer.empty())
+		return std::wstring(unknown_string);
+	buffer.pop_back();
+	return buffer;
 }
-const wchar_t* DataManager::FormatLinkMarker(int link_marker) {
-	wchar_t* p = lmBuffer;
-	*p = 0;
-	if(link_marker & LINK_MARKER_TOP_LEFT)
-		BufferIO::CopyWStrRef(L"[\u2196]", p, 4);
-	if(link_marker & LINK_MARKER_TOP)
-		BufferIO::CopyWStrRef(L"[\u2191]", p, 4);
-	if(link_marker & LINK_MARKER_TOP_RIGHT)
-		BufferIO::CopyWStrRef(L"[\u2197]", p, 4);
-	if(link_marker & LINK_MARKER_LEFT)
-		BufferIO::CopyWStrRef(L"[\u2190]", p, 4);
-	if(link_marker & LINK_MARKER_RIGHT)
-		BufferIO::CopyWStrRef(L"[\u2192]", p, 4);
-	if(link_marker & LINK_MARKER_BOTTOM_LEFT)
-		BufferIO::CopyWStrRef(L"[\u2199]", p, 4);
-	if(link_marker & LINK_MARKER_BOTTOM)
-		BufferIO::CopyWStrRef(L"[\u2193]", p, 4);
-	if(link_marker & LINK_MARKER_BOTTOM_RIGHT)
-		BufferIO::CopyWStrRef(L"[\u2198]", p, 4);
-	return lmBuffer;
+std::wstring DataManager::FormatLinkMarker(unsigned int link_marker) const {
+	std::wstring buffer;
+	if (link_marker & LINK_MARKER_TOP_LEFT)
+		buffer.append(L"[\u2196]");
+	if (link_marker & LINK_MARKER_TOP)
+		buffer.append(L"[\u2191]");
+	if (link_marker & LINK_MARKER_TOP_RIGHT)
+		buffer.append(L"[\u2197]");
+	if (link_marker & LINK_MARKER_LEFT)
+		buffer.append(L"[\u2190]");
+	if (link_marker & LINK_MARKER_RIGHT)
+		buffer.append(L"[\u2192]");
+	if (link_marker & LINK_MARKER_BOTTOM_LEFT)
+		buffer.append(L"[\u2199]");
+	if (link_marker & LINK_MARKER_BOTTOM)
+		buffer.append(L"[\u2193]");
+	if (link_marker & LINK_MARKER_BOTTOM_RIGHT)
+		buffer.append(L"[\u2198]");
+	return buffer;
 }
 uint32 DataManager::CardReader(uint32 code, card_data* pData) {
 	if (!dataManager.GetData(code, pData))
