@@ -957,7 +957,7 @@ void Game::DrawSpec() {
 				DrawShadowText(lpcFont, lstr, ResizePhaseHint(660 - (9 - showcardp) * 40, 290, 960, 370, pos.Width), Resize(-1, -1, 0, 0), alpha | 0xffffff, alpha);
 			} else if(showcardp < showcarddif) {
 				DrawShadowText(lpcFont, lstr, ResizePhaseHint(660, 290, 960, 370, pos.Width), Resize(-1, -1, 0, 0), 0xffffffff);
-				if(dInfo.vic_string && (showcardcode == 1 || showcardcode == 2)) {
+				if(dInfo.vic_string.size() && (showcardcode == 1 || showcardcode == 2)) {
 					int w = guiFont->getDimension(dInfo.vic_string).Width;
 					if(w < 200)
 						w = 200;
