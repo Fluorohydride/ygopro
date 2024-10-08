@@ -257,7 +257,7 @@ public:
 	int lpd;
 	int lpplayer;
 	int lpccolor;
-	wchar_t* lpcstring;
+	std::wstring lpcstring;
 	bool always_chain;
 	bool ignore_chain;
 	bool chain_when_avail;
