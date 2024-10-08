@@ -381,6 +381,11 @@ public:
 		size_raw_ = other.size_raw();
 	}
 
+	ustring16(const stringw& other)
+		: data_(nullptr), size_(0), size_raw_(0) {
+		assign(other.c_str(), static_cast<u32>(other.size()));
+	}
+
 	template <class T>
 	ustring16(const T& other)
 		: data_(nullptr), size_(0), size_raw_(0) {
@@ -407,6 +412,11 @@ public:
 		data_ = other.data();
 		size_raw_ = other.size_raw();
 		size_ = 0xffffffff;
+		return *this;
+	}
+
+	ustring16& operator=(const stringw& other) {
+		assign(other.c_str(), static_cast<u32>(other.size()));
 		return *this;
 	}
 
