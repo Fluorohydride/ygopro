@@ -564,7 +564,7 @@ void Game::DrawMisc() {
 		lpccolor -= 0x19000000;
 		lpframe--;
 	}
-	if(lpcstring) {
+	if(lpcstring.size()) {
 		if(lpplayer == 0) {
 			DrawShadowText(lpcFont, lpcstring, Resize(400, 472, 922, 520), Resize(0, 2, 2, 0), lpccolor, lpccolor | 0x00ffffff, true, false, 0);
 		} else {
