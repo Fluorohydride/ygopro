@@ -1274,52 +1274,50 @@ void Game::DrawDeckBd() {
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangle(0x80000000, Resize(806, 164 + i * 66, 1019, 230 + i * 66));
 		DrawThumb(ptr, position2di(810, 165 + i * 66), deckBuilder.filterList);
+		const wchar_t* availBuffer = L"";
+		if ((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_OCG)
+			availBuffer = L" [OCG]";
+		else if ((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_TCG)
+			availBuffer = L" [TCG]";
+		else if ((ptr->second.ot & AVAIL_CUSTOM) == AVAIL_CUSTOM)
+			availBuffer = L" [Custom]";
 		if(ptr->second.type & TYPE_MONSTER) {
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
 			DrawShadowText(textFont, textBuffer, Resize(860, 165 + i * 66, 955, 185 + i * 66), Resize(1, 1, 0, 0));
+			const wchar_t* form = L"\u2605";
+			wchar_t adBuffer[32]{};
+			wchar_t scaleBuffer[16]{};
 			if(!(ptr->second.type & TYPE_LINK)) {
-				const wchar_t* form = L"\u2605";
-				if(ptr->second.type & TYPE_XYZ) form = L"\u2606";
-				myswprintf(textBuffer, L"%ls/%ls %ls%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), form, ptr->second.level);
-				DrawShadowText(textFont, textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
+				if(ptr->second.type & TYPE_XYZ)
+					form = L"\u2606";
 				if(ptr->second.attack < 0 && ptr->second.defense < 0)
-					myswprintf(textBuffer, L"?/?");
+					myswprintf(adBuffer, L"?/?");
 				else if(ptr->second.attack < 0)
-					myswprintf(textBuffer, L"?/%d", ptr->second.defense);
+					myswprintf(adBuffer, L"?/%d", ptr->second.defense);
 				else if(ptr->second.defense < 0)
-					myswprintf(textBuffer, L"%d/?", ptr->second.attack);
-				else myswprintf(textBuffer, L"%d/%d", ptr->second.attack, ptr->second.defense);
+					myswprintf(adBuffer, L"%d/?", ptr->second.attack);
+				else
+					myswprintf(adBuffer, L"%d/%d", ptr->second.attack, ptr->second.defense);
 			} else {
-				myswprintf(textBuffer, L"%ls/%ls LINK-%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), ptr->second.level);
-				DrawShadowText(textFont, textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
+				form = L"LINK-";
 				if(ptr->second.attack < 0)
-					myswprintf(textBuffer, L"?/-");
-				else myswprintf(textBuffer, L"%d/-", ptr->second.attack);
+					myswprintf(adBuffer, L"?/-");
+				else
+					myswprintf(adBuffer, L"%d/-", ptr->second.attack);
 			}
+			myswprintf(textBuffer, L"%ls/%ls %ls%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), form, ptr->second.level);
+			DrawShadowText(textFont, textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
 			if(ptr->second.type & TYPE_PENDULUM) {
-				wchar_t scaleBuffer[16];
 				myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
-				wcscat(textBuffer, scaleBuffer);
 			}
-			if((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_OCG)
-				wcscat(textBuffer, L" [OCG]");
-			else if((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_TCG)
-				wcscat(textBuffer, L" [TCG]");
-			else if((ptr->second.ot & AVAIL_CUSTOM) == AVAIL_CUSTOM)
-				wcscat(textBuffer, L" [Custom]");
+			myswprintf(textBuffer, L"%ls%ls%ls", adBuffer, scaleBuffer, availBuffer);
 			DrawShadowText(textFont, textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), Resize(1, 1, 0, 0));
 		} else {
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
 			DrawShadowText(textFont, textBuffer, Resize(860, 165 + i * 66, 955, 185 + i * 66), Resize(1, 1, 0, 0));
 			const wchar_t* ptype = dataManager.FormatType(ptr->second.type);
 			DrawShadowText(textFont, ptype, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
-			textBuffer[0] = 0;
-			if((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_OCG)
-				wcscat(textBuffer, L"[OCG]");
-			else if((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_TCG)
-				wcscat(textBuffer, L"[TCG]");
-			else if((ptr->second.ot & AVAIL_CUSTOM) == AVAIL_CUSTOM)
-				wcscat(textBuffer, L"[Custom]");
+			myswprintf(textBuffer, L"%ls", availBuffer);
 			DrawShadowText(textFont, textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), Resize(1, 1, 0, 0));
 		}
 	}

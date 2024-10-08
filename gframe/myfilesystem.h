@@ -14,6 +14,7 @@
 
 #ifdef _WIN32
 
+#include <wchar.h>
 #define NOMINMAX
 #include <Windows.h>
 
@@ -89,8 +90,7 @@ public:
 
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
-		wcscpy(findstr, wpath);
-		wcscat(findstr, L"/*");
+		swprintf(findstr, 1024, L"%s/*", wpath);
 		WIN32_FIND_DATAW fdataw;
 		HANDLE fh = FindFirstFileW(findstr, &fdataw);
 		if(fh == INVALID_HANDLE_VALUE)
