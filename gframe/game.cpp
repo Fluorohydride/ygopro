@@ -1582,8 +1582,8 @@ void Game::ShowCardInfo(int code, bool resize) {
 			offset_info = 15;
 		if(!(cd.type & TYPE_LINK)) {
 			const wchar_t* form = L"\u2605";
-			if(cd.type & TYPE_XYZ) form = L"\u2606";
-			myswprintf(formatBuffer, L"[%ls%d] ", form, cd.level);
+			if(cd.type & TYPE_XYZ)
+				form = L"\u2606";
 			wchar_t adBuffer[16];
 			if(cd.attack < 0 && cd.defense < 0)
 				myswprintf(adBuffer, L"?/?");
@@ -1593,16 +1593,14 @@ void Game::ShowCardInfo(int code, bool resize) {
 				myswprintf(adBuffer, L"%d/?", cd.attack);
 			else
 				myswprintf(adBuffer, L"%d/%d", cd.attack, cd.defense);
-			wcscat(formatBuffer, adBuffer);
+			myswprintf(formatBuffer, L"[%ls%d] %ls", form, cd.level, adBuffer);
 		} else {
-			myswprintf(formatBuffer, L"[LINK-%d] ", cd.level);
 			wchar_t adBuffer[16];
 			if(cd.attack < 0)
 				myswprintf(adBuffer, L"?/-   ");
 			else
 				myswprintf(adBuffer, L"%d/-   ", cd.attack);
-			wcscat(formatBuffer, adBuffer);
-			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker));
+			myswprintf(formatBuffer, L"[LINK-%d] %ls%ls", cd.level, adBuffer, dataManager.FormatLinkMarker(cd.link_marker));
 		}
 		if(cd.type & TYPE_PENDULUM) {
 			wchar_t scaleBuffer[16];
