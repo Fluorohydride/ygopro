@@ -1586,9 +1586,9 @@ void Game::ShowCardInfo(int code, bool resize) {
 		} else {
 			form = L"LINK-";
 			if(cd.attack < 0)
-				myswprintf(adBuffer, L"?/-   %ls", dataManager.FormatLinkMarker(cd.link_marker));
+				myswprintf(adBuffer, L"?/-   %ls", dataManager.FormatLinkMarker(cd.link_marker).c_str());
 			else
-				myswprintf(adBuffer, L"%d/-   %ls", cd.attack, dataManager.FormatLinkMarker(cd.link_marker));
+				myswprintf(adBuffer, L"%d/-   %ls", cd.attack, dataManager.FormatLinkMarker(cd.link_marker).c_str());
 		}
 		if(cd.type & TYPE_PENDULUM) {
 			myswprintf(scaleBuffer, L"   %d/%d", cd.lscale, cd.rscale);
