@@ -583,17 +583,17 @@ void Game::DrawMisc() {
 		recti p1size = Resize(335, 31, 629, 50);
 		recti p2size = Resize(986, 31, 986, 50);
 		if(!dInfo.isTag || !dInfo.tag_player[0])
-			textFont->draw(dInfo.hostname, p1size, 0xffffffff, false, false, 0);
+			textFont->drawUstring(dInfo.hostname, p1size, 0xffffffff, false, false, 0);
 		else
-			textFont->draw(dInfo.hostname_tag, p1size, 0xffffffff, false, false, 0);
+			textFont->drawUstring(dInfo.hostname_tag, p1size, 0xffffffff, false, false, 0);
 		if(!dInfo.isTag || !dInfo.tag_player[1]) {
 			auto cld = textFont->getDimension(dInfo.clientname);
 			p2size.UpperLeftCorner.X -= cld.Width;
-			textFont->draw(dInfo.clientname, p2size, 0xffffffff, false, false, 0);
+			textFont->drawUstring(dInfo.clientname, p2size, 0xffffffff, false, false, 0);
 		} else {
 			auto cld = textFont->getDimension(dInfo.clientname_tag);
 			p2size.UpperLeftCorner.X -= cld.Width;
-			textFont->draw(dInfo.clientname_tag, p2size, 0xffffffff, false, false, 0);
+			textFont->drawUstring(dInfo.clientname_tag, p2size, 0xffffffff, false, false, 0);
 		}
 	}
 	driver->draw2DRectangle(Resize(632, 10, 688, 30), 0x00000000, 0x00000000, 0xffffffff, 0xffffffff);
@@ -1021,8 +1021,8 @@ void Game::DrawSpec() {
 			recti shadowloc = msgloc + position2di(1, 1);
 
 			driver->draw2DRectangle(rectloc, 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
-			guiFont->draw(msg.c_str(), msgloc, 0xff000000, false, false);
-			guiFont->draw(msg.c_str(), shadowloc, chatColor[chatType[i]], false, false);
+			guiFont->drawUstring(msg, msgloc, 0xff000000, false, false);
+			guiFont->drawUstring(msg, shadowloc, chatColor[chatType[i]], false, false);
 
 			chatRectY += h;
 		}
