@@ -16,40 +16,20 @@ DataManager::DataManager() : _datas(16384), _strings(16384) {
 	strings_end = _strings.end();
 	extra_setcode = { {8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}}, };
 }
-bool DataManager::LoadDB(const wchar_t* wfile) {
-	char file[256];
-	BufferIO::EncodeUTF8(wfile, file);
-#ifdef _WIN32
-	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
-#else
-	IReadFile* reader = FileSystem->createAndOpenFile(file);
-#endif
-	if(reader == NULL)
-		return false;
-	spmemvfs_db_t db;
-	spmembuffer_t* mem = (spmembuffer_t*)calloc(sizeof(spmembuffer_t), 1);
-	spmemvfs_env_init();
-	mem->total = mem->used = reader->getSize();
-	mem->data = (char*)malloc(mem->total + 1);
-	reader->read(mem->data, mem->total);
-	reader->drop();
-	(mem->data)[mem->total] = '\0';
-	if(spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
-		return Error(&db);
-	sqlite3* pDB = db.handle;
-	sqlite3_stmt* pStmt;
+bool DataManager::ReadDB(sqlite3* pDB) {
+	sqlite3_stmt* pStmt{};
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
-	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
-		return Error(&db);
+	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
+		return Error(pDB);
 	wchar_t strBuffer[4096];
 	int step = 0;
 	do {
 		CardDataC cd;
 		CardString cs;
 		step = sqlite3_step(pStmt);
-		if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
-			return Error(&db, pStmt);
-		else if(step == SQLITE_ROW) {
+		if (step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
+			return Error(pDB, pStmt);
+		else if (step == SQLITE_ROW) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
@@ -69,10 +49,11 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defense = sqlite3_column_int(pStmt, 6);
-			if(cd.type & TYPE_LINK) {
+			if (cd.type & TYPE_LINK) {
 				cd.link_marker = cd.defense;
 				cd.defense = 0;
-			} else
+			}
+			else
 				cd.link_marker = 0;
 			unsigned int level = sqlite3_column_int(pStmt, 7);
 			cd.level = level & 0xff;
@@ -82,31 +63,56 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
 			_datas[cd.code] = cd;
-			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+			if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.name = strBuffer;
 			}
-			if(const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
+			if (const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.text = strBuffer;
 			}
-			for(int i = 0; i < 16; ++i) {
-				if(const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
+			for (int i = 0; i < 16; ++i) {
+				if (const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
 					BufferIO::DecodeUTF8(text, strBuffer);
 					cs.desc[i] = strBuffer;
 				}
 			}
 			_strings[cd.code] = cs;
 		}
-	} while(step != SQLITE_DONE);
-	sqlite3_finalize(pStmt);
-	spmemvfs_close_db(&db);
-	spmemvfs_env_fini();
+	} while (step != SQLITE_DONE);
 	datas_begin = _datas.begin();
 	datas_end = _datas.end();
 	strings_begin = _strings.begin();
 	strings_end = _strings.end();
+	sqlite3_finalize(pStmt);
 	return true;
+}
+bool DataManager::LoadDB(const wchar_t* wfile) {
+	char file[256];
+	BufferIO::EncodeUTF8(wfile, file);
+#ifdef _WIN32
+	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
+#else
+	IReadFile* reader = FileSystem->createAndOpenFile(file);
+#endif
+	if(reader == NULL)
+		return false;
+	spmemvfs_db_t db;
+	spmembuffer_t* mem = (spmembuffer_t*)calloc(sizeof(spmembuffer_t), 1);
+	spmemvfs_env_init();
+	mem->total = mem->used = reader->getSize();
+	mem->data = (char*)malloc(mem->total + 1);
+	reader->read(mem->data, mem->total);
+	reader->drop();
+	(mem->data)[mem->total] = '\0';
+	bool ret{};
+	if (spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
+		ret = Error(db.handle);
+	else
+		ret = ReadDB(db.handle);
+	spmemvfs_close_db(&db);
+	spmemvfs_env_fini();
+	return ret;
 }
 bool DataManager::LoadStrings(const char* file) {
 	FILE* fp = fopen(file, "r");
@@ -167,13 +173,11 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 		_setnameStrings[value] = strBuffer;
 	}
 }
-bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
-	wchar_t strBuffer[4096];
-	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB->handle), strBuffer);
+bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
+	std::strncpy(errmsg, sqlite3_errmsg(pDB), sizeof errmsg);
+	BufferIO::NullTerminate(errmsg);
 	if(pStmt)
 		sqlite3_finalize(pStmt);
-	spmemvfs_close_db(pDB);
-	spmemvfs_env_fini();
 	return false;
 }
 bool DataManager::GetData(unsigned int code, CardData* pData) const {
