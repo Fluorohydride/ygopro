@@ -117,8 +117,6 @@ bool DataManager::LoadStrings(const char* file) {
 		ReadStringConfLine(linebuf);
 	}
 	fclose(fp);
-	for(int i = 0; i < 301; ++i)
-		myswprintf(numStrings[i], L"%d", i);
 	return true;
 }
 bool DataManager::LoadStrings(IReadFile* reader) {
@@ -272,14 +270,12 @@ std::vector<unsigned int> DataManager::GetSetCodes(std::wstring setname) const {
 	}
 	return matchingCodes;
 }
-const wchar_t* DataManager::GetNumString(int num, bool bracket) {
+std::wstring DataManager::GetNumString(int num, bool bracket) const {
 	if(!bracket)
-		return numStrings[num];
-	wchar_t* p = numBuffer;
-	*p++ = L'(';
-	BufferIO::CopyWStrRef(numStrings[num], p, 4);
-	*p = L')';
-	*++p = 0;
+		return std::to_wstring(num);
+	std::wstring numBuffer{ L"(" };
+	numBuffer.append(std::to_wstring(num));
+	numBuffer.push_back(L')');
 	return numBuffer;
 }
 const wchar_t* DataManager::FormatLocation(int location, int sequence) const {

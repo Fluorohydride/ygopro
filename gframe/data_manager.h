@@ -31,7 +31,7 @@ public:
 	const wchar_t* GetCounterName(int code) const;
 	const wchar_t* GetSetName(int code) const;
 	std::vector<unsigned int> GetSetCodes(std::wstring setname) const;
-	const wchar_t* GetNumString(int num, bool bracket = false);
+	std::wstring GetNumString(int num, bool bracket = false) const;
 	const wchar_t* FormatLocation(int location, int sequence) const;
 	std::wstring FormatAttribute(unsigned int attribute) const;
 	std::wstring FormatRace(unsigned int race) const;
@@ -47,9 +47,6 @@ public:
 	code_pointer datas_end;
 	string_pointer strings_begin;
 	string_pointer strings_end;
-
-	wchar_t numStrings[301][4]{};
-	wchar_t numBuffer[6]{};
 
 	static byte scriptBuffer[0x20000];
 	static const wchar_t* unknown_string;
