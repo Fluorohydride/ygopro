@@ -60,11 +60,11 @@ int SingleMode::SinglePlayThread() {
 	if(open_file) {
 		open_file = false;
 		slen = BufferIO::EncodeUTF8(open_file_name, filename);
-		if(!preload_script(pduel, filename, 0)) {
+		if(!preload_script(pduel, filename)) {
 			wchar_t fname[256];
 			myswprintf(fname, L"./single/%ls", open_file_name);
 			slen = BufferIO::EncodeUTF8(fname, filename);
-			if(!preload_script(pduel, filename, 0))
+			if(!preload_script(pduel, filename))
 				slen = 0;
 		}
 	} else {
@@ -72,7 +72,7 @@ int SingleMode::SinglePlayThread() {
 		wchar_t fname[256];
 		myswprintf(fname, L"./single/%ls", name);
 		slen = BufferIO::EncodeUTF8(fname, filename);
-		if(!preload_script(pduel, filename, 0))
+		if(!preload_script(pduel, filename))
 			slen = 0;
 	}
 	if(slen == 0) {
