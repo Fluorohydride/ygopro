@@ -1,0 +1,27 @@
+language: cpp
+dist: bionic
+git:
+  submodules: false
+addons:
+  ssh_known_hosts:
+  - github.com
+  apt:
+   # sources:
+   #   - ubuntu-toolchain-r-test
+    packages:
+    #  - gcc-6
+    #  - g++-6
+      - libevent-dev
+      - libsqlite3-dev
+      - liblua5.3-dev
+before_install:
+- git submodule update --init --recursive
+#- sudo ln -s /usr/bin/gcc-6 /usr/local/bin/gcc
+#- sudo ln -s /usr/bin/g++-6 /usr/local/bin/g++
+#- g++ --version
+- wget -O - https://github.com/premake/premake-core/releases/download/v5.0.0-beta1/premake-5.0.0-beta1-linux.tar.gz | tar zfx -
+#- wget -O - https://www.lua.org/ftp/lua-5.3.6.tar.gz | tar zfx -; cd lua-5.3.6; sudo make linux install; cd ..
+script:
+- ./premake5 gmake
+- cd build
+- make config=release

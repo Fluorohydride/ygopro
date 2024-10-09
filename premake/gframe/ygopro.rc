@@ -11,11 +11,11 @@ BLOCK "StringFileInfo"
 BEGIN
 BLOCK "080404b0"
 BEGIN
-VALUE "FileDescription", "YGOPro"
-VALUE "InternalName", "YGOPro"
+VALUE "FileDescription", "YGOPro Server Mode"
+VALUE "InternalName", "YGOPro Server Mode"
 VALUE "LegalCopyright", "Copyright (C) 2022 Fluorohydride"
 VALUE "OriginalFilename", "YGOPro.exe"
-VALUE "ProductName", "YGOPro"
+VALUE "ProductName", "YGOPro Server Mode"
 VALUE "FileVersion", "1.035.3"
 VALUE "ProductVersion", "1.035.3"
 END

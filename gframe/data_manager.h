@@ -3,7 +3,9 @@
 
 #include "config.h"
 #include "sqlite3.h"
+#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 #include "spmemvfs/spmemvfs.h"
+#endif
 #include "client_card.h"
 #include <unordered_map>
 
@@ -17,7 +19,9 @@ public:
 	bool ReadDB(sqlite3* pDB);
 	bool LoadDB(const wchar_t* wfile);
 	bool LoadStrings(const char* file);
+#ifndef YGOPRO_SERVER_MODE
 	bool LoadStrings(IReadFile* reader);
+#endif
 	void ReadStringConfLine(const char* linebuf);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = nullptr);
 
@@ -64,7 +68,9 @@ public:
 	static uint32 CardReader(uint32, card_data*);
 	static byte* ScriptReaderEx(const char* script_name, int* slen);
 	static byte* ScriptReader(const char* script_name, int* slen);
+#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 	static IFileSystem* FileSystem;
+#endif
 
 private:
 	std::unordered_map<unsigned int, CardDataC> _datas;

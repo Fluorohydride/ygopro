@@ -1,6 +1,6 @@
 [submodule "ocgcore"]
 	path = ocgcore
-	url = https://github.com/Fluorohydride/ygopro-core.git
+	url = https://github.com/mycard/ygopro-core
 [submodule "script"]
 	path = script
-	url = https://github.com/Fluorohydride/ygopro-scripts.git
+	url = https://github.com/mycard/ygopro-scripts

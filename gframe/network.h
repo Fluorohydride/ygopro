@@ -227,6 +227,9 @@ public:
 	virtual void Surrender(DuelPlayer* dp) {}
 	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {}
 	virtual void TimeConfirm(DuelPlayer* dp) {}
+#ifdef YGOPRO_SERVER_MODE
+	virtual void RequestField(DuelPlayer* dp) {}
+#endif
 	virtual void EndDuel() {}
 
 public:

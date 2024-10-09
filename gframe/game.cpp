@@ -1,5 +1,20 @@
 #include "config.h"
 #include "game.h"
+#ifdef YGOPRO_SERVER_MODE
+#include "myfilesystem.h"
+#include "data_manager.h"
+#include "deck_manager.h"
+#include "replay.h"
+#ifdef SERVER_ZIP_SUPPORT
+#include "CFileSystem.h"
+namespace irr {
+	namespace core {
+		// taken from Irrlicht.cpp beacuse that file is not included
+		irr::core::stringc LOCALE_DECIMAL_POINTS(".");
+	}
+}
+#endif
+#else
 #include "myfilesystem.h"
 #include "image_manager.h"
 #include "data_manager.h"
@@ -10,6 +25,7 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#endif //YGOPRO_SERVER_MODE
 #include <thread>
 
 const unsigned short PRO_VERSION = 0x1361;
@@ -18,6 +34,7 @@ namespace ygo {
 
 Game* mainGame;
 
+#ifndef YGOPRO_SERVER_MODE
 void DuelInfo::Clear() {
 	isStarted = false;
 	isInDuel = false;
@@ -50,7 +67,35 @@ void DuelInfo::Clear() {
 	time_left[0] = 0;
 	time_left[1] = 0;
 }
+#endif
 
+#ifdef YGOPRO_SERVER_MODE
+unsigned short server_port;
+unsigned short replay_mode;
+unsigned int pre_seed[3];
+HostInfo game_info;
+
+void Game::MainServerLoop() {
+#ifdef SERVER_ZIP_SUPPORT
+	dataManager.FileSystem = new irr::io::CFileSystem();
+#endif
+	deckManager.LoadLFList();
+	dataManager.LoadDB(L"cards.cdb");
+	LoadExpansions();
+#ifdef SERVER_PRO2_SUPPORT
+	dataManager.FileSystem->addFileArchive("data/script.zip", true, false, EFAT_ZIP);
+#endif
+
+	server_port = NetServer::StartServer(server_port);
+	NetServer::InitDuel();
+	printf("%u\n", server_port);
+	fflush(stdout);
+	
+	while(NetServer::net_evbase) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	}
+}
+#else //YGOPRO_SERVER_MODE
 bool Game::Initialize() {
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
@@ -1137,18 +1182,31 @@ std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth,
 	ret.assign(strBuffer);
 	return ret;
 }
+#endif //YGOPRO_SERVER_MODE
 void Game::LoadExpansions() {
+#ifdef SERVER_PRO2_SUPPORT
+	FileSystem::TraversalDir(L"./cdb", [](const wchar_t* name, bool isdir) {
+		wchar_t fpath[1024];
+		myswprintf(fpath, L"./cdb/%ls", name);
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
+			dataManager.LoadDB(fpath);
+		}
+	});
+#endif // SERVER_PRO2_SUPPORT
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
 		wchar_t fpath[1024];
 		myswprintf(fpath, L"./expansions/%ls", name);
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
 			dataManager.LoadDB(fpath);
 		}
+#ifndef YGOPRO_SERVER_MODE
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".conf", 5)) {
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
 			dataManager.LoadStrings(upath);
 		}
+#endif // YGOPRO_SERVER_MODE
+#if defined(SERVER_ZIP_SUPPORT) || !defined(YGOPRO_SERVER_MODE)
 		if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ypk", 4))) {
 #ifdef _WIN32
 			dataManager.FileSystem->addFileArchive(fpath, true, false, EFAT_ZIP);
@@ -1158,7 +1216,9 @@ void Game::LoadExpansions() {
 			dataManager.FileSystem->addFileArchive(upath, true, false, EFAT_ZIP);
 #endif
 		}
+#endif //SERVER_ZIP_SUPPORT
 	});
+#if defined(SERVER_ZIP_SUPPORT) || !defined(YGOPRO_SERVER_MODE)
 	for(u32 i = 0; i < DataManager::FileSystem->getFileArchiveCount(); ++i) {
 		const IFileList* archive = DataManager::FileSystem->getFileArchive(i)->getFileList();
 		for(u32 j = 0; j < archive->getFileCount(); ++j) {
@@ -1171,6 +1231,7 @@ void Game::LoadExpansions() {
 #endif
 			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".cdb", 4))
 				dataManager.LoadDB(fname);
+#ifndef YGOPRO_SERVER_MODE
 			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".conf", 5)) {
 #ifdef _WIN32
 				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(fname);
@@ -1182,9 +1243,12 @@ void Game::LoadExpansions() {
 			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".ydk", 4)) {
 				deckBuilder.expansionPacks.push_back(fname);
 			}
+#endif // YGOPRO_SERVER_MODE
 		}
 	}
+#endif //SERVER_ZIP_SUPPORT
 }
+#ifndef YGOPRO_SERVER_MODE
 void Game::RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck, bool selectlastused) {
 	cbCategory->clear();
 	cbCategory->addItem(dataManager.GetSysString(1450));
@@ -1707,7 +1771,11 @@ void Game::ClearChatMsg() {
 		chatTiming[i] = 0;
 	}
 }
+#endif //YGOPRO_SERVER_MODE
 void Game::AddDebugMsg(const char* msg) {
+#ifdef YGOPRO_SERVER_MODE
+	fprintf(stderr, "%s\n", msg);
+#else
 	if (enable_log & 0x1) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msg, wbuf);
@@ -1718,7 +1786,9 @@ void Game::AddDebugMsg(const char* msg) {
 		snprintf(msgbuf, sizeof msgbuf, "[Script Error]: %s", msg);
 		ErrorLog(msgbuf);
 	}
+#endif //YGOPRO_SERVER_MODE
 }
+#ifndef YGOPRO_SERVER_MODE
 void Game::ErrorLog(const char* msg) {
 	FILE* fp = fopen("error.log", "at");
 	if(!fp)
@@ -2166,5 +2236,6 @@ void Game::SetCursor(ECURSOR_ICON icon) {
 		cursor->setActiveIcon(icon);
 	}
 }
+#endif //YGOPRO_SERVER_MODE
 
 }
