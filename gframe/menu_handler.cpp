@@ -499,7 +499,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wReplaySave);
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
 					wchar_t newname[256];
-					BufferIO::CopyWStr(mainGame->ebRSName->getText(), newname, 256);
+					BufferIO::CopyWideString(mainGame->ebRSName->getText(), newname);
 					if(mywcsncasecmp(newname + wcslen(newname) - 4, L".yrp", 4)) {
 						myswprintf(newname, L"%ls.yrp", mainGame->ebRSName->getText());
 					}

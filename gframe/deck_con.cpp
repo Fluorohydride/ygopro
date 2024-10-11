@@ -540,7 +540,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					const wchar_t* newcatename = mainGame->cbDMCategory->getText();
 					const wchar_t* olddeckname = mainGame->lstDecks->getListItem(decksel);
 					wchar_t deckname[256];
-					BufferIO::CopyWStr(olddeckname, deckname, 256);
+					BufferIO::CopyWideString(olddeckname, deckname);
 					wchar_t oldfilepath[256];
 					deckManager.GetDeckFile(oldfilepath, mainGame->cbDBCategory, mainGame->cbDBDecks);
 					wchar_t newfilepath[256];
@@ -580,7 +580,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					const wchar_t* newcatename = mainGame->cbDMCategory->getText();
 					const wchar_t* olddeckname = mainGame->lstDecks->getListItem(decksel);
 					wchar_t deckname[256];
-					BufferIO::CopyWStr(olddeckname, deckname, 256);
+					BufferIO::CopyWideString(olddeckname, deckname);
 					wchar_t newfilepath[256];
 					if(oldcatesel != 2 && newcatesel == 0) {
 						myswprintf(newfilepath, L"./deck/%ls.ydk", deckname);
