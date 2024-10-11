@@ -237,7 +237,7 @@ void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) 
 		myswprintf(catepath, L"./pack");
 		break;
 	case 1:
-		myswprintf(catepath, mainGame->gameConf.bot_deck_path);
+		BufferIO::CopyWideString(mainGame->gameConf.bot_deck_path, catepath);
 		break;
 	case -1:
 	case 2:
