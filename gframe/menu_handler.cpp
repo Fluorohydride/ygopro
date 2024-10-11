@@ -448,8 +448,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						wcsncpy(deck_name, dash + 1, 256);
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 							if(!wcscmp(mainGame->cbDBDecks->getItem(i), deck_name)) {
-								wcsncpy(mainGame->gameConf.lastdeck, deck_name, sizeof mainGame->gameConf.lastdeck / sizeof mainGame->gameConf.lastdeck[0]);
-								BufferIO::NullTerminate(mainGame->gameConf.lastdeck);
+								wcscpy(mainGame->gameConf.lastdeck, deck_name);
 								mainGame->cbDBDecks->setSelected(i);
 								break;
 							}
@@ -457,8 +456,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					} else { // only deck name
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 							if(!wcscmp(mainGame->cbDBDecks->getItem(i), open_file_name)) {
-								wcsncpy(mainGame->gameConf.lastdeck, open_file_name, sizeof mainGame->gameConf.lastdeck / sizeof mainGame->gameConf.lastdeck[0]);
-								BufferIO::NullTerminate(mainGame->gameConf.lastdeck);
+								wcscpy(mainGame->gameConf.lastdeck, open_file_name);
 								mainGame->cbDBDecks->setSelected(i);
 								break;
 							}
