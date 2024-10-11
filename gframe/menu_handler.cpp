@@ -13,12 +13,8 @@
 namespace ygo {
 
 void UpdateDeck() {
-	auto category = mainGame->cbCategorySelect->getItem(mainGame->cbCategorySelect->getSelected());
-	if (category)
-		BufferIO::CopyWideString(category, mainGame->gameConf.lastcategory);
-	auto deckname = mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected());
-	if (deckname)
-		BufferIO::CopyWideString(deckname, mainGame->gameConf.lastdeck);
+	BufferIO::CopyWideString(mainGame->cbCategorySelect->getText(), mainGame->gameConf.lastcategory);
+	BufferIO::CopyWideString(mainGame->cbDeckSelect->getText(), mainGame->gameConf.lastdeck);
 	unsigned char deckbuf[1024]{};
 	auto pdeck = deckbuf;
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
