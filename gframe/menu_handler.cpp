@@ -13,11 +13,13 @@
 namespace ygo {
 
 void UpdateDeck() {
-	BufferIO::CopyWStr(mainGame->cbCategorySelect->getItem(mainGame->cbCategorySelect->getSelected()),
-		mainGame->gameConf.lastcategory, 64);
-	BufferIO::CopyWStr(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()),
-		mainGame->gameConf.lastdeck, 64);
-	unsigned char deckbuf[1024];
+	auto category = mainGame->cbCategorySelect->getItem(mainGame->cbCategorySelect->getSelected());
+	if (category)
+		BufferIO::CopyWideString(category, mainGame->gameConf.lastcategory);
+	auto deckname = mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected());
+	if (deckname)
+		BufferIO::CopyWideString(deckname, mainGame->gameConf.lastdeck);
+	unsigned char deckbuf[1024]{};
 	auto pdeck = deckbuf;
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
@@ -448,7 +450,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						wcsncpy(deck_name, dash + 1, 256);
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 							if(!wcscmp(mainGame->cbDBDecks->getItem(i), deck_name)) {
-								wcscpy(mainGame->gameConf.lastdeck, deck_name);
+								BufferIO::CopyWideString(deck_name, mainGame->gameConf.lastdeck);
 								mainGame->cbDBDecks->setSelected(i);
 								break;
 							}
@@ -456,14 +458,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					} else { // only deck name
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 							if(!wcscmp(mainGame->cbDBDecks->getItem(i), open_file_name)) {
-								wcscpy(mainGame->gameConf.lastdeck, open_file_name);
+								BufferIO::CopyWideString(open_file_name, mainGame->gameConf.lastdeck);
 								mainGame->cbDBDecks->setSelected(i);
 								break;
 							}
 						}
 					}
 					open_file = false;
-				} else if(mainGame->cbDBCategory->getSelected() != -1 && mainGame->cbDBDecks->getSelected() != -1) {
+				} 
+				else if(mainGame->cbDBCategory->getSelected() != -1 && mainGame->cbDBDecks->getSelected() != -1) {
 					deckManager.LoadCurrentDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
 					mainGame->ebDeckname->setText(L"");
 				}
