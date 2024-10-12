@@ -1,7 +1,7 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
-#include <string.h>
+#include <cstdio>
 #include <functional>
 #include "bufferio.h"
 
@@ -14,14 +14,13 @@
 
 #ifdef _WIN32
 
-#include <wchar.h>
 #define NOMINMAX
 #include <Windows.h>
 
 class FileSystem {
 public:
 	static void SafeFileName(wchar_t* wfile) {
-		while((wfile = wcspbrk(wfile, L"<>:\"/\\|?*")) != NULL)
+		while((wfile = std::wcspbrk(wfile, L"<>:\"/\\|?*")) != nullptr)
 			*wfile++ = '_';
 	}
 
@@ -71,8 +70,8 @@ public:
 
 	static bool DeleteDir(const wchar_t* wdir) {
 		wchar_t pdir[256];
-		BufferIO::CopyWideString(wdir, pdir);
-		pdir[wcslen(wdir) + 1] = 0;
+		int len = BufferIO::CopyWStr(wdir, pdir, sizeof pdir / sizeof pdir[0]);
+		pdir[len + 1] = 0;
 		SHFILEOPSTRUCTW lpFileOp;
 		lpFileOp.hwnd = NULL;
 		lpFileOp.wFunc = FO_DELETE;
@@ -90,7 +89,7 @@ public:
 
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
-		swprintf(findstr, 1024, L"%s/*", wpath);
+		std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
 		WIN32_FIND_DATAW fdataw;
 		HANDLE fh = FindFirstFileW(findstr, &fdataw);
 		if(fh == INVALID_HANDLE_VALUE)
@@ -118,7 +117,7 @@ public:
 class FileSystem {
 public:
 	static void SafeFileName(wchar_t* wfile) {
-		while((wfile = wcspbrk(wfile, L"/")) != NULL)
+		while((wfile = std::wcspbrk(wfile, L"/")) != nullptr)
 			*wfile++ = '_';
 	}
 	
@@ -208,9 +207,7 @@ public:
 		while((dirp = readdir(dir)) != nullptr) {
 			file_unit funit;
 			char fname[1024];
-			strcpy(fname, path);
-			strcat(fname, "/");
-			strcat(fname, dirp->d_name);
+			std::snprintf(fname, sizeof fname, "%s/%s", path, dirp->d_name);
 			stat(fname, &fileStat);
 			funit.filename = std::string(dirp->d_name);
 			funit.is_dir = S_ISDIR(fileStat.st_mode);
