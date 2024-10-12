@@ -12,6 +12,7 @@ namespace ygo {
 	constexpr int DECK_MIN_SIZE = 40;
 	constexpr int EXTRA_MAX_SIZE = 15;
 	constexpr int SIDE_MAX_SIZE = 15;
+	constexpr int PACK_MAX_SIZE = 1000;
 
 struct LFList {
 	unsigned int hash{};
