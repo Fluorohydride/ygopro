@@ -2480,11 +2480,14 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 	}
 }
 void ClientField::SetResponseSelectedCards() const {
-	unsigned char respbuf[SIZE_RETURN_VALUE];
-	respbuf[0] = selected_cards.size();
-	for (size_t i = 0; i < selected_cards.size(); ++i)
+	unsigned char respbuf[SIZE_RETURN_VALUE]{};
+	int len = (int)selected_cards.size();
+	if (len > UINT8_MAX)
+		len = UINT8_MAX;
+	respbuf[0] = (unsigned char)len;
+	for (int i = 0; i < len; ++i)
 		respbuf[i + 1] = selected_cards[i]->select_seq;
-	DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+	DuelClient::SetResponseB(respbuf, len + 1);
 }
 void ClientField::SetResponseSelectedOption() const {
 	if(mainGame->dInfo.curMsg == MSG_SELECT_OPTION) {
