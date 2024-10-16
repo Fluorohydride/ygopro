@@ -22,7 +22,8 @@
 #include <mutex>
 #include <functional>
 
-#define DEFAULT_DUEL_RULE 5
+constexpr int DEFAULT_DUEL_RULE = 5;
+constexpr int CONFIG_LINE_SIZE = 1024;
 
 namespace ygo {
 
@@ -36,12 +37,13 @@ struct Config {
 	wchar_t lastport[10]{};
 	wchar_t nickname[20]{};
 	wchar_t gamename[20]{};
-	wchar_t lastcategory[64]{};
-	wchar_t lastdeck[64]{};
+	wchar_t roompass[20]{};
+	//path
+	wchar_t lastcategory[256]{};
+	wchar_t lastdeck[256]{};
 	wchar_t textfont[256]{};
 	wchar_t numfont[256]{};
-	wchar_t roompass[20]{};
-	wchar_t bot_deck_path[64]{};
+	wchar_t bot_deck_path[256]{};
 	//settings
 	int chkMAutoPos{ 0 };
 	int chkSTAutoPos{ 1 };
