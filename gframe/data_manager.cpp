@@ -180,6 +180,12 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 		sqlite3_finalize(pStmt);
 	return false;
 }
+code_pointer DataManager::GetCodePointer(unsigned int code) const {
+	return _datas.find(code);
+}
+string_pointer DataManager::GetStringPointer(unsigned int code) const {
+	return _strings.find(code);
+}
 bool DataManager::GetData(unsigned int code, CardData* pData) const {
 	auto cdit = _datas.find(code);
 	if(cdit == _datas.end())
@@ -188,12 +194,6 @@ bool DataManager::GetData(unsigned int code, CardData* pData) const {
 		*pData = cdit->second;
 	}
 	return true;
-}
-code_pointer DataManager::GetCodePointer(unsigned int code) const {
-	return _datas.find(code);
-}
-string_pointer DataManager::GetStringPointer(unsigned int code) const {
-	return _strings.find(code);
 }
 bool DataManager::GetString(unsigned int code, CardString* pStr) const {
 	auto csit = _strings.find(code);

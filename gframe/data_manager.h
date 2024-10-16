@@ -21,9 +21,9 @@ public:
 	void ReadStringConfLine(const char* linebuf);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = nullptr);
 
-	bool GetData(unsigned int code, CardData* pData) const;
 	code_pointer GetCodePointer(unsigned int code) const;
 	string_pointer GetStringPointer(unsigned int code) const;
+	bool GetData(unsigned int code, CardData* pData) const;
 	bool GetString(unsigned int code, CardString* pStr) const;
 	const wchar_t* GetName(unsigned int code) const;
 	const wchar_t* GetText(unsigned int code) const;
