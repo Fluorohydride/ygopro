@@ -1541,7 +1541,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		return;
 	wchar_t formatBuffer[256];
 	auto cit = dataManager.GetCodePointer(code);
-	bool is_valid = (cit != dataManager.datas_end);
+	bool is_valid = (cit != dataManager.datas_begin());
 	imgCard->setImage(imageManager.GetTexture(code, true));
 	if (is_valid) {
 		auto& cd = cit->second;
@@ -1558,7 +1558,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 	if (is_valid && !gameConf.hide_setname) {
 		auto& cd = cit->second;
 		auto target = cit;
-		if (cd.alias && dataManager.GetCodePointer(cd.alias) != dataManager.datas_end) {
+		if (cd.alias && dataManager.GetCodePointer(cd.alias) != dataManager.datas_begin()) {
 			target = dataManager.GetCodePointer(cd.alias);
 		}
 		if (target->second.setcode[0]) {

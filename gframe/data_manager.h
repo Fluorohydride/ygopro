@@ -23,6 +23,10 @@ public:
 
 	code_pointer GetCodePointer(unsigned int code) const;
 	string_pointer GetStringPointer(unsigned int code) const;
+	code_pointer datas_begin();
+	code_pointer datas_end();
+	string_pointer strings_begin();
+	string_pointer strings_end();
 	bool GetData(unsigned int code, CardData* pData) const;
 	bool GetString(unsigned int code, CardString* pStr) const;
 	const wchar_t* GetName(unsigned int code) const;
@@ -45,10 +49,6 @@ public:
 	std::unordered_map<unsigned int, std::wstring> _victoryStrings;
 	std::unordered_map<unsigned int, std::wstring> _setnameStrings;
 	std::unordered_map<unsigned int, std::wstring> _sysStrings;
-	code_pointer datas_begin;
-	code_pointer datas_end;
-	string_pointer strings_begin;
-	string_pointer strings_end;
 	char errmsg[512]{};
 
 	wchar_t numStrings[301][4]{};
