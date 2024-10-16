@@ -2,10 +2,9 @@
 #define DATAMANAGER_H
 
 #include "config.h"
-#include "sqlite3.h"
-#include "spmemvfs/spmemvfs.h"
-#include "client_card.h"
 #include <unordered_map>
+#include <sqlite3.h>
+#include "client_card.h"
 
 namespace ygo {
 	constexpr int MAX_STRING_ID = 0x7ff;
