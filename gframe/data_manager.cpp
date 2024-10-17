@@ -10,7 +10,7 @@ byte DataManager::scriptBuffer[0x20000];
 IFileSystem* DataManager::FileSystem;
 DataManager dataManager;
 
-DataManager::DataManager() : _datas(16384), _strings(16384) {
+DataManager::DataManager() : _datas(32768), _strings(32768) {
 	extra_setcode = { {8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}}, };
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
