@@ -27,6 +27,8 @@ constexpr int CONFIG_LINE_SIZE = 1024;
 
 namespace ygo {
 
+bool IsExtension(const wchar_t* filename, const wchar_t* extension);
+
 struct Config {
 	bool use_d3d{ false };
 	bool use_image_scale{ true };

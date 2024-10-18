@@ -50,6 +50,15 @@ void DuelInfo::Clear() {
 	time_left[1] = 0;
 }
 
+bool IsExtension(const wchar_t* filename, const wchar_t* extension) {
+	int flen = std::wcslen(filename);
+	int elen = std::wcslen(extension);
+	if (!flen || !elen || flen < elen)
+		return false;
+	auto fend = filename + flen;
+	return !mywcsncasecmp(fend - elen, extension, elen);
+}
+
 bool Game::Initialize() {
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
@@ -152,7 +161,7 @@ bool Game::Initialize() {
 		wchar_t fpath[1024]{};
 		fpath[0] = 0;
 		FileSystem::TraversalDir(L"./fonts", [&fpath](const wchar_t* name, bool isdir) {
-			if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".ttf", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ttc", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".otf", 4))) {
+			if(!isdir && (IsExtension(name, L".ttf") || IsExtension(name, L".ttc") || IsExtension(name, L".otf"))) {
 				myswprintf(fpath, L"./fonts/%ls", name);
 			}
 		});
@@ -1139,15 +1148,17 @@ void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
 		wchar_t fpath[1024];
 		myswprintf(fpath, L"./expansions/%ls", name);
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
+		if (!isdir && IsExtension(name, L".cdb")) {
 			dataManager.LoadDB(fpath);
+			return;
 		}
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".conf", 5)) {
+		if (!isdir && IsExtension(name, L".conf")) {
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
 			dataManager.LoadStrings(upath);
+			return;
 		}
-		if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ypk", 4))) {
+		if (!isdir && (IsExtension(name, L".zip") || IsExtension(name, L".ypk"))) {
 #ifdef _WIN32
 			dataManager.FileSystem->addFileArchive(fpath, true, false, EFAT_ZIP);
 #else
@@ -1155,6 +1166,7 @@ void Game::LoadExpansions() {
 			BufferIO::EncodeUTF8(fpath, upath);
 			dataManager.FileSystem->addFileArchive(upath, true, false, EFAT_ZIP);
 #endif
+			return;
 		}
 	});
 	for(u32 i = 0; i < DataManager::FileSystem->getFileArchiveCount(); ++i) {
@@ -1167,18 +1179,22 @@ void Game::LoadExpansions() {
 			const char* uname = archive->getFullFileName(j).c_str();
 			BufferIO::DecodeUTF8(uname, fname);
 #endif
-			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".cdb", 4))
+			if (IsExtension(fname, L".cdb")) {
 				dataManager.LoadDB(fname);
-			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".conf", 5)) {
+				continue;
+			}
+			if (IsExtension(fname, L".conf")) {
 #ifdef _WIN32
 				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(fname);
 #else
 				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(uname);
 #endif
 				dataManager.LoadStrings(reader);
+				continue;
 			}
-			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".ydk", 4)) {
+			if (!mywcsncasecmp(fname, L"pack/", 5) && IsExtension(fname, L".ydk")) {
 				deckBuilder.expansionPacks.push_back(fname);
+				continue;
 			}
 		}
 	}
@@ -1227,14 +1243,15 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBo
 void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const wchar_t*)>& additem) {
 	if(!mywcsncasecmp(deckpath, L"./pack", 6)) {
 		for(auto& pack : deckBuilder.expansionPacks) {
+			// add pack/xxx.ydk
 			additem(pack.substr(5, pack.size() - 9).c_str());
 		}
 	}
 	FileSystem::TraversalDir(deckpath, [additem](const wchar_t* name, bool isdir) {
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
-			size_t len = wcslen(name);
+		if (!isdir && IsExtension(name, L".ydk")) {
+			size_t len = std::wcslen(name);
 			wchar_t deckname[256];
-			wcsncpy(deckname, name, len - 4);
+			std::wcsncpy(deckname, name, len - 4);
 			deckname[len - 4] = 0;
 			additem(deckname);
 		}
@@ -1243,7 +1260,7 @@ void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const w
 void Game::RefreshReplay() {
 	lstReplayList->clear();
 	FileSystem::TraversalDir(L"./replay", [this](const wchar_t* name, bool isdir) {
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".yrp", 4) && Replay::CheckReplay(name))
+		if (!isdir && IsExtension(name, L".yrp") && Replay::CheckReplay(name))
 			lstReplayList->addItem(name);
 	});
 }
@@ -1251,7 +1268,7 @@ void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
 	stSinglePlayInfo->setText(L"");
 	FileSystem::TraversalDir(L"./single", [this](const wchar_t* name, bool isdir) {
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".lua", 4))
+		if(!isdir && IsExtension(name, L".lua"))
 			lstSinglePlayList->addItem(name);
 	});
 }
