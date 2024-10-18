@@ -263,9 +263,12 @@ public:
 	virtual void setFontHinting(const bool enable, const bool enable_auto_hinting = true);
 
 	//! Draws some text and clips it to the specified rectangle if wanted.
-	virtual void draw(const core::stringw& text, const core::rect<s32>& position,
+	void draw(const core::stringw& text, const core::rect<s32>& position,
 	                  video::SColor color, bool hcenter = false, bool vcenter = false,
-	                  const core::rect<s32>* clip = 0);
+	                  const core::rect<s32>* clip = 0) override;
+	void drawUstring(const core::ustring& text, const core::rect<s32>& position,
+					video::SColor color, bool hcenter = false, bool vcenter = false,
+					const core::rect<s32>* clip = 0);
 
 	//! Returns the dimension of a character produced by this font.
 	virtual core::dimension2d<u32> getCharDimension(const wchar_t ch) const;
