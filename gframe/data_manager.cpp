@@ -1,6 +1,7 @@
 #include "data_manager.h"
 #include "game.h"
 #include <stdio.h>
+#include "spmemvfs/spmemvfs.h"
 
 namespace ygo {
 
@@ -9,7 +10,7 @@ byte DataManager::scriptBuffer[0x20000];
 IFileSystem* DataManager::FileSystem;
 DataManager dataManager;
 
-DataManager::DataManager() : _datas(16384), _strings(16384) {
+DataManager::DataManager() : _datas(32768), _strings(32768) {
 	extra_setcode = { {8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}}, };
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
@@ -166,8 +167,8 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 	}
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	std::strncpy(errmsg, sqlite3_errmsg(pDB), sizeof errmsg);
-	BufferIO::NullTerminate(errmsg);
+	errmsg[0] = '\0';
+	std::strncat(errmsg, sqlite3_errmsg(pDB), sizeof errmsg - 1);
 	if(pStmt)
 		sqlite3_finalize(pStmt);
 	return false;
