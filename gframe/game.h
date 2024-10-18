@@ -104,7 +104,7 @@ struct DuelInfo {
 	wchar_t hostname_tag[20]{};
 	wchar_t clientname_tag[20]{};
 	wchar_t strLP[2][16]{};
-	wchar_t* vic_string{ nullptr };
+	std::wstring vic_string;
 	unsigned char player_type{ 0 };
 	unsigned char time_player{ 0 };
 	unsigned short time_limit{ 0 };
@@ -157,7 +157,6 @@ public:
 	void CheckMutual(ClientCard* pcard, int mark);
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
-	void DrawShadowText(irr::gui::CGUITTFont* font, const core::stringw& text, const core::rect<s32>& position, const core::rect<s32>& padding, video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const core::rect<s32>* clip = 0);
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
 	void DrawGUI();
@@ -258,7 +257,7 @@ public:
 	int lpd;
 	int lpplayer;
 	int lpccolor;
-	wchar_t* lpcstring;
+	std::wstring lpcstring;
 	bool always_chain;
 	bool ignore_chain;
 	bool chain_when_avail;
