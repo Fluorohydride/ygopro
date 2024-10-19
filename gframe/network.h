@@ -208,26 +208,25 @@ inline unsigned int GetPosition(unsigned char* qbuf, int offset) {
 
 class DuelMode {
 public:
-	virtual ~DuelMode() {}
-	virtual void Chat(DuelPlayer* dp, unsigned char* pdata, int len) {}
-	virtual void JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {}
-	virtual void LeaveGame(DuelPlayer* dp) {}
-	virtual void ToDuelist(DuelPlayer* dp) {}
-	virtual void ToObserver(DuelPlayer* dp) {}
-	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) {}
-	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) {}
-	virtual void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {}
-	virtual void StartDuel(DuelPlayer* dp) {}
-	virtual void HandResult(DuelPlayer* dp, unsigned char res) {}
-	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {}
-	virtual void Process() {}
-	virtual int Analyze(char* msgbuffer, unsigned int len) {
-		return 0;
-	}
-	virtual void Surrender(DuelPlayer* dp) {}
-	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {}
-	virtual void TimeConfirm(DuelPlayer* dp) {}
-	virtual void EndDuel() {}
+	DuelMode() = default;
+	virtual ~DuelMode() = default;
+	virtual void Chat(DuelPlayer* dp, unsigned char* pdata, int len) = 0;
+	virtual void JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) = 0;
+	virtual void LeaveGame(DuelPlayer* dp) = 0;
+	virtual void ToDuelist(DuelPlayer* dp) = 0;
+	virtual void ToObserver(DuelPlayer* dp) = 0;
+	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) = 0;
+	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) = 0;
+	virtual void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) = 0;
+	virtual void StartDuel(DuelPlayer* dp) = 0;
+	virtual void HandResult(DuelPlayer* dp, unsigned char res) = 0;
+	virtual void TPResult(DuelPlayer* dp, unsigned char tp) = 0;
+	virtual void Process() = 0;
+	virtual int Analyze(unsigned char* msgbuffer, unsigned int len) = 0;
+	virtual void Surrender(DuelPlayer* dp) = 0;
+	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) = 0;
+	virtual void TimeConfirm(DuelPlayer* dp) = 0;
+	virtual void EndDuel() = 0;
 
 public:
 	event* etimer { nullptr };
