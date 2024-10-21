@@ -54,8 +54,10 @@ public:
 	void GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
 	FILE* OpenDeckFile(const wchar_t* file, const char* mode);
 	IReadFile* OpenDeckReader(const wchar_t* file);
+	bool LoadCurrentDeck(std::istringstream& deckStream, bool is_packlist = false);
 	bool LoadCurrentDeck(const wchar_t* file, bool is_packlist = false);
 	bool LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	void SaveDeck(Deck& deck, std::stringstream& deckStream);
 	bool SaveDeck(Deck& deck, const wchar_t* file);
 	bool DeleteDeck(const wchar_t* file);
 	bool CreateCategory(const wchar_t* name);
