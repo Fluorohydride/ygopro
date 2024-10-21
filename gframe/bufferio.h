@@ -2,6 +2,7 @@
 #define BUFFERIO_H
 
 #include <cstdint>
+#include <cwchar>
 #include "../ocgcore/buffer.h"
 
 class BufferIO {
@@ -48,6 +49,16 @@ public:
 		pstr += l;
 		*pstr = 0;
 		return l;
+	}
+	template<size_t N>
+	static void CopyString(const char* src, wchar_t(&dst)[N]) {
+		dst[0] = 0;
+		std::strncat(dst, src, N - 1);
+	}
+	template<size_t N>
+	static void CopyWideString(const wchar_t* src, wchar_t(&dst)[N]) {
+		dst[0] = 0;
+		std::wcsncat(dst, src, N - 1);
 	}
 	template<typename T>
 	static bool CheckUTF8Byte(const T* str, int len) {
