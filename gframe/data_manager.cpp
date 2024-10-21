@@ -1,6 +1,9 @@
 #include "data_manager.h"
 #include "game.h"
 #include <stdio.h>
+#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
+#include "spmemvfs/spmemvfs.h"
+#endif
 
 namespace ygo {
 
@@ -11,52 +14,18 @@ IFileSystem* DataManager::FileSystem;
 #endif
 DataManager dataManager;
 
-DataManager::DataManager() : _datas(16384), _strings(16384) {
-	datas_begin = _datas.begin();
-	datas_end = _datas.end();
-	strings_begin = _strings.begin();
-	strings_end = _strings.end();
+DataManager::DataManager() : _datas(32768), _strings(32768) {
 	extra_setcode = { {8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}}, };
 }
-bool DataManager::LoadDB(const wchar_t* wfile) {
-	char file[256];
-	BufferIO::EncodeUTF8(wfile, file);
-#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
-	sqlite3* pDB;
-	if(sqlite3_open_v2(file, &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
-		return Error(pDB);
-#else
-#ifdef _WIN32
-	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
-#else
-	IReadFile* reader = FileSystem->createAndOpenFile(file);
-#endif
-	if(reader == NULL)
-		return false;
-	spmemvfs_db_t db;
-	spmembuffer_t* mem = (spmembuffer_t*)calloc(sizeof(spmembuffer_t), 1);
-	spmemvfs_env_init();
-	mem->total = mem->used = reader->getSize();
-	mem->data = (char*)malloc(mem->total + 1);
-	reader->read(mem->data, mem->total);
-	reader->drop();
-	(mem->data)[mem->total] = '\0';
-	if(spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
-		return Error(&db);
-	sqlite3* pDB = db.handle;
-#endif //YGOPRO_SERVER_MODE
-	sqlite3_stmt* pStmt;
+bool DataManager::ReadDB(sqlite3* pDB) {
+	sqlite3_stmt* pStmt{};
 #ifdef YGOPRO_SERVER_MODE
 	const char* sql = "select * from datas";
 #else
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 #endif
-	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
-#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
+	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
 		return Error(pDB);
-#else
-		return Error(&db);
-#endif
 #ifndef YGOPRO_SERVER_MODE
 	wchar_t strBuffer[4096];
 #endif
@@ -65,13 +34,9 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 		CardDataC cd;
 		CardString cs;
 		step = sqlite3_step(pStmt);
-		if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
-#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
+		if (step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
 			return Error(pDB, pStmt);
-#else
-			return Error(&db, pStmt);
-#endif
-		else if(step == SQLITE_ROW) {
+		else if (step == SQLITE_ROW) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
@@ -91,10 +56,11 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defense = sqlite3_column_int(pStmt, 6);
-			if(cd.type & TYPE_LINK) {
+			if (cd.type & TYPE_LINK) {
 				cd.link_marker = cd.defense;
 				cd.defense = 0;
-			} else
+			}
+			else
 				cd.link_marker = 0;
 			unsigned int level = sqlite3_column_int(pStmt, 7);
 			cd.level = level & 0xff;
@@ -105,16 +71,16 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.category = sqlite3_column_int(pStmt, 10);
 			_datas[cd.code] = cd;
 #ifndef YGOPRO_SERVER_MODE
-			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+			if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.name = strBuffer;
 			}
-			if(const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
+			if (const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.text = strBuffer;
 			}
-			for(int i = 0; i < 16; ++i) {
-				if(const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
+			for (int i = 0; i < 16; ++i) {
+				if (const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
 					BufferIO::DecodeUTF8(text, strBuffer);
 					cs.desc[i] = strBuffer;
 				}
@@ -122,19 +88,46 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			_strings[cd.code] = cs;
 #endif //YGOPRO_SERVER_MODE
 		}
-	} while(step != SQLITE_DONE);
+	} while (step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
-#ifdef YGOPRO_SERVER_MODE
+	return true;
+}
+bool DataManager::LoadDB(const wchar_t* wfile) {
+	char file[256];
+	BufferIO::EncodeUTF8(wfile, file);
+#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
+	bool ret{};
+	sqlite3* pDB{};
+	if (sqlite3_open_v2(file, &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
+		ret = Error(pDB);
+	else
+		ret = ReadDB(pDB);
 	sqlite3_close(pDB);
 #else
+#ifdef _WIN32
+	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
+#else
+	IReadFile* reader = FileSystem->createAndOpenFile(file);
+#endif
+	if(reader == NULL)
+		return false;
+	spmemvfs_db_t db;
+	spmembuffer_t* mem = (spmembuffer_t*)calloc(sizeof(spmembuffer_t), 1);
+	spmemvfs_env_init();
+	mem->total = mem->used = reader->getSize();
+	mem->data = (char*)malloc(mem->total + 1);
+	reader->read(mem->data, mem->total);
+	reader->drop();
+	(mem->data)[mem->total] = '\0';
+	bool ret{};
+	if (spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
+		ret = Error(db.handle);
+	else
+		ret = ReadDB(db.handle);
 	spmemvfs_close_db(&db);
 	spmemvfs_env_fini();
-#endif
-	datas_begin = _datas.begin();
-	datas_end = _datas.end();
-	strings_begin = _strings.begin();
-	strings_end = _strings.end();
-	return true;
+#endif //YGOPRO_SERVER_MODE
+	return ret;
 }
 bool DataManager::LoadStrings(const char* file) {
 	FILE* fp = fopen(file, "r");
@@ -197,46 +190,12 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 		_setnameStrings[value] = strBuffer;
 	}
 }
-#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	wchar_t strBuffer[4096];
-	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB), strBuffer);
+	errmsg[0] = '\0';
+	std::strncat(errmsg, sqlite3_errmsg(pDB), sizeof errmsg - 1);
 	if(pStmt)
 		sqlite3_finalize(pStmt);
-	sqlite3_close(pDB);
 	return false;
-}
-#else
-bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
-	wchar_t strBuffer[4096];
-	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB->handle), strBuffer);
-	if(pStmt)
-		sqlite3_finalize(pStmt);
-	spmemvfs_close_db(pDB);
-	spmemvfs_env_fini();
-	return false;
-}
-#endif //YGOPRO_SERVER_MODE
-bool DataManager::GetData(unsigned int code, CardData* pData) {
-	code_pointer cdit = _datas.find(code);
-	if(cdit == _datas.end())
-		return false;
-	auto& data = cdit->second;
-	if (pData) {
-		pData->code = data.code;
-		pData->alias = data.alias;
-		std::memcpy(pData->setcode, data.setcode, SIZE_SETCODE);
-		pData->type = data.type;
-		pData->level = data.level;
-		pData->attribute = data.attribute;
-		pData->race = data.race;
-		pData->attack = data.attack;
-		pData->defense = data.defense;
-		pData->lscale = data.lscale;
-		pData->rscale = data.rscale;
-		pData->link_marker = data.link_marker;
-	}
-	return true;
 }
 code_pointer DataManager::GetCodePointer(unsigned int code) const {
 	return _datas.find(code);
@@ -244,7 +203,28 @@ code_pointer DataManager::GetCodePointer(unsigned int code) const {
 string_pointer DataManager::GetStringPointer(unsigned int code) const {
 	return _strings.find(code);
 }
-bool DataManager::GetString(unsigned int code, CardString* pStr) {
+code_pointer DataManager::datas_begin() {
+	return _datas.cbegin();
+}
+code_pointer DataManager::datas_end() {
+	return _datas.cend();
+}
+string_pointer DataManager::strings_begin() {
+	return _strings.cbegin();
+}
+string_pointer DataManager::strings_end() {
+	return _strings.cend();
+}
+bool DataManager::GetData(unsigned int code, CardData* pData) const {
+	auto cdit = _datas.find(code);
+	if(cdit == _datas.end())
+		return false;
+	if (pData) {
+		*pData = cdit->second;
+	}
+	return true;
+}
+bool DataManager::GetString(unsigned int code, CardString* pStr) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end()) {
 		pStr->name = unknown_string;
@@ -254,7 +234,7 @@ bool DataManager::GetString(unsigned int code, CardString* pStr) {
 	*pStr = csit->second;
 	return true;
 }
-const wchar_t* DataManager::GetName(unsigned int code) {
+const wchar_t* DataManager::GetName(unsigned int code) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -262,7 +242,7 @@ const wchar_t* DataManager::GetName(unsigned int code) {
 		return csit->second.name.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetText(unsigned int code) {
+const wchar_t* DataManager::GetText(unsigned int code) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -270,7 +250,7 @@ const wchar_t* DataManager::GetText(unsigned int code) {
 		return csit->second.text.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetDesc(unsigned int strCode) {
+const wchar_t* DataManager::GetDesc(unsigned int strCode) const {
 	if (strCode < (MIN_CARD_ID << 4))
 		return GetSysString(strCode);
 	unsigned int code = (strCode >> 4) & 0x0fffffff;
@@ -282,7 +262,7 @@ const wchar_t* DataManager::GetDesc(unsigned int strCode) {
 		return csit->second.desc[offset].c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetSysString(int code) {
+const wchar_t* DataManager::GetSysString(int code) const {
 	if (code < 0 || code > MAX_STRING_ID)
 		return unknown_string;
 	auto csit = _sysStrings.find(code);
@@ -290,25 +270,25 @@ const wchar_t* DataManager::GetSysString(int code) {
 		return unknown_string;
 	return csit->second.c_str();
 }
-const wchar_t* DataManager::GetVictoryString(int code) {
+const wchar_t* DataManager::GetVictoryString(int code) const {
 	auto csit = _victoryStrings.find(code);
 	if(csit == _victoryStrings.end())
 		return unknown_string;
 	return csit->second.c_str();
 }
-const wchar_t* DataManager::GetCounterName(int code) {
+const wchar_t* DataManager::GetCounterName(int code) const {
 	auto csit = _counterStrings.find(code);
 	if(csit == _counterStrings.end())
 		return unknown_string;
 	return csit->second.c_str();
 }
-const wchar_t* DataManager::GetSetName(int code) {
+const wchar_t* DataManager::GetSetName(int code) const {
 	auto csit = _setnameStrings.find(code);
 	if(csit == _setnameStrings.end())
-		return NULL;
+		return nullptr;
 	return csit->second.c_str();
 }
-std::vector<unsigned int> DataManager::GetSetCodes(std::wstring setname) {
+std::vector<unsigned int> DataManager::GetSetCodes(std::wstring setname) const {
 	std::vector<unsigned int> matchingCodes;
 	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
 		auto xpos = csit->second.find_first_of(L'|');//setname|another setname or extra info
@@ -335,8 +315,8 @@ const wchar_t* DataManager::GetNumString(int num, bool bracket) {
 	*++p = 0;
 	return numBuffer;
 }
-const wchar_t* DataManager::FormatLocation(int location, int sequence) {
-	if(location == 0x8) {
+const wchar_t* DataManager::FormatLocation(int location, int sequence) const {
+	if(location == LOCATION_SZONE) {
 		if(sequence < 5)
 			return GetSysString(1003);
 		else if(sequence == 5)
@@ -344,12 +324,16 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) {
 		else
 			return GetSysString(1009);
 	}
-	unsigned filter = 1;
 	int i = 1000;
-	for(; filter != 0x100 && filter != location; filter <<= 1)
-		++i;
-	if(filter == location)
-		return GetSysString(i);
+	int string_id = 0;
+	for (unsigned filter = LOCATION_DECK; filter <= LOCATION_PZONE; filter <<= 1, ++i) {
+		if (filter == location) {
+			string_id = i;
+			break;
+		}
+	}
+	if (string_id)
+		return GetSysString(string_id);
 	else
 		return unknown_string;
 }
@@ -451,12 +435,12 @@ uint32 DataManager::CardReader(uint32 code, card_data* pData) {
 byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 	// default script name: ./script/c%d.lua
 #ifdef YGOPRO_SERVER_MODE
-	char first[256];
-	char second[256];
-	char third[256];
-	sprintf(first, "specials/%s", script_name + 9);
-	sprintf(second, "expansions/%s", script_name + 2);
-	sprintf(third, "%s", script_name + 2);
+	char first[256]{};
+	char second[256]{};
+	char third[256]{};
+	snprintf(first, sizeof first, "specials/%s", script_name + 9);
+	snprintf(second, sizeof second, "expansions/%s", script_name + 2);
+	snprintf(third, sizeof third, "%s", script_name + 2);
 	if(ScriptReader(first, slen))
 		return scriptBuffer;
 	else if(ScriptReader(second, slen))

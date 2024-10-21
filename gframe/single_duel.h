@@ -10,27 +10,27 @@ namespace ygo {
 class SingleDuel: public DuelMode {
 public:
 	SingleDuel(bool is_match);
-	virtual ~SingleDuel();
-	virtual void Chat(DuelPlayer* dp, unsigned char* pdata, int len);
-	virtual void JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater);
-	virtual void LeaveGame(DuelPlayer* dp);
-	virtual void ToDuelist(DuelPlayer* dp);
-	virtual void ToObserver(DuelPlayer* dp);
-	virtual void PlayerReady(DuelPlayer* dp, bool ready);
-	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos);
-	virtual void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len);
-	virtual void StartDuel(DuelPlayer* dp);
-	virtual void HandResult(DuelPlayer* dp, unsigned char res);
-	virtual void TPResult(DuelPlayer* dp, unsigned char tp);
-	virtual void Process();
-	virtual void Surrender(DuelPlayer* dp);
-	virtual int Analyze(unsigned char* msgbuffer, unsigned int len);
-	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len);
-	virtual void TimeConfirm(DuelPlayer* dp);
+	~SingleDuel() override;
+	void Chat(DuelPlayer* dp, unsigned char* pdata, int len) override;
+	void JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) override;
+	void LeaveGame(DuelPlayer* dp) override;
+	void ToDuelist(DuelPlayer* dp) override;
+	void ToObserver(DuelPlayer* dp) override;
+	void PlayerReady(DuelPlayer* dp, bool ready) override;
+	void PlayerKick(DuelPlayer* dp, unsigned char pos) override;
+	void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) override;
+	void StartDuel(DuelPlayer* dp) override;
+	void HandResult(DuelPlayer* dp, unsigned char res) override;
+	void TPResult(DuelPlayer* dp, unsigned char tp) override;
+	void Process() override;
+	void Surrender(DuelPlayer* dp) override;
+	int Analyze(unsigned char* msgbuffer, unsigned int len) override;
+	void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) override;
+	void TimeConfirm(DuelPlayer* dp) override;
 #ifdef YGOPRO_SERVER_MODE
-	virtual void RequestField(DuelPlayer* dp);
+	void RequestField(DuelPlayer* dp) override;
 #endif
-	virtual void EndDuel();
+	void EndDuel() override;
 	
 	void DuelEndProc();
 	void WaitforResponse(int playerid);
