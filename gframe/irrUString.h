@@ -38,6 +38,7 @@
 
 #include <utility>
 #include <iterator>
+#include <string>
 
 
 namespace irr {
@@ -387,7 +388,7 @@ public:
 	}
 
 	template <class T>
-	ustring16(const T& other)
+	ustring16(const std::basic_string<T>& other)
 		: data_(nullptr), size_(0), size_raw_(0) {
 		assign(other.data(), static_cast<u32>(other.size()));
 	}
@@ -421,7 +422,7 @@ public:
 	}
 
 	template <class T>
-	ustring16& operator=(const T& other) {
+	ustring16& operator=(const std::basic_string<T>& other) {
 		assign(other.data(), static_cast<u32>(other.size()));
 		return *this;
 	}
