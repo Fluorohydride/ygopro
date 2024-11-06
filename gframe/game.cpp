@@ -43,12 +43,20 @@ void DuelInfo::Clear() {
 	clientname_tag[0] = 0;
 	strLP[0][0] = 0;
 	strLP[1][0] = 0;
-	vic_string = 0;
 	player_type = 0;
 	time_player = 0;
 	time_limit = 0;
 	time_left[0] = 0;
 	time_left[1] = 0;
+}
+
+bool IsExtension(const wchar_t* filename, const wchar_t* extension) {
+	int flen = std::wcslen(filename);
+	int elen = std::wcslen(extension);
+	if (!flen || !elen || flen < elen)
+		return false;
+	auto fend = filename + flen;
+	return !mywcsncasecmp(fend - elen, extension, elen);
 }
 
 bool Game::Initialize() {
@@ -77,7 +85,6 @@ bool Game::Initialize() {
 	showcard = 0;
 	is_attacking = false;
 	lpframe = 0;
-	lpcstring = 0;
 	always_chain = false;
 	ignore_chain = false;
 	chain_when_avail = false;
@@ -119,7 +126,7 @@ bool Game::Initialize() {
 			L"./fonts/numFont.otf"
 		};
 		for(const wchar_t* path : numFontPaths) {
-			myswprintf(gameConf.numfont, path);
+			BufferIO::CopyWideString(path, gameConf.numfont);
 			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 			if(numFont)
 				break;
@@ -144,17 +151,17 @@ bool Game::Initialize() {
 			L"./fonts/textFont.otf"
 		};
 		for(const wchar_t* path : textFontPaths) {
-			myswprintf(gameConf.textfont, path);
+			BufferIO::CopyWideString(path, gameConf.textfont);
 			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 			if(textFont)
 				break;
 		}
 	}
 	if(!numFont || !textFont) {
-		wchar_t fpath[1024];
+		wchar_t fpath[1024]{};
 		fpath[0] = 0;
 		FileSystem::TraversalDir(L"./fonts", [&fpath](const wchar_t* name, bool isdir) {
-			if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".ttf", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ttc", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".otf", 4))) {
+			if(!isdir && (IsExtension(name, L".ttf") || IsExtension(name, L".ttc") || IsExtension(name, L".otf"))) {
 				myswprintf(fpath, L"./fonts/%ls", name);
 			}
 		});
@@ -163,11 +170,11 @@ bool Game::Initialize() {
 			return false;
 		}
 		if(!numFont) {
-			myswprintf(gameConf.numfont, fpath);
+			BufferIO::CopyWideString(fpath, gameConf.numfont);
 			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 		}
 		if(!textFont) {
-			myswprintf(gameConf.textfont, fpath);
+			BufferIO::CopyWideString(fpath, gameConf.textfont);
 			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 		}
 	}
@@ -613,14 +620,14 @@ bool Game::Initialize() {
 	wANAttribute->setVisible(false);
 	for(int filter = 0x1, i = 0; i < 7; filter <<= 1, ++i)
 		chkAttribute[i] = env->addCheckBox(false, rect<s32>(10 + (i % 4) * 80, 25 + (i / 4) * 25, 90 + (i % 4) * 80, 50 + (i / 4) * 25),
-		                                   wANAttribute, CHECK_ATTRIBUTE, dataManager.FormatAttribute(filter));
+		                                   wANAttribute, CHECK_ATTRIBUTE, dataManager.FormatAttribute(filter).c_str());
 	//announce race
 	wANRace = env->addWindow(rect<s32>(480, 200, 850, 410), false, dataManager.GetSysString(563));
 	wANRace->getCloseButton()->setVisible(false);
 	wANRace->setVisible(false);
 	for(int filter = 0x1, i = 0; i < RACES_COUNT; filter <<= 1, ++i)
 		chkRace[i] = env->addCheckBox(false, rect<s32>(10 + (i % 4) * 90, 25 + (i / 4) * 25, 100 + (i % 4) * 90, 50 + (i / 4) * 25),
-		                              wANRace, CHECK_RACE, dataManager.FormatRace(filter));
+		                              wANRace, CHECK_RACE, dataManager.FormatRace(filter).c_str());
 	//selection hint
 	stHintMsg = env->addStaticText(L"", rect<s32>(500, 60, 820, 90), true, false, 0, -1, false);
 	stHintMsg->setBackgroundColor(0xc0ffffff);
@@ -750,13 +757,13 @@ bool Game::Initialize() {
 	cbAttribute->setMaxSelectionRows(10);
 	cbAttribute->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter != 0x80; filter <<= 1)
-		cbAttribute->addItem(dataManager.FormatAttribute(filter), filter);
+		cbAttribute->addItem(dataManager.FormatAttribute(filter).c_str(), filter);
 	stRace = env->addStaticText(dataManager.GetSysString(1321), rect<s32>(10, 42 + 75 / 6, 70, 62 + 75 / 6), false, false, wFilter);
 	cbRace = env->addComboBox(rect<s32>(60, 40 + 75 / 6, 195, 60 + 75 / 6), wFilter, COMBOBOX_RACE);
 	cbRace->setMaxSelectionRows(10);
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter < (1 << RACES_COUNT); filter <<= 1)
-		cbRace->addItem(dataManager.FormatRace(filter), filter);
+		cbRace->addItem(dataManager.FormatRace(filter).c_str(), filter);
 	stAttack = env->addStaticText(dataManager.GetSysString(1322), rect<s32>(205, 22 + 50 / 6, 280, 42 + 50 / 6), false, false, wFilter);
 	ebAttack = env->addEditBox(L"", rect<s32>(260, 20 + 50 / 6, 340, 40 + 50 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebAttack->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -1141,15 +1148,17 @@ void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
 		wchar_t fpath[1024];
 		myswprintf(fpath, L"./expansions/%ls", name);
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
+		if (!isdir && IsExtension(name, L".cdb")) {
 			dataManager.LoadDB(fpath);
+			return;
 		}
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".conf", 5)) {
+		if (!isdir && IsExtension(name, L".conf")) {
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
 			dataManager.LoadStrings(upath);
+			return;
 		}
-		if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ypk", 4))) {
+		if (!isdir && (IsExtension(name, L".zip") || IsExtension(name, L".ypk"))) {
 #ifdef _WIN32
 			dataManager.FileSystem->addFileArchive(fpath, true, false, EFAT_ZIP);
 #else
@@ -1157,6 +1166,7 @@ void Game::LoadExpansions() {
 			BufferIO::EncodeUTF8(fpath, upath);
 			dataManager.FileSystem->addFileArchive(upath, true, false, EFAT_ZIP);
 #endif
+			return;
 		}
 	});
 	for(u32 i = 0; i < DataManager::FileSystem->getFileArchiveCount(); ++i) {
@@ -1169,18 +1179,22 @@ void Game::LoadExpansions() {
 			const char* uname = archive->getFullFileName(j).c_str();
 			BufferIO::DecodeUTF8(uname, fname);
 #endif
-			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".cdb", 4))
+			if (IsExtension(fname, L".cdb")) {
 				dataManager.LoadDB(fname);
-			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".conf", 5)) {
+				continue;
+			}
+			if (IsExtension(fname, L".conf")) {
 #ifdef _WIN32
 				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(fname);
 #else
 				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(uname);
 #endif
 				dataManager.LoadStrings(reader);
+				continue;
 			}
-			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".ydk", 4)) {
+			if (!mywcsncasecmp(fname, L"pack/", 5) && IsExtension(fname, L".ydk")) {
 				deckBuilder.expansionPacks.push_back(fname);
+				continue;
 			}
 		}
 	}
@@ -1229,14 +1243,15 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBo
 void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const wchar_t*)>& additem) {
 	if(!mywcsncasecmp(deckpath, L"./pack", 6)) {
 		for(auto& pack : deckBuilder.expansionPacks) {
+			// add pack/xxx.ydk
 			additem(pack.substr(5, pack.size() - 9).c_str());
 		}
 	}
 	FileSystem::TraversalDir(deckpath, [additem](const wchar_t* name, bool isdir) {
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
-			size_t len = wcslen(name);
+		if (!isdir && IsExtension(name, L".ydk")) {
+			size_t len = std::wcslen(name);
 			wchar_t deckname[256];
-			wcsncpy(deckname, name, len - 4);
+			std::wcsncpy(deckname, name, len - 4);
 			deckname[len - 4] = 0;
 			additem(deckname);
 		}
@@ -1245,7 +1260,7 @@ void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const w
 void Game::RefreshReplay() {
 	lstReplayList->clear();
 	FileSystem::TraversalDir(L"./replay", [this](const wchar_t* name, bool isdir) {
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".yrp", 4) && Replay::CheckReplay(name))
+		if (!isdir && IsExtension(name, L".yrp") && Replay::CheckReplay(name))
 			lstReplayList->addItem(name);
 	});
 }
@@ -1253,7 +1268,7 @@ void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
 	stSinglePlayInfo->setText(L"");
 	FileSystem::TraversalDir(L"./single", [this](const wchar_t* name, bool isdir) {
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".lua", 4))
+		if(!isdir && IsExtension(name, L".lua"))
 			lstSinglePlayList->addItem(name);
 	});
 }
@@ -1317,12 +1332,11 @@ void Game::LoadConfig() {
 	FILE* fp = fopen("system.conf", "r");
 	if(!fp)
 		return;
-	char linebuf[256]{};
+	char linebuf[CONFIG_LINE_SIZE]{};
 	char strbuf[64]{};
-	char valbuf[256]{};
-	wchar_t wstr[256]{};
-	while(fgets(linebuf, 256, fp)) {
-		if (sscanf(linebuf, "%63s = %255s", strbuf, valbuf) != 2)
+	char valbuf[960]{};
+	while(fgets(linebuf, sizeof linebuf, fp)) {
+		if (sscanf(linebuf, "%63s = %959s", strbuf, valbuf) != 2)
 			continue;
 		if(!std::strcmp(strbuf, "antialias")) {
 			gameConf.antialias = strtol(valbuf, nullptr, 10);
@@ -1335,25 +1349,18 @@ void Game::LoadConfig() {
 			enable_log = val & 0xff;
 		} else if(!std::strcmp(strbuf, "textfont")) {
 			int textfontsize = 0;
-			if (sscanf(linebuf, "%63s = %255s %d", strbuf, valbuf, &textfontsize) != 3)
+			if (sscanf(linebuf, "%63s = %959s %d", strbuf, valbuf, &textfontsize) != 3)
 				continue;
 			gameConf.textfontsize = textfontsize;
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
+			BufferIO::DecodeUTF8(valbuf, gameConf.textfont);
 		} else if(!std::strcmp(strbuf, "numfont")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.numfont, 256);
+			BufferIO::DecodeUTF8(valbuf, gameConf.numfont);
 		} else if(!std::strcmp(strbuf, "serverport")) {
 			gameConf.serverport = strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "lasthost")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.lasthost, 100);
+			BufferIO::DecodeUTF8(valbuf, gameConf.lasthost);
 		} else if(!std::strcmp(strbuf, "lastport")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.lastport, 20);
-		} else if(!std::strcmp(strbuf, "roompass")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
+			BufferIO::DecodeUTF8(valbuf, gameConf.lastport);
 		} else if(!std::strcmp(strbuf, "automonsterpos")) {
 			gameConf.chkMAutoPos = strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "autospellpos")) {
@@ -1440,23 +1447,20 @@ void Game::LoadConfig() {
 #endif
 		} else {
 			// options allowing multiple words
-			if (sscanf(linebuf, "%63s = %240[^\n]", strbuf, valbuf) != 2)
+			if (sscanf(linebuf, "%63s = %959[^\n]", strbuf, valbuf) != 2)
 				continue;
 			if (!std::strcmp(strbuf, "nickname")) {
-				BufferIO::DecodeUTF8(valbuf, wstr);
-				BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
+				BufferIO::DecodeUTF8(valbuf, gameConf.nickname);
 			} else if (!std::strcmp(strbuf, "gamename")) {
-				BufferIO::DecodeUTF8(valbuf, wstr);
-				BufferIO::CopyWStr(wstr, gameConf.gamename, 20);
+				BufferIO::DecodeUTF8(valbuf, gameConf.gamename);
+			} else if (!std::strcmp(strbuf, "roompass")) {
+				BufferIO::DecodeUTF8(valbuf, gameConf.roompass);
 			} else if (!std::strcmp(strbuf, "lastcategory")) {
-				BufferIO::DecodeUTF8(valbuf, wstr);
-				BufferIO::CopyWStr(wstr, gameConf.lastcategory, 64);
+				BufferIO::DecodeUTF8(valbuf, gameConf.lastcategory);
 			} else if (!std::strcmp(strbuf, "lastdeck")) {
-				BufferIO::DecodeUTF8(valbuf, wstr);
-				BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
+				BufferIO::DecodeUTF8(valbuf, gameConf.lastdeck);
 			} else if(!std::strcmp(strbuf, "bot_deck_path")) {
-				BufferIO::DecodeUTF8(valbuf, wstr);
-				BufferIO::CopyWStr(wstr, gameConf.bot_deck_path, 64);
+				BufferIO::DecodeUTF8(valbuf, gameConf.bot_deck_path);
 			}
 		}
 	}
@@ -1465,12 +1469,12 @@ void Game::LoadConfig() {
 void Game::SaveConfig() {
 	FILE* fp = fopen("system.conf", "w");
 	fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
-	char linebuf[256];
+	char linebuf[CONFIG_LINE_SIZE];
 	fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
 	fprintf(fp, "use_image_scale = %d\n", gameConf.use_image_scale ? 1 : 0);
 	fprintf(fp, "antialias = %d\n", gameConf.antialias);
 	fprintf(fp, "errorlog = %u\n", enable_log);
-	BufferIO::CopyWStr(ebNickName->getText(), gameConf.nickname, 20);
+	BufferIO::CopyWideString(ebNickName->getText(), gameConf.nickname);
 	BufferIO::EncodeUTF8(gameConf.nickname, linebuf);
 	fprintf(fp, "nickname = %s\n", linebuf);
 	BufferIO::EncodeUTF8(gameConf.gamename, linebuf);
@@ -1563,7 +1567,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		}
 		if (target->second.setcode[0]) {
 			offset = 23;// *yScale;
-			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(target->second.setcode));
+			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(target->second.setcode).c_str());
 			stSetName->setText(formatBuffer);
 		}
 		else
@@ -1574,17 +1578,18 @@ void Game::ShowCardInfo(int code, bool resize) {
 	}
 	if(is_valid && cit->second.type & TYPE_MONSTER) {
 		auto& cd = cit->second;
-		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
+		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type).c_str(), dataManager.FormatRace(cd.race).c_str(), dataManager.FormatAttribute(cd.attribute).c_str());
 		stInfo->setText(formatBuffer);
 		int offset_info = 0;
 		irr::core::dimension2d<unsigned int> dtxt = guiFont->getDimension(formatBuffer);
 		if(dtxt.Width > (300 * xScale - 13) - 15)
 			offset_info = 15;
+		const wchar_t* form = L"\u2605";
+		wchar_t adBuffer[64]{};
+		wchar_t scaleBuffer[16]{};
 		if(!(cd.type & TYPE_LINK)) {
-			const wchar_t* form = L"\u2605";
-			if(cd.type & TYPE_XYZ) form = L"\u2606";
-			myswprintf(formatBuffer, L"[%ls%d] ", form, cd.level);
-			wchar_t adBuffer[16];
+			if(cd.type & TYPE_XYZ)
+				form = L"\u2606";
 			if(cd.attack < 0 && cd.defense < 0)
 				myswprintf(adBuffer, L"?/?");
 			else if(cd.attack < 0)
@@ -1593,22 +1598,17 @@ void Game::ShowCardInfo(int code, bool resize) {
 				myswprintf(adBuffer, L"%d/?", cd.attack);
 			else
 				myswprintf(adBuffer, L"%d/%d", cd.attack, cd.defense);
-			wcscat(formatBuffer, adBuffer);
 		} else {
-			myswprintf(formatBuffer, L"[LINK-%d] ", cd.level);
-			wchar_t adBuffer[16];
+			form = L"LINK-";
 			if(cd.attack < 0)
-				myswprintf(adBuffer, L"?/-   ");
+				myswprintf(adBuffer, L"?/-   %ls", dataManager.FormatLinkMarker(cd.link_marker).c_str());
 			else
-				myswprintf(adBuffer, L"%d/-   ", cd.attack);
-			wcscat(formatBuffer, adBuffer);
-			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker));
+				myswprintf(adBuffer, L"%d/-   %ls", cd.attack, dataManager.FormatLinkMarker(cd.link_marker).c_str());
 		}
 		if(cd.type & TYPE_PENDULUM) {
-			wchar_t scaleBuffer[16];
 			myswprintf(scaleBuffer, L"   %d/%d", cd.lscale, cd.rscale);
-			wcscat(formatBuffer, scaleBuffer);
 		}
+		myswprintf(formatBuffer, L"[%ls%d] %ls%ls", form, cd.level, adBuffer, scaleBuffer);
 		stDataInfo->setText(formatBuffer);
 		int offset_arrows = offset_info;
 		dtxt = guiFont->getDimension(formatBuffer);
@@ -1622,9 +1622,9 @@ void Game::ShowCardInfo(int code, bool resize) {
 	}
 	else {
 		if (is_valid)
-			myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cit->second.type));
+			myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cit->second.type).c_str());
 		else
-			myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(0));
+			myswprintf(formatBuffer, L"[%ls]", dataManager.unknown_string);
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
 		stSetName->setRelativePosition(rect<s32>(15, 60, 296 * xScale, 60 + offset));

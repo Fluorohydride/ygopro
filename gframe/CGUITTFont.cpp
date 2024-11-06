@@ -269,7 +269,7 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 
 	// Log.
 	if (logger)
-		logger->log(L"CGUITTFont", core::stringw(core::stringw(L"Creating new font: ") + core::ustring(filename).toWCHAR_s() + L" " + core::stringc(size) + L"pt " + (antialias ? L"+antialias " : L"-antialias ") + (transparency ? L"+transparency" : L"-transparency")).c_str(), irr::ELL_INFORMATION);
+		logger->log(L"CGUITTFont", core::stringw(core::stringw(L"Creating new font: ") + core::stringc(filename) + L" " + core::stringc(size) + L"pt " + (antialias ? L"+antialias " : L"-antialias ") + (transparency ? L"+transparency" : L"-transparency")).c_str(), irr::ELL_INFORMATION);
 
 	// Grab the face.
 	SGUITTFace* face = 0;
@@ -304,15 +304,12 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 				return false;
 			}
 		} else {
-			core::ustring converter(filename);
-			if (FT_New_Face(c_library, reinterpret_cast<const char*>(converter.toUTF8_s().c_str()), 0, &face->face)) {
-				if (logger) logger->log(L"CGUITTFont", L"FT_New_Face failed.", irr::ELL_INFORMATION);
+			if (logger) logger->log(L"CGUITTFont", L"FT_New_Face failed.", irr::ELL_INFORMATION);
 
-				c_faces.remove(filename);
-				delete face;
-				face = 0;
-				return false;
-			}
+			c_faces.remove(filename);
+			delete face;
+			face = 0;
+			return false;
 		}
 	} else {
 		// Using another instance of this face.
@@ -493,6 +490,12 @@ void CGUITTFont::setFontHinting(const bool enable, const bool enable_auto_hintin
 void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position, video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
 	if (!Driver)
 		return;
+	drawUstring(text, position, color, hcenter, vcenter, clip);
+}
+
+void CGUITTFont::drawUstring(const core::ustring& utext, const core::rect<s32>&position, video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>*clip) {
+	if (!Driver)
+		return;
 
 	// Clear the glyph pages of their render information.
 	for (u32 i = 0; i < Glyph_Pages.size(); ++i) {
@@ -506,7 +509,7 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 
 	// Determine offset positions.
 	if (hcenter || vcenter) {
-		textDimension = getDimension(text.c_str());
+		textDimension = getDimension(utext);
 
 		if (hcenter)
 			offset.X = ((position.getWidth() - textDimension.Width) >> 1) + offset.X;
@@ -514,9 +517,6 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 		if (vcenter)
 			offset.Y = ((position.getHeight() - textDimension.Height) >> 1) + offset.Y;
 	}
-
-	// Convert to a unicode string.
-	core::ustring utext(text);
 
 	// Set up our render map.
 	core::map<u32, CGUITTGlyphPage*> Render_Map;

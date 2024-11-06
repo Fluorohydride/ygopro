@@ -13,11 +13,9 @@
 namespace ygo {
 
 void UpdateDeck() {
-	BufferIO::CopyWStr(mainGame->cbCategorySelect->getItem(mainGame->cbCategorySelect->getSelected()),
-		mainGame->gameConf.lastcategory, 64);
-	BufferIO::CopyWStr(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()),
-		mainGame->gameConf.lastdeck, 64);
-	unsigned char deckbuf[1024];
+	BufferIO::CopyWideString(mainGame->cbCategorySelect->getText(), mainGame->gameConf.lastcategory);
+	BufferIO::CopyWideString(mainGame->cbDeckSelect->getText(), mainGame->gameConf.lastdeck);
+	unsigned char deckbuf[1024]{};
 	auto pdeck = deckbuf;
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
@@ -68,14 +66,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->TrimText(mainGame->ebJoinHost);
 				mainGame->TrimText(mainGame->ebJoinPort);
 				char ip[20];
-				const wchar_t* pstr = mainGame->ebJoinHost->getText();
-				BufferIO::CopyWStr(pstr, ip, 16);
+				wchar_t pstr[100];
+				wchar_t portstr[10];
+				BufferIO::CopyWideString(mainGame->ebJoinHost->getText(), pstr);
+				BufferIO::CopyWideString(mainGame->ebJoinPort->getText(), portstr);
+				BufferIO::EncodeUTF8(pstr, ip);
 				unsigned int remote_addr = htonl(inet_addr(ip));
 				if(remote_addr == -1) {
 					char hostname[100];
 					char port[6];
-					BufferIO::CopyWStr(pstr, hostname, 100);
-					BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), port, 6);
+					BufferIO::EncodeUTF8(pstr, hostname);
+					BufferIO::EncodeUTF8(portstr, port);
 					struct evutil_addrinfo hints;
 					struct evutil_addrinfo *answer = NULL;
 					std::memset(&hints, 0, sizeof hints);
@@ -97,9 +98,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						evutil_freeaddrinfo(answer);
 					}
 				}
-				unsigned int remote_port = wcstol(mainGame->ebJoinPort->getText(), nullptr, 10);
-				BufferIO::CopyWStr(pstr, mainGame->gameConf.lasthost, 100);
-				BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), mainGame->gameConf.lastport, 20);
+				unsigned int remote_port = wcstol(portstr, nullptr, 10);
+				BufferIO::CopyWideString(pstr, mainGame->gameConf.lasthost);
+				BufferIO::CopyWideString(portstr, mainGame->gameConf.lastport);
 				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
 					mainGame->btnCreateHost->setEnabled(false);
 					mainGame->btnJoinHost->setEnabled(false);
@@ -127,7 +128,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_HOST_CONFIRM: {
 				bot_mode = false;
-				BufferIO::CopyWStr(mainGame->ebServerName->getText(), mainGame->gameConf.gamename, 20);
+				BufferIO::CopyWideString(mainGame->ebServerName->getText(), mainGame->gameConf.gamename);
 				if(!NetServer::StartServer(mainGame->gameConf.serverport)) {
 					soundManager.PlaySoundEffect(SOUND_INFO);
 					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
@@ -448,7 +449,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						wcsncpy(deck_name, dash + 1, 256);
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 							if(!wcscmp(mainGame->cbDBDecks->getItem(i), deck_name)) {
-								wcscpy(mainGame->gameConf.lastdeck, deck_name);
+								BufferIO::CopyWideString(deck_name, mainGame->gameConf.lastdeck);
 								mainGame->cbDBDecks->setSelected(i);
 								break;
 							}
@@ -456,14 +457,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					} else { // only deck name
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 							if(!wcscmp(mainGame->cbDBDecks->getItem(i), open_file_name)) {
-								wcscpy(mainGame->gameConf.lastdeck, open_file_name);
+								BufferIO::CopyWideString(open_file_name, mainGame->gameConf.lastdeck);
 								mainGame->cbDBDecks->setSelected(i);
 								break;
 							}
 						}
 					}
 					open_file = false;
-				} else if(mainGame->cbDBCategory->getSelected() != -1 && mainGame->cbDBDecks->getSelected() != -1) {
+				} 
+				else if(mainGame->cbDBCategory->getSelected() != -1 && mainGame->cbDBDecks->getSelected() != -1) {
 					deckManager.LoadCurrentDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
 					mainGame->ebDeckname->setText(L"");
 				}
@@ -493,7 +495,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wReplaySave);
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
 					wchar_t newname[256];
-					BufferIO::CopyWStr(mainGame->ebRSName->getText(), newname, 256);
+					BufferIO::CopyWideString(mainGame->ebRSName->getText(), newname);
 					if(mywcsncasecmp(newname + wcslen(newname) - 4, L".yrp", 4)) {
 						myswprintf(newname, L"%ls.yrp", mainGame->ebRSName->getText());
 					}
