@@ -53,10 +53,9 @@ void DuelInfo::Clear() {
 bool IsExtension(const wchar_t* filename, const wchar_t* extension) {
 	int flen = std::wcslen(filename);
 	int elen = std::wcslen(extension);
-	if (!flen || !elen || flen < elen)
+	if (!elen || flen < elen)
 		return false;
-	auto fend = filename + flen;
-	return !mywcsncasecmp(fend - elen, extension, elen);
+	return !mywcsncasecmp(filename + (flen - elen), extension, elen);
 }
 
 bool Game::Initialize() {
