@@ -177,14 +177,14 @@ int main(int argc, char* argv[]) {
 			++i;
 			if(i < wargc) {
 				deckCategorySpecified = true;
-				wcscpy(ygo::mainGame->gameConf.lastcategory, wargv[i]);
+				BufferIO::CopyWideString(wargv[i], ygo::mainGame->gameConf.lastcategory);
 			}
 		} else if(!wcscmp(wargv[i], L"-d")) { // Deck
 			++i;
 			if(!deckCategorySpecified)
 				ygo::mainGame->gameConf.lastcategory[0] = 0;
 			if(i + 1 < wargc) { // select deck
-				wcscpy(ygo::mainGame->gameConf.lastdeck, wargv[i]);
+				BufferIO::CopyWideString(wargv[i], ygo::mainGame->gameConf.lastdeck);
 				continue;
 			} else { // open deck
 				exit_on_return = !keep_on_return;
@@ -197,7 +197,7 @@ int main(int argc, char* argv[]) {
 						myswprintf(open_file_name, L"%ls/%ls", ygo::mainGame->gameConf.lastcategory, wargv[i]);
 #endif
 					} else {
-						wcscpy(open_file_name, wargv[i]);
+						BufferIO::CopyWideString(wargv[i], open_file_name);
 					}
 				}
 				ClickButton(ygo::mainGame->btnDeckEdit);
@@ -218,7 +218,7 @@ int main(int argc, char* argv[]) {
 			++i;
 			if(i < wargc) {
 				open_file = true;
-				wcscpy(open_file_name, wargv[i]);
+				BufferIO::CopyWideString(wargv[i], open_file_name);
 			}
 			ClickButton(ygo::mainGame->btnReplayMode);
 			if(open_file)
@@ -229,7 +229,7 @@ int main(int argc, char* argv[]) {
 			++i;
 			if(i < wargc) {
 				open_file = true;
-				wcscpy(open_file_name, wargv[i]);
+				BufferIO::CopyWideString(wargv[i], open_file_name);
 			}
 			ClickButton(ygo::mainGame->btnSingleMode);
 			if(open_file)
@@ -239,14 +239,14 @@ int main(int argc, char* argv[]) {
 			wchar_t* pstrext = wargv[1] + wcslen(wargv[1]) - 4;
 			if(!mywcsncasecmp(pstrext, L".ydk", 4)) {
 				open_file = true;
-				wcscpy(open_file_name, wargv[i]);
+				BufferIO::CopyWideString(wargv[i], open_file_name);
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
 			if(!mywcsncasecmp(pstrext, L".yrp", 4)) {
 				open_file = true;
-				wcscpy(open_file_name, wargv[i]);
+				BufferIO::CopyWideString(wargv[i], open_file_name);
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnReplayMode);
 				ClickButton(ygo::mainGame->btnLoadReplay);

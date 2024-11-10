@@ -28,6 +28,7 @@ namespace ygo {
 	constexpr int DECK_MIN_SIZE = YGOPRO_MIN_DECK;
 	constexpr int EXTRA_MAX_SIZE = YGOPRO_MAX_EXTRA;
 	constexpr int SIDE_MAX_SIZE = YGOPRO_MAX_SIDE;
+	constexpr int PACK_MAX_SIZE = 1000;
 
 struct LFList {
 	unsigned int hash{};
