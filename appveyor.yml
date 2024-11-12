@@ -1,5 +1,5 @@
 version: '{build}'
-image: Visual Studio 2019
+image: Visual Studio 2022
 environment:
   matrix:
     - SERVER_MODE: true
@@ -9,25 +9,25 @@ install:
   - git submodule update --init --recursive
 
   # environment and system dependency
-  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/premake/premake-core/releases/download/v5.0.0-beta2/premake-5.0.0-beta2-windows.zip ; exit 0"
-  - 7z x premake-5.0.0-beta2-windows.zip
+  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/premake/premake-core/releases/download/v5.0.0-beta3/premake-5.0.0-beta3-windows.zip ; exit 0"
+  - 7z x premake-5.0.0-beta3-windows.zip
   
   - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/libevent/libevent/releases/download/release-2.0.22-stable/libevent-2.0.22-stable.tar.gz ; exit 0"
   - tar xf libevent-2.0.22-stable.tar.gz
   - move libevent-2.0.22-stable event
   - xcopy /E event\WIN32-Code event\include
   
-  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.lua.org/ftp/lua-5.4.4.tar.gz ; exit 0"
-  - tar xf lua-5.4.4.tar.gz
-  - move lua-5.4.4 lua
+  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.lua.org/ftp/lua-5.4.7.tar.gz ; exit 0"
+  - tar xf lua-5.4.7.tar.gz
+  - move lua-5.4.7 lua
   
-  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.sqlite.org/2022/sqlite-amalgamation-3390300.zip  ; exit 0"
-  - 7z x sqlite-amalgamation-3390300.zip
-  - move sqlite-amalgamation-3390300 sqlite3
+  - bash -c "curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.sqlite.org/2024/sqlite-amalgamation-3470000.zip  ; exit 0"
+  - 7z x sqlite-amalgamation-3470000.zip
+  - move sqlite-amalgamation-3470000 sqlite3
 
 before_build:
   - xcopy /E premake\* .
-  - premake5 vs2019
+  - premake5 vs2022
   
 configuration: Release
 
@@ -54,7 +54,7 @@ for:
     - patch -p1 < irrlicht.patch
     - cd ..
 
-    - premake5 vs2019
+    - premake5 vs2022
 
   after_build:
     - ps: move bin\release\AI.Server.exe .
@@ -64,8 +64,8 @@ for:
       name: YGOPro server for YGOPro2 AI
 
 cache:
-  - premake-5.0.0-beta2-windows.zip
+  - premake-5.0.0-beta3-windows.zip
   - libevent-2.0.22-stable.tar.gz
   - irrlicht-1.8.5.zip
-  - lua-5.4.4.tar.gz
-  - sqlite-amalgamation-3390300.zip
+  - lua-5.4.7.tar.gz
+  - sqlite-amalgamation-3470000.zip

@@ -37,7 +37,7 @@ index 43557cd..ffa06bc 100644
  } // end namespace core
  } // end namespace irr
 diff --git a/include/irrTypes.h b/include/irrTypes.h
-index 403f890..940e859 100644
+index 403f890..bfa13f4 100644
 --- a/include/irrTypes.h
 +++ b/include/irrTypes.h
 @@ -48,6 +48,9 @@ typedef __int16			s16;
@@ -50,6 +50,24 @@ index 403f890..940e859 100644
  
  
  //! 32 bit unsigned variable.
+@@ -113,17 +116,6 @@ typedef double				f64;
+ 
+ #include <wchar.h>
+ #ifdef _IRR_WINDOWS_API_
+-//! Defines for s{w,n}printf because these methods do not match the ISO C
+-//! standard on Windows platforms, but it does on all others.
+-//! These should be int snprintf(char *str, size_t size, const char *format, ...);
+-//! and int swprintf(wchar_t *wcs, size_t maxlen, const wchar_t *format, ...);
+-#if defined(_MSC_VER) && _MSC_VER > 1310 && !defined (_WIN32_WCE)
+-#define swprintf swprintf_s
+-#define snprintf sprintf_s
+-#elif !defined(__CYGWIN__)
+-#define swprintf _snwprintf
+-#define snprintf _snprintf
+-#endif
+ 
+ // define the wchar_t type if not already built in.
+ #ifdef _MSC_VER
 diff --git a/source/Irrlicht/CGUIEditBox.cpp b/source/Irrlicht/CGUIEditBox.cpp
 index 395fb69..cc6b75f 100644
 --- a/source/Irrlicht/CGUIEditBox.cpp
