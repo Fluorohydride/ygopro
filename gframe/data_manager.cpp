@@ -414,16 +414,16 @@ byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 #else
 	IReadFile* reader = FileSystem->createAndOpenFile(script_name);
 #endif
-	if(reader == NULL)
-		return 0;
+	if (!reader)
+		return nullptr;
 	size_t size = reader->getSize();
-	if(size > sizeof(scriptBuffer)) {
+	if (size > sizeof scriptBuffer) {
 		reader->drop();
-		return 0;
+		return nullptr;
 	}
 	reader->read(scriptBuffer, size);
 	reader->drop();
-	*slen = size;
+	*slen = (int)size;
 	return scriptBuffer;
 }
 
