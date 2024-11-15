@@ -649,11 +649,11 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 				mainGame->btnSpectatorSwap->setVisible(true);
 			}
 			if(selftype != 1) {
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[0]->getToolTipText().c_str(), mainGame->dInfo.hostname, 20);
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[1]->getToolTipText().c_str(), mainGame->dInfo.clientname, 20);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[0]->getToolTipText().c_str(), mainGame->dInfo.hostname);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[1]->getToolTipText().c_str(), mainGame->dInfo.clientname);
 			} else {
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[1]->getToolTipText().c_str(), mainGame->dInfo.hostname, 20);
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[0]->getToolTipText().c_str(), mainGame->dInfo.clientname, 20);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[1]->getToolTipText().c_str(), mainGame->dInfo.hostname);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[0]->getToolTipText().c_str(), mainGame->dInfo.clientname);
 			}
 		} else {
 			if(selftype > 3) {
@@ -663,15 +663,15 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 				mainGame->btnSpectatorSwap->setVisible(true);
 			}
 			if(selftype > 1 && selftype < 4) {
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[2]->getToolTipText().c_str(), mainGame->dInfo.hostname, 20);
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[3]->getToolTipText().c_str(), mainGame->dInfo.hostname_tag, 20);
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[0]->getToolTipText().c_str(), mainGame->dInfo.clientname, 20);
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[1]->getToolTipText().c_str(), mainGame->dInfo.clientname_tag, 20);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[2]->getToolTipText().c_str(), mainGame->dInfo.hostname);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[3]->getToolTipText().c_str(), mainGame->dInfo.hostname_tag);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[0]->getToolTipText().c_str(), mainGame->dInfo.clientname);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[1]->getToolTipText().c_str(), mainGame->dInfo.clientname_tag);
 			} else {
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[0]->getToolTipText().c_str(), mainGame->dInfo.hostname, 20);
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[1]->getToolTipText().c_str(), mainGame->dInfo.hostname_tag, 20);
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[2]->getToolTipText().c_str(), mainGame->dInfo.clientname, 20);
-				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[3]->getToolTipText().c_str(), mainGame->dInfo.clientname_tag, 20);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[0]->getToolTipText().c_str(), mainGame->dInfo.hostname);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[1]->getToolTipText().c_str(), mainGame->dInfo.hostname_tag);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[2]->getToolTipText().c_str(), mainGame->dInfo.clientname);
+				BufferIO::CopyWideString(mainGame->stHostPrepDuelist[3]->getToolTipText().c_str(), mainGame->dInfo.clientname_tag);
 			}
 			mainGame->dInfo.tag_player[0] = false;
 			mainGame->dInfo.tag_player[1] = false;

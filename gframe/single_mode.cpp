@@ -49,7 +49,7 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dInfo.start_lp = start_lp;
 	myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
-	BufferIO::CopyWStr(mainGame->ebNickName->getText(), mainGame->dInfo.hostname, 20);
+	BufferIO::CopyWideString(mainGame->ebNickName->getText(), mainGame->dInfo.hostname);
 	mainGame->dInfo.clientname[0] = 0;
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
