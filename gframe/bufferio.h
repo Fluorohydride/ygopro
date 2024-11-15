@@ -51,7 +51,7 @@ public:
 		return l;
 	}
 	template<size_t N>
-	static void CopyString(const char* src, wchar_t(&dst)[N]) {
+	static void CopyString(const char* src, char(&dst)[N]) {
 		dst[0] = 0;
 		std::strncat(dst, src, N - 1);
 	}
