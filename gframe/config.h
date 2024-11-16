@@ -64,7 +64,7 @@ inline FILE* myfopen(const char* filename, const char* mode) {
 	wchar_t wname[256]{};
 	wchar_t wmode[20]{};
 	BufferIO::DecodeUTF8(filename, wname);
-	BufferIO::CopyWStr(mode, wmode, sizeof wmode / sizeof wmode[0]);
+	BufferIO::CopyCharArray(mode, wmode);
 	fp = _wfopen(wname, wmode);
 #else
 	fp = fopen(filename, mode);

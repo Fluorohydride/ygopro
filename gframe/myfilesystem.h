@@ -70,9 +70,8 @@ public:
 
 	static bool DeleteDir(const wchar_t* wdir) {
 		wchar_t pdir[256];
-		int len = BufferIO::CopyWStr(wdir, pdir, sizeof pdir / sizeof pdir[0]);
-		pdir[len + 1] = 0;
-		SHFILEOPSTRUCTW lpFileOp;
+		BufferIO::CopyWideString(wdir, pdir);
+		SHFILEOPSTRUCTW lpFileOp{};
 		lpFileOp.hwnd = NULL;
 		lpFileOp.wFunc = FO_DELETE;
 		lpFileOp.pFrom = pdir;

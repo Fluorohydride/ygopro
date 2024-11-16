@@ -45,7 +45,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater)
 		}
 		wchar_t jpass[20];
 		BufferIO::NullTerminate(pkt->pass);
-		BufferIO::CopyWStr(pkt->pass, jpass, 20);
+		BufferIO::CopyCharArray(pkt->pass, jpass);
 		if(wcscmp(jpass, pass)) {
 			STOC_ErrorMsg scem;
 			scem.msg = ERRMSG_JOINERROR;
@@ -63,7 +63,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater)
 	sctc.type = (host_player == dp) ? 0x10 : 0;
 	if(!players[0] || !players[1]) {
 		STOC_HS_PlayerEnter scpe;
-		BufferIO::CopyWStr(dp->name, scpe.name, 20);
+		BufferIO::CopyCharArray(dp->name, scpe.name);
 		if(!players[0])
 			scpe.pos = 0;
 		else
@@ -102,7 +102,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater)
 	NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
 	if(players[0]) {
 		STOC_HS_PlayerEnter scpe;
-		BufferIO::CopyWStr(players[0]->name, scpe.name, 20);
+		BufferIO::CopyCharArray(players[0]->name, scpe.name);
 		scpe.pos = 0;
 		NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
 		if(ready[0]) {
@@ -113,7 +113,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater)
 	}
 	if(players[1]) {
 		STOC_HS_PlayerEnter scpe;
-		BufferIO::CopyWStr(players[1]->name, scpe.name, 20);
+		BufferIO::CopyCharArray(players[1]->name, scpe.name);
 		scpe.pos = 1;
 		NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
 		if(ready[1]) {
@@ -191,7 +191,7 @@ void SingleDuel::ToDuelist(DuelPlayer* dp) {
 		return;
 	observers.erase(dp);
 	STOC_HS_PlayerEnter scpe;
-	BufferIO::CopyWStr(dp->name, scpe.name, 20);
+	BufferIO::CopyCharArray(dp->name, scpe.name);
 	if(!players[0]) {
 		players[0] = dp;
 		dp->type = NETPLAYER_TYPE_PLAYER1;
