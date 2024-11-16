@@ -1250,8 +1250,9 @@ void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const w
 		if (!isdir && IsExtension(name, L".ydk")) {
 			size_t len = std::wcslen(name);
 			wchar_t deckname[256];
-			std::wcsncpy(deckname, name, len - 4);
-			deckname[len - 4] = 0;
+			size_t count = std::min(len - 4, sizeof deckname / sizeof deckname[0]);
+			std::wcsncpy(deckname, name, count);
+			deckname[(sizeof deckname / sizeof deckname[0]) - 1] = 0;
 			additem(deckname);
 		}
 	});
