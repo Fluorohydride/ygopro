@@ -269,7 +269,7 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 	return fp;
 }
 IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
-#ifdef WIN32
+#ifdef _WIN32
 	IReadFile* reader = dataManager.FileSystem->createAndOpenFile(file);
 #else
 	char file2[256];
@@ -333,7 +333,7 @@ bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
 	return true;
 }
 bool DeckManager::DeleteDeck(const wchar_t* file) {
-#ifdef WIN32
+#ifdef _WIN32
 	BOOL result = DeleteFileW(file);
 	return !!result;
 #else
