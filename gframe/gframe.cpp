@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
 				if(i < wargc) {
 					open_file = true;
 					if(deckCategorySpecified) {
-#ifdef WIN32
+#ifdef _WIN32
 						myswprintf(open_file_name, L"%ls\\%ls", ygo::mainGame->gameConf.lastcategory, wargv[i]);
 #else
 						myswprintf(open_file_name, L"%ls/%ls", ygo::mainGame->gameConf.lastcategory, wargv[i]);
