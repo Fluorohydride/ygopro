@@ -1249,10 +1249,10 @@ void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const w
 	FileSystem::TraversalDir(deckpath, [additem](const wchar_t* name, bool isdir) {
 		if (!isdir && IsExtension(name, L".ydk")) {
 			size_t len = std::wcslen(name);
-			wchar_t deckname[256];
-			size_t count = std::min(len - 4, sizeof deckname / sizeof deckname[0]);
+			wchar_t deckname[256]{};
+			size_t count = std::min(len - 4, sizeof deckname / sizeof deckname[0] - 1);
 			std::wcsncpy(deckname, name, count);
-			deckname[(sizeof deckname / sizeof deckname[0]) - 1] = 0;
+			deckname[count] = 0;
 			additem(deckname);
 		}
 	});
