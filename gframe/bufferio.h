@@ -28,7 +28,13 @@ public:
 	static void WriteInt8(unsigned char*& p, char val) {
 		buffer_write<char>(p, val);
 	}
-	// return: string length
+	/**
+	* @brief Copy a C-style string to another C-style string.
+	* @param src The source wide string
+	* @param pstr The destination char string
+	* @param bufsize The size of the destination buffer
+	* @return The length of the copied string
+	*/
 	template<typename T1, typename T2>
 	static int CopyWStr(const T1* src, T2* pstr, int bufsize) {
 		int l = 0;
