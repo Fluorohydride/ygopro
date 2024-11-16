@@ -111,23 +111,23 @@ bool DataManager::LoadStrings(const char* file) {
 	FILE* fp = fopen(file, "r");
 	if(!fp)
 		return false;
-	char linebuf[256];
-	while(fgets(linebuf, 256, fp)) {
+	char linebuf[TEXT_LINE_SIZE]{};
+	while(fgets(linebuf, sizeof linebuf, fp)) {
 		ReadStringConfLine(linebuf);
 	}
 	fclose(fp);
 	return true;
 }
 bool DataManager::LoadStrings(IReadFile* reader) {
-	char ch[2] = " ";
-	char linebuf[256] = "";
-	while(reader->read(&ch[0], 1)) {
-		if(ch[0] == '\0')
+	char ch{};
+	std::string linebuf;
+	while (reader->read(&ch, 1)) {
+		if (ch == '\0')
 			break;
-		std::strcat(linebuf, ch);
-		if(ch[0] == '\n') {
-			ReadStringConfLine(linebuf);
-			linebuf[0] = '\0';
+		linebuf.push_back(ch);
+		if (ch == '\n' || linebuf.size() >= TEXT_LINE_SIZE - 1) {
+			ReadStringConfLine(linebuf.data());
+			linebuf.clear();
 		}
 	}
 	reader->drop();
@@ -136,7 +136,7 @@ bool DataManager::LoadStrings(IReadFile* reader) {
 void DataManager::ReadStringConfLine(const char* linebuf) {
 	if(linebuf[0] != '!')
 		return;
-	char strbuf[256]{};
+	char strbuf[TEXT_LINE_SIZE]{};
 	int value{};
 	wchar_t strBuffer[4096]{};
 	if (sscanf(linebuf, "!%63s", strbuf) != 1)
