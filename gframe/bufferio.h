@@ -50,6 +50,10 @@ public:
 		*pstr = 0;
 		return l;
 	}
+	template<typename T1, typename T2, size_t N>
+	static int CopyCharArray(const T1* src, T2(&dst)[N]) {
+		return CopyWStr(src, dst, N);
+	}
 	template<size_t N>
 	static void CopyString(const char* src, char(&dst)[N]) {
 		dst[0] = 0;

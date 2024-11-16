@@ -109,10 +109,10 @@ int SingleMode::SinglePlayThread() {
 		is_continuing = SinglePlayAnalyze(engineBuffer.data(), len);
 	last_replay.BeginRecord();
 	last_replay.WriteHeader(rh);
-	unsigned short buffer[20];
-	BufferIO::CopyWStr(mainGame->dInfo.hostname, buffer, 20);
+	uint16_t buffer[20];
+	BufferIO::CopyCharArray(mainGame->dInfo.hostname, buffer);
 	last_replay.WriteData(buffer, 40, false);
-	BufferIO::CopyWStr(mainGame->dInfo.clientname, buffer, 20);
+	BufferIO::CopyCharArray(mainGame->dInfo.clientname, buffer);
 	last_replay.WriteData(buffer, 40, false);
 	last_replay.WriteInt32(start_lp, false);
 	last_replay.WriteInt32(start_hand, false);
@@ -747,14 +747,14 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_AI_NAME: {
-			char namebuf[128];
-			wchar_t wname[128];
+			char namebuf[128]{};
+			wchar_t wname[20]{};
 			int len = BufferIO::ReadInt16(pbuf);
 			auto begin = pbuf;
 			pbuf += len + 1;
 			std::memcpy(namebuf, begin, len + 1);
 			BufferIO::DecodeUTF8(namebuf, wname);
-			BufferIO::CopyWStr(wname, mainGame->dInfo.clientname, 20);
+			BufferIO::CopyCharArray(wname, mainGame->dInfo.clientname);
 			break;
 		}
 		case MSG_SHOW_HINT: {
