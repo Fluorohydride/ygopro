@@ -24,6 +24,7 @@
 
 constexpr int DEFAULT_DUEL_RULE = 5;
 constexpr int CONFIG_LINE_SIZE = 1024;
+constexpr int TEXT_LINE_SIZE = 256;
 
 namespace ygo {
 
