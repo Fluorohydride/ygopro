@@ -13,7 +13,7 @@ DataManager dataManager;
 DataManager::DataManager() : _datas(32768), _strings(32768) {
 	extra_setcode = { {8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}}, };
 }
-bool DataManager::ReadDB(sqlite3* pDB) {
+bool DataManager::ReadDB(sqlite3* pDB, bool expansion) {
 	sqlite3_stmt* pStmt{};
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
@@ -60,6 +60,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
 			_datas[cd.code] = cd;
+			if (expansion) _expansionDatas.push_back(cd.code);
 			if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.name = strBuffer;
@@ -80,7 +81,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_finalize(pStmt);
 	return true;
 }
-bool DataManager::LoadDB(const wchar_t* wfile) {
+bool DataManager::LoadDB(const wchar_t* wfile, bool expansion) {
 	char file[256];
 	BufferIO::EncodeUTF8(wfile, file);
 #ifdef _WIN32
@@ -102,23 +103,23 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	if (spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
 		ret = Error(db.handle);
 	else
-		ret = ReadDB(db.handle);
+		ret = ReadDB(db.handle, expansion);
 	spmemvfs_close_db(&db);
 	spmemvfs_env_fini();
 	return ret;
 }
-bool DataManager::LoadStrings(const char* file) {
+bool DataManager::LoadStrings(const char* file, bool expansion) {
 	FILE* fp = fopen(file, "r");
 	if(!fp)
 		return false;
 	char linebuf[TEXT_LINE_SIZE]{};
 	while(fgets(linebuf, sizeof linebuf, fp)) {
-		ReadStringConfLine(linebuf);
+		ReadStringConfLine(linebuf, expansion);
 	}
 	fclose(fp);
 	return true;
 }
-bool DataManager::LoadStrings(IReadFile* reader) {
+bool DataManager::LoadStrings(IReadFile* reader, bool expansion) {
 	char ch{};
 	std::string linebuf;
 	while (reader->read(&ch, 1)) {
@@ -126,14 +127,14 @@ bool DataManager::LoadStrings(IReadFile* reader) {
 			break;
 		linebuf.push_back(ch);
 		if (ch == '\n' || linebuf.size() >= TEXT_LINE_SIZE - 1) {
-			ReadStringConfLine(linebuf.data());
+			ReadStringConfLine(linebuf.data(), expansion);
 			linebuf.clear();
 		}
 	}
 	reader->drop();
 	return true;
 }
-void DataManager::ReadStringConfLine(const char* linebuf) {
+void DataManager::ReadStringConfLine(const char* linebuf, bool expansion) {
 	if(linebuf[0] != '!')
 		return;
 	char strbuf[TEXT_LINE_SIZE]{};
@@ -146,22 +147,26 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_sysStrings[value] = strBuffer;
+		if (expansion) _expansionStrings.push_back(value);
 	} else if(!std::strcmp(strbuf, "victory")) {
 		if (sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_victoryStrings[value] = strBuffer;
+		if (expansion) _expansionStrings.push_back(value);
 	} else if(!std::strcmp(strbuf, "counter")) {
 		if (sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_counterStrings[value] = strBuffer;
+		if (expansion) _expansionStrings.push_back(value);
 	} else if(!std::strcmp(strbuf, "setname")) {
 		//using tab for comment
 		if (sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_setnameStrings[value] = strBuffer;
+		if (expansion) _expansionStrings.push_back(value);
 	}
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
