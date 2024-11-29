@@ -136,7 +136,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	if(pheader.flag & REPLAY_COMPRESSED) {
 		comp_size = fread(comp_data, 1, MAX_COMP_SIZE, rfp);
 		fclose(rfp);
-		if ((int)pheader.datasize < 0 && (int)pheader.datasize > MAX_REPLAY_SIZE)
+		if (pheader.datasize > MAX_REPLAY_SIZE)
 			return false;
 		replay_size = pheader.datasize;
 		if (LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.props, 5) != SZ_OK)
