@@ -208,13 +208,13 @@ bool Replay::ReadNextResponse(unsigned char resp[]) {
 		return false;
 	return true;
 }
-void Replay::ReadName(wchar_t* data) {
+bool Replay::ReadName(wchar_t* data) {
 	uint16_t buffer[20]{};
 	if (!ReadData(buffer, sizeof buffer)) {
-		data[0] = 0;
-		return;
+		return false;
 	}
 	BufferIO::CopyWStr(buffer, data, 20);
+	return true;
 }
 bool Replay::ReadData(void* data, int length) {
 	if(!is_replaying)
