@@ -102,9 +102,7 @@ void Replay::SaveReplay(const wchar_t* name) {
 		return;
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls.yrp", name);
-	char fullname[256]{};
-	BufferIO::EncodeUTF8(fname, fullname);
-	FILE* rfp = myfopen(fullname, "wb");
+	FILE* rfp = myfopen(fname, "wb");
 	if(!rfp)
 		return;
 	fwrite(&pheader, sizeof pheader, 1, rfp);
@@ -112,14 +110,11 @@ void Replay::SaveReplay(const wchar_t* name) {
 	fclose(rfp);
 }
 bool Replay::OpenReplay(const wchar_t* name) {
-	char fullname[256]{};
-	BufferIO::EncodeUTF8(name, fullname);
-	FILE* rfp = myfopen(fullname, "rb");
+	FILE* rfp = myfopen(name, "rb");
 	if(!rfp) {
 		wchar_t fname[256];
 		myswprintf(fname, L"./replay/%ls", name);
-		BufferIO::EncodeUTF8(fname, fullname);
-		rfp = myfopen(fullname, "rb");
+		rfp = myfopen(fname, "rb");
 	}
 	if(!rfp)
 		return false;
@@ -156,9 +151,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 bool Replay::CheckReplay(const wchar_t* name) {
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls", name);
-	char fullname[256]{};
-	BufferIO::EncodeUTF8(fname, fullname);
-	FILE* rfp = myfopen(fullname, "rb");
+	FILE* rfp = myfopen(fname, "rb");
 	if(!rfp)
 		return false;
 	ReplayHeader rheader;
