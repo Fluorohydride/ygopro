@@ -58,16 +58,16 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/common.h"
 
-inline FILE* myfopen(const char* filename, const char* mode) {
+inline FILE* myfopen(const wchar_t* filename, const char* mode) {
 	FILE* fp{};
 #ifdef _WIN32
-	wchar_t wname[256]{};
 	wchar_t wmode[20]{};
-	BufferIO::DecodeUTF8(filename, wname);
 	BufferIO::CopyCharArray(mode, wmode);
-	fp = _wfopen(wname, wmode);
+	fp = _wfopen(filename, wmode);
 #else
-	fp = fopen(filename, mode);
+	char fname[1024]{};
+	BufferIO::EncodeUTF8(filename, fname);
+	fp = fopen(fname, mode);
 #endif
 	return fp;
 }
