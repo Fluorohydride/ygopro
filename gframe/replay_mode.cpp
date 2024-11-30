@@ -886,7 +886,7 @@ inline void ReplayMode::ReloadLocation(int player, int location, int flag, std::
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, queryBuffer.data());
 }
 void ReplayMode::ReplayRefresh(int flag) {
-	std::vector<byte> queryBuffer;
+	std::vector<unsigned char> queryBuffer;
 	queryBuffer.resize(SIZE_QUERY_BUFFER);
 	ReloadLocation(0, LOCATION_MZONE, flag, queryBuffer);
 	ReloadLocation(1, LOCATION_MZONE, flag, queryBuffer);

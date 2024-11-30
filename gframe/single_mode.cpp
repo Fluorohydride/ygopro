@@ -815,7 +815,7 @@ void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence,
 	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, queryBuffer);
 }
 void SingleMode::SinglePlayReload() {
-	std::vector<byte> queryBuffer;
+	std::vector<unsigned char> queryBuffer;
 	queryBuffer.resize(SIZE_QUERY_BUFFER);
 	unsigned int flag = 0xffdfff;
 	ReloadLocation(0, LOCATION_MZONE, flag, queryBuffer);
