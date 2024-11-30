@@ -236,9 +236,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					ReplayMode::cur_replay.OpenReplay(open_file_name);
 					open_file = false;
 				} else {
-					if(mainGame->lstReplayList->getSelected() == -1)
+					auto selected = mainGame->lstReplayList->getSelected();
+					if(selected == -1)
 						break;
-					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
+					wchar_t replay_path[256]{};
+					myswprintf(replay_path, L"./replay/%ls", mainGame->lstReplayList->getListItem(selected));
+					if (!ReplayMode::cur_replay.OpenReplay(replay_path))
 						break;
 				}
 				mainGame->ClearCardInfo();
@@ -293,14 +296,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_EXPORT_DECK: {
-				if(mainGame->lstReplayList->getSelected() == -1)
+				auto selected = mainGame->lstReplayList->getSelected();
+				if(selected == -1)
 					break;
 				Replay replay;
 				wchar_t ex_filename[256]{};
 				wchar_t namebuf[4][20]{};
 				wchar_t filename[256]{};
-				myswprintf(ex_filename, L"%ls", mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected()));
-				if(!replay.OpenReplay(ex_filename))
+				wchar_t replay_path[256]{};
+				BufferIO::CopyWideString(mainGame->lstReplayList->getListItem(selected), ex_filename);
+				myswprintf(replay_path, L"./replay/%ls", ex_filename);
+				if (!replay.OpenReplay(replay_path))
 					break;
 				const ReplayHeader& rh = replay.pheader;
 				if(rh.flag & REPLAY_SINGLE_MODE)
@@ -537,9 +543,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->lstReplayList->getSelected();
 				if(sel == -1)
 					break;
-				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(sel)))
+				wchar_t replay_path[256]{};
+				myswprintf(replay_path, L"./replay/%ls", mainGame->lstReplayList->getListItem(sel));
+				if (!ReplayMode::cur_replay.OpenReplay(replay_path)) {
+					mainGame->stReplayInfo->setText(L"");
 					break;
-				wchar_t infobuf[256];
+				}
+				wchar_t infobuf[256]{};
 				std::wstring repinfo;
 				time_t curtime;
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_UNIFORM)
