@@ -6,7 +6,7 @@
 namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
-byte DataManager::scriptBuffer[0x20000];
+unsigned char DataManager::scriptBuffer[0x20000];
 IFileSystem* DataManager::FileSystem;
 DataManager dataManager;
 
@@ -390,7 +390,7 @@ uint32 DataManager::CardReader(uint32 code, card_data* pData) {
 		pData->clear();
 	return 0;
 }
-byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
+unsigned char* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 	// default script name: ./script/c%d.lua
 	char first[256]{};
 	char second[256]{};
@@ -406,7 +406,7 @@ byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 	else
 		return ScriptReader(second, slen);
 }
-byte* DataManager::ScriptReader(const char* script_name, int* slen) {
+unsigned char* DataManager::ScriptReader(const char* script_name, int* slen) {
 #ifdef _WIN32
 	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
