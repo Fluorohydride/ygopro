@@ -109,6 +109,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	LoadExpansions();
+	LastExpansionsTime = GetLastWriteTime(L"./expansions");
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	if(!numFont) {
@@ -1143,31 +1144,41 @@ std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth,
 	ret.assign(strBuffer);
 	return ret;
 }
+int Game::GetLastWriteTime(wchar_t* dirPath) {
+	struct _stat64i32 st = { 0 };
+	if (_wstat(dirPath, &st) != -1)
+		return (int)(st.st_mtime);
+	return 0;
+}
 void Game::ReLoadExpansions() {
-	for (size_t i = 0; i < dataManager._expansionDatas.size(); ++i) {
-		int code = dataManager._expansionDatas[i];
-		dataManager._strings.erase(code);
-		dataManager._datas.erase(code);
+	int time = GetLastWriteTime(L"./expansions");
+	if (LastExpansionsTime != time) {
+		for (size_t i = 0; i < dataManager._expansionDatas.size(); ++i) {
+			int code = dataManager._expansionDatas[i];
+			dataManager._strings.erase(code);
+			dataManager._datas.erase(code);
+		}
+		dataManager._expansionDatas.clear();
+		for (size_t i = 0; i < dataManager._expansionStrings.size(); ++i) {
+			int value = dataManager._expansionStrings[i];
+			dataManager._counterStrings.erase(value);
+			dataManager._victoryStrings.erase(value);
+			dataManager._setnameStrings.erase(value);
+			dataManager._sysStrings.erase(value);
+		}
+		dataManager._expansionStrings.clear();
+		dataManager.LoadStrings("./expansions/strings.conf", true);
+		deckManager._lfList.clear();
+		deckManager.LoadLFList();
+		cbHostLFlist->clear();
+		cbLFlist->clear();
+		for (unsigned int i = 0; i < deckManager._lfList.size(); ++i)
+			cbHostLFlist->addItem(deckManager._lfList[i].listName.c_str());
+		for (unsigned int i = 0; i < deckManager._lfList.size(); ++i)
+			cbLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
+		LoadExpansions();
+		LastExpansionsTime = time;
 	}
-	dataManager._expansionDatas.clear();
-	for (size_t i = 0; i < dataManager._expansionStrings.size(); ++i) {
-		int value = dataManager._expansionStrings[i];
-		dataManager._counterStrings.erase(value);
-		dataManager._victoryStrings.erase(value);
-		dataManager._setnameStrings.erase(value);
-		dataManager._sysStrings.erase(value);
-	}
-	dataManager._expansionStrings.clear();
-	dataManager.LoadStrings("./expansions/strings.conf", true);
-	deckManager._lfList.clear();
-	deckManager.LoadLFList();
-	cbHostLFlist->clear();
-	cbLFlist->clear();
-	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbHostLFlist->addItem(deckManager._lfList[i].listName.c_str());
-	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
-	LoadExpansions();
 }
 void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {

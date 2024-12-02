@@ -139,6 +139,8 @@ struct FadingUnit {
 };
 
 class Game {
+private:
+	int LastExpansionsTime;
 
 public:
 	bool Initialize();
@@ -186,6 +188,7 @@ public:
 	void CloseGameWindow();
 	void CloseDuelWindow();
 
+	int GetLastWriteTime(wchar_t* dirPath);
 	int LocalPlayer(int player) const;
 	int OppositePlayer(int player);
 	int ChatLocalPlayer(int player);
