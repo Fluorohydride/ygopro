@@ -69,7 +69,7 @@ public:
 	std::vector<ClientCard*> selected_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
-	std::vector<int> declare_opcodes;
+	std::vector<unsigned int> declare_opcodes;
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
@@ -158,8 +158,6 @@ public:
 }
 
 //special cards
-#define CARD_MARINE_DOLPHIN	78734254
-#define CARD_TWINKLE_MOSS	13857930
 #define CARD_QUESTION		38723936
 
 #endif //CLIENT_FIELD_H
