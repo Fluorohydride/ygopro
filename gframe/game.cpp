@@ -109,7 +109,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	LoadExpansions();
-	ChkLastTime(false);
+	ChkLastTime();
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	if(!numFont) {
@@ -1150,20 +1150,19 @@ int Game::GetLastWriteTime(wchar_t* dirPath) {
 		return (int)(st.st_mtime);
 	return 0;
 }
-void Game::ChkLastTime(bool chk) {
+void Game::ChkLastTime() {
 	int time = GetLastWriteTime(L"./expansions");
 	if (LastExpansionsTime < time) {
 		LastExpansionsTime = time;
 		ChkReload = true;
-		if (chk) return;
 	}
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
 		if (!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ypk", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".conf", 5))) {
 			wchar_t fpath[1024];
 			myswprintf(fpath, L"./expansions/%ls", name);
 			int time = mainGame->GetLastWriteTime(fpath);
-			if (mainGame->LastExpansionsTime < time) {
-				mainGame->LastExpansionsTime = time;
+			if (mainGame->LastExpansionsFileTime < time) {
+				mainGame->LastExpansionsFileTime = time;
 				mainGame->ChkReload = true;
 			}
 		}
