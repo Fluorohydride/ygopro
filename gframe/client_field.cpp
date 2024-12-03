@@ -1397,8 +1397,7 @@ bool ClientField::check_sum_trib(std::set<ClientCard*>::const_iterator index, st
 		|| check_sum_trib(index, end, acc + l2)
 		|| check_sum_trib(index, end, acc);
 }
-template <class T>
-static bool is_declarable(T const& cd, const std::vector<int>& opcode) {
+static bool is_declarable(const CardData& cd, const std::vector<unsigned int>& opcode) {
 	std::stack<int> stack;
 	for(auto it = opcode.begin(); it != opcode.end(); ++it) {
 		switch(*it) {
@@ -1448,7 +1447,7 @@ static bool is_declarable(T const& cd, const std::vector<int>& opcode) {
 				stack.pop();
 				int lhs = stack.top();
 				stack.pop();
-				stack.push(lhs && rhs);
+				stack.push(static_cast<int>(lhs && rhs));
 			}
 			break;
 		}
@@ -1458,7 +1457,7 @@ static bool is_declarable(T const& cd, const std::vector<int>& opcode) {
 				stack.pop();
 				int lhs = stack.top();
 				stack.pop();
-				stack.push(lhs || rhs);
+				stack.push(static_cast<int>(lhs || rhs));
 			}
 			break;
 		}
@@ -1474,7 +1473,7 @@ static bool is_declarable(T const& cd, const std::vector<int>& opcode) {
 			if (stack.size() >= 1) {
 				int val = stack.top();
 				stack.pop();
-				stack.push(!val);
+				stack.push(static_cast<int>(!val));
 			}
 			break;
 		}
@@ -1527,8 +1526,9 @@ static bool is_declarable(T const& cd, const std::vector<int>& opcode) {
 	}
 	if(stack.size() != 1 || stack.top() == 0)
 		return false;
-	return cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS
-		|| (!cd.alias && (cd.type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
+	if (cd.type & TYPE_TOKEN)
+		return false;
+	return !cd.alias || second_code.find(cd.code) != second_code.end();
 }
 void ClientField::UpdateDeclarableList() {
 	const wchar_t* pname = mainGame->ebANCard->getText();

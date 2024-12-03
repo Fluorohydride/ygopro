@@ -3644,7 +3644,7 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 		int count = BufferIO::ReadUInt8(pbuf);
 		mainGame->dField.declare_opcodes.clear();
 		for (int i = 0; i < count; ++i)
-			mainGame->dField.declare_opcodes.push_back(BufferIO::ReadInt32(pbuf));
+			mainGame->dField.declare_opcodes.push_back(buffer_read<uint32_t>(pbuf));
 		if(select_hint)
 			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
 		else myswprintf(textBuffer, dataManager.GetSysString(564));
