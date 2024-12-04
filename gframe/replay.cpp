@@ -147,9 +147,7 @@ void Replay::SaveReplay(const wchar_t* name) {
 		return;
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls.yrp", name);
-	char fullname[256]{};
-	BufferIO::EncodeUTF8(fname, fullname);
-	FILE* rfp = myfopen(fullname, "wb");
+	FILE* rfp = myfopen(fname, "wb");
 	if(!rfp)
 		return;
 	fwrite(&pheader, sizeof pheader, 1, rfp);
@@ -157,14 +155,11 @@ void Replay::SaveReplay(const wchar_t* name) {
 	fclose(rfp);
 }
 bool Replay::OpenReplay(const wchar_t* name) {
-	char fullname[256]{};
-	BufferIO::EncodeUTF8(name, fullname);
-	FILE* rfp = myfopen(fullname, "rb");
+	FILE* rfp = myfopen(name, "rb");
 	if(!rfp) {
 		wchar_t fname[256];
 		myswprintf(fname, L"./replay/%ls", name);
-		BufferIO::EncodeUTF8(fname, fullname);
-		rfp = myfopen(fullname, "rb");
+		rfp = myfopen(fname, "rb");
 	}
 	if(!rfp)
 		return false;
@@ -181,7 +176,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	if(pheader.flag & REPLAY_COMPRESSED) {
 		comp_size = fread(comp_data, 1, MAX_COMP_SIZE, rfp);
 		fclose(rfp);
-		if ((int)pheader.datasize < 0 && (int)pheader.datasize > MAX_REPLAY_SIZE)
+		if (pheader.datasize > MAX_REPLAY_SIZE)
 			return false;
 		replay_size = pheader.datasize;
 		if (LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.props, 5) != SZ_OK)
@@ -201,9 +196,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 bool Replay::CheckReplay(const wchar_t* name) {
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls", name);
-	char fullname[256]{};
-	BufferIO::EncodeUTF8(fname, fullname);
-	FILE* rfp = myfopen(fullname, "rb");
+	FILE* rfp = myfopen(fname, "rb");
 	if(!rfp)
 		return false;
 	ReplayHeader rheader;
@@ -253,13 +246,13 @@ bool Replay::ReadNextResponse(unsigned char resp[]) {
 		return false;
 	return true;
 }
-void Replay::ReadName(wchar_t* data) {
+bool Replay::ReadName(wchar_t* data) {
 	uint16_t buffer[20]{};
 	if (!ReadData(buffer, sizeof buffer)) {
-		data[0] = 0;
-		return;
+		return false;
 	}
 	BufferIO::CopyWStr(buffer, data, 20);
+	return true;
 }
 bool Replay::ReadData(void* data, int length) {
 	if(!is_replaying)

@@ -256,14 +256,18 @@ public:
 		str[N - 1] = 0;
 	}
 	static int GetVal(const wchar_t* pstr) {
-		unsigned int ret = 0;
-		while(*pstr >= L'0' && *pstr <= L'9') {
-			ret = ret * 10 + (*pstr - L'0');
-			pstr++;
+		if (*pstr >= L'0' && *pstr <= L'9') {
+			int ret{};
+			wchar_t* str_end{};
+			ret = std::wcstol(pstr, &str_end, 10);
+			if (*str_end == 0)
+				return ret;
+			else
+				return 0;
 		}
-		if (*pstr == 0)
-			return (int)ret;
-		return 0;
+		else
+			return 0;
+	
 	}
 };
 

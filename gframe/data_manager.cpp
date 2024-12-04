@@ -8,7 +8,7 @@
 namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
-byte DataManager::scriptBuffer[0x20000];
+unsigned char DataManager::scriptBuffer[0x20000];
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 IFileSystem* DataManager::FileSystem;
 #endif
@@ -414,7 +414,7 @@ uint32 DataManager::CardReader(uint32 code, card_data* pData) {
 		pData->clear();
 	return 0;
 }
-byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
+unsigned char* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 	// default script name: ./script/c%d.lua
 #ifdef YGOPRO_SERVER_MODE
 	char first[256]{};
@@ -445,7 +445,7 @@ byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 		return ScriptReader(second, slen);
 #endif //YGOPRO_SERVER_MODE
 }
-byte* DataManager::ScriptReader(const char* script_name, int* slen) {
+unsigned char* DataManager::ScriptReader(const char* script_name, int* slen) {
 #if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
 	FILE* fp = fopen(script_name, "rb");
 	if(!fp)
