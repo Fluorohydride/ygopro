@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 #endif
 #ifdef __APPLE__
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
+	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(nullptr, bundle_url);
 	CFRelease(bundle_url);
 	CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
 	CFRelease(bundle_base_url);
@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 	if(argc == 2 && (pstrext = std::strrchr(argv[1], '.'))
 		&& (!mystrncasecmp(pstrext, ".ydk", 4) || !mystrncasecmp(pstrext, ".yrp", 4))) {
 		wchar_t exepath[MAX_PATH];
-		GetModuleFileNameW(NULL, exepath, MAX_PATH);
+		GetModuleFileNameW(nullptr, exepath, MAX_PATH);
 		wchar_t* p = wcsrchr(exepath, '\\');
 		*p = '\0';
 		SetCurrentDirectoryW(exepath);

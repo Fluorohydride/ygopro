@@ -47,7 +47,7 @@ public:
 	}
 
 	static bool MakeDir(const wchar_t* wdir) {
-		return CreateDirectoryW(wdir, NULL);
+		return CreateDirectoryW(wdir, nullptr);
 	}
 
 	static bool MakeDir(const char* dir) {
@@ -72,7 +72,7 @@ public:
 		wchar_t pdir[256];
 		BufferIO::CopyWideString(wdir, pdir);
 		SHFILEOPSTRUCTW lpFileOp{};
-		lpFileOp.hwnd = NULL;
+		lpFileOp.hwnd = nullptr;
 		lpFileOp.wFunc = FO_DELETE;
 		lpFileOp.pFrom = pdir;
 		lpFileOp.pTo = 0;

@@ -88,7 +88,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 #else
 	IReadFile* reader = FileSystem->createAndOpenFile(file);
 #endif
-	if(reader == NULL)
+	if(reader == nullptr)
 		return false;
 	spmemvfs_db_t db;
 	spmembuffer_t* mem = (spmembuffer_t*)calloc(sizeof(spmembuffer_t), 1);

@@ -135,7 +135,7 @@ int SingleMode::SinglePlayThread() {
 	}
 	last_replay.EndRecord();
 	mainGame->gMutex.lock();
-	time_t nowtime = time(NULL);
+	time_t nowtime = time(nullptr);
 	tm* localedtime = localtime(&nowtime);
 	wchar_t timetext[40];
 	wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
