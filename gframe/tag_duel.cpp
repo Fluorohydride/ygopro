@@ -185,7 +185,7 @@ void TagDuel::ToDuelist(DuelPlayer* dp) {
 	} else {
 		if(ready[dp->type])
 			return;
-		uint8 dptype = (dp->type + 1) % 4;
+		unsigned char dptype = (dp->type + 1) % 4;
 		while(players[dptype])
 			dptype = (dptype + 1) % 4;
 		STOC_HS_PlayerChange scpc;
