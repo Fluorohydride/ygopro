@@ -32,6 +32,7 @@
 
 #define DEFAULT_DUEL_RULE YGOPRO_DEFAULT_DUEL_RULE
 constexpr int CONFIG_LINE_SIZE = 1024;
+constexpr int TEXT_LINE_SIZE = 256;
 
 namespace ygo {
 
@@ -234,6 +235,9 @@ public:
 	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(ECURSOR_ICON icon);
+	template<typename T>
+	static void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const core::rect<s32>& position, const core::rect<s32>& padding,
+		video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const core::rect<s32>* clip = nullptr);
 
 	std::mutex gMutex;
 	Signal frameSignal;

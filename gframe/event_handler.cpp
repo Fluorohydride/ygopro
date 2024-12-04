@@ -2028,7 +2028,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				const wchar_t* input = mainGame->ebChatInput->getText();
 				if(input[0]) {
 					uint16_t msgbuf[LEN_CHAT_MSG];
-					int len = BufferIO::CopyWStr(input, msgbuf, LEN_CHAT_MSG);
+					int len = BufferIO::CopyCharArray(input, msgbuf);
 					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(uint16_t));
 					mainGame->ebChatInput->setText(L"");
 					return true;

@@ -69,8 +69,8 @@ void DuelInfo::Clear() {
 #endif
 
 bool IsExtension(const wchar_t* filename, const wchar_t* extension) {
-	int flen = std::wcslen(filename);
-	int elen = std::wcslen(extension);
+	auto flen = std::wcslen(filename);
+	auto elen = std::wcslen(extension);
 	if (!elen || flen < elen)
 		return false;
 	return !mywcsncasecmp(filename + (flen - elen), extension, elen);
@@ -1314,9 +1314,10 @@ void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const w
 	FileSystem::TraversalDir(deckpath, [additem](const wchar_t* name, bool isdir) {
 		if (!isdir && IsExtension(name, L".ydk")) {
 			size_t len = std::wcslen(name);
-			wchar_t deckname[256];
-			std::wcsncpy(deckname, name, len - 4);
-			deckname[len - 4] = 0;
+			wchar_t deckname[256]{};
+			size_t count = std::min(len - 4, sizeof deckname / sizeof deckname[0] - 1);
+			std::wcsncpy(deckname, name, count);
+			deckname[count] = 0;
 			additem(deckname);
 		}
 	});

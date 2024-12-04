@@ -133,8 +133,8 @@ bool DataManager::LoadStrings(const char* file) {
 	FILE* fp = fopen(file, "r");
 	if(!fp)
 		return false;
-	char linebuf[256];
-	while(fgets(linebuf, 256, fp)) {
+	char linebuf[TEXT_LINE_SIZE]{};
+	while(fgets(linebuf, sizeof linebuf, fp)) {
 		ReadStringConfLine(linebuf);
 	}
 	fclose(fp);
@@ -142,15 +142,15 @@ bool DataManager::LoadStrings(const char* file) {
 }
 #ifndef YGOPRO_SERVER_MODE
 bool DataManager::LoadStrings(IReadFile* reader) {
-	char ch[2] = " ";
-	char linebuf[256] = "";
-	while(reader->read(&ch[0], 1)) {
-		if(ch[0] == '\0')
+	char ch{};
+	std::string linebuf;
+	while (reader->read(&ch, 1)) {
+		if (ch == '\0')
 			break;
-		std::strcat(linebuf, ch);
-		if(ch[0] == '\n') {
-			ReadStringConfLine(linebuf);
-			linebuf[0] = '\0';
+		linebuf.push_back(ch);
+		if (ch == '\n' || linebuf.size() >= TEXT_LINE_SIZE - 1) {
+			ReadStringConfLine(linebuf.data());
+			linebuf.clear();
 		}
 	}
 	reader->drop();
@@ -160,7 +160,7 @@ bool DataManager::LoadStrings(IReadFile* reader) {
 void DataManager::ReadStringConfLine(const char* linebuf) {
 	if(linebuf[0] != '!')
 		return;
-	char strbuf[256]{};
+	char strbuf[TEXT_LINE_SIZE]{};
 	int value{};
 	wchar_t strBuffer[4096]{};
 	if (sscanf(linebuf, "!%63s", strbuf) != 1)
@@ -463,16 +463,16 @@ byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 #else
 	IReadFile* reader = FileSystem->createAndOpenFile(script_name);
 #endif
-	if(reader == NULL)
-		return 0;
+	if (!reader)
+		return nullptr;
 	size_t size = reader->getSize();
-	if(size > sizeof(scriptBuffer)) {
+	if (size > sizeof scriptBuffer) {
 		reader->drop();
-		return 0;
+		return nullptr;
 	}
 	reader->read(scriptBuffer, size);
 	reader->drop();
-	*slen = size;
+	*slen = (int)size;
 #endif //YGOPRO_SERVER_MODE
 	return scriptBuffer;
 }
