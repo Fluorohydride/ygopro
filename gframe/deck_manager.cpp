@@ -253,7 +253,7 @@ void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, 
 	wchar_t filepath[256];
 	wchar_t catepath[256];
 	const wchar_t* deckname = cbDeck->getItem(cbDeck->getSelected());
-	if(deckname != NULL) {
+	if(deckname != nullptr) {
 		GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
 		myswprintf(filepath, L"%ls/%ls.ydk", catepath, deckname);
 		BufferIO::CopyWStr(filepath, ret, 256);

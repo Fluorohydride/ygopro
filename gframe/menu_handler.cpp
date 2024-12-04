@@ -78,7 +78,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					BufferIO::EncodeUTF8(pstr, hostname);
 					BufferIO::EncodeUTF8(portstr, port);
 					struct evutil_addrinfo hints;
-					struct evutil_addrinfo *answer = NULL;
+					struct evutil_addrinfo *answer = nullptr;
 					std::memset(&hints, 0, sizeof hints);
 					hints.ai_family = AF_INET;
 					hints.ai_socktype = SOCK_STREAM;
@@ -375,7 +375,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int flag = 0;
 				flag += (mainGame->chkBotHand->isChecked() ? 0x1 : 0);
 				myswprintf(cmd, L"Bot.exe \"%ls\" %d %d", arg1, flag, mainGame->gameConf.serverport);
-				if(!CreateProcessW(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+				if(!CreateProcessW(nullptr, cmd, nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi))
 				{
 					NetServer::StopServer();
 					break;
@@ -399,7 +399,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					snprintf(arg2, sizeof arg2, "%d", flag);
 					char arg3[8];
 					snprintf(arg3, sizeof arg3, "%d", mainGame->gameConf.serverport);
-					execl("./bot", "bot", arg1, arg2, arg3, NULL);
+					execl("./bot", "bot", arg1, arg2, arg3, nullptr);
 					exit(0);
 				} else {
 					if(!NetServer::StartServer(mainGame->gameConf.serverport)) {
