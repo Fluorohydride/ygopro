@@ -385,7 +385,7 @@ std::wstring DataManager::FormatLinkMarker(unsigned int link_marker) const {
 		buffer.append(L"[\u2198]");
 	return buffer;
 }
-uint32 DataManager::CardReader(uint32 code, card_data* pData) {
+uint32_t DataManager::CardReader(uint32_t code, card_data* pData) {
 	if (!dataManager.GetData(code, pData))
 		pData->clear();
 	return 0;

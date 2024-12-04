@@ -567,7 +567,7 @@ void SingleDuel::Surrender(DuelPlayer* dp) {
 	if(dp->type > 1 || !pduel)
 		return;
 	unsigned char wbuf[3];
-	uint32 player = dp->type;
+	uint32_t player = dp->type;
 	wbuf[0] = MSG_WIN;
 	wbuf[1] = 1 - player;
 	wbuf[2] = 0;
@@ -1584,7 +1584,7 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	for (auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 }
-uint32 SingleDuel::MessageHandler(intptr_t fduel, uint32 type) {
+uint32_t SingleDuel::MessageHandler(intptr_t fduel, uint32_t type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
@@ -1597,7 +1597,7 @@ void SingleDuel::SingleTimer(evutil_socket_t fd, short events, void* arg) {
 	sd->time_elapsed++;
 	if(sd->time_elapsed >= sd->time_limit[sd->last_response] || sd->time_limit[sd->last_response] <= 0) {
 		unsigned char wbuf[3];
-		uint32 player = sd->last_response;
+		uint32_t player = sd->last_response;
 		wbuf[0] = MSG_WIN;
 		wbuf[1] = 1 - player;
 		wbuf[2] = 0x3;

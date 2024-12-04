@@ -937,7 +937,7 @@ void ReplayMode::ReplayReload() {
 	ReloadLocation(0, LOCATION_REMOVED, flag, queryBuffer);
 	ReloadLocation(1, LOCATION_REMOVED, flag, queryBuffer);
 }
-uint32 ReplayMode::MessageHandler(intptr_t fduel, uint32 type) {
+uint32_t ReplayMode::MessageHandler(intptr_t fduel, uint32_t type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];

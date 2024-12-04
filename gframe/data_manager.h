@@ -52,7 +52,7 @@ public:
 
 	static unsigned char scriptBuffer[0x20000];
 	static const wchar_t* unknown_string;
-	static uint32 CardReader(uint32, card_data*);
+	static uint32_t CardReader(uint32_t, card_data*);
 	static unsigned char* ScriptReaderEx(const char* script_name, int* slen);
 	static unsigned char* ScriptReader(const char* script_name, int* slen);
 	static IFileSystem* FileSystem;
