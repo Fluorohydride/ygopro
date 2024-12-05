@@ -47,7 +47,7 @@ public:
 	static void ReplayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 	static void ReplayReload();
 
-	static uint32 MessageHandler(intptr_t fduel, uint32 type);
+	static uint32_t MessageHandler(intptr_t fduel, uint32_t type);
 };
 
 }
