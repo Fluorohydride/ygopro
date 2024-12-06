@@ -448,7 +448,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteInt32(host_info.draw_count, false);
 	last_replay.WriteInt32(opt, false);
 	last_replay.Flush();
-	auto load = [&](std::vector<code_pointer>& deck_container, uint8_t p, uint8_t location) {
+	auto load = [&](const std::vector<code_pointer>& deck_container, uint8_t p, uint8_t location) {
 		last_replay.WriteInt32(deck_container.size(), false);
 		for (auto cit = deck_container.rbegin(); cit != deck_container.rend(); ++cit) {
 			new_card(pduel, (*cit)->first, p, p, location, 0, POS_FACEDOWN_DEFENSE);
