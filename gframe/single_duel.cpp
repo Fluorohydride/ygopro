@@ -448,28 +448,19 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteInt32(host_info.draw_count, false);
 	last_replay.WriteInt32(opt, false);
 	last_replay.Flush();
-	last_replay.WriteInt32(pdeck[0].main.size(), false);
-	for(int i = (int)pdeck[0].main.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[0].main[i]->first, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[0].main[i]->first, false);
-	}
-	last_replay.WriteInt32(pdeck[0].extra.size(), false);
-	for(int i = (int)pdeck[0].extra.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[0].extra[i]->first, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[0].extra[i]->first, false);
-	}
-	last_replay.WriteInt32(pdeck[1].main.size(), false);
-	for(int i = (int)pdeck[1].main.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[1].main[i]->first, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[1].main[i]->first, false);
-	}
-	last_replay.WriteInt32(pdeck[1].extra.size(), false);
-	for(int i = (int)pdeck[1].extra.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[1].extra[i]->first, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[1].extra[i]->first, false);
-	}
+	auto load = [&](const std::vector<code_pointer>& deck_container, uint8_t p, uint8_t location) {
+		last_replay.WriteInt32(deck_container.size(), false);
+		for (auto cit = deck_container.rbegin(); cit != deck_container.rend(); ++cit) {
+			new_card(pduel, (*cit)->first, p, p, location, 0, POS_FACEDOWN_DEFENSE);
+			last_replay.WriteInt32((*cit)->first, false);
+		}
+	};
+	load(pdeck[0].main, 0, LOCATION_DECK);
+	load(pdeck[0].extra, 0, LOCATION_EXTRA);
+	load(pdeck[1].main, 1, LOCATION_DECK);
+	load(pdeck[1].extra, 1, LOCATION_EXTRA);
 	last_replay.Flush();
-	unsigned char startbuf[32];
+	unsigned char startbuf[32]{};
 	auto pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, 0);
