@@ -394,8 +394,12 @@ unsigned char* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 	// default script name: ./script/c%d.lua
 	if (std::strncmp(script_name, "./script", 8) != 0)
 		return DefaultScriptReader(script_name, slen);
+	char expansions_path[1024]{};
+	std::snprintf(expansions_path, sizeof expansions_path, "./expansions/%s", script_name + 2);
 	if(mainGame->gameConf.prefer_expansion_script) {
 		if (ScriptReader(script_name, slen))
+			return scriptBuffer;
+		else if (DefaultScriptReader(expansions_path, slen))
 			return scriptBuffer;
 		else if (DefaultScriptReader(script_name, slen))
 			return scriptBuffer;
@@ -404,10 +408,10 @@ unsigned char* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 			return scriptBuffer;
 		else if (ScriptReader(script_name, slen))
 			return scriptBuffer;
+		else if (DefaultScriptReader(expansions_path, slen))
+			return scriptBuffer;
 	}
-	char expansions_path[1024]{};
-	std::snprintf(expansions_path, sizeof expansions_path, "./expansions/%s", script_name + 2);
-	return DefaultScriptReader(expansions_path, slen);
+	return nullptr;
 }
 unsigned char* DataManager::ScriptReader(const char* script_name, int* slen) {
 #ifdef _WIN32
