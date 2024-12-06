@@ -449,7 +449,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	load_tag(pdeck[2].main, 1, LOCATION_DECK);
 	load_tag(pdeck[2].extra, 1, LOCATION_EXTRA);
 	last_replay.Flush();
-	unsigned char startbuf[32];
+	unsigned char startbuf[32]{};
 	auto pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, 0);
