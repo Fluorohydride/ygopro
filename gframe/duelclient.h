@@ -31,6 +31,11 @@ private:
 	static unsigned int last_successful_msg_length;
 	static wchar_t event_string[256];
 	static mt19937 rnd;
+	static bool is_refreshing;
+	static int match_kill;
+	static event* resp_event;
+	static std::set<std::pair<unsigned int, unsigned short>> remotes;
+
 public:
 	static unsigned char selftype;
 	static bool StartClient(unsigned int ip, unsigned short port, bool create_game = true);
@@ -73,13 +78,7 @@ public:
 		std::memcpy(p, buffer, blen);
 		bufferevent_write(client_bev, duel_client_write, blen + 3);
 	}
-	
-protected:
-	static bool is_refreshing;
-	static int match_kill;
-	static event* resp_event;
-	static std::set<std::pair<unsigned int, unsigned short>> remotes;
-public:
+
 	static std::vector<HostPacket> hosts;
 	static void BeginRefreshHost();
 	static int RefreshThread(event_base* broadev);
