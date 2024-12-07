@@ -42,7 +42,7 @@ public:
 	static void ConnectTimeout(evutil_socket_t fd, short events, void* arg);
 	static void StopClient(bool is_exiting = false);
 	static void ClientRead(bufferevent* bev, void* ctx);
-	static void ClientEvent(bufferevent *bev, short events, void *ctx);
+	static void ClientEvent(bufferevent* bev, short events, void* ctx);
 	static int ClientThread();
 	static void HandleSTOCPacketLan(unsigned char* data, int len);
 	static int ClientAnalyze(unsigned char* msg, unsigned int len);

@@ -118,9 +118,9 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	}
 	delete[] duel_client_read;
 }
-void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
+void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 	if (events & BEV_EVENT_CONNECTED) {
-		bool create_game = (size_t)ctx != 0;
+		bool create_game = (intptr_t)ctx;
 		CTOS_PlayerInfo cspi;
 		BufferIO::CopyCharArray(mainGame->ebNickName->getText(), cspi.name);
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
