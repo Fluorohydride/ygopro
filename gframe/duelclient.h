@@ -31,13 +31,18 @@ private:
 	static unsigned int last_successful_msg_length;
 	static wchar_t event_string[256];
 	static mt19937 rnd;
+	static bool is_refreshing;
+	static int match_kill;
+	static event* resp_event;
+	static std::set<std::pair<unsigned int, unsigned short>> remotes;
+
 public:
 	static unsigned char selftype;
 	static bool StartClient(unsigned int ip, unsigned short port, bool create_game = true);
 	static void ConnectTimeout(evutil_socket_t fd, short events, void* arg);
 	static void StopClient(bool is_exiting = false);
 	static void ClientRead(bufferevent* bev, void* ctx);
-	static void ClientEvent(bufferevent *bev, short events, void *ctx);
+	static void ClientEvent(bufferevent* bev, short events, void* ctx);
 	static int ClientThread();
 	static void HandleSTOCPacketLan(unsigned char* data, int len);
 	static int ClientAnalyze(unsigned char* msg, unsigned int len);
@@ -73,13 +78,7 @@ public:
 		std::memcpy(p, buffer, blen);
 		bufferevent_write(client_bev, duel_client_write, blen + 3);
 	}
-	
-protected:
-	static bool is_refreshing;
-	static int match_kill;
-	static event* resp_event;
-	static std::set<std::pair<unsigned int, unsigned short>> remotes;
-public:
+
 	static std::vector<HostPacket> hosts;
 	static void BeginRefreshHost();
 	static int RefreshThread(event_base* broadev);
