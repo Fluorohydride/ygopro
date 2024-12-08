@@ -1,6 +1,7 @@
 #include "single_mode.h"
 #include "duelclient.h"
 #include "game.h"
+#include "myfilesystem.h"
 #include "../ocgcore/common.h"
 #include "../ocgcore/mtrandom.h"
 #include <thread>
@@ -57,6 +58,8 @@ int SingleMode::SinglePlayThread() {
 		opt |= DUEL_RETURN_DECK_TOP;
 	char filename[256]{};
 	int slen = 0;
+	if (FileSystem::IsFileExists("./single/common.lua"))
+		preload_script(pduel, "./single/common.lua");
 	if(open_file) {
 		open_file = false;
 		slen = BufferIO::EncodeUTF8(open_file_name, filename);
