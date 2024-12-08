@@ -13,11 +13,11 @@ namespace ygo {
 class DataManager {
 public:
 	DataManager();
-	bool ReadDB(sqlite3* pDB);
-	bool LoadDB(const wchar_t* wfile);
-	bool LoadStrings(const char* file);
-	bool LoadStrings(IReadFile* reader);
-	void ReadStringConfLine(const char* linebuf);
+	bool ReadDB(sqlite3* pDB, bool expansion = false);
+	bool LoadDB(const wchar_t* wfile, bool expansion = false);
+	bool LoadStrings(const char* file, bool expansion = false);
+	bool LoadStrings(IReadFile* reader, bool expansion = false);
+	void ReadStringConfLine(const char* linebuf, bool expansion = false);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = nullptr);
 
 	code_pointer GetCodePointer(unsigned int code) const;
@@ -44,6 +44,10 @@ public:
 	std::wstring FormatSetName(const uint16_t setcode[]) const;
 	std::wstring FormatLinkMarker(unsigned int link_marker) const;
 
+	std::vector<int> _expansionDatas;
+	std::vector<int> _expansionStrings;
+	std::unordered_map<unsigned int, CardDataC> _datas;
+	std::unordered_map<unsigned int, CardString> _strings;
 	std::unordered_map<unsigned int, std::wstring> _counterStrings;
 	std::unordered_map<unsigned int, std::wstring> _victoryStrings;
 	std::unordered_map<unsigned int, std::wstring> _setnameStrings;
@@ -58,8 +62,6 @@ public:
 	static IFileSystem* FileSystem;
 
 private:
-	std::unordered_map<unsigned int, CardDataC> _datas;
-	std::unordered_map<unsigned int, CardString> _strings;
 	std::unordered_map<unsigned int, std::vector<uint16_t>> extra_setcode;
 };
 
