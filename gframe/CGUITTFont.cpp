@@ -809,11 +809,6 @@ core::vector2di CGUITTFont::getKerning(const uchar32_t thisLetter, const uchar32
 }
 
 void CGUITTFont::setInvisibleCharacters(const wchar_t *s) {
-	core::ustring us(s);
-	Invisible = us;
-}
-
-void CGUITTFont::setInvisibleCharacters(const core::ustring& s) {
 	Invisible = s;
 }
 
