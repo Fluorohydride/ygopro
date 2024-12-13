@@ -52,31 +52,28 @@ public:
 	static void SendResponse();
 	static void SendPacketToServer(unsigned char proto) {
 		auto p = duel_client_write;
-		BufferIO::WriteInt16(p, 1);
-		BufferIO::WriteInt8(p, proto);
+		buffer_write<uint16_t>(p, 1);
+		buffer_write<uint8_t>(p, proto);
 		bufferevent_write(client_bev, duel_client_write, 3);
 	}
 	template<typename ST>
 	static void SendPacketToServer(unsigned char proto, ST& st) {
 		auto p = duel_client_write;
-		if ((int)sizeof(ST) > MAX_DATA_SIZE)
+		if (sizeof(ST) > MAX_DATA_SIZE)
 			return;
-		BufferIO::WriteInt16(p, (short)(1 + sizeof(ST)));
-		BufferIO::WriteInt8(p, proto);
+		buffer_write<uint16_t>(p, (uint16_t)(1 + sizeof(ST)));
+		buffer_write<uint8_t>(p, proto);
 		std::memcpy(p, &st, sizeof(ST));
 		bufferevent_write(client_bev, duel_client_write, sizeof(ST) + 3);
 	}
 	static void SendBufferToServer(unsigned char proto, void* buffer, size_t len) {
 		auto p = duel_client_write;
-		int blen = len;
-		if (blen < 0)
-			return;
-		if (blen > MAX_DATA_SIZE)
-			blen = MAX_DATA_SIZE;
-		BufferIO::WriteInt16(p, (short)(1 + blen));
-		BufferIO::WriteInt8(p, proto);
-		std::memcpy(p, buffer, blen);
-		bufferevent_write(client_bev, duel_client_write, blen + 3);
+		if (len > MAX_DATA_SIZE)
+			len = MAX_DATA_SIZE;
+		buffer_write<uint16_t>(p, (uint16_t)(1 + len));
+		buffer_write<uint8_t>(p, proto);
+		std::memcpy(p, buffer, len);
+		bufferevent_write(client_bev, duel_client_write, len + 3);
 	}
 
 	static std::vector<HostPacket> hosts;
