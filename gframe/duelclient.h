@@ -16,7 +16,7 @@ class DuelClient {
 private:
 	static unsigned int connect_state;
 	static unsigned char response_buf[SIZE_RETURN_VALUE];
-	static unsigned int response_len;
+	static size_t response_len;
 	static unsigned int watching;
 	static bool is_host;
 	static event_base* client_base;
@@ -28,7 +28,7 @@ private:
 	static int select_unselect_hint;
 	static int last_select_hint;
 	static unsigned char last_successful_msg[0x2000];
-	static unsigned int last_successful_msg_length;
+	static size_t last_successful_msg_length;
 	static wchar_t event_string[256];
 	static mt19937 rnd;
 	static bool is_refreshing;
@@ -47,8 +47,8 @@ public:
 	static void HandleSTOCPacketLan(unsigned char* data, int len);
 	static int ClientAnalyze(unsigned char* msg, unsigned int len);
 	static void SwapField();
-	static void SetResponseI(int respI);
-	static void SetResponseB(void* respB, unsigned int len);
+	static void SetResponseI(int32_t respI);
+	static void SetResponseB(void* respB, size_t len);
 	static void SendResponse();
 	static void SendPacketToServer(unsigned char proto) {
 		auto p = duel_client_write;
