@@ -34,7 +34,11 @@ public:
 	// record
 	void BeginRecord();
 	void WriteHeader(ReplayHeader& header);
-	void WriteData(const void* data, int length, bool flush = true);
+	void WriteData(const void* data, size_t length, bool flush = true);
+	template<typename T>
+	void Write(T data, bool flush = true) {
+		WriteData(&data, sizeof(T), flush);
+	}
 	void WriteInt32(int data, bool flush = true);
 	void WriteInt16(short data, bool flush = true);
 	void WriteInt8(char data, bool flush = true);
@@ -50,9 +54,13 @@ public:
 	bool ReadNextResponse(unsigned char resp[]);
 	bool ReadName(wchar_t* data);
 	//void ReadHeader(ReplayHeader& header);
-	bool ReadData(void* data, int length);
+	bool ReadData(void* data, size_t length);
 	template<typename T>
-	T ReadValue();
+	T Read() {
+		T ret{};
+		ReadData(&ret, sizeof(T));
+		return ret;
+	}
 	int ReadInt32();
 	short ReadInt16();
 	char ReadInt8();
@@ -71,7 +79,7 @@ private:
 	unsigned char* replay_data;
 	size_t replay_size{};
 	unsigned char* pwrite{};
-	unsigned char* pdata{};
+	size_t data_position{};
 	bool is_recording{};
 	bool is_replaying{};
 };

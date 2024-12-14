@@ -44,10 +44,10 @@ void Replay::WriteHeader(ReplayHeader& header) {
 	fflush(fp);
 #endif
 }
-void Replay::WriteData(const void* data, int length, bool flush) {
+void Replay::WriteData(const void* data, size_t length, bool flush) {
 	if(!is_recording)
 		return;
-	if (length < 0 || (int)(pwrite - replay_data) + length > MAX_REPLAY_SIZE)
+	if ((pwrite - replay_data) + length > MAX_REPLAY_SIZE)
 		return;
 	std::memcpy(pwrite, data, length);
 	pwrite += length;
@@ -119,7 +119,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	if(!rfp)
 		return false;
 
-	pdata = replay_data;
+	data_position = 0;
 	is_recording = false;
 	is_replaying = false;
 	replay_size = 0;
@@ -209,25 +209,16 @@ bool Replay::ReadName(wchar_t* data) {
 	BufferIO::CopyWStr(buffer, data, 20);
 	return true;
 }
-bool Replay::ReadData(void* data, int length) {
+bool Replay::ReadData(void* data, size_t length) {
 	if(!is_replaying)
 		return false;
-	if (length < 0)
-		return false;
-	if ((int)(pdata - replay_data) + length > (int)replay_size) {
+	if (data_position + length > replay_size) {
 		is_replaying = false;
 		return false;
 	}
-	std::memcpy(data, pdata, length);
-	pdata += length;
+	std::memcpy(data, &replay_data[data_position], length);
+	data_position += length;
 	return true;
-}
-template<typename T>
-T Replay::ReadValue() {
-	T ret{};
-	if (!ReadData(&ret, sizeof ret))
-		return -1;
-	return ret;
 }
 int Replay::ReadInt32() {
 	return ReadValue<int32_t>();
@@ -239,7 +230,7 @@ char Replay::ReadInt8() {
 	return ReadValue<char>();
 }
 void Replay::Rewind() {
-	pdata = replay_data;
+	data_position = 0;
 }
 
 }
