@@ -63,12 +63,6 @@ void Replay::WriteData(const void* data, size_t length, bool flush) {
 void Replay::WriteInt32(int data, bool flush) {
 	WriteData(&data, sizeof data, flush);
 }
-void Replay::WriteInt16(short data, bool flush) {
-	WriteData(&data, sizeof data, flush);
-}
-void Replay::WriteInt8(char data, bool flush) {
-	WriteData(&data, sizeof data, flush);
-}
 void Replay::Flush() {
 	if(!is_recording)
 		return;
