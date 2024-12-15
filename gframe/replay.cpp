@@ -203,6 +203,9 @@ bool Replay::ReadName(wchar_t* data) {
 	BufferIO::CopyWStr(buffer, data, 20);
 	return true;
 }
+void Replay::ReadHeader(ReplayHeader& header) {
+	header = pheader;
+}
 bool Replay::ReadData(void* data, size_t length) {
 	if(!is_replaying)
 		return false;

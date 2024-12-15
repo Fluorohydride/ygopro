@@ -51,7 +51,7 @@ public:
 	static bool RenameReplay(const wchar_t* oldname, const wchar_t* newname);
 	bool ReadNextResponse(unsigned char resp[]);
 	bool ReadName(wchar_t* data);
-	//void ReadHeader(ReplayHeader& header);
+	void ReadHeader(ReplayHeader& header);
 	bool ReadData(void* data, size_t length);
 	template<typename T>
 	T Read() {
