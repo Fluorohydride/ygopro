@@ -1,8 +1,8 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#include "config.h"
-#include "deck_manager.h"
+#include <cstdint>
+#include <cstring>
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
@@ -191,7 +191,7 @@ struct DuelPlayer {
 
 inline bool check_msg_size(int size) {
 	// empty string is not allowed
-	if (size < 2* sizeof(uint16_t))
+	if (size < 2 * sizeof(uint16_t))
 		return false;
 	if (size > LEN_CHAT_MSG * sizeof(uint16_t))
 		return false;

@@ -1,13 +1,13 @@
+#include "config.h"
 #include "duelclient.h"
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
 #include "sound_manager.h"
 #include "single_mode.h"
-#include "../ocgcore/common.h"
 #include "game.h"
+#include "deck_manager.h"
 #include "replay.h"
-#include "replay_mode.h"
 #include <thread>
 
 namespace ygo {

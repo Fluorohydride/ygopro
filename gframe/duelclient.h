@@ -1,13 +1,9 @@
 #ifndef DUELCLIENT_H
 #define DUELCLIENT_H
 
-#include "config.h"
 #include <vector>
 #include <set>
-#include <utility>
 #include "network.h"
-#include "data_manager.h"
-#include "deck_manager.h"
 #include "../ocgcore/mtrandom.h"
 
 namespace ygo {

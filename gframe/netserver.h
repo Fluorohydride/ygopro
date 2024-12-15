@@ -1,11 +1,7 @@
 #ifndef NETSERVER_H
 #define NETSERVER_H
 
-#include "config.h"
 #include "network.h"
-#include "data_manager.h"
-#include "deck_manager.h"
-#include <set>
 #include <unordered_map>
 
 namespace ygo {
