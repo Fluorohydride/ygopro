@@ -1,7 +1,7 @@
 #include "replay_mode.h"
 #include "duelclient.h"
 #include "game.h"
-#include "../ocgcore/common.h"
+#include "data_manager.h"
 #include "../ocgcore/mtrandom.h"
 #include <thread>
 

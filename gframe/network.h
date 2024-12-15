@@ -1,8 +1,8 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#include "config.h"
-#include "deck_manager.h"
+#include <cstdint>
+#include <cstring>
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>

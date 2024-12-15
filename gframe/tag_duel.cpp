@@ -1,8 +1,8 @@
+#include "config.h"
 #include "tag_duel.h"
 #include "netserver.h"
 #include "game.h"
-#include "../ocgcore/ocgapi.h"
-#include "../ocgcore/common.h"
+#include "data_manager.h"
 #include "../ocgcore/mtrandom.h"
 
 namespace ygo {
