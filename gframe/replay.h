@@ -60,8 +60,6 @@ public:
 		return ret;
 	}
 	int ReadInt32();
-	short ReadInt16();
-	char ReadInt8();
 	void Rewind();
 
 	FILE* fp{ nullptr };

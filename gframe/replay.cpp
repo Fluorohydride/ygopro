@@ -217,12 +217,6 @@ bool Replay::ReadData(void* data, size_t length) {
 int Replay::ReadInt32() {
 	return ReadValue<int32_t>();
 }
-short Replay::ReadInt16() {
-	return ReadValue<int16_t>();
-}
-char Replay::ReadInt8() {
-	return ReadValue<char>();
-}
 void Replay::Rewind() {
 	data_position = 0;
 }
