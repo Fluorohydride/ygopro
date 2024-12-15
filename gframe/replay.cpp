@@ -214,8 +214,8 @@ bool Replay::ReadData(void* data, size_t length) {
 	data_position += length;
 	return true;
 }
-int Replay::ReadInt32() {
-	return ReadValue<int32_t>();
+int32_t Replay::ReadInt32() {
+	return Read<int32_t>();
 }
 void Replay::Rewind() {
 	data_position = 0;

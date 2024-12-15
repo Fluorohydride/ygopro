@@ -59,7 +59,7 @@ public:
 		ReadData(&ret, sizeof(T));
 		return ret;
 	}
-	int ReadInt32();
+	int32_t ReadInt32();
 	void Rewind();
 
 	FILE* fp{ nullptr };
