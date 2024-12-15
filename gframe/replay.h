@@ -39,7 +39,7 @@ public:
 	void Write(T data, bool flush = true) {
 		WriteData(&data, sizeof(T), flush);
 	}
-	void WriteInt32(int data, bool flush = true);
+	void WriteInt32(int32_t data, bool flush = true);
 	void Flush();
 	void EndRecord();
 	void SaveReplay(const wchar_t* name);
