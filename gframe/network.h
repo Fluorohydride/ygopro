@@ -191,7 +191,7 @@ struct DuelPlayer {
 
 inline bool check_msg_size(int size) {
 	// empty string is not allowed
-	if (size < 2* sizeof(uint16_t))
+	if (size < 2 * sizeof(uint16_t))
 		return false;
 	if (size > LEN_CHAT_MSG * sizeof(uint16_t))
 		return false;
