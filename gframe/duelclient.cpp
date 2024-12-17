@@ -49,7 +49,6 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 	sin.sin_addr.s_addr = htonl(ip);
 	sin.sin_port = htons(port);
 	client_bev = bufferevent_socket_new(client_base, -1, BEV_OPT_CLOSE_ON_FREE);
-	bufferevent_setwatermark(client_bev, EV_READ, 3, 0);
 	bufferevent_setcb(client_bev, ClientRead, nullptr, ClientEvent, (void*)create_game);
 	if (bufferevent_socket_connect(client_bev, (sockaddr*)&sin, sizeof(sin)) < 0) {
 		bufferevent_free(client_bev);
@@ -99,20 +98,17 @@ void DuelClient::StopClient(bool is_exiting) {
 }
 void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
-	int len = evbuffer_get_length(input);
+	auto len = evbuffer_get_length(input);
+	if (len < 2)
+		return;
 	unsigned char* duel_client_read = new unsigned char[SIZE_NETWORK_BUFFER];
-	unsigned short packet_len;
+	uint16_t packet_len = 0;
 	while (len >= 2) {
 		evbuffer_copyout(input, &packet_len, sizeof packet_len);
-		if (packet_len + 2 > SIZE_NETWORK_BUFFER) {
-			delete[] duel_client_read;
-			ClientEvent(bev, BEV_EVENT_ERROR, 0);
-			return;
-		}
 		if (len < packet_len + 2)
 			break;
 		int read_len = evbuffer_remove(input, duel_client_read, packet_len + 2);
-		if (read_len >= 3)
+		if (read_len > 2)
 			HandleSTOCPacketLan(&duel_client_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}

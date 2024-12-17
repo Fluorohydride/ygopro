@@ -110,7 +110,6 @@ void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, socka
 	dp.type = 0xff;
 	dp.bev = bev;
 	users[bev] = dp;
-	bufferevent_setwatermark(bev, EV_READ, 3, 0);
 	bufferevent_setcb(bev, ServerEchoRead, nullptr, ServerEchoEvent, nullptr);
 	bufferevent_enable(bev, EV_READ);
 }
@@ -124,20 +123,17 @@ void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {
 */
 void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
-	int len = evbuffer_get_length(input);
+	auto len = evbuffer_get_length(input);
+	if (len < 2)
+		return;
 	unsigned char* net_server_read = new unsigned char[SIZE_NETWORK_BUFFER];
-	unsigned short packet_len;
+	uint16_t packet_len = 0;
 	while (len >= 2) {
 		evbuffer_copyout(input, &packet_len, sizeof packet_len);
-		if (packet_len + 2 > SIZE_NETWORK_BUFFER) {
-			delete[] net_server_read;
-			ServerEchoEvent(bev, BEV_EVENT_ERROR, 0);
-			return;
-		}
 		if (len < packet_len + 2)
 			break;
 		int read_len = evbuffer_remove(input, net_server_read, packet_len + 2);
-		if (read_len >= 3)
+		if (read_len > 2)
 			HandleCTOSPacket(&users[bev], &net_server_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}

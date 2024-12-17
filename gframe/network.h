@@ -13,7 +13,7 @@
 #define check_trivially_copyable(T) static_assert(std::is_trivially_copyable<T>::value == true && std::is_standard_layout<T>::value == true, "not trivially copyable")
 
 namespace ygo {
-	constexpr int SIZE_NETWORK_BUFFER = 0x2000;
+	constexpr int SIZE_NETWORK_BUFFER = 0x20000;
 	constexpr int MAX_DATA_SIZE = SIZE_NETWORK_BUFFER - 3;
 	constexpr int MAINC_MAX = 250;	// the limit of card_state
 	constexpr int SIDEC_MAX = MAINC_MAX;
