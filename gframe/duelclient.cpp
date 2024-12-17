@@ -98,7 +98,7 @@ void DuelClient::StopClient(bool is_exiting) {
 }
 void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
-	auto len = evbuffer_get_length(input);
+	int len = evbuffer_get_length(input);
 	if (len < 2)
 		return;
 	unsigned char* duel_client_read = new unsigned char[SIZE_NETWORK_BUFFER];
