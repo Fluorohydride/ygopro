@@ -74,7 +74,6 @@ public:
 private:
 	unsigned char* replay_data;
 	size_t replay_size{};
-	unsigned char* pwrite{};
 	size_t data_position{};
 	bool is_recording{};
 	bool is_replaying{};
