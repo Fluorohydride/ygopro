@@ -228,8 +228,8 @@ bool ReplayMode::StartDuel() {
 		}
 	} else {
 		char filename[256];
-		int slen = cur_replay.ReadInt16();
-		if (slen < 0 || slen > 255) {
+		auto slen = cur_replay.Read<uint16_t>();
+		if (slen > sizeof(filename) - 1) {
 			return false;
 		}
 		cur_replay.ReadData(filename, slen);
