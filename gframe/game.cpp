@@ -109,6 +109,8 @@ bool Game::Initialize() {
 		return false;
 	}
 	LoadExpansions();
+	ChkLastTime();
+	ChkReload = false;
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	if(!numFont) {
@@ -1143,18 +1145,72 @@ std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth,
 	ret.assign(strBuffer);
 	return ret;
 }
+int Game::GetLastWriteTime(wchar_t* dirPath) {
+	struct _stat64i32 st = { 0 };
+	if (_wstat(dirPath, &st) != -1)
+		return (int)(st.st_mtime);
+	return 0;
+}
+void Game::ChkLastTime() {
+	int time = GetLastWriteTime(L"./expansions");
+	if (LastExpansionsTime < time) {
+		LastExpansionsTime = time;
+		ChkReload = true;
+	}
+	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
+		if (!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ypk", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".conf", 5))) {
+			wchar_t fpath[1024];
+			myswprintf(fpath, L"./expansions/%ls", name);
+			int time = mainGame->GetLastWriteTime(fpath);
+			if (mainGame->LastExpansionsFileTime < time) {
+				mainGame->LastExpansionsFileTime = time;
+				mainGame->ChkReload = true;
+			}
+		}
+	});
+}
+void Game::ReLoadExpansions() {
+	ChkLastTime();
+	if (ChkReload) {
+		ChkReload = false;
+		for (size_t i = 0; i < dataManager._expansionDatas.size(); ++i) {
+			int code = dataManager._expansionDatas[i];
+			dataManager._strings.erase(code);
+			dataManager._datas.erase(code);
+		}
+		dataManager._expansionDatas.clear();
+		for (size_t i = 0; i < dataManager._expansionStrings.size(); ++i) {
+			int value = dataManager._expansionStrings[i];
+			dataManager._counterStrings.erase(value);
+			dataManager._victoryStrings.erase(value);
+			dataManager._setnameStrings.erase(value);
+			dataManager._sysStrings.erase(value);
+		}
+		dataManager._expansionStrings.clear();
+		dataManager.LoadStrings("./expansions/strings.conf", true);
+		deckManager._lfList.clear();
+		deckManager.LoadLFList();
+		cbHostLFlist->clear();
+		cbLFlist->clear();
+		for (unsigned int i = 0; i < deckManager._lfList.size(); ++i)
+			cbHostLFlist->addItem(deckManager._lfList[i].listName.c_str());
+		for (unsigned int i = 0; i < deckManager._lfList.size(); ++i)
+			cbLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
+		LoadExpansions();
+	}
+}
 void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
 		wchar_t fpath[1024];
 		myswprintf(fpath, L"./expansions/%ls", name);
 		if (!isdir && IsExtension(name, L".cdb")) {
-			dataManager.LoadDB(fpath);
+			dataManager.LoadDB(fpath, true);
 			return;
 		}
 		if (!isdir && IsExtension(name, L".conf")) {
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
-			dataManager.LoadStrings(upath);
+			dataManager.LoadStrings(upath, true);
 			return;
 		}
 		if (!isdir && (IsExtension(name, L".zip") || IsExtension(name, L".ypk"))) {
@@ -1179,7 +1235,7 @@ void Game::LoadExpansions() {
 			BufferIO::DecodeUTF8(uname, fname);
 #endif
 			if (IsExtension(fname, L".cdb")) {
-				dataManager.LoadDB(fname);
+				dataManager.LoadDB(fname, true);
 				continue;
 			}
 			if (IsExtension(fname, L".conf")) {
@@ -1188,7 +1244,7 @@ void Game::LoadExpansions() {
 #else
 				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(uname);
 #endif
-				dataManager.LoadStrings(reader);
+				dataManager.LoadStrings(reader, true);
 				continue;
 			}
 			if (!mywcsncasecmp(fname, L"pack/", 5) && IsExtension(fname, L".ydk")) {
