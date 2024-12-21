@@ -398,18 +398,18 @@ unsigned char* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 	char expansions_path[1024]{};
 	std::snprintf(expansions_path, sizeof expansions_path, "./expansions/%s", script_name + 2);
 	if(mainGame->gameConf.prefer_expansion_script) {
-		if (ScriptReader(script_name, slen))
+		if (DefaultScriptReader(expansions_path, slen))
 			return scriptBuffer;
-		else if (DefaultScriptReader(expansions_path, slen))
+		else if (ScriptReader(script_name, slen))
 			return scriptBuffer;
 		else if (DefaultScriptReader(script_name, slen))
 			return scriptBuffer;
 	} else {
 		if (DefaultScriptReader(script_name, slen))
 			return scriptBuffer;
-		else if (ScriptReader(script_name, slen))
-			return scriptBuffer;
 		else if (DefaultScriptReader(expansions_path, slen))
+			return scriptBuffer;
+		else if (ScriptReader(script_name, slen))
 			return scriptBuffer;
 	}
 	return nullptr;
