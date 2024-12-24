@@ -400,7 +400,7 @@ unsigned char* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 	if(mainGame->gameConf.prefer_expansion_script) {
 		if (DefaultScriptReader(expansions_path, slen))
 			return scriptBuffer;
-		else if (ScriptReader(script_name, slen))
+		else if (ScriptReader(script_name + 2, slen))
 			return scriptBuffer;
 		else if (DefaultScriptReader(script_name, slen))
 			return scriptBuffer;
@@ -409,7 +409,7 @@ unsigned char* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 			return scriptBuffer;
 		else if (DefaultScriptReader(expansions_path, slen))
 			return scriptBuffer;
-		else if (ScriptReader(script_name, slen))
+		else if (ScriptReader(script_name + 2, slen))
 			return scriptBuffer;
 	}
 	return nullptr;
