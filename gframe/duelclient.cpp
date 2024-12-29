@@ -1,20 +1,20 @@
+#include "config.h"
 #include "duelclient.h"
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
 #include "sound_manager.h"
 #include "single_mode.h"
-#include "../ocgcore/common.h"
 #include "game.h"
+#include "deck_manager.h"
 #include "replay.h"
-#include "replay_mode.h"
 #include <thread>
 
 namespace ygo {
 
 unsigned DuelClient::connect_state = 0;
 unsigned char DuelClient::response_buf[SIZE_RETURN_VALUE];
-unsigned int DuelClient::response_len = 0;
+size_t DuelClient::response_len = 0;
 unsigned int DuelClient::watching = 0;
 unsigned char DuelClient::selftype = 0;
 bool DuelClient::is_host = false;
@@ -27,7 +27,7 @@ int DuelClient::select_hint = 0;
 int DuelClient::select_unselect_hint = 0;
 int DuelClient::last_select_hint = 0;
 unsigned char DuelClient::last_successful_msg[0x2000];
-unsigned int DuelClient::last_successful_msg_length = 0;
+size_t DuelClient::last_successful_msg_length = 0;
 wchar_t DuelClient::event_string[256];
 mt19937 DuelClient::rnd;
 
@@ -49,8 +49,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 	sin.sin_addr.s_addr = htonl(ip);
 	sin.sin_port = htons(port);
 	client_bev = bufferevent_socket_new(client_base, -1, BEV_OPT_CLOSE_ON_FREE);
-	bufferevent_setwatermark(client_bev, EV_READ, 3, 0);
-	bufferevent_setcb(client_bev, ClientRead, NULL, ClientEvent, (void*)create_game);
+	bufferevent_setcb(client_bev, ClientRead, nullptr, ClientEvent, (void*)create_game);
 	if (bufferevent_socket_connect(client_bev, (sockaddr*)&sin, sizeof(sin)) < 0) {
 		bufferevent_free(client_bev);
 		event_base_free(client_base);
@@ -100,27 +99,24 @@ void DuelClient::StopClient(bool is_exiting) {
 void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
 	int len = evbuffer_get_length(input);
+	if (len < 2)
+		return;
 	unsigned char* duel_client_read = new unsigned char[SIZE_NETWORK_BUFFER];
-	unsigned short packet_len;
+	uint16_t packet_len = 0;
 	while (len >= 2) {
 		evbuffer_copyout(input, &packet_len, sizeof packet_len);
-		if (packet_len + 2 > SIZE_NETWORK_BUFFER) {
-			delete[] duel_client_read;
-			ClientEvent(bev, BEV_EVENT_ERROR, 0);
-			return;
-		}
 		if (len < packet_len + 2)
 			break;
 		int read_len = evbuffer_remove(input, duel_client_read, packet_len + 2);
-		if (read_len >= 3)
+		if (read_len > 2)
 			HandleSTOCPacketLan(&duel_client_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}
 	delete[] duel_client_read;
 }
-void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
+void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 	if (events & BEV_EVENT_CONNECTED) {
-		bool create_game = (size_t)ctx != 0;
+		bool create_game = (intptr_t)ctx;
 		CTOS_PlayerInfo cspi;
 		BufferIO::CopyCharArray(mainGame->ebNickName->getText(), cspi.name);
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
@@ -4000,11 +3996,11 @@ int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
 void DuelClient::SwapField() {
 	is_swapping = true;
 }
-void DuelClient::SetResponseI(int respI) {
+void DuelClient::SetResponseI(int32_t respI) {
 	std::memcpy(response_buf, &respI, sizeof respI);
-	response_len = 4;
+	response_len = sizeof respI;
 }
-void DuelClient::SetResponseB(void* respB, unsigned int len) {
+void DuelClient::SetResponseB(void* respB, size_t len) {
 	if (len > SIZE_RETURN_VALUE)
 		len = SIZE_RETURN_VALUE;
 	std::memcpy(response_buf, respB, len);

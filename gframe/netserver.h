@@ -1,11 +1,7 @@
 #ifndef NETSERVER_H
 #define NETSERVER_H
 
-#include "config.h"
 #include "network.h"
-#include "data_manager.h"
-#include "deck_manager.h"
-#include <set>
 #include <unordered_map>
 
 namespace ygo {
@@ -21,7 +17,7 @@ private:
 	static evconnlistener* listener;
 	static DuelMode* duel_mode;
 	static unsigned char net_server_write[SIZE_NETWORK_BUFFER];
-	static unsigned short last_sent;
+	static size_t last_sent;
 
 public:
 #ifdef YGOPRO_SERVER_MODE
@@ -47,20 +43,19 @@ public:
 	static size_t CreateChatPacket(unsigned char* src, int src_size, unsigned char* dst, uint16_t dst_player_type);
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto) {
 		auto p = net_server_write;
-		BufferIO::WriteInt16(p, 1);
-		BufferIO::WriteInt8(p, proto);
+		buffer_write<uint16_t>(p, 1);
+		buffer_write<uint8_t>(p, proto);
 		last_sent = 3;
-		if(!dp)
-			return;
-		bufferevent_write(dp->bev, net_server_write, 3);
+		if (dp)
+			bufferevent_write(dp->bev, net_server_write, 3);
 	}
 	template<typename ST>
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, ST& st) {
 		auto p = net_server_write;
-		if ((int)sizeof(ST) > MAX_DATA_SIZE)
+		if (sizeof(ST) > MAX_DATA_SIZE)
 			return;
-		BufferIO::WriteInt16(p, (short)(1 + sizeof(ST)));
-		BufferIO::WriteInt8(p, proto);
+		buffer_write<uint16_t>(p, (uint16_t)(1 + sizeof(ST)));
+		buffer_write<uint8_t>(p, proto);
 		std::memcpy(p, &st, sizeof(ST));
 		last_sent = sizeof(ST) + 3;
 		if (dp)
@@ -68,17 +63,14 @@ public:
 	}
 	static void SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* buffer, size_t len) {
 		auto p = net_server_write;
-		int blen = len;
-		if (blen < 0)
-			return;
-		if (blen > MAX_DATA_SIZE)
-			blen = MAX_DATA_SIZE;
-		BufferIO::WriteInt16(p, (short)(1 + blen));
-		BufferIO::WriteInt8(p, proto);
-		std::memcpy(p, buffer, blen);
-		last_sent = blen + 3;
+		if (len > MAX_DATA_SIZE)
+			len = MAX_DATA_SIZE;
+		buffer_write<uint16_t>(p, (uint16_t)(1 + len));
+		buffer_write<uint8_t>(p, proto);
+		std::memcpy(p, buffer, len);
+		last_sent = len + 3;
 		if (dp)
-			bufferevent_write(dp->bev, net_server_write, blen + 3);
+			bufferevent_write(dp->bev, net_server_write, len + 3);
 	}
 	static void ReSendToPlayer(DuelPlayer* dp) {
 		if(dp)

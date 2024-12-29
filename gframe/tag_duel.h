@@ -1,8 +1,8 @@
 #ifndef TAG_DUEL_H
 #define TAG_DUEL_H
 
-#include "config.h"
 #include "network.h"
+#include "deck_manager.h"
 #include "replay.h"
 
 namespace ygo {
@@ -50,7 +50,7 @@ public:
 #endif
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 
-	static uint32 MessageHandler(intptr_t fduel, uint32 type);
+	static uint32_t MessageHandler(intptr_t fduel, uint32_t type);
 	static void TagTimer(evutil_socket_t fd, short events, void* arg);
 
 private:

@@ -1131,8 +1131,8 @@ void Game::DrawThumb(code_pointer cp, position2di pos, const std::unordered_map<
 	if(lcode == 0)
 		lcode = code;
 	irr::video::ITexture* img = imageManager.GetTextureThumb(code);
-	if(img == NULL)
-		return; //NULL->getSize() will cause a crash
+	if(img == nullptr)
+		return; //nullptr->getSize() will cause a crash
 	dimension2d<u32> size = img->getOriginalSize();
 	recti dragloc = mainGame->Resize(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH, pos.Y + CARD_THUMB_HEIGHT);
 	recti limitloc = mainGame->Resize(pos.X, pos.Y, pos.X + 20, pos.Y + 20);

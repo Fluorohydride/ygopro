@@ -1,8 +1,8 @@
+#include "config.h"
 #include "single_duel.h"
 #include "netserver.h"
 #include "game.h"
-#include "../ocgcore/ocgapi.h"
-#include "../ocgcore/common.h"
+#include "data_manager.h"
 #include "../ocgcore/mtrandom.h"
 
 namespace ygo {
@@ -585,28 +585,19 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteInt32(host_info.draw_count, false);
 	last_replay.WriteInt32(opt, false);
 	last_replay.Flush();
-	last_replay.WriteInt32(pdeck[0].main.size(), false);
-	for(int32 i = (int32)pdeck[0].main.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[0].main[i]->first, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[0].main[i]->first, false);
-	}
-	last_replay.WriteInt32(pdeck[0].extra.size(), false);
-	for(int32 i = (int32)pdeck[0].extra.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[0].extra[i]->first, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[0].extra[i]->first, false);
-	}
-	last_replay.WriteInt32(pdeck[1].main.size(), false);
-	for(int32 i = (int32)pdeck[1].main.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[1].main[i]->first, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[1].main[i]->first, false);
-	}
-	last_replay.WriteInt32(pdeck[1].extra.size(), false);
-	for(int32 i = (int32)pdeck[1].extra.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[1].extra[i]->first, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[1].extra[i]->first, false);
-	}
+	auto load = [&](const std::vector<code_pointer>& deck_container, uint8_t p, uint8_t location) {
+		last_replay.WriteInt32(deck_container.size(), false);
+		for (auto cit = deck_container.rbegin(); cit != deck_container.rend(); ++cit) {
+			new_card(pduel, (*cit)->first, p, p, location, 0, POS_FACEDOWN_DEFENSE);
+			last_replay.WriteInt32((*cit)->first, false);
+		}
+	};
+	load(pdeck[0].main, 0, LOCATION_DECK);
+	load(pdeck[0].extra, 0, LOCATION_EXTRA);
+	load(pdeck[1].main, 1, LOCATION_DECK);
+	load(pdeck[1].extra, 1, LOCATION_EXTRA);
 	last_replay.Flush();
-	unsigned char startbuf[32];
+	unsigned char startbuf[32]{};
 	auto pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, 0);
@@ -735,7 +726,7 @@ void SingleDuel::Surrender(DuelPlayer* dp) {
 	if(dp->type > 1 || !pduel)
 		return;
 	unsigned char wbuf[3];
-	uint32 player = dp->type;
+	uint32_t player = dp->type;
 	wbuf[0] = MSG_WIN;
 	wbuf[1] = 1 - player;
 	wbuf[2] = 0;
@@ -1790,7 +1781,7 @@ void SingleDuel::GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int 
 	if (len > SIZE_RETURN_VALUE)
 		len = SIZE_RETURN_VALUE;
 	std::memcpy(resb, pdata, len);
-	last_replay.WriteInt8(len);
+	last_replay.Write<uint8_t>(len);
 	last_replay.WriteData(resb, len);
 	set_responseb(pduel, resb);
 	players[dp->type]->state = 0xff;
@@ -2189,7 +2180,7 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	NetServer::ReSendToPlayers(cache_recorder, replay_recorder);
 #endif
 }
-uint32 SingleDuel::MessageHandler(intptr_t fduel, uint32 type) {
+uint32_t SingleDuel::MessageHandler(intptr_t fduel, uint32_t type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
@@ -2202,7 +2193,7 @@ void SingleDuel::SingleTimer(evutil_socket_t fd, short events, void* arg) {
 	sd->time_elapsed++;
 	if(sd->time_elapsed >= sd->time_limit[sd->last_response] || sd->time_limit[sd->last_response] <= 0) {
 		unsigned char wbuf[3];
-		uint32 player = sd->last_response;
+		uint32_t player = sd->last_response;
 		wbuf[0] = MSG_WIN;
 		wbuf[1] = 1 - player;
 		wbuf[2] = 0x3;

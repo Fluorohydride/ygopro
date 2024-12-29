@@ -93,11 +93,11 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 	if(!list)
 		return 0;
 	int dc = 0;
-	if((int)deck.main.size() < DECK_MIN_SIZE || (int)deck.main.size() > DECK_MAX_SIZE)
+	if(deck.main.size() < DECK_MIN_SIZE || deck.main.size() > DECK_MAX_SIZE)
 		return ((unsigned)DECKERROR_MAINCOUNT << 28) + deck.main.size();
-	if((int)deck.extra.size() > EXTRA_MAX_SIZE)
+	if(deck.extra.size() > EXTRA_MAX_SIZE)
 		return ((unsigned)DECKERROR_EXTRACOUNT << 28) + deck.extra.size();
-	if((int)deck.side.size() > SIDE_MAX_SIZE)
+	if(deck.side.size() > SIDE_MAX_SIZE)
 		return ((unsigned)DECKERROR_SIDECOUNT << 28) + deck.side.size();
 	if (rule < 0 || rule >= 6)
 		return 0;
@@ -263,7 +263,7 @@ void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, 
 	wchar_t filepath[256];
 	wchar_t catepath[256];
 	const wchar_t* deckname = cbDeck->getItem(cbDeck->getSelected());
-	if(deckname != NULL) {
+	if(deckname != nullptr) {
 		GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
 		myswprintf(filepath, L"%ls/%ls.ydk", catepath, deckname);
 		BufferIO::CopyWStr(filepath, ret, 256);

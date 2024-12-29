@@ -1,8 +1,8 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#include "config.h"
-#include "deck_manager.h"
+#include <cstdint>
+#include <cstring>
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
@@ -13,7 +13,7 @@
 #define check_trivially_copyable(T) static_assert(std::is_trivially_copyable<T>::value == true && std::is_standard_layout<T>::value == true, "not trivially copyable")
 
 namespace ygo {
-	constexpr int SIZE_NETWORK_BUFFER = 0x2000;
+	constexpr int SIZE_NETWORK_BUFFER = 0x20000;
 	constexpr int MAX_DATA_SIZE = SIZE_NETWORK_BUFFER - 3;
 	constexpr int MAINC_MAX = 250;	// the limit of card_state
 	constexpr int SIDEC_MAX = MAINC_MAX;
@@ -36,86 +36,86 @@ check_trivially_copyable(HostInfo);
 static_assert(sizeof(HostInfo) == 20, "size mismatch: HostInfo");
 
 struct HostPacket {
-	uint16_t identifier;
-	uint16_t version;
-	uint16_t port;
+	uint16_t identifier{};
+	uint16_t version{};
+	uint16_t port{};
 	// byte padding[2]
 
-	uint32_t ipaddr;
-	uint16_t name[20];
+	uint32_t ipaddr{};
+	uint16_t name[20]{};
 	HostInfo host;
 };
 check_trivially_copyable(HostPacket);
 static_assert(sizeof(HostPacket) == 72, "size mismatch: HostPacket");
 
 struct HostRequest {
-	uint16_t identifier;
+	uint16_t identifier{};
 };
 check_trivially_copyable(HostRequest);
 static_assert(sizeof(HostRequest) == 2, "size mismatch: HostRequest");
 
 struct CTOS_HandResult {
-	unsigned char res;
+	unsigned char res{};
 };
 check_trivially_copyable(CTOS_HandResult);
 static_assert(sizeof(CTOS_HandResult) == 1, "size mismatch: CTOS_HandResult");
 
 struct CTOS_TPResult {
-	unsigned char res;
+	unsigned char res{};
 };
 check_trivially_copyable(CTOS_TPResult);
 static_assert(sizeof(CTOS_TPResult) == 1, "size mismatch: CTOS_TPResult");
 
 struct CTOS_PlayerInfo {
-	uint16_t name[20];
+	uint16_t name[20]{};
 };
 check_trivially_copyable(CTOS_PlayerInfo);
 static_assert(sizeof(CTOS_PlayerInfo) == 40, "size mismatch: CTOS_PlayerInfo");
 
 struct CTOS_CreateGame {
 	HostInfo info;
-	uint16_t name[20];
-	uint16_t pass[20];
+	uint16_t name[20]{};
+	uint16_t pass[20]{};
 };
 check_trivially_copyable(CTOS_CreateGame);
 static_assert(sizeof(CTOS_CreateGame) == 100, "size mismatch: CTOS_CreateGame");
 
 struct CTOS_JoinGame {
-	uint16_t version;
+	uint16_t version{};
 	// byte padding[2]
 
-	uint32_t gameid;
-	uint16_t pass[20];
+	uint32_t gameid{};
+	uint16_t pass[20]{};
 };
 check_trivially_copyable(CTOS_JoinGame);
 static_assert(sizeof(CTOS_JoinGame) == 48, "size mismatch: CTOS_JoinGame");
 
 struct CTOS_Kick {
-	unsigned char pos;
+	unsigned char pos{};
 };
 check_trivially_copyable(CTOS_Kick);
 static_assert(sizeof(CTOS_Kick) == 1, "size mismatch: CTOS_Kick");
 
 // STOC
 struct STOC_ErrorMsg {
-	unsigned char msg;
+	unsigned char msg{};
 	// byte padding[3]
 
-	uint32_t code;
+	uint32_t code{};
 };
 check_trivially_copyable(STOC_ErrorMsg);
 static_assert(sizeof(STOC_ErrorMsg) == 8, "size mismatch: STOC_ErrorMsg");
 
 struct STOC_HandResult {
-	unsigned char res1;
-	unsigned char res2;
+	unsigned char res1{};
+	unsigned char res2{};
 };
 check_trivially_copyable(STOC_HandResult);
 static_assert(sizeof(STOC_HandResult) == 2, "size mismatch: STOC_HandResult");
 
 // reserved for STOC_CREATE_GAME
 struct STOC_CreateGame {
-	uint32_t gameid;
+	uint32_t gameid{};
 };
 check_trivially_copyable(STOC_CreateGame);
 static_assert(sizeof(STOC_CreateGame) == 4, "size mismatch: STOC_CreateGame");
@@ -127,23 +127,23 @@ check_trivially_copyable(STOC_JoinGame);
 static_assert(sizeof(STOC_JoinGame) == 20, "size mismatch: STOC_JoinGame");
 
 struct STOC_TypeChange {
-	unsigned char type;
+	unsigned char type{};
 };
 check_trivially_copyable(STOC_TypeChange);
 static_assert(sizeof(STOC_TypeChange) == 1, "size mismatch: STOC_TypeChange");
 
 // reserved for STOC_LEAVE_GAME
 struct STOC_ExitGame {
-	unsigned char pos;
+	unsigned char pos{};
 };
 check_trivially_copyable(STOC_ExitGame);
 static_assert(sizeof(STOC_ExitGame) == 1, "size mismatch: STOC_ExitGame");
 
 struct STOC_TimeLimit {
-	unsigned char player;
+	unsigned char player{};
 	// byte padding[1]
 
-	uint16_t left_time;
+	uint16_t left_time{};
 };
 check_trivially_copyable(STOC_TimeLimit);
 static_assert(sizeof(STOC_TimeLimit) == 4, "size mismatch: STOC_TimeLimit");
@@ -158,8 +158,8 @@ constexpr int LEN_CHAT_MSG = 256;
 constexpr int SIZE_STOC_CHAT = (LEN_CHAT_PLAYER + LEN_CHAT_MSG) * sizeof(uint16_t);
 
 struct STOC_HS_PlayerEnter {
-	uint16_t name[20];
-	unsigned char pos;
+	uint16_t name[20]{};
+	unsigned char pos{};
 	// byte padding[1]
 };
 check_trivially_copyable(STOC_HS_PlayerEnter);
@@ -168,13 +168,13 @@ constexpr int STOC_HS_PlayerEnter_size = 41;	//workwround
 
 struct STOC_HS_PlayerChange {
 	//pos<<4 | state
-	unsigned char status;
+	unsigned char status{};
 };
 check_trivially_copyable(STOC_HS_PlayerChange);
 static_assert(sizeof(STOC_HS_PlayerChange) == 1, "size mismatch: STOC_HS_PlayerChange");
 
 struct STOC_HS_WatchChange {
-	uint16_t watch_count;
+	uint16_t watch_count{};
 };
 check_trivially_copyable(STOC_HS_WatchChange);
 static_assert(sizeof(STOC_HS_WatchChange) == 2, "size mismatch: STOC_HS_WatchChange");
@@ -183,15 +183,15 @@ class DuelMode;
 
 struct DuelPlayer {
 	unsigned short name[20]{};
-	DuelMode* game{ nullptr };
-	unsigned char type{ 0 };
-	unsigned char state{ 0 };
-	bufferevent* bev{ 0 };
+	DuelMode* game{};
+	unsigned char type{};
+	unsigned char state{};
+	bufferevent* bev{};
 };
 
 inline bool check_msg_size(int size) {
 	// empty string is not allowed
-	if (size < 2* sizeof(uint16_t))
+	if (size < 2 * sizeof(uint16_t))
 		return false;
 	if (size > LEN_CHAT_MSG * sizeof(uint16_t))
 		return false;
@@ -200,7 +200,7 @@ inline bool check_msg_size(int size) {
 	return true;
 }
 
-inline unsigned int GetPosition(unsigned char* qbuf, int offset) {
+inline unsigned int GetPosition(unsigned char* qbuf, size_t offset) {
 	unsigned int info = 0;
 	std::memcpy(&info, qbuf + offset, sizeof info);
 	return info >> 24;
