@@ -58,7 +58,7 @@ void NetServer::InitDuel()
 }
 
 bool NetServer::IsCanIncreaseTime(unsigned short gameMsg, void *pdata, unsigned int len) {
-	int32* ivalue = (int32*)pdata;
+	int32_t* ivalue = (int32_t*)pdata;
 	switch(gameMsg) {
 		case MSG_RETRY:
 		case MSG_SELECT_UNSELECT_CARD:
@@ -66,11 +66,11 @@ bool NetServer::IsCanIncreaseTime(unsigned short gameMsg, void *pdata, unsigned 
 		case MSG_SELECT_CHAIN:
 			return ivalue[0] != -1;
 		case MSG_SELECT_IDLECMD: {
-			int32 idleChoice = ivalue[0] & 0xffff;
+			int32_t idleChoice = ivalue[0] & 0xffff;
 			return idleChoice <= 5; // no shuffle hand, enter other phases
 		}
 		case MSG_SELECT_BATTLECMD: {
-			int32 battleChoice = ivalue[0] & 0xffff;
+			int32_t battleChoice = ivalue[0] & 0xffff;
 			return battleChoice <= 1; // attack only
 		}
 		default:
