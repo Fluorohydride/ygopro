@@ -424,14 +424,11 @@ unsigned char* DataManager::ScriptReader(const char* script_name, int* slen) {
 #endif
 	if (!reader)
 		return nullptr;
-	size_t size = reader->getSize();
-	if (size > sizeof scriptBuffer) {
-		reader->drop();
-		return nullptr;
-	}
-	reader->read(scriptBuffer, size);
+	int size = reader->read(scriptBuffer, sizeof scriptBuffer);
 	reader->drop();
-	*slen = (int)size;
+	if (size >= (int)sizeof scriptBuffer)
+		return nullptr;
+	*slen = size;
 	return scriptBuffer;
 }
 unsigned char* DataManager::DefaultScriptReader(const char* script_name, int* slen) {
