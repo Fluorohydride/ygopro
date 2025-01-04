@@ -6,7 +6,7 @@
 namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
-unsigned char DataManager::scriptBuffer[0x20000];
+unsigned char DataManager::scriptBuffer[0x100000];
 IFileSystem* DataManager::FileSystem;
 DataManager dataManager;
 
