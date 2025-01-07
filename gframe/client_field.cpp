@@ -1201,11 +1201,11 @@ bool ClientField::CheckSelectSum() {
 	if (select_mode == 0) { // sum equal
 		bool ret = check_sel_sum_s(selable, 0, select_sumval);
 		selectable_cards.clear();
-		for(auto sc : selected_cards) {
-			selectable_cards.push_back(sc);
-		}
 		for(auto sc : selectsum_cards) {
 			sc->is_selectable = true;
+			selectable_cards.push_back(sc);
+		}
+		for(auto sc : selected_cards) {
 			selectable_cards.push_back(sc);
 		}
 		return ret;
@@ -1265,11 +1265,11 @@ bool ClientField::CheckSelectSum() {
 			}
 		}
 		selectable_cards.clear();
-		for(auto sc : selected_cards) {
-			selectable_cards.push_back(sc);
-		}
 		for(auto sc : selectsum_cards) {
 			sc->is_selectable = true;
+			selectable_cards.push_back(sc);
+		}
+		for(auto sc : selected_cards) {
 			selectable_cards.push_back(sc);
 		}
 		return ret;
