@@ -7,7 +7,7 @@ namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
 unsigned char DataManager::scriptBuffer[0x100000] = {};
-IFileSystem* DataManager::FileSystem = nullptr;
+irr::io::IFileSystem* DataManager::FileSystem = nullptr;
 DataManager dataManager;
 
 DataManager::DataManager() : _datas(32768), _strings(32768) {
@@ -119,7 +119,7 @@ bool DataManager::LoadStrings(const char* file) {
 	fclose(fp);
 	return true;
 }
-bool DataManager::LoadStrings(IReadFile* reader) {
+bool DataManager::LoadStrings(irr::io::IReadFile* reader) {
 	char ch{};
 	std::string linebuf;
 	while (reader->read(&ch, 1)) {

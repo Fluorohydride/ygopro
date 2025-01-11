@@ -1,14 +1,43 @@
 #ifndef DATAMANAGER_H
 #define DATAMANAGER_H
 
-#include "config.h"
 #include <unordered_map>
+#include <vector>
+#include <string>
 #include <sqlite3.h>
-#include "client_card.h"
+#include "../ocgcore/card_data.h"
+
+namespace irr {
+	namespace io {
+		class IReadFile;
+		class IFileSystem;
+	}
+}
 
 namespace ygo {
-	constexpr int MAX_STRING_ID = 0x7ff;
-	constexpr unsigned int MIN_CARD_ID = (unsigned int)(MAX_STRING_ID + 1) >> 4;
+constexpr int MAX_STRING_ID = 0x7ff;
+constexpr unsigned int MIN_CARD_ID = (unsigned int)(MAX_STRING_ID + 1) >> 4;
+	
+using CardData = card_data;
+struct CardDataC : card_data {
+	unsigned int ot{};
+	unsigned int category{};
+
+	bool is_setcodes(std::vector <uint32_t> values) const {
+		for (auto& value : values) {
+			if (is_setcode(value))
+				return true;
+		}
+		return false;
+	}
+};
+struct CardString {
+	std::wstring name;
+	std::wstring text;
+	std::wstring desc[16];
+};
+typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer;
+typedef std::unordered_map<unsigned int, CardString>::const_iterator string_pointer;
 
 class DataManager {
 public:
@@ -16,7 +45,7 @@ public:
 	bool ReadDB(sqlite3* pDB);
 	bool LoadDB(const wchar_t* wfile);
 	bool LoadStrings(const char* file);
-	bool LoadStrings(IReadFile* reader);
+	bool LoadStrings(irr::io::IReadFile* reader);
 	void ReadStringConfLine(const char* linebuf);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = nullptr);
 
@@ -60,7 +89,7 @@ public:
 	//read by fread
 	static unsigned char* DefaultScriptReader(const char* script_name, int* slen);
 	
-	static IFileSystem* FileSystem;
+	static irr::io::IFileSystem* FileSystem;
 
 private:
 	std::unordered_map<unsigned int, CardDataC> _datas;

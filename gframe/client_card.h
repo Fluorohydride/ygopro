@@ -2,34 +2,12 @@
 #define CLIENT_CARD_H
 
 #include "config.h"
-#include "../ocgcore/card_data.h"
+#include "data_manager.h"
 #include <vector>
 #include <set>
 #include <map>
-#include <unordered_map>
 
 namespace ygo {
-
-using CardData = card_data;
-struct CardDataC : card_data {
-	unsigned int ot{};
-	unsigned int category{};
-
-	bool is_setcodes(std::vector <uint32_t> values) const {
-		for (auto& value : values) {
-			if (is_setcode(value))
-				return true;
-		}
-		return false;
-	}
-};
-struct CardString {
-	std::wstring name;
-	std::wstring text;
-	std::wstring desc[16];
-};
-typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer;
-typedef std::unordered_map<unsigned int, CardString>::const_iterator string_pointer;
 
 class ClientCard {
 public:
