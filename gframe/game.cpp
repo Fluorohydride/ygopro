@@ -99,7 +99,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load textures!");
 		return false;
 	}
-	dataManager.FileSystem = device->getFileSystem();
+	DataManager::FileSystem = device->getFileSystem();
 	if(!dataManager.LoadDB(L"cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");
 		return false;
@@ -1159,11 +1159,11 @@ void Game::LoadExpansions() {
 		}
 		if (!isdir && (IsExtension(name, L".zip") || IsExtension(name, L".ypk"))) {
 #ifdef _WIN32
-			dataManager.FileSystem->addFileArchive(fpath, true, false, EFAT_ZIP);
+			DataManager::FileSystem->addFileArchive(fpath, true, false, EFAT_ZIP);
 #else
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
-			dataManager.FileSystem->addFileArchive(upath, true, false, EFAT_ZIP);
+			DataManager::FileSystem->addFileArchive(upath, true, false, EFAT_ZIP);
 #endif
 			return;
 		}

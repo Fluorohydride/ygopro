@@ -268,11 +268,11 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 }
 IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
 #ifdef _WIN32
-	IReadFile* reader = dataManager.FileSystem->createAndOpenFile(file);
+	IReadFile* reader = DataManager::FileSystem->createAndOpenFile(file);
 #else
 	char file2[256];
 	BufferIO::EncodeUTF8(file, file2);
-	IReadFile* reader = dataManager.FileSystem->createAndOpenFile(file2);
+	IReadFile* reader = DataManager::FileSystem->createAndOpenFile(file2);
 #endif
 	return reader;
 }
