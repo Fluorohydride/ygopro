@@ -54,6 +54,13 @@ struct HostRequest {
 check_trivially_copyable(HostRequest);
 static_assert(sizeof(HostRequest) == 2, "size mismatch: HostRequest");
 
+struct CTOS_DeckData {
+	int32_t mainc{};
+	int32_t sidec{};
+	int32_t list[MAINC_MAX + SIDEC_MAX]{};
+};
+check_trivially_copyable(CTOS_DeckData);
+
 struct CTOS_HandResult {
 	unsigned char res{};
 };
@@ -252,7 +259,7 @@ public:
 #define NETPLAYER_TYPE_OBSERVER		7
 
 #define CTOS_RESPONSE		0x1		// byte array
-#define CTOS_UPDATE_DECK	0x2		// mainc, sidec, int32_t[mainc + sidec]
+#define CTOS_UPDATE_DECK	0x2		// CTOS_DeckData
 #define CTOS_HAND_RESULT	0x3		// CTOS_HandResult
 #define CTOS_TP_RESULT		0x4		// CTOS_TPResult
 #define CTOS_PLAYER_INFO	0x10	// CTOS_PlayerInfo
