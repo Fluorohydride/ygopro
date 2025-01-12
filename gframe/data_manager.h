@@ -50,11 +50,16 @@ public:
 	std::unordered_map<unsigned int, std::wstring> _sysStrings;
 	char errmsg[512]{};
 
-	static unsigned char scriptBuffer[0x20000];
+	static unsigned char scriptBuffer[0x100000];
 	static const wchar_t* unknown_string;
 	static uint32_t CardReader(uint32_t, card_data*);
 	static unsigned char* ScriptReaderEx(const char* script_name, int* slen);
+	
+	//read by IFileSystem
 	static unsigned char* ScriptReader(const char* script_name, int* slen);
+	//read by fread
+	static unsigned char* DefaultScriptReader(const char* script_name, int* slen);
+	
 	static IFileSystem* FileSystem;
 
 private:

@@ -295,8 +295,7 @@ public:
 	s32 getKerningHeight() const override;
 
 	//! Define which characters should not be drawn by the font.
-	void setInvisibleCharacters(const wchar_t *s) override;
-	void setInvisibleCharacters(const core::ustring& s);
+	void setInvisibleCharacters(const wchar_t *s) final;
 
 	//! Get the last glyph page if there's still available slots.
 	//! If not, it will return zero.

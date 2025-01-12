@@ -268,11 +268,11 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 }
 IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
 #ifdef _WIN32
-	IReadFile* reader = dataManager.FileSystem->createAndOpenFile(file);
+	IReadFile* reader = DataManager::FileSystem->createAndOpenFile(file);
 #else
 	char file2[256];
 	BufferIO::EncodeUTF8(file, file2);
-	IReadFile* reader = dataManager.FileSystem->createAndOpenFile(file2);
+	IReadFile* reader = DataManager::FileSystem->createAndOpenFile(file2);
 #endif
 	return reader;
 }
@@ -280,25 +280,23 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	current_deck.clear();
 	IReadFile* reader = OpenDeckReader(file);
 	if(!reader) {
-		wchar_t localfile[64];
+		wchar_t localfile[256];
 		myswprintf(localfile, L"./deck/%ls.ydk", file);
 		reader = OpenDeckReader(localfile);
 	}
 	if(!reader && !mywcsncasecmp(file, L"./pack", 6)) {
-		wchar_t zipfile[64];
+		wchar_t zipfile[256];
 		myswprintf(zipfile, L"%ls", file + 2);
 		reader = OpenDeckReader(zipfile);
 	}
 	if(!reader)
 		return false;
-	auto size = reader->getSize();
-	if(size >= (int)sizeof deckBuffer) {
-		reader->drop();
+	std::memset(deckBuffer, 0, sizeof deckBuffer);
+	int size = reader->read(deckBuffer, sizeof deckBuffer);
+	reader->drop();
+	if (size >= (int)sizeof deckBuffer) {
 		return false;
 	}
-	std::memset(deckBuffer, 0, sizeof deckBuffer);
-	reader->read(deckBuffer, size);
-	reader->drop();
 	std::istringstream deckStream(deckBuffer);
 	LoadDeck(current_deck, deckStream, is_packlist);
 	return true;  // the above LoadDeck has return value but we ignore it here for now

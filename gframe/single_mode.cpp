@@ -1,8 +1,8 @@
 #include "single_mode.h"
 #include "duelclient.h"
 #include "game.h"
+#include "data_manager.h"
 #include "myfilesystem.h"
-#include "../ocgcore/common.h"
 #include "../ocgcore/mtrandom.h"
 #include <thread>
 
@@ -26,7 +26,7 @@ void SingleMode::StopPlay(bool is_exiting) {
 void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	if(!pduel)
 		return;
-	last_replay.WriteInt8(len);
+	last_replay.Write<uint8_t>(len);
 	last_replay.WriteData(resp, len);
 	set_responseb(pduel, resp);
 }
@@ -122,7 +122,7 @@ int SingleMode::SinglePlayThread() {
 	last_replay.WriteInt32(start_hand, false);
 	last_replay.WriteInt32(draw_count, false);
 	last_replay.WriteInt32(opt, false);
-	last_replay.WriteInt16(slen, false);
+	last_replay.Write<uint16_t>(slen, false);
 	last_replay.WriteData(filename, slen, false);
 	last_replay.Flush();
 	start_duel(pduel, opt);

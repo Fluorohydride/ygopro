@@ -7,6 +7,7 @@
 #include "data_manager.h"
 #include "image_manager.h"
 #include "sound_manager.h"
+#include "deck_manager.h"
 #include "replay_mode.h"
 #include "single_mode.h"
 #include "materials.h"
