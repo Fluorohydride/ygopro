@@ -20,8 +20,8 @@ constexpr unsigned int MIN_CARD_ID = (unsigned int)(MAX_STRING_ID + 1) >> 4;
 	
 using CardData = card_data;
 struct CardDataC : card_data {
-	unsigned int ot{};
-	unsigned int category{};
+	uint32_t ot{};
+	uint32_t category{};
 
 	bool is_setcodes(std::vector <uint32_t> values) const {
 		for (auto& value : values) {
@@ -36,8 +36,8 @@ struct CardString {
 	std::wstring text;
 	std::wstring desc[16];
 };
-typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer;
-typedef std::unordered_map<unsigned int, CardString>::const_iterator string_pointer;
+using code_pointer = std::unordered_map<unsigned int, CardDataC>::const_iterator;
+using string_pointer = std::unordered_map<unsigned int, CardString>::const_iterator;
 
 class DataManager {
 public:
