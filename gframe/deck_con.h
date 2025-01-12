@@ -4,7 +4,7 @@
 #include "config.h"
 #include <unordered_map>
 #include <vector>
-#include "client_card.h"
+#include "data_manager.h"
 #include "../ocgcore/mtrandom.h"
 
 namespace ygo {
