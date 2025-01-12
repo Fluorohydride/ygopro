@@ -41,7 +41,7 @@ public:
 	void pop_side(int seq);
 	bool check_limit(code_pointer pointer);
 
-	long long filter_effect{};
+	unsigned long long filter_effect{};
 	unsigned int filter_type{};
 	unsigned int filter_type2{};
 	unsigned int filter_attrib{};
