@@ -4,6 +4,7 @@
 #include "tag_duel.h"
 #include "deck_manager.h"
 #include <thread>
+#include <array>
 
 namespace ygo {
 std::unordered_map<bufferevent*, DuelPlayer> NetServer::users;
@@ -126,18 +127,17 @@ void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 	int len = evbuffer_get_length(input);
 	if (len < 2)
 		return;
-	unsigned char* net_server_read = new unsigned char[SIZE_NETWORK_BUFFER];
+	std::array<unsigned char, SIZE_NETWORK_BUFFER> net_server_read;
 	uint16_t packet_len = 0;
 	while (len >= 2) {
 		evbuffer_copyout(input, &packet_len, sizeof packet_len);
 		if (len < packet_len + 2)
 			break;
-		int read_len = evbuffer_remove(input, net_server_read, packet_len + 2);
+		int read_len = evbuffer_remove(input, net_server_read.data(), packet_len + 2);
 		if (read_len > 2)
 			HandleCTOSPacket(&users[bev], &net_server_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}
-	delete[] net_server_read;
 }
 void NetServer::ServerEchoEvent(bufferevent* bev, short events, void* ctx) {
 	if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
