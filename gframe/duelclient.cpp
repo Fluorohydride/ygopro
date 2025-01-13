@@ -9,6 +9,7 @@
 #include "deck_manager.h"
 #include "replay.h"
 #include <thread>
+#include <array>
 
 namespace ygo {
 
@@ -101,18 +102,17 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	int len = evbuffer_get_length(input);
 	if (len < 2)
 		return;
-	unsigned char* duel_client_read = new unsigned char[SIZE_NETWORK_BUFFER];
+	std::array<unsigned char, SIZE_NETWORK_BUFFER> duel_client_read;
 	uint16_t packet_len = 0;
 	while (len >= 2) {
 		evbuffer_copyout(input, &packet_len, sizeof packet_len);
 		if (len < packet_len + 2)
 			break;
-		int read_len = evbuffer_remove(input, duel_client_read, packet_len + 2);
+		int read_len = evbuffer_remove(input, duel_client_read.data(), packet_len + 2);
 		if (read_len > 2)
 			HandleSTOCPacketLan(&duel_client_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}
-	delete[] duel_client_read;
 }
 void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 	if (events & BEV_EVENT_CONNECTED) {
