@@ -1,4 +1,5 @@
 #include "game.h"
+#include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
 #include "deck_manager.h"

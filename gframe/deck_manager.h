@@ -2,7 +2,7 @@
 #define DECKMANAGER_H
 
 #include "config.h"
-#include "client_card.h"
+#include "data_manager.h"
 #include <unordered_map>
 #include <vector>
 #include <sstream>
