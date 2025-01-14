@@ -138,7 +138,7 @@ int SingleMode::SinglePlayThread() {
 	time_t nowtime = time(nullptr);
 	tm* localedtime = localtime(&nowtime);
 	wchar_t timetext[40];
-	wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
+	std::wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
 	mainGame->ebRSName->setText(timetext);
 	if(!mainGame->chkAutoSaveReplay->isChecked()) {
 		mainGame->wReplaySave->setText(dataManager.GetSysString(1340));

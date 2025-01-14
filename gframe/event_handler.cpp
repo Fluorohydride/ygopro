@@ -1572,7 +1572,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							myswprintf(formatBuffer, L"%ls", dataManager.GetName(mcard->code));
 							str.append(formatBuffer);
 							if(mcard->type & TYPE_MONSTER) {
-								if(mcard->alias && wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
+								if(mcard->alias && std::wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
 									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
@@ -1594,7 +1594,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									str.append(formatBuffer);
 								}
 							} else {
-								if(mcard->alias && wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
+								if(mcard->alias && std::wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
 									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}

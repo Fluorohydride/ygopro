@@ -505,7 +505,7 @@ bool DataManager::deck_sort_def(code_pointer p1, code_pointer p2) {
 bool DataManager::deck_sort_name(code_pointer p1, code_pointer p2) {
 	const wchar_t* name1 = dataManager.GetName(p1->first);
 	const wchar_t* name2 = dataManager.GetName(p2->first);
-	int res = wcscmp(name1, name2);
+	int res = std::wcscmp(name1, name2);
 	if (res != 0)
 		return res < 0;
 	return p1->first < p2->first;

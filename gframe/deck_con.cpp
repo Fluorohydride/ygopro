@@ -178,7 +178,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				int sel = -1;
 				for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
-					if(!wcscmp(dname, mainGame->cbDBDecks->getItem(i))) {
+					if(!std::wcscmp(dname, mainGame->cbDBDecks->getItem(i))) {
 						sel = i;
 						break;
 					}
@@ -1524,7 +1524,7 @@ void DeckBuilder::FilterCards() {
 	SortList();
 }
 void DeckBuilder::InstantSearch() {
-	if(mainGame->gameConf.auto_search_limit >= 0 && ((int)wcslen(mainGame->ebCardName->getText()) >= mainGame->gameConf.auto_search_limit))
+	if(mainGame->gameConf.auto_search_limit >= 0 && ((int)std::wcslen(mainGame->ebCardName->getText()) >= mainGame->gameConf.auto_search_limit))
 		StartFilter();
 }
 void DeckBuilder::ClearSearch() {
@@ -1565,7 +1565,7 @@ void DeckBuilder::SortList() {
 	auto left = results.begin();
 	const wchar_t* pstr = mainGame->ebCardName->getText();
 	for(auto it = results.begin(); it != results.end(); ++it) {
-		if(wcscmp(pstr, dataManager.GetName((*it)->first)) == 0) {
+		if(std::wcscmp(pstr, dataManager.GetName((*it)->first)) == 0) {
 			std::iter_swap(left, it);
 			++left;
 		}
