@@ -98,7 +98,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						evutil_freeaddrinfo(answer);
 					}
 				}
-				unsigned int remote_port = wcstol(portstr, nullptr, 10);
+				unsigned int remote_port = std::wcstol(portstr, nullptr, 10);
 				BufferIO::CopyWideString(pstr, mainGame->gameConf.lasthost);
 				BufferIO::CopyWideString(portstr, mainGame->gameConf.lastport);
 				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
@@ -257,7 +257,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->dField.Clear();
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->device->setEventReceiver(&mainGame->dField);
-				unsigned int start_turn = wcstol(mainGame->ebRepStartTurn->getText(), nullptr, 10);
+				unsigned int start_turn = std::wcstol(mainGame->ebRepStartTurn->getText(), nullptr, 10);
 				if(start_turn == 1)
 					start_turn = 0;
 				ReplayMode::StartReplay(start_turn);
@@ -435,14 +435,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->RefreshCategoryDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
 				if(open_file && deckManager.LoadCurrentDeck(open_file_name)) {
 #ifdef _WIN32
-					wchar_t *dash = wcsrchr(open_file_name, L'\\');
+					wchar_t *dash = std::wcsrchr(open_file_name, L'\\');
 #else
-					wchar_t *dash = wcsrchr(open_file_name, L'/');
+					wchar_t *dash = std::wcsrchr(open_file_name, L'/');
 #endif
-					wchar_t *dot = wcsrchr(open_file_name, L'.');
+					wchar_t *dot = std::wcsrchr(open_file_name, L'.');
 					if(dash && dot && !mywcsncasecmp(dot, L".ydk", 4)) { // full path
 						wchar_t deck_name[256];
-						wcsncpy(deck_name, dash + 1, dot - dash - 1);
+						std::wcsncpy(deck_name, dash + 1, dot - dash - 1);
 						deck_name[dot - dash - 1] = L'\0';
 						mainGame->ebDeckname->setText(deck_name);
 						mainGame->cbDBCategory->setSelected(-1);
@@ -452,9 +452,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDBDecks->setEnabled(false);
 					} else if(dash) { // has category
 						wchar_t deck_name[256];
-						wcsncpy(deck_name, dash + 1, 256);
+						std::wcsncpy(deck_name, dash + 1, 256);
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
-							if(!wcscmp(mainGame->cbDBDecks->getItem(i), deck_name)) {
+							if(!std::wcscmp(mainGame->cbDBDecks->getItem(i), deck_name)) {
 								BufferIO::CopyWideString(deck_name, mainGame->gameConf.lastdeck);
 								mainGame->cbDBDecks->setSelected(i);
 								break;
@@ -462,7 +462,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						}
 					} else { // only deck name
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
-							if(!wcscmp(mainGame->cbDBDecks->getItem(i), open_file_name)) {
+							if(!std::wcscmp(mainGame->cbDBDecks->getItem(i), open_file_name)) {
 								BufferIO::CopyWideString(open_file_name, mainGame->gameConf.lastdeck);
 								mainGame->cbDBDecks->setSelected(i);
 								break;
@@ -502,7 +502,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
 					wchar_t newname[256];
 					BufferIO::CopyWideString(mainGame->ebRSName->getText(), newname);
-					if(mywcsncasecmp(newname + wcslen(newname) - 4, L".yrp", 4)) {
+					if(mywcsncasecmp(newname + std::wcslen(newname) - 4, L".yrp", 4)) {
 						myswprintf(newname, L"%ls.yrp", mainGame->ebRSName->getText());
 					}
 					if(Replay::RenameReplay(mainGame->lstReplayList->getListItem(prev_sel), newname)) {
@@ -557,7 +557,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				else
 					curtime = ReplayMode::cur_replay.pheader.seed;
 				tm* st = localtime(&curtime);
-				wcsftime(infobuf, 256, L"%Y/%m/%d %H:%M:%S\n", st);
+				std::wcsftime(infobuf, 256, L"%Y/%m/%d %H:%M:%S\n", st);
 				repinfo.append(infobuf);
 				wchar_t namebuf[4][20]{};
 				ReplayMode::cur_replay.ReadName(namebuf[0]);
