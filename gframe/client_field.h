@@ -57,9 +57,12 @@ public:
 	int select_min{ 0 };
 	int select_max{ 0 };
 	int must_select_count{ 0 };
+	int select_curval_l{ 0 };
+	int select_curval_h{ 0 };
 	int select_sumval{ 0 };
 	int select_mode{ 0 };
-	bool select_cancelable{ false };
+	int select_hint{0};
+	bool select_cancelable{false};
 	bool select_panalmode{ false };
 	bool select_ready{ false };
 	int announce_count{ 0 };
