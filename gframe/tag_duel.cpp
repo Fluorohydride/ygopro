@@ -261,6 +261,8 @@ void TagDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 	if(dp->type > 3 || ready[dp->type])
 		return;
+	if (len < 8 || len > sizeof(CTOS_DeckData))
+		return;
 	bool valid = true;
 	CTOS_DeckData deckbuf;
 	std::memcpy(&deckbuf, pdata, len);
