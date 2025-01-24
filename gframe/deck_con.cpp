@@ -369,6 +369,30 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				prev_operation = id;
 				break;
 			}
+			case BUTTON_IMPORT_DECK_CODE: {
+				time_t currentTime = time(nullptr);
+				tm* localedtime = localtime(&currentTime);
+				wchar_t timetext[40];
+				wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
+				mainGame->gMutex.lock();
+				mainGame->stDMMessage->setText(dataManager.GetSysString(1471));
+				mainGame->ebDMName->setVisible(true);
+				mainGame->ebDMName->setText(timetext);
+				mainGame->PopupElement(mainGame->wDMQuery);
+				mainGame->gMutex.unlock();
+				prev_operation = id;
+				break;
+			}
+			case BUTTON_EXPORT_DECK_CODE: {
+				std::stringstream textStream;
+				deckManager.SaveDeck(deckManager.current_deck, textStream);
+				wchar_t text[0x10000];
+				BufferIO::DecodeUTF8(textStream.str().c_str(), text);
+				mainGame->env->getOSOperator()->copyToClipboard(text);
+				mainGame->stACMessage->setText(dataManager.GetSysString(1480));
+				mainGame->PopupElement(mainGame->wACMessage, 20);
+				break;
+			}
 			case BUTTON_DM_OK: {
 				switch(prev_operation) {
 				case BUTTON_NEW_CATEGORY: {
@@ -445,7 +469,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					}
 					break;
 				}
-				case BUTTON_NEW_DECK: {
+				case BUTTON_NEW_DECK:
+				case BUTTON_IMPORT_DECK_CODE: {
 					const wchar_t* deckname = mainGame->ebDMName->getText();
 					wchar_t catepath[256];
 					deckManager.GetCategoryPath(catepath, mainGame->cbDBCategory->getSelected(), mainGame->cbDBCategory->getText());
@@ -453,9 +478,19 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					myswprintf(filepath, L"%ls/%ls.ydk", catepath, deckname);
 					bool res = false;
 					if(!FileSystem::IsFileExists(filepath)) {
-						deckManager.current_deck.main.clear();
-						deckManager.current_deck.extra.clear();
-						deckManager.current_deck.side.clear();
+						if(prev_operation == BUTTON_NEW_DECK) {
+							deckManager.current_deck.main.clear();
+							deckManager.current_deck.extra.clear();
+							deckManager.current_deck.side.clear();
+						} else {
+							const wchar_t* txt = mainGame->env->getOSOperator()->getTextFromClipboard();
+							if(txt) {
+								char text[0x10000];
+								BufferIO::EncodeUTF8(txt, text);
+								std::istringstream textStream(text);
+								deckManager.LoadCurrentDeck(textStream);
+							}
+						}
 						res = deckManager.SaveDeck(deckManager.current_deck, filepath);
 						RefreshDeckList();
 						ChangeCategory(mainGame->lstCategories->getSelected());
