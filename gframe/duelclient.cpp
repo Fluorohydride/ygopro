@@ -1565,7 +1565,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			l = BufferIO::ReadUInt8(pbuf);
 			s = BufferIO::ReadUInt8(pbuf);
 			ss = BufferIO::ReadUInt8(pbuf);
-			if ((l & LOCATION_OVERLAY) > 0)
+			if (l & LOCATION_OVERLAY)
 				pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
 			else
 				pcard = mainGame->dField.GetCard(c, l, s);
@@ -1630,7 +1630,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			l = BufferIO::ReadUInt8(pbuf);
 			s = BufferIO::ReadUInt8(pbuf);
 			ss = BufferIO::ReadUInt8(pbuf);
-			if ((l & LOCATION_OVERLAY) > 0)
+			if (l & LOCATION_OVERLAY)
 				pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
 			else
 				pcard = mainGame->dField.GetCard(c, l, s);
@@ -1654,7 +1654,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			l = BufferIO::ReadUInt8(pbuf);
 			s = BufferIO::ReadUInt8(pbuf);
 			ss = BufferIO::ReadUInt8(pbuf);
-			if ((l & LOCATION_OVERLAY) > 0)
+			if (l & LOCATION_OVERLAY)
 				pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
 			else
 				pcard = mainGame->dField.GetCard(c, l, s);
@@ -3072,7 +3072,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			unsigned int l = BufferIO::ReadUInt8(pbuf);
 			int s = BufferIO::ReadUInt8(pbuf);
 			int ss = BufferIO::ReadUInt8(pbuf);
-			if ((l & LOCATION_OVERLAY) > 0)
+			if (l & LOCATION_OVERLAY)
 				pcards[i] = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
 			else
 				pcards[i] = mainGame->dField.GetCard(c, l, s);
