@@ -2201,7 +2201,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		}
 		if (field_confirm.size() > 0) {
 			mainGame->WaitFrameSignal(5);
-			for(size_t i = 0; i < field_confirm.size(); ++i) {
+			for(int i = 0; i < (int)field_confirm.size(); ++i) {
 				pcard = field_confirm[i];
 				c = pcard->controler;
 				l = pcard->location;
@@ -2231,7 +2231,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				mainGame->WaitFrameSignal(30);
 			else
 				mainGame->WaitFrameSignal(90);
-			for(size_t i = 0; i < field_confirm.size(); ++i) {
+			for(int i = 0; i < (int)field_confirm.size(); ++i) {
 				pcard = field_confirm[i];
 				mainGame->dField.MoveCard(pcard, 5);
 				pcard->is_highlighting = false;

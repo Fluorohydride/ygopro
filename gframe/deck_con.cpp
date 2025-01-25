@@ -177,7 +177,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(*dname == 0)
 					break;
 				int sel = -1;
-				for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
+				for(int i = 0; i < (int)mainGame->cbDBDecks->getItemCount(); ++i) {
 					if(!std::wcscmp(dname, mainGame->cbDBDecks->getItem(i))) {
 						sel = i;
 						break;

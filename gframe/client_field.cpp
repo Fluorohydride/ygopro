@@ -405,8 +405,8 @@ void ClientField::ClearChainSelect() {
 void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 	if(cant_check_grave) {
 		bool has_card_in_grave = false;
-		for(size_t i = 0; i < selectable_cards.size(); ++i) {
-			if(selectable_cards[i]->location == LOCATION_GRAVE) {
+		for (auto& pcard : selectable_cards) {
+			if (pcard->location == LOCATION_GRAVE) {
 				has_card_in_grave = true;
 				break;
 			}
@@ -416,7 +416,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		}
 	}
 	int startpos;
-	size_t ct;
+	int ct;
 	if(selectable_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
 		ct = selectable_cards.size();
@@ -424,7 +424,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		startpos = 30;
 		ct = 5;
 	}
-	for(size_t i = 0; i < ct; ++i) {
+	for(int i = 0; i < ct; ++i) {
 		mainGame->stCardPos[i]->enableOverrideColor(false);
 		// image
 		if(selectable_cards[i]->code)
@@ -508,7 +508,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 }
 void ClientField::ShowChainCard() {
 	int startpos;
-	size_t ct;
+	int ct;
 	if(selectable_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
 		ct = selectable_cards.size();
@@ -516,7 +516,7 @@ void ClientField::ShowChainCard() {
 		startpos = 30;
 		ct = 5;
 	}
-	for(size_t i = 0; i < ct; ++i) {
+	for(int i = 0; i < ct; ++i) {
 		if(selectable_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
 		else
@@ -562,7 +562,7 @@ void ClientField::ShowChainCard() {
 }
 void ClientField::ShowLocationCard() {
 	int startpos;
-	size_t ct;
+	int ct;
 	if(display_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - display_cards.size()) / 2;
 		ct = display_cards.size();
@@ -570,7 +570,7 @@ void ClientField::ShowLocationCard() {
 		startpos = 30;
 		ct = 5;
 	}
-	for(size_t i = 0; i < ct; ++i) {
+	for(int i = 0; i < ct; ++i) {
 		mainGame->stDisplayPos[i]->enableOverrideColor(false);
 		if(display_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardDisplay[i], display_cards[i]->code));
@@ -1167,8 +1167,8 @@ bool ClientField::CheckSelectSum() {
 		(*sit)->is_selected = false;
 		selable.insert(*sit);
 	}
-	for(size_t i = 0; i < selected_cards.size(); ++i) {
-		if((int)i < must_select_count)
+	for(int i = 0; i < (int)selected_cards.size(); ++i) {
+		if(i < must_select_count)
 			selected_cards[i]->is_selectable = false;
 		else
 			selected_cards[i]->is_selectable = true;
@@ -1254,7 +1254,7 @@ bool ClientField::CheckSelectTribute() {
 		(*sit)->is_selected = false;
 		selable.insert(*sit);
 	}
-	for(size_t i = 0; i < selected_cards.size(); ++i) {
+	for(int i = 0; i < (int)selected_cards.size(); ++i) {
 		selected_cards[i]->is_selectable = true;
 		selected_cards[i]->is_selected = true;
 		selable.erase(selected_cards[i]);
