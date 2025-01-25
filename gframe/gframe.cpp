@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 		&& (!mystrncasecmp(pstrext, ".ydk", 4) || !mystrncasecmp(pstrext, ".yrp", 4))) {
 		wchar_t exepath[MAX_PATH];
 		GetModuleFileNameW(nullptr, exepath, MAX_PATH);
-		wchar_t* p = wcsrchr(exepath, '\\');
+		wchar_t* p = std::wcsrchr(exepath, '\\');
 		*p = '\0';
 		SetCurrentDirectoryW(exepath);
 	}
@@ -144,42 +144,42 @@ int main(int argc, char* argv[]) {
 			ygo::dataManager.LoadDB(&wargv[i][2]);
 			continue;
 		}
-		if(!wcscmp(wargv[i], L"-e")) { // extra database
+		if(!std::wcscmp(wargv[i], L"-e")) { // extra database
 			++i;
 			if(i < wargc) {
 				ygo::dataManager.LoadDB(wargv[i]);
 			}
 			continue;
-		} else if(!wcscmp(wargv[i], L"-n")) { // nickName
+		} else if(!std::wcscmp(wargv[i], L"-n")) { // nickName
 			++i;
 			if(i < wargc)
 				ygo::mainGame->ebNickName->setText(wargv[i]);
 			continue;
-		} else if(!wcscmp(wargv[i], L"-h")) { // Host address
+		} else if(!std::wcscmp(wargv[i], L"-h")) { // Host address
 			++i;
 			if(i < wargc)
 				ygo::mainGame->ebJoinHost->setText(wargv[i]);
 			continue;
-		} else if(!wcscmp(wargv[i], L"-p")) { // host Port
+		} else if(!std::wcscmp(wargv[i], L"-p")) { // host Port
 			++i;
 			if(i < wargc)
 				ygo::mainGame->ebJoinPort->setText(wargv[i]);
 			continue;
-		} else if(!wcscmp(wargv[i], L"-w")) { // host passWord
+		} else if(!std::wcscmp(wargv[i], L"-w")) { // host passWord
 			++i;
 			if(i < wargc)
 				ygo::mainGame->ebJoinPass->setText(wargv[i]);
 			continue;
-		} else if(!wcscmp(wargv[i], L"-k")) { // Keep on return
+		} else if(!std::wcscmp(wargv[i], L"-k")) { // Keep on return
 			exit_on_return = false;
 			keep_on_return = true;
-		} else if(!wcscmp(wargv[i], L"--deck-category")) {
+		} else if(!std::wcscmp(wargv[i], L"--deck-category")) {
 			++i;
 			if(i < wargc) {
 				deckCategorySpecified = true;
 				BufferIO::CopyWideString(wargv[i], ygo::mainGame->gameConf.lastcategory);
 			}
-		} else if(!wcscmp(wargv[i], L"-d")) { // Deck
+		} else if(!std::wcscmp(wargv[i], L"-d")) { // Deck
 			++i;
 			if(!deckCategorySpecified)
 				ygo::mainGame->gameConf.lastcategory[0] = 0;
@@ -203,17 +203,17 @@ int main(int argc, char* argv[]) {
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
-		} else if(!wcscmp(wargv[i], L"-c")) { // Create host
+		} else if(!std::wcscmp(wargv[i], L"-c")) { // Create host
 			exit_on_return = !keep_on_return;
 			ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
 			ClickButton(ygo::mainGame->btnHostConfirm);
 			break;
-		} else if(!wcscmp(wargv[i], L"-j")) { // Join host
+		} else if(!std::wcscmp(wargv[i], L"-j")) { // Join host
 			exit_on_return = !keep_on_return;
 			ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
 			ClickButton(ygo::mainGame->btnJoinHost);
 			break;
-		} else if(!wcscmp(wargv[i], L"-r")) { // Replay
+		} else if(!std::wcscmp(wargv[i], L"-r")) { // Replay
 			exit_on_return = !keep_on_return;
 			++i;
 			if(i < wargc) {
@@ -224,7 +224,7 @@ int main(int argc, char* argv[]) {
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadReplay);
 			break;
-		} else if(!wcscmp(wargv[i], L"-s")) { // Single
+		} else if(!std::wcscmp(wargv[i], L"-s")) { // Single
 			exit_on_return = !keep_on_return;
 			++i;
 			if(i < wargc) {
@@ -235,8 +235,8 @@ int main(int argc, char* argv[]) {
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
-		} else if(wargc == 2 && wcslen(wargv[1]) >= 4) {
-			wchar_t* pstrext = wargv[1] + wcslen(wargv[1]) - 4;
+		} else if(wargc == 2 && std::wcslen(wargv[1]) >= 4) {
+			wchar_t* pstrext = wargv[1] + std::wcslen(wargv[1]) - 4;
 			if(!mywcsncasecmp(pstrext, L".ydk", 4)) {
 				open_file = true;
 				BufferIO::CopyWideString(wargv[i], open_file_name);

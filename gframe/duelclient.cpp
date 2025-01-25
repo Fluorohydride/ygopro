@@ -26,7 +26,7 @@ bool DuelClient::is_swapping = false;
 int DuelClient::select_hint = 0;
 int DuelClient::select_unselect_hint = 0;
 int DuelClient::last_select_hint = 0;
-unsigned char DuelClient::last_successful_msg[0x2000];
+unsigned char DuelClient::last_successful_msg[SIZE_NETWORK_BUFFER];
 size_t DuelClient::last_successful_msg_length = 0;
 wchar_t DuelClient::event_string[256];
 mt19937 DuelClient::rnd;
@@ -141,10 +141,10 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 				BufferIO::CopyCharArray(mainGame->ebServerPass->getText(), cscg.pass);
 				cscg.info.rule = mainGame->cbRule->getSelected();
 				cscg.info.mode = mainGame->cbMatchMode->getSelected();
-				cscg.info.start_hand = wcstol(mainGame->ebStartHand->getText(),nullptr,10);
-				cscg.info.start_lp = wcstol(mainGame->ebStartLP->getText(),nullptr,10);
-				cscg.info.draw_count = wcstol(mainGame->ebDrawCount->getText(),nullptr,10);
-				cscg.info.time_limit = wcstol(mainGame->ebTimeLimit->getText(),nullptr,10);
+				cscg.info.start_hand = std::wcstol(mainGame->ebStartHand->getText(),nullptr,10);
+				cscg.info.start_lp = std::wcstol(mainGame->ebStartLP->getText(),nullptr,10);
+				cscg.info.draw_count = std::wcstol(mainGame->ebDrawCount->getText(),nullptr,10);
+				cscg.info.time_limit = std::wcstol(mainGame->ebTimeLimit->getText(),nullptr,10);
 				cscg.info.lflist = mainGame->cbHostLFlist->getItemData(mainGame->cbHostLFlist->getSelected());
 				cscg.info.duel_rule = mainGame->cbDuelRule->getSelected() + 1;
 				cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
@@ -732,7 +732,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		
 		tm* localedtime = localtime(&starttime);
 		wchar_t timetext[40];
-		wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
+		std::wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
 		mainGame->ebRSName->setText(timetext);
 		if(!mainGame->chkAutoSaveReplay->isChecked()) {
 			mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
@@ -936,7 +936,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 	}
 }
 // Analyze STOC_GAME_MSG packet
-int DuelClient::ClientAnalyze(unsigned char* msg, unsigned int len) {
+bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	unsigned char* pbuf = msg;
 	wchar_t textBuffer[256];
 	mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);

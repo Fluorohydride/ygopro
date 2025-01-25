@@ -1,14 +1,43 @@
 #ifndef DATAMANAGER_H
 #define DATAMANAGER_H
 
-#include "config.h"
 #include <unordered_map>
+#include <vector>
+#include <string>
 #include <sqlite3.h>
-#include "client_card.h"
+#include "../ocgcore/card_data.h"
+
+namespace irr {
+	namespace io {
+		class IReadFile;
+		class IFileSystem;
+	}
+}
 
 namespace ygo {
-	constexpr int MAX_STRING_ID = 0x7ff;
-	constexpr unsigned int MIN_CARD_ID = (unsigned int)(MAX_STRING_ID + 1) >> 4;
+constexpr int MAX_STRING_ID = 0x7ff;
+constexpr unsigned int MIN_CARD_ID = (unsigned int)(MAX_STRING_ID + 1) >> 4;
+	
+using CardData = card_data;
+struct CardDataC : card_data {
+	uint32_t ot{};
+	uint32_t category{};
+
+	bool is_setcodes(std::vector <uint32_t> values) const {
+		for (auto& value : values) {
+			if (is_setcode(value))
+				return true;
+		}
+		return false;
+	}
+};
+struct CardString {
+	std::wstring name;
+	std::wstring text;
+	std::wstring desc[16];
+};
+using code_pointer = std::unordered_map<unsigned int, CardDataC>::const_iterator;
+using string_pointer = std::unordered_map<unsigned int, CardString>::const_iterator;
 
 class DataManager {
 public:
@@ -17,7 +46,7 @@ public:
 	bool LoadDB(const wchar_t* wfile);
 	bool LoadStrings(const char* file);
 #ifndef YGOPRO_SERVER_MODE
-	bool LoadStrings(IReadFile* reader);
+	bool LoadStrings(irr::io::IReadFile* reader);
 #endif
 	void ReadStringConfLine(const char* linebuf);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = nullptr);
@@ -52,7 +81,7 @@ public:
 	std::unordered_map<unsigned int, std::wstring> _sysStrings;
 	char errmsg[512]{};
 
-	static unsigned char scriptBuffer[0x20000];
+	static unsigned char scriptBuffer[0x100000];
 	static const wchar_t* unknown_string;
 	static uint32_t CardReader(uint32_t, card_data*);
 	static unsigned char* ScriptReaderEx(const char* script_name, int* slen);
@@ -64,7 +93,14 @@ public:
 	static unsigned char* DefaultScriptReader(const char* script_name, int* slen);
 	
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
-	static IFileSystem* FileSystem;
+	static irr::io::IFileSystem* FileSystem;
+#endif
+
+#ifndef YGOPRO_SERVER_MODE
+	static bool deck_sort_lv(code_pointer l1, code_pointer l2);
+	static bool deck_sort_atk(code_pointer l1, code_pointer l2);
+	static bool deck_sort_def(code_pointer l1, code_pointer l2);
+	static bool deck_sort_name(code_pointer l1, code_pointer l2);
 #endif
 
 private:

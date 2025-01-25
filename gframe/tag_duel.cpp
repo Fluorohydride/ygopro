@@ -67,18 +67,18 @@ void TagDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {
 		BufferIO::NullTerminate(pkt->pass);
 		BufferIO::CopyCharArray(pkt->pass, jpass);
 #ifdef YGOPRO_SERVER_MODE
-		if(!wcscmp(jpass, L"the Big Brother") && !cache_recorder) {
+		if(!std::wcscmp(jpass, L"the Big Brother") && !cache_recorder) {
 			is_recorder = true;
 			cache_recorder = dp;
 		}
 #ifndef YGOPRO_SERVER_MODE_DISABLE_CLOUD_REPLAY
-		if(!wcscmp(jpass, L"Marshtomp") && !replay_recorder) {
+		if(!std::wcscmp(jpass, L"Marshtomp") && !replay_recorder) {
 			is_recorder = true;
 			replay_recorder = dp;
 		}
 #endif //YGOPRO_SERVER_MODE_DISABLE_CLOUD_REPLAY
 #else
-		if(wcscmp(jpass, pass)) {
+		if(std::wcscmp(jpass, pass)) {
 			STOC_ErrorMsg scem;
 			scem.msg = ERRMSG_JOINERROR;
 			scem.code = 1;
@@ -378,23 +378,16 @@ void TagDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 	if(dp->type > 3 || ready[dp->type])
 		return;
-	if (len < 8)
+	if (len < 8 || len > sizeof(CTOS_DeckData))
 		return;
 	bool valid = true;
-	auto deckbuf = pdata;
-	int mainc = BufferIO::ReadInt32(deckbuf);
-	int sidec = BufferIO::ReadInt32(deckbuf);
-	const int deck_size = len - 2 * sizeof(int32_t);
-	if (mainc < 0 || mainc > MAINC_MAX)
+	CTOS_DeckData deckbuf;
+	std::memcpy(&deckbuf, pdata, len);
+	if (deckbuf.mainc < 0 || deckbuf.mainc > MAINC_MAX)
 		valid = false;
-	else if (sidec < 0 || sidec > SIDEC_MAX)
+	else if (deckbuf.sidec < 0 || deckbuf.sidec > SIDEC_MAX)
 		valid = false;
-	else if
-#ifdef YGOPRO_SERVER_MODE
-(deck_size < (mainc + sidec) * (int)sizeof(int32_t) || deck_size > MAINC_MAX + SIDEC_MAX)
-#else
-(deck_size != (mainc + sidec) * (int)sizeof(int32_t))
-#endif
+	else if (len < (2 + deckbuf.mainc + deckbuf.sidec) * (int)sizeof(int32_t))
 		valid = false;
 	if (!valid) {
 		STOC_ErrorMsg scem;
@@ -403,9 +396,7 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 		return;
 	}
-	int deck_list[SIZE_NETWORK_BUFFER / sizeof(int32_t)];
-	std::memcpy(deck_list, deckbuf, deck_size);
-	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], deck_list, mainc, sidec);
+	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], deckbuf.list, deckbuf.mainc, deckbuf.sidec);
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)

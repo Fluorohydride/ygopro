@@ -23,7 +23,7 @@ private:
 	static int select_hint;
 	static int select_unselect_hint;
 	static int last_select_hint;
-	static unsigned char last_successful_msg[0x2000];
+	static unsigned char last_successful_msg[SIZE_NETWORK_BUFFER];
 	static size_t last_successful_msg_length;
 	static wchar_t event_string[256];
 	static mt19937 rnd;
@@ -41,7 +41,7 @@ public:
 	static void ClientEvent(bufferevent* bev, short events, void* ctx);
 	static int ClientThread();
 	static void HandleSTOCPacketLan(unsigned char* data, int len);
-	static int ClientAnalyze(unsigned char* msg, unsigned int len);
+	static bool ClientAnalyze(unsigned char* msg, int len);
 	static void SwapField();
 	static void SetResponseI(int32_t respI);
 	static void SetResponseB(void* respB, size_t len);
