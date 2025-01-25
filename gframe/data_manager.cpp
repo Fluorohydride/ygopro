@@ -130,6 +130,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 #endif //YGOPRO_SERVER_MODE
 	return ret;
 }
+#ifndef YGOPRO_SERVER_MODE
 bool DataManager::LoadStrings(const char* file) {
 	FILE* fp = fopen(file, "r");
 	if(!fp)
@@ -141,7 +142,6 @@ bool DataManager::LoadStrings(const char* file) {
 	fclose(fp);
 	return true;
 }
-#ifndef YGOPRO_SERVER_MODE
 bool DataManager::LoadStrings(irr::io::IReadFile* reader) {
 	char ch{};
 	std::string linebuf;
@@ -157,7 +157,6 @@ bool DataManager::LoadStrings(irr::io::IReadFile* reader) {
 	reader->drop();
 	return true;
 }
-#endif //YGOPRO_SERVER_MODE
 void DataManager::ReadStringConfLine(const char* linebuf) {
 	if(linebuf[0] != '!')
 		return;
@@ -189,6 +188,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 		_setnameStrings[value] = strBuffer;
 	}
 }
+#endif //YGOPRO_SERVER_MODE
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	errmsg[0] = '\0';
 	std::strncat(errmsg, sqlite3_errmsg(pDB), sizeof errmsg - 1);
@@ -199,6 +199,7 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 code_pointer DataManager::GetCodePointer(unsigned int code) const {
 	return _datas.find(code);
 }
+#ifndef YGOPRO_SERVER_MODE
 string_pointer DataManager::GetStringPointer(unsigned int code) const {
 	return _strings.find(code);
 }
@@ -214,6 +215,7 @@ string_pointer DataManager::strings_begin() const {
 string_pointer DataManager::strings_end() const {
 	return _strings.cend();
 }
+#endif //YGOPRO_SERVER_MODE
 bool DataManager::GetData(unsigned int code, CardData* pData) const {
 	auto cdit = _datas.find(code);
 	if(cdit == _datas.end())
@@ -223,6 +225,7 @@ bool DataManager::GetData(unsigned int code, CardData* pData) const {
 	}
 	return true;
 }
+#ifndef YGOPRO_SERVER_MODE
 bool DataManager::GetString(unsigned int code, CardString* pStr) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end()) {
@@ -408,6 +411,7 @@ std::wstring DataManager::FormatLinkMarker(unsigned int link_marker) const {
 		buffer.append(L"[\u2198]");
 	return buffer;
 }
+#endif //YGOPRO_SERVER_MODE
 uint32_t DataManager::CardReader(uint32_t code, card_data* pData) {
 	if (!dataManager.GetData(code, pData))
 		pData->clear();
@@ -447,14 +451,7 @@ unsigned char* DataManager::ScriptReaderExSingle(const char* path, const char* s
 }
 unsigned char* DataManager::ScriptReader(const char* script_name, int* slen) {
 #if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
-	FILE* fp = fopen(script_name, "rb");
-	if(!fp)
-		return 0;
-	int len = fread(scriptBuffer, 1, sizeof(scriptBuffer), fp);
-	fclose(fp);
-	if(len >= (int)sizeof(scriptBuffer))
-		return nullptr;
-	*slen = len;
+	return DefaultScriptReader(script_name, slen);
 #else
 #ifdef _WIN32
 	wchar_t fname[256]{};
@@ -470,8 +467,8 @@ unsigned char* DataManager::ScriptReader(const char* script_name, int* slen) {
 	if (size >= (int)sizeof scriptBuffer)
 		return nullptr;
 	*slen = size;
-#endif //YGOPRO_SERVER_MODE
 	return scriptBuffer;
+#endif //YGOPRO_SERVER_MODE
 }
 unsigned char* DataManager::DefaultScriptReader(const char* script_name, int* slen) {
 	wchar_t fname[256]{};
