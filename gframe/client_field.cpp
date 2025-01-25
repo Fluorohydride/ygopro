@@ -196,12 +196,9 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 			deck[controler].push_back(pcard);
 			pcard->sequence = (unsigned char)(deck[controler].size() - 1);
 		} else {
-			deck[controler].push_back(0);
-			for(int i = deck[controler].size() - 1; i > 0; --i) {
-				deck[controler][i] = deck[controler][i - 1];
-				deck[controler][i]->sequence++;
-			}
-			deck[controler][0] = pcard;
+			for (auto& pcard : deck[controler])
+				pcard->sequence++;
+			deck[controler].insert(deck[controler].begin(), pcard);
 			pcard->sequence = 0;
 		}
 		pcard->is_reversed = false;
@@ -235,15 +232,13 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 			extra[controler].push_back(pcard);
 			pcard->sequence = (unsigned char)(extra[controler].size() - 1);
 		} else {
-			extra[controler].push_back(0);
 			int p = extra[controler].size() - extra_p_count[controler] - 1;
 			for(int i = extra[controler].size() - 1; i > p; --i) {
-				extra[controler][i] = extra[controler][i - 1];
 				extra[controler][i]->sequence++;
 				extra[controler][i]->curPos += irr::core::vector3df(0, 0, 0.01f);
 				extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
 			}
-			extra[controler][p] = pcard;
+			extra[controler].insert(extra[controler].begin() + p, pcard);
 			pcard->sequence = p;
 		}
 		if (pcard->position & POS_FACEUP)
@@ -253,69 +248,54 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 }
 ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
-	ClientCard* pcard = 0;
+	ClientCard* pcard = nullptr;
+	auto erase_card = [](std::vector<ClientCard*>& lst, int seq) {
+		for (int i = seq; i < (int)lst.size() - 1; ++i) {
+			lst[i] = lst[i + 1];
+			lst[i]->sequence--;
+			lst[i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
+			lst[i]->mTransform.setTranslation(lst[i]->curPos);
+		}
+		lst.pop_back();
+	};
 	switch (location) {
 	case LOCATION_DECK: {
 		pcard = deck[controler][sequence];
-		for (size_t i = sequence; i < deck[controler].size() - 1; ++i) {
-			deck[controler][i] = deck[controler][i + 1];
-			deck[controler][i]->sequence--;
-			deck[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
-			deck[controler][i]->mTransform.setTranslation(deck[controler][i]->curPos);
-		}
-		deck[controler].erase(deck[controler].end() - 1);
+		erase_card(deck[controler], sequence);
 		break;
 	}
 	case LOCATION_HAND: {
 		pcard = hand[controler][sequence];
-		for (size_t i = sequence; i < hand[controler].size() - 1; ++i) {
+		for (int i = sequence; i < (int)hand[controler].size() - 1; ++i) {
 			hand[controler][i] = hand[controler][i + 1];
 			hand[controler][i]->sequence--;
 		}
-		hand[controler].erase(hand[controler].end() - 1);
+		hand[controler].pop_back();
 		break;
 	}
 	case LOCATION_MZONE: {
 		pcard = mzone[controler][sequence];
-		mzone[controler][sequence] = 0;
+		mzone[controler][sequence] = nullptr;
 		break;
 	}
 	case LOCATION_SZONE: {
 		pcard = szone[controler][sequence];
-		szone[controler][sequence] = 0;
+		szone[controler][sequence] = nullptr;
 		break;
 	}
 	case LOCATION_GRAVE: {
 		pcard = grave[controler][sequence];
-		for (size_t i = sequence; i < grave[controler].size() - 1; ++i) {
-			grave[controler][i] = grave[controler][i + 1];
-			grave[controler][i]->sequence--;
-			grave[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
-			grave[controler][i]->mTransform.setTranslation(grave[controler][i]->curPos);
-		}
-		grave[controler].erase(grave[controler].end() - 1);
+		erase_card(grave[controler], sequence);
 		break;
 	}
 	case LOCATION_REMOVED: {
 		pcard = remove[controler][sequence];
-		for (size_t i = sequence; i < remove[controler].size() - 1; ++i) {
-			remove[controler][i] = remove[controler][i + 1];
-			remove[controler][i]->sequence--;
-			remove[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
-			remove[controler][i]->mTransform.setTranslation(remove[controler][i]->curPos);
-		}
-		remove[controler].erase(remove[controler].end() - 1);
+		erase_card(remove[controler], sequence);
 		break;
 	}
 	case LOCATION_EXTRA: {
 		pcard = extra[controler][sequence];
-		for (size_t i = sequence; i < extra[controler].size() - 1; ++i) {
-			extra[controler][i] = extra[controler][i + 1];
-			extra[controler][i]->sequence--;
-			extra[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
-			extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
-		}
-		extra[controler].erase(extra[controler].end() - 1);
+		erase_card(extra[controler], sequence);
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]--;
 		break;
