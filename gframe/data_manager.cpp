@@ -389,30 +389,32 @@ uint32_t DataManager::CardReader(uint32_t code, card_data* pData) {
 		pData->clear();
 	return 0;
 }
-unsigned char* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
+unsigned char* DataManager::ScriptReaderEx(const char* script_path, int* slen) {
 	// default script name: ./script/c%d.lua
-	if (std::strncmp(script_name, "./script", 8) != 0)
-		return DefaultScriptReader(script_name, slen);
+	if (std::strncmp(script_path, "./script", 8) != 0) // not a card script file
+		return ReadScriptFromFile(script_path, slen);
+	const char* script_name = script_path + 2;
 	char expansions_path[1024]{};
-	std::snprintf(expansions_path, sizeof expansions_path, "./expansions/%s", script_name + 2);
-	if(mainGame->gameConf.prefer_expansion_script) {
-		if (DefaultScriptReader(expansions_path, slen))
+	std::snprintf(expansions_path, sizeof expansions_path, "./expansions/%s", script_name);
+	if (mainGame->gameConf.prefer_expansion_script) { // debug script with raw file in expansions
+		if (ReadScriptFromFile(expansions_path, slen))
 			return scriptBuffer;
-		else if (ScriptReader(script_name + 2, slen))
+		if (ReadScriptFromIrrFS(script_name, slen))
 			return scriptBuffer;
-		else if (DefaultScriptReader(script_name, slen))
+		if (ReadScriptFromFile(script_path, slen))
 			return scriptBuffer;
 	} else {
-		if (DefaultScriptReader(script_name, slen))
+		if (ReadScriptFromIrrFS(script_name, slen))
 			return scriptBuffer;
-		else if (DefaultScriptReader(expansions_path, slen))
+		if (ReadScriptFromFile(script_path, slen))
 			return scriptBuffer;
-		else if (ScriptReader(script_name + 2, slen))
+		if (ReadScriptFromFile(expansions_path, slen))
 			return scriptBuffer;
 	}
+
 	return nullptr;
 }
-unsigned char* DataManager::ScriptReader(const char* script_name, int* slen) {
+unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* slen) {
 #ifdef _WIN32
 	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
@@ -429,7 +431,7 @@ unsigned char* DataManager::ScriptReader(const char* script_name, int* slen) {
 	*slen = size;
 	return scriptBuffer;
 }
-unsigned char* DataManager::DefaultScriptReader(const char* script_name, int* slen) {
+unsigned char* DataManager::ReadScriptFromFile(const char* script_name, int* slen) {
 	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
 	FILE* fp = myfopen(fname, "rb");
