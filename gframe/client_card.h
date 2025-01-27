@@ -75,7 +75,7 @@ public:
 
 	ClientCard() = default;
 	~ClientCard();
-	void SetCode(int x);
+	void SetCode(unsigned int x);
 	void UpdateInfo(unsigned char* buf);
 	void ClearTarget();
 	void ClearData();

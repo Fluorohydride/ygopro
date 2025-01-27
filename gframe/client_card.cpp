@@ -31,8 +31,8 @@ ClientCard::~ClientCard() {
 	}
 	overlayed.clear();
 }
-void ClientCard::SetCode(int x) {
-	if((location == LOCATION_HAND) && (code != (unsigned int)x)) {
+void ClientCard::SetCode(unsigned int x) {
+	if((location == LOCATION_HAND) && (code != x)) {
 		code = x;
 		mainGame->dField.MoveCard(this, 5);
 	} else
@@ -175,13 +175,13 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 	}
 }
 void ClientCard::ClearTarget() {
-	for(auto cit = cardTarget.begin(); cit != cardTarget.end(); ++cit) {
-		(*cit)->is_showtarget = false;
-		(*cit)->ownerTarget.erase(this);
+	for (auto& pcard : cardTarget) {
+		pcard->is_showtarget = false;
+		pcard->ownerTarget.erase(this);
 	}
-	for(auto cit = ownerTarget.begin(); cit != ownerTarget.end(); ++cit) {
-		(*cit)->is_showtarget = false;
-		(*cit)->cardTarget.erase(this);
+	for (auto& pcard : ownerTarget) {
+		pcard->is_showtarget = false;
+		pcard->cardTarget.erase(this);
 	}
 	cardTarget.clear();
 	ownerTarget.clear();
