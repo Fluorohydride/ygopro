@@ -8,7 +8,7 @@
 namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
-unsigned char DataManager::scriptBuffer[0x100000];
+unsigned char DataManager::scriptBuffer[0x100000] = {};
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 irr::io::IFileSystem* DataManager::FileSystem = nullptr;
 #endif
@@ -417,42 +417,47 @@ uint32_t DataManager::CardReader(uint32_t code, card_data* pData) {
 		pData->clear();
 	return 0;
 }
-unsigned char* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
-	if (std::strncmp(script_name, "./script", 8) != 0)
-		return DefaultScriptReader(script_name, slen);
-	unsigned char* buffer;
-#ifndef YGOPRO_SERVER_MODE
-	if(!mainGame->gameConf.prefer_expansion_script) {
-		buffer = ScriptReaderExSingle("", script_name, slen);
-		if(buffer)
-			return buffer;
+unsigned char* DataManager::ScriptReaderEx(const char* script_path, int* slen) {
+	// default script name: ./script/c%d.lua
+	if (std::strncmp(script_path, "./script", 8) != 0) // not a card script file
+		return ReadScriptFromFile(script_path, slen);
+	const char* script_name = script_path + 2;
+	char expansions_path[1024]{};
+	std::snprintf(expansions_path, sizeof expansions_path, "./expansions/%s", script_name);
+#ifdef YGOPRO_SERVER_MODE
+	char special_path[1024]{};
+	std::snprintf(special_path, sizeof special_path, "./specials/%s", script_path + 9);
+	if (ReadScriptFromFile(special_path, slen))
+		return scriptBuffer;
+	if (ReadScriptFromFile(expansions_path, slen)) // always read expansions first
+		return scriptBuffer;
+#ifdef SERVER_ZIP_SUPPORT
+	if (ReadScriptFromIrrFS(script_name, slen))
+		return scriptBuffer;
+#endif
+	if (ReadScriptFromFile(script_path, slen))
+		return scriptBuffer;
+#else //YGOPRO_SERVER_MODE
+	if (mainGame->gameConf.prefer_expansion_script) { // debug script with raw file in expansions
+		if (ReadScriptFromFile(expansions_path, slen))
+			return scriptBuffer;
+		if (ReadScriptFromIrrFS(script_name, slen))
+			return scriptBuffer;
+		if (ReadScriptFromFile(script_path, slen))
+			return scriptBuffer;
+	} else {
+		if (ReadScriptFromIrrFS(script_name, slen))
+			return scriptBuffer;
+		if (ReadScriptFromFile(script_path, slen))
+			return scriptBuffer;
+		if (ReadScriptFromFile(expansions_path, slen))
+			return scriptBuffer;
 	}
 #endif //YGOPRO_SERVER_MODE
-	buffer = ScriptReaderExSingle("specials/", script_name, slen, 9);
-	if(buffer)
-		return buffer;
-	buffer = ScriptReaderExSingle("expansions/", script_name, slen);
-	if(buffer)
-		return buffer;
+	return nullptr;
+}
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
-	buffer = ScriptReaderExSingle("", script_name, slen, 2, TRUE);
-	if(buffer)
-		return buffer;
-#endif
-	return ScriptReaderExSingle("", script_name, slen);
-}
-unsigned char* DataManager::ScriptReaderExSingle(const char* path, const char* script_name, int* slen, int pre_len, unsigned int use_irr) {
-	char sname[256];
-	snprintf(sname, sizeof sname, "%s%s", path, script_name + pre_len); //default script name: ./script/c%d.lua
-	if (use_irr) {
-		return ScriptReader(sname, slen);
-	}
-	return DefaultScriptReader(sname, slen);
-}
-unsigned char* DataManager::ScriptReader(const char* script_name, int* slen) {
-#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
-	return DefaultScriptReader(script_name, slen);
-#else
+unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* slen) {
 #ifdef _WIN32
 	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
@@ -468,9 +473,9 @@ unsigned char* DataManager::ScriptReader(const char* script_name, int* slen) {
 		return nullptr;
 	*slen = size;
 	return scriptBuffer;
-#endif //YGOPRO_SERVER_MODE
 }
-unsigned char* DataManager::DefaultScriptReader(const char* script_name, int* slen) {
+#endif //YGOPRO_SERVER_MODE
+unsigned char* DataManager::ReadScriptFromFile(const char* script_name, int* slen) {
 	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
 	FILE* fp = myfopen(fname, "rb");
