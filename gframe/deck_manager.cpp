@@ -35,7 +35,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			int count = -1;
 			if (sscanf(linebuf, "%d %d", &code, &count) != 2)
 				continue;
-			if (code <= 0 || code > 0xfffffff)
+			if (code <= 0 || code > MAX_CARD_ID)
 				continue;
 			if (count < 0 || count > 2)
 				continue;
@@ -72,71 +72,75 @@ const std::unordered_map<int, int>* DeckManager::GetLFListContent(int lfhash) {
 		return &lit->content;
 	return nullptr;
 }
-static int checkAvail(unsigned int ot, unsigned int avail) {
+static unsigned int checkAvail(unsigned int ot, unsigned int avail) {
 	if((ot & avail) == avail)
 		return 0;
-	if((ot & AVAIL_OCG) && !(avail == AVAIL_OCG))
+	if((ot & AVAIL_OCG) && (avail != AVAIL_OCG))
 		return DECKERROR_OCGONLY;
-	if((ot & AVAIL_TCG) && !(avail == AVAIL_TCG))
+	if((ot & AVAIL_TCG) && (avail != AVAIL_TCG))
 		return DECKERROR_TCGONLY;
 	return DECKERROR_NOTAVAIL;
 }
-int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
+unsigned int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 	std::unordered_map<int, int> ccount;
-	auto list = GetLFListContent(lfhash);
-	if(!list)
-		return 0;
-	int dc = 0;
+	// rule
 	if(deck.main.size() < DECK_MIN_SIZE || deck.main.size() > DECK_MAX_SIZE)
-		return ((unsigned)DECKERROR_MAINCOUNT << 28) + deck.main.size();
+		return (DECKERROR_MAINCOUNT << 28) | (unsigned)deck.main.size();
 	if(deck.extra.size() > EXTRA_MAX_SIZE)
-		return ((unsigned)DECKERROR_EXTRACOUNT << 28) + deck.extra.size();
+		return (DECKERROR_EXTRACOUNT << 28) | (unsigned)deck.extra.size();
 	if(deck.side.size() > SIDE_MAX_SIZE)
-		return ((unsigned)DECKERROR_SIDECOUNT << 28) + deck.side.size();
-	if (rule < 0 || rule >= 6)
+		return (DECKERROR_SIDECOUNT << 28) | (unsigned)deck.side.size();
+	auto list = GetLFListContent(lfhash);
+	if (!list)
 		return 0;
 	const unsigned int rule_map[6] = { AVAIL_OCG, AVAIL_TCG, AVAIL_SC, AVAIL_CUSTOM, AVAIL_OCGTCG, 0 };
-	auto avail = rule_map[rule];
+	unsigned int avail = 0;
+	if (rule >= 0 && rule < (int)(sizeof rule_map / sizeof rule_map[0]))
+		avail = rule_map[rule];
 	for (auto& cit : deck.main) {
-		int gameruleDeckError = checkAvail(cit->second.ot, avail);
+		auto gameruleDeckError = checkAvail(cit->second.ot, avail);
 		if(gameruleDeckError)
-			return (gameruleDeckError << 28) + cit->first;
+			return (gameruleDeckError << 28) | cit->first;
 		if (cit->second.type & (TYPES_EXTRA_DECK | TYPE_TOKEN))
+			return (DECKERROR_MAINCOUNT << 28);
+		int code = cit->second.alias ? cit->second.alias : cit->first;
+		ccount[code]++;
+		int dc = ccount[code];
+		if(dc > 3)
+			return (DECKERROR_CARDCOUNT << 28) | cit->first;
+		auto it = list->find(code);
+		if(it != list->end() && dc > it->second)
+			return (DECKERROR_LFLIST << 28) | cit->first;
+	}
+	for (auto& cit : deck.extra) {
+		auto gameruleDeckError = checkAvail(cit->second.ot, avail);
+		if(gameruleDeckError)
+			return (gameruleDeckError << 28) | cit->first;
+		if (!(cit->second.type & TYPES_EXTRA_DECK) || cit->second.type & TYPE_TOKEN)
 			return (DECKERROR_EXTRACOUNT << 28);
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
-		dc = ccount[code];
+		int dc = ccount[code];
 		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) + cit->first;
+			return (DECKERROR_CARDCOUNT << 28) | cit->first;
 		auto it = list->find(code);
 		if(it != list->end() && dc > it->second)
-			return (DECKERROR_LFLIST << 28) + cit->first;
-	}
-	for (auto& cit : deck.extra) {
-		int gameruleDeckError = checkAvail(cit->second.ot, avail);
-		if(gameruleDeckError)
-			return (gameruleDeckError << 28) + cit->first;
-		int code = cit->second.alias ? cit->second.alias : cit->first;
-		ccount[code]++;
-		dc = ccount[code];
-		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) + cit->first;
-		auto it = list->find(code);
-		if(it != list->end() && dc > it->second)
-			return (DECKERROR_LFLIST << 28) + cit->first;
+			return (DECKERROR_LFLIST << 28) | cit->first;
 	}
 	for (auto& cit : deck.side) {
-		int gameruleDeckError = checkAvail(cit->second.ot, avail);
+		auto gameruleDeckError = checkAvail(cit->second.ot, avail);
 		if(gameruleDeckError)
-			return (gameruleDeckError << 28) + cit->first;
+			return (gameruleDeckError << 28) | cit->first;
+		if (cit->second.type & TYPE_TOKEN)
+			return (DECKERROR_SIDECOUNT << 28);
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
-		dc = ccount[code];
+		int dc = ccount[code];
 		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) + cit->first;
+			return (DECKERROR_CARDCOUNT << 28) | cit->first;
 		auto it = list->find(code);
 		if(it != list->end() && dc > it->second)
-			return (DECKERROR_LFLIST << 28) + cit->first;
+			return (DECKERROR_LFLIST << 28) | cit->first;
 	}
 	return 0;
 }
@@ -160,11 +164,11 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 			continue;
 		}
 		if (cd.type & TYPES_EXTRA_DECK) {
-			if ((int)deck.extra.size() < EXTRA_MAX_SIZE)
+			if (deck.extra.size() < EXTRA_MAX_SIZE)
 				deck.extra.push_back(dataManager.GetCodePointer(code));
 		}
 		else {
-			if ((int)deck.main.size() < DECK_MAX_SIZE)
+			if (deck.main.size() < DECK_MAX_SIZE)
 				deck.main.push_back(dataManager.GetCodePointer(code));
 		}
 	}

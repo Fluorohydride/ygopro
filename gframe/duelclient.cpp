@@ -274,8 +274,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		}
 		case ERRMSG_DECKERROR: {
 			mainGame->gMutex.lock();
-			unsigned int code = pkt->code & 0xFFFFFFF;
-			int flag = pkt->code >> 28;
+			unsigned int code = pkt->code & MAX_CARD_ID;
+			unsigned int flag = pkt->code >> 28;
 			wchar_t msgbuf[256];
 			switch(flag)
 			{
