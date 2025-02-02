@@ -204,6 +204,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 		pcard->is_reversed = false;
 		pcard->ClearData();
 		pcard->ClearTarget();
+		SetShowMark(pcard, false);
 		break;
 	}
 	case LOCATION_HAND: {

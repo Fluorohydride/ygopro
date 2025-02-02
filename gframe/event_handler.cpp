@@ -2407,19 +2407,19 @@ void ClientField::ShowCancelOrFinishButton(int buttonOp) {
 void ClientField::SetShowMark(ClientCard* pcard, bool enable) {
 	if(pcard->equipTarget)
 		pcard->equipTarget->is_showequip = enable;
-	for(auto cit = pcard->equipped.begin(); cit != pcard->equipped.end(); ++cit)
-		(*cit)->is_showequip = enable;
-	for(auto cit = pcard->cardTarget.begin(); cit != pcard->cardTarget.end(); ++cit)
-		(*cit)->is_showtarget = enable;
-	for(auto cit = pcard->ownerTarget.begin(); cit != pcard->ownerTarget.end(); ++cit)
-		(*cit)->is_showtarget = enable;
-	for(auto chit = chains.begin(); chit != chains.end(); ++chit) {
-		if(pcard == chit->chain_card) {
-			for(auto tgit = chit->target.begin(); tgit != chit->target.end(); ++tgit)
-				(*tgit)->is_showchaintarget = enable;
+	for (auto& card : pcard->equipped)
+		card->is_showequip = enable;
+	for (auto& card : pcard->cardTarget)
+		card->is_showtarget = enable;
+	for (auto& card : pcard->ownerTarget)
+		card->is_showtarget = enable;
+	for (auto& ch : chains) {
+		if (pcard == ch.chain_card) {
+			for (auto& tg : ch.target)
+				tg->is_showchaintarget = enable;
 		}
-		if(chit->target.find(pcard) != chit->target.end())
-			chit->chain_card->is_showchaintarget = enable;
+		if (ch.target.find(pcard) != ch.target.end())
+			ch.chain_card->is_showchaintarget = enable;
 	}
 }
 void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* element, irr::gui::IGUIElement* parent) {
