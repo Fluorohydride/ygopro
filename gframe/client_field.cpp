@@ -127,7 +127,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		deck[player].push_back(pcard);
 		pcard->owner = player;
 		pcard->controler = player;
-		pcard->location = 0x1;
+		pcard->location = LOCATION_DECK;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
@@ -137,7 +137,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		extra[player].push_back(pcard);
 		pcard->owner = player;
 		pcard->controler = player;
-		pcard->location = 0x40;
+		pcard->location = LOCATION_EXTRA;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
@@ -202,6 +202,9 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 			pcard->sequence = 0;
 		}
 		pcard->is_reversed = false;
+		pcard->ClearData();
+		pcard->ClearTarget();
+		SetShowMark(pcard, false);
 		break;
 	}
 	case LOCATION_HAND: {

@@ -220,27 +220,29 @@ bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 		return cp1 < cp2;
 	if(c1->location != c2->location)
 		return c1->location < c2->location;
-	if (c1->location & LOCATION_OVERLAY) {
+	if (c1->location == LOCATION_OVERLAY) {
 		if (c1->overlayTarget != c2->overlayTarget)
 			return c1->overlayTarget->sequence < c2->overlayTarget->sequence;
 		else
 			return c1->sequence < c2->sequence;
 	}
-	else {
-		if(c1->location & (LOCATION_DECK | LOCATION_GRAVE | LOCATION_REMOVED | LOCATION_EXTRA)) {
-			auto it1 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c1](const ChainInfo& ch) {
-				return c1 == ch.chain_card || ch.target.find(c1) != ch.target.end();
-				});
-			auto it2 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c2](const ChainInfo& ch) {
-				return c2 == ch.chain_card || ch.target.find(c2) != ch.target.end();
-				});
-			if(it1 != mainGame->dField.chains.rend() || it2 != mainGame->dField.chains.rend()) {
-				return it1 < it2;
-			}
-			return c1->sequence > c2->sequence;
+	else if (c1->location == LOCATION_DECK) {
+		return c1->sequence > c2->sequence;
+	}
+	else if (c1->location & (LOCATION_GRAVE | LOCATION_REMOVED | LOCATION_EXTRA)) {
+		auto it1 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c1](const ChainInfo& ch) {
+			return c1 == ch.chain_card || ch.target.find(c1) != ch.target.end();
+		});
+		auto it2 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c2](const ChainInfo& ch) {
+			return c2 == ch.chain_card || ch.target.find(c2) != ch.target.end();
+		});
+		if (it1 != mainGame->dField.chains.rend() || it2 != mainGame->dField.chains.rend()) {
+			return it1 < it2;
 		}
-		else
-			return c1->sequence < c2->sequence;
+		return c1->sequence > c2->sequence;
+	}
+	else {
+		return c1->sequence < c2->sequence;
 	}
 }
 }
