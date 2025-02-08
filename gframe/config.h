@@ -60,7 +60,7 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #ifdef __GNUC__
 	return swprintf(buf, N, fmt, args...);
 #else
-  return std::swprintf(buf, N, fmt, args...);
+	return std::swprintf(buf, N, fmt, args...);
 #endif
 }
 
