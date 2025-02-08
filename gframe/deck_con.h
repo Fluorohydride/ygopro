@@ -11,7 +11,7 @@ namespace ygo {
 
 class DeckBuilder: public irr::IEventReceiver {
 public:
-	virtual bool OnEvent(const irr::SEvent& event);
+	bool OnEvent(const irr::SEvent& event) override;
 	void Initialize();
 	void Terminate();
 	void GetHoveredCard();
