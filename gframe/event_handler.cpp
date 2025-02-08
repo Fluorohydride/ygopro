@@ -2407,19 +2407,19 @@ void ClientField::ShowCancelOrFinishButton(int buttonOp) {
 void ClientField::SetShowMark(ClientCard* pcard, bool enable) {
 	if(pcard->equipTarget)
 		pcard->equipTarget->is_showequip = enable;
-	for(auto cit = pcard->equipped.begin(); cit != pcard->equipped.end(); ++cit)
-		(*cit)->is_showequip = enable;
-	for(auto cit = pcard->cardTarget.begin(); cit != pcard->cardTarget.end(); ++cit)
-		(*cit)->is_showtarget = enable;
-	for(auto cit = pcard->ownerTarget.begin(); cit != pcard->ownerTarget.end(); ++cit)
-		(*cit)->is_showtarget = enable;
-	for(auto chit = chains.begin(); chit != chains.end(); ++chit) {
-		if(pcard == chit->chain_card) {
-			for(auto tgit = chit->target.begin(); tgit != chit->target.end(); ++tgit)
-				(*tgit)->is_showchaintarget = enable;
+	for (auto& card : pcard->equipped)
+		card->is_showequip = enable;
+	for (auto& card : pcard->cardTarget)
+		card->is_showtarget = enable;
+	for (auto& card : pcard->ownerTarget)
+		card->is_showtarget = enable;
+	for (auto& ch : chains) {
+		if (pcard == ch.chain_card) {
+			for (auto& tg : ch.target)
+				tg->is_showchaintarget = enable;
 		}
-		if(chit->target.find(pcard) != chit->target.end())
-			chit->chain_card->is_showchaintarget = enable;
+		if (ch.target.find(pcard) != ch.target.end())
+			ch.chain_card->is_showchaintarget = enable;
 	}
 }
 void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* element, irr::gui::IGUIElement* parent) {
@@ -2428,26 +2428,28 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 	if(pcard->code) {
 		str.append(dataManager.GetName(pcard->code));
 	}
-	if(pcard->overlayTarget) {
-		myswprintf(formatBuffer, dataManager.GetSysString(225), dataManager.GetName(pcard->overlayTarget->code), pcard->overlayTarget->sequence + 1);
-		str.append(L"\n").append(formatBuffer);
-	}
-	if((pcard->status & STATUS_PROC_COMPLETE)
-		&& (pcard->type & (TYPE_RITUAL | TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK | TYPE_SPSUMMON)))
-		str.append(L"\n").append(dataManager.GetSysString(224));
-	for(auto iter = pcard->desc_hints.begin(); iter != pcard->desc_hints.end(); ++iter) {
-		myswprintf(formatBuffer, L"\n*%ls", dataManager.GetDesc(iter->first));
-		str.append(formatBuffer);
-	}
-	for(size_t i = 0; i < chains.size(); ++i) {
-		auto chit = chains[i];
-		if(pcard == chit.chain_card) {
-			myswprintf(formatBuffer, dataManager.GetSysString(216), i + 1);
+	if (pcard->location != LOCATION_DECK) {
+		if (pcard->overlayTarget) {
+			myswprintf(formatBuffer, dataManager.GetSysString(225), dataManager.GetName(pcard->overlayTarget->code), pcard->overlayTarget->sequence + 1);
 			str.append(L"\n").append(formatBuffer);
 		}
-		if(chit.target.find(pcard) != chit.target.end()) {
-			myswprintf(formatBuffer, dataManager.GetSysString(217), i + 1, dataManager.GetName(chit.chain_card->code));
-			str.append(L"\n").append(formatBuffer);
+		if ((pcard->status & STATUS_PROC_COMPLETE)
+			&& (pcard->type & (TYPE_RITUAL | TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK | TYPE_SPSUMMON)))
+			str.append(L"\n").append(dataManager.GetSysString(224));
+		for (auto iter = pcard->desc_hints.begin(); iter != pcard->desc_hints.end(); ++iter) {
+			myswprintf(formatBuffer, L"\n*%ls", dataManager.GetDesc(iter->first));
+			str.append(formatBuffer);
+		}
+		for (size_t i = 0; i < chains.size(); ++i) {
+			const auto& chit = chains[i];
+			if (pcard == chit.chain_card) {
+				myswprintf(formatBuffer, dataManager.GetSysString(216), i + 1);
+				str.append(L"\n").append(formatBuffer);
+			}
+			if (chit.target.find(pcard) != chit.target.end()) {
+				myswprintf(formatBuffer, dataManager.GetSysString(217), i + 1, dataManager.GetName(chit.chain_card->code));
+				str.append(L"\n").append(formatBuffer);
+			}
 		}
 	}
 	if(str.length() > 0) {
