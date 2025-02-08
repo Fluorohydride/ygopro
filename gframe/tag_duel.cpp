@@ -50,7 +50,7 @@ void TagDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {
 		wchar_t jpass[20];
 		BufferIO::NullTerminate(pkt->pass);
 		BufferIO::CopyCharArray(pkt->pass, jpass);
-		if(wcscmp(jpass, pass)) {
+		if(std::wcscmp(jpass, pass)) {
 			STOC_ErrorMsg scem;
 			scem.msg = ERRMSG_JOINERROR;
 			scem.code = 1;
@@ -261,18 +261,16 @@ void TagDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 	if(dp->type > 3 || ready[dp->type])
 		return;
-	if (len < 8)
+	if (len < 8 || len > sizeof(CTOS_DeckData))
 		return;
 	bool valid = true;
-	auto deckbuf = pdata;
-	int mainc = BufferIO::ReadInt32(deckbuf);
-	int sidec = BufferIO::ReadInt32(deckbuf);
-	const int deck_size = len - 2 * sizeof(int32_t);
-	if (mainc < 0 || mainc > MAINC_MAX)
+	CTOS_DeckData deckbuf;
+	std::memcpy(&deckbuf, pdata, len);
+	if (deckbuf.mainc < 0 || deckbuf.mainc > MAINC_MAX)
 		valid = false;
-	else if (sidec < 0 || sidec > SIDEC_MAX)
+	else if (deckbuf.sidec < 0 || deckbuf.sidec > SIDEC_MAX)
 		valid = false;
-	else if (deck_size != (mainc + sidec) * (int)sizeof(int32_t))
+	else if (len < (2 + deckbuf.mainc + deckbuf.sidec) * (int)sizeof(int32_t))
 		valid = false;
 	if (!valid) {
 		STOC_ErrorMsg scem;
@@ -281,9 +279,7 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 		return;
 	}
-	int deck_list[SIZE_NETWORK_BUFFER / sizeof(int32_t)];
-	std::memcpy(deck_list, deckbuf, deck_size);
-	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], deck_list, mainc, sidec);
+	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], deckbuf.list, deckbuf.mainc, deckbuf.sidec);
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)

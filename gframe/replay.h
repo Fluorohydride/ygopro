@@ -13,8 +13,8 @@ namespace ygo {
 #define REPLAY_UNIFORM		0x10
 
 // max size
-#define MAX_REPLAY_SIZE	0x20000
-#define MAX_COMP_SIZE	0x2000
+constexpr int MAX_REPLAY_SIZE = 0x20000;
+constexpr int MAX_COMP_SIZE = UINT16_MAX + 1;
 
 struct ReplayHeader {
 	unsigned int id{};

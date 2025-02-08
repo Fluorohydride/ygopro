@@ -150,9 +150,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SORT_DECK: {
-				std::sort(deckManager.current_deck.main.begin(), deckManager.current_deck.main.end(), ClientCard::deck_sort_lv);
-				std::sort(deckManager.current_deck.extra.begin(), deckManager.current_deck.extra.end(), ClientCard::deck_sort_lv);
-				std::sort(deckManager.current_deck.side.begin(), deckManager.current_deck.side.end(), ClientCard::deck_sort_lv);
+				std::sort(deckManager.current_deck.main.begin(), deckManager.current_deck.main.end(), DataManager::deck_sort_lv);
+				std::sort(deckManager.current_deck.extra.begin(), deckManager.current_deck.extra.end(), DataManager::deck_sort_lv);
+				std::sort(deckManager.current_deck.side.begin(), deckManager.current_deck.side.end(), DataManager::deck_sort_lv);
 				break;
 			}
 			case BUTTON_SHUFFLE_DECK: {
@@ -177,8 +177,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(*dname == 0)
 					break;
 				int sel = -1;
-				for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
-					if(!wcscmp(dname, mainGame->cbDBDecks->getItem(i))) {
+				for(int i = 0; i < (int)mainGame->cbDBDecks->getItemCount(); ++i) {
+					if(!std::wcscmp(dname, mainGame->cbDBDecks->getItem(i))) {
 						sel = i;
 						break;
 					}
@@ -1524,7 +1524,7 @@ void DeckBuilder::FilterCards() {
 	SortList();
 }
 void DeckBuilder::InstantSearch() {
-	if(mainGame->gameConf.auto_search_limit >= 0 && ((int)wcslen(mainGame->ebCardName->getText()) >= mainGame->gameConf.auto_search_limit))
+	if(mainGame->gameConf.auto_search_limit >= 0 && ((int)std::wcslen(mainGame->ebCardName->getText()) >= mainGame->gameConf.auto_search_limit))
 		StartFilter();
 }
 void DeckBuilder::ClearSearch() {
@@ -1565,23 +1565,23 @@ void DeckBuilder::SortList() {
 	auto left = results.begin();
 	const wchar_t* pstr = mainGame->ebCardName->getText();
 	for(auto it = results.begin(); it != results.end(); ++it) {
-		if(wcscmp(pstr, dataManager.GetName((*it)->first)) == 0) {
+		if(std::wcscmp(pstr, dataManager.GetName((*it)->first)) == 0) {
 			std::iter_swap(left, it);
 			++left;
 		}
 	}
 	switch(mainGame->cbSortType->getSelected()) {
 	case 0:
-		std::sort(left, results.end(), ClientCard::deck_sort_lv);
+		std::sort(left, results.end(), DataManager::deck_sort_lv);
 		break;
 	case 1:
-		std::sort(left, results.end(), ClientCard::deck_sort_atk);
+		std::sort(left, results.end(), DataManager::deck_sort_atk);
 		break;
 	case 2:
-		std::sort(left, results.end(), ClientCard::deck_sort_def);
+		std::sort(left, results.end(), DataManager::deck_sort_def);
 		break;
 	case 3:
-		std::sort(left, results.end(), ClientCard::deck_sort_name);
+		std::sort(left, results.end(), DataManager::deck_sort_name);
 		break;
 	}
 }

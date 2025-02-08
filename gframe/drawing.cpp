@@ -1,4 +1,5 @@
 #include "game.h"
+#include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
 #include "deck_manager.h"
@@ -1265,7 +1266,7 @@ void Game::DrawDeckBd() {
 		driver->draw2DRectangle(Resize(805, 160, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 		driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
 	}
-	for(size_t i = 0; i < 9 && i + scrFilter->getPos() < deckBuilder.results.size(); ++i) {
+	for(int i = 0; i < 9 && i + scrFilter->getPos() < (int)deckBuilder.results.size(); ++i) {
 		code_pointer ptr = deckBuilder.results[i + scrFilter->getPos()];
 		if(i >= 7)
 		{

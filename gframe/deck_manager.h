@@ -2,7 +2,7 @@
 #define DECKMANAGER_H
 
 #include "config.h"
-#include "client_card.h"
+#include "data_manager.h"
 #include <unordered_map>
 #include <vector>
 #include <sstream>
@@ -47,7 +47,7 @@ public:
 	void LoadLFList();
 	const wchar_t* GetLFListName(int lfhash);
 	const std::unordered_map<int, int>* GetLFListContent(int lfhash);
-	int CheckDeck(Deck& deck, int lfhash, int rule);
+	unsigned int CheckDeck(Deck& deck, int lfhash, int rule);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_packlist = false);
 	int LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist = false);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);

@@ -214,7 +214,9 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	case CTOS_UPDATE_DECK: {
 		if(!dp->game)
 			return;
-		if (len < 1 + (int)sizeof(unsigned char))
+		if (len < 1 + (int)sizeof(int32_t) + (int)sizeof(int32_t))
+			return;
+		if (len > 1 + (int)sizeof(CTOS_DeckData))
 			return;
 		duel_mode->UpdateDeck(dp, pdata, len - 1);
 		break;
