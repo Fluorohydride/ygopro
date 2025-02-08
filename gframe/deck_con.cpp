@@ -1511,7 +1511,6 @@ void DeckBuilder::FilterCards() {
 		else
 			continue;
 	}
-	myswprintf(result_string, L"%d", results.size());
 	if(results.size() > 7) {
 		mainGame->scrFilter->setVisible(true);
 		mainGame->scrFilter->setMax(results.size() - 7);
@@ -1541,7 +1540,6 @@ void DeckBuilder::ClearSearch() {
 	mainGame->scrFilter->setPos(0);
 	ClearFilter();
 	results.clear();
-	myswprintf(result_string, L"%d", 0);
 }
 void DeckBuilder::ClearFilter() {
 	mainGame->cbAttribute->setSelected(0);

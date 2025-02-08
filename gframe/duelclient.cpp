@@ -400,8 +400,6 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		mainGame->btnSideShuffle->setVisible(true);
 		mainGame->btnSideSort->setVisible(true);
 		mainGame->btnSideReload->setVisible(true);
-		mainGame->deckBuilder.result_string[0] = L'0';
-		mainGame->deckBuilder.result_string[1] = 0;
 		mainGame->deckBuilder.results.clear();
 		mainGame->deckBuilder.hovered_code = 0;
 		mainGame->deckBuilder.is_draging = false;
