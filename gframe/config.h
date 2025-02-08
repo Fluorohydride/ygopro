@@ -13,6 +13,9 @@
 #ifdef _MSC_VER
 #define mywcsncasecmp _wcsnicmp
 #define mystrncasecmp _strnicmp
+#elif __GNUC__
+#define mywcsncasecmp _wcsnicmp
+#define mystrncasecmp _strnicmp
 #else
 #define mywcsncasecmp wcsncasecmp
 #define mystrncasecmp strncasecmp
@@ -54,7 +57,7 @@
 
 template<size_t N, typename... TR>
 inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
-	return std::swprintf(buf, N, fmt, args...);
+	return swprintf(buf, N, fmt, args...);
 }
 
 inline FILE* myfopen(const wchar_t* filename, const char* mode) {
