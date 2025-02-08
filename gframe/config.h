@@ -57,11 +57,7 @@
 
 template<size_t N, typename... TR>
 inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
-#ifdef __GNUC__
-	return swprintf(buf, N, fmt, args...);
-#else
 	return std::swprintf(buf, N, fmt, args...);
-#endif
 }
 
 inline FILE* myfopen(const wchar_t* filename, const char* mode) {

@@ -16,6 +16,7 @@
 
 #define NOMINMAX
 #include <Windows.h>
+#define swprintf swprintf
 
 class FileSystem {
 public:
@@ -88,11 +89,7 @@ public:
 
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
-#ifdef __GNUC__
-		swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
-#else
 		std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
-#endif
 		WIN32_FIND_DATAW fdataw;
 		HANDLE fh = FindFirstFileW(findstr, &fdataw);
 		if(fh == INVALID_HANDLE_VALUE)
