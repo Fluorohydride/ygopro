@@ -742,7 +742,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				case MSG_SELECT_SUM: {
 					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
-					selected_cards.push_back(command_card);
+					if (command_card->is_selected) {
+						command_card->is_selected = false;
+						int i = 0;
+						while(selected_cards[i] != command_card) i++;
+						selected_cards.erase(selected_cards.begin() + i);
+						if(command_card->controler)
+							mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffd0d0d0);
+						else mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffffff);
+					} else {
+						command_card->is_selected = true;
+						mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffff00);
+						selected_cards.push_back(command_card);
+					}
 					ShowSelectSum(true);
 					break;
 				}
@@ -2597,11 +2609,14 @@ void ClientField::CancelOrFinish() {
 		break;
 	}
 	case MSG_SELECT_SUM: {
-		if(mainGame->wQuery->isVisible()) {
+		if (select_ready) {
 			SetResponseSelectedCards();
 			ShowCancelOrFinishButton(0);
-			mainGame->HideElement(mainGame->wQuery, true);
-			break;
+
+			if(mainGame->wCardSelect->isVisible())
+				mainGame->HideElement(mainGame->wCardSelect, true);
+			else
+				DuelClient::SendResponse();
 		}
 		break;
 	}

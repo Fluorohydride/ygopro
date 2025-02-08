@@ -1111,50 +1111,43 @@ void ClientField::FadeCard(ClientCard * pcard, int alpha, int frame) {
 	pcard->aniFrame = frame;
 }
 bool ClientField::ShowSelectSum(bool panelmode) {
-	if(panelmode) {
-		if(CheckSelectSum()) {
-			if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
-				SetResponseSelectedCards();
-				ShowCancelOrFinishButton(0);
-				if(mainGame->wCardSelect->isVisible())
-					mainGame->HideElement(mainGame->wCardSelect, true);
-				else {
-					DuelClient::SendResponse();
-					return true;
-				}
-			} else {
-				select_ready = true;
-				mainGame->wCardSelect->setVisible(false);
-				wchar_t wbuf[256], *pwbuf = wbuf;
-				BufferIO::CopyWStrRef(dataManager.GetSysString(209), pwbuf, 256);
-				*pwbuf++ = L'\n';
-				BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
-				mainGame->stQMessage->setText(wbuf);
-				mainGame->PopupElement(mainGame->wQuery);
-			}
-		} else {
-			select_ready = false;
-			mainGame->wCardSelect->setVisible(false);
-			mainGame->dField.ShowSelectCard();
-		}
+	select_ready = CheckSelectSum();
+	if(select_ready && (selectsum_cards.size() == 0 || selectable_cards.size() == 0)) {
+		SetResponseSelectedCards();
+		ShowCancelOrFinishButton(0);
+		if(mainGame->wCardSelect->isVisible())
+			mainGame->HideElement(mainGame->wCardSelect, true);
+		else 
+			DuelClient::SendResponse();
+		return true;
+	}
+
+	auto display_hint = select_hint ? dataManager.GetDesc(select_hint) : dataManager.GetSysString(560);
+
+	wchar_t cur_hint[20];
+	if (select_curval_l == select_curval_h) {
+		myswprintf(cur_hint, L"%d", select_curval_l);
 	} else {
-		if(CheckSelectSum()) {
-			if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
-				SetResponseSelectedCards();
-				ShowCancelOrFinishButton(0);
-				DuelClient::SendResponse();
-				return true;
-			} else {
-				select_ready = true;
-				wchar_t wbuf[256], *pwbuf = wbuf;
-				BufferIO::CopyWStrRef(dataManager.GetSysString(209), pwbuf, 256);
-				*pwbuf++ = L'\n';
-				BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
-				mainGame->stQMessage->setText(wbuf);
-				mainGame->PopupElement(mainGame->wQuery);
-			}
-		} else
-			select_ready = false;
+		myswprintf(cur_hint, L"%d-%d", select_curval_l, select_curval_h);
+	}
+
+	wchar_t target_hint[20];
+	if (select_mode == 0) { // sum equal
+		myswprintf(target_hint, L"%d", select_sumval);
+	} else { // sum greater
+		myswprintf(target_hint, L"%d+", select_sumval);
+	}
+
+	wchar_t textBuffer[256];
+	myswprintf(textBuffer, L"%ls(%ls/%ls)", display_hint, cur_hint, target_hint);
+
+	if(panelmode) {
+		mainGame->wCardSelect->setText(textBuffer);
+		mainGame->wCardSelect->setVisible(false);
+		mainGame->dField.ShowSelectCard();
+	} else {
+		mainGame->stHintMsg->setText(textBuffer);
+		mainGame->stHintMsg->setVisible(true);
 	}
 	if (select_ready) {
 		ShowCancelOrFinishButton(2);
@@ -1165,11 +1158,13 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 }
 bool ClientField::CheckSelectSum() {
 	std::set<ClientCard*> selable;
-	for(auto sit = selectsum_all.begin(); sit != selectsum_all.end(); ++sit) {
-		(*sit)->is_selectable = false;
-		(*sit)->is_selected = false;
-		selable.insert(*sit);
+	for(auto sc : selectsum_all) {
+		sc->is_selectable = false;
+		sc->is_selected = false;
+		selable.insert(sc);
 	}
+	select_curval_l = 0;
+	select_curval_h = 0;
 	for(int i = 0; i < (int)selected_cards.size(); ++i) {
 		if(i < must_select_count)
 			selected_cards[i]->is_selectable = false;
@@ -1177,22 +1172,32 @@ bool ClientField::CheckSelectSum() {
 			selected_cards[i]->is_selectable = true;
 		selected_cards[i]->is_selected = true;
 		selable.erase(selected_cards[i]);
+
+		int op1 = selected_cards[i]->opParam & 0xffff;
+		int op2 = selected_cards[i]->opParam >> 16;
+		int opmin = (op2 > 0 && op1 > op2) ? op2 : op1;
+		int opmax = op2 > op1 ? op2 : op1;
+		select_curval_l += opmin;
+		select_curval_h += opmax;
 	}
 	selectsum_cards.clear();
-	if (select_mode == 0) {
+	if (select_mode == 0) { // sum equal
 		bool ret = check_sel_sum_s(selable, 0, select_sumval);
 		selectable_cards.clear();
-		for(auto sit = selectsum_cards.begin(); sit != selectsum_cards.end(); ++sit) {
-			(*sit)->is_selectable = true;
-			selectable_cards.push_back(*sit);
+		for(auto sc : selectsum_cards) {
+			sc->is_selectable = true;
+			selectable_cards.push_back(sc);
+		}
+		for(auto sc : selected_cards) {
+			selectable_cards.push_back(sc);
 		}
 		return ret;
-	} else {
+	} else { // sum greater
 		int mm = -1, mx = -1, max = 0, sumc = 0;
 		bool ret = false;
-		for (auto sit = selected_cards.begin(); sit != selected_cards.end(); ++sit) {
-			int op1 = (*sit)->opParam & 0xffff;
-			int op2 = (*sit)->opParam >> 16;
+		for (auto sc : selected_cards) {
+			int op1 = sc->opParam & 0xffff;
+			int op2 = sc->opParam >> 16;
 			int opmin = (op2 > 0 && op1 > op2) ? op2 : op1;
 			int opmax = op2 > op1 ? op2 : op1;
 			if (mm == -1 || opmin < mm)
@@ -1206,9 +1211,9 @@ bool ClientField::CheckSelectSum() {
 			return true;
 		if (select_sumval <= max && select_sumval > max - mx)
 			ret = true;
-		for(auto sit = selable.begin(); sit != selable.end(); ++sit) {
-			int op1 = (*sit)->opParam & 0xffff;
-			int op2 = (*sit)->opParam >> 16;
+		for(auto sc : selable) {
+			int op1 = sc->opParam & 0xffff;
+			int op2 = sc->opParam >> 16;
 			int m = op1;
 			int sums = sumc;
 			sums += m;
@@ -1217,12 +1222,12 @@ bool ClientField::CheckSelectSum() {
 				ms = m;
 			if (sums >= select_sumval) {
 				if (sums - ms < select_sumval)
-					selectsum_cards.insert(*sit);
+					selectsum_cards.insert(sc);
 			} else {
 				std::set<ClientCard*> left(selable);
-				left.erase(*sit);
+				left.erase(sc);
 				if (check_min(left, left.begin(), select_sumval - sums, select_sumval - sums + ms - 1))
-					selectsum_cards.insert(*sit);
+					selectsum_cards.insert(sc);
 			}
 			if (op2 == 0)
 				continue;
@@ -1234,18 +1239,21 @@ bool ClientField::CheckSelectSum() {
 				ms = m;
 			if (sums >= select_sumval) {
 				if (sums - ms < select_sumval)
-					selectsum_cards.insert(*sit);
+					selectsum_cards.insert(sc);
 			} else {
 				std::set<ClientCard*> left(selable);
-				left.erase(*sit);
+				left.erase(sc);
 				if (check_min(left, left.begin(), select_sumval - sums, select_sumval - sums + ms - 1))
-					selectsum_cards.insert(*sit);
+					selectsum_cards.insert(sc);
 			}
 		}
 		selectable_cards.clear();
-		for(auto sit = selectsum_cards.begin(); sit != selectsum_cards.end(); ++sit) {
-			(*sit)->is_selectable = true;
-			selectable_cards.push_back(*sit);
+		for(auto sc : selectsum_cards) {
+			sc->is_selectable = true;
+			selectable_cards.push_back(sc);
+		}
+		for(auto sc : selected_cards) {
+			selectable_cards.push_back(sc);
 		}
 		return ret;
 	}
