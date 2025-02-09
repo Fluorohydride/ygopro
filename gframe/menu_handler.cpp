@@ -556,8 +556,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					curtime = ReplayMode::cur_replay.pheader.start_time;
 				else
 					curtime = ReplayMode::cur_replay.pheader.seed;
-				tm* st = localtime(&curtime);
-				std::wcsftime(infobuf, 256, L"%Y/%m/%d %H:%M:%S\n", st);
+				std::wcsftime(infobuf, sizeof infobuf / sizeof infobuf[0], L"%Y/%m/%d %H:%M:%S\n", std::localtime(&curtime));
 				repinfo.append(infobuf);
 				wchar_t namebuf[4][20]{};
 				ReplayMode::cur_replay.ReadName(namebuf[0]);

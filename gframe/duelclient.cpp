@@ -730,9 +730,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		else
 			starttime = new_replay.pheader.seed;
 		
-		tm* localedtime = localtime(&starttime);
 		wchar_t timetext[40];
-		std::wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
+		std::wcsftime(timetext, sizeof timetext / sizeof timetext[0], L"%Y-%m-%d %H-%M-%S", std::localtime(&starttime));
 		mainGame->ebRSName->setText(timetext);
 		if(!mainGame->chkAutoSaveReplay->isChecked()) {
 			mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
