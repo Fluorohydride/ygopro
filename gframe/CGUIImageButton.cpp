@@ -1,8 +1,15 @@
-#ifdef _MSC_VER
-#pragma warning(disable: 4244)
-#endif
+// Copyright (C) 2002-2012 Nikolaus Gebhardt
+// This file is part of the "Irrlicht Engine".
+// For conditions of distribution and use, see copyright notice in irrlicht.h
 
 #include "CGUIImageButton.h"
+#ifdef _IRR_COMPILE_WITH_GUI_
+
+#include <IGUISpriteBank.h>
+#include <IGUISkin.h>
+#include <IGUIEnvironment.h>
+#include <IVideoDriver.h>
+#include <IGUIFont.h>
 
 namespace irr {
 namespace gui {
@@ -94,18 +101,36 @@ void Draw2DImageQuad(video::IVideoDriver* driver, video::ITexture* image, core::
 	driver->setTransform(irr::video::ETS_PROJECTION, oldProjMat);
 	driver->setTransform(irr::video::ETS_VIEW, oldViewMat);
 }
-CGUIImageButton::CGUIImageButton(IGUIEnvironment* environment, IGUIElement* parent, s32 id, core::rect<s32> rectangle)
-	: CGUIButton(environment, parent, id, rectangle) {
+CGUIImageButton* CGUIImageButton::addImageButton(IGUIEnvironment *env, const core::rect<s32>& rectangle, IGUIElement* parent, s32 id) {
+	CGUIImageButton* button = new CGUIImageButton(env, parent ? parent : 0, id, rectangle);
+	button->drop();
+	return button;
+}
+//! constructor
+CGUIImageButton::CGUIImageButton(IGUIEnvironment* environment, IGUIElement* parent,
+	s32 id, core::rect<s32> rectangle, bool noclip)
+	: IGUIButton(environment, parent, id, rectangle),
+	SpriteBank(0), OverrideFont(0), Image(0), PressedImage(0),
+	ClickTime(0), HoverTime(0), FocusTime(0),
+	IsPushButton(false), Pressed(false),
+	UseAlphaChannel(false), DrawBorder(true), ScaleImage(false) {
+#ifdef _DEBUG
+	setDebugName("CGUIImageButton");
+#endif
+	setNotClipped(noclip);
+
+	// Initialize the sprites.
+	for (u32 i = 0; i < EGBS_COUNT; ++i)
+		ButtonSprites[i].Index = -1;
+
+	// This element can be tabbed.
+	setTabStop(true);
+	setTabOrder(-1);
 	isDrawImage = true;
 	isFixedSize = false;
 	imageRotation = 0.0f;
 	imageScale = core::vector2df(1.0f, 1.0f);
 	imageSize = core::dimension2di(rectangle.getWidth(), rectangle.getHeight());
-}
-CGUIImageButton* CGUIImageButton::addImageButton(IGUIEnvironment *env, const core::rect<s32>& rectangle, IGUIElement* parent, s32 id) {
-	CGUIImageButton* button = new CGUIImageButton(env, parent ? parent : 0, id, rectangle);
-	button->drop();
-	return button;
 }
 void CGUIImageButton::draw() {
 	if (!IsVisible)
@@ -180,3 +205,4 @@ IGUIFont* CGUIImageButton::getActiveFont() const
 
 }
 }
+#endif // _IRR_COMPILE_WITH_GUI_
