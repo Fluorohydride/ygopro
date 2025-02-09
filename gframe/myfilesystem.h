@@ -16,7 +16,6 @@
 
 #define NOMINMAX
 #include <Windows.h>
-#define swprintf swprintf
 
 class FileSystem {
 public:
