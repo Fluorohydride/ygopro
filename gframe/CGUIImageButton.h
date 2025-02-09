@@ -138,8 +138,6 @@ protected:
 	core::rect<s32> ImageRect;
 	core::rect<s32> PressedImageRect;
 
-	u32 ClickTime, HoverTime, FocusTime;
-
 	bool IsPushButton;
 	bool Pressed;
 	bool UseAlphaChannel;
