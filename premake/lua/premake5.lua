@@ -1,6 +1,8 @@
 project "lua"
     kind "StaticLib"
 
+    defines { "LUA_UCID" }
+
     files { "src/*.c", "src/*.h", "src/*.hpp" }
     removefiles { "src/lua.c", "src/luac.c" }
 
