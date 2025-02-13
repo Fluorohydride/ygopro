@@ -13,6 +13,9 @@
 #ifdef _MSC_VER
 #define mywcsncasecmp _wcsnicmp
 #define mystrncasecmp _strnicmp
+#elif __GNUC__
+#define mywcsncasecmp _wcsnicmp
+#define mystrncasecmp _strnicmp
 #else
 #define mywcsncasecmp wcsncasecmp
 #define mystrncasecmp strncasecmp
