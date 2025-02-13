@@ -50,7 +50,6 @@
 #include <string>
 #include "bufferio.h"
 #include "../ocgcore/ocgapi.h"
-#include "../ocgcore/common.h"
 
 template<size_t N, typename... TR>
 inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
