@@ -2129,8 +2129,8 @@ void Game::SetWindowsIcon() {
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandleW(nullptr);
 	HICON hSmallIcon = (HICON)LoadImageW(hInstance, MAKEINTRESOURCEW(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 	HICON hBigIcon = (HICON)LoadImageW(hInstance, MAKEINTRESOURCEW(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
-	SendMessageW(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
-	SendMessageW(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
+	SendMessageW(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hSmallIcon);
+	SendMessageW(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hBigIcon);
 #endif
 }
 void Game::SetWindowsScale(float scale) {
