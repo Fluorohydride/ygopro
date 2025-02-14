@@ -2170,6 +2170,7 @@ void Game::SetCursor(ECURSOR_ICON icon) {
 	}
 }
 bool Game::CopyTextToClipboard(const wchar_t* text) {
+#ifdef _WIN32
 	if (! text) {
 		return false; // 如果传入的文本为空指针，直接返回false
 	}
@@ -2199,6 +2200,9 @@ bool Game::CopyTextToClipboard(const wchar_t* text) {
 	}
 	CloseClipboard(); // 关闭剪贴板
 	return success;   // 返回操作是否成功
+#else
+	return false;
+#endif
 }
 
 }
