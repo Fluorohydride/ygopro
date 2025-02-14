@@ -224,6 +224,8 @@ public:
 	static void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const core::rect<s32>& position, const core::rect<s32>& padding,
 		video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const core::rect<s32>* clip = nullptr);
 
+	bool CopyTextToClipboard(const wchar_t* text);
+
 	std::mutex gMutex;
 	Signal frameSignal;
 	Signal actionSignal;
@@ -282,6 +284,8 @@ public:
 	irr::video::IVideoDriver* driver;
 	irr::scene::ISceneManager* smgr;
 	irr::scene::ICameraSceneNode* camera;
+
+	wchar_t currentCardName[256];
 
 #ifdef _WIN32
 	HWND hWnd;
@@ -830,6 +834,7 @@ extern Game* mainGame;
 #define BUTTON_BIG_CARD_ZOOM_IN		381
 #define BUTTON_BIG_CARD_ZOOM_OUT	382
 #define BUTTON_BIG_CARD_ORIG_SIZE	383
+#define TEXT_CARD_NAME	384
 
 #define AVAIL_OCG					0x1
 #define AVAIL_TCG					0x2

@@ -303,9 +303,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_OPTION_0:
-			case BUTTON_OPTION_1: 
-			case BUTTON_OPTION_2: 
-			case BUTTON_OPTION_3: 
+			case BUTTON_OPTION_1:
+			case BUTTON_OPTION_2:
+			case BUTTON_OPTION_3:
 			case BUTTON_OPTION_4: {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				int step = mainGame->scrOption->isVisible() ? mainGame->scrOption->getPos() : 0;
@@ -2065,6 +2065,23 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->device->minimizeWindow();
 			return true;
+			break;
+		}
+		default: break;
+		}
+	}
+	case irr::EET_MOUSE_INPUT_EVENT: {
+		switch (event.MouseInput.Event) {
+		case irr::EMIE_LMOUSE_LEFT_UP: {
+			s32 id = mainGame->env->getHovered()->getID();
+			switch (id) {
+				case TEXT_CARD_NAME: {
+					mainGame->CopyTextToClipboard(mainGame->currentCardName);
+					return true;
+					break;
+				}
+				default: break;
+			}
 			break;
 		}
 		default: break;

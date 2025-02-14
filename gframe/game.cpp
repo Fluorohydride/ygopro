@@ -259,7 +259,7 @@ bool Game::Initialize() {
 	default:
 		cbRule->setSelected(5);
 		break;
-	}	
+	}
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
@@ -359,7 +359,7 @@ bool Game::Initialize() {
 	wInfos->setVisible(false);
 	//info
 	irr::gui::IGUITab* tabInfo = wInfos->addTab(dataManager.GetSysString(1270));
-	stName = env->addStaticText(L"", rect<s32>(10, 10, 287, 32), true, false, tabInfo, -1, false);
+	stName = env->addStaticText(L"", rect<s32>(10, 10, 287, 32), true, false, tabInfo, TEXT_CARD_NAME, false);
 	stName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stInfo = env->addStaticText(L"", rect<s32>(15, 37, 296, 60), false, true, tabInfo, -1, false);
 	stInfo->setOverrideColor(SColor(255, 0, 0, 255));
@@ -1549,10 +1549,14 @@ void Game::ShowCardInfo(int code, bool resize) {
 	imgCard->setImage(imageManager.GetTexture(code, true));
 	if (is_valid) {
 		auto& cd = cit->second;
-		if (cd.is_alternative())
+		if (cd.is_alternative()) {
 			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
-		else
+			myswprintf(currentCardName, L"「%ls」", dataManager.GetName(cd.alias));
+		}
+		else {
 			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
+			myswprintf(currentCardName, L"「%ls」", dataManager.GetName(code));
+		}
 	}
 	else {
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
@@ -2164,6 +2168,37 @@ void Game::SetCursor(ECURSOR_ICON icon) {
 	if(cursor->getActiveIcon() != icon) {
 		cursor->setActiveIcon(icon);
 	}
+}
+bool Game::CopyTextToClipboard(const wchar_t* text) {
+	if (! text) {
+		return false; // 如果传入的文本为空指针，直接返回false
+	}
+	if (! OpenClipboard(nullptr)) {
+		return false; // 打开剪贴板失败，返回false
+	}
+	EmptyClipboard(); // 清空剪贴板
+	bool success = false;
+	const size_t textLength = wcslen(text);
+	const size_t bufferSize = (textLength + 1) * sizeof(wchar_t); // 计算所需的缓冲区大小
+	HGLOBAL handle = GlobalAlloc(GMEM_MOVEABLE, bufferSize);
+	if (handle) {
+		wchar_t* globalText = static_cast<wchar_t*>(GlobalLock(handle));
+		if (globalText) {
+			swprintf(globalText, textLength + 1, L"%ls", text); // 将文本复制到全局内存
+			GlobalUnlock(handle);
+			if (SetClipboardData(CF_UNICODETEXT, handle)) {
+				success = true; // 设置剪贴板数据成功
+			}
+			else {
+				GlobalFree(handle); // 设置剪贴板数据失败，释放内存
+			}
+		}
+		else {
+			GlobalFree(handle); // 锁定内存失败，释放内存
+		}
+	}
+	CloseClipboard(); // 关闭剪贴板
+	return success;   // 返回操作是否成功
 }
 
 }
