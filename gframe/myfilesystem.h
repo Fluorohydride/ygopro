@@ -88,7 +88,7 @@ public:
 
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
-		std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
+		std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%ls/*", wpath);
 		WIN32_FIND_DATAW fdataw;
 		HANDLE fh = FindFirstFileW(findstr, &fdataw);
 		if(fh == INVALID_HANDLE_VALUE)
@@ -119,7 +119,7 @@ public:
 		while((wfile = std::wcspbrk(wfile, L"/")) != nullptr)
 			*wfile++ = '_';
 	}
-	
+
 	static bool IsFileExists(const char* file) {
 		struct stat fileStat;
 		return (stat(file, &fileStat) == 0) && !S_ISDIR(fileStat.st_mode);
