@@ -224,8 +224,6 @@ public:
 	static void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const core::rect<s32>& position, const core::rect<s32>& padding,
 		video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const core::rect<s32>* clip = nullptr);
 
-	bool CopyTextToClipboard(const wchar_t* text);
-
 	std::mutex gMutex;
 	Signal frameSignal;
 	Signal actionSignal;

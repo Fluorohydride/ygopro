@@ -2076,7 +2076,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			s32 id = mainGame->env->getHovered()->getID();
 			switch (id) {
 				case TEXT_CARD_NAME: {
-					mainGame->CopyTextToClipboard(mainGame->currentCardName);
+					mainGame->env->getOSOperator()->copyToClipboard(mainGame->currentCardName);
 					return true;
 					break;
 				}

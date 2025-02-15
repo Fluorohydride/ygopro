@@ -2169,40 +2169,5 @@ void Game::SetCursor(ECURSOR_ICON icon) {
 		cursor->setActiveIcon(icon);
 	}
 }
-bool Game::CopyTextToClipboard(const wchar_t* text) {
-#ifdef _WIN32
-	if (! text) {
-		return false; // 如果传入的文本为空指针，直接返回false
-	}
-	if (! OpenClipboard(nullptr)) {
-		return false; // 打开剪贴板失败，返回false
-	}
-	EmptyClipboard(); // 清空剪贴板
-	bool success = false;
-	const size_t textLength = wcslen(text);
-	const size_t bufferSize = (textLength + 1) * sizeof(wchar_t); // 计算所需的缓冲区大小
-	HGLOBAL handle = GlobalAlloc(GMEM_MOVEABLE, bufferSize);
-	if (handle) {
-		wchar_t* globalText = static_cast<wchar_t*>(GlobalLock(handle));
-		if (globalText) {
-			swprintf(globalText, textLength + 1, L"%ls", text); // 将文本复制到全局内存
-			GlobalUnlock(handle);
-			if (SetClipboardData(CF_UNICODETEXT, handle)) {
-				success = true; // 设置剪贴板数据成功
-			}
-			else {
-				GlobalFree(handle); // 设置剪贴板数据失败，释放内存
-			}
-		}
-		else {
-			GlobalFree(handle); // 锁定内存失败，释放内存
-		}
-	}
-	CloseClipboard(); // 关闭剪贴板
-	return success;   // 返回操作是否成功
-#else
-	return false;
-#endif
-}
 
 }
