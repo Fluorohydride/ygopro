@@ -204,16 +204,10 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	case LOCATION_DECK: {
 		if (sequence != 0 || deck[controler].size() == 0) {
 			deck[controler].push_back(pcard);
-			pcard->sequence = (unsigned char)(deck[controler].size() - 1);
 		} else {
-			deck[controler].push_back(0);
-			for(int i = deck[controler].size() - 1; i > 0; --i) {
-				deck[controler][i] = deck[controler][i - 1];
-				deck[controler][i]->sequence++;
-			}
-			deck[controler][0] = pcard;
-			pcard->sequence = 0;
+			deck[controler].insert(deck[controler].begin(), pcard);
 		}
+		ResetSequence(deck[controler], true);
 		pcard->is_reversed = false;
 		pcard->ClearData();
 		pcard->ClearTarget();
@@ -222,7 +216,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 	case LOCATION_HAND: {
 		hand[controler].push_back(pcard);
-		pcard->sequence = (unsigned char)(hand[controler].size() - 1);
+		ResetSequence(hand[controler], false);
 		break;
 	}
 	case LOCATION_MZONE: {
@@ -235,30 +229,22 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 	case LOCATION_GRAVE: {
 		grave[controler].push_back(pcard);
-		pcard->sequence = (unsigned char)(grave[controler].size() - 1);
+		ResetSequence(grave[controler], true);
 		break;
 	}
 	case LOCATION_REMOVED: {
 		remove[controler].push_back(pcard);
-		pcard->sequence = (unsigned char)(remove[controler].size() - 1);
+		ResetSequence(remove[controler], true);
 		break;
 	}
 	case LOCATION_EXTRA: {
 		if(extra_p_count[controler] == 0 || (pcard->position & POS_FACEUP)) {
 			extra[controler].push_back(pcard);
-			pcard->sequence = (unsigned char)(extra[controler].size() - 1);
 		} else {
-			extra[controler].push_back(0);
-			int p = extra[controler].size() - extra_p_count[controler] - 1;
-			for(int i = extra[controler].size() - 1; i > p; --i) {
-				extra[controler][i] = extra[controler][i - 1];
-				extra[controler][i]->sequence++;
-				extra[controler][i]->curPos += irr::core::vector3df(0, 0, 0.01f);
-				extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
-			}
-			extra[controler][p] = pcard;
-			pcard->sequence = p;
+			size_t faceup_begin = extra[controler].size() - extra_p_count[controler];
+			extra[controler].insert(extra[controler].begin() + faceup_begin, pcard);
 		}
+		ResetSequence(extra[controler], true);
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]++;
 		break;
