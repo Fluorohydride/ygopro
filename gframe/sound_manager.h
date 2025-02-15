@@ -67,6 +67,7 @@ extern SoundManager soundManager;
 #define SOUND_CARD_DROP				306
 #define SOUND_PLAYER_ENTER			307
 #define SOUND_CHAT					308
+#define SOUND_COMMON_FEEDBACK					309
 
 #define BGM_ALL						0
 #define BGM_DUEL					1

@@ -173,6 +173,10 @@ void SoundManager::PlaySoundEffect(int sound) {
 		engineSound->play2D("./sound/chatmessage.wav");
 		break;
 	}
+	case SOUND_COMMON_FEEDBACK: {
+		engineSound->play2D("./sound/common_feedback.wav");
+		break;
+	}
 	default:
 		break;
 	}
