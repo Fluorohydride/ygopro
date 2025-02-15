@@ -235,7 +235,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 			extra[controler].push_back(pcard);
 			pcard->sequence = (unsigned char)(extra[controler].size() - 1);
 		} else {
-			int p = extra[controler].size() - extra_p_count[controler] - 1;
+			int p = extra[controler].size() - extra_p_count[controler];
 			for(int i = extra[controler].size() - 1; i > p; --i) {
 				extra[controler][i]->sequence++;
 				extra[controler][i]->curPos += irr::core::vector3df(0, 0, 0.01f);
