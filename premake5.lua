@@ -4,6 +4,7 @@ BUILD_LUA = true
 BUILD_EVENT = os.istarget("windows")
 BUILD_FREETYPE = os.istarget("windows")
 BUILD_SQLITE = os.istarget("windows")
+BUILD_MINIAUDIO = false
 BUILD_IRRLICHT = not os.istarget("macosx")
 USE_IRRKLANG = true
 IRRKLANG_PRO = false
@@ -31,6 +32,11 @@ newoption { trigger = "build-sqlite", category = "YGOPro - sqlite", description 
 newoption { trigger = "no-build-sqlite", category = "YGOPro - sqlite", description = "" }
 newoption { trigger = "sqlite-include-dir", category = "YGOPro - sqlite", description = "", value = "PATH" }
 newoption { trigger = "sqlite-lib-dir", category = "YGOPro - sqlite", description = "", value = "PATH" }
+
+newoption { trigger = "build-miniaudio", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "no-build-miniaudio", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "miniaudio-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "miniaudio-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 
 newoption { trigger = "build-irrlicht", category = "YGOPro - irrlicht", description = "" }
 newoption { trigger = "no-build-irrlicht", category = "YGOPro - irrlicht", description = "" }
@@ -103,6 +109,16 @@ if not BUILD_SQLITE then
     SQLITE_LIB_DIR = GetParam("sqlite-lib-dir") or "/usr/local/lib"
 end
 
+if GetParam("build-miniaudio") then
+    BUILD_MINIAUDIO = true
+elseif GetParam("no-build-miniaudio") then
+    BUILD_MINIAUDIO = false
+end
+if not BUILD_miniaudio then
+    MINIAUDIO_INCLUDE_DIR = GetParam("miniaudio-include-dir") or "/usr/local/include"
+    MINIAUDIO_LIB_DIR = GetParam("miniaudio-lib-dir") or "/usr/local/lib"
+end
+
 if GetParam("build-irrlicht") then
     BUILD_IRRLICHT = true
 elseif GetParam("no-build-irrlicht") then
@@ -139,7 +155,7 @@ end
 if IRRKLANG_PRO then
     -- irrklang pro can't use the pro lib to debug
     IRRKLANG_PRO_RELEASE_LIB_DIR = GetParam("irrklang-pro-release-lib-dir") or "../irrklang/lib/Win32-vs2019"
-    IRRKLANG_PRO_DEBUG_LIB_DIR = GetParam("irrklang-pro-debug-lib-dir") or "../irrklang/lib/Win32-visualStudio-debug"  
+    IRRKLANG_PRO_DEBUG_LIB_DIR = GetParam("irrklang-pro-debug-lib-dir") or "../irrklang/lib/Win32-visualStudio-debug"
 end
 
 BUILD_IKPMP3 = USE_IRRKLANG and (GetParam("build-ikpmp3") or IRRKLANG_PRO)
@@ -209,7 +225,7 @@ workspace "YGOPro"
         vectorextensions "SSE2"
         buildoptions { "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
-    
+
     filter "not action:vs*"
         buildoptions { "-fno-strict-aliasing", "-Wno-multichar", "-Wno-format-security" }
 
@@ -231,6 +247,9 @@ workspace "YGOPro"
     end
     if BUILD_SQLITE then
         include "sqlite3"
+    end
+    if BUILD_MINIAUDIO then
+        include "miniaudio3"
     end
     if BUILD_IKPMP3 then
         include "ikpmp3"
