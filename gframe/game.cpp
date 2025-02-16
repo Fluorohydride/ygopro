@@ -259,7 +259,7 @@ bool Game::Initialize() {
 	default:
 		cbRule->setSelected(5);
 		break;
-	}	
+	}
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
@@ -1423,7 +1423,7 @@ void Game::LoadConfig() {
 			gameConf.window_height = strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "resize_popup_menu")) {
 			gameConf.resize_popup_menu = strtol(valbuf, nullptr, 10) > 0;
-#ifdef YGOPRO_USE_IRRKLANG
+#ifdef YGOPRO_USE_IRRKLANG or YGOPRO_USE_MINIAUDIO
 		} else if(!std::strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "sound_volume")) {
@@ -1528,7 +1528,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "window_width = %d\n", gameConf.window_width);
 	fprintf(fp, "window_height = %d\n", gameConf.window_height);
 	fprintf(fp, "resize_popup_menu = %d\n", gameConf.resize_popup_menu ? 1 : 0);
-#ifdef YGOPRO_USE_IRRKLANG
+#ifdef YGOPRO_USE_IRRKLANG or YGOPRO_USE_MINIAUDIO
 	fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
 	fprintf(fp, "#Volume of sound and music, between 0 and 100\n");

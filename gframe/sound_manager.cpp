@@ -25,6 +25,17 @@ bool SoundManager::Init() {
 	}
 #endif // YGOPRO_USE_IRRKLANG
 	// TODO: Implement other sound engines
+#ifdef YGOPRO_USE_MINIAUDIO
+	bgm_scene = -1;
+	RefreshBGMList();
+	rnd.reset((unsigned int)std::time(nullptr));
+	if (ma_engine_init(nullptr, &engineSound) or ma_engine_init(nullptr, &engineMusic)) {
+		return false;
+	}
+	else {
+		return true;
+	}
+#endif
 	return false;
 }
 void SoundManager::RefreshBGMList() {
@@ -177,6 +188,139 @@ void SoundManager::PlaySoundEffect(int sound) {
 		break;
 	}
 #endif
+#ifdef YGOPRO_USE_MINIAUDIO
+	if (! mainGame->chkEnableSound->isChecked())
+		return;
+	ma_engine_set_volume(&engineSound, mainGame->gameConf.sound_volume);
+	switch (sound) {
+		case SOUND_SUMMON: {
+			ma_engine_play_sound(&engineSound, "./sound/summon.wav", nullptr);
+			break;
+		}
+		case SOUND_SPECIAL_SUMMON: {
+			ma_engine_play_sound(&engineSound, "./sound/specialsummon.wav", nullptr);
+			break;
+		}
+		case SOUND_ACTIVATE: {
+			ma_engine_play_sound(&engineSound, "./sound/activate.wav", nullptr);
+			break;
+		}
+		case SOUND_SET: {
+			ma_engine_play_sound(&engineSound, "./sound/set.wav", nullptr);
+			break;
+		}
+		case SOUND_FILP: {
+			ma_engine_play_sound(&engineSound, "./sound/flip.wav", nullptr);
+			break;
+		}
+		case SOUND_REVEAL: {
+			ma_engine_play_sound(&engineSound, "./sound/reveal.wav", nullptr);
+			break;
+		}
+		case SOUND_EQUIP: {
+			ma_engine_play_sound(&engineSound, "./sound/equip.wav", nullptr);
+			break;
+		}
+		case SOUND_DESTROYED: {
+			ma_engine_play_sound(&engineSound, "./sound/destroyed.wav", nullptr);
+			break;
+		}
+		case SOUND_BANISHED: {
+			ma_engine_play_sound(&engineSound, "./sound/banished.wav", nullptr);
+			break;
+		}
+		case SOUND_TOKEN: {
+			ma_engine_play_sound(&engineSound, "./sound/token.wav", nullptr);
+			break;
+		}
+		case SOUND_ATTACK: {
+			ma_engine_play_sound(&engineSound, "./sound/attack.wav", nullptr);
+			break;
+		}
+		case SOUND_DIRECT_ATTACK: {
+			ma_engine_play_sound(&engineSound, "./sound/directattack.wav", nullptr);
+			break;
+		}
+		case SOUND_DRAW: {
+			ma_engine_play_sound(&engineSound, "./sound/draw.wav", nullptr);
+			break;
+		}
+		case SOUND_SHUFFLE: {
+			ma_engine_play_sound(&engineSound, "./sound/shuffle.wav", nullptr);
+			break;
+		}
+		case SOUND_DAMAGE: {
+			ma_engine_play_sound(&engineSound, "./sound/damage.wav", nullptr);
+			break;
+		}
+		case SOUND_RECOVER: {
+			ma_engine_play_sound(&engineSound, "./sound/gainlp.wav", nullptr);
+			break;
+		}
+		case SOUND_COUNTER_ADD: {
+			ma_engine_play_sound(&engineSound, "./sound/addcounter.wav", nullptr);
+			break;
+		}
+		case SOUND_COUNTER_REMOVE: {
+			ma_engine_play_sound(&engineSound, "./sound/removecounter.wav", nullptr);
+			break;
+		}
+		case SOUND_COIN: {
+			ma_engine_play_sound(&engineSound, "./sound/coinflip.wav", nullptr);
+			break;
+		}
+		case SOUND_DICE: {
+			ma_engine_play_sound(&engineSound, "./sound/diceroll.wav", nullptr);
+			break;
+		}
+		case SOUND_NEXT_TURN: {
+			ma_engine_play_sound(&engineSound, "./sound/nextturn.wav", nullptr);
+			break;
+		}
+		case SOUND_PHASE: {
+			ma_engine_play_sound(&engineSound, "./sound/phase.wav", nullptr);
+			break;
+		}
+		case SOUND_MENU: {
+			ma_engine_play_sound(&engineSound, "./sound/menu.wav", nullptr);
+			break;
+		}
+		case SOUND_BUTTON: {
+			ma_engine_play_sound(&engineSound, "./sound/button.wav", nullptr);
+			break;
+		}
+		case SOUND_INFO: {
+			ma_engine_play_sound(&engineSound, "./sound/info.wav", nullptr);
+			break;
+		}
+		case SOUND_QUESTION: {
+			ma_engine_play_sound(&engineSound, "./sound/question.wav", nullptr);
+			break;
+		}
+		case SOUND_CARD_PICK: {
+			ma_engine_play_sound(&engineSound, "./sound/cardpick.wav", nullptr);
+			break;
+		}
+		case SOUND_CARD_DROP: {
+			ma_engine_play_sound(&engineSound, "./sound/carddrop.wav", nullptr);
+			break;
+		}
+		case SOUND_PLAYER_ENTER: {
+			ma_engine_play_sound(&engineSound, "./sound/playerenter.wav", nullptr);
+			break;
+		}
+		case SOUND_CHAT: {
+			ma_engine_play_sound(&engineSound, "./sound/chatmessage.wav", nullptr);
+			break;
+		}
+		case SOUND_COMMON_FEEDBACK: {
+			ma_engine_play_sound(&engineSound, "./sound/common_feedback.wav", nullptr);
+			break;
+		}
+		default:
+			break;
+	}
+#endif
 }
 void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 	if(element == mainGame->wMessage) {
@@ -211,6 +355,18 @@ void SoundManager::PlayMusic(char* song, bool loop) {
 		soundBGM = engineMusic->play2D(song, loop, false, true);
 	}
 #endif
+#ifdef YGOPRO_USE_MINIAUDIO
+	if (! mainGame->chkEnableMusic->isChecked())
+		return;
+	ma_sound_uninit(&soundBGM);
+#ifdef _WIN32
+	ma_sound_init_from_file_w(&engineMusic, reinterpret_cast<wchar_t*>(song), MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_STREAM, nullptr, nullptr, &soundBGM);
+#else
+	ma_sound_init_from_file(&engineMusic, song, MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_STREAM, nullptr, nullptr, &soundBGM);
+#endif
+	ma_sound_set_looping(&soundBGM, loop);
+	ma_sound_start(&soundBGM);
+#endif
 }
 void SoundManager::PlayBGM(int scene) {
 #ifdef YGOPRO_USE_IRRKLANG
@@ -232,20 +388,47 @@ void SoundManager::PlayBGM(int scene) {
 		PlayMusic(BGMName, false);
 	}
 #endif
+#ifdef YGOPRO_USE_MINIAUDIO
+	if (! mainGame->chkEnableMusic->isChecked())
+		return;
+	if (! mainGame->chkMusicMode->isChecked())
+		scene = BGM_ALL;
+	char BGMName[1024];
+	if (scene != bgm_scene) {
+		int count = BGMList[scene].size();
+		if (count <= 0)
+			return;
+		bgm_scene = scene;
+		int bgm = rnd.get_random_integer(0, count - 1);
+		auto name = BGMList[scene][bgm].c_str();
+		wchar_t fname[1024];
+		myswprintf(fname, L"./sound/BGM/%ls", name);
+		PlayMusic(reinterpret_cast<char*>(fname), false);
+	}
+#endif
 }
 void SoundManager::StopBGM() {
 #ifdef YGOPRO_USE_IRRKLANG
 	engineMusic->stopAllSounds();
+#endif
+#ifdef YGOPRO_USE_MINIAUDIO
+	ma_sound_stop(&soundBGM);
 #endif
 }
 void SoundManager::SetSoundVolume(double volume) {
 #ifdef YGOPRO_USE_IRRKLANG
 	engineSound->setSoundVolume(volume);
 #endif
+#ifdef YGOPRO_USE_MINIAUDIO
+	ma_engine_set_volume(&engineSound, volume);
+#endif
 }
 void SoundManager::SetMusicVolume(double volume) {
 #ifdef YGOPRO_USE_IRRKLANG
 	engineMusic->setSoundVolume(volume);
+#endif
+#ifdef YGOPRO_USE_MINIAUDIO
+	ma_engine_set_volume(&engineMusic, volume);
 #endif
 }
 }

@@ -28,6 +28,7 @@ cardpick.wav
 carddrop.wav
 playerenter.wav
 chatmessage.wav
+common_feedback.wav
 
 BGM/*.mp3
 BGM/duel/*.mp3
