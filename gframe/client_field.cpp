@@ -229,12 +229,12 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 	case LOCATION_GRAVE: {
 		grave[controler].push_back(pcard);
-		ResetSequence(grave[controler], true);
+		ResetSequence(grave[controler], false);
 		break;
 	}
 	case LOCATION_REMOVED: {
 		remove[controler].push_back(pcard);
-		ResetSequence(remove[controler], true);
+		ResetSequence(remove[controler], false);
 		break;
 	}
 	case LOCATION_EXTRA: {
