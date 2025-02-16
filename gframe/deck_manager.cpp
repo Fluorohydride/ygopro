@@ -1,7 +1,7 @@
 #include "deck_manager.h"
+#include "game.h"
 #include "myfilesystem.h"
 #include "network.h"
-#include "game.h"
 
 namespace ygo {
 
@@ -269,13 +269,13 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 	FILE* fp = myfopen(file, mode);
 	return fp;
 }
-IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
+irr::io::IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
 #ifdef _WIN32
-	IReadFile* reader = DataManager::FileSystem->createAndOpenFile(file);
+	auto reader = DataManager::FileSystem->createAndOpenFile(file);
 #else
 	char file2[256];
 	BufferIO::EncodeUTF8(file, file2);
-	IReadFile* reader = DataManager::FileSystem->createAndOpenFile(file2);
+	auto = DataManager::FileSystem->createAndOpenFile(file2);
 #endif
 	return reader;
 }
