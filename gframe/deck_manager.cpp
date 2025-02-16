@@ -18,19 +18,16 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			if(linebuf[0] == '#')
 				continue;
 			if(linebuf[0] == '!') {
-				int sa = BufferIO::DecodeUTF8(&linebuf[1], strBuffer);
-				while(strBuffer[sa - 1] == L'\r' || strBuffer[sa - 1] == L'\n' )
-					sa--;
-				strBuffer[sa] = 0;
+				auto len = std::strcspn(linebuf, "\r\n");
+				linebuf[len] = 0;
+				BufferIO::DecodeUTF8(&linebuf[1], strBuffer);
 				LFList newlist;
+				newlist.listName = strBuffer;
+				newlist.hash = 0x7dfcee6a;
 				_lfList.push_back(newlist);
 				cur = _lfList.rbegin();
-				cur->listName = strBuffer;
-				cur->hash = 0x7dfcee6a;
 				continue;
 			}
-			if(linebuf[0] == 0)
-				continue;
 			int code = 0;
 			int count = -1;
 			if (sscanf(linebuf, "%d %d", &code, &count) != 2)
