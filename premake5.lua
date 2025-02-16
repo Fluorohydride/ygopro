@@ -7,6 +7,7 @@ BUILD_SQLITE = os.istarget("windows")
 BUILD_MINIAUDIO = false
 BUILD_IRRLICHT = not os.istarget("macosx")
 USE_IRRKLANG = true
+USE_MINIAUDIO = false
 IRRKLANG_PRO = false
 LUA_LIB_NAME = "lua"
 
