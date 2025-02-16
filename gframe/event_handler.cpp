@@ -13,7 +13,7 @@
 #include "materials.h"
 #include "../ocgcore/common.h"
 
-namespace ygo {g
+namespace ygo {
 
 bool ClientField::OnEvent(const irr::SEvent& event) {
 	if(OnCommonEvent(event))
