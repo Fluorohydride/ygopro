@@ -40,6 +40,16 @@ project "YGOPro"
         libdirs { SQLITE_LIB_DIR }
     end
 
+    if USE_MINIAUDIO then
+      defines { "YGOPRO_USE_MINIAUDIO" }
+      if BUILD_MINIAUDIO then
+          includedirs { "../miniaudio" }
+      else
+          includedirs { MINIAUDIO_INCLUDE_DIR }
+          libdirs { MINIAUDIO_LIB_DIR }
+      end
+    end
+
     if USE_IRRKLANG then
         defines { "YGOPRO_USE_IRRKLANG" }
         includedirs { IRRKLANG_INCLUDE_DIR }

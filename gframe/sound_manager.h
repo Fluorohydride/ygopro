@@ -6,6 +6,9 @@
 #ifdef YGOPRO_USE_IRRKLANG
 #include <irrKlang.h>
 #endif
+#ifdef YGOPRO_USE_MINIAUDIO
+#include <miniaudio.h>
+#endif
 
 namespace ygo {
 
@@ -18,6 +21,11 @@ private:
 	irrklang::ISoundEngine* engineSound;
 	irrklang::ISoundEngine* engineMusic;
 	irrklang::ISound* soundBGM;
+#endif
+#ifdef YGOPRO_USE_MINIAUDIO
+	ma_engine engineSound;
+	ma_engine engineMusic;
+	ma_sound soundBGM;
 #endif
 	void RefershBGMDir(std::wstring path, int scene);
 
@@ -67,6 +75,7 @@ extern SoundManager soundManager;
 #define SOUND_CARD_DROP				306
 #define SOUND_PLAYER_ENTER			307
 #define SOUND_CHAT					308
+#define SOUND_COMMON_FEEDBACK		309
 
 #define BGM_ALL						0
 #define BGM_DUEL					1
