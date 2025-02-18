@@ -43,7 +43,7 @@
 #define mystrncasecmp strncasecmp
 #endif
 
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <iostream>
 #include <algorithm>
