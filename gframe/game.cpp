@@ -1285,17 +1285,17 @@ void Game::RefreshBot() {
 				continue;
 			if(linebuf[0] == '!') {
 				BotInfo newinfo;
-				if (sscanf(linebuf, "!%240[^\n]", strbuf) != 1)
+				if (std::sscanf(linebuf, "!%240[^\n]", strbuf) != 1)
 					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.name);
 				if (!std::fgets(linebuf, 256, fp))
 					break;
-				if (sscanf(linebuf, "%240[^\n]", strbuf) != 1)
+				if (std::sscanf(linebuf, "%240[^\n]", strbuf) != 1)
 					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.command);
 				if (!std::fgets(linebuf, 256, fp))
 					break;
-				if (sscanf(linebuf, "%240[^\n]", strbuf) != 1)
+				if (std::sscanf(linebuf, "%240[^\n]", strbuf) != 1)
 					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.desc);
 				if (!std::fgets(linebuf, 256, fp))
@@ -1336,7 +1336,7 @@ void Game::LoadConfig() {
 	char strbuf[64]{};
 	char valbuf[960]{};
 	while(std::fgets(linebuf, sizeof linebuf, fp)) {
-		if (sscanf(linebuf, "%63s = %959s", strbuf, valbuf) != 2)
+		if (std::sscanf(linebuf, "%63s = %959s", strbuf, valbuf) != 2)
 			continue;
 		if(!std::strcmp(strbuf, "antialias")) {
 			gameConf.antialias = strtol(valbuf, nullptr, 10);
@@ -1349,7 +1349,7 @@ void Game::LoadConfig() {
 			enable_log = val & 0xff;
 		} else if(!std::strcmp(strbuf, "textfont")) {
 			int textfontsize = 0;
-			if (sscanf(linebuf, "%63s = %959s %d", strbuf, valbuf, &textfontsize) != 3)
+			if (std::sscanf(linebuf, "%63s = %959s %d", strbuf, valbuf, &textfontsize) != 3)
 				continue;
 			gameConf.textfontsize = textfontsize;
 			BufferIO::DecodeUTF8(valbuf, gameConf.textfont);
@@ -1447,7 +1447,7 @@ void Game::LoadConfig() {
 #endif
 		} else {
 			// options allowing multiple words
-			if (sscanf(linebuf, "%63s = %959[^\n]", strbuf, valbuf) != 2)
+			if (std::sscanf(linebuf, "%63s = %959[^\n]", strbuf, valbuf) != 2)
 				continue;
 			if (!std::strcmp(strbuf, "nickname")) {
 				BufferIO::DecodeUTF8(valbuf, gameConf.nickname);
@@ -1715,7 +1715,7 @@ void Game::AddDebugMsg(const char* msg) {
 	}
 	if (enable_log & 0x2) {
 		char msgbuf[1040];
-		snprintf(msgbuf, sizeof msgbuf, "[Script Error]: %s", msg);
+		std::snprintf(msgbuf, sizeof msgbuf, "[Script Error]: %s", msg);
 		ErrorLog(msgbuf);
 	}
 }
