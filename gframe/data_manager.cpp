@@ -109,14 +109,14 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	return ret;
 }
 bool DataManager::LoadStrings(const char* file) {
-	FILE* fp = fopen(file, "r");
+	FILE* fp = std::fopen(file, "r");
 	if(!fp)
 		return false;
 	char linebuf[TEXT_LINE_SIZE]{};
-	while(fgets(linebuf, sizeof linebuf, fp)) {
+	while(std::fgets(linebuf, sizeof linebuf, fp)) {
 		ReadStringConfLine(linebuf);
 	}
-	fclose(fp);
+	std::fclose(fp);
 	return true;
 }
 bool DataManager::LoadStrings(irr::io::IReadFile* reader) {

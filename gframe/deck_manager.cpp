@@ -10,11 +10,11 @@ DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
 	auto cur = _lfList.rend();
-	FILE* fp = fopen(path, "r");
+	FILE* fp = std::fopen(path, "r");
 	char linebuf[256]{};
 	wchar_t strBuffer[256]{};
 	if(fp) {
-		while(fgets(linebuf, 256, fp)) {
+		while(std::fgets(linebuf, 256, fp)) {
 			if(linebuf[0] == '#')
 				continue;
 			if(linebuf[0] == '!') {
@@ -45,7 +45,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			cur->content[code] = count;
 			cur->hash = cur->hash ^ ((hcode << 18) | (hcode >> 14)) ^ ((hcode << (27 + count)) | (hcode >> (5 - count)));
 		}
-		fclose(fp);
+		std::fclose(fp);
 	}
 }
 void DeckManager::LoadLFList() {
@@ -328,7 +328,7 @@ bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
 	fprintf(fp, "!side\n");
 	for(size_t i = 0; i < deck.side.size(); ++i)
 		fprintf(fp, "%d\n", deck.side[i]->first);
-	fclose(fp);
+	std::fclose(fp);
 	return true;
 }
 bool DeckManager::DeleteDeck(const wchar_t* file) {
@@ -397,7 +397,7 @@ bool DeckManager::SaveDeckBuffer(const int deckbuf[], const wchar_t* name) {
 		fprintf(fp, "%d\n", deckbuf[it]);
 		++it;
 	}
-	fclose(fp);
+	std::fclose(fp);
 	return true;
 }
 }
