@@ -40,7 +40,7 @@ void Replay::WriteHeader(ReplayHeader& header) {
 	WriteFile(recording_fp, &header, sizeof(header), &size, nullptr);
 #else
 	std::fwrite(&header, sizeof(header), 1, fp);
-	fflush(fp);
+	std::fflush(fp);
 #endif
 }
 void Replay::WriteData(const void* data, size_t length, bool flush) {
@@ -56,7 +56,7 @@ void Replay::WriteData(const void* data, size_t length, bool flush) {
 #else
 	std::fwrite(data, length, 1, fp);
 	if(flush)
-		fflush(fp);
+		std::fflush(fp);
 #endif
 }
 void Replay::WriteInt32(int32_t data, bool flush) {
@@ -67,7 +67,7 @@ void Replay::Flush() {
 		return;
 #ifdef _WIN32
 #else
-	fflush(fp);
+	std::fflush(fp);
 #endif
 }
 void Replay::EndRecord() {
