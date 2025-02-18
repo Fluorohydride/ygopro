@@ -94,7 +94,7 @@ public:
 		if(fh == INVALID_HANDLE_VALUE)
 			return;
 		do {
-			if(mywcsncasecmp(fdataw.cFileName, L".", 1) && mywcsncasecmp(fdataw.cFileName, L"..", 2))
+			if(std::wcsncmp(fdataw.cFileName, L".", 1))
 				cb(fdataw.cFileName, (fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
