@@ -319,15 +319,15 @@ bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
 	FILE* fp = OpenDeckFile(file, "w");
 	if(!fp)
 		return false;
-	fprintf(fp, "#created by ...\n#main\n");
+	std::fprintf(fp, "#created by ...\n#main\n");
 	for(size_t i = 0; i < deck.main.size(); ++i)
-		fprintf(fp, "%d\n", deck.main[i]->first);
-	fprintf(fp, "#extra\n");
+		std::fprintf(fp, "%d\n", deck.main[i]->first);
+	std::fprintf(fp, "#extra\n");
 	for(size_t i = 0; i < deck.extra.size(); ++i)
-		fprintf(fp, "%d\n", deck.extra[i]->first);
-	fprintf(fp, "!side\n");
+		std::fprintf(fp, "%d\n", deck.extra[i]->first);
+	std::fprintf(fp, "!side\n");
 	for(size_t i = 0; i < deck.side.size(); ++i)
-		fprintf(fp, "%d\n", deck.side[i]->first);
+		std::fprintf(fp, "%d\n", deck.side[i]->first);
 	std::fclose(fp);
 	return true;
 }
@@ -378,23 +378,23 @@ bool DeckManager::SaveDeckBuffer(const int deckbuf[], const wchar_t* name) {
 	int it = 0;
 	const int mainc = deckbuf[it];
 	++it;
-	fprintf(fp, "#created by ...\n#main\n");
+	std::fprintf(fp, "#created by ...\n#main\n");
 	for (int i = 0; i < mainc; ++i) {
-		fprintf(fp, "%d\n", deckbuf[it]);
+		std::fprintf(fp, "%d\n", deckbuf[it]);
 		++it;
 	}
 	const int extrac = deckbuf[it];
 	++it;
-	fprintf(fp, "#extra\n");
+	std::fprintf(fp, "#extra\n");
 	for (int i = 0; i < extrac; ++i) {
-		fprintf(fp, "%d\n", deckbuf[it]);
+		std::fprintf(fp, "%d\n", deckbuf[it]);
 		++it;
 	}
 	const int sidec = deckbuf[it];
 	++it;
-	fprintf(fp, "!side\n");
+	std::fprintf(fp, "!side\n");
 	for (int i = 0; i < sidec; ++i) {
-		fprintf(fp, "%d\n", deckbuf[it]);
+		std::fprintf(fp, "%d\n", deckbuf[it]);
 		++it;
 	}
 	std::fclose(fp);
