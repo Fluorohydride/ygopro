@@ -1551,12 +1551,11 @@ void Game::ShowCardInfo(int code, bool resize) {
 		auto& cd = cit->second;
 		if (cd.is_alternative()) {
 			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
-			myswprintf(currentCardName, L"「%ls」", dataManager.GetName(cd.alias));
 		}
 		else {
 			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
-			myswprintf(currentCardName, L"「%ls」", dataManager.GetName(code));
 		}
+		myswprintf(currentCardName, formatBuffer);
 	}
 	else {
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
