@@ -1,6 +1,5 @@
 #include "data_manager.h"
 #include "game.h"
-#include <stdio.h>
 #include "spmemvfs/spmemvfs.h"
 
 namespace ygo {
