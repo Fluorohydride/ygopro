@@ -23,8 +23,8 @@ void Replay::BeginRecord() {
 		return;
 #else
 	if(is_recording)
-		fclose(fp);
-	fp = fopen("./replay/_LastReplay.yrp", "wb");
+		std::fclose(fp);
+	fp = std::fopen("./replay/_LastReplay.yrp", "wb");
 	if(!fp)
 		return;
 #endif
@@ -76,7 +76,7 @@ void Replay::EndRecord() {
 #ifdef _WIN32
 	CloseHandle(recording_fp);
 #else
-	fclose(fp);
+	std::fclose(fp);
 #endif
 	pheader.datasize = replay_size;
 	pheader.flag |= REPLAY_COMPRESSED;
@@ -99,7 +99,7 @@ void Replay::SaveReplay(const wchar_t* name) {
 		return;
 	std::fwrite(&pheader, sizeof pheader, 1, rfp);
 	std::fwrite(comp_data, comp_size, 1, rfp);
-	fclose(rfp);
+	std::fclose(rfp);
 }
 bool Replay::OpenReplay(const wchar_t* name) {
 	FILE* rfp = myfopen(name, "rb");
@@ -117,12 +117,12 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	replay_size = 0;
 	comp_size = 0;
 	if(std::fread(&pheader, sizeof pheader, 1, rfp) < 1) {
-		fclose(rfp);
+		std::fclose(rfp);
 		return false;
 	}
 	if(pheader.flag & REPLAY_COMPRESSED) {
 		comp_size = std::fread(comp_data, 1, MAX_COMP_SIZE, rfp);
-		fclose(rfp);
+		std::fclose(rfp);
 		if (pheader.datasize > MAX_REPLAY_SIZE)
 			return false;
 		replay_size = pheader.datasize;
@@ -134,7 +134,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		}
 	} else {
 		replay_size = std::fread(replay_data, 1, MAX_REPLAY_SIZE, rfp);
-		fclose(rfp);
+		std::fclose(rfp);
 		comp_size = 0;
 	}
 	is_replaying = true;
@@ -148,7 +148,7 @@ bool Replay::CheckReplay(const wchar_t* name) {
 		return false;
 	ReplayHeader rheader;
 	size_t count = std::fread(&rheader, sizeof rheader, 1, rfp);
-	fclose(rfp);
+	std::fclose(rfp);
 	return count == 1 && rheader.id == 0x31707279 && rheader.version >= 0x12d0u && (rheader.version < 0x1353u || (rheader.flag & REPLAY_UNIFORM));
 }
 bool Replay::DeleteReplay(const wchar_t* name) {

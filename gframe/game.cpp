@@ -1276,11 +1276,11 @@ void Game::RefreshBot() {
 	if(!gameConf.enable_bot_mode)
 		return;
 	botInfo.clear();
-	FILE* fp = fopen("bot.conf", "r");
+	FILE* fp = std::fopen("bot.conf", "r");
 	char linebuf[256]{};
 	char strbuf[256]{};
 	if(fp) {
-		while(fgets(linebuf, 256, fp)) {
+		while(std::fgets(linebuf, 256, fp)) {
 			if(linebuf[0] == '#')
 				continue;
 			if(linebuf[0] == '!') {
@@ -1288,17 +1288,17 @@ void Game::RefreshBot() {
 				if (sscanf(linebuf, "!%240[^\n]", strbuf) != 1)
 					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.name);
-				if (!fgets(linebuf, 256, fp))
+				if (!std::fgets(linebuf, 256, fp))
 					break;
 				if (sscanf(linebuf, "%240[^\n]", strbuf) != 1)
 					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.command);
-				if (!fgets(linebuf, 256, fp))
+				if (!std::fgets(linebuf, 256, fp))
 					break;
 				if (sscanf(linebuf, "%240[^\n]", strbuf) != 1)
 					continue;
 				BufferIO::DecodeUTF8(strbuf, newinfo.desc);
-				if (!fgets(linebuf, 256, fp))
+				if (!std::fgets(linebuf, 256, fp))
 					break;
 				newinfo.support_master_rule_3 = !!std::strstr(linebuf, "SUPPORT_MASTER_RULE_3");
 				newinfo.support_new_master_rule = !!std::strstr(linebuf, "SUPPORT_NEW_MASTER_RULE");
@@ -1312,7 +1312,7 @@ void Game::RefreshBot() {
 				continue;
 			}
 		}
-		fclose(fp);
+		std::fclose(fp);
 	}
 	lstBotList->clear();
 	stBotInfo->setText(L"");
@@ -1329,13 +1329,13 @@ void Game::RefreshBot() {
 	}
 }
 void Game::LoadConfig() {
-	FILE* fp = fopen("system.conf", "r");
+	FILE* fp = std::fopen("system.conf", "r");
 	if(!fp)
 		return;
 	char linebuf[CONFIG_LINE_SIZE]{};
 	char strbuf[64]{};
 	char valbuf[960]{};
-	while(fgets(linebuf, sizeof linebuf, fp)) {
+	while(std::fgets(linebuf, sizeof linebuf, fp)) {
 		if (sscanf(linebuf, "%63s = %959s", strbuf, valbuf) != 2)
 			continue;
 		if(!std::strcmp(strbuf, "antialias")) {
@@ -1464,10 +1464,10 @@ void Game::LoadConfig() {
 			}
 		}
 	}
-	fclose(fp);
+	std::fclose(fp);
 }
 void Game::SaveConfig() {
-	FILE* fp = fopen("system.conf", "w");
+	FILE* fp = std::fopen("system.conf", "w");
 	fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[CONFIG_LINE_SIZE];
 	fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
@@ -1538,7 +1538,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "music_volume = %d\n", vol);
 	fprintf(fp, "music_mode = %d\n", (chkMusicMode->isChecked() ? 1 : 0));
 #endif
-	fclose(fp);
+	std::fclose(fp);
 }
 void Game::ShowCardInfo(int code, bool resize) {
 	if(showingcode == code && !resize)
@@ -1720,14 +1720,14 @@ void Game::AddDebugMsg(const char* msg) {
 	}
 }
 void Game::ErrorLog(const char* msg) {
-	FILE* fp = fopen("error.log", "at");
+	FILE* fp = std::fopen("error.log", "at");
 	if(!fp)
 		return;
 	time_t nowtime = std::time(nullptr);
 	char timebuf[40];
 	std::strftime(timebuf, sizeof timebuf, "%Y-%m-%d %H:%M:%S", std::localtime(&nowtime));
 	fprintf(fp, "[%s]%s\n", timebuf, msg);
-	fclose(fp);
+	std::fclose(fp);
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);

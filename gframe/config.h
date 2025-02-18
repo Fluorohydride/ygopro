@@ -65,7 +65,7 @@ inline FILE* myfopen(const wchar_t* filename, const char* mode) {
 #else
 	char fname[1024]{};
 	BufferIO::EncodeUTF8(filename, fname);
-	fp = fopen(fname, mode);
+	fp = std::fopen(fname, mode);
 #endif
 	return fp;
 }

@@ -590,7 +590,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				wchar_t wlinebuf[1024];
 				std::wstring message = L"";
 				bool in_message = false;
-				while(fgets(linebuf, 1024, fp)) {
+				while(std::fgets(linebuf, 1024, fp)) {
 					if(!std::strncmp(linebuf, "--[[message", 11)) {
 						size_t len = std::strlen(linebuf);
 						char* msgend = std::strrchr(linebuf, ']');
@@ -613,7 +613,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						message.append(wlinebuf);
 					}
 				}
-				fclose(fp);
+				std::fclose(fp);
 				mainGame->SetStaticText(mainGame->stSinglePlayInfo, 200, mainGame->guiFont, message.c_str());
 				break;
 			}
