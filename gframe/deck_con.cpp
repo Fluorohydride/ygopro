@@ -924,13 +924,13 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				}
-				mainGame->env->setFocus(0);
+				mainGame->env->setFocus(nullptr);
 				InstantSearch();
 				break;
 			}
 			case COMBOBOX_SORTTYPE: {
 				SortList();
-				mainGame->env->setFocus(0);
+				mainGame->env->setFocus(nullptr);
 				break;
 			}
 			case COMBOBOX_SECONDTYPE: {
@@ -942,14 +942,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->ebDefense->setEnabled(true);
 					}
 				}
-				mainGame->env->setFocus(0);
+				mainGame->env->setFocus(nullptr);
 				InstantSearch();
 				break;
 			}
 			case COMBOBOX_ATTRIBUTE:
 			case COMBOBOX_RACE:
 			case COMBOBOX_LIMIT:
-				mainGame->env->setFocus(0);
+				mainGame->env->setFocus(nullptr);
 				InstantSearch();
 				break;
 			}

@@ -16,7 +16,7 @@ DataManager::DataManager() : _datas(32768), _strings(32768) {
 bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt{};
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
-	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
+	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, nullptr) != SQLITE_OK)
 		return Error(pDB);
 	wchar_t strBuffer[4096];
 	int step = 0;

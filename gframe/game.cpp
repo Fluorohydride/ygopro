@@ -332,7 +332,7 @@ bool Game::Initialize() {
 	btnHostPrepStart = env->addButton(rect<s32>(230, 280, 340, 305), wHostPrepare, BUTTON_HP_START, dataManager.GetSysString(1215));
 	btnHostPrepCancel = env->addButton(rect<s32>(350, 280, 460, 305), wHostPrepare, BUTTON_HP_CANCEL, dataManager.GetSysString(1210));
 	//img
-	wCardImg = env->addStaticText(L"", rect<s32>(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18), true, false, 0, -1, true);
+	wCardImg = env->addStaticText(L"", rect<s32>(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18), true, false, nullptr, -1, true);
 	wCardImg->setBackgroundColor(0xc0c0c0c0);
 	wCardImg->setVisible(false);
 	imgCard = env->addImage(rect<s32>(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT), wCardImg);
@@ -354,7 +354,7 @@ bool Game::Initialize() {
 	btnEP = env->addButton(rect<s32>(320, 0, 370, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
 	btnEP->setVisible(false);
 	//tab
-	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), 0, true);
+	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), nullptr, true);
 	wInfos->setTabExtraWidth(16);
 	wInfos->setVisible(false);
 	//info
@@ -628,7 +628,7 @@ bool Game::Initialize() {
 		chkRace[i] = env->addCheckBox(false, rect<s32>(10 + (i % 4) * 90, 25 + (i / 4) * 25, 100 + (i % 4) * 90, 50 + (i / 4) * 25),
 		                              wANRace, CHECK_RACE, dataManager.FormatRace(filter).c_str());
 	//selection hint
-	stHintMsg = env->addStaticText(L"", rect<s32>(500, 60, 820, 90), true, false, 0, -1, false);
+	stHintMsg = env->addStaticText(L"", rect<s32>(500, 60, 820, 90), true, false, nullptr, -1, false);
 	stHintMsg->setBackgroundColor(0xc0ffffff);
 	stHintMsg->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stHintMsg->setVisible(false);
@@ -648,11 +648,11 @@ bool Game::Initialize() {
 	btnOperation = env->addButton(rect<s32>(1, 169, 99, 189), wCmdMenu, BUTTON_CMD_ACTIVATE, dataManager.GetSysString(1161));
 	btnReset = env->addButton(rect<s32>(1, 190, 99, 210), wCmdMenu, BUTTON_CMD_RESET, dataManager.GetSysString(1162));
 	//deck edit
-	wDeckEdit = env->addStaticText(L"", rect<s32>(309, 5, 605, 130), true, false, 0, -1, true);
+	wDeckEdit = env->addStaticText(L"", rect<s32>(309, 5, 605, 130), true, false, nullptr, -1, true);
 	wDeckEdit->setVisible(false);
 	btnManageDeck = env->addButton(rect<s32>(225, 5, 290, 30), wDeckEdit, BUTTON_MANAGE_DECK, dataManager.GetSysString(1328));
 	//deck manage
-	wDeckManage = env->addWindow(rect<s32>(310, 135, 800, 465), false, dataManager.GetSysString(1460), 0, WINDOW_DECK_MANAGE);
+	wDeckManage = env->addWindow(rect<s32>(310, 135, 800, 465), false, dataManager.GetSysString(1460), nullptr, WINDOW_DECK_MANAGE);
 	wDeckManage->setVisible(false);
 	lstCategories = env->addListBox(rect<s32>(10, 30, 140, 320), wDeckManage, LISTBOX_CATEGORIES, true);
 	lstDecks = env->addListBox(rect<s32>(150, 30, 340, 320), wDeckManage, LISTBOX_DECKS, true);
@@ -688,7 +688,7 @@ bool Game::Initialize() {
 	cbDMCategory->setMaxSelectionRows(10);
 	btnDMOK = env->addButton(rect<s32>(70, 80, 140, 105), wDMQuery, BUTTON_DM_OK, dataManager.GetSysString(1211));
 	btnDMCancel = env->addButton(rect<s32>(170, 80, 240, 105), wDMQuery, BUTTON_DM_CANCEL, dataManager.GetSysString(1212));
-	scrPackCards = env->addScrollBar(false, recti(775, 161, 795, 629), 0, SCROLL_FILTER);
+	scrPackCards = env->addScrollBar(false, recti(775, 161, 795, 629), nullptr, SCROLL_FILTER);
 	scrPackCards->setLargeStep(1);
 	scrPackCards->setSmallStep(1);
 	scrPackCards->setVisible(false);
@@ -707,28 +707,28 @@ bool Game::Initialize() {
 	btnShuffleDeck = env->addButton(rect<s32>(5, 99, 55, 120), wDeckEdit, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307));
 	btnSortDeck = env->addButton(rect<s32>(60, 99, 110, 120), wDeckEdit, BUTTON_SORT_DECK, dataManager.GetSysString(1305));
 	btnClearDeck = env->addButton(rect<s32>(115, 99, 165, 120), wDeckEdit, BUTTON_CLEAR_DECK, dataManager.GetSysString(1304));
-	btnSideOK = env->addButton(rect<s32>(400, 40, 710, 80), 0, BUTTON_SIDE_OK, dataManager.GetSysString(1334));
+	btnSideOK = env->addButton(rect<s32>(400, 40, 710, 80), nullptr, BUTTON_SIDE_OK, dataManager.GetSysString(1334));
 	btnSideOK->setVisible(false);
-	btnSideShuffle = env->addButton(rect<s32>(310, 100, 370, 130), 0, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307));
+	btnSideShuffle = env->addButton(rect<s32>(310, 100, 370, 130), nullptr, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307));
 	btnSideShuffle->setVisible(false);
-	btnSideSort = env->addButton(rect<s32>(375, 100, 435, 130), 0, BUTTON_SORT_DECK, dataManager.GetSysString(1305));
+	btnSideSort = env->addButton(rect<s32>(375, 100, 435, 130), nullptr, BUTTON_SORT_DECK, dataManager.GetSysString(1305));
 	btnSideSort->setVisible(false);
-	btnSideReload = env->addButton(rect<s32>(440, 100, 500, 130), 0, BUTTON_SIDE_RELOAD, dataManager.GetSysString(1309));
+	btnSideReload = env->addButton(rect<s32>(440, 100, 500, 130), nullptr, BUTTON_SIDE_RELOAD, dataManager.GetSysString(1309));
 	btnSideReload->setVisible(false);
 	//
-	scrFilter = env->addScrollBar(false, recti(999, 161, 1019, 629), 0, SCROLL_FILTER);
+	scrFilter = env->addScrollBar(false, recti(999, 161, 1019, 629), nullptr, SCROLL_FILTER);
 	scrFilter->setLargeStep(10);
 	scrFilter->setSmallStep(1);
 	scrFilter->setVisible(false);
 	//sort type
-	wSort = env->addStaticText(L"", rect<s32>(930, 132, 1020, 156), true, false, 0, -1, true);
+	wSort = env->addStaticText(L"", rect<s32>(930, 132, 1020, 156), true, false, nullptr, -1, true);
 	cbSortType = env->addComboBox(rect<s32>(10, 2, 85, 22), wSort, COMBOBOX_SORTTYPE);
 	cbSortType->setMaxSelectionRows(10);
 	for(int i = 1370; i <= 1373; i++)
 		cbSortType->addItem(dataManager.GetSysString(i));
 	wSort->setVisible(false);
 	//filters
-	wFilter = env->addStaticText(L"", rect<s32>(610, 5, 1020, 130), true, false, 0, -1, true);
+	wFilter = env->addStaticText(L"", rect<s32>(610, 5, 1020, 130), true, false, nullptr, -1, true);
 	wFilter->setVisible(false);
 	stCategory = env->addStaticText(dataManager.GetSysString(1311), rect<s32>(10, 2 + 25 / 6, 70, 22 + 25 / 6), false, false, wFilter);
 	cbCardType = env->addComboBox(rect<s32>(60, 25 / 6, 120, 20 + 25 / 6), wFilter, COMBOBOX_MAINTYPE);
@@ -885,7 +885,7 @@ bool Game::Initialize() {
 	btnRSYes = env->addButton(rect<s32>(70, 80, 140, 105), wReplaySave, BUTTON_REPLAY_SAVE, dataManager.GetSysString(1341));
 	btnRSNo = env->addButton(rect<s32>(170, 80, 240, 105), wReplaySave, BUTTON_REPLAY_CANCEL, dataManager.GetSysString(1212));
 	//replay control
-	wReplayControl = env->addStaticText(L"", rect<s32>(205, 118, 295, 273), true, false, 0, -1, true);
+	wReplayControl = env->addStaticText(L"", rect<s32>(205, 118, 295, 273), true, false, nullptr, -1, true);
 	wReplayControl->setVisible(false);
 	btnReplayStart = env->addButton(rect<s32>(5, 5, 85, 25), wReplayControl, BUTTON_REPLAY_START, dataManager.GetSysString(1343));
 	btnReplayPause = env->addButton(rect<s32>(5, 30, 85, 50), wReplayControl, BUTTON_REPLAY_PAUSE, dataManager.GetSysString(1344));
@@ -901,12 +901,12 @@ bool Game::Initialize() {
 	wChat->setVisible(false);
 	ebChatInput = env->addEditBox(L"", rect<s32>(3, 2, 710, 22), true, wChat, EDITBOX_CHAT);
 	//swap
-	btnSpectatorSwap = env->addButton(rect<s32>(205, 100, 295, 135), 0, BUTTON_REPLAY_SWAP, dataManager.GetSysString(1346));
+	btnSpectatorSwap = env->addButton(rect<s32>(205, 100, 295, 135), nullptr, BUTTON_REPLAY_SWAP, dataManager.GetSysString(1346));
 	btnSpectatorSwap->setVisible(false);
 	//chain buttons
-	btnChainIgnore = env->addButton(rect<s32>(205, 100, 295, 135), 0, BUTTON_CHAIN_IGNORE, dataManager.GetSysString(1292));
-	btnChainAlways = env->addButton(rect<s32>(205, 140, 295, 175), 0, BUTTON_CHAIN_ALWAYS, dataManager.GetSysString(1293));
-	btnChainWhenAvail = env->addButton(rect<s32>(205, 180, 295, 215), 0, BUTTON_CHAIN_WHENAVAIL, dataManager.GetSysString(1294));
+	btnChainIgnore = env->addButton(rect<s32>(205, 100, 295, 135), nullptr, BUTTON_CHAIN_IGNORE, dataManager.GetSysString(1292));
+	btnChainAlways = env->addButton(rect<s32>(205, 140, 295, 175), nullptr, BUTTON_CHAIN_ALWAYS, dataManager.GetSysString(1293));
+	btnChainWhenAvail = env->addButton(rect<s32>(205, 180, 295, 215), nullptr, BUTTON_CHAIN_WHENAVAIL, dataManager.GetSysString(1294));
 	btnChainIgnore->setIsPushButton(true);
 	btnChainAlways->setIsPushButton(true);
 	btnChainWhenAvail->setIsPushButton(true);
@@ -914,10 +914,10 @@ bool Game::Initialize() {
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
 	//shuffle
-	btnShuffle = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CMD_SHUFFLE, dataManager.GetSysString(1297));
+	btnShuffle = env->addButton(rect<s32>(205, 230, 295, 265), nullptr, BUTTON_CMD_SHUFFLE, dataManager.GetSysString(1297));
 	btnShuffle->setVisible(false);
 	//cancel or finish
-	btnCancelOrFinish = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CANCEL_OR_FINISH, dataManager.GetSysString(1295));
+	btnCancelOrFinish = env->addButton(rect<s32>(205, 230, 295, 265), nullptr, BUTTON_CANCEL_OR_FINISH, dataManager.GetSysString(1295));
 	btnCancelOrFinish->setVisible(false);
 	//big picture
 	wBigCard = env->addWindow(rect<s32>(0, 0, 0, 0), false, L"");
@@ -928,19 +928,19 @@ bool Game::Initialize() {
 	imgBigCard = env->addImage(rect<s32>(0, 0, 0, 0), wBigCard);
 	imgBigCard->setScaleImage(false);
 	imgBigCard->setUseAlphaChannel(true);
-	btnBigCardOriginalSize = env->addButton(rect<s32>(205, 100, 295, 135), 0, BUTTON_BIG_CARD_ORIG_SIZE, dataManager.GetSysString(1443));
-	btnBigCardZoomIn = env->addButton(rect<s32>(205, 140, 295, 175), 0, BUTTON_BIG_CARD_ZOOM_IN, dataManager.GetSysString(1441));
-	btnBigCardZoomOut = env->addButton(rect<s32>(205, 180, 295, 215), 0, BUTTON_BIG_CARD_ZOOM_OUT, dataManager.GetSysString(1442));
-	btnBigCardClose = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_BIG_CARD_CLOSE, dataManager.GetSysString(1440));
+	btnBigCardOriginalSize = env->addButton(rect<s32>(205, 100, 295, 135), nullptr, BUTTON_BIG_CARD_ORIG_SIZE, dataManager.GetSysString(1443));
+	btnBigCardZoomIn = env->addButton(rect<s32>(205, 140, 295, 175), nullptr, BUTTON_BIG_CARD_ZOOM_IN, dataManager.GetSysString(1441));
+	btnBigCardZoomOut = env->addButton(rect<s32>(205, 180, 295, 215), nullptr, BUTTON_BIG_CARD_ZOOM_OUT, dataManager.GetSysString(1442));
+	btnBigCardClose = env->addButton(rect<s32>(205, 230, 295, 265), nullptr, BUTTON_BIG_CARD_CLOSE, dataManager.GetSysString(1440));
 	btnBigCardOriginalSize->setVisible(false);
 	btnBigCardZoomIn->setVisible(false);
 	btnBigCardZoomOut->setVisible(false);
 	btnBigCardClose->setVisible(false);
 	//leave/surrender/exit
-	btnLeaveGame = env->addButton(rect<s32>(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
+	btnLeaveGame = env->addButton(rect<s32>(205, 5, 295, 80), nullptr, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
 	//tip
-	stTip = env->addStaticText(L"", rect<s32>(0, 0, 150, 150), false, true, 0, -1, true);
+	stTip = env->addStaticText(L"", rect<s32>(0, 0, 150, 150), false, true, nullptr, -1, true);
 	stTip->setBackgroundColor(0xc0ffffff);
 	stTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stTip->setVisible(false);
@@ -982,7 +982,7 @@ bool Game::Initialize() {
 }
 void Game::MainLoop() {
 	wchar_t cap[256];
-	camera = smgr->addCameraSceneNode(0);
+	camera = smgr->addCameraSceneNode(nullptr);
 	irr::core::matrix4 mProjection;
 	BuildProjectionMatrix(mProjection, -0.90f, 0.45f, -0.42f, 0.42f, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
@@ -1730,7 +1730,7 @@ void Game::ErrorLog(const char* msg) {
 	fclose(fp);
 }
 void Game::ClearTextures() {
-	matManager.mCard.setTexture(0, 0);
+	matManager.mCard.setTexture(0, nullptr);
 	ClearCardInfo(0);
 	btnPSAU->setImage();
 	btnPSDU->setImage();

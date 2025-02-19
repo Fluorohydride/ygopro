@@ -43,7 +43,7 @@ public:
 	void draw() override;
 
 	//! sets another skin independent font. if this is set to zero, the button uses the font of the skin.
-	void setOverrideFont(IGUIFont* font = 0) override;
+	void setOverrideFont(IGUIFont* font = nullptr) override;
 
 	//! Gets the override font (if any)
 	IGUIFont* getOverrideFont() const override;
@@ -52,19 +52,19 @@ public:
 	IGUIFont* getActiveFont() const override;
 
 	//! Sets an image which should be displayed on the button when it is in normal state.
-	void setImage(video::ITexture* image = 0) override;
+	void setImage(video::ITexture* image = nullptr) override;
 
 	//! Sets an image which should be displayed on the button when it is in normal state.
 	void setImage(video::ITexture* image, const core::rect<s32>& pos) override;
 
 	//! Sets an image which should be displayed on the button when it is in pressed state.
-	void setPressedImage(video::ITexture* image = 0) override;
+	void setPressedImage(video::ITexture* image = nullptr) override;
 
 	//! Sets an image which should be displayed on the button when it is in pressed state.
 	void setPressedImage(video::ITexture* image, const core::rect<s32>& pos) override;
 
 	//! Sets the sprite bank used by the button
-	void setSpriteBank(IGUISpriteBank* bank = 0) override;
+	void setSpriteBank(IGUISpriteBank* bank = nullptr) override;
 
 	//! Sets the animated sprite for a specific button state
 	/** \param index: Number of the sprite within the sprite bank, use -1 for no sprite

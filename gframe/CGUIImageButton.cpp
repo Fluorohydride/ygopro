@@ -102,7 +102,7 @@ void Draw2DImageQuad(video::IVideoDriver* driver, video::ITexture* image, core::
 	driver->setTransform(irr::video::ETS_VIEW, oldViewMat);
 }
 CGUIImageButton* CGUIImageButton::addImageButton(IGUIEnvironment *env, const core::rect<s32>& rectangle, IGUIElement* parent, s32 id) {
-	CGUIImageButton* button = new CGUIImageButton(env, parent ? parent : 0, id, rectangle);
+	CGUIImageButton* button = new CGUIImageButton(env, parent ? parent : nullptr, id, rectangle);
 	button->drop();
 	return button;
 }
@@ -110,7 +110,7 @@ CGUIImageButton* CGUIImageButton::addImageButton(IGUIEnvironment *env, const cor
 CGUIImageButton::CGUIImageButton(IGUIEnvironment* environment, IGUIElement* parent,
 	s32 id, core::rect<s32> rectangle, bool noclip)
 	: IGUIButton(environment, parent, id, rectangle),
-	SpriteBank(0), OverrideFont(0), Image(0), PressedImage(0),
+	SpriteBank(nullptr), OverrideFont(nullptr), Image(nullptr), PressedImage(nullptr),
 	IsPushButton(false), Pressed(false),
 	UseAlphaChannel(false), DrawBorder(true), ScaleImage(false) {
 #ifdef _DEBUG
@@ -234,7 +234,7 @@ bool CGUIImageButton::OnEvent(const SEvent& event)
 					SEvent newEvent;
 					newEvent.EventType = EET_GUI_EVENT;
 					newEvent.GUIEvent.Caller = this;
-					newEvent.GUIEvent.Element = 0;
+					newEvent.GUIEvent.Element = nullptr;
 					newEvent.GUIEvent.EventType = EGET_BUTTON_CLICKED;
 					Parent->OnEvent(newEvent);
 				}
@@ -292,7 +292,7 @@ bool CGUIImageButton::OnEvent(const SEvent& event)
 					SEvent newEvent;
 					newEvent.EventType = EET_GUI_EVENT;
 					newEvent.GUIEvent.Caller = this;
-					newEvent.GUIEvent.Element = 0;
+					newEvent.GUIEvent.Element = nullptr;
 					newEvent.GUIEvent.EventType = EGET_BUTTON_CLICKED;
 					Parent->OnEvent(newEvent);
 				}
@@ -483,7 +483,7 @@ bool CGUIImageButton::isDrawingBorder() const
 
 
 //! Writes attributes of the element.
-void CGUIImageButton::serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options = 0) const
+void CGUIImageButton::serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options = nullptr) const
 {
 	IGUIButton::serializeAttributes(out, options);
 
@@ -505,7 +505,7 @@ void CGUIImageButton::serializeAttributes(io::IAttributes* out, io::SAttributeRe
 
 
 //! Reads attributes of the element
-void CGUIImageButton::deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options = 0)
+void CGUIImageButton::deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options = nullptr)
 {
 	IGUIButton::deserializeAttributes(in, options);
 

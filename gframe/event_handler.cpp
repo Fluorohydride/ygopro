@@ -204,7 +204,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SELECT_EFFECTYN: {
 					if(highlighting_card)
 						highlighting_card->is_highlighting = false;
-					highlighting_card = 0;
+					highlighting_card = nullptr;
 					DuelClient::SetResponseI(1);
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
@@ -238,7 +238,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SELECT_EFFECTYN: {
 					if(highlighting_card)
 						highlighting_card->is_highlighting = false;
-					highlighting_card = 0;
+					highlighting_card = nullptr;
 					DuelClient::SetResponseI(0);
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
@@ -1096,7 +1096,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			GetHoverField(x, y);
 			if(hovered_location & 0xe)
 				clicked_card = GetCard(hovered_controler, hovered_location, hovered_sequence);
-			else clicked_card = 0;
+			else clicked_card = nullptr;
 			wchar_t formatBuffer[2048];
 			if(mainGame->dInfo.isReplay) {
 				if(mainGame->wCardSelect->isVisible())
@@ -1515,7 +1515,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			hovered_location = 0;
-			ClientCard* mcard = 0;
+			ClientCard* mcard = nullptr;
 			int mplayer = -1;
 			if(!panel || !panel->isVisible() || !panel->getRelativePosition().isPointInside(mousepos)) {
 				GetHoverField(x, y);
@@ -1528,13 +1528,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(remove[hovered_controler].size()) {
 						mcard = remove[hovered_controler].back();
 						if(mcard->position & POS_FACEDOWN)
-							mcard = 0;
+							mcard = nullptr;
 					}
 				} else if(hovered_location == LOCATION_EXTRA) {
 					if(extra[hovered_controler].size()) {
 						mcard = extra[hovered_controler].back();
 						if(mcard->position & POS_FACEDOWN)
-							mcard = 0;
+							mcard = nullptr;
 					}
 				} else if(hovered_location == LOCATION_DECK) {
 					if(deck[hovered_controler].size())
@@ -1547,8 +1547,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 			}
 			if(hovered_location == LOCATION_HAND && (mainGame->dInfo.is_shuffling || mainGame->dInfo.curMsg == MSG_SHUFFLE_HAND))
-				mcard = 0;
-			if(mcard == 0 && mplayer < 0)
+				mcard = nullptr;
+			if(mcard == nullptr && mplayer < 0)
 				should_show_tip = false;
 			else if(mcard == hovered_card && mplayer == hovered_player) {
 				if(mainGame->stTip->isVisible()) {
@@ -2540,7 +2540,7 @@ void ClientField::CancelOrFinish() {
 	case MSG_SELECT_EFFECTYN: {
 		if(highlighting_card)
 			highlighting_card->is_highlighting = false;
-		highlighting_card = 0;
+		highlighting_card = nullptr;
 		DuelClient::SetResponseI(0);
 		mainGame->HideElement(mainGame->wQuery, true);
 		break;
