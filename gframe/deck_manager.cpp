@@ -146,7 +146,7 @@ unsigned int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 }
 int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_packlist) {
 	deck.clear();
-	int code;
+	int code = 0;
 	int errorcode = 0;
 	CardData cd;
 	for(int i = 0; i < mainc; ++i) {

@@ -551,7 +551,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				wchar_t infobuf[256]{};
 				std::wstring repinfo;
-				time_t curtime;
+				time_t curtime = 0;
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_UNIFORM)
 					curtime = ReplayMode::cur_replay.pheader.start_time;
 				else

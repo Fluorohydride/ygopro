@@ -1650,7 +1650,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			if(mplayer != hovered_player) {
 				if(mplayer >= 0) {
-					const wchar_t* player_name;
+					const wchar_t* player_name = nullptr;
 					if(mplayer == 0) {
 						if(!mainGame->dInfo.isTag || !mainGame->dInfo.tag_player[0])
 							player_name = mainGame->dInfo.hostname;

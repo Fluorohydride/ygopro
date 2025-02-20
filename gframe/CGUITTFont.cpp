@@ -522,7 +522,7 @@ void CGUITTFont::drawUstring(const core::ustring& utext, const core::rect<s32>&p
 	core::map<u32, CGUITTGlyphPage*> Render_Map;
 
 	// Start parsing characters.
-	u32 n;
+	u32 n = 0;
 	uchar32_t previousChar = 0;
 	core::ustring::const_iterator iter(utext);
 	while (!iter.atEnd()) {
