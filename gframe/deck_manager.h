@@ -4,13 +4,8 @@
 #include <unordered_map>
 #include <vector>
 #include <sstream>
+#include "config.h"
 #include "data_manager.h"
-
-namespace irr {
-	namespace gui {
-		class IGUIComboBox;
-	}
-}
 
 namespace ygo {
 	constexpr int DECK_MAX_SIZE = 60;
