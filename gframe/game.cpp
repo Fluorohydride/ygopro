@@ -1165,17 +1165,17 @@ void Game::LoadExpansions() {
 		}
 		if (!isdir && (IsExtension(name, L".zip") || IsExtension(name, L".ypk"))) {
 #ifdef _WIN32
-			DataManager::FileSystem->addFileArchive(fpath, true, false, EFAT_ZIP);
+			DataManager::FileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
 #else
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
-			DataManager::FileSystem->addFileArchive(upath, true, false, EFAT_ZIP);
+			DataManager::FileSystem->addFileArchive(upath, true, false, irr::io::EFAT_ZIP);
 #endif
 			return;
 		}
 	});
 	for(u32 i = 0; i < DataManager::FileSystem->getFileArchiveCount(); ++i) {
-		const IFileList* archive = DataManager::FileSystem->getFileArchive(i)->getFileList();
+		auto archive = DataManager::FileSystem->getFileArchive(i)->getFileList();
 		for(u32 j = 0; j < archive->getFileCount(); ++j) {
 #ifdef _WIN32
 			const wchar_t* fname = archive->getFullFileName(j).c_str();
@@ -1190,9 +1190,9 @@ void Game::LoadExpansions() {
 			}
 			if (IsExtension(fname, L".conf")) {
 #ifdef _WIN32
-				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(fname);
+				auto reader = DataManager::FileSystem->createAndOpenFile(fname);
 #else
-				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(uname);
+				auto reader = DataManager::FileSystem->createAndOpenFile(uname);
 #endif
 				dataManager.LoadStrings(reader);
 				continue;
