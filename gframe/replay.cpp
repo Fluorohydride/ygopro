@@ -36,7 +36,7 @@ void Replay::BeginRecord() {
 void Replay::WriteHeader(ReplayHeader& header) {
 	pheader = header;
 #ifdef _WIN32
-	DWORD size;
+	DWORD size = 0;
 	WriteFile(recording_fp, &header, sizeof(header), &size, nullptr);
 #else
 	fwrite(&header, sizeof(header), 1, fp);
@@ -51,7 +51,7 @@ void Replay::WriteData(const void* data, size_t length, bool flush) {
 	std::memcpy(replay_data + replay_size, data, length);
 	replay_size += length;
 #ifdef _WIN32
-	DWORD size;
+	DWORD size = 0;
 	WriteFile(recording_fp, data, length, &size, nullptr);
 #else
 	fwrite(data, length, 1, fp);

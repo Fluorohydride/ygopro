@@ -1,4 +1,6 @@
 #include "image_manager.h"
+
+#include <math.h>
 #include "game.h"
 #include <thread>
 
@@ -128,8 +130,8 @@ void ImageManager::ResizeTexture() {
 }
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
 void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
-	double sx, sy, minsx, maxsx, minsy, maxsy, area, ra, ga, ba, aa, pw, ph, pa;
-	u32 dy, dx;
+	double sx = NAN, sy = NAN, minsx = NAN, maxsx = NAN, minsy = NAN, maxsy = NAN, area = NAN, ra = NAN, ga = NAN, ba = NAN, aa = NAN, pw = NAN, ph = NAN, pa = NAN;
+	u32 dy = 0, dx = 0;
 	irr::video::SColor pxl;
 
 	// Cache rectsngle boundaries.
@@ -201,7 +203,7 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 }
 irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, s32 width, s32 height) {
 	if(mainGame->gameConf.use_image_scale) {
-		irr::video::ITexture* texture;
+		irr::video::ITexture* texture = nullptr;
 		irr::video::IImage* srcimg = driver->createImageFromFile(file);
 		if(srcimg == nullptr)
 			return nullptr;
@@ -259,7 +261,7 @@ irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 		driver->removeTexture(tBigPicture);
 		tBigPicture = nullptr;
 	}
-	irr::video::ITexture* texture;
+	irr::video::ITexture* texture = nullptr;
 	char file[256];
 	snprintf(file, sizeof file, "expansions/pics/%d.jpg", code);
 	irr::video::IImage* srcimg = driver->createImageFromFile(file);

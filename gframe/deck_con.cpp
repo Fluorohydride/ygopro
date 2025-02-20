@@ -1232,7 +1232,7 @@ void DeckBuilder::GetHoveredCard() {
 					lx = 12;
 				if(mainsize > 60)
 					dy = 66;
-				int px;
+				int px = 0;
 				int py = (y - 164) / dy;
 				hovered_pos = 1;
 				if(x >= 750)
@@ -1248,7 +1248,7 @@ void DeckBuilder::GetHoveredCard() {
 				}
 			}
 		} else if(y >= 164 && y <= 435) {
-			int lx = 10, px, py = (y - 164) / 68;
+			int lx = 10, px = 0, py = (y - 164) / 68;
 			hovered_pos = 1;
 			if(deckManager.current_deck.main.size() > DECK_MIN_SIZE)
 				lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;

@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "game.h"
 #include "client_card.h"
 #include "materials.h"
@@ -220,7 +222,7 @@ void Game::DrawBackGround() {
 }
 void Game::DrawLinkedZones(ClientCard* pcard) {
 	auto mark = pcard->link_marker;
-	ClientCard* pcard2;
+	ClientCard* pcard2 = nullptr;
 	if (dField.hovered_sequence < 5) {
 		if (mark & LINK_MARKER_LEFT && dField.hovered_sequence > 0) {
 			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence - 1];
@@ -601,7 +603,7 @@ void Game::DrawMisc() {
 	driver->draw2DRectangle(Resize(632, 10, 688, 30), 0x00000000, 0x00000000, 0xffffffff, 0xffffffff);
 	driver->draw2DRectangle(Resize(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);
 	DrawShadowText(lpcFont, dataManager.GetNumString(dInfo.turn), Resize(635, 5, 687, 40), Resize(0, 0, 2, 0), 0x8000ffff, 0x80000000, true, false, 0);
-	ClientCard* pcard;
+	ClientCard* pcard = nullptr;
 	for(int i = 0; i < 5; ++i) {
 		pcard = dField.mzone[0][i];
 		if(pcard && pcard->code != 0)
@@ -1195,9 +1197,9 @@ void Game::DrawDeckBd() {
 	DrawShadowText(numFont, dataManager.GetNumString(mainsize), Resize(380, 138, 440, 158), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
 	driver->draw2DRectangle(Resize(310, 160, 797, deckBuilder.showing_pack ? 630 : 436), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(Resize(309, 159, 797, deckBuilder.showing_pack ? 630 : 436));
-	int lx;
+	int lx = 0;
 	int dy = 68;
-	float dx;
+	float dx = NAN;
 	if(mainsize <= 40) {
 		dx = 436.0f / 9;
 		lx = 10;

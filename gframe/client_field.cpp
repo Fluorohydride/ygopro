@@ -121,7 +121,7 @@ void ClientField::Clear() {
 	tag_teammate_surrender = false;
 }
 void ClientField::Initial(int player, int deckc, int extrac) {
-	ClientCard* pcard;
+	ClientCard* pcard = nullptr;
 	for(int i = 0; i < deckc; ++i) {
 		pcard = new ClientCard;
 		deck[player].push_back(pcard);
@@ -360,7 +360,7 @@ void ClientField::UpdateFieldCard(int controler, int location, unsigned char* da
 	}
 	if(!lst)
 		return;
-	int len;
+	int len = 0;
 	for(auto cit = lst->begin(); cit != lst->end(); ++cit) {
 		len = BufferIO::ReadInt32(data);
 		if(len > LEN_HEADER)
@@ -438,8 +438,8 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			rnd.shuffle_vector(selectable_cards);
 		}
 	}
-	int startpos;
-	int ct;
+	int startpos = 0;
+	int ct = 0;
 	if(selectable_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
 		ct = selectable_cards.size();
@@ -530,8 +530,8 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
 void ClientField::ShowChainCard() {
-	int startpos;
-	int ct;
+	int startpos = 0;
+	int ct = 0;
 	if(selectable_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
 		ct = selectable_cards.size();
@@ -584,8 +584,8 @@ void ClientField::ShowChainCard() {
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
 void ClientField::ShowLocationCard() {
-	int startpos;
-	int ct;
+	int startpos = 0;
+	int ct = 0;
 	if(display_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - display_cards.size()) / 2;
 		ct = display_cards.size();
