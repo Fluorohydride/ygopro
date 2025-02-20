@@ -76,7 +76,6 @@ inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
 using namespace irr;
 using namespace core;
 using namespace scene;
-using namespace video;
 
 extern const unsigned short PRO_VERSION;
 extern unsigned int enable_log;

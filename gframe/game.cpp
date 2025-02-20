@@ -368,11 +368,11 @@ bool Game::Initialize() {
 	stName = env->addStaticText(L"", rect<s32>(10, 10, 287, 32), true, false, tabInfo, -1, false);
 	stName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stInfo = env->addStaticText(L"", rect<s32>(15, 37, 296, 60), false, true, tabInfo, -1, false);
-	stInfo->setOverrideColor(SColor(255, 0, 0, 255));
+	stInfo->setOverrideColor(irr::video::SColor(255, 0, 0, 255));
 	stDataInfo = env->addStaticText(L"", rect<s32>(15, 60, 296, 83), false, true, tabInfo, -1, false);
-	stDataInfo->setOverrideColor(SColor(255, 0, 0, 255));
+	stDataInfo->setOverrideColor(irr::video::SColor(255, 0, 0, 255));
 	stSetName = env->addStaticText(L"", rect<s32>(15, 83, 296, 106), false, true, tabInfo, -1, false);
-	stSetName->setOverrideColor(SColor(255, 0, 0, 255));
+	stSetName->setOverrideColor(irr::video::SColor(255, 0, 0, 255));
 	stText = env->addStaticText(L"", rect<s32>(15, 106, 287, 324), false, true, tabInfo, -1, false);
 	scrCardText = env->addScrollBar(false, rect<s32>(267, 106, 287, 324), tabInfo, SCROLL_CARDTEXT);
 	scrCardText->setLargeStep(1);
@@ -971,7 +971,7 @@ bool Game::Initialize() {
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
 	for (int i = 0; i < irr::gui::EGDC_COUNT; ++i) {
-		SColor col = env->getSkin()->getColor((irr::gui::EGUI_DEFAULT_COLOR)i);
+		auto col = env->getSkin()->getColor((irr::gui::EGUI_DEFAULT_COLOR)i);
 		col.setAlpha(224);
 		env->getSkin()->setColor((irr::gui::EGUI_DEFAULT_COLOR)i, col);
 	}
@@ -995,7 +995,7 @@ void Game::MainLoop() {
 
 	mProjection.buildCameraLookAtMatrixLH(vector3df(4.2f, 8.0f, 7.8f), vector3df(4.2f, 0, 0), vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
-	smgr->setAmbientLight(SColorf(1.0f, 1.0f, 1.0f));
+	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
 	irr::ITimer* timer = device->getTimer();
 	timer->setTime(0);
@@ -1013,7 +1013,7 @@ void Game::MainLoop() {
 		linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
-		driver->beginScene(true, true, SColor(0, 0, 0, 0));
+		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
 		gMutex.lock();
 		if(dInfo.isStarted) {
 			if(dInfo.isFinished && showcardcode == 1)
