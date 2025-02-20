@@ -16,7 +16,7 @@ void UpdateDeck() {
 	BufferIO::CopyWideString(mainGame->cbCategorySelect->getText(), mainGame->gameConf.lastcategory);
 	BufferIO::CopyWideString(mainGame->cbDeckSelect->getText(), mainGame->gameConf.lastdeck);
 	unsigned char deckbuf[1024]{};
-	auto pdeck = deckbuf;
+	auto *pdeck = deckbuf;
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
 	for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)

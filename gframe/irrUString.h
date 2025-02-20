@@ -492,7 +492,7 @@ public:
 		// Calculate the size of the string to read in.
 		if(length == 0xffffffff) {
 			length = 0;
-			auto* p = other;
+			const auto* p = other;
 			while(*p++) {
 				++length;
 			}

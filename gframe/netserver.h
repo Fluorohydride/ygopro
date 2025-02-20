@@ -33,7 +33,7 @@ public:
 	static void HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len);
 	static size_t CreateChatPacket(unsigned char* src, int src_size, unsigned char* dst, uint16_t dst_player_type);
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto) {
-		auto p = net_server_write;
+		auto *p = net_server_write;
 		buffer_write<uint16_t>(p, 1);
 		buffer_write<uint8_t>(p, proto);
 		last_sent = 3;
@@ -42,7 +42,7 @@ public:
 	}
 	template<typename ST>
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, ST& st) {
-		auto p = net_server_write;
+		auto *p = net_server_write;
 		if (sizeof(ST) > MAX_DATA_SIZE)
 			return;
 		buffer_write<uint16_t>(p, (uint16_t)(1 + sizeof(ST)));
@@ -53,7 +53,7 @@ public:
 			bufferevent_write(dp->bev, net_server_write, sizeof(ST) + 3);
 	}
 	static void SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* buffer, size_t len) {
-		auto p = net_server_write;
+		auto *p = net_server_write;
 		if (len > MAX_DATA_SIZE)
 			len = MAX_DATA_SIZE;
 		buffer_write<uint16_t>(p, (uint16_t)(1 + len));

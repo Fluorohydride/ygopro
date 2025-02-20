@@ -47,14 +47,14 @@ public:
 	static void SetResponseB(void* respB, size_t len);
 	static void SendResponse();
 	static void SendPacketToServer(unsigned char proto) {
-		auto p = duel_client_write;
+		auto *p = duel_client_write;
 		buffer_write<uint16_t>(p, 1);
 		buffer_write<uint8_t>(p, proto);
 		bufferevent_write(client_bev, duel_client_write, 3);
 	}
 	template<typename ST>
 	static void SendPacketToServer(unsigned char proto, ST& st) {
-		auto p = duel_client_write;
+		auto *p = duel_client_write;
 		if (sizeof(ST) > MAX_DATA_SIZE)
 			return;
 		buffer_write<uint16_t>(p, (uint16_t)(1 + sizeof(ST)));
@@ -63,7 +63,7 @@ public:
 		bufferevent_write(client_bev, duel_client_write, sizeof(ST) + 3);
 	}
 	static void SendBufferToServer(unsigned char proto, void* buffer, size_t len) {
-		auto p = duel_client_write;
+		auto *p = duel_client_write;
 		if (len > MAX_DATA_SIZE)
 			len = MAX_DATA_SIZE;
 		buffer_write<uint16_t>(p, (uint16_t)(1 + len));

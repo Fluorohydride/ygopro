@@ -321,7 +321,7 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			mainGame->gMutex.unlock();
 			is_swaping = false;
 		}
-		auto offset = pbuf;
+		auto *offset = pbuf;
 		bool pauseable = true;
 		mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 		switch (mainGame->dInfo.curMsg) {

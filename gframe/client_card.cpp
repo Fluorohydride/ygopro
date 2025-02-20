@@ -11,7 +11,7 @@ ClientCard::~ClientCard() {
 		equipTarget->equipped.erase(this);
 		equipTarget = nullptr;
 	}
-	for (auto& card : equipped) {
+	for (const auto& card : equipped) {
 		card->is_showequip = false;
 		card->equipTarget = nullptr;
 	}
@@ -175,11 +175,11 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 	}
 }
 void ClientCard::ClearTarget() {
-	for (auto& pcard : cardTarget) {
+	for (const auto& pcard : cardTarget) {
 		pcard->is_showtarget = false;
 		pcard->ownerTarget.erase(this);
 	}
-	for (auto& pcard : ownerTarget) {
+	for (const auto& pcard : ownerTarget) {
 		pcard->is_showtarget = false;
 		pcard->cardTarget.erase(this);
 	}

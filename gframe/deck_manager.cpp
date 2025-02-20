@@ -90,7 +90,7 @@ unsigned int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 		return (DECKERROR_EXTRACOUNT << 28) | (unsigned)deck.extra.size();
 	if(deck.side.size() > SIDE_MAX_SIZE)
 		return (DECKERROR_SIDECOUNT << 28) | (unsigned)deck.side.size();
-	auto list = GetLFListContent(lfhash);
+	const auto *list = GetLFListContent(lfhash);
 	if (!list)
 		return 0;
 	const unsigned int rule_map[6] = { AVAIL_OCG, AVAIL_TCG, AVAIL_SC, AVAIL_CUSTOM, AVAIL_OCGTCG, 0 };
