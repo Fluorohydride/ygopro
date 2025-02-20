@@ -975,7 +975,7 @@ bool Game::Initialize() {
 		col.setAlpha(224);
 		env->getSkin()->setColor((irr::gui::EGUI_DEFAULT_COLOR)i, col);
 	}
-	dimension2du size = driver->getScreenSize();
+	auto size = driver->getScreenSize();
 	if(window_size != size) {
 		window_size = size;
 		xScale = window_size.Width / 1024.0;
@@ -1002,7 +1002,7 @@ void Game::MainLoop() {
 	int fps = 0;
 	int cur_time = 0;
 	while(device->run()) {
-		dimension2du size = driver->getScreenSize();
+		auto size = driver->getScreenSize();
 		if(window_size != size) {
 			window_size = size;
 			xScale = window_size.Width / 1024.0;
