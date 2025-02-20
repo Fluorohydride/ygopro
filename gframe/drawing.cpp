@@ -414,7 +414,7 @@ void Game::DrawCard(ClientCard* pcard) {
 }
 template<typename T>
 void Game::DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const irr::core::rect<s32>& position, const irr::core::rect<s32>& padding,
-			video::SColor color, video::SColor shadowcolor, bool hcenter, bool vcenter, const irr::core::rect<s32>* clip) {
+			irr::video::SColor color, irr::video::SColor shadowcolor, bool hcenter, bool vcenter, const irr::core::rect<s32>* clip) {
 	irr::core::rect<s32> shadowposition = irr::core::recti(position.UpperLeftCorner.X - padding.UpperLeftCorner.X, position.UpperLeftCorner.Y - padding.UpperLeftCorner.Y, 
 										   position.LowerRightCorner.X - padding.LowerRightCorner.X, position.LowerRightCorner.Y - padding.LowerRightCorner.Y);
 	font->drawUstring(text, shadowposition, shadowcolor, hcenter, vcenter, clip);

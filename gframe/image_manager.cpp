@@ -208,7 +208,7 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, s32 wid
 		if(srcimg->getDimension() == irr::core::dimension2d<u32>(width, height)) {
 			texture = driver->addTexture(file, srcimg);
 		} else {
-			video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<u32>(width, height));
+			irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<u32>(width, height));
 			imageScaleNNAA(srcimg, destimg);
 			texture = driver->addTexture(file, destimg);
 			destimg->drop();
@@ -274,7 +274,7 @@ irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 		texture = driver->addTexture(file, srcimg);
 	} else {
 		auto origsize = srcimg->getDimension();
-		video::IImage* destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<u32>(origsize.Width * zoom, origsize.Height * zoom));
+		irr::video::IImage* destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<u32>(origsize.Width * zoom, origsize.Height * zoom));
 		imageScaleNNAA(srcimg, destimg);
 		texture = driver->addTexture(file, destimg);
 		destimg->drop();

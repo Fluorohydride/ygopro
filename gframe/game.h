@@ -223,7 +223,7 @@ public:
 	void SetCursor(irr::gui::ECURSOR_ICON icon);
 	template<typename T>
 	static void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const irr::core::rect<s32>& position, const irr::core::rect<s32>& padding,
-		video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const irr::core::rect<s32>* clip = nullptr);
+		irr::video::SColor color = 0xffffffff, irr::video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const irr::core::rect<s32>* clip = nullptr);
 
 	std::mutex gMutex;
 	Signal frameSignal;
