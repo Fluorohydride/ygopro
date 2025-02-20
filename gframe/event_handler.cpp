@@ -1638,7 +1638,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							}
 							should_show_tip = true;
 							irr::core::dimension2d<unsigned int> dtip = mainGame->guiFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
-							mainGame->stTip->setRelativePosition(recti(mousepos.X - 10 - dtip.Width, mousepos.Y - 10 - dtip.Height, mousepos.X - 10, mousepos.Y - 10));
+							mainGame->stTip->setRelativePosition(irr::core::recti(mousepos.X - 10 - dtip.Width, mousepos.Y - 10 - dtip.Height, mousepos.X - 10, mousepos.Y - 10));
 							mainGame->stTip->setText(str.c_str());
 						}
 					} else {
@@ -1677,7 +1677,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					should_show_tip = true;
 					irr::core::dimension2d<unsigned int> dtip = mainGame->guiFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
-					mainGame->stTip->setRelativePosition(recti(mousepos.X - 10 - dtip.Width, mousepos.Y + 10, mousepos.X - 10, mousepos.Y + 10 + dtip.Height));
+					mainGame->stTip->setRelativePosition(irr::core::recti(mousepos.X - 10 - dtip.Width, mousepos.Y + 10, mousepos.X - 10, mousepos.Y + 10 + dtip.Height));
 					mainGame->stTip->setText(str.c_str());
 				}
 				hovered_player = mplayer;
@@ -2006,13 +2006,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			case SCROLL_TAB_HELPER: {
 				rect<s32> pos = mainGame->tabHelper->getRelativePosition();
-				mainGame->tabHelper->setRelativePosition(recti(0, mainGame->scrTabHelper->getPos() * -1, pos.LowerRightCorner.X, pos.LowerRightCorner.Y));
+				mainGame->tabHelper->setRelativePosition(irr::core::recti(0, mainGame->scrTabHelper->getPos() * -1, pos.LowerRightCorner.X, pos.LowerRightCorner.Y));
 				return true;
 				break;
 			}
 			case SCROLL_TAB_SYSTEM: {
 				rect<s32> pos = mainGame->tabSystem->getRelativePosition();
-				mainGame->tabSystem->setRelativePosition(recti(0, mainGame->scrTabSystem->getPos() * -1, pos.LowerRightCorner.X, pos.LowerRightCorner.Y));
+				mainGame->tabSystem->setRelativePosition(irr::core::recti(0, mainGame->scrTabSystem->getPos() * -1, pos.LowerRightCorner.X, pos.LowerRightCorner.Y));
 				return true;
 				break;
 			}
@@ -2476,7 +2476,7 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 			x = w + 10;
 		if(x + w > 670)
 			x = 670 - w;
-		mainGame->stCardListTip->setRelativePosition(recti(x - w, y - 10, x + w, y - 10 + dTip.Height));
+		mainGame->stCardListTip->setRelativePosition(irr::core::recti(x - w, y - 10, x + w, y - 10 + dTip.Height));
 		mainGame->stCardListTip->setVisible(true);
 	}
 }

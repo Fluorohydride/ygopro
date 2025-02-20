@@ -204,18 +204,18 @@ public:
 
 	void OnResize();
 	void ResizeChatInputWindow();
-	recti Resize(s32 x, s32 y, s32 x2, s32 y2);
-	recti Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2);
+	irr::core::recti Resize(s32 x, s32 y, s32 x2, s32 y2);
+	irr::core::recti Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2);
 	irr::core::vector2di Resize(s32 x, s32 y);
 	irr::core::vector2di ResizeReverse(s32 x, s32 y);
-	recti ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width);
-	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2);
-	recti ResizeCardImgWin(s32 x, s32 y, s32 mx, s32 my);
-	recti ResizeCardHint(s32 x, s32 y, s32 x2, s32 y2);
+	irr::core::recti ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width);
+	irr::core::recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2);
+	irr::core::recti ResizeCardImgWin(s32 x, s32 y, s32 mx, s32 my);
+	irr::core::recti ResizeCardHint(s32 x, s32 y, s32 x2, s32 y2);
 	irr::core::vector2di ResizeCardHint(s32 x, s32 y);
-	recti ResizeCardMid(s32 x, s32 y, s32 x2, s32 y2, s32 midx, s32 midy);
+	irr::core::recti ResizeCardMid(s32 x, s32 y, s32 x2, s32 y2, s32 midx, s32 midy);
 	irr::core::vector2di ResizeCardMid(s32 x, s32 y, s32 midx, s32 midy);
-	recti ResizeFit(s32 x, s32 y, s32 x2, s32 y2);
+	irr::core::recti ResizeFit(s32 x, s32 y, s32 x2, s32 y2);
 
 	void SetWindowsIcon();
 	void SetWindowsScale(float scale);
