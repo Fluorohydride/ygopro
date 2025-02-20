@@ -191,7 +191,7 @@ public:
 	int ChatLocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
 
-	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
+	bool HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();
 		return focus && focus->hasType(type);
 	}
@@ -220,7 +220,7 @@ public:
 	void SetWindowsIcon();
 	void SetWindowsScale(float scale);
 	void FlashWindow();
-	void SetCursor(ECURSOR_ICON icon);
+	void SetCursor(irr::gui::ECURSOR_ICON icon);
 	template<typename T>
 	static void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const core::rect<s32>& position, const core::rect<s32>& padding,
 		video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const core::rect<s32>* clip = nullptr);

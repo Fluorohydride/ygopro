@@ -970,10 +970,10 @@ bool Game::Initialize() {
 	}
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
-	for (u32 i = 0; i < EGDC_COUNT; ++i) {
-		SColor col = env->getSkin()->getColor((EGUI_DEFAULT_COLOR)i);
+	for (u32 i = 0; i < irr::gui::EGDC_COUNT; ++i) {
+		SColor col = env->getSkin()->getColor((irr::gui::EGUI_DEFAULT_COLOR)i);
 		col.setAlpha(224);
-		env->getSkin()->setColor((EGUI_DEFAULT_COLOR)i, col);
+		env->getSkin()->setColor((irr::gui::EGUI_DEFAULT_COLOR)i, col);
 	}
 	dimension2du size = driver->getScreenSize();
 	if(window_size != size) {
@@ -2165,8 +2165,8 @@ void Game::FlashWindow() {
 	FlashWindowEx(&fi);
 #endif
 }
-void Game::SetCursor(ECURSOR_ICON icon) {
-	ICursorControl* cursor = device->getCursorControl();
+void Game::SetCursor(irr::gui::ECURSOR_ICON icon) {
+	irr::gui::ICursorControl* cursor = device->getCursorControl();
 	if(cursor->getActiveIcon() != icon) {
 		cursor->setActiveIcon(icon);
 	}
