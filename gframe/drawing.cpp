@@ -879,10 +879,10 @@ void Game::DrawSpec() {
 			irr::s32 winx = midx * xScale + (574 - midx) * mul;
 			irr::s32 winx2 = midx * xScale + (751 - midx) * mul;
 			irr::s32 winy = midy * yScale + (404 - midy) * mul;
-			corner[0] = irr::core::vector2d<s32>(winx - (CARD_IMG_HEIGHT * mul - y) * 0.3f, winy - y);
-			corner[1] = irr::core::vector2d<s32>(winx2 + (CARD_IMG_HEIGHT * mul - y) * 0.3f, winy - y);
-			corner[2] = irr::core::vector2d<s32>(winx, winy);
-			corner[3] = irr::core::vector2d<s32>(winx2, winy);
+			corner[0] = irr::core::vector2d<irr::s32>(winx - (CARD_IMG_HEIGHT * mul - y) * 0.3f, winy - y);
+			corner[1] = irr::core::vector2d<irr::s32>(winx2 + (CARD_IMG_HEIGHT * mul - y) * 0.3f, winy - y);
+			corner[2] = irr::core::vector2d<irr::s32>(winx, winy);
+			corner[3] = irr::core::vector2d<irr::s32>(winx2, winy);
 			irr::gui::Draw2DImageQuad(driver, imageManager.GetTexture(showcardcode, true), ResizeFit(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), corner);
 			showcardp++;
 			showcarddif += 9;
