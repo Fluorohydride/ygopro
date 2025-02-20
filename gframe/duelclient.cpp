@@ -3428,11 +3428,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			float xd = mainGame->dField.attack_target->curPos.X;
 			float yd = mainGame->dField.attack_target->curPos.Y;
 			sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-			mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
+			mainGame->atk_t = irr::core::vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
 			if (ca == 0)
-				mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
 			else
-				mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
 		} else {
 			soundManager.PlaySoundEffect(SOUND_DIRECT_ATTACK);
 			myswprintf(event_string, dataManager.GetSysString(1620), dataManager.GetName(mainGame->dField.attacker->code));
@@ -3443,11 +3443,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			if (ca == 0)
 				yd = -3.5f;
 			sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-			mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
+			mainGame->atk_t = irr::core::vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
 			if (ca == 0)
-				mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
 			else
-				mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
 		}
 		matManager.GenArrow(sy);
 		mainGame->attack_sv = 0;

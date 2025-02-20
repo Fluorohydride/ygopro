@@ -993,7 +993,7 @@ void Game::MainLoop() {
 	BuildProjectionMatrix(mProjection, -0.90f, 0.45f, -0.42f, 0.42f, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
 
-	mProjection.buildCameraLookAtMatrixLH(vector3df(4.2f, 8.0f, 7.8f), vector3df(4.2f, 0, 0), vector3df(0, 0, 1));
+	mProjection.buildCameraLookAtMatrixLH(irr::core::vector3df(4.2f, 8.0f, 7.8f), irr::core::vector3df(4.2f, 0, 0), irr::core::vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
