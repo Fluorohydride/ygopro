@@ -18,8 +18,8 @@ size_t DuelClient::response_len = 0;
 unsigned int DuelClient::watching = 0;
 unsigned char DuelClient::selftype = 0;
 bool DuelClient::is_host = false;
-event_base* DuelClient::client_base = 0;
-bufferevent* DuelClient::client_bev = 0;
+event_base* DuelClient::client_base = nullptr;
+bufferevent* DuelClient::client_bev = nullptr;
 unsigned char DuelClient::duel_client_write[SIZE_NETWORK_BUFFER];
 bool DuelClient::is_closing = false;
 bool DuelClient::is_swapping = false;
@@ -35,7 +35,7 @@ bool DuelClient::is_refreshing = false;
 int DuelClient::match_kill = 0;
 std::vector<HostPacket> DuelClient::hosts;
 std::set<std::pair<unsigned int, unsigned short>> DuelClient::remotes;
-event* DuelClient::resp_event = 0;
+event* DuelClient::resp_event = nullptr;
 
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
 	if(connect_state)
@@ -53,15 +53,15 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 	if (bufferevent_socket_connect(client_bev, (sockaddr*)&sin, sizeof(sin)) < 0) {
 		bufferevent_free(client_bev);
 		event_base_free(client_base);
-		client_bev = 0;
-		client_base = 0;
+		client_bev = nullptr;
+		client_base = nullptr;
 		return false;
 	}
 	connect_state = 0x1;
 	rnd.reset((uint_fast32_t)std::random_device()());
 	if(!create_game) {
 		timeval timeout = {5, 0};
-		event* timeout_event = event_new(client_base, 0, EV_TIMEOUT, ConnectTimeout, 0);
+		event* timeout_event = event_new(client_base, 0, EV_TIMEOUT, ConnectTimeout, nullptr);
 		event_add(timeout_event, &timeout);
 	}
 	std::thread(ClientThread).detach();
@@ -225,15 +225,15 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 				}
 			}
 		}
-		event_base_loopexit(client_base, 0);
+		event_base_loopexit(client_base, nullptr);
 	}
 }
 int DuelClient::ClientThread() {
 	event_base_dispatch(client_base);
 	bufferevent_free(client_bev);
 	event_base_free(client_base);
-	client_bev = 0;
-	client_base = 0;
+	client_bev = nullptr;
+	client_base = nullptr;
 	connect_state = 0;
 	return 0;
 }
@@ -1524,7 +1524,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	case MSG_SELECT_YESNO: {
 		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
 		int desc = BufferIO::ReadInt32(pbuf);
-		mainGame->dField.highlighting_card = 0;
+		mainGame->dField.highlighting_card = nullptr;
 		mainGame->gMutex.lock();
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetDesc(desc));
 		mainGame->PopupElement(mainGame->wQuery);
@@ -2425,7 +2425,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_SHUFFLE_SET_CARD: {
-		std::vector<ClientCard*>* lst = 0;
+		std::vector<ClientCard*>* lst = nullptr;
 		unsigned int loc = BufferIO::ReadUInt8(pbuf);
 		int count = BufferIO::ReadUInt8(pbuf);
 		if(loc == LOCATION_MZONE)
@@ -2600,7 +2600,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				pcard->SetCode(code);
 			pcard->ClearTarget();
 			for(auto eqit = pcard->equipped.begin(); eqit != pcard->equipped.end(); ++eqit)
-				(*eqit)->equipTarget = 0;
+				(*eqit)->equipTarget = nullptr;
 			if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 				mainGame->dField.FadeCard(pcard, 5, appear);
 				mainGame->WaitFrameSignal(appear);
@@ -2608,7 +2608,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				mainGame->dField.RemoveCard(pc, pl, ps);
 				mainGame->gMutex.unlock();
 				if(pcard == mainGame->dField.hovered_card)
-					mainGame->dField.hovered_card = 0;
+					mainGame->dField.hovered_card = nullptr;
 			} else
 				mainGame->dField.RemoveCard(pc, pl, ps);
 			delete pcard;
@@ -2626,7 +2626,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 					if(pcard->equipTarget) {
 						pcard->equipTarget->is_showequip = false;
 						pcard->equipTarget->equipped.erase(pcard);
-						pcard->equipTarget = 0;
+						pcard->equipTarget = nullptr;
 					}
 				}
 				pcard->is_hovered = false;
@@ -2685,7 +2685,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				if(pcard->equipTarget) {
 					pcard->equipTarget->is_showequip = false;
 					pcard->equipTarget->equipped.erase(pcard);
-					pcard->equipTarget = 0;
+					pcard->equipTarget = nullptr;
 				}
 				pcard->is_showequip = false;
 				pcard->is_showtarget = false;
@@ -2722,7 +2722,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				ClientCard* pcard = olcard->overlayed[pp];
 				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 					olcard->overlayed.erase(olcard->overlayed.begin() + pcard->sequence);
-					pcard->overlayTarget = 0;
+					pcard->overlayTarget = nullptr;
 					pcard->position = cp;
 					mainGame->dField.AddCard(pcard, cc, cl, cs);
 					mainGame->dField.overlay_cards.erase(pcard);
@@ -2731,7 +2731,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				} else {
 					mainGame->gMutex.lock();
 					olcard->overlayed.erase(olcard->overlayed.begin() + pcard->sequence);
-					pcard->overlayTarget = 0;
+					pcard->overlayTarget = nullptr;
 					pcard->position = cp;
 					mainGame->dField.AddCard(pcard, cc, cl, cs);
 					mainGame->dField.overlay_cards.erase(pcard);
@@ -3267,7 +3267,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		ClientCard* pc = mainGame->dField.GetCard(c1, l1, s1);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			pc->equipTarget->equipped.erase(pc);
-			pc->equipTarget = 0;
+			pc->equipTarget = nullptr;
 		} else {
 			mainGame->gMutex.lock();
 			if (mainGame->dField.hovered_card == pc)
@@ -3275,7 +3275,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			else if (mainGame->dField.hovered_card == pc->equipTarget)
 				pc->is_showequip = false;
 			pc->equipTarget->equipped.erase(pc);
-			pc->equipTarget = 0;
+			pc->equipTarget = nullptr;
 			mainGame->gMutex.unlock();
 		}
 		return true;
@@ -4072,7 +4072,7 @@ void DuelClient::BeginRefreshHost() {
 	HostRequest hReq;
 	hReq.identifier = NETWORK_CLIENT_ID;
 	for(int i = 0; i < 8; ++i) {
-		if(host->h_addr_list[i] == 0)
+		if(host->h_addr_list[i] == nullptr)
 			break;
 		unsigned int local_addr = 0;
 		std::memcpy(&local_addr, host->h_addr_list[i], sizeof local_addr);
@@ -4093,7 +4093,7 @@ void DuelClient::BeginRefreshHost() {
 int DuelClient::RefreshThread(event_base* broadev) {
 	event_base_dispatch(broadev);
 	evutil_socket_t fd;
-	event_get_assignment(resp_event, 0, &fd, 0, 0, 0);
+	event_get_assignment(resp_event, nullptr, &fd, nullptr, nullptr, nullptr);
 	evutil_closesocket(fd);
 	event_free(resp_event);
 	event_base_free(broadev);

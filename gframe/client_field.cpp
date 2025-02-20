@@ -12,8 +12,8 @@ namespace ygo {
 
 ClientField::ClientField() {
 	for(int p = 0; p < 2; ++p) {
-		mzone[p].resize(7, 0);
-		szone[p].resize(8, 0);
+		mzone[p].resize(7, nullptr);
+		szone[p].resize(8, nullptr);
 	}
 	rnd.reset((uint_fast32_t)std::random_device()());
 }
@@ -100,11 +100,11 @@ void ClientField::Clear() {
 	reposable_cards.clear();
 	attackable_cards.clear();
 	disabled_field = 0;
-	panel = 0;
-	hovered_card = 0;
-	clicked_card = 0;
-	highlighting_card = 0;
-	menu_card = 0;
+	panel = nullptr;
+	hovered_card = nullptr;
+	clicked_card = nullptr;
+	highlighting_card = nullptr;
+	menu_card = nullptr;
 	hovered_controler = 0;
 	hovered_location = 0;
 	hovered_sequence = 0;
@@ -144,7 +144,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 	}
 }
 ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
-	std::vector<ClientCard*>* lst = 0;
+	std::vector<ClientCard*>* lst = nullptr;
 	bool is_xyz = (location & LOCATION_OVERLAY) != 0;
 	location &= 0x7f;
 	switch(location) {
@@ -171,18 +171,18 @@ ClientCard* ClientField::GetCard(int controler, int location, int sequence, int 
 		break;
 	}
 	if(!lst)
-		return 0;
+		return nullptr;
 	if(is_xyz) {
 		if(sequence >= (int)lst->size())
-			return 0;
+			return nullptr;
 		ClientCard* scard = (*lst)[sequence];
 		if(scard && (int)scard->overlayed.size() > sub_seq)
 			return scard->overlayed[sub_seq];
 		else
-			return 0;
+			return nullptr;
 	} else {
 		if(sequence >= (int)lst->size())
-			return 0;
+			return nullptr;
 		return (*lst)[sequence];
 	}
 }
@@ -196,7 +196,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 			deck[controler].push_back(pcard);
 			pcard->sequence = (unsigned char)(deck[controler].size() - 1);
 		} else {
-			deck[controler].push_back(0);
+			deck[controler].push_back(nullptr);
 			for(int i = deck[controler].size() - 1; i > 0; --i) {
 				deck[controler][i] = deck[controler][i - 1];
 				deck[controler][i]->sequence++;
@@ -238,7 +238,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 			extra[controler].push_back(pcard);
 			pcard->sequence = (unsigned char)(extra[controler].size() - 1);
 		} else {
-			extra[controler].push_back(0);
+			extra[controler].push_back(nullptr);
 			int p = extra[controler].size() - extra_p_count[controler] - 1;
 			for(int i = extra[controler].size() - 1; i > p; --i) {
 				extra[controler][i] = extra[controler][i - 1];
@@ -256,7 +256,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 }
 ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
-	ClientCard* pcard = 0;
+	ClientCard* pcard = nullptr;
 	switch (location) {
 	case LOCATION_DECK: {
 		pcard = deck[controler][sequence];
@@ -280,12 +280,12 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 	}
 	case LOCATION_MZONE: {
 		pcard = mzone[controler][sequence];
-		mzone[controler][sequence] = 0;
+		mzone[controler][sequence] = nullptr;
 		break;
 	}
 	case LOCATION_SZONE: {
 		pcard = szone[controler][sequence];
-		szone[controler][sequence] = 0;
+		szone[controler][sequence] = nullptr;
 		break;
 	}
 	case LOCATION_GRAVE: {
@@ -334,7 +334,7 @@ void ClientField::UpdateCard(int controler, int location, int sequence, unsigned
 		pcard->UpdateInfo(data);
 }
 void ClientField::UpdateFieldCard(int controler, int location, unsigned char* data) {
-	std::vector<ClientCard*>* lst = 0;
+	std::vector<ClientCard*>* lst = nullptr;
 	switch(location) {
 	case LOCATION_DECK:
 		lst = &deck[controler];

@@ -75,7 +75,7 @@ public:
 		lpFileOp.hwnd = nullptr;
 		lpFileOp.wFunc = FO_DELETE;
 		lpFileOp.pFrom = pdir;
-		lpFileOp.pTo = 0;
+		lpFileOp.pTo = nullptr;
 		lpFileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
 		return SHFileOperationW(&lpFileOp) == 0;
 	}

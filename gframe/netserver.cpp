@@ -8,10 +8,10 @@
 namespace ygo {
 std::unordered_map<bufferevent*, DuelPlayer> NetServer::users;
 unsigned short NetServer::server_port = 0;
-event_base* NetServer::net_evbase = 0;
-event* NetServer::broadcast_ev = 0;
-evconnlistener* NetServer::listener = 0;
-DuelMode* NetServer::duel_mode = 0;
+event_base* NetServer::net_evbase = nullptr;
+event* NetServer::broadcast_ev = nullptr;
+evconnlistener* NetServer::listener = nullptr;
+DuelMode* NetServer::duel_mode = nullptr;
 unsigned char NetServer::net_server_write[SIZE_NETWORK_BUFFER];
 size_t NetServer::last_sent = 0;
 
@@ -31,7 +31,7 @@ bool NetServer::StartServer(unsigned short port) {
 	                                   LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, (sockaddr*)&sin, sizeof(sin));
 	if(!listener) {
 		event_base_free(net_evbase);
-		net_evbase = 0;
+		net_evbase = nullptr;
 		return false;
 	}
 	evconnlistener_set_error_cb(listener, ServerAcceptError);
@@ -63,17 +63,17 @@ void NetServer::StopServer() {
 		return;
 	if(duel_mode)
 		duel_mode->EndDuel();
-	event_base_loopexit(net_evbase, 0);
+	event_base_loopexit(net_evbase, nullptr);
 }
 void NetServer::StopBroadcast() {
 	if(!net_evbase || !broadcast_ev)
 		return;
 	event_del(broadcast_ev);
 	evutil_socket_t fd;
-	event_get_assignment(broadcast_ev, 0, &fd, 0, 0, 0);
+	event_get_assignment(broadcast_ev, nullptr, &fd, nullptr, nullptr, nullptr);
 	evutil_closesocket(fd);
 	event_free(broadcast_ev);
-	broadcast_ev = 0;
+	broadcast_ev = nullptr;
 }
 void NetServer::StopListen() {
 	evconnlistener_disable(listener);
@@ -114,7 +114,7 @@ void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, socka
 	bufferevent_enable(bev, EV_READ);
 }
 void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {
-	event_base_loopexit(net_evbase, 0);
+	event_base_loopexit(net_evbase, nullptr);
 }
 /*
 * packet_len: 2 bytes
@@ -157,21 +157,21 @@ int NetServer::ServerThread() {
 	}
 	users.clear();
 	evconnlistener_free(listener);
-	listener = 0;
+	listener = nullptr;
 	if(broadcast_ev) {
 		evutil_socket_t fd;
-		event_get_assignment(broadcast_ev, 0, &fd, 0, 0, 0);
+		event_get_assignment(broadcast_ev, nullptr, &fd, nullptr, nullptr, nullptr);
 		evutil_closesocket(fd);
 		event_free(broadcast_ev);
-		broadcast_ev = 0;
+		broadcast_ev = nullptr;
 	}
 	if(duel_mode) {
 		event_free(duel_mode->etimer);
 		delete duel_mode;
 	}
-	duel_mode = 0;
+	duel_mode = nullptr;
 	event_base_free(net_evbase);
-	net_evbase = 0;
+	net_evbase = nullptr;
 	return 0;
 }
 void NetServer::DisconnectPlayer(DuelPlayer* dp) {
@@ -297,7 +297,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 		BufferIO::NullTerminate(pkt->pass);
 		BufferIO::CopyCharArray(pkt->name, duel_mode->name);
 		BufferIO::CopyCharArray(pkt->pass, duel_mode->pass);
-		duel_mode->JoinGame(dp, 0, true);
+		duel_mode->JoinGame(dp, nullptr, true);
 		StartBroadcast();
 		break;
 	}
