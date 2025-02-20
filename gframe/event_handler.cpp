@@ -1718,7 +1718,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	case irr::EET_KEY_INPUT_EVENT: {
 		switch(event.KeyInput.Key) {
 		case irr::KEY_KEY_A: {
-			if(mainGame->gameConf.control_mode == 0 && !mainGame->HasFocus(EGUIET_EDIT_BOX)) {
+			if(mainGame->gameConf.control_mode == 0 && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 				mainGame->always_chain = event.KeyInput.PressedDown;
 				mainGame->ignore_chain = false;
 				mainGame->chain_when_avail = false;
@@ -1727,7 +1727,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_S: {
-			if(mainGame->gameConf.control_mode == 0 && !mainGame->HasFocus(EGUIET_EDIT_BOX)) {
+			if(mainGame->gameConf.control_mode == 0 && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 				mainGame->ignore_chain = event.KeyInput.PressedDown;
 				mainGame->always_chain = false;
 				mainGame->chain_when_avail = false;
@@ -1736,7 +1736,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_D: {
-			if(mainGame->gameConf.control_mode == 0 && !mainGame->HasFocus(EGUIET_EDIT_BOX)) {
+			if(mainGame->gameConf.control_mode == 0 && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 				mainGame->chain_when_avail = event.KeyInput.PressedDown;
 				mainGame->always_chain = false;
 				mainGame->ignore_chain = false;
@@ -1753,7 +1753,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_F7:
 		case irr::KEY_F8: {
 			if(!event.KeyInput.PressedDown && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type != 7 && mainGame->dInfo.isStarted
-					&& !mainGame->wCardDisplay->isVisible() && !mainGame->HasFocus(EGUIET_EDIT_BOX)) {
+					&& !mainGame->wCardDisplay->isVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 				int loc_id = 0;
 				display_cards.clear();
 				switch(event.KeyInput.Key) {
@@ -1833,19 +1833,19 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		s32 id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_ELEMENT_HOVERED: {
-			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX) {
-				mainGame->SetCursor(event.GUIEvent.Caller->isEnabled() ? ECI_IBEAM : ECI_NORMAL);
+			if(event.GUIEvent.Caller->getType() == irr::gui::EGUIET_EDIT_BOX) {
+				mainGame->SetCursor(event.GUIEvent.Caller->isEnabled() ? irr::gui::ECI_IBEAM : irr::gui::ECI_NORMAL);
 				return true;
 			}
 			if(event.GUIEvent.Caller == mainGame->imgCard && mainGame->is_building && !mainGame->is_siding) {
-				mainGame->SetCursor(ECI_HAND);
+				mainGame->SetCursor(irr::gui::ECI_HAND);
 				return true;
 			}
 			break;
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
-			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX || event.GUIEvent.Caller == mainGame->imgCard) {
-				mainGame->SetCursor(ECI_NORMAL);
+			if(event.GUIEvent.Caller->getType() == irr::gui::EGUIET_EDIT_BOX || event.GUIEvent.Caller == mainGame->imgCard) {
+				mainGame->SetCursor(irr::gui::ECI_NORMAL);
 				return true;
 			}
 			break;
@@ -2045,7 +2045,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		switch(event.KeyInput.Key) {
 		case irr::KEY_KEY_R: {
 			if(mainGame->gameConf.control_mode == 0
-				&& !event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX)) {
+				&& !event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 				mainGame->textFont->setTransparency(true);
 				mainGame->guiFont->setTransparency(true);
 			}
@@ -2054,7 +2054,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_F9: {
 			if(mainGame->gameConf.control_mode == 1
-				&& !event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX)) {
+				&& !event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 				mainGame->textFont->setTransparency(true);
 				mainGame->guiFont->setTransparency(true);
 			}
@@ -2062,7 +2062,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_ESCAPE: {
-			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
+			if(!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 				mainGame->device->minimizeWindow();
 			return true;
 			break;
