@@ -73,7 +73,6 @@ inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
 }
 
 #include <irrlicht.h>
-using namespace irr;
 
 extern const unsigned short PRO_VERSION;
 extern unsigned int enable_log;
