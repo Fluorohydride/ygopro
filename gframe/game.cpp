@@ -1084,7 +1084,7 @@ void Game::MainLoop() {
 	SaveConfig();
 	device->drop();
 }
-void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
+void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f32 left, irr::f32 right, irr::f32 bottom, irr::f32 top, irr::f32 znear, irr::f32 zfar) {
 	for(int i = 0; i < 16; ++i)
 		mProjection[i] = 0;
 	mProjection[0] = 2.0f * znear / (right - left);
