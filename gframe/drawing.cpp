@@ -413,9 +413,9 @@ void Game::DrawCard(ClientCard* pcard) {
 	}
 }
 template<typename T>
-void Game::DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const core::rect<s32>& position, const core::rect<s32>& padding,
-			video::SColor color, video::SColor shadowcolor, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
-	core::rect<s32> shadowposition = irr::core::recti(position.UpperLeftCorner.X - padding.UpperLeftCorner.X, position.UpperLeftCorner.Y - padding.UpperLeftCorner.Y, 
+void Game::DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const irr::core::rect<s32>& position, const irr::core::rect<s32>& padding,
+			video::SColor color, video::SColor shadowcolor, bool hcenter, bool vcenter, const irr::core::rect<s32>* clip) {
+	irr::core::rect<s32> shadowposition = irr::core::recti(position.UpperLeftCorner.X - padding.UpperLeftCorner.X, position.UpperLeftCorner.Y - padding.UpperLeftCorner.Y, 
 										   position.LowerRightCorner.X - padding.LowerRightCorner.X, position.LowerRightCorner.Y - padding.LowerRightCorner.Y);
 	font->drawUstring(text, shadowposition, shadowcolor, hcenter, vcenter, clip);
 	font->drawUstring(text, position, color, hcenter, vcenter, clip);
@@ -1143,7 +1143,7 @@ void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lf
 		limitloc = irr::core::recti(pos.X, pos.Y, pos.X + 20 * mainGame->xScale, pos.Y + 20 * mainGame->yScale);
 		otloc = irr::core::recti(pos.X + 7, pos.Y + 50 * mainGame->yScale, pos.X + 37 * mainGame->xScale, pos.Y + 65 * mainGame->yScale);
 	}
-	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height));
+	driver->draw2DImage(img, dragloc, irr::core::rect<s32>(0, 0, size.Width, size.Height));
 	auto lfit = lflist->content.find(lcode);
 	if (lfit != lflist->content.end()) {
 		switch(lfit->second) {
