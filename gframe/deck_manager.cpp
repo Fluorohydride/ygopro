@@ -272,7 +272,7 @@ irr::io::IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
 #else
 	char file2[256];
 	BufferIO::EncodeUTF8(file, file2);
-	auto = DataManager::FileSystem->createAndOpenFile(file2);
+	auto reader = DataManager::FileSystem->createAndOpenFile(file2);
 #endif
 	return reader;
 }
