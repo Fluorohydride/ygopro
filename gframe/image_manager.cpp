@@ -129,7 +129,7 @@ void ImageManager::ResizeTexture() {
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
 void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 	double sx, sy, minsx, maxsx, minsy, maxsy, area, ra, ga, ba, aa, pw, ph, pa;
-	u32 dy, dx;
+	irr::u32 dy, dx;
 	irr::video::SColor pxl;
 
 	// Cache rectsngle boundaries.
@@ -138,7 +138,7 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 
 	// Walk each destination image pixel.
 	// Note: loop y around x for better cache locality.
-	irr::core::dimension2d<u32> dim = dest->getDimension();
+	irr::core::dimension2d<irr::u32> dim = dest->getDimension();
 	for(dy = 0; dy < dim.Height; dy++)
 		for(dx = 0; dx < dim.Width; dx++) {
 
@@ -176,7 +176,7 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 
 					// Get source pixel and add it to totals, weighted
 					// by covered area and alpha.
-					pxl = src->getPixel((u32)sx, (u32)sy);
+					pxl = src->getPixel((irr::u32)sx, (irr::u32)sy);
 					area += pa;
 					ra += pa * pxl.getRed();
 					ga += pa * pxl.getGreen();
@@ -199,16 +199,16 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 			dest->setPixel(dx, dy, pxl);
 		}
 }
-irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, s32 width, s32 height) {
+irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, irr::s32 width, irr::s32 height) {
 	if(mainGame->gameConf.use_image_scale) {
 		irr::video::ITexture* texture;
 		irr::video::IImage* srcimg = driver->createImageFromFile(file);
 		if(srcimg == nullptr)
 			return nullptr;
-		if(srcimg->getDimension() == irr::core::dimension2d<u32>(width, height)) {
+		if(srcimg->getDimension() == irr::core::dimension2d<irr::u32>(width, height)) {
 			texture = driver->addTexture(file, srcimg);
 		} else {
-			irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<u32>(width, height));
+			irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
 			imageScaleNNAA(srcimg, destimg);
 			texture = driver->addTexture(file, destimg);
 			destimg->drop();
@@ -274,7 +274,7 @@ irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 		texture = driver->addTexture(file, srcimg);
 	} else {
 		auto origsize = srcimg->getDimension();
-		irr::video::IImage* destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<u32>(origsize.Width * zoom, origsize.Height * zoom));
+		irr::video::IImage* destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(origsize.Width * zoom, origsize.Height * zoom));
 		imageScaleNNAA(srcimg, destimg);
 		texture = driver->addTexture(file, destimg);
 		destimg->drop();
@@ -307,14 +307,14 @@ int ImageManager::LoadThumbThread() {
 		if(img != nullptr) {
 			int width = CARD_THUMB_WIDTH * mainGame->xScale;
 			int height = CARD_THUMB_HEIGHT * mainGame->yScale;
-			if(img->getDimension() == irr::core::dimension2d<u32>(width, height)) {
+			if(img->getDimension() == irr::core::dimension2d<irr::u32>(width, height)) {
 				img->grab();
 				imageManager.tThumbLoadingMutex.lock();
 				if(imageManager.tThumbLoadingThreadRunning)
 					imageManager.tThumbLoading[code] = img;
 				imageManager.tThumbLoadingMutex.unlock();
 			} else {
-				irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<u32>(width, height));
+				irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
 				imageScaleNNAA(img, destimg);
 				img->drop();
 				destimg->grab();
