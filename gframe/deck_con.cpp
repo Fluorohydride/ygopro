@@ -1680,7 +1680,7 @@ void DeckBuilder::ShowDeckManage() {
 void DeckBuilder::ShowBigCard(int code, float zoom) {
 	bigcard_code = code;
 	bigcard_zoom = zoom;
-	ITexture* img = imageManager.GetBigPicture(code, zoom);
+	auto img = imageManager.GetBigPicture(code, zoom);
 	mainGame->imgBigCard->setImage(img);
 	auto size = img->getSize();
 	s32 left = mainGame->window_size.Width / 2 - size.Width / 2;
@@ -1701,7 +1701,7 @@ void DeckBuilder::ZoomBigCard(s32 centerx, s32 centery) {
 		bigcard_zoom = 4;
 	if(bigcard_zoom <= 0.2f)
 		bigcard_zoom = 0.2f;
-	ITexture* img = imageManager.GetBigPicture(bigcard_code, bigcard_zoom);
+	auto img = imageManager.GetBigPicture(bigcard_code, bigcard_zoom);
 	mainGame->imgBigCard->setImage(img);
 	auto size = img->getSize();
 	auto pos = mainGame->wBigCard->getRelativePosition();

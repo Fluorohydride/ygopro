@@ -98,7 +98,7 @@ void Game::DrawBackGround() {
 			fieldcode2 = dField.szone[1][5]->code;
 		int fieldcode = (fieldcode1 > 0) ? fieldcode1 : fieldcode2;
 		if(fieldcode1 > 0 && fieldcode2 > 0 && fieldcode1 != fieldcode2) {
-			ITexture* texture = imageManager.GetTextureField(fieldcode1);
+			auto texture = imageManager.GetTextureField(fieldcode1);
 			if(texture) {
 				drawField = true;
 				matManager.mTexture.setTexture(0, texture);
@@ -113,7 +113,7 @@ void Game::DrawBackGround() {
 				driver->drawVertexPrimitiveList(matManager.vFieldSpell2, 4, matManager.iRectangle, 2);
 			}
 		} else if(fieldcode > 0) {
-			ITexture* texture = imageManager.GetTextureField(fieldcode);
+			auto texture = imageManager.GetTextureField(fieldcode);
 			if(texture) {
 				drawField = true;
 				matManager.mTexture.setTexture(0, texture);
@@ -186,7 +186,7 @@ void Game::DrawBackGround() {
 	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT
 		&& !(dInfo.duel_rule < 4 && dField.hovered_location == LOCATION_MZONE && dField.hovered_sequence > 4)
 		&& !(dInfo.duel_rule >= 4 && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5)) {
-		S3DVertex *vertex = 0;
+		irr::video::S3DVertex* vertex = 0;
 		if (dField.hovered_location == LOCATION_DECK)
 			vertex = matManager.vFieldDeck[dField.hovered_controler];
 		else if (dField.hovered_location == LOCATION_MZONE) {
@@ -980,7 +980,7 @@ void Game::DrawSpec() {
 		matk.setRotationRadians(atk_r);
 		driver->setTransform(irr::video::ETS_WORLD, matk);
 		driver->setMaterial(matManager.mATK);
-		driver->drawVertexPrimitiveList(&matManager.vArrow[attack_sv], 12, matManager.iArrow, 10, EVT_STANDARD, EPT_TRIANGLE_STRIP);
+		driver->drawVertexPrimitiveList(&matManager.vArrow[attack_sv], 12, matManager.iArrow, 10, irr::video::EVT_STANDARD, EPT_TRIANGLE_STRIP);
 		attack_sv += 4;
 		if (attack_sv > 28)
 			attack_sv = 0;
