@@ -970,7 +970,7 @@ bool Game::Initialize() {
 	}
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
-	for (u32 i = 0; i < irr::gui::EGDC_COUNT; ++i) {
+	for (int i = 0; i < irr::gui::EGDC_COUNT; ++i) {
 		SColor col = env->getSkin()->getColor((irr::gui::EGUI_DEFAULT_COLOR)i);
 		col.setAlpha(224);
 		env->getSkin()->setColor((irr::gui::EGUI_DEFAULT_COLOR)i, col);
