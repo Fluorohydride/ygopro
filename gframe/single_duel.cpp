@@ -148,7 +148,7 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 	} else {
 		if(duel_stage == DUEL_STAGE_BEGIN) {
 			STOC_HS_PlayerChange scpc;
-			players[dp->type] = 0;
+			players[dp->type] = nullptr;
 			ready[dp->type] = false;
 			scpc.status = (dp->type << 4) | PLAYERCHANGE_LEAVE;
 			if(players[0] && dp->type != 0)
@@ -228,7 +228,7 @@ void SingleDuel::ToObserver(DuelPlayer* dp) {
 		NetServer::SendPacketToPlayer(players[1], STOC_HS_PLAYER_CHANGE, scpc);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
-	players[dp->type] = 0;
+	players[dp->type] = nullptr;
 	ready[dp->type] = false;
 	dp->type = NETPLAYER_TYPE_OBSERVER;
 	observers.insert(dp);
