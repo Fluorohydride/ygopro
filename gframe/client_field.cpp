@@ -51,7 +51,7 @@ ClientField::~ClientField() {
 		}
 		extra[i].clear();
 	}
-	for (auto& card : overlay_cards) {
+	for (const auto& card : overlay_cards) {
 		delete card;
 	}
 	overlay_cards.clear();
@@ -1142,7 +1142,7 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 		return true;
 	}
 
-	auto display_hint = select_hint ? dataManager.GetDesc(select_hint) : dataManager.GetSysString(560);
+	const auto *display_hint = select_hint ? dataManager.GetDesc(select_hint) : dataManager.GetSysString(560);
 
 	wchar_t cur_hint[20];
 	if (select_curval_l == select_curval_h) {
@@ -1178,7 +1178,7 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 }
 bool ClientField::CheckSelectSum() {
 	std::set<ClientCard*> selable;
-	for(auto sc : selectsum_all) {
+	for(auto *sc : selectsum_all) {
 		sc->is_selectable = false;
 		sc->is_selected = false;
 		selable.insert(sc);
@@ -1204,18 +1204,18 @@ bool ClientField::CheckSelectSum() {
 	if (select_mode == 0) { // sum equal
 		bool ret = check_sel_sum_s(selable, 0, select_sumval);
 		selectable_cards.clear();
-		for(auto sc : selectsum_cards) {
+		for(auto *sc : selectsum_cards) {
 			sc->is_selectable = true;
 			selectable_cards.push_back(sc);
 		}
-		for(auto sc : selected_cards) {
+		for(auto *sc : selected_cards) {
 			selectable_cards.push_back(sc);
 		}
 		return ret;
 	} else { // sum greater
 		int mm = -1, mx = -1, max = 0, sumc = 0;
 		bool ret = false;
-		for (auto sc : selected_cards) {
+		for (auto *sc : selected_cards) {
 			int op1 = sc->opParam & 0xffff;
 			int op2 = sc->opParam >> 16;
 			int opmin = (op2 > 0 && op1 > op2) ? op2 : op1;
@@ -1231,7 +1231,7 @@ bool ClientField::CheckSelectSum() {
 			return true;
 		if (select_sumval <= max && select_sumval > max - mx)
 			ret = true;
-		for(auto sc : selable) {
+		for(auto *sc : selable) {
 			int op1 = sc->opParam & 0xffff;
 			int op2 = sc->opParam >> 16;
 			int m = op1;
@@ -1268,11 +1268,11 @@ bool ClientField::CheckSelectSum() {
 			}
 		}
 		selectable_cards.clear();
-		for(auto sc : selectsum_cards) {
+		for(auto *sc : selectsum_cards) {
 			sc->is_selectable = true;
 			selectable_cards.push_back(sc);
 		}
-		for(auto sc : selected_cards) {
+		for(auto *sc : selected_cards) {
 			selectable_cards.push_back(sc);
 		}
 		return ret;

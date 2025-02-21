@@ -34,7 +34,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater)
 		}
 		CTOS_JoinGame packet;
 		std::memcpy(&packet, pdata, sizeof packet);
-		auto pkt = &packet;
+		auto *pkt = &packet;
 		if(pkt->version != PRO_VERSION) {
 			STOC_ErrorMsg scem;
 			scem.msg = ERRMSG_VERERROR;
@@ -330,7 +330,7 @@ void SingleDuel::StartDuel(DuelPlayer* dp) {
 		NetServer::ReSendToPlayer(*oit);
 	}
 	unsigned char deckbuff[12];
-	auto pbuf = deckbuff;
+	auto *pbuf = deckbuff;
 	BufferIO::WriteInt16(pbuf, (short)pdeck[0].main.size());
 	BufferIO::WriteInt16(pbuf, (short)pdeck[0].extra.size());
 	BufferIO::WriteInt16(pbuf, (short)pdeck[0].side.size());
@@ -457,7 +457,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	load(pdeck[1].extra, 1, LOCATION_EXTRA);
 	last_replay.Flush();
 	unsigned char startbuf[32]{};
-	auto pbuf = startbuf;
+	auto *pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, 0);
 	BufferIO::WriteInt8(pbuf, host_info.duel_rule);
@@ -1471,7 +1471,7 @@ inline int SingleDuel::WriteUpdateData(int& player, int location, int& flag, uns
 void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 	std::vector<unsigned char> query_buffer;
 	query_buffer.resize(SIZE_QUERY_BUFFER);
-	auto qbuf = query_buffer.data();
+	auto *qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_MZONE, flag, qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	int qlen = 0;
@@ -1492,7 +1492,7 @@ void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 void SingleDuel::RefreshSzone(int player, int flag, int use_cache) {
 	std::vector<unsigned char> query_buffer;
 	query_buffer.resize(SIZE_QUERY_BUFFER);
-	auto qbuf = query_buffer.data();
+	auto *qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_SZONE, flag, qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	int qlen = 0;
@@ -1513,7 +1513,7 @@ void SingleDuel::RefreshSzone(int player, int flag, int use_cache) {
 void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
 	std::vector<unsigned char> query_buffer;
 	query_buffer.resize(SIZE_QUERY_BUFFER);
-	auto qbuf = query_buffer.data();
+	auto *qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_HAND, flag, qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	int qlen = 0;
@@ -1534,7 +1534,7 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
 void SingleDuel::RefreshGrave(int player, int flag, int use_cache) {
 	std::vector<unsigned char> query_buffer;
 	query_buffer.resize(SIZE_QUERY_BUFFER);
-	auto qbuf = query_buffer.data();
+	auto *qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_GRAVE, flag, qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	NetServer::ReSendToPlayer(players[1]);
@@ -1544,14 +1544,14 @@ void SingleDuel::RefreshGrave(int player, int flag, int use_cache) {
 void SingleDuel::RefreshExtra(int player, int flag, int use_cache) {
 	std::vector<unsigned char> query_buffer;
 	query_buffer.resize(SIZE_QUERY_BUFFER);
-	auto qbuf = query_buffer.data();
+	auto *qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_EXTRA, flag, qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer.data(), len + 3);
 }
 void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	flag |= (QUERY_CODE | QUERY_POSITION);
 	unsigned char query_buffer[0x1000];
-	auto qbuf = query_buffer;
+	auto *qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_CARD);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, location);
