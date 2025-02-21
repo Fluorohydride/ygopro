@@ -54,7 +54,7 @@ public:
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
 	void GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
 	FILE* OpenDeckFile(const wchar_t* file, const char* mode);
-	IReadFile* OpenDeckReader(const wchar_t* file);
+	irr::io::IReadFile* OpenDeckReader(const wchar_t* file);
 	bool LoadCurrentDeck(const wchar_t* file, bool is_packlist = false);
 	bool LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
 	bool SaveDeck(Deck& deck, const wchar_t* file);
