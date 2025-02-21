@@ -2419,15 +2419,15 @@ void ClientField::ShowCancelOrFinishButton(int buttonOp) {
 void ClientField::SetShowMark(ClientCard* pcard, bool enable) {
 	if(pcard->equipTarget)
 		pcard->equipTarget->is_showequip = enable;
-	for (auto& card : pcard->equipped)
+	for (const auto& card : pcard->equipped)
 		card->is_showequip = enable;
-	for (auto& card : pcard->cardTarget)
+	for (const auto& card : pcard->cardTarget)
 		card->is_showtarget = enable;
-	for (auto& card : pcard->ownerTarget)
+	for (const auto& card : pcard->ownerTarget)
 		card->is_showtarget = enable;
 	for (auto& ch : chains) {
 		if (pcard == ch.chain_card) {
-			for (auto& tg : ch.target)
+			for (const auto& tg : ch.target)
 				tg->is_showchaintarget = enable;
 		}
 		if (ch.target.find(pcard) != ch.target.end())

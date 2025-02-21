@@ -750,7 +750,7 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 			char namebuf[128]{};
 			wchar_t wname[20]{};
 			int len = BufferIO::ReadInt16(pbuf);
-			auto begin = pbuf;
+			auto *begin = pbuf;
 			pbuf += len + 1;
 			std::memcpy(namebuf, begin, len + 1);
 			BufferIO::DecodeUTF8(namebuf, wname);
@@ -761,7 +761,7 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 			char msgbuf[1024];
 			wchar_t msg[1024];
 			int len = BufferIO::ReadInt16(pbuf);
-			auto begin = pbuf;
+			auto *begin = pbuf;
 			pbuf += len + 1;
 			std::memcpy(msgbuf, begin, len + 1);
 			BufferIO::DecodeUTF8(msgbuf, msg);

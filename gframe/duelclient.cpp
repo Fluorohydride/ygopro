@@ -721,7 +721,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
 		mainGame->CloseGameButtons();
-		auto prep = pdata;
+		auto *prep = pdata;
 		Replay new_replay;
 		std::memcpy(&new_replay.pheader, prep, sizeof(new_replay.pheader));
 		time_t starttime;
@@ -817,7 +817,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		soundManager.PlaySoundEffect(SOUND_PLAYER_ENTER);
 		STOC_HS_PlayerEnter packet;
 		std::memcpy(&packet, pdata, STOC_HS_PlayerEnter_size);
-		auto pkt = &packet;
+		auto *pkt = &packet;
 		if(pkt->pos > 3)
 			break;
 		wchar_t name[20];
@@ -971,7 +971,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
 		if(last_successful_msg_length) {
-			auto p = last_successful_msg;
+			auto *p = last_successful_msg;
 			auto last_msg = BufferIO::ReadUInt8(p);
 			int err_desc = 1421;
 			switch(last_msg) {
