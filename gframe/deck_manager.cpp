@@ -263,7 +263,7 @@ void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, 
 	}
 }
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
-	FILE* fp = myfopen(file, mode);
+	FILE* fp = mywfopen(file, mode);
 	return fp;
 }
 irr::io::IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
