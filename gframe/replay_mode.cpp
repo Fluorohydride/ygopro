@@ -306,7 +306,7 @@ void ReplayMode::Undo() {
 }
 bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 	unsigned char* pbuf = msg;
-	int player, count;
+	int player = 0, count = 0;
 	is_restarting = false;
 	while (pbuf - msg < (int)len) {
 		if(is_closing)

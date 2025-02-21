@@ -537,8 +537,8 @@ void TagDuel::Surrender(DuelPlayer* dp) {
 	event_del(etimer);
 }
 int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
-	unsigned char* offset, *pbufw, *pbuf = msgbuffer;
-	int player, count, type;
+	unsigned char* offset = nullptr, *pbufw = nullptr, *pbuf = msgbuffer;
+	int player = 0, count = 0, type = 0;
 	while (pbuf - msgbuffer < (int)len) {
 		offset = pbuf;
 		unsigned char engType = BufferIO::ReadUInt8(pbuf);
@@ -662,7 +662,7 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			player = BufferIO::ReadUInt8(pbuf);
 			pbuf += 3;
 			count = BufferIO::ReadUInt8(pbuf);
-			int c/*, l, s, ss, code*/;
+			int c = 0/*, l, s, ss, code*/;
 			for (int i = 0; i < count; ++i) {
 				pbufw = pbuf;
 				/*code = */BufferIO::ReadInt32(pbuf);
@@ -680,7 +680,7 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			player = BufferIO::ReadUInt8(pbuf);
 			pbuf += 4;
 			count = BufferIO::ReadUInt8(pbuf);
-			int c/*, l, s, ss, code*/;
+			int c = 0/*, l, s, ss, code*/;
 			for (int i = 0; i < count; ++i) {
 				pbufw = pbuf;
 				/*code = */BufferIO::ReadInt32(pbuf);

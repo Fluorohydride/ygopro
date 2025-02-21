@@ -69,7 +69,7 @@ void NetServer::StopBroadcast() {
 	if(!net_evbase || !broadcast_ev)
 		return;
 	event_del(broadcast_ev);
-	evutil_socket_t fd;
+	evutil_socket_t fd = 0;
 	event_get_assignment(broadcast_ev, nullptr, &fd, nullptr, nullptr, nullptr);
 	evutil_closesocket(fd);
 	event_free(broadcast_ev);
@@ -159,7 +159,7 @@ int NetServer::ServerThread() {
 	evconnlistener_free(listener);
 	listener = nullptr;
 	if(broadcast_ev) {
-		evutil_socket_t fd;
+		evutil_socket_t fd = 0;
 		event_get_assignment(broadcast_ev, nullptr, &fd, nullptr, nullptr, nullptr);
 		evutil_closesocket(fd);
 		event_free(broadcast_ev);

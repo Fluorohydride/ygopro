@@ -178,8 +178,8 @@ int SingleMode::SinglePlayThread() {
 	return 0;
 }
 bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
-	unsigned char* offset, * pbuf = msg;
-	int player, count;
+	unsigned char* offset = nullptr, * pbuf = msg;
+	int player = 0, count = 0;
 	while (pbuf - msg < (int)len) {
 		if(is_closing || !is_continuing)
 			return false;
