@@ -191,8 +191,9 @@ Materials::Materials() {
 	//remove
 	SetS3DVertex(vFieldRemove[0][0], 7.9f, 0.1f, 8.7f, 1.3f, 0, 1, 0, 0, 0, 0);
 	SetS3DVertex(vFieldRemove[0][1], 6.9f, 0.1f, 7.7f, 1.3f, 0, 1, 0, 0, 0, 0);
-	for(int i = 0; i < 5; ++i)
+	for(int i = 0; i < 5; ++i) {
 		SetS3DVertex(vFieldMzone[0][i], 1.2f + i * 1.1f, 0.8f, 2.3f + i * 1.1f, 2.0f, 0, 1, 0, 0, 0, 0);
+}
 	SetS3DVertex(vFieldMzone[0][5], 2.3f, -0.6f, 3.4f, 0.6f, 0, 1, 0, 0, 0, 0);
 	SetS3DVertex(vFieldMzone[0][6], 4.5f, -0.6f, 5.6f, 0.6f, 0, 1, 0, 0, 0, 0);
 	for (int i = 0; i < 5; ++i) {
@@ -218,8 +219,9 @@ Materials::Materials() {
 	//remove
 	SetS3DVertex(vFieldRemove[1][0], 0.0f, -0.1f, -0.8f, -1.3f, 0, 1, 0, 0, 0, 0);
 	SetS3DVertex(vFieldRemove[1][1], 1.0f, -0.1f, 0.2f, -1.3f, 0, 1, 0, 0, 0, 0);
-	for(int i = 0; i < 5; ++i)
+	for(int i = 0; i < 5; ++i) {
 		SetS3DVertex(vFieldMzone[1][i], 6.7f - i * 1.1f, -0.8f, 5.6f - i * 1.1f, -2.0f, 0, 1, 0, 0, 0, 0);
+}
 	SetS3DVertex(vFieldMzone[1][5], 5.6f, 0.6f, 4.5f, -0.6f, 0, 1, 0, 0, 0, 0);
 	SetS3DVertex(vFieldMzone[1][6], 3.4f, 0.6f, 2.3f, -0.6f, 0, 1, 0, 0, 0, 0);
 	for (int i = 0; i < 5; ++i) {
@@ -243,8 +245,9 @@ Materials::Materials() {
 	vFieldContiAct[3] = vector3df(4.4f, 0.6f, 0.0f);
 
 
-	for(int i = 0; i < 40; ++i)
+	for(int i = 0; i < 40; ++i) {
 		iArrow[i] = i;
+}
 
 	mCard.AmbientColor = 0xffffffff;
 	mCard.DiffuseColor = 0xff000000;

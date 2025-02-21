@@ -1,4 +1,6 @@
 #include "image_manager.h"
+
+#include <math.h>
 #include "game.h"
 #include <thread>
 
@@ -11,8 +13,9 @@ bool ImageManager::Initial() {
 	tCover[1] = nullptr;
 	tCover[2] = GetTextureFromFile("textures/cover.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	tCover[3] = GetTextureFromFile("textures/cover2.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
-	if(!tCover[3])
+	if(!tCover[3]) {
 		tCover[3] = tCover[2];
+}
 	tUnknown = nullptr;
 	tUnknownFit = nullptr;
 	tUnknownThumb = nullptr;
@@ -51,16 +54,19 @@ void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 }
 void ImageManager::ClearTexture() {
 	for(auto tit = tMap[0].begin(); tit != tMap[0].end(); ++tit) {
-		if(tit->second)
+		if(tit->second) {
 			driver->removeTexture(tit->second);
+}
 	}
 	for(auto tit = tMap[1].begin(); tit != tMap[1].end(); ++tit) {
-		if(tit->second)
+		if(tit->second) {
 			driver->removeTexture(tit->second);
+}
 	}
 	for(auto tit = tThumb.begin(); tit != tThumb.end(); ++tit) {
-		if(tit->second && tit->second != tLoading)
+		if(tit->second && tit->second != tLoading) {
 			driver->removeTexture(tit->second);
+}
 	}
 	if(tBigPicture != nullptr) {
 		driver->removeTexture(tBigPicture);
@@ -71,8 +77,9 @@ void ImageManager::ClearTexture() {
 	tThumb.clear();
 	tThumbLoadingMutex.lock();
 	tThumbLoading.clear();
-	while(!tThumbLoadingCodes.empty())
+	while(!tThumbLoadingCodes.empty()) {
 		tThumbLoadingCodes.pop();
+}
 	tThumbLoadingThreadRunning = false;
 	tThumbLoadingMutex.unlock();
 	tFields.clear();
@@ -80,14 +87,16 @@ void ImageManager::ClearTexture() {
 void ImageManager::RemoveTexture(int code) {
 	auto tit = tMap[0].find(code);
 	if(tit != tMap[0].end()) {
-		if(tit->second)
+		if(tit->second) {
 			driver->removeTexture(tit->second);
+}
 		tMap[0].erase(tit);
 	}
 	tit = tMap[1].find(code);
 	if(tit != tMap[1].end()) {
-		if(tit->second)
+		if(tit->second) {
 			driver->removeTexture(tit->second);
+}
 		tMap[1].erase(tit);
 	}
 }
@@ -105,8 +114,9 @@ void ImageManager::ResizeTexture() {
 	driver->removeTexture(tCover[1]);
 	tCover[0] = GetTextureFromFile("textures/cover.jpg", imgWidth, imgHeight);
 	tCover[1] = GetTextureFromFile("textures/cover2.jpg", imgWidth, imgHeight);
-	if(!tCover[1])
+	if(!tCover[1]) {
 		tCover[1] = tCover[0];
+}
 	driver->removeTexture(tUnknown);
 	driver->removeTexture(tUnknownFit);
 	driver->removeTexture(tUnknownThumb);
@@ -119,17 +129,19 @@ void ImageManager::ResizeTexture() {
 	tBackGround = GetTextureFromFile("textures/bg.jpg", bgWidth, bgHeight);
 	driver->removeTexture(tBackGround_menu);
 	tBackGround_menu = GetTextureFromFile("textures/bg_menu.jpg", bgWidth, bgHeight);
-	if(!tBackGround_menu)
+	if(!tBackGround_menu) {
 		tBackGround_menu = tBackGround;
+}
 	driver->removeTexture(tBackGround_deck);
 	tBackGround_deck = GetTextureFromFile("textures/bg_deck.jpg", bgWidth, bgHeight);
-	if(!tBackGround_deck)
+	if(!tBackGround_deck) {
 		tBackGround_deck = tBackGround;
+}
 }
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
 void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
-	double sx, sy, minsx, maxsx, minsy, maxsy, area, ra, ga, ba, aa, pw, ph, pa;
-	u32 dy, dx;
+	double sx = NAN, sy = NAN, minsx = NAN, maxsx = NAN, minsy = NAN, maxsy = NAN, area = NAN, ra = NAN, ga = NAN, ba = NAN, aa = NAN, pw = NAN, ph = NAN, pa = NAN;
+	u32 dy = 0, dx = 0;
 	irr::video::SColor pxl;
 
 	// Cache rectsngle boundaries.
@@ -139,7 +151,7 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 	// Walk each destination image pixel.
 	// Note: loop y around x for better cache locality.
 	irr::core::dimension2d<u32> dim = dest->getDimension();
-	for(dy = 0; dy < dim.Height; dy++)
+	for(dy = 0; dy < dim.Height; dy++) {
 		for(dx = 0; dx < dim.Width; dx++) {
 
 			// Calculate floating-point source rectangle bounds.
@@ -157,21 +169,25 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 			aa = 0;
 
 			// Loop over the integral pixel positions described by those bounds.
-			for(sy = floor(minsy); sy < maxsy; sy++)
+			for(sy = floor(minsy); sy < maxsy; sy++) {
 				for(sx = floor(minsx); sx < maxsx; sx++) {
 
 					// Calculate width, height, then area of dest pixel
 					// that's covered by this source pixel.
 					pw = 1;
-					if(minsx > sx)
+					if(minsx > sx) {
 						pw += sx - minsx;
-					if(maxsx < (sx + 1))
+}
+					if(maxsx < (sx + 1)) {
 						pw += maxsx - sx - 1;
+}
 					ph = 1;
-					if(minsy > sy)
+					if(minsy > sy) {
 						ph += sy - minsy;
-					if(maxsy < (sy + 1))
+}
+					if(maxsy < (sy + 1)) {
 						ph += maxsy - sy - 1;
+}
 					pa = pw * ph;
 
 					// Get source pixel and add it to totals, weighted
@@ -183,6 +199,7 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 					ba += pa * pxl.getBlue();
 					aa += pa * pxl.getAlpha();
 				}
+}
 
 			// Set the destination image pixel to the average color.
 			if(area > 0) {
@@ -199,12 +216,14 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 			dest->setPixel(dx, dy, pxl);
 		}
 }
+}
 irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, s32 width, s32 height) {
 	if(mainGame->gameConf.use_image_scale) {
-		irr::video::ITexture* texture;
+		irr::video::ITexture* texture = nullptr;
 		irr::video::IImage* srcimg = driver->createImageFromFile(file);
-		if(srcimg == nullptr)
+		if(srcimg == nullptr) {
 			return nullptr;
+}
 		if(srcimg->getDimension() == irr::core::dimension2d<u32>(width, height)) {
 			texture = driver->addTexture(file, srcimg);
 		} else {
@@ -220,14 +239,16 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, s32 wid
 	}
 }
 irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
-	if(code == 0)
+	if(code == 0) {
 		return fit ? tUnknownFit : tUnknown;
+}
 	int width = CARD_IMG_WIDTH;
 	int height = CARD_IMG_HEIGHT;
 	if(fit) {
 		float mul = mainGame->xScale;
-		if(mainGame->xScale > mainGame->yScale)
+		if(mainGame->xScale > mainGame->yScale) {
 			mul = mainGame->yScale;
+}
 		width = width * mul;
 		height = height * mul;
 	}
@@ -247,19 +268,21 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 		tMap[fit ? 1 : 0][code] = img;
 		return (img == nullptr) ? (fit ? tUnknownFit : tUnknown) : img;
 	}
-	if(tit->second)
+	if(tit->second) {
 		return tit->second;
-	else
+	} else {
 		return mainGame->gameConf.use_image_scale ? (fit ? tUnknownFit : tUnknown) : GetTextureThumb(code);
 }
+}
 irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
-	if(code == 0)
+	if(code == 0) {
 		return tUnknown;
+}
 	if(tBigPicture != nullptr) {
 		driver->removeTexture(tBigPicture);
 		tBigPicture = nullptr;
 	}
-	irr::video::ITexture* texture;
+	irr::video::ITexture* texture = nullptr;
 	char file[256];
 	snprintf(file, sizeof file, "expansions/pics/%d.jpg", code);
 	irr::video::IImage* srcimg = driver->createImageFromFile(file);
@@ -310,8 +333,9 @@ int ImageManager::LoadThumbThread() {
 			if(img->getDimension() == irr::core::dimension2d<u32>(width, height)) {
 				img->grab();
 				imageManager.tThumbLoadingMutex.lock();
-				if(imageManager.tThumbLoadingThreadRunning)
+				if(imageManager.tThumbLoadingThreadRunning) {
 					imageManager.tThumbLoading[code] = img;
+}
 				imageManager.tThumbLoadingMutex.unlock();
 			} else {
 				irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<u32>(width, height));
@@ -319,28 +343,32 @@ int ImageManager::LoadThumbThread() {
 				img->drop();
 				destimg->grab();
 				imageManager.tThumbLoadingMutex.lock();
-				if(imageManager.tThumbLoadingThreadRunning)
+				if(imageManager.tThumbLoadingThreadRunning) {
 					imageManager.tThumbLoading[code] = destimg;
+}
 				imageManager.tThumbLoadingMutex.unlock();
 			}
 		} else {
 			imageManager.tThumbLoadingMutex.lock();
-			if(imageManager.tThumbLoadingThreadRunning)
+			if(imageManager.tThumbLoadingThreadRunning) {
 				imageManager.tThumbLoading[code] = nullptr;
+}
 			imageManager.tThumbLoadingMutex.unlock();
 		}
 		imageManager.tThumbLoadingMutex.lock();
 		imageManager.tThumbLoadingThreadRunning = !imageManager.tThumbLoadingCodes.empty();
-		if(!imageManager.tThumbLoadingThreadRunning)
+		if(!imageManager.tThumbLoadingThreadRunning) {
 			break;
+}
 		imageManager.tThumbLoadingMutex.unlock();
 	}
 	imageManager.tThumbLoadingMutex.unlock();
 	return 0;
 }
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
-	if(code == 0)
+	if(code == 0) {
 		return tUnknownThumb;
+}
 	imageManager.tThumbLoadingMutex.lock();
 	auto lit = tThumbLoading.find(code);
 	if(lit != tThumbLoading.end()) {
@@ -368,14 +396,16 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		imageManager.tThumbLoadingMutex.unlock();
 		return tLoading;
 	}
-	if(tit->second)
+	if(tit->second) {
 		return tit->second;
-	else
+	} else {
 		return tUnknownThumb;
 }
+}
 irr::video::ITexture* ImageManager::GetTextureField(int code) {
-	if(code == 0)
+	if(code == 0) {
 		return nullptr;
+}
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
 		char file[256];
@@ -404,9 +434,10 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 			return img;
 		}
 	}
-	if(tit->second)
+	if(tit->second) {
 		return tit->second;
-	else
+	} else {
 		return nullptr;
+}
 }
 }
