@@ -396,9 +396,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					int flag = 0;
 					flag += (mainGame->chkBotHand->isChecked() ? 0x1 : 0);
 					char arg2[8];
-					snprintf(arg2, sizeof arg2, "%d", flag);
+					std::snprintf(arg2, sizeof arg2, "%d", flag);
 					char arg3[8];
-					snprintf(arg3, sizeof arg3, "%d", mainGame->gameConf.serverport);
+					std::snprintf(arg3, sizeof arg3, "%d", mainGame->gameConf.serverport);
 					execl("./bot", "bot", arg1, arg2, arg3, nullptr);
 					exit(0);
 				} else {
@@ -590,7 +590,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				wchar_t wlinebuf[1024];
 				std::wstring message = L"";
 				bool in_message = false;
-				while(fgets(linebuf, 1024, fp)) {
+				while(std::fgets(linebuf, 1024, fp)) {
 					if(!std::strncmp(linebuf, "--[[message", 11)) {
 						size_t len = std::strlen(linebuf);
 						char* msgend = std::strrchr(linebuf, ']');
@@ -613,7 +613,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						message.append(wlinebuf);
 					}
 				}
-				fclose(fp);
+				std::fclose(fp);
 				mainGame->SetStaticText(mainGame->stSinglePlayInfo, 200, mainGame->guiFont, message.c_str());
 				break;
 			}
