@@ -143,6 +143,16 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
 	}
 }
+void ClientField::ResetSequence(std::vector<ClientCard*>& list, bool reset_height) {
+	unsigned char seq = 0;
+	for (auto& pcard : list) {
+		pcard->sequence = seq++;
+		if (reset_height) {
+			pcard->curPos.Z = 0.01f + 0.01f * pcard->sequence;
+			pcard->mTransform.setTranslation(pcard->curPos);
+		}
+	}
+}
 ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
 	std::vector<ClientCard*>* lst = 0;
 	bool is_xyz = (location & LOCATION_OVERLAY) != 0;
@@ -194,16 +204,10 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	case LOCATION_DECK: {
 		if (sequence != 0 || deck[controler].size() == 0) {
 			deck[controler].push_back(pcard);
-			pcard->sequence = (unsigned char)(deck[controler].size() - 1);
 		} else {
-			deck[controler].push_back(0);
-			for(int i = deck[controler].size() - 1; i > 0; --i) {
-				deck[controler][i] = deck[controler][i - 1];
-				deck[controler][i]->sequence++;
-			}
-			deck[controler][0] = pcard;
-			pcard->sequence = 0;
+			deck[controler].insert(deck[controler].begin(), pcard);
 		}
+		ResetSequence(deck[controler], true);
 		pcard->is_reversed = false;
 		pcard->ClearData();
 		pcard->ClearTarget();
@@ -212,7 +216,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 	case LOCATION_HAND: {
 		hand[controler].push_back(pcard);
-		pcard->sequence = (unsigned char)(hand[controler].size() - 1);
+		ResetSequence(hand[controler], false);
 		break;
 	}
 	case LOCATION_MZONE: {
@@ -225,30 +229,22 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 	case LOCATION_GRAVE: {
 		grave[controler].push_back(pcard);
-		pcard->sequence = (unsigned char)(grave[controler].size() - 1);
+		ResetSequence(grave[controler], false);
 		break;
 	}
 	case LOCATION_REMOVED: {
 		remove[controler].push_back(pcard);
-		pcard->sequence = (unsigned char)(remove[controler].size() - 1);
+		ResetSequence(remove[controler], false);
 		break;
 	}
 	case LOCATION_EXTRA: {
 		if(extra_p_count[controler] == 0 || (pcard->position & POS_FACEUP)) {
 			extra[controler].push_back(pcard);
-			pcard->sequence = (unsigned char)(extra[controler].size() - 1);
 		} else {
-			extra[controler].push_back(0);
-			int p = extra[controler].size() - extra_p_count[controler] - 1;
-			for(int i = extra[controler].size() - 1; i > p; --i) {
-				extra[controler][i] = extra[controler][i - 1];
-				extra[controler][i]->sequence++;
-				extra[controler][i]->curPos += irr::core::vector3df(0, 0, 0.01f);
-				extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
-			}
-			extra[controler][p] = pcard;
-			pcard->sequence = p;
+			size_t faceup_begin = extra[controler].size() - extra_p_count[controler];
+			extra[controler].insert(extra[controler].begin() + faceup_begin, pcard);
 		}
+		ResetSequence(extra[controler], true);
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]++;
 		break;
@@ -256,73 +252,52 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 }
 ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
-	ClientCard* pcard = 0;
+	ClientCard* pcard = nullptr;
 	switch (location) {
 	case LOCATION_DECK: {
 		pcard = deck[controler][sequence];
-		for (size_t i = sequence; i < deck[controler].size() - 1; ++i) {
-			deck[controler][i] = deck[controler][i + 1];
-			deck[controler][i]->sequence--;
-			deck[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
-			deck[controler][i]->mTransform.setTranslation(deck[controler][i]->curPos);
-		}
-		deck[controler].erase(deck[controler].end() - 1);
+		deck[controler].erase(deck[controler].begin() + sequence);
+		ResetSequence(deck[controler], true);
 		break;
 	}
 	case LOCATION_HAND: {
 		pcard = hand[controler][sequence];
-		for (size_t i = sequence; i < hand[controler].size() - 1; ++i) {
-			hand[controler][i] = hand[controler][i + 1];
-			hand[controler][i]->sequence--;
-		}
-		hand[controler].erase(hand[controler].end() - 1);
+		hand[controler].erase(hand[controler].begin() + sequence);
+		ResetSequence(hand[controler], false);
 		break;
 	}
 	case LOCATION_MZONE: {
 		pcard = mzone[controler][sequence];
-		mzone[controler][sequence] = 0;
+		mzone[controler][sequence] = nullptr;
 		break;
 	}
 	case LOCATION_SZONE: {
 		pcard = szone[controler][sequence];
-		szone[controler][sequence] = 0;
+		szone[controler][sequence] = nullptr;
 		break;
 	}
 	case LOCATION_GRAVE: {
 		pcard = grave[controler][sequence];
-		for (size_t i = sequence; i < grave[controler].size() - 1; ++i) {
-			grave[controler][i] = grave[controler][i + 1];
-			grave[controler][i]->sequence--;
-			grave[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
-			grave[controler][i]->mTransform.setTranslation(grave[controler][i]->curPos);
-		}
-		grave[controler].erase(grave[controler].end() - 1);
+		grave[controler].erase(grave[controler].begin() + sequence);
+		ResetSequence(grave[controler], true);
 		break;
 	}
 	case LOCATION_REMOVED: {
 		pcard = remove[controler][sequence];
-		for (size_t i = sequence; i < remove[controler].size() - 1; ++i) {
-			remove[controler][i] = remove[controler][i + 1];
-			remove[controler][i]->sequence--;
-			remove[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
-			remove[controler][i]->mTransform.setTranslation(remove[controler][i]->curPos);
-		}
-		remove[controler].erase(remove[controler].end() - 1);
+		remove[controler].erase(remove[controler].begin() + sequence);
+		ResetSequence(remove[controler], true);
 		break;
 	}
 	case LOCATION_EXTRA: {
 		pcard = extra[controler][sequence];
-		for (size_t i = sequence; i < extra[controler].size() - 1; ++i) {
-			extra[controler][i] = extra[controler][i + 1];
-			extra[controler][i]->sequence--;
-			extra[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
-			extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
-		}
-		extra[controler].erase(extra[controler].end() - 1);
+		extra[controler].erase(extra[controler].begin() + sequence);
+		ResetSequence(extra[controler], true);
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]--;
 		break;
 	}
+	default:
+		return nullptr;
 	}
 	pcard->location = 0;
 	return pcard;
