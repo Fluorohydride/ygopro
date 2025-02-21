@@ -1,5 +1,5 @@
 ---
-Checks:          '-*,hicpp-use-nullptr'
+Checks:          '-*,hicpp-use-nullptr,readability-qualified-auto,cppcoreguidelines-init-variables,readability-braces-around-statements'
 WarningsAsErrors: ''
 HeaderFileExtensions:
   - ''
