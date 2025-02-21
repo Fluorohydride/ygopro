@@ -21,8 +21,9 @@ ClientCard::~ClientCard() {
 			if (*it == this) {
 				it = overlayTarget->overlayed.erase(it);
 			}
-			else
+			else {
 				++it;
+}
 		}
 		overlayTarget = nullptr;
 	}
@@ -35,8 +36,9 @@ void ClientCard::SetCode(unsigned int x) {
 	if((location == LOCATION_HAND) && (code != x)) {
 		code = x;
 		mainGame->dField.MoveCard(this, 5);
-	} else
+	} else {
 		code = x;
+}
 }
 void ClientCard::UpdateInfo(unsigned char* buf) {
 	int flag = BufferIO::ReadInt32(buf);
@@ -46,26 +48,31 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 	}
 	if(flag & QUERY_CODE) {
 		int pdata = BufferIO::ReadInt32(buf);
-		if (!pdata)
+		if (!pdata) {
 			ClearData();
+}
 		if((location == LOCATION_HAND) && ((unsigned int)pdata != code)) {
 			code = pdata;
 			mainGame->dField.MoveCard(this, 5);
-		} else
+		} else {
 			code = pdata;
+}
 	}
 	if(flag & QUERY_POSITION) {
 		int pdata = (BufferIO::ReadInt32(buf) >> 24) & 0xff;
 		if((location & (LOCATION_EXTRA | LOCATION_REMOVED)) && (u8)pdata != position) {
 			position = pdata;
 			mainGame->dField.MoveCard(this, 1);
-		} else
+		} else {
 			position = pdata;
+}
 	}
-	if(flag & QUERY_ALIAS)
+	if(flag & QUERY_ALIAS) {
 		alias = BufferIO::ReadInt32(buf);
-	if(flag & QUERY_TYPE)
+}
+	if(flag & QUERY_TYPE) {
 		type = BufferIO::ReadInt32(buf);
+}
 	if(flag & QUERY_LEVEL) {
 		int pdata = BufferIO::ReadInt32(buf);
 		if(level != (unsigned int)pdata) {
@@ -80,17 +87,20 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 			myswprintf(lvstring, L"R%d", rank);
 		}
 	}
-	if(flag & QUERY_ATTRIBUTE)
+	if(flag & QUERY_ATTRIBUTE) {
 		attribute = BufferIO::ReadInt32(buf);
-	if(flag & QUERY_RACE)
+}
+	if(flag & QUERY_RACE) {
 		race = BufferIO::ReadInt32(buf);
+}
 	if(flag & QUERY_ATTACK) {
 		attack = BufferIO::ReadInt32(buf);
 		if(attack < 0) {
 			atkstring[0] = '?';
 			atkstring[1] = 0;
-		} else
+		} else {
 			myswprintf(atkstring, L"%d", attack);
+}
 	}
 	if(flag & QUERY_DEFENSE) {
 		defense = BufferIO::ReadInt32(buf);
@@ -100,17 +110,22 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 		} else if(defense < 0) {
 			defstring[0] = '?';
 			defstring[1] = 0;
-		} else
+		} else {
 			myswprintf(defstring, L"%d", defense);
+}
 	}
-	if(flag & QUERY_BASE_ATTACK)
+	if(flag & QUERY_BASE_ATTACK) {
 		base_attack = BufferIO::ReadInt32(buf);
-	if(flag & QUERY_BASE_DEFENSE)
+}
+	if(flag & QUERY_BASE_DEFENSE) {
 		base_defense = BufferIO::ReadInt32(buf);
-	if(flag & QUERY_REASON)
+}
+	if(flag & QUERY_REASON) {
 		reason = BufferIO::ReadInt32(buf);
-	if(flag & QUERY_REASON_CARD)
+}
+	if(flag & QUERY_REASON_CARD) {
 		buf += 4;
+}
 	if(flag & QUERY_EQUIP_CARD) {
 		int c = BufferIO::ReadUInt8(buf);
 		unsigned int l = BufferIO::ReadUInt8(buf);
@@ -150,10 +165,12 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 			counters[ctype] = ccount;
 		}
 	}
-	if(flag & QUERY_OWNER)
+	if(flag & QUERY_OWNER) {
 		owner = BufferIO::ReadInt32(buf);
-	if(flag & QUERY_STATUS)
+}
+	if(flag & QUERY_STATUS) {
 		status = BufferIO::ReadInt32(buf);
+}
 	if(flag & QUERY_LSCALE) {
 		lscale = BufferIO::ReadInt32(buf);
 		myswprintf(lscstring, L"%d", lscale);
@@ -212,19 +229,23 @@ void ClientCard::ClearData() {
 	counters.clear();
 }
 bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
-	if(c1->is_selected != c2->is_selected)
+	if(c1->is_selected != c2->is_selected) {
 		return c1->is_selected < c2->is_selected;
+}
 	int cp1 = c1->overlayTarget ? c1->overlayTarget->controler : c1->controler;
 	int cp2 = c2->overlayTarget ? c2->overlayTarget->controler : c2->controler;
-	if(cp1 != cp2)
+	if(cp1 != cp2) {
 		return cp1 < cp2;
-	if(c1->location != c2->location)
+}
+	if(c1->location != c2->location) {
 		return c1->location < c2->location;
+}
 	if (c1->location == LOCATION_OVERLAY) {
-		if (c1->overlayTarget != c2->overlayTarget)
+		if (c1->overlayTarget != c2->overlayTarget) {
 			return c1->overlayTarget->sequence < c2->overlayTarget->sequence;
-		else
+		} else {
 			return c1->sequence < c2->sequence;
+}
 	}
 	else if (c1->location == LOCATION_DECK) {
 		return c1->sequence > c2->sequence;

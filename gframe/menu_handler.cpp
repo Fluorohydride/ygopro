@@ -19,17 +19,21 @@ void UpdateDeck() {
 	auto *pdeck = deckbuf;
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
-	for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
+	for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i) {
 		BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->first);
-	for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
+}
+	for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i) {
 		BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->first);
-	for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
+}
+	for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i) {
 		BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
+}
 	DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 }
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
-	if(mainGame->dField.OnCommonEvent(event))
+	if(mainGame->dField.OnCommonEvent(event)) {
 		return false;
+}
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
@@ -44,10 +48,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
-			if(id < 110)
+			if(id < 110) {
 				soundManager.PlaySoundEffect(SOUND_MENU);
-			else
+			} else {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
+}
 			switch(id) {
 			case BUTTON_MODE_EXIT: {
 				mainGame->device->closeDevice();
@@ -111,8 +116,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_JOIN_CANCEL: {
 				mainGame->HideElement(mainGame->wLanWindow);
 				mainGame->ShowElement(mainGame->wMainMenu);
-				if(exit_on_return)
+				if(exit_on_return) {
 					mainGame->device->closeDevice();
+}
 				break;
 			}
 			case BUTTON_LAN_REFRESH: {
@@ -165,8 +171,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HP_KICK: {
 				int index = 0;
 				while(index < 4) {
-					if(mainGame->btnHostPrepKick[index] == caller)
+					if(mainGame->btnHostPrepKick[index] == caller) {
 						break;
+}
 					++index;
 				}
 				CTOS_Kick csk;
@@ -207,13 +214,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnStartBot->setEnabled(true);
 				mainGame->btnBotCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostPrepare);
-				if(bot_mode)
+				if(bot_mode) {
 					mainGame->ShowElement(mainGame->wSinglePlay);
-				else
+				} else {
 					mainGame->ShowElement(mainGame->wLanWindow);
+}
 				mainGame->wChat->setVisible(false);
-				if(exit_on_return)
+				if(exit_on_return) {
 					mainGame->device->closeDevice();
+}
 				break;
 			}
 			case BUTTON_REPLAY_MODE: {
@@ -237,12 +246,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					open_file = false;
 				} else {
 					auto selected = mainGame->lstReplayList->getSelected();
-					if(selected == -1)
+					if(selected == -1) {
 						break;
+}
 					wchar_t replay_path[256]{};
 					myswprintf(replay_path, L"./replay/%ls", mainGame->lstReplayList->getListItem(selected));
-					if (!ReplayMode::cur_replay.OpenReplay(replay_path))
+					if (!ReplayMode::cur_replay.OpenReplay(replay_path)) {
 						break;
+}
 				}
 				mainGame->ClearCardInfo();
 				mainGame->wCardImg->setVisible(true);
@@ -258,15 +269,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->device->setEventReceiver(&mainGame->dField);
 				unsigned int start_turn = std::wcstol(mainGame->ebRepStartTurn->getText(), nullptr, 10);
-				if(start_turn == 1)
+				if(start_turn == 1) {
 					start_turn = 0;
+}
 				ReplayMode::StartReplay(start_turn);
 				break;
 			}
 			case BUTTON_DELETE_REPLAY: {
 				int sel = mainGame->lstReplayList->getSelected();
-				if(sel == -1)
+				if(sel == -1) {
 					break;
+}
 				mainGame->gMutex.lock();
 				wchar_t textBuffer[256];
 				myswprintf(textBuffer, L"%ls\n%ls", mainGame->lstReplayList->getListItem(sel), dataManager.GetSysString(1363));
@@ -279,8 +292,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_RENAME_REPLAY: {
 				int sel = mainGame->lstReplayList->getSelected();
-				if(sel == -1)
+				if(sel == -1) {
 					break;
+}
 				mainGame->gMutex.lock();
 				mainGame->wReplaySave->setText(dataManager.GetSysString(1364));
 				mainGame->ebRSName->setText(mainGame->lstReplayList->getListItem(sel));
@@ -297,8 +311,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_EXPORT_DECK: {
 				auto selected = mainGame->lstReplayList->getSelected();
-				if(selected == -1)
+				if(selected == -1) {
 					break;
+}
 				Replay replay;
 				wchar_t ex_filename[256]{};
 				wchar_t namebuf[4][20]{};
@@ -306,18 +321,22 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				wchar_t replay_path[256]{};
 				BufferIO::CopyWideString(mainGame->lstReplayList->getListItem(selected), ex_filename);
 				myswprintf(replay_path, L"./replay/%ls", ex_filename);
-				if (!replay.OpenReplay(replay_path))
+				if (!replay.OpenReplay(replay_path)) {
 					break;
+}
 				const ReplayHeader& rh = replay.pheader;
-				if(rh.flag & REPLAY_SINGLE_MODE)
+				if(rh.flag & REPLAY_SINGLE_MODE) {
 					break;
+}
 				int player_count = (rh.flag & REPLAY_TAG) ? 4 : 2;
 				//player name
-				for(int i = 0; i < player_count; ++i)
+				for(int i = 0; i < player_count; ++i) {
 					replay.ReadName(namebuf[i]);
+}
 				//skip pre infos
-				for(int i = 0; i < 4; ++i)
+				for(int i = 0; i < 4; ++i) {
 					replay.ReadInt32();
+}
 				//deck
 				std::vector<int> deckbuf;
 				for(int i = 0; i < player_count; ++i) {
@@ -343,8 +362,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_BOT_START: {
 				int sel = mainGame->lstBotList->getSelected();
-				if(sel == -1)
+				if(sel == -1) {
 					break;
+}
 				bot_mode = true;
 #ifdef _WIN32
 				if(!NetServer::StartServer(mainGame->gameConf.serverport)) {
@@ -370,8 +390,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					deckManager.GetDeckFile(botdeck, mainGame->cbBotDeckCategory, mainGame->cbBotDeck);
 					myswprintf(arg1, L"%ls DeckFile='%ls'", mainGame->botInfo[sel].command, botdeck);
 				}
-				else
+				else {
 					myswprintf(arg1, L"%ls", mainGame->botInfo[sel].command);
+}
 				int flag = 0;
 				flag += (mainGame->chkBotHand->isChecked() ? 0x1 : 0);
 				myswprintf(cmd, L"Bot.exe \"%ls\" %d %d", arg1, flag, mainGame->gameConf.serverport);
@@ -420,8 +441,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_SINGLEPLAY: {
-				if(!open_file && mainGame->lstSinglePlayList->getSelected() == -1)
+				if(!open_file && mainGame->lstSinglePlayList->getSelected() == -1) {
 					break;
+}
 				mainGame->singleSignal.SetNoWait(false);
 				SingleMode::StartPlay();
 				break;
@@ -528,8 +550,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case LISTBOX_LAN_HOST: {
 				int sel = mainGame->lstHostList->getSelected();
-				if(sel == -1)
+				if(sel == -1) {
 					break;
+}
 				int addr = DuelClient::hosts[sel].ipaddr;
 				int port = DuelClient::hosts[sel].port;
 				wchar_t buf[20];
@@ -541,8 +564,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_REPLAY_LIST: {
 				int sel = mainGame->lstReplayList->getSelected();
-				if(sel == -1)
+				if(sel == -1) {
 					break;
+}
 				wchar_t replay_path[256]{};
 				myswprintf(replay_path, L"./replay/%ls", mainGame->lstReplayList->getListItem(sel));
 				if (!ReplayMode::cur_replay.OpenReplay(replay_path)) {
@@ -552,10 +576,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				wchar_t infobuf[256]{};
 				std::wstring repinfo;
 				time_t curtime = 0;
-				if(ReplayMode::cur_replay.pheader.flag & REPLAY_UNIFORM)
+				if(ReplayMode::cur_replay.pheader.flag & REPLAY_UNIFORM) {
 					curtime = ReplayMode::cur_replay.pheader.start_time;
-				else
+				} else {
 					curtime = ReplayMode::cur_replay.pheader.seed;
+}
 				std::wcsftime(infobuf, sizeof infobuf / sizeof infobuf[0], L"%Y/%m/%d %H:%M:%S\n", std::localtime(&curtime));
 				repinfo.append(infobuf);
 				wchar_t namebuf[4][20]{};
@@ -565,10 +590,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					ReplayMode::cur_replay.ReadName(namebuf[2]);
 					ReplayMode::cur_replay.ReadName(namebuf[3]);
 				}
-				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
+				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG) {
 					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3]);
-				else
+				} else {
 					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", namebuf[0], namebuf[1]);
+}
 				repinfo.append(infobuf);
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, repinfo.c_str());
@@ -576,8 +602,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_SINGLEPLAY_LIST: {
 				int sel = mainGame->lstSinglePlayList->getSelected();
-				if(sel == -1)
+				if(sel == -1) {
 					break;
+}
 				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(sel);
 				wchar_t fname[256];
 				myswprintf(fname, L"./single/%ls", name);
@@ -619,8 +646,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_BOT_LIST: {
 				int sel = mainGame->lstBotList->getSelected();
-				if(sel == -1)
+				if(sel == -1) {
 					break;
+}
 				mainGame->SetStaticText(mainGame->stBotInfo, 200, mainGame->guiFont, mainGame->botInfo[sel].desc);
 				mainGame->cbBotDeckCategory->setVisible(mainGame->botInfo[sel].select_deckfile);
 				mainGame->cbBotDeck->setVisible(mainGame->botInfo[sel].select_deckfile);
@@ -632,8 +660,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch(id) {
 			case CHECKBOX_HP_READY: {
-				if(!caller->isEnabled())
+				if(!caller->isEnabled()) {
 					break;
+}
 				mainGame->env->setFocus(mainGame->wHostPrepare);
 				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
 					if(mainGame->cbCategorySelect->getSelected() == -1 || mainGame->cbDeckSelect->getSelected() == -1 ||

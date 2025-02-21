@@ -59,8 +59,9 @@ int main(int argc, char* argv[]) {
 #endif //_WIN32
 	ygo::Game _game;
 	ygo::mainGame = &_game;
-	if(!ygo::mainGame->Initialize())
+	if(!ygo::mainGame->Initialize()) {
 		return 0;
+}
 
 #ifdef _WIN32
 	int wargc = 0;
@@ -90,23 +91,27 @@ int main(int argc, char* argv[]) {
 			continue;
 		} else if(!std::wcscmp(wargv[i], L"-n")) { // nickName
 			++i;
-			if(i < wargc)
+			if(i < wargc) {
 				ygo::mainGame->ebNickName->setText(wargv[i]);
+}
 			continue;
 		} else if(!std::wcscmp(wargv[i], L"-h")) { // Host address
 			++i;
-			if(i < wargc)
+			if(i < wargc) {
 				ygo::mainGame->ebJoinHost->setText(wargv[i]);
+}
 			continue;
 		} else if(!std::wcscmp(wargv[i], L"-p")) { // host Port
 			++i;
-			if(i < wargc)
+			if(i < wargc) {
 				ygo::mainGame->ebJoinPort->setText(wargv[i]);
+}
 			continue;
 		} else if(!std::wcscmp(wargv[i], L"-w")) { // host passWord
 			++i;
-			if(i < wargc)
+			if(i < wargc) {
 				ygo::mainGame->ebJoinPass->setText(wargv[i]);
+}
 			continue;
 		} else if(!std::wcscmp(wargv[i], L"-k")) { // Keep on return
 			exit_on_return = false;
@@ -119,8 +124,9 @@ int main(int argc, char* argv[]) {
 			}
 		} else if(!std::wcscmp(wargv[i], L"-d")) { // Deck
 			++i;
-			if(!deckCategorySpecified)
+			if(!deckCategorySpecified) {
 				ygo::mainGame->gameConf.lastcategory[0] = 0;
+}
 			if(i + 1 < wargc) { // select deck
 				BufferIO::CopyWideString(wargv[i], ygo::mainGame->gameConf.lastdeck);
 				continue;
@@ -159,8 +165,9 @@ int main(int argc, char* argv[]) {
 				BufferIO::CopyWideString(wargv[i], open_file_name);
 			}
 			ClickButton(ygo::mainGame->btnReplayMode);
-			if(open_file)
+			if(open_file) {
 				ClickButton(ygo::mainGame->btnLoadReplay);
+}
 			break;
 		} else if(!std::wcscmp(wargv[i], L"-s")) { // Single
 			exit_on_return = !keep_on_return;
@@ -170,8 +177,9 @@ int main(int argc, char* argv[]) {
 				BufferIO::CopyWideString(wargv[i], open_file_name);
 			}
 			ClickButton(ygo::mainGame->btnSingleMode);
-			if(open_file)
+			if(open_file) {
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
+}
 			break;
 		} else if(wargc == 2 && std::wcslen(wargv[1]) >= 4) {
 			wchar_t* pstrext = wargv[1] + std::wcslen(wargv[1]) - 4;
