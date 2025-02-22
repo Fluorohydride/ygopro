@@ -367,7 +367,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				wchar_t arg1[512];
 				if(mainGame->botInfo[sel].select_deckfile) {
 					wchar_t botdeck[256];
-					deckManager.GetDeckFile(botdeck, mainGame->cbBotDeckCategory, mainGame->cbBotDeck);
+					deckManager.GetDeckFile(botdeck, mainGame->cbBotDeckCategory->getSelected(), mainGame->cbBotDeckCategory->getText(), mainGame->cbBotDeck->getText());
 					myswprintf(arg1, L"%ls DeckFile='%ls'", mainGame->botInfo[sel].command, botdeck);
 				}
 				else
@@ -386,7 +386,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					wchar_t warg1[512];
 					if(mainGame->botInfo[sel].select_deckfile) {
 						wchar_t botdeck[256];
-						deckManager.GetDeckFile(botdeck, mainGame->cbBotDeckCategory, mainGame->cbBotDeck);
+						deckManager.GetDeckFile(botdeck, mainGame->cbBotDeckCategory->getSelected(), mainGame->cbBotDeckCategory->getText(), mainGame->cbBotDeck->getText());
 						myswprintf(warg1, L"%ls DeckFile='%ls'", mainGame->botInfo[sel].command, botdeck);
 					}
 					else

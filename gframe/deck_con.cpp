@@ -46,6 +46,10 @@ static inline bool havePopupWindow() {
 	return mainGame->wQuery->isVisible() || mainGame->wCategories->isVisible() || mainGame->wLinkMarks->isVisible() || mainGame->wDeckManage->isVisible() || mainGame->wDMQuery->isVisible();
 }
 
+static inline void get_deck_file(wchar_t* ret) {
+	deckManager.GetDeckFile(ret, mainGame->cbDBCategory->getSelected(), mainGame->cbDBCategory->getText(), mainGame->cbDBDecks->getText());
+}
+
 void DeckBuilder::Initialize() {
 	mainGame->is_building = true;
 	mainGame->is_siding = false;
@@ -164,7 +168,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				wchar_t filepath[256];
-				deckManager.GetDeckFile(filepath, mainGame->cbDBCategory, mainGame->cbDBDecks);
+				get_deck_file(filepath);
 				if(deckManager.SaveDeck(deckManager.current_deck, filepath)) {
 					mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 					mainGame->PopupElement(mainGame->wACMessage, 20);
@@ -480,7 +484,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					int decksel = mainGame->lstDecks->getSelected();
 					const wchar_t* catename = mainGame->lstCategories->getListItem(catesel);
 					wchar_t oldfilepath[256];
-					deckManager.GetDeckFile(oldfilepath, mainGame->cbDBCategory, mainGame->cbDBDecks);
+					get_deck_file(oldfilepath);
 					const wchar_t* newdeckname = mainGame->ebDMName->getText();
 					wchar_t newfilepath[256];
 					if(catesel == 2) {
@@ -512,7 +516,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				case BUTTON_DELETE_DECK_DM: {
 					int decksel = mainGame->lstDecks->getSelected();
 					wchar_t filepath[256];
-					deckManager.GetDeckFile(filepath, mainGame->cbDBCategory, mainGame->cbDBDecks);
+					get_deck_file(filepath);
 					if(deckManager.DeleteDeck(filepath)) {
 						mainGame->lstDecks->removeItem(decksel);
 						mainGame->cbDBDecks->removeItem(decksel);
@@ -542,7 +546,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					wchar_t deckname[256];
 					BufferIO::CopyWideString(olddeckname, deckname);
 					wchar_t oldfilepath[256];
-					deckManager.GetDeckFile(oldfilepath, mainGame->cbDBCategory, mainGame->cbDBDecks);
+					get_deck_file(oldfilepath);
 					wchar_t newfilepath[256];
 					if(oldcatesel != 2 && newcatesel == 0) {
 						myswprintf(newfilepath, L"./deck/%ls.ydk", deckname);
@@ -689,7 +693,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					int sel = prev_sel;
 					mainGame->cbDBDecks->setSelected(sel);
 					wchar_t filepath[256];
-					deckManager.GetDeckFile(filepath, mainGame->cbDBCategory, mainGame->cbDBDecks);
+					get_deck_file(filepath);
 					if(deckManager.DeleteDeck(filepath)) {
 						mainGame->cbDBDecks->removeItem(sel);
 						int count = mainGame->cbDBDecks->getItemCount();
