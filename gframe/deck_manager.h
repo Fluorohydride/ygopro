@@ -56,7 +56,7 @@ public:
 	FILE* OpenDeckFile(const wchar_t* file, const char* mode);
 	irr::io::IReadFile* OpenDeckReader(const wchar_t* file);
 	bool LoadCurrentDeck(const wchar_t* file, bool is_packlist = false);
-	bool LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	bool LoadCurrentDeck(int category_index, const wchar_t* category_name, const wchar_t* deckname);
 	bool SaveDeck(Deck& deck, const wchar_t* file);
 	bool DeleteDeck(const wchar_t* file);
 	bool CreateCategory(const wchar_t* name);
