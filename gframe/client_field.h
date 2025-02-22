@@ -77,6 +77,7 @@ public:
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
 	bool grave_act{ false };
+	int32_t grave_act_player{ 0 };
 	bool remove_act{ false };
 	bool deck_act{ false };
 	bool extra_act{ false };

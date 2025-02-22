@@ -434,9 +434,13 @@ void Game::DrawMisc() {
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
-	if(dField.grave_act) {
-		im.setTranslation(vector3df((matManager.vFieldGrave[0][rule][0].Pos.X + matManager.vFieldGrave[0][rule][1].Pos.X) / 2,
-			(matManager.vFieldGrave[0][rule][0].Pos.Y + matManager.vFieldGrave[0][rule][2].Pos.Y) / 2, dField.grave[0].size() * 0.01f + 0.02f));
+	if (dField.grave_act and dField.grave_act_player) {
+		im.setTranslation(vector3df((matManager.vFieldGrave[dField.grave_act_player][rule][0].Pos.X + matManager.vFieldGrave[dField.grave_act_player][rule][1].Pos.X) / 2, (matManager.vFieldGrave[dField.grave_act_player][rule][0].Pos.Y + matManager.vFieldGrave[dField.grave_act_player][rule][2].Pos.Y) / 2, dField.grave[dField.grave_act_player].size() * 0.01f + 0.02f));
+		driver->setTransform(irr::video::ETS_WORLD, im);
+		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
+	}
+	else if (dField.grave_act) {
+		im.setTranslation(vector3df((matManager.vFieldGrave[0][rule][0].Pos.X + matManager.vFieldGrave[0][rule][1].Pos.X) / 2, (matManager.vFieldGrave[0][rule][0].Pos.Y + matManager.vFieldGrave[0][rule][2].Pos.Y) / 2, dField.grave[0].size() * 0.01f + 0.02f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
