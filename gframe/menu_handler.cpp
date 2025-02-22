@@ -176,7 +176,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_HP_READY: {
 				if(mainGame->cbCategorySelect->getSelected() == -1 || mainGame->cbDeckSelect->getSelected() == -1 ||
-					!deckManager.LoadCurrentDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect)) {
+					!deckManager.LoadCurrentDeck(mainGame->cbCategorySelect->getSelected(), mainGame->cbCategorySelect->getText(), mainGame->cbDeckSelect->getText())) {
 					mainGame->gMutex.lock();
 					soundManager.PlaySoundEffect(SOUND_INFO);
 					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
@@ -472,7 +472,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					open_file = false;
 				} 
 				else if(mainGame->cbDBCategory->getSelected() != -1 && mainGame->cbDBDecks->getSelected() != -1) {
-					deckManager.LoadCurrentDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
+					deckManager.LoadCurrentDeck(mainGame->cbDBCategory->getSelected(), mainGame->cbDBCategory->getText(), mainGame->cbDBDecks->getText());
 					mainGame->ebDeckname->setText(L"");
 				}
 				mainGame->HideElement(mainGame->wMainMenu);
@@ -637,7 +637,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->env->setFocus(mainGame->wHostPrepare);
 				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
 					if(mainGame->cbCategorySelect->getSelected() == -1 || mainGame->cbDeckSelect->getSelected() == -1 ||
-						!deckManager.LoadCurrentDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect)) {
+						!deckManager.LoadCurrentDeck(mainGame->cbCategorySelect->getSelected(), mainGame->cbCategorySelect->getText(), mainGame->cbDeckSelect->getText())) {
 						mainGame->gMutex.lock();
 						static_cast<irr::gui::IGUICheckBox*>(caller)->setChecked(false);
 						soundManager.PlaySoundEffect(SOUND_INFO);
