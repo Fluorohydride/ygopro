@@ -52,7 +52,7 @@ public:
 	int LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist = false);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
-	void GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	void GetDeckFile(wchar_t* ret, int category_index, const wchar_t* category_name, const wchar_t* deckname);
 	FILE* OpenDeckFile(const wchar_t* file, const char* mode);
 	irr::io::IReadFile* OpenDeckReader(const wchar_t* file);
 	bool LoadCurrentDeck(const wchar_t* file, bool is_packlist = false);
