@@ -78,7 +78,7 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
-extern const unsigned short PRO_VERSION;
+constexpr uint16_t PRO_VERSION = 0x1361;
 extern unsigned int enable_log;
 extern bool exit_on_return;
 extern bool open_file;
