@@ -249,12 +249,11 @@ void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) 
 	}
 	BufferIO::CopyWStr(catepath, ret, 256);
 }
-void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+void DeckManager::GetDeckFile(wchar_t* ret, int category_index, const wchar_t* category_name, const wchar_t* deckname) {
 	wchar_t filepath[256];
 	wchar_t catepath[256];
-	const wchar_t* deckname = cbDeck->getItem(cbDeck->getSelected());
 	if(deckname != nullptr) {
-		GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
+		GetCategoryPath(catepath, category_index, category_name);
 		myswprintf(filepath, L"%ls/%ls.ydk", catepath, deckname);
 		BufferIO::CopyWStr(filepath, ret, 256);
 	}
@@ -301,10 +300,10 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	LoadDeck(current_deck, deckStream, is_packlist);
 	return true;  // the above LoadDeck has return value but we ignore it here for now
 }
-bool DeckManager::LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+bool DeckManager::LoadCurrentDeck(int category_index, const wchar_t* category_name, const wchar_t* deckname) {
 	wchar_t filepath[256];
-	GetDeckFile(filepath, cbCategory, cbDeck);
-	bool is_packlist = cbCategory->getSelected() == 0;
+	GetDeckFile(filepath, category_index, category_name, deckname);
+	bool is_packlist = (category_index == 0);
 	bool res = LoadCurrentDeck(filepath, is_packlist);
 	if (res && mainGame->is_building)
 		mainGame->deckBuilder.RefreshPackListScroll();
