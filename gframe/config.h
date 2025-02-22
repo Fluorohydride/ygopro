@@ -43,7 +43,7 @@
 #define mystrncasecmp strncasecmp
 #endif
 
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <iostream>
 #include <algorithm>
@@ -56,7 +56,7 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 	return std::swprintf(buf, N, fmt, args...);
 }
 
-inline FILE* myfopen(const wchar_t* filename, const char* mode) {
+inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
 	FILE* fp{};
 #ifdef _WIN32
 	wchar_t wmode[20]{};
@@ -65,7 +65,7 @@ inline FILE* myfopen(const wchar_t* filename, const char* mode) {
 #else
 	char fname[1024]{};
 	BufferIO::EncodeUTF8(filename, fname);
-	fp = fopen(fname, mode);
+	fp = std::fopen(fname, mode);
 #endif
 	return fp;
 }

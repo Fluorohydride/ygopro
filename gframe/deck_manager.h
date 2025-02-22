@@ -1,11 +1,10 @@
 #ifndef DECKMANAGER_H
 #define DECKMANAGER_H
 
-#include "config.h"
-#include "data_manager.h"
 #include <unordered_map>
 #include <vector>
 #include <sstream>
+#include "data_manager.h"
 
 namespace ygo {
 	constexpr int DECK_MAX_SIZE = 60;
@@ -52,11 +51,11 @@ public:
 	int LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist = false);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
-	void GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	void GetDeckFile(wchar_t* ret, int category_index, const wchar_t* category_name, const wchar_t* deckname);
 	FILE* OpenDeckFile(const wchar_t* file, const char* mode);
-	IReadFile* OpenDeckReader(const wchar_t* file);
+	irr::io::IReadFile* OpenDeckReader(const wchar_t* file);
 	bool LoadCurrentDeck(const wchar_t* file, bool is_packlist = false);
-	bool LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	bool LoadCurrentDeck(int category_index, const wchar_t* category_name, const wchar_t* deckname);
 	bool SaveDeck(Deck& deck, const wchar_t* file);
 	bool DeleteDeck(const wchar_t* file);
 	bool CreateCategory(const wchar_t* name);

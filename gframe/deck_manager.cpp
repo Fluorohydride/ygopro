@@ -1,7 +1,7 @@
 #include "deck_manager.h"
+#include "game.h"
 #include "myfilesystem.h"
 #include "network.h"
-#include "game.h"
 
 namespace ygo {
 
@@ -10,30 +10,27 @@ DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
 	auto cur = _lfList.rend();
-	FILE* fp = fopen(path, "r");
+	FILE* fp = std::fopen(path, "r");
 	char linebuf[256]{};
 	wchar_t strBuffer[256]{};
 	if(fp) {
-		while(fgets(linebuf, 256, fp)) {
+		while(std::fgets(linebuf, 256, fp)) {
 			if(linebuf[0] == '#')
 				continue;
 			if(linebuf[0] == '!') {
-				int sa = BufferIO::DecodeUTF8(&linebuf[1], strBuffer);
-				while(strBuffer[sa - 1] == L'\r' || strBuffer[sa - 1] == L'\n' )
-					sa--;
-				strBuffer[sa] = 0;
+				auto len = std::strcspn(linebuf, "\r\n");
+				linebuf[len] = 0;
+				BufferIO::DecodeUTF8(&linebuf[1], strBuffer);
 				LFList newlist;
+				newlist.listName = strBuffer;
+				newlist.hash = 0x7dfcee6a;
 				_lfList.push_back(newlist);
 				cur = _lfList.rbegin();
-				cur->listName = strBuffer;
-				cur->hash = 0x7dfcee6a;
 				continue;
 			}
-			if(linebuf[0] == 0)
-				continue;
 			int code = 0;
 			int count = -1;
-			if (sscanf(linebuf, "%d %d", &code, &count) != 2)
+			if (std::sscanf(linebuf, "%d %d", &code, &count) != 2)
 				continue;
 			if (code <= 0 || code > MAX_CARD_ID)
 				continue;
@@ -45,7 +42,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			cur->content[code] = count;
 			cur->hash = cur->hash ^ ((hcode << 18) | (hcode >> 14)) ^ ((hcode << (27 + count)) | (hcode >> (5 - count)));
 		}
-		fclose(fp);
+		std::fclose(fp);
 	}
 }
 void DeckManager::LoadLFList() {
@@ -252,12 +249,11 @@ void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) 
 	}
 	BufferIO::CopyWStr(catepath, ret, 256);
 }
-void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+void DeckManager::GetDeckFile(wchar_t* ret, int category_index, const wchar_t* category_name, const wchar_t* deckname) {
 	wchar_t filepath[256];
 	wchar_t catepath[256];
-	const wchar_t* deckname = cbDeck->getItem(cbDeck->getSelected());
 	if(deckname != nullptr) {
-		GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
+		GetCategoryPath(catepath, category_index, category_name);
 		myswprintf(filepath, L"%ls/%ls.ydk", catepath, deckname);
 		BufferIO::CopyWStr(filepath, ret, 256);
 	}
@@ -266,16 +262,16 @@ void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, 
 	}
 }
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
-	FILE* fp = myfopen(file, mode);
+	FILE* fp = mywfopen(file, mode);
 	return fp;
 }
-IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
+irr::io::IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
 #ifdef _WIN32
-	IReadFile* reader = DataManager::FileSystem->createAndOpenFile(file);
+	auto reader = DataManager::FileSystem->createAndOpenFile(file);
 #else
 	char file2[256];
 	BufferIO::EncodeUTF8(file, file2);
-	IReadFile* reader = DataManager::FileSystem->createAndOpenFile(file2);
+	auto reader = DataManager::FileSystem->createAndOpenFile(file2);
 #endif
 	return reader;
 }
@@ -304,10 +300,10 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	LoadDeck(current_deck, deckStream, is_packlist);
 	return true;  // the above LoadDeck has return value but we ignore it here for now
 }
-bool DeckManager::LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+bool DeckManager::LoadCurrentDeck(int category_index, const wchar_t* category_name, const wchar_t* deckname) {
 	wchar_t filepath[256];
-	GetDeckFile(filepath, cbCategory, cbDeck);
-	bool is_packlist = cbCategory->getSelected() == 0;
+	GetDeckFile(filepath, category_index, category_name, deckname);
+	bool is_packlist = (category_index == 0);
 	bool res = LoadCurrentDeck(filepath, is_packlist);
 	if (res && mainGame->is_building)
 		mainGame->deckBuilder.RefreshPackListScroll();
@@ -319,16 +315,16 @@ bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
 	FILE* fp = OpenDeckFile(file, "w");
 	if(!fp)
 		return false;
-	fprintf(fp, "#created by ...\n#main\n");
+	std::fprintf(fp, "#created by ...\n#main\n");
 	for(size_t i = 0; i < deck.main.size(); ++i)
-		fprintf(fp, "%d\n", deck.main[i]->first);
-	fprintf(fp, "#extra\n");
+		std::fprintf(fp, "%d\n", deck.main[i]->first);
+	std::fprintf(fp, "#extra\n");
 	for(size_t i = 0; i < deck.extra.size(); ++i)
-		fprintf(fp, "%d\n", deck.extra[i]->first);
-	fprintf(fp, "!side\n");
+		std::fprintf(fp, "%d\n", deck.extra[i]->first);
+	std::fprintf(fp, "!side\n");
 	for(size_t i = 0; i < deck.side.size(); ++i)
-		fprintf(fp, "%d\n", deck.side[i]->first);
-	fclose(fp);
+		std::fprintf(fp, "%d\n", deck.side[i]->first);
+	std::fclose(fp);
 	return true;
 }
 bool DeckManager::DeleteDeck(const wchar_t* file) {
@@ -378,26 +374,26 @@ bool DeckManager::SaveDeckBuffer(const int deckbuf[], const wchar_t* name) {
 	int it = 0;
 	const int mainc = deckbuf[it];
 	++it;
-	fprintf(fp, "#created by ...\n#main\n");
+	std::fprintf(fp, "#created by ...\n#main\n");
 	for (int i = 0; i < mainc; ++i) {
-		fprintf(fp, "%d\n", deckbuf[it]);
+		std::fprintf(fp, "%d\n", deckbuf[it]);
 		++it;
 	}
 	const int extrac = deckbuf[it];
 	++it;
-	fprintf(fp, "#extra\n");
+	std::fprintf(fp, "#extra\n");
 	for (int i = 0; i < extrac; ++i) {
-		fprintf(fp, "%d\n", deckbuf[it]);
+		std::fprintf(fp, "%d\n", deckbuf[it]);
 		++it;
 	}
 	const int sidec = deckbuf[it];
 	++it;
-	fprintf(fp, "!side\n");
+	std::fprintf(fp, "!side\n");
 	for (int i = 0; i < sidec; ++i) {
-		fprintf(fp, "%d\n", deckbuf[it]);
+		std::fprintf(fp, "%d\n", deckbuf[it]);
 		++it;
 	}
-	fclose(fp);
+	std::fclose(fp);
 	return true;
 }
 }
