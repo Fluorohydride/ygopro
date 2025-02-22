@@ -94,7 +94,7 @@ void Replay::SaveReplay(const wchar_t* name) {
 		return;
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls.yrp", name);
-	FILE* rfp = myfopen(fname, "wb");
+	FILE* rfp = mywfopen(fname, "wb");
 	if(!rfp)
 		return;
 	std::fwrite(&pheader, sizeof pheader, 1, rfp);
@@ -102,11 +102,11 @@ void Replay::SaveReplay(const wchar_t* name) {
 	std::fclose(rfp);
 }
 bool Replay::OpenReplay(const wchar_t* name) {
-	FILE* rfp = myfopen(name, "rb");
+	FILE* rfp = mywfopen(name, "rb");
 	if(!rfp) {
 		wchar_t fname[256];
 		myswprintf(fname, L"./replay/%ls", name);
-		rfp = myfopen(fname, "rb");
+		rfp = mywfopen(fname, "rb");
 	}
 	if(!rfp)
 		return false;
@@ -143,7 +143,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 bool Replay::CheckReplay(const wchar_t* name) {
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls", name);
-	FILE* rfp = myfopen(fname, "rb");
+	FILE* rfp = mywfopen(fname, "rb");
 	if(!rfp)
 		return false;
 	ReplayHeader rheader;
