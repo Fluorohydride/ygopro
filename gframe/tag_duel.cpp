@@ -1,8 +1,8 @@
+#include "config.h"
 #include "tag_duel.h"
 #include "netserver.h"
 #include "game.h"
-#include "../ocgcore/ocgapi.h"
-#include "../ocgcore/common.h"
+#include "data_manager.h"
 #include "../ocgcore/mtrandom.h"
 
 namespace ygo {
@@ -49,8 +49,8 @@ void TagDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {
 		}
 		wchar_t jpass[20];
 		BufferIO::NullTerminate(pkt->pass);
-		BufferIO::CopyWStr(pkt->pass, jpass, 20);
-		if(wcscmp(jpass, pass)) {
+		BufferIO::CopyCharArray(pkt->pass, jpass);
+		if(std::wcscmp(jpass, pass)) {
 			STOC_ErrorMsg scem;
 			scem.msg = ERRMSG_JOINERROR;
 			scem.code = 1;
@@ -67,7 +67,7 @@ void TagDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {
 	sctc.type = (host_player == dp) ? 0x10 : 0;
 	if(!players[0] || !players[1] || !players[2] || !players[3]) {
 		STOC_HS_PlayerEnter scpe;
-		BufferIO::CopyWStr(dp->name, scpe.name, 20);
+		BufferIO::CopyCharArray(dp->name, scpe.name);
 		if(!players[0])
 			scpe.pos = 0;
 		else if(!players[1])
@@ -101,7 +101,7 @@ void TagDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {
 	for(int i = 0; i < 4; ++i)
 		if(players[i]) {
 			STOC_HS_PlayerEnter scpe;
-			BufferIO::CopyWStr(players[i]->name, scpe.name, 20);
+			BufferIO::CopyCharArray(players[i]->name, scpe.name);
 			scpe.pos = i;
 			NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
 			if(ready[i]) {
@@ -157,7 +157,7 @@ void TagDuel::ToDuelist(DuelPlayer* dp) {
 	if(dp->type == NETPLAYER_TYPE_OBSERVER) {
 		observers.erase(dp);
 		STOC_HS_PlayerEnter scpe;
-		BufferIO::CopyWStr(dp->name, scpe.name, 20);
+		BufferIO::CopyCharArray(dp->name, scpe.name);
 		if(!players[0])
 			dp->type = 0;
 		else if(!players[1])
@@ -185,7 +185,7 @@ void TagDuel::ToDuelist(DuelPlayer* dp) {
 	} else {
 		if(ready[dp->type])
 			return;
-		uint8 dptype = (dp->type + 1) % 4;
+		unsigned char dptype = (dp->type + 1) % 4;
 		while(players[dptype])
 			dptype = (dptype + 1) % 4;
 		STOC_HS_PlayerChange scpc;
@@ -261,18 +261,16 @@ void TagDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 	if(dp->type > 3 || ready[dp->type])
 		return;
-	if (len < 8)
+	if (len < 8 || len > sizeof(CTOS_DeckData))
 		return;
 	bool valid = true;
-	auto deckbuf = pdata;
-	int mainc = BufferIO::ReadInt32(deckbuf);
-	int sidec = BufferIO::ReadInt32(deckbuf);
-	const int deck_size = len - 2 * sizeof(int32_t);
-	if (mainc < 0 || mainc > MAINC_MAX)
+	CTOS_DeckData deckbuf;
+	std::memcpy(&deckbuf, pdata, len);
+	if (deckbuf.mainc < 0 || deckbuf.mainc > MAINC_MAX)
 		valid = false;
-	else if (sidec < 0 || sidec > SIDEC_MAX)
+	else if (deckbuf.sidec < 0 || deckbuf.sidec > SIDEC_MAX)
 		valid = false;
-	else if (deck_size != (mainc + sidec) * (int)sizeof(int32_t))
+	else if (len < (2 + deckbuf.mainc + deckbuf.sidec) * (int)sizeof(int32_t))
 		valid = false;
 	if (!valid) {
 		STOC_ErrorMsg scem;
@@ -281,9 +279,7 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 		return;
 	}
-	int deck_list[SIZE_NETWORK_BUFFER / sizeof(int32_t)];
-	std::memcpy(deck_list, deckbuf, deck_size);
-	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], deck_list, mainc, sidec);
+	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], deckbuf.list, deckbuf.mainc, deckbuf.sidec);
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)
@@ -396,7 +392,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.version = PRO_VERSION;
 	rh.flag = REPLAY_UNIFORM | REPLAY_TAG;
 	rh.seed = seed;
-	rh.start_time = (unsigned int)time(nullptr);
+	rh.start_time = (unsigned int)std::time(nullptr);
 	last_replay.BeginRecord();
 	last_replay.WriteHeader(rh);
 	last_replay.WriteData(players[0]->name, 40, false);
@@ -426,52 +422,30 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteInt32(host_info.draw_count, false);
 	last_replay.WriteInt32(opt, false);
 	last_replay.Flush();
-	//
-	last_replay.WriteInt32(pdeck[0].main.size(), false);
-	for(int32 i = (int32)pdeck[0].main.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[0].main[i]->first, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[0].main[i]->first, false);
-	}
-	last_replay.WriteInt32(pdeck[0].extra.size(), false);
-	for(int32 i = (int32)pdeck[0].extra.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[0].extra[i]->first, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[0].extra[i]->first, false);
-	}
-	//
-	last_replay.WriteInt32(pdeck[1].main.size(), false);
-	for(int32 i = (int32)pdeck[1].main.size() - 1; i >= 0; --i) {
-		new_tag_card(pduel, pdeck[1].main[i]->first, 0, LOCATION_DECK);
-		last_replay.WriteInt32(pdeck[1].main[i]->first, false);
-	}
-	last_replay.WriteInt32(pdeck[1].extra.size(), false);
-	for(int32 i = (int32)pdeck[1].extra.size() - 1; i >= 0; --i) {
-		new_tag_card(pduel, pdeck[1].extra[i]->first, 0, LOCATION_EXTRA);
-		last_replay.WriteInt32(pdeck[1].extra[i]->first, false);
-	}
-	//
-	last_replay.WriteInt32(pdeck[3].main.size(), false);
-	for(int32 i = (int32)pdeck[3].main.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[3].main[i]->first, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[3].main[i]->first, false);
-	}
-	last_replay.WriteInt32(pdeck[3].extra.size(), false);
-	for(int32 i = (int32)pdeck[3].extra.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[3].extra[i]->first, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[3].extra[i]->first, false);
-	}
-	//
-	last_replay.WriteInt32(pdeck[2].main.size(), false);
-	for(int32 i = (int32)pdeck[2].main.size() - 1; i >= 0; --i) {
-		new_tag_card(pduel, pdeck[2].main[i]->first, 1, LOCATION_DECK);
-		last_replay.WriteInt32(pdeck[2].main[i]->first, false);
-	}
-	last_replay.WriteInt32(pdeck[2].extra.size(), false);
-	for(int32 i = (int32)pdeck[2].extra.size() - 1; i >= 0; --i) {
-		new_tag_card(pduel, pdeck[2].extra[i]->first, 1, LOCATION_EXTRA);
-		last_replay.WriteInt32(pdeck[2].extra[i]->first, false);
-	}
+	auto load_single = [&](const std::vector<code_pointer>& deck_container, uint8_t p, uint8_t location) {
+		last_replay.WriteInt32(deck_container.size(), false);
+		for (auto cit = deck_container.rbegin(); cit != deck_container.rend(); ++cit) {
+			new_card(pduel, (*cit)->first, p, p, location, 0, POS_FACEDOWN_DEFENSE);
+			last_replay.WriteInt32((*cit)->first, false);
+		}
+	};
+	auto load_tag = [&](const std::vector<code_pointer>& deck_container, uint8_t p, uint8_t location) {
+		last_replay.WriteInt32(deck_container.size(), false);
+		for (auto cit = deck_container.rbegin(); cit != deck_container.rend(); ++cit) {
+			new_tag_card(pduel, (*cit)->first, p, location);
+			last_replay.WriteInt32((*cit)->first, false);
+		}
+	};
+	load_single(pdeck[0].main, 0, LOCATION_DECK);
+	load_single(pdeck[0].extra, 0, LOCATION_EXTRA);
+	load_tag(pdeck[1].main, 0, LOCATION_DECK);
+	load_tag(pdeck[1].extra, 0, LOCATION_EXTRA);
+	load_single(pdeck[3].main, 1, LOCATION_DECK);
+	load_single(pdeck[3].extra, 1, LOCATION_EXTRA);
+	load_tag(pdeck[2].main, 1, LOCATION_DECK);
+	load_tag(pdeck[2].extra, 1, LOCATION_EXTRA);
 	last_replay.Flush();
-	unsigned char startbuf[32];
+	unsigned char startbuf[32]{};
 	auto pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, 0);
@@ -536,18 +510,18 @@ void TagDuel::DuelEndProc() {
 void TagDuel::Surrender(DuelPlayer* dp) {
 	if(dp->type > 3 || !pduel)
 		return;
-	uint32 player = dp->type;
+	uint32_t player = dp->type;
 	if(surrender[player])
 		return;
-	static const uint32 teammatemap[] = { 1, 0, 3, 2 };
-	uint32 teammate = teammatemap[player];
+	static const uint32_t teammatemap[] = { 1, 0, 3, 2 };
+	uint32_t teammate = teammatemap[player];
 	if(!surrender[teammate]) {
 		surrender[player] = true;
 		NetServer::SendPacketToPlayer(players[player], STOC_TEAMMATE_SURRENDER);
 		NetServer::SendPacketToPlayer(players[teammate], STOC_TEAMMATE_SURRENDER);
 		return;
 	}
-	static const uint32 winplayermap[] = { 1, 1, 0, 0 };
+	static const uint32_t winplayermap[] = { 1, 1, 0, 0 };
 	unsigned char wbuf[3];
 	wbuf[0] = MSG_WIN;
 	wbuf[1] = winplayermap[player];
@@ -1533,11 +1507,11 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 	return 0;
 }
 void TagDuel::GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {
-	byte resb[SIZE_RETURN_VALUE]{};
+	unsigned char resb[SIZE_RETURN_VALUE]{};
 	if (len > SIZE_RETURN_VALUE)
 		len = SIZE_RETURN_VALUE;
 	std::memcpy(resb, pdata, len);
-	last_replay.WriteInt8(len);
+	last_replay.Write<uint8_t>(len);
 	last_replay.WriteData(resb, len);
 	set_responseb(pduel, resb);
 	players[dp->type]->state = 0xff;
@@ -1619,7 +1593,7 @@ void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if (position & POS_FACEDOWN)
-			memset(qbuf, 0, clen - 4);
+			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
 	pid = 2 - pid;
@@ -1644,7 +1618,7 @@ void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if (position & POS_FACEDOWN)
-			memset(qbuf, 0, clen - 4);
+			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
 	pid = 2 - pid;
@@ -1667,7 +1641,7 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache) {
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if(!(position & POS_FACEUP))
-			memset(qbuf, 0, slen - 4);
+			std::memset(qbuf, 0, slen - 4);
 		qbuf += slen - 4;
 	}
 	for(int i = 0; i < 4; ++i)
@@ -1731,7 +1705,7 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 		}
 	}
 }
-uint32 TagDuel::MessageHandler(intptr_t fduel, uint32 type) {
+uint32_t TagDuel::MessageHandler(intptr_t fduel, uint32_t type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
@@ -1744,7 +1718,7 @@ void TagDuel::TagTimer(evutil_socket_t fd, short events, void* arg) {
 	sd->time_elapsed++;
 	if(sd->time_elapsed >= sd->time_limit[sd->last_response] || sd->time_limit[sd->last_response] <= 0) {
 		unsigned char wbuf[3];
-		uint32 player = sd->last_response;
+		uint32_t player = sd->last_response;
 		wbuf[0] = MSG_WIN;
 		wbuf[1] = 1 - player;
 		wbuf[2] = 0x3;

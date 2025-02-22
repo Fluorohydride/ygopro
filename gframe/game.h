@@ -15,16 +15,20 @@
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
-#include <time.h>
+#include <ctime>
 #include <unordered_map>
 #include <vector>
 #include <list>
 #include <mutex>
 #include <functional>
 
-#define DEFAULT_DUEL_RULE 5
+constexpr int DEFAULT_DUEL_RULE = 5;
+constexpr int CONFIG_LINE_SIZE = 1024;
+constexpr int TEXT_LINE_SIZE = 256;
 
 namespace ygo {
+
+bool IsExtension(const wchar_t* filename, const wchar_t* extension);
 
 struct Config {
 	bool use_d3d{ false };
@@ -36,12 +40,13 @@ struct Config {
 	wchar_t lastport[10]{};
 	wchar_t nickname[20]{};
 	wchar_t gamename[20]{};
-	wchar_t lastcategory[64]{};
-	wchar_t lastdeck[64]{};
+	wchar_t roompass[20]{};
+	//path
+	wchar_t lastcategory[256]{};
+	wchar_t lastdeck[256]{};
 	wchar_t textfont[256]{};
 	wchar_t numfont[256]{};
-	wchar_t roompass[20]{};
-	wchar_t bot_deck_path[64]{};
+	wchar_t bot_deck_path[256]{};
 	//settings
 	int chkMAutoPos{ 0 };
 	int chkSTAutoPos{ 1 };
@@ -102,7 +107,7 @@ struct DuelInfo {
 	wchar_t hostname_tag[20]{};
 	wchar_t clientname_tag[20]{};
 	wchar_t strLP[2][16]{};
-	wchar_t* vic_string{ nullptr };
+	std::wstring vic_string;
 	unsigned char player_type{ 0 };
 	unsigned char time_player{ 0 };
 	unsigned short time_limit{ 0 };
@@ -155,7 +160,6 @@ public:
 	void CheckMutual(ClientCard* pcard, int mark);
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
-	void DrawShadowText(irr::gui::CGUITTFont* font, const core::stringw& text, const core::rect<s32>& position, const core::rect<s32>& padding, video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const core::rect<s32>* clip = 0);
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
 	void DrawGUI();
@@ -216,6 +220,9 @@ public:
 	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(ECURSOR_ICON icon);
+	template<typename T>
+	static void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const core::rect<s32>& position, const core::rect<s32>& padding,
+		video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const core::rect<s32>* clip = nullptr);
 
 	std::mutex gMutex;
 	Signal frameSignal;
@@ -256,7 +263,7 @@ public:
 	int lpd;
 	int lpplayer;
 	int lpccolor;
-	wchar_t* lpcstring;
+	std::wstring lpcstring;
 	bool always_chain;
 	bool ignore_chain;
 	bool chain_when_avail;
@@ -827,19 +834,6 @@ extern Game* mainGame;
 #define BUTTON_BIG_CARD_ZOOM_IN		381
 #define BUTTON_BIG_CARD_ZOOM_OUT	382
 #define BUTTON_BIG_CARD_ORIG_SIZE	383
-
-//STOC_GAME_MSG messages
-#define MSG_WAITING				3
-#define MSG_START				4
-#define MSG_UPDATE_DATA			6	// flag=0: clear
-#define MSG_UPDATE_CARD			7	// flag=QUERY_CODE, code=0: clear
-#define MSG_REQUEST_DECK		8
-#define MSG_REFRESH_DECK		34
-#define MSG_CARD_SELECTED		80
-#define MSG_UNEQUIP				95
-#define MSG_BE_CHAIN_TARGET		121
-#define MSG_CREATE_RELATION		122
-#define MSG_RELEASE_RELATION	123
 
 #define AVAIL_OCG					0x1
 #define AVAIL_TCG					0x2

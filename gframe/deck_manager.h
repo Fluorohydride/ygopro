@@ -1,17 +1,17 @@
 #ifndef DECKMANAGER_H
 #define DECKMANAGER_H
 
-#include "config.h"
-#include "client_card.h"
 #include <unordered_map>
 #include <vector>
 #include <sstream>
+#include "data_manager.h"
 
 namespace ygo {
 	constexpr int DECK_MAX_SIZE = 60;
 	constexpr int DECK_MIN_SIZE = 40;
 	constexpr int EXTRA_MAX_SIZE = 15;
 	constexpr int SIDE_MAX_SIZE = 15;
+	constexpr int PACK_MAX_SIZE = 1000;
 
 struct LFList {
 	unsigned int hash{};
@@ -46,17 +46,17 @@ public:
 	void LoadLFList();
 	const wchar_t* GetLFListName(int lfhash);
 	const std::unordered_map<int, int>* GetLFListContent(int lfhash);
-	int CheckDeck(Deck& deck, int lfhash, int rule);
+	unsigned int CheckDeck(Deck& deck, int lfhash, int rule);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_packlist = false);
 	int LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist = false);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
-	void GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	void GetDeckFile(wchar_t* ret, int category_index, const wchar_t* category_name, const wchar_t* deckname);
 	FILE* OpenDeckFile(const wchar_t* file, const char* mode);
-	IReadFile* OpenDeckReader(const wchar_t* file);
+	irr::io::IReadFile* OpenDeckReader(const wchar_t* file);
 	bool LoadCurrentDeck(std::istringstream& deckStream, bool is_packlist = false);
 	bool LoadCurrentDeck(const wchar_t* file, bool is_packlist = false);
-	bool LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	bool LoadCurrentDeck(int category_index, const wchar_t* category_name, const wchar_t* deckname);
 	void SaveDeck(Deck& deck, std::stringstream& deckStream);
 	bool SaveDeck(Deck& deck, const wchar_t* file);
 	bool DeleteDeck(const wchar_t* file);

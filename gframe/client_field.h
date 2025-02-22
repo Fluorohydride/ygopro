@@ -57,9 +57,12 @@ public:
 	int select_min{ 0 };
 	int select_max{ 0 };
 	int must_select_count{ 0 };
+	int select_curval_l{ 0 };
+	int select_curval_h{ 0 };
 	int select_sumval{ 0 };
 	int select_mode{ 0 };
-	bool select_cancelable{ false };
+	int select_hint{0};
+	bool select_cancelable{false};
 	bool select_panalmode{ false };
 	bool select_ready{ false };
 	int announce_count{ 0 };
@@ -69,7 +72,7 @@ public:
 	std::vector<ClientCard*> selected_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
-	std::vector<int> declare_opcodes;
+	std::vector<unsigned int> declare_opcodes;
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
@@ -141,8 +144,8 @@ public:
 	ClientCard* menu_card{ nullptr };
 	int list_command{ 0 };
 
-	virtual bool OnEvent(const irr::SEvent& event);
-	virtual bool OnCommonEvent(const irr::SEvent& event);
+	bool OnEvent(const irr::SEvent& event) override;
+	bool OnCommonEvent(const irr::SEvent& event);
 	void GetHoverField(int x, int y);
 	void ShowMenu(int flag, int x, int y);
 	void HideMenu();
@@ -158,8 +161,6 @@ public:
 }
 
 //special cards
-#define CARD_MARINE_DOLPHIN	78734254
-#define CARD_TWINKLE_MOSS	13857930
 #define CARD_QUESTION		38723936
 
 #endif //CLIENT_FIELD_H

@@ -1,8 +1,8 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#include "config.h"
-#include "deck_manager.h"
+#include <cstdint>
+#include <cstring>
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
@@ -13,109 +13,116 @@
 #define check_trivially_copyable(T) static_assert(std::is_trivially_copyable<T>::value == true && std::is_standard_layout<T>::value == true, "not trivially copyable")
 
 namespace ygo {
-	constexpr int SIZE_NETWORK_BUFFER = 0x2000;
-	constexpr int MAX_DATA_SIZE = SIZE_NETWORK_BUFFER - 3;
+	constexpr int SIZE_NETWORK_BUFFER = 0x20000;
+	constexpr int MAX_DATA_SIZE = UINT16_MAX - 1;
 	constexpr int MAINC_MAX = 250;	// the limit of card_state
 	constexpr int SIDEC_MAX = MAINC_MAX;
 
 struct HostInfo {
 	uint32_t lflist{};
-	unsigned char rule{};
-	unsigned char mode{};
-	unsigned char duel_rule{};
-	unsigned char no_check_deck{};
-	unsigned char no_shuffle_deck{};
+	uint8_t rule{};
+	uint8_t mode{};
+	uint8_t duel_rule{};
+	uint8_t no_check_deck{};
+	uint8_t no_shuffle_deck{};
 	// byte padding[3]
 
 	uint32_t start_lp{};
-	unsigned char start_hand{};
-	unsigned char draw_count{};
+	uint8_t start_hand{};
+	uint8_t draw_count{};
 	uint16_t time_limit{};
 };
 check_trivially_copyable(HostInfo);
 static_assert(sizeof(HostInfo) == 20, "size mismatch: HostInfo");
 
 struct HostPacket {
-	uint16_t identifier;
-	uint16_t version;
-	uint16_t port;
+	uint16_t identifier{};
+	uint16_t version{};
+	uint16_t port{};
 	// byte padding[2]
 
-	uint32_t ipaddr;
-	uint16_t name[20];
+	uint32_t ipaddr{};
+	uint16_t name[20]{};
 	HostInfo host;
 };
 check_trivially_copyable(HostPacket);
 static_assert(sizeof(HostPacket) == 72, "size mismatch: HostPacket");
 
 struct HostRequest {
-	uint16_t identifier;
+	uint16_t identifier{};
 };
 check_trivially_copyable(HostRequest);
 static_assert(sizeof(HostRequest) == 2, "size mismatch: HostRequest");
 
+struct CTOS_DeckData {
+	int32_t mainc{};
+	int32_t sidec{};
+	int32_t list[MAINC_MAX + SIDEC_MAX]{};
+};
+check_trivially_copyable(CTOS_DeckData);
+
 struct CTOS_HandResult {
-	unsigned char res;
+	uint8_t res{};
 };
 check_trivially_copyable(CTOS_HandResult);
 static_assert(sizeof(CTOS_HandResult) == 1, "size mismatch: CTOS_HandResult");
 
 struct CTOS_TPResult {
-	unsigned char res;
+	uint8_t res{};
 };
 check_trivially_copyable(CTOS_TPResult);
 static_assert(sizeof(CTOS_TPResult) == 1, "size mismatch: CTOS_TPResult");
 
 struct CTOS_PlayerInfo {
-	uint16_t name[20];
+	uint16_t name[20]{};
 };
 check_trivially_copyable(CTOS_PlayerInfo);
 static_assert(sizeof(CTOS_PlayerInfo) == 40, "size mismatch: CTOS_PlayerInfo");
 
 struct CTOS_CreateGame {
 	HostInfo info;
-	uint16_t name[20];
-	uint16_t pass[20];
+	uint16_t name[20]{};
+	uint16_t pass[20]{};
 };
 check_trivially_copyable(CTOS_CreateGame);
 static_assert(sizeof(CTOS_CreateGame) == 100, "size mismatch: CTOS_CreateGame");
 
 struct CTOS_JoinGame {
-	uint16_t version;
+	uint16_t version{};
 	// byte padding[2]
 
-	uint32_t gameid;
-	uint16_t pass[20];
+	uint32_t gameid{};
+	uint16_t pass[20]{};
 };
 check_trivially_copyable(CTOS_JoinGame);
 static_assert(sizeof(CTOS_JoinGame) == 48, "size mismatch: CTOS_JoinGame");
 
 struct CTOS_Kick {
-	unsigned char pos;
+	uint8_t pos{};
 };
 check_trivially_copyable(CTOS_Kick);
 static_assert(sizeof(CTOS_Kick) == 1, "size mismatch: CTOS_Kick");
 
 // STOC
 struct STOC_ErrorMsg {
-	unsigned char msg;
+	uint8_t msg{};
 	// byte padding[3]
 
-	uint32_t code;
+	uint32_t code{};
 };
 check_trivially_copyable(STOC_ErrorMsg);
 static_assert(sizeof(STOC_ErrorMsg) == 8, "size mismatch: STOC_ErrorMsg");
 
 struct STOC_HandResult {
-	unsigned char res1;
-	unsigned char res2;
+	uint8_t res1{};
+	uint8_t res2{};
 };
 check_trivially_copyable(STOC_HandResult);
 static_assert(sizeof(STOC_HandResult) == 2, "size mismatch: STOC_HandResult");
 
 // reserved for STOC_CREATE_GAME
 struct STOC_CreateGame {
-	uint32_t gameid;
+	uint32_t gameid{};
 };
 check_trivially_copyable(STOC_CreateGame);
 static_assert(sizeof(STOC_CreateGame) == 4, "size mismatch: STOC_CreateGame");
@@ -127,23 +134,23 @@ check_trivially_copyable(STOC_JoinGame);
 static_assert(sizeof(STOC_JoinGame) == 20, "size mismatch: STOC_JoinGame");
 
 struct STOC_TypeChange {
-	unsigned char type;
+	uint8_t type{};
 };
 check_trivially_copyable(STOC_TypeChange);
 static_assert(sizeof(STOC_TypeChange) == 1, "size mismatch: STOC_TypeChange");
 
 // reserved for STOC_LEAVE_GAME
 struct STOC_ExitGame {
-	unsigned char pos;
+	uint8_t pos{};
 };
 check_trivially_copyable(STOC_ExitGame);
 static_assert(sizeof(STOC_ExitGame) == 1, "size mismatch: STOC_ExitGame");
 
 struct STOC_TimeLimit {
-	unsigned char player;
+	uint8_t player{};
 	// byte padding[1]
 
-	uint16_t left_time;
+	uint16_t left_time{};
 };
 check_trivially_copyable(STOC_TimeLimit);
 static_assert(sizeof(STOC_TimeLimit) == 4, "size mismatch: STOC_TimeLimit");
@@ -158,8 +165,8 @@ constexpr int LEN_CHAT_MSG = 256;
 constexpr int SIZE_STOC_CHAT = (LEN_CHAT_PLAYER + LEN_CHAT_MSG) * sizeof(uint16_t);
 
 struct STOC_HS_PlayerEnter {
-	uint16_t name[20];
-	unsigned char pos;
+	uint16_t name[20]{};
+	uint8_t pos{};
 	// byte padding[1]
 };
 check_trivially_copyable(STOC_HS_PlayerEnter);
@@ -168,13 +175,13 @@ constexpr int STOC_HS_PlayerEnter_size = 41;	//workwround
 
 struct STOC_HS_PlayerChange {
 	//pos<<4 | state
-	unsigned char status;
+	uint8_t status{};
 };
 check_trivially_copyable(STOC_HS_PlayerChange);
 static_assert(sizeof(STOC_HS_PlayerChange) == 1, "size mismatch: STOC_HS_PlayerChange");
 
 struct STOC_HS_WatchChange {
-	uint16_t watch_count;
+	uint16_t watch_count{};
 };
 check_trivially_copyable(STOC_HS_WatchChange);
 static_assert(sizeof(STOC_HS_WatchChange) == 2, "size mismatch: STOC_HS_WatchChange");
@@ -182,16 +189,16 @@ static_assert(sizeof(STOC_HS_WatchChange) == 2, "size mismatch: STOC_HS_WatchCha
 class DuelMode;
 
 struct DuelPlayer {
-	unsigned short name[20]{};
-	DuelMode* game{ nullptr };
-	unsigned char type{ 0 };
-	unsigned char state{ 0 };
-	bufferevent* bev{ 0 };
+	uint16_t name[20]{};
+	DuelMode* game{};
+	uint8_t type{};
+	uint8_t state{};
+	bufferevent* bev{};
 };
 
 inline bool check_msg_size(int size) {
 	// empty string is not allowed
-	if (size < 2* sizeof(uint16_t))
+	if (size < 2 * sizeof(uint16_t))
 		return false;
 	if (size > LEN_CHAT_MSG * sizeof(uint16_t))
 		return false;
@@ -200,7 +207,7 @@ inline bool check_msg_size(int size) {
 	return true;
 }
 
-inline unsigned int GetPosition(unsigned char* qbuf, int offset) {
+inline unsigned int GetPosition(unsigned char* qbuf, size_t offset) {
 	unsigned int info = 0;
 	std::memcpy(&info, qbuf + offset, sizeof info);
 	return info >> 24;
@@ -208,26 +215,25 @@ inline unsigned int GetPosition(unsigned char* qbuf, int offset) {
 
 class DuelMode {
 public:
-	virtual ~DuelMode() {}
-	virtual void Chat(DuelPlayer* dp, unsigned char* pdata, int len) {}
-	virtual void JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {}
-	virtual void LeaveGame(DuelPlayer* dp) {}
-	virtual void ToDuelist(DuelPlayer* dp) {}
-	virtual void ToObserver(DuelPlayer* dp) {}
-	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) {}
-	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) {}
-	virtual void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {}
-	virtual void StartDuel(DuelPlayer* dp) {}
-	virtual void HandResult(DuelPlayer* dp, unsigned char res) {}
-	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {}
-	virtual void Process() {}
-	virtual int Analyze(char* msgbuffer, unsigned int len) {
-		return 0;
-	}
-	virtual void Surrender(DuelPlayer* dp) {}
-	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {}
-	virtual void TimeConfirm(DuelPlayer* dp) {}
-	virtual void EndDuel() {}
+	DuelMode() = default;
+	virtual ~DuelMode() = default;
+	virtual void Chat(DuelPlayer* dp, unsigned char* pdata, int len) = 0;
+	virtual void JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) = 0;
+	virtual void LeaveGame(DuelPlayer* dp) = 0;
+	virtual void ToDuelist(DuelPlayer* dp) = 0;
+	virtual void ToObserver(DuelPlayer* dp) = 0;
+	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) = 0;
+	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) = 0;
+	virtual void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) = 0;
+	virtual void StartDuel(DuelPlayer* dp) = 0;
+	virtual void HandResult(DuelPlayer* dp, unsigned char res) = 0;
+	virtual void TPResult(DuelPlayer* dp, unsigned char tp) = 0;
+	virtual void Process() = 0;
+	virtual int Analyze(unsigned char* msgbuffer, unsigned int len) = 0;
+	virtual void Surrender(DuelPlayer* dp) = 0;
+	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) = 0;
+	virtual void TimeConfirm(DuelPlayer* dp) = 0;
+	virtual void EndDuel() = 0;
 
 public:
 	event* etimer { nullptr };
@@ -253,7 +259,7 @@ public:
 #define NETPLAYER_TYPE_OBSERVER		7
 
 #define CTOS_RESPONSE		0x1		// byte array
-#define CTOS_UPDATE_DECK	0x2		// mainc, sidec, int32_t[mainc + sidec]
+#define CTOS_UPDATE_DECK	0x2		// CTOS_DeckData
 #define CTOS_HAND_RESULT	0x3		// CTOS_HandResult
 #define CTOS_TP_RESULT		0x4		// CTOS_TPResult
 #define CTOS_PLAYER_INFO	0x10	// CTOS_PlayerInfo
@@ -295,6 +301,19 @@ public:
 #define STOC_TEAMMATE_SURRENDER	0x23	// no data
 #define STOC_FIELD_FINISH		0x30
 
+// STOC_GAME_MSG header
+#define MSG_WAITING				3
+#define MSG_START				4
+#define MSG_UPDATE_DATA			6	// flag=0: clear
+#define MSG_UPDATE_CARD			7	// flag=QUERY_CODE, code=0: clear
+#define MSG_REQUEST_DECK		8
+#define MSG_REFRESH_DECK		34
+#define MSG_CARD_SELECTED		80
+#define MSG_UNEQUIP				95
+#define MSG_BE_CHAIN_TARGET		121
+#define MSG_CREATE_RELATION		122
+#define MSG_RELEASE_RELATION	123
+
 #define PLAYERCHANGE_OBSERVE	0x8
 #define PLAYERCHANGE_READY		0x9
 #define PLAYERCHANGE_NOTREADY	0xa
@@ -305,15 +324,15 @@ public:
 #define ERRMSG_SIDEERROR	0x3
 #define ERRMSG_VERERROR		0x4
 
-#define DECKERROR_LFLIST		0x1
-#define DECKERROR_OCGONLY		0x2
-#define DECKERROR_TCGONLY		0x3
-#define DECKERROR_UNKNOWNCARD	0x4
-#define DECKERROR_CARDCOUNT		0x5
-#define DECKERROR_MAINCOUNT		0x6
-#define DECKERROR_EXTRACOUNT	0x7
-#define DECKERROR_SIDECOUNT		0x8
-#define DECKERROR_NOTAVAIL		0x9
+#define DECKERROR_LFLIST		0x1U
+#define DECKERROR_OCGONLY		0x2U
+#define DECKERROR_TCGONLY		0x3U
+#define DECKERROR_UNKNOWNCARD	0x4U
+#define DECKERROR_CARDCOUNT		0x5U
+#define DECKERROR_MAINCOUNT		0x6U
+#define DECKERROR_EXTRACOUNT	0x7U
+#define DECKERROR_SIDECOUNT		0x8U
+#define DECKERROR_NOTAVAIL		0x9U
 
 #define MODE_SINGLE		0x0
 #define MODE_MATCH		0x1

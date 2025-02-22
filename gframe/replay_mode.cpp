@@ -1,7 +1,7 @@
 #include "replay_mode.h"
 #include "duelclient.h"
 #include "game.h"
-#include "../ocgcore/common.h"
+#include "data_manager.h"
 #include "../ocgcore/mtrandom.h"
 #include <thread>
 
@@ -228,13 +228,13 @@ bool ReplayMode::StartDuel() {
 		}
 	} else {
 		char filename[256];
-		int slen = cur_replay.ReadInt16();
-		if (slen < 0 || slen > 255) {
+		auto slen = cur_replay.Read<uint16_t>();
+		if (slen > sizeof(filename) - 1) {
 			return false;
 		}
 		cur_replay.ReadData(filename, slen);
 		filename[slen] = 0;
-		if(!preload_script(pduel, filename, 0)) {
+		if(!preload_script(pduel, filename)) {
 			return false;
 		}
 	}
@@ -886,7 +886,7 @@ inline void ReplayMode::ReloadLocation(int player, int location, int flag, std::
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, queryBuffer.data());
 }
 void ReplayMode::ReplayRefresh(int flag) {
-	std::vector<byte> queryBuffer;
+	std::vector<unsigned char> queryBuffer;
 	queryBuffer.resize(SIZE_QUERY_BUFFER);
 	ReloadLocation(0, LOCATION_MZONE, flag, queryBuffer);
 	ReloadLocation(1, LOCATION_MZONE, flag, queryBuffer);
@@ -937,7 +937,7 @@ void ReplayMode::ReplayReload() {
 	ReloadLocation(0, LOCATION_REMOVED, flag, queryBuffer);
 	ReloadLocation(1, LOCATION_REMOVED, flag, queryBuffer);
 }
-uint32 ReplayMode::MessageHandler(intptr_t fduel, uint32 type) {
+uint32_t ReplayMode::MessageHandler(intptr_t fduel, uint32_t type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
