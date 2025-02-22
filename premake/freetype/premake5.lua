@@ -43,6 +43,10 @@ project "freetype"
             "src/type42/type42.c",
             "src/winfonts/winfnt.c" }
 
+    if os.isfile("src/svg/svg.c") then
+        files { "src/svg/svg.c" }
+    end
+
     filter "system:windows"
         files { "builds/windows/ftsystem.c",
                 "builds/windows/ftdebug.c" }
