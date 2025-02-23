@@ -1,3 +1,6 @@
+#ifndef MATERIALS_H
+#define MATERIALS_H
+
 #include "config.h"
 
 namespace ygo {
@@ -44,3 +47,5 @@ public:
 extern Materials matManager;
 
 }
+
+#endif //MATERIALS_H
