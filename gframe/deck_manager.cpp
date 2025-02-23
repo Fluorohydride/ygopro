@@ -32,7 +32,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 				continue;
 			int code = 0;
 			int count = -1;
-			if (std::sscanf(linebuf, "%9d%[ ]%9d", &code, &count) != 2)
+			if (std::sscanf(linebuf, "%9d%*[ ]%9d", &code, &count) != 2)
 				continue;
 			if (code <= 0 || code > MAX_CARD_ID)
 				continue;
