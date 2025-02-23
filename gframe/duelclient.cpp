@@ -1326,7 +1326,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				mainGame->dField.conti_act = true;
 			} else {
 				pcard->cmdFlag |= COMMAND_ACTIVATE;
-				if(pcard->controler == 0) {
+				if(pcard->controler == 0 or mainGame->dInfo.isSingleMode) {
 					if(pcard->location == LOCATION_GRAVE) {
 						mainGame->dField.grave_act = true;
 						mainGame->dField.grave_act_player = selecting_player;
@@ -1464,7 +1464,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				mainGame->dField.conti_act = true;
 			} else {
 				pcard->cmdFlag |= COMMAND_ACTIVATE;
-				if(pcard->controler == 0) {
+				if(pcard->controler == 0 or mainGame->dInfo.isSingleMode) {
 					if(pcard->location == LOCATION_GRAVE) {
 						mainGame->dField.grave_act = true;
 						mainGame->dField.grave_act_player = selecting_player;
