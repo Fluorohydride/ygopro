@@ -22,7 +22,7 @@ struct Deck {
 	std::vector<code_pointer> main;
 	std::vector<code_pointer> extra;
 	std::vector<code_pointer> side;
-	Deck() {}
+	Deck() = default;
 	Deck(const Deck& ndeck) {
 		main = ndeck.main;
 		extra = ndeck.extra;

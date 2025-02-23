@@ -185,11 +185,12 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 	return errorcode;
 }
 int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
-	int ct = 0, mainc = 0, sidec = 0, code = 0;
+	size_t ct = 0;
+	int mainc = 0, sidec = 0, code = 0;
 	int cardlist[PACK_MAX_SIZE]{};
 	bool is_side = false;
 	std::string linebuf;
-	while (std::getline(deckStream, linebuf, '\n') && ct < (int)(sizeof cardlist / sizeof cardlist[0])) {
+	while (std::getline(deckStream, linebuf, '\n') && ct < (sizeof cardlist / sizeof cardlist[0])) {
 		if (linebuf[0] == '!') {
 			is_side = true;
 			continue;
@@ -203,7 +204,7 @@ int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_pa
 		else
 			++mainc;
 	}
-	return LoadDeck(current_deck, cardlist, mainc, sidec, is_packlist);
+	return LoadDeck(deck, cardlist, mainc, sidec, is_packlist);
 }
 bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	std::unordered_map<int, int> pcount;
