@@ -4,7 +4,6 @@
 #include "game.h"
 #include "../ocgcore/mtrandom.h"
 #ifdef YGOPRO_USE_AUDIO
-#define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio/miniaudio.h"
 #endif
 
