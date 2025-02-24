@@ -9,7 +9,7 @@ namespace ygo {
 
 TagDuel::TagDuel() {
 	for(int i = 0; i < 4; ++i) {
-		players[i] = 0;
+		players[i] = nullptr;
 		ready[i] = false;
 		surrender[i] = false;
 	}
@@ -135,7 +135,7 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 	} else {
 		if(duel_stage == DUEL_STAGE_BEGIN) {
 			STOC_HS_PlayerChange scpc;
-			players[dp->type] = 0;
+			players[dp->type] = nullptr;
 			ready[dp->type] = false;
 			scpc.status = (dp->type << 4) | PLAYERCHANGE_LEAVE;
 			for(int i = 0; i < 4; ++i)
@@ -199,7 +199,7 @@ void TagDuel::ToDuelist(DuelPlayer* dp) {
 		sctc.type = (dp == host_player ? 0x10 : 0) | dptype;
 		NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
 		players[dptype] = dp;
-		players[dp->type] = 0;
+		players[dp->type] = nullptr;
 		dp->type = dptype;
 	}
 }
@@ -213,7 +213,7 @@ void TagDuel::ToObserver(DuelPlayer* dp) {
 			NetServer::SendPacketToPlayer(players[i], STOC_HS_PLAYER_CHANGE, scpc);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
-	players[dp->type] = 0;
+	players[dp->type] = nullptr;
 	ready[dp->type] = false;
 	dp->type = NETPLAYER_TYPE_OBSERVER;
 	observers.insert(dp);
