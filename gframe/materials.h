@@ -1,7 +1,7 @@
 #ifndef MATERIALS_H
 #define MATERIALS_H
 
-#include "config.h"
+#include <irrlicht.h>
 
 namespace ygo {
 
