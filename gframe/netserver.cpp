@@ -184,7 +184,7 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 	}
 }
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
-	auto pdata = data;
+	auto *pdata = data;
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
 	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
 		return;
@@ -248,7 +248,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 			return;
 		CTOS_PlayerInfo packet;
 		std::memcpy(&packet, pdata, sizeof packet);
-		auto pkt = &packet;
+		auto *pkt = &packet;
 		BufferIO::NullTerminate(pkt->name);
 		BufferIO::CopyCharArray(pkt->name, dp->name);
 		break;
@@ -260,7 +260,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 			return;
 		CTOS_CreateGame packet;
 		std::memcpy(&packet, pdata, sizeof packet);
-		auto pkt = &packet;
+		auto *pkt = &packet;
 		if(pkt->info.rule > CURRENT_RULE)
 			pkt->info.rule = CURRENT_RULE;
 		if(pkt->info.mode > MODE_TAG)
@@ -368,7 +368,7 @@ size_t NetServer::CreateChatPacket(unsigned char* src, int src_size, unsigned ch
 	if (src_msg[src_len - 1] != 0)
 		return 0;
 	// STOC_Chat packet
-	auto pdst = dst;
+	auto *pdst = dst;
 	buffer_write<uint16_t>(pdst, dst_player_type);
 	buffer_write_block(pdst, src_msg, src_size);
 	return sizeof(dst_player_type) + src_size;
