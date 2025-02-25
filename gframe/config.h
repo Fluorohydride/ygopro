@@ -3,6 +3,9 @@
 
 #define _IRR_STATIC_LIB_
 #define IRR_COMPILE_WITH_DX9_DEV_PACK
+
+#include <cerrno>
+
 #ifdef _WIN32
 
 #define NOMINMAX
@@ -22,7 +25,6 @@
 
 #else //_WIN32
 
-#include <errno.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
