@@ -14,7 +14,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	char linebuf[256]{};
 	wchar_t strBuffer[256]{};
 	if(fp) {
-		while(std::fgets(linebuf, 256, fp)) {
+		while(std::fgets(linebuf, sizeof linebuf, fp)) {
 			if(linebuf[0] == '#')
 				continue;
 			if(linebuf[0] == '!') {
@@ -28,15 +28,15 @@ void DeckManager::LoadLFListSingle(const char* path) {
 				cur = _lfList.rbegin();
 				continue;
 			}
+			if (cur == _lfList.rend())
+				continue;
 			int code = 0;
 			int count = -1;
-			if (std::sscanf(linebuf, "%d %d", &code, &count) != 2)
+			if (std::sscanf(linebuf, "%9d%*[ ]%9d", &code, &count) != 2)
 				continue;
 			if (code <= 0 || code > MAX_CARD_ID)
 				continue;
 			if (count < 0 || count > 2)
-				continue;
-			if (cur == _lfList.rend())
 				continue;
 			unsigned int hcode = code;
 			cur->content[code] = count;
@@ -197,7 +197,9 @@ int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_pa
 		}
 		if (linebuf[0] < '0' || linebuf[0] > '9')
 			continue;
-		code = std::stoi(linebuf);
+		code = strtol(linebuf.c_str(), nullptr, 10);
+		if (errno == ERANGE)
+			continue;
 		cardlist[ct++] = code;
 		if (is_side)
 			++sidec;
