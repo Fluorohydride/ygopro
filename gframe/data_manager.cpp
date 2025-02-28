@@ -23,9 +23,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		CardDataC cd;
 		CardString cs;
 		step = sqlite3_step(pStmt);
-		if (step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
-			return Error(pDB, pStmt);
-		else if (step == SQLITE_ROW) {
+		if (step == SQLITE_ROW) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
@@ -76,6 +74,8 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 			}
 			_strings[cd.code] = cs;
 		}
+		else if (step != SQLITE_DONE)
+			return Error(pDB, pStmt);
 	} while (step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
 	return true;
