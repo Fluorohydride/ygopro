@@ -197,6 +197,7 @@ int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_pa
 		}
 		if (linebuf[0] < '0' || linebuf[0] > '9')
 			continue;
+		errno = 0;
 		code = strtol(linebuf.c_str(), nullptr, 10);
 		if (errno == ERANGE)
 			continue;
