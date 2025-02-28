@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
 #endif //__APPLE__
 #ifdef _WIN32
 #ifndef _DEBUG
-	char* pstrext;
+	char* pstrext = nullptr;
 	if(argc == 2 && (pstrext = std::strrchr(argv[1], '.'))
 		&& (!mystrncasecmp(pstrext, ".ydk", 4) || !mystrncasecmp(pstrext, ".yrp", 4))) {
 		wchar_t exepath[MAX_PATH];
@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
 #endif //_DEBUG
 #endif //_WIN32
 #ifdef _WIN32
-	WORD wVersionRequested;
+	WORD wVersionRequested = 0;
 	WSADATA wsaData;
 	wVersionRequested = MAKEWORD(2, 2);
 	WSAStartup(wVersionRequested, &wsaData);
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 		return 0;
 
 #ifdef _WIN32
-	int wargc;
+	int wargc = 0;
 	std::unique_ptr<wchar_t*[], void(*)(wchar_t**)> wargv(CommandLineToArgvW(GetCommandLineW(), &wargc), [](wchar_t** wargv) {
 		LocalFree(wargv);
 	});

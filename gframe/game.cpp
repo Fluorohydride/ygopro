@@ -1805,7 +1805,7 @@ int Game::OppositePlayer(int player) {
 int Game::ChatLocalPlayer(int player) {
 	if(player > 3)
 		return player;
-	bool is_self;
+	bool is_self = false;
 	if(dInfo.isStarted || is_siding) {
 		if(dInfo.isInDuel)
 			// when in duel
