@@ -29,7 +29,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
-			auto setcode = sqlite3_column_int64(pStmt, 3);
+			uint64_t setcode = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 3));
 			if (setcode) {
 				auto it = extra_setcode.find(cd.code);
 				if (it != extra_setcode.end()) {
@@ -42,7 +42,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 				else
 					cd.set_setcode(setcode);
 			}
-			cd.type = sqlite3_column_int(pStmt, 4);
+			cd.type = static_cast<decltype(cd.type)>(sqlite3_column_int64(pStmt, 4));
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defense = sqlite3_column_int(pStmt, 6);
 			if (cd.type & TYPE_LINK) {
@@ -51,13 +51,13 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 			}
 			else
 				cd.link_marker = 0;
-			unsigned int level = sqlite3_column_int(pStmt, 7);
+			uint32_t level = static_cast<uint32_t>(sqlite3_column_int(pStmt, 7));
 			cd.level = level & 0xff;
 			cd.lscale = (level >> 24) & 0xff;
 			cd.rscale = (level >> 16) & 0xff;
-			cd.race = sqlite3_column_int(pStmt, 8);
-			cd.attribute = sqlite3_column_int(pStmt, 9);
-			cd.category = sqlite3_column_int(pStmt, 10);
+			cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
+			cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
+			cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
 			_datas[cd.code] = cd;
 			if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
