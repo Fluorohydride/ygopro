@@ -25,7 +25,7 @@ struct CardDataC : card_data {
 	uint32_t category{};
 
 	bool is_setcodes(const std::vector<unsigned int>& values) const {
-		for (auto& value : values) {
+		for (const auto& value : values) {
 			if (is_setcode(value))
 				return true;
 		}

@@ -1548,7 +1548,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 	bool is_valid = (cit != dataManager.datas_end());
 	imgCard->setImage(imageManager.GetTexture(code, true));
 	if (is_valid) {
-		auto& cd = cit->second;
+		const auto& cd = cit->second;
 		if (cd.is_alternative())
 			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
 		else
@@ -1560,7 +1560,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 	stName->setText(formatBuffer);
 	int offset = 0;
 	if (is_valid && !gameConf.hide_setname) {
-		auto& cd = cit->second;
+		const auto& cd = cit->second;
 		auto target = cit;
 		if (cd.alias && dataManager.GetCodePointer(cd.alias) != dataManager.datas_end()) {
 			target = dataManager.GetCodePointer(cd.alias);
@@ -1577,7 +1577,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		stSetName->setText(L"");
 	}
 	if(is_valid && cit->second.type & TYPE_MONSTER) {
-		auto& cd = cit->second;
+		const auto& cd = cit->second;
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type).c_str(), dataManager.FormatRace(cd.race).c_str(), dataManager.FormatAttribute(cd.attribute).c_str());
 		stInfo->setText(formatBuffer);
 		int offset_info = 0;
