@@ -325,7 +325,7 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 	font_metrics = tt_face->size->metrics;
 
 	// Allocate our glyphs.
-	Glyphs.clear();
+	Glyphs.set_used(0);
 	Glyphs.reallocate(tt_face->num_glyphs);
 	Glyphs.set_used(tt_face->num_glyphs);
 	for (FT_Long i = 0; i < tt_face->num_glyphs; ++i) {
