@@ -313,8 +313,8 @@ void CGUIImageButton::draw() {
 		return;
 	IGUISkin* skin = Environment->getSkin();
 	video::IVideoDriver* driver = Environment->getVideoDriver();
-	core::position2di center = AbsoluteRect.getCenter();
-	core::position2di pos = center;
+	core::vector2di center = AbsoluteRect.getCenter();
+	core::vector2di pos = center;
 	pos.X -= (s32)(ImageRect.getWidth() * imageScale.X * 0.5f);
 	pos.Y -= (s32)(ImageRect.getHeight() * imageScale.Y * 0.5f);
 	if(Pressed) {
