@@ -505,7 +505,7 @@ void CGUITTFont::drawUstring(const core::ustring& utext, const core::rect<s32>&p
 
 	// Set up some variables.
 	core::dimension2d<s32> textDimension;
-	core::position2d<s32> offset = position.UpperLeftCorner;
+	core::vector2d<s32> offset = position.UpperLeftCorner;
 
 	// Determine offset positions.
 	if (hcenter || vcenter) {
