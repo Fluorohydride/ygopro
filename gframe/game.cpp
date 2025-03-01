@@ -60,7 +60,7 @@ bool IsExtension(const wchar_t* filename, const wchar_t* extension) {
 
 bool Game::Initialize() {
 	LoadConfig();
-	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
+	irr::SIrrlichtCreationParameters params{};
 	params.AntiAlias = gameConf.antialias;
 	if(gameConf.use_d3d)
 		params.DriverType = irr::video::EDT_DIRECT3D9;
@@ -88,8 +88,6 @@ bool Game::Initialize() {
 	ignore_chain = false;
 	chain_when_avail = false;
 	is_building = false;
-	menuHandler.prev_operation = 0;
-	menuHandler.prev_sel = -1;
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
