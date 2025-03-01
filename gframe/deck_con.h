@@ -56,7 +56,7 @@ public:
 	unsigned int filter_scl{};
 	unsigned int filter_marks{};
 	int filter_lm{};
-	position2di mouse_pos;
+	irr::core::vector2di mouse_pos;
 	int hovered_code{};
 	int hovered_pos{};
 	int hovered_seq{ -1 };

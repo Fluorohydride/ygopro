@@ -1224,7 +1224,7 @@ void DeckBuilder::GetHoveredCard() {
 	irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 	if(root->getElementFromPoint(mouse_pos) != root)
 		return;
-	position2di pos = mainGame->ResizeReverse(mouse_pos.X, mouse_pos.Y);
+	irr::core::vector2di pos = mainGame->ResizeReverse(mouse_pos.X, mouse_pos.Y);
 	int x = pos.X;
 	int y = pos.Y;
 	is_lastcard = 0;
