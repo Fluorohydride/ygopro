@@ -1,9 +1,9 @@
 #ifndef DECK_CON_H
 #define DECK_CON_H
 
-#include "config.h"
 #include <unordered_map>
 #include <vector>
+#include <irrlicht.h>
 #include "data_manager.h"
 #include "../ocgcore/mtrandom.h"
 
@@ -28,7 +28,7 @@ public:
 	void ChangeCategory(int catesel);
 	void ShowDeckManage();
 	void ShowBigCard(int code, float zoom);
-	void ZoomBigCard(s32 centerx = -1, s32 centery = -1);
+	void ZoomBigCard(irr::s32 centerx = -1, irr::s32 centery = -1);
 	void CloseBigCard();
 
 	bool CardNameContains(const wchar_t *haystack, const wchar_t *needle);
@@ -56,7 +56,7 @@ public:
 	unsigned int filter_scl{};
 	unsigned int filter_marks{};
 	int filter_lm{};
-	position2di mouse_pos;
+	irr::core::vector2di mouse_pos;
 	int hovered_code{};
 	int hovered_pos{};
 	int hovered_seq{ -1 };
@@ -74,7 +74,7 @@ public:
 	code_pointer draging_pointer;
 	int prev_category{};
 	int prev_deck{};
-	s32 prev_operation{};
+	irr::s32 prev_operation{};
 	int prev_sel{ -1 };
 	bool is_modified{};
 	bool readonly{};

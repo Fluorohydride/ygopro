@@ -169,7 +169,7 @@ public:
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
 	void WaitFrameSignal(int frame);
-	void DrawThumb(code_pointer cp, position2di pos, const std::unordered_map<int,int>* lflist, bool drag = false);
+	void DrawThumb(code_pointer cp, irr::core::vector2di pos, const std::unordered_map<int,int>* lflist, bool drag = false);
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
@@ -205,15 +205,15 @@ public:
 	void ResizeChatInputWindow();
 	recti Resize(s32 x, s32 y, s32 x2, s32 y2);
 	recti Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2);
-	position2di Resize(s32 x, s32 y);
-	position2di ResizeReverse(s32 x, s32 y);
+	irr::core::vector2di Resize(s32 x, s32 y);
+	irr::core::vector2di ResizeReverse(s32 x, s32 y);
 	recti ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width);
 	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2);
 	recti ResizeCardImgWin(s32 x, s32 y, s32 mx, s32 my);
 	recti ResizeCardHint(s32 x, s32 y, s32 x2, s32 y2);
-	position2di ResizeCardHint(s32 x, s32 y);
+	irr::core::vector2di ResizeCardHint(s32 x, s32 y);
 	recti ResizeCardMid(s32 x, s32 y, s32 x2, s32 y2, s32 midx, s32 midy);
-	position2di ResizeCardMid(s32 x, s32 y, s32 midx, s32 midy);
+	irr::core::vector2di ResizeCardMid(s32 x, s32 y, s32 midx, s32 midy);
 	recti ResizeFit(s32 x, s32 y, s32 x2, s32 y2);
 
 	void SetWindowsIcon();
