@@ -29,6 +29,7 @@ constexpr int TEXT_LINE_SIZE = 256;
 namespace ygo {
 
 bool IsExtension(const wchar_t* filename, const wchar_t* extension);
+bool IsExtension(const char* filename, const char* extension);
 
 struct Config {
 	bool use_d3d{ false };
