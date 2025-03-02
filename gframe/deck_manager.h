@@ -45,7 +45,7 @@ public:
 	void LoadLFListSingle(const char* path);
 	void LoadLFList();
 	const wchar_t* GetLFListName(int lfhash);
-	const LFList* GetLFListContent(unsigned int lfhash);
+	const LFList* GetLFList(unsigned int lfhash);
 	unsigned int CheckDeck(Deck& deck, int lfhash, int rule);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_packlist = false);
 	int LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist = false);

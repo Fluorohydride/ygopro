@@ -61,7 +61,7 @@ const wchar_t* DeckManager::GetLFListName(int lfhash) {
 		return lit->listName.c_str();
 	return dataManager.unknown_string;
 }
-const LFList* DeckManager::GetLFListContent(unsigned int lfhash) {
+const LFList* DeckManager::GetLFList(unsigned int lfhash) {
 	auto lit = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](const ygo::LFList& list) {
 		return list.hash == lfhash;
 	});
@@ -87,7 +87,7 @@ unsigned int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 		return (DECKERROR_EXTRACOUNT << 28) | (unsigned)deck.extra.size();
 	if(deck.side.size() > SIDE_MAX_SIZE)
 		return (DECKERROR_SIDECOUNT << 28) | (unsigned)deck.side.size();
-	auto lflist = GetLFListContent(lfhash);
+	auto lflist = GetLFList(lfhash);
 	if (!lflist)
 		return 0;
 	auto& list = lflist->content;
