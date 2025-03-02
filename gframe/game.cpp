@@ -1718,7 +1718,7 @@ void Game::AddDebugMsg(const char* msg) {
 	}
 }
 void Game::ErrorLog(const char* msg) {
-	FILE* fp = std::fopen("error.log", "at");
+	FILE* fp = std::fopen("error.log", "a");
 	if(!fp)
 		return;
 	time_t nowtime = std::time(nullptr);
