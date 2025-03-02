@@ -53,7 +53,7 @@ void DeckManager::LoadLFList() {
 	nolimit.hash = 0;
 	_lfList.push_back(nolimit);
 }
-const wchar_t* DeckManager::GetLFListName(int lfhash) {
+const wchar_t* DeckManager::GetLFListName(unsigned int lfhash) {
 	auto lit = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](const ygo::LFList& list) {
 		return list.hash == lfhash;
 	});
