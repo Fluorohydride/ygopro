@@ -30,17 +30,14 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			}
 			if (cur == _lfList.rend())
 				continue;
-			int code = 0;
+			unsigned int code = 0;
 			int count = -1;
-			if (std::sscanf(linebuf, "%9d%*[ ]%9d", &code, &count) != 2)
-				continue;
-			if (code <= 0 || code > MAX_CARD_ID)
+			if (std::sscanf(linebuf, "%9u%*[ ]%9d", &code, &count) != 2)
 				continue;
 			if (count < 0 || count > 2)
 				continue;
-			unsigned int hcode = code;
 			cur->content[code] = count;
-			cur->hash = cur->hash ^ ((hcode << 18) | (hcode >> 14)) ^ ((hcode << (27 + count)) | (hcode >> (5 - count)));
+			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 		}
 		std::fclose(fp);
 	}
