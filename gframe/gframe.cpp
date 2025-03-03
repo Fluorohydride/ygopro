@@ -36,17 +36,15 @@ int main(int argc, char* argv[]) {
 	CFRelease(path);
 #endif //__APPLE__
 #ifdef _WIN32
-#ifndef _DEBUG
-	char* pstrext;
-	if(argc == 2 && (pstrext = std::strrchr(argv[1], '.'))
-		&& (!mystrncasecmp(pstrext, ".ydk", 4) || !mystrncasecmp(pstrext, ".yrp", 4))) {
+	if (argc == 2 && (ygo::IsExtension(argv[1], ".ydk") || ygo::IsExtension(argv[1], ".yrp"))) { // open file from explorer
 		wchar_t exepath[MAX_PATH];
 		GetModuleFileNameW(nullptr, exepath, MAX_PATH);
-		wchar_t* p = std::wcsrchr(exepath, '\\');
-		*p = '\0';
-		SetCurrentDirectoryW(exepath);
+		wchar_t* p = std::wcsrchr(exepath, L'\\');
+		if (p) {
+			*p = 0;
+			SetCurrentDirectoryW(exepath);
+		}
 	}
-#endif //_DEBUG
 #endif //_WIN32
 #ifdef _WIN32
 	WORD wVersionRequested;
