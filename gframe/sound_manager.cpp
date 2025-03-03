@@ -12,7 +12,7 @@ bool SoundManager::Init() {
 #ifdef YGOPRO_USE_IRRKLANG
 	bgm_scene = -1;
 	RefreshBGMList();
-	rnd.reset((unsigned int)time(nullptr));
+	rnd.reset((unsigned int)std::time(nullptr));
 	engineSound = irrklang::createIrrKlangDevice();
 	engineMusic = irrklang::createIrrKlangDevice();
 	if(!engineSound || !engineMusic) {

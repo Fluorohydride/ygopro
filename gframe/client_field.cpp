@@ -143,6 +143,16 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
 	}
 }
+void ClientField::ResetSequence(std::vector<ClientCard*>& list, bool reset_height) {
+	unsigned char seq = 0;
+	for (auto& pcard : list) {
+		pcard->sequence = seq++;
+		if (reset_height) {
+			pcard->curPos.Z = 0.01f + 0.01f * pcard->sequence;
+			pcard->mTransform.setTranslation(pcard->curPos);
+		}
+	}
+}
 ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
 	std::vector<ClientCard*>* lst = 0;
 	bool is_xyz = (location & LOCATION_OVERLAY) != 0;
@@ -194,13 +204,10 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	case LOCATION_DECK: {
 		if (sequence != 0 || deck[controler].size() == 0) {
 			deck[controler].push_back(pcard);
-			pcard->sequence = (unsigned char)(deck[controler].size() - 1);
 		} else {
-			for (auto& pcard : deck[controler])
-				pcard->sequence++;
 			deck[controler].insert(deck[controler].begin(), pcard);
-			pcard->sequence = 0;
 		}
+		ResetSequence(deck[controler], true);
 		pcard->is_reversed = false;
 		pcard->ClearData();
 		pcard->ClearTarget();
@@ -209,7 +216,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 	case LOCATION_HAND: {
 		hand[controler].push_back(pcard);
-		pcard->sequence = (unsigned char)(hand[controler].size() - 1);
+		ResetSequence(hand[controler], false);
 		break;
 	}
 	case LOCATION_MZONE: {
@@ -222,28 +229,22 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 	case LOCATION_GRAVE: {
 		grave[controler].push_back(pcard);
-		pcard->sequence = (unsigned char)(grave[controler].size() - 1);
+		ResetSequence(grave[controler], false);
 		break;
 	}
 	case LOCATION_REMOVED: {
 		remove[controler].push_back(pcard);
-		pcard->sequence = (unsigned char)(remove[controler].size() - 1);
+		ResetSequence(remove[controler], false);
 		break;
 	}
 	case LOCATION_EXTRA: {
 		if(extra_p_count[controler] == 0 || (pcard->position & POS_FACEUP)) {
 			extra[controler].push_back(pcard);
-			pcard->sequence = (unsigned char)(extra[controler].size() - 1);
 		} else {
-			int p = extra[controler].size() - extra_p_count[controler] - 1;
-			for(int i = extra[controler].size() - 1; i > p; --i) {
-				extra[controler][i]->sequence++;
-				extra[controler][i]->curPos += irr::core::vector3df(0, 0, 0.01f);
-				extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
-			}
-			extra[controler].insert(extra[controler].begin() + p, pcard);
-			pcard->sequence = p;
+			size_t faceup_begin = extra[controler].size() - extra_p_count[controler];
+			extra[controler].insert(extra[controler].begin() + faceup_begin, pcard);
 		}
+		ResetSequence(extra[controler], true);
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]++;
 		break;
@@ -252,28 +253,17 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 }
 ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 	ClientCard* pcard = nullptr;
-	auto erase_card = [](std::vector<ClientCard*>& lst, int seq) {
-		for (int i = seq; i < (int)lst.size() - 1; ++i) {
-			lst[i] = lst[i + 1];
-			lst[i]->sequence--;
-			lst[i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
-			lst[i]->mTransform.setTranslation(lst[i]->curPos);
-		}
-		lst.pop_back();
-	};
 	switch (location) {
 	case LOCATION_DECK: {
 		pcard = deck[controler][sequence];
-		erase_card(deck[controler], sequence);
+		deck[controler].erase(deck[controler].begin() + sequence);
+		ResetSequence(deck[controler], true);
 		break;
 	}
 	case LOCATION_HAND: {
 		pcard = hand[controler][sequence];
-		for (int i = sequence; i < (int)hand[controler].size() - 1; ++i) {
-			hand[controler][i] = hand[controler][i + 1];
-			hand[controler][i]->sequence--;
-		}
-		hand[controler].pop_back();
+		hand[controler].erase(hand[controler].begin() + sequence);
+		ResetSequence(hand[controler], false);
 		break;
 	}
 	case LOCATION_MZONE: {
@@ -288,21 +278,26 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 	}
 	case LOCATION_GRAVE: {
 		pcard = grave[controler][sequence];
-		erase_card(grave[controler], sequence);
+		grave[controler].erase(grave[controler].begin() + sequence);
+		ResetSequence(grave[controler], true);
 		break;
 	}
 	case LOCATION_REMOVED: {
 		pcard = remove[controler][sequence];
-		erase_card(remove[controler], sequence);
+		remove[controler].erase(remove[controler].begin() + sequence);
+		ResetSequence(remove[controler], true);
 		break;
 	}
 	case LOCATION_EXTRA: {
 		pcard = extra[controler][sequence];
-		erase_card(extra[controler], sequence);
+		extra[controler].erase(extra[controler].begin() + sequence);
+		ResetSequence(extra[controler], true);
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]--;
 		break;
 	}
+	default:
+		return nullptr;
 	}
 	pcard->location = 0;
 	return pcard;

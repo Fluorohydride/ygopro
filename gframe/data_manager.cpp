@@ -1,6 +1,5 @@
 #include "data_manager.h"
 #include "game.h"
-#include <stdio.h>
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 #include "spmemvfs/spmemvfs.h"
 #endif
@@ -132,14 +131,14 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 }
 #ifndef YGOPRO_SERVER_MODE
 bool DataManager::LoadStrings(const char* file) {
-	FILE* fp = fopen(file, "r");
+	FILE* fp = std::fopen(file, "r");
 	if(!fp)
 		return false;
 	char linebuf[TEXT_LINE_SIZE]{};
-	while(fgets(linebuf, sizeof linebuf, fp)) {
+	while(std::fgets(linebuf, sizeof linebuf, fp)) {
 		ReadStringConfLine(linebuf);
 	}
-	fclose(fp);
+	std::fclose(fp);
 	return true;
 }
 bool DataManager::LoadStrings(irr::io::IReadFile* reader) {
@@ -163,26 +162,26 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 	char strbuf[TEXT_LINE_SIZE]{};
 	int value{};
 	wchar_t strBuffer[4096]{};
-	if (sscanf(linebuf, "!%63s", strbuf) != 1)
+	if (std::sscanf(linebuf, "!%63s", strbuf) != 1)
 		return;
 	if(!std::strcmp(strbuf, "system")) {
-		if (sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf) != 2)
+		if (std::sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_sysStrings[value] = strBuffer;
 	} else if(!std::strcmp(strbuf, "victory")) {
-		if (sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
+		if (std::sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_victoryStrings[value] = strBuffer;
 	} else if(!std::strcmp(strbuf, "counter")) {
-		if (sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
+		if (std::sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_counterStrings[value] = strBuffer;
 	} else if(!std::strcmp(strbuf, "setname")) {
 		//using tab for comment
-		if (sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf) != 2)
+		if (std::sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_setnameStrings[value] = strBuffer;
@@ -478,7 +477,7 @@ unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* sl
 unsigned char* DataManager::ReadScriptFromFile(const char* script_name, int* slen) {
 	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
-	FILE* fp = myfopen(fname, "rb");
+	FILE* fp = mywfopen(fname, "rb");
 	if (!fp)
 		return nullptr;
 	size_t len = std::fread(scriptBuffer, 1, sizeof scriptBuffer, fp);

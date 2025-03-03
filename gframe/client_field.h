@@ -96,6 +96,7 @@ public:
 	~ClientField();
 	void Clear();
 	void Initial(int player, int deckc, int extrac);
+	void ResetSequence(std::vector<ClientCard*>& list, bool reset_height);
 	ClientCard* GetCard(int controler, int location, int sequence, int sub_seq = 0);
 	void AddCard(ClientCard* pcard, int controler, int location, int sequence);
 	ClientCard* RemoveCard(int controler, int location, int sequence);
@@ -144,8 +145,8 @@ public:
 	ClientCard* menu_card{ nullptr };
 	int list_command{ 0 };
 
-	virtual bool OnEvent(const irr::SEvent& event);
-	virtual bool OnCommonEvent(const irr::SEvent& event);
+	bool OnEvent(const irr::SEvent& event) override;
+	bool OnCommonEvent(const irr::SEvent& event);
 	void GetHoverField(int x, int y);
 	void ShowMenu(int flag, int x, int y);
 	void HideMenu();

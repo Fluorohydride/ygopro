@@ -1,11 +1,10 @@
 #ifndef DECKMANAGER_H
 #define DECKMANAGER_H
 
-#include "config.h"
-#include "data_manager.h"
 #include <unordered_map>
 #include <vector>
 #include <sstream>
+#include "data_manager.h"
 
 #ifndef YGOPRO_MAX_DECK
 #define YGOPRO_MAX_DECK					60
@@ -39,7 +38,7 @@ struct Deck {
 	std::vector<code_pointer> main;
 	std::vector<code_pointer> extra;
 	std::vector<code_pointer> side;
-	Deck() {}
+	Deck() = default;
 	Deck(const Deck& ndeck) {
 		main = ndeck.main;
 		extra = ndeck.extra;
@@ -71,11 +70,11 @@ public:
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 #ifndef YGOPRO_SERVER_MODE
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
-	void GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	void GetDeckFile(wchar_t* ret, int category_index, const wchar_t* category_name, const wchar_t* deckname);
 	FILE* OpenDeckFile(const wchar_t* file, const char* mode);
-	IReadFile* OpenDeckReader(const wchar_t* file);
+	irr::io::IReadFile* OpenDeckReader(const wchar_t* file);
 	bool LoadCurrentDeck(const wchar_t* file, bool is_packlist = false);
-	bool LoadCurrentDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	bool LoadCurrentDeck(int category_index, const wchar_t* category_name, const wchar_t* deckname);
 	bool SaveDeck(Deck& deck, const wchar_t* file);
 	bool DeleteDeck(const wchar_t* file);
 	bool CreateCategory(const wchar_t* name);

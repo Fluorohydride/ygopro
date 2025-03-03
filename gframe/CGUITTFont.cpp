@@ -505,7 +505,7 @@ void CGUITTFont::drawUstring(const core::ustring& utext, const core::rect<s32>&p
 
 	// Set up some variables.
 	core::dimension2d<s32> textDimension;
-	core::position2d<s32> offset = position.UpperLeftCorner;
+	core::vector2d<s32> offset = position.UpperLeftCorner;
 
 	// Determine offset positions.
 	if (hcenter || vcenter) {
@@ -561,7 +561,7 @@ void CGUITTFont::drawUstring(const core::ustring& utext, const core::rect<s32>&p
 			// Determine rendering information.
 			SGUITTGlyph& glyph = Glyphs[n - 1];
 			CGUITTGlyphPage* const page = Glyph_Pages[glyph.glyph_page];
-			page->render_positions.push_back(core::position2di(offset.X + offx, offset.Y + offy));
+			page->render_positions.push_back(core::vector2di(offset.X + offx, offset.Y + offy));
 			page->render_source_rects.push_back(glyph.source_rect);
 			Render_Map.set(glyph.glyph_page, page);
 		}
@@ -832,7 +832,7 @@ video::IImage* CGUITTFont::createTextureFromChar(const uchar32_t& ch) {
 	// Copy the image data out of the page texture.
 	core::dimension2du glyph_size(glyph.source_rect.getSize());
 	video::IImage* image = Driver->createImage(format, glyph_size);
-	pageholder->copyTo(image, core::position2di(0, 0), glyph.source_rect);
+	pageholder->copyTo(image, core::vector2di(0, 0), glyph.source_rect);
 
 	tex->unlock();
 	return image;

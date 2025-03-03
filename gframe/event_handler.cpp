@@ -1073,8 +1073,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if(!mainGame->dInfo.isStarted)
 				break;
 			hovered_location = 0;
-			position2di pos = mainGame->ResizeReverse(event.MouseInput.X, event.MouseInput.Y);
-			position2di mousepos(event.MouseInput.X, event.MouseInput.Y);
+			irr::core::vector2di pos = mainGame->ResizeReverse(event.MouseInput.X, event.MouseInput.Y);
+			irr::core::vector2di mousepos(event.MouseInput.X, event.MouseInput.Y);
 			s32 x = pos.X;
 			s32 y = pos.Y;
 			if(x < 300)
@@ -1496,8 +1496,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if(!mainGame->dInfo.isStarted)
 				break;
 			bool should_show_tip = false;
-			position2di pos = mainGame->ResizeReverse(event.MouseInput.X, event.MouseInput.Y);
-			position2di mousepos = position2di(event.MouseInput.X, event.MouseInput.Y);
+			irr::core::vector2di pos = mainGame->ResizeReverse(event.MouseInput.X, event.MouseInput.Y);
+			irr::core::vector2di mousepos = irr::core::vector2di(event.MouseInput.X, event.MouseInput.Y);
 			s32 x = pos.X;
 			s32 y = pos.Y;
 			wchar_t formatBuffer[2048];
@@ -1554,7 +1554,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->stTip->isVisible()) {
 					should_show_tip = true;
 					irr::core::recti tpos = mainGame->stTip->getRelativePosition();
-					mainGame->stTip->setRelativePosition(irr::core::position2di(mousepos.X - tpos.getWidth() - 10, mcard ? mousepos.Y - tpos.getHeight() - 10 : y + 10));
+					mainGame->stTip->setRelativePosition(irr::core::vector2di(mousepos.X - tpos.getWidth() - 10, mcard ? mousepos.Y - tpos.getHeight() - 10 : y + 10));
 				}
 			}
 			if(mcard != hovered_card) {
@@ -2078,7 +2078,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 void ClientField::GetHoverField(int x, int y) {
 	irr::core::recti sfRect(430, 504, 875, 600);
 	irr::core::recti ofRect(531, 135, 800, 191);
-	irr::core::position2di pos(x, y);
+	irr::core::vector2di pos(x, y);
 	int rule = (mainGame->dInfo.duel_rule >= 4) ? 1 : 0;
 	if(sfRect.isPointInside(pos)) {
 		int hc = hand[0].size();
@@ -2315,22 +2315,22 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 	int offset = mainGame->gameConf.resize_popup_menu ? ((mainGame->yScale >= 0.666) ? 21 * mainGame->yScale : 14) : 21;
 	if(flag & COMMAND_ACTIVATE) {
 		mainGame->btnActivate->setVisible(true);
-		mainGame->btnActivate->setRelativePosition(position2di(1, height));
+		mainGame->btnActivate->setRelativePosition(irr::core::vector2di(1, height));
 		height += offset;
 	} else mainGame->btnActivate->setVisible(false);
 	if(flag & COMMAND_SUMMON) {
 		mainGame->btnSummon->setVisible(true);
-		mainGame->btnSummon->setRelativePosition(position2di(1, height));
+		mainGame->btnSummon->setRelativePosition(irr::core::vector2di(1, height));
 		height += offset;
 	} else mainGame->btnSummon->setVisible(false);
 	if(flag & COMMAND_SPSUMMON) {
 		mainGame->btnSPSummon->setVisible(true);
-		mainGame->btnSPSummon->setRelativePosition(position2di(1, height));
+		mainGame->btnSPSummon->setRelativePosition(irr::core::vector2di(1, height));
 		height += offset;
 	} else mainGame->btnSPSummon->setVisible(false);
 	if(flag & COMMAND_MSET) {
 		mainGame->btnMSet->setVisible(true);
-		mainGame->btnMSet->setRelativePosition(position2di(1, height));
+		mainGame->btnMSet->setRelativePosition(irr::core::vector2di(1, height));
 		height += offset;
 	} else mainGame->btnMSet->setVisible(false);
 	if(flag & COMMAND_SSET) {
@@ -2339,7 +2339,7 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 		else
 			mainGame->btnSSet->setText(dataManager.GetSysString(1159));
 		mainGame->btnSSet->setVisible(true);
-		mainGame->btnSSet->setRelativePosition(position2di(1, height));
+		mainGame->btnSSet->setRelativePosition(irr::core::vector2di(1, height));
 		height += offset;
 	} else mainGame->btnSSet->setVisible(false);
 	if(flag & COMMAND_REPOS) {
@@ -2350,27 +2350,27 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 		else
 			mainGame->btnRepos->setText(dataManager.GetSysString(1156));
 		mainGame->btnRepos->setVisible(true);
-		mainGame->btnRepos->setRelativePosition(position2di(1, height));
+		mainGame->btnRepos->setRelativePosition(irr::core::vector2di(1, height));
 		height += offset;
 	} else mainGame->btnRepos->setVisible(false);
 	if(flag & COMMAND_ATTACK) {
 		mainGame->btnAttack->setVisible(true);
-		mainGame->btnAttack->setRelativePosition(position2di(1, height));
+		mainGame->btnAttack->setRelativePosition(irr::core::vector2di(1, height));
 		height += offset;
 	} else mainGame->btnAttack->setVisible(false);
 	if(flag & COMMAND_LIST) {
 		mainGame->btnShowList->setVisible(true);
-		mainGame->btnShowList->setRelativePosition(position2di(1, height));
+		mainGame->btnShowList->setRelativePosition(irr::core::vector2di(1, height));
 		height += offset;
 	} else mainGame->btnShowList->setVisible(false);
 	if(flag & COMMAND_OPERATION) {
 		mainGame->btnOperation->setVisible(true);
-		mainGame->btnOperation->setRelativePosition(position2di(1, height));
+		mainGame->btnOperation->setRelativePosition(irr::core::vector2di(1, height));
 		height += offset;
 	} else mainGame->btnOperation->setVisible(false);
 	if(flag & COMMAND_RESET) {
 		mainGame->btnReset->setVisible(true);
-		mainGame->btnReset->setRelativePosition(position2di(1, height));
+		mainGame->btnReset->setRelativePosition(irr::core::vector2di(1, height));
 		height += offset;
 	} else mainGame->btnReset->setVisible(false);
 	panel = mainGame->wCmdMenu;

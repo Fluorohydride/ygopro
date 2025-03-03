@@ -88,13 +88,13 @@ public:
 
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
-		std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
+		std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%ls/*", wpath);
 		WIN32_FIND_DATAW fdataw;
 		HANDLE fh = FindFirstFileW(findstr, &fdataw);
 		if(fh == INVALID_HANDLE_VALUE)
 			return;
 		do {
-			if(mywcsncasecmp(fdataw.cFileName, L".", 1) && mywcsncasecmp(fdataw.cFileName, L"..", 2))
+			if(std::wcscmp(fdataw.cFileName, L".") && std::wcscmp(fdataw.cFileName, L".."))
 				cb(fdataw.cFileName, (fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
@@ -119,7 +119,7 @@ public:
 		while((wfile = std::wcspbrk(wfile, L"/")) != nullptr)
 			*wfile++ = '_';
 	}
-	
+
 	static bool IsFileExists(const char* file) {
 		struct stat fileStat;
 		return (stat(file, &fileStat) == 0) && !S_ISDIR(fileStat.st_mode);
@@ -228,7 +228,7 @@ public:
 #else
 			funit.filename = std::string(dirp->d_name);
 			funit.is_dir = S_ISDIR(fileStat.st_mode);
-			if(funit.is_dir && (strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0))
+			if(funit.is_dir && (std::strcmp(dirp->d_name, ".") == 0 || std::strcmp(dirp->d_name, "..") == 0))
 				continue;
 			file_list.push_back(funit);
 #endif
