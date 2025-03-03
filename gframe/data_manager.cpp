@@ -431,7 +431,9 @@ unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* sl
 	return scriptBuffer;
 }
 unsigned char* DataManager::ReadScriptFromFile(const char* script_name, int* slen) {
-	FILE* fp = std::fopen(script_name, "rb");
+	wchar_t fname[256]{};
+	BufferIO::DecodeUTF8(script_name, fname);
+	FILE* fp = myfopen(fname, "rb");
 	if (!fp)
 		return nullptr;
 	size_t len = std::fread(scriptBuffer, 1, sizeof scriptBuffer, fp);
