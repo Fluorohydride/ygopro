@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 	CFRelease(path);
 #endif //__APPLE__
 #ifdef _WIN32
-	if (argc == 2 && (ygo::IsExtension(argv[1], ".ydk") || ygo::IsExtension(argv[1], ".yrp"))) {
+	if (argc == 2 && (ygo::IsExtension(argv[1], ".ydk") || ygo::IsExtension(argv[1], ".yrp"))) { // open file from explorer
 		wchar_t exepath[MAX_PATH];
 		GetModuleFileNameW(nullptr, exepath, MAX_PATH);
 		wchar_t* p = std::wcsrchr(exepath, L'\\');
