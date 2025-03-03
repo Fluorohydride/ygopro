@@ -83,6 +83,11 @@ void ClientField::Clear() {
 		for(auto cit = extra[i].begin(); cit != extra[i].end(); ++cit)
 			delete *cit;
 		extra[i].clear();
+		deck_act[i] = false;
+		grave_act[i] = false;
+		remove_act[i] = false;
+		extra_act[i] = false;
+		pzone_act[i] = false;
 	}
 	for(auto sit = overlay_cards.begin(); sit != overlay_cards.end(); ++sit)
 		delete *sit;
@@ -108,12 +113,6 @@ void ClientField::Clear() {
 	hovered_controler = 0;
 	hovered_location = 0;
 	hovered_sequence = 0;
-	deck_act = false;
-	grave_act = false;
-	remove_act = false;
-	extra_act = false;
-	pzone_act[0] = false;
-	pzone_act[1] = false;
 	conti_act = false;
 	deck_reversed = false;
 	cant_check_grave = false;
@@ -358,13 +357,14 @@ void ClientField::ClearCommandFlag() {
 		(*cit)->cmdFlag = 0;
 	for(auto cit = attackable_cards.begin(); cit != attackable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
+	for(int i = 0; i < 2; ++i) {
+		deck_act[i] = false;
+		extra_act[i] = false;
+		grave_act[i] = false;
+		remove_act[i] = false;
+		pzone_act[i] = false;
+	}
 	conti_cards.clear();
-	deck_act = false;
-	extra_act = false;
-	grave_act = false;
-	remove_act = false;
-	pzone_act[0] = false;
-	pzone_act[1] = false;
 	conti_act = false;
 }
 void ClientField::ClearSelect() {
@@ -392,11 +392,14 @@ void ClientField::ClearChainSelect() {
 		(*cit)->is_selectable = false;
 		(*cit)->is_selected = false;
 	}
+	for(int i = 0; i < 2; ++i) {
+		deck_act[i] = false;
+		extra_act[i] = false;
+		grave_act[i] = false;
+		remove_act[i] = false;
+		pzone_act[i] = false;
+	}
 	conti_cards.clear();
-	deck_act = false;
-	grave_act = false;
-	remove_act = false;
-	extra_act = false;
 	conti_act = false;
 }
 // needs to be synchronized with EGET_SCROLL_BAR_CHANGED
