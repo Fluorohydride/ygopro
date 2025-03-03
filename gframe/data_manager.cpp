@@ -391,7 +391,7 @@ uint32_t DataManager::CardReader(uint32_t code, card_data* pData) {
 unsigned char* DataManager::ScriptReaderEx(const char* script_path, int* slen) {
 	// default script name: ./script/c%d.lua
 	if (std::strncmp(script_path, "./script", 8) != 0) // not a card script file
-		return ReadScriptFromFile(script_path, slen);
+		return ReadScriptFromIrrFS(script_path, slen);
 	const char* script_name = script_path + 2;
 	char expansions_path[1024]{};
 	std::snprintf(expansions_path, sizeof expansions_path, "./expansions/%s", script_name);
@@ -431,9 +431,7 @@ unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* sl
 	return scriptBuffer;
 }
 unsigned char* DataManager::ReadScriptFromFile(const char* script_name, int* slen) {
-	wchar_t fname[256]{};
-	BufferIO::DecodeUTF8(script_name, fname);
-	FILE* fp = mywfopen(fname, "rb");
+	FILE* fp = std::fopen(script_name, "rb");
 	if (!fp)
 		return nullptr;
 	size_t len = std::fread(scriptBuffer, 1, sizeof scriptBuffer, fp);
