@@ -69,7 +69,18 @@ void DeckBuilder::Initialize() {
 	mainGame->btnSideShuffle->setVisible(false);
 	mainGame->btnSideSort->setVisible(false);
 	mainGame->btnSideReload->setVisible(false);
-	filterList = &deckManager._lfList[mainGame->gameConf.use_lflist ? mainGame->gameConf.default_lflist : deckManager._lfList.size() - 1].content;
+	if (mainGame->gameConf.use_lflist) {
+		if (mainGame->gameConf.default_lflist >= 0 && mainGame->gameConf.default_lflist < (int)deckManager._lfList.size()) {
+			filterList = &deckManager._lfList[mainGame->gameConf.default_lflist];
+		}
+		else {
+			mainGame->gameConf.default_lflist = 0;
+			filterList = &deckManager._lfList.front();
+		}
+	}
+	else {
+		filterList = &deckManager._lfList.back();
+	}
 	ClearSearch();
 	rnd.reset((uint_fast32_t)std::time(nullptr));
 	mouse_pos.set(0, 0);
@@ -1480,7 +1491,7 @@ void DeckBuilder::FilterCards() {
 		if(filter_marks && (data.link_marker & filter_marks) != filter_marks)
 			continue;
 		if(filter_lm) {
-			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList).at(ptr->first) != filter_lm - 1))
+			if(filter_lm <= 3 && (!filterList->content.count(ptr->first) || filterList->content.at(ptr->first) != filter_lm - 1))
 				continue;
 			if(filter_lm == 4 && !(data.ot & AVAIL_OCG))
 				continue;
@@ -1822,8 +1833,8 @@ void DeckBuilder::pop_side(int seq) {
 bool DeckBuilder::check_limit(code_pointer pointer) {
 	unsigned int limitcode = pointer->second.alias ? pointer->second.alias : pointer->first;
 	int limit = 3;
-	auto flit = filterList->find(limitcode);
-	if(flit != filterList->end())
+	auto flit = filterList->content.find(limitcode);
+	if(flit != filterList->content.end())
 		limit = flit->second;
 	for(auto it = deckManager.current_deck.main.begin(); it != deckManager.current_deck.main.end(); ++it) {
 		if((*it)->first == limitcode || (*it)->second.alias == limitcode)

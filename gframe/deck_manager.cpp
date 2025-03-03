@@ -30,17 +30,14 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			}
 			if (cur == _lfList.rend())
 				continue;
-			int code = 0;
+			unsigned int code = 0;
 			int count = -1;
-			if (std::sscanf(linebuf, "%9d%*[ ]%9d", &code, &count) != 2)
-				continue;
-			if (code <= 0 || code > MAX_CARD_ID)
+			if (std::sscanf(linebuf, "%9u%*[ ]%9d", &code, &count) != 2)
 				continue;
 			if (count < 0 || count > 2)
 				continue;
-			unsigned int hcode = code;
 			cur->content[code] = count;
-			cur->hash = cur->hash ^ ((hcode << 18) | (hcode >> 14)) ^ ((hcode << (27 + count)) | (hcode >> (5 - count)));
+			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 		}
 		std::fclose(fp);
 	}
@@ -53,7 +50,7 @@ void DeckManager::LoadLFList() {
 	nolimit.hash = 0;
 	_lfList.push_back(nolimit);
 }
-const wchar_t* DeckManager::GetLFListName(int lfhash) {
+const wchar_t* DeckManager::GetLFListName(unsigned int lfhash) {
 	auto lit = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](const ygo::LFList& list) {
 		return list.hash == lfhash;
 	});
@@ -61,12 +58,12 @@ const wchar_t* DeckManager::GetLFListName(int lfhash) {
 		return lit->listName.c_str();
 	return dataManager.unknown_string;
 }
-const std::unordered_map<int, int>* DeckManager::GetLFListContent(int lfhash) {
+const LFList* DeckManager::GetLFList(unsigned int lfhash) {
 	auto lit = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](const ygo::LFList& list) {
 		return list.hash == lfhash;
 	});
-	if(lit != _lfList.end())
-		return &lit->content;
+	if (lit != _lfList.end())
+		return &(*lit);
 	return nullptr;
 }
 static unsigned int checkAvail(unsigned int ot, unsigned int avail) {
@@ -87,9 +84,10 @@ unsigned int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 		return (DECKERROR_EXTRACOUNT << 28) | (unsigned)deck.extra.size();
 	if(deck.side.size() > SIDE_MAX_SIZE)
 		return (DECKERROR_SIDECOUNT << 28) | (unsigned)deck.side.size();
-	auto list = GetLFListContent(lfhash);
-	if (!list)
+	auto lflist = GetLFList(lfhash);
+	if (!lflist)
 		return 0;
+	auto& list = lflist->content;
 	const unsigned int rule_map[6] = { AVAIL_OCG, AVAIL_TCG, AVAIL_SC, AVAIL_CUSTOM, AVAIL_OCGTCG, 0 };
 	unsigned int avail = 0;
 	if (rule >= 0 && rule < (int)(sizeof rule_map / sizeof rule_map[0]))
@@ -105,8 +103,8 @@ unsigned int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 		int dc = ccount[code];
 		if(dc > 3)
 			return (DECKERROR_CARDCOUNT << 28) | cit->first;
-		auto it = list->find(code);
-		if(it != list->end() && dc > it->second)
+		auto it = list.find(code);
+		if(it != list.end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) | cit->first;
 	}
 	for (auto& cit : deck.extra) {
@@ -120,8 +118,8 @@ unsigned int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 		int dc = ccount[code];
 		if(dc > 3)
 			return (DECKERROR_CARDCOUNT << 28) | cit->first;
-		auto it = list->find(code);
-		if(it != list->end() && dc > it->second)
+		auto it = list.find(code);
+		if(it != list.end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) | cit->first;
 	}
 	for (auto& cit : deck.side) {
@@ -135,8 +133,8 @@ unsigned int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 		int dc = ccount[code];
 		if(dc > 3)
 			return (DECKERROR_CARDCOUNT << 28) | cit->first;
-		auto it = list->find(code);
-		if(it != list->end() && dc > it->second)
+		auto it = list.find(code);
+		if(it != list.end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) | cit->first;
 	}
 	return 0;

@@ -1126,9 +1126,9 @@ void Game::WaitFrameSignal(int frame) {
 	signalFrame = (gameConf.quick_animation && frame >= 12) ? 12 : frame;
 	frameSignal.Wait();
 }
-void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const std::unordered_map<int,int>* lflist, bool drag) {
+void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lflist, bool drag) {
 	int code = cp->first;
-	int lcode = cp->second.alias;
+	auto lcode = cp->second.alias;
 	if(lcode == 0)
 		lcode = code;
 	irr::video::ITexture* img = imageManager.GetTextureThumb(code);
@@ -1144,8 +1144,9 @@ void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const std::unord
 		otloc = recti(pos.X + 7, pos.Y + 50 * mainGame->yScale, pos.X + 37 * mainGame->xScale, pos.Y + 65 * mainGame->yScale);
 	}
 	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height));
-	if(lflist->count(lcode)) {
-		switch((*lflist).at(lcode)) {
+	auto lfit = lflist->content.find(lcode);
+	if (lfit != lflist->content.end()) {
+		switch(lfit->second) {
 		case 0:
 			driver->draw2DImage(imageManager.tLim, limitloc, recti(0, 0, 64, 64), 0, 0, true);
 			break;
