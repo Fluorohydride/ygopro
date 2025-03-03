@@ -68,7 +68,7 @@ bool IsExtension(const char* filename, const char* extension) {
 
 bool Game::Initialize() {
 	LoadConfig();
-	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
+	irr::SIrrlichtCreationParameters params{};
 	params.AntiAlias = gameConf.antialias;
 	if(gameConf.use_d3d)
 		params.DriverType = irr::video::EDT_DIRECT3D9;
