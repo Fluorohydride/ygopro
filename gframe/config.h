@@ -72,6 +72,18 @@ inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
 	return fp;
 }
 
+#ifdef _WIN32
+inline FILE* myfopen(const char* filename, const char* mode) {
+	wchar_t wfilename[256]{};
+	BufferIO::DecodeUTF8(filename, wfilename);
+	wchar_t wmode[20]{};
+	BufferIO::CopyCharArray(mode, wmode);
+	return _wfopen(wfilename, wmode);
+}
+#else
+#define myfopen std::fopen
+#endif
+
 #include <irrlicht.h>
 using namespace irr;
 using namespace core;
