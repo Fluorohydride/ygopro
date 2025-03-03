@@ -76,7 +76,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		}
 		else if (step != SQLITE_DONE)
 			return Error(pDB, pStmt);
-	} while (step != SQLITE_DONE);
+	} while (step == SQLITE_ROW);
 	sqlite3_finalize(pStmt);
 	return true;
 }
