@@ -581,7 +581,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(sel);
 				wchar_t fname[256];
 				myswprintf(fname, L"./single/%ls", name);
-				FILE* fp = myfopen(fname, "rb");
+				FILE* fp = mywfopen(fname, "rb");
 				if(!fp) {
 					mainGame->stSinglePlayInfo->setText(L"");
 					break;
