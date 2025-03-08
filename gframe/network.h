@@ -10,7 +10,7 @@
 #include <event2/thread.h>
 #include <type_traits>
 
-#define check_trivially_copyable(T) static_assert(std::is_trivially_copyable<T>::value == true && std::is_standard_layout<T>::value == true, "not trivially copyable")
+#define check_trivially_copyable(T) static_assert(std::is_trivially_copyable_v<T> == true && std::is_standard_layout_v<T> == true, "not trivially copyable")
 
 namespace ygo {
 	constexpr int SIZE_NETWORK_BUFFER = 0x20000;
