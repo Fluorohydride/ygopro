@@ -143,7 +143,7 @@ public:
 		while (*pw != 0) {
 			unsigned cur = 0;
 			int codepoint_size = 0;
-			if (sizeof(wchar_t) == 2) {
+			if constexpr (sizeof(wchar_t) == 2) {
 				if (IsHighSurrogate(pw[0])) {
 					if (pw[1] == 0)
 						break;
@@ -220,7 +220,7 @@ public:
 			if (!IsUnicodeChar(cur))
 				continue;
 			if (cur >= 0x10000) {
-				if (sizeof(wchar_t) == 2)
+				if constexpr (sizeof(wchar_t) == 2)
 					codepoint_size = 2;
 				else
 					codepoint_size = 1;
