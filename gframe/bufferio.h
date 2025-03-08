@@ -138,8 +138,8 @@ public:
 	// UTF-16/UTF-32 to UTF-8
 	// return: string length
 	static int EncodeUTF8String(const wchar_t* wsrc, char* str, int size) {
-		auto pw = wsrc;
-		auto pstr = str;
+		const auto *pw = wsrc;
+		auto *pstr = str;
 		while (*pw != 0) {
 			unsigned cur = 0;
 			int codepoint_size = 0;

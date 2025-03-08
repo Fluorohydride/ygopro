@@ -320,8 +320,8 @@ void Game::DrawCards() {
 			DrawCard(*it);
 	}
 	for (auto cit = dField.overlay_cards.begin(); cit != dField.overlay_cards.end(); ++cit) {
-		auto pcard = (*cit);
-		auto olcard = pcard->overlayTarget;
+		auto *pcard = (*cit);
+		auto *olcard = pcard->overlayTarget;
 		if (pcard->aniFrame) {
 			DrawCard(pcard);
 		}
