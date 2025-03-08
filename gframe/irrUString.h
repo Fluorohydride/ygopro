@@ -449,7 +449,7 @@ public:
 	//! Returns the length of a ustring16 in full characters.
 	//! \return Length of a ustring16 in full characters.
 	u32 size() const {
-		if (sizeof(wchar_t) == 4) {
+		if constexpr (sizeof(wchar_t) == 4) {
 			return size_raw_;
 		} else {
 			if(size_ != 0xffffffff)
@@ -524,7 +524,7 @@ public:
 	//! \return A reference to our current string.
 	void validate() {
 		// Validate all unicode characters.
-		if (sizeof(wchar_t) == 4) {
+		if constexpr (sizeof(wchar_t) == 4) {
 			size_ = size_raw_;
 			return;
 		}
