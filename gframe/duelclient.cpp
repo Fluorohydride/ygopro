@@ -3872,7 +3872,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		break;
 	}
 	case MSG_RELOAD_FIELD: {
-		mainGame->gMutex.lock();
+		if (mainGame->dInfo.isReplaySkiping) {
+		}
+		else {
+			mainGame->gMutex.lock();
+		}
 		mainGame->dField.Clear();
 		mainGame->dInfo.duel_rule = BufferIO::ReadUInt8(pbuf);
 		int val = 0;
@@ -3978,7 +3982,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
 			mainGame->dField.last_chain = true;
 		}
-		mainGame->gMutex.unlock();
+		if (mainGame->dInfo.isReplaySkiping) {
+		}
+		else {
+			mainGame->gMutex.unlock();
+		}
 		break;
 	}
 	}
