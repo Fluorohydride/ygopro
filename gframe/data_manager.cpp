@@ -84,9 +84,9 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	char file[256];
 	BufferIO::EncodeUTF8(wfile, file);
 #ifdef _WIN32
-	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
+	auto reader = FileSystem->createAndOpenFile(wfile);
 #else
-	IReadFile* reader = FileSystem->createAndOpenFile(file);
+	auto reader = FileSystem->createAndOpenFile(file);
 #endif
 	if(reader == nullptr)
 		return false;
@@ -417,9 +417,9 @@ unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* sl
 #ifdef _WIN32
 	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
-	IReadFile* reader = FileSystem->createAndOpenFile(fname);
+	auto reader = FileSystem->createAndOpenFile(fname);
 #else
-	IReadFile* reader = FileSystem->createAndOpenFile(script_name);
+	auto reader = FileSystem->createAndOpenFile(script_name);
 #endif
 	if (!reader)
 		return nullptr;
