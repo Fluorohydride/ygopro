@@ -1345,13 +1345,13 @@ void Game::LoadConfig() {
 		if (std::sscanf(linebuf, "%63s = %959s", strbuf, valbuf) != 2)
 			continue;
 		if(!std::strcmp(strbuf, "antialias")) {
-			gameConf.antialias = strtol(valbuf, nullptr, 10);
+			gameConf.antialias = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "use_d3d")) {
-			gameConf.use_d3d = strtol(valbuf, nullptr, 10) > 0;
+			gameConf.use_d3d = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "use_image_scale")) {
-			gameConf.use_image_scale = strtol(valbuf, nullptr, 10) > 0;
+			gameConf.use_image_scale = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "errorlog")) {
-			unsigned int val = strtol(valbuf, nullptr, 10);
+			unsigned int val = std::strtol(valbuf, nullptr, 10);
 			enable_log = val & 0xff;
 		} else if(!std::strcmp(strbuf, "textfont")) {
 			int textfontsize = 0;
@@ -1362,94 +1362,94 @@ void Game::LoadConfig() {
 		} else if(!std::strcmp(strbuf, "numfont")) {
 			BufferIO::DecodeUTF8(valbuf, gameConf.numfont);
 		} else if(!std::strcmp(strbuf, "serverport")) {
-			gameConf.serverport = strtol(valbuf, nullptr, 10);
+			gameConf.serverport = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "lasthost")) {
 			BufferIO::DecodeUTF8(valbuf, gameConf.lasthost);
 		} else if(!std::strcmp(strbuf, "lastport")) {
 			BufferIO::DecodeUTF8(valbuf, gameConf.lastport);
 		} else if(!std::strcmp(strbuf, "automonsterpos")) {
-			gameConf.chkMAutoPos = strtol(valbuf, nullptr, 10);
+			gameConf.chkMAutoPos = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "autospellpos")) {
-			gameConf.chkSTAutoPos = strtol(valbuf, nullptr, 10);
+			gameConf.chkSTAutoPos = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "randompos")) {
-			gameConf.chkRandomPos = strtol(valbuf, nullptr, 10);
+			gameConf.chkRandomPos = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "autochain")) {
-			gameConf.chkAutoChain = strtol(valbuf, nullptr, 10);
+			gameConf.chkAutoChain = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "waitchain")) {
-			gameConf.chkWaitChain = strtol(valbuf, nullptr, 10);
+			gameConf.chkWaitChain = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "showchain")) {
-			gameConf.chkDefaultShowChain = strtol(valbuf, nullptr, 10);
+			gameConf.chkDefaultShowChain = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "mute_opponent")) {
-			gameConf.chkIgnore1 = strtol(valbuf, nullptr, 10);
+			gameConf.chkIgnore1 = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "mute_spectators")) {
-			gameConf.chkIgnore2 = strtol(valbuf, nullptr, 10);
+			gameConf.chkIgnore2 = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "use_lflist")) {
-			gameConf.use_lflist = strtol(valbuf, nullptr, 10);
+			gameConf.use_lflist = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "default_lflist")) {
-			gameConf.default_lflist = strtol(valbuf, nullptr, 10);
+			gameConf.default_lflist = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "default_rule")) {
-			gameConf.default_rule = strtol(valbuf, nullptr, 10);
+			gameConf.default_rule = std::strtol(valbuf, nullptr, 10);
 			if(gameConf.default_rule <= 0)
 				gameConf.default_rule = DEFAULT_DUEL_RULE;
 		} else if(!std::strcmp(strbuf, "hide_setname")) {
-			gameConf.hide_setname = strtol(valbuf, nullptr, 10);
+			gameConf.hide_setname = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "hide_hint_button")) {
-			gameConf.hide_hint_button = strtol(valbuf, nullptr, 10);
+			gameConf.hide_hint_button = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "control_mode")) {
-			gameConf.control_mode = strtol(valbuf, nullptr, 10);
+			gameConf.control_mode = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "draw_field_spell")) {
-			gameConf.draw_field_spell = strtol(valbuf, nullptr, 10);
+			gameConf.draw_field_spell = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "separate_clear_button")) {
-			gameConf.separate_clear_button = strtol(valbuf, nullptr, 10);
+			gameConf.separate_clear_button = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "auto_search_limit")) {
-			gameConf.auto_search_limit = strtol(valbuf, nullptr, 10);
+			gameConf.auto_search_limit = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "search_multiple_keywords")) {
-			gameConf.search_multiple_keywords = strtol(valbuf, nullptr, 10);
+			gameConf.search_multiple_keywords = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "ignore_deck_changes")) {
-			gameConf.chkIgnoreDeckChanges = strtol(valbuf, nullptr, 10);
+			gameConf.chkIgnoreDeckChanges = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "default_ot")) {
-			gameConf.defaultOT = strtol(valbuf, nullptr, 10);
+			gameConf.defaultOT = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "enable_bot_mode")) {
-			gameConf.enable_bot_mode = strtol(valbuf, nullptr, 10);
+			gameConf.enable_bot_mode = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "quick_animation")) {
-			gameConf.quick_animation = strtol(valbuf, nullptr, 10);
+			gameConf.quick_animation = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "auto_save_replay")) {
-			gameConf.auto_save_replay = strtol(valbuf, nullptr, 10);
+			gameConf.auto_save_replay = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "draw_single_chain")) {
-			gameConf.draw_single_chain = strtol(valbuf, nullptr, 10);
+			gameConf.draw_single_chain = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "hide_player_name")) {
-			gameConf.hide_player_name = strtol(valbuf, nullptr, 10);
+			gameConf.hide_player_name = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "prefer_expansion_script")) {
-			gameConf.prefer_expansion_script = strtol(valbuf, nullptr, 10);
+			gameConf.prefer_expansion_script = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "window_maximized")) {
-			gameConf.window_maximized = strtol(valbuf, nullptr, 10) > 0;
+			gameConf.window_maximized = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "window_width")) {
-			gameConf.window_width = strtol(valbuf, nullptr, 10);
+			gameConf.window_width = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "window_height")) {
-			gameConf.window_height = strtol(valbuf, nullptr, 10);
+			gameConf.window_height = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "resize_popup_menu")) {
-			gameConf.resize_popup_menu = strtol(valbuf, nullptr, 10) > 0;
+			gameConf.resize_popup_menu = std::strtol(valbuf, nullptr, 10) > 0;
 #ifdef YGOPRO_USE_IRRKLANG
 		} else if(!std::strcmp(strbuf, "enable_sound")) {
-			gameConf.enable_sound = strtol(valbuf, nullptr, 10) > 0;
+			gameConf.enable_sound = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "sound_volume")) {
-			int vol = strtol(valbuf, nullptr, 10);
+			int vol = std::strtol(valbuf, nullptr, 10);
 			if (vol < 0)
 				vol = 0;
 			else if (vol > 100)
 				vol = 100;
 			gameConf.sound_volume = (double)vol / 100;
 		} else if(!std::strcmp(strbuf, "enable_music")) {
-			gameConf.enable_music = strtol(valbuf, nullptr, 10) > 0;
+			gameConf.enable_music = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "music_volume")) {
-			int vol = strtol(valbuf, nullptr, 10);
+			int vol = std::strtol(valbuf, nullptr, 10);
 			if (vol < 0)
 				vol = 0;
 			else if (vol > 100)
 				vol = 100;
 			gameConf.music_volume = (double)vol / 100;
 		} else if(!std::strcmp(strbuf, "music_mode")) {
-			gameConf.music_mode = strtol(valbuf, nullptr, 10);
+			gameConf.music_mode = std::strtol(valbuf, nullptr, 10);
 #endif
 		} else {
 			// options allowing multiple words
