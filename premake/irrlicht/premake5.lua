@@ -90,15 +90,8 @@ project "irrlicht"
             "source/Irrlicht/libpng/pngwrite.c",
             "source/Irrlicht/libpng/pngwtran.c",
             "source/Irrlicht/libpng/pngwutil.c",
-            "source/Irrlicht/aesGladman/aescrypt.cpp",
-            "source/Irrlicht/aesGladman/aeskey.cpp",
-            "source/Irrlicht/aesGladman/aestab.cpp",
-            "source/Irrlicht/aesGladman/fileenc.cpp",
-            "source/Irrlicht/aesGladman/hmac.cpp",
-            "source/Irrlicht/aesGladman/prng.cpp",
-            "source/Irrlicht/aesGladman/pwd2key.cpp",
-            "source/Irrlicht/aesGladman/sha1.cpp",
-            "source/Irrlicht/aesGladman/sha2.cpp" }
+            "source/Irrlicht/aesGladman/*.h",
+            "source/Irrlicht/aesGladman/*.cpp" }
 
     filter { "system:windows" }
         defines { "_IRR_WCHAR_FILESYSTEM" }
