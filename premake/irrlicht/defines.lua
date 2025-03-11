@@ -1,3 +1,5 @@
 defines {
     "_IRR_STATIC_LIB_",
+    "NO_IRR_USE_NON_SYSTEM_BZLIB_",
+    "NO_IRR_COMPILE_WITH_BZIP2_",
 }

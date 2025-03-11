@@ -98,14 +98,7 @@ project "irrlicht"
             "source/Irrlicht/aesGladman/prng.cpp",
             "source/Irrlicht/aesGladman/pwd2key.cpp",
             "source/Irrlicht/aesGladman/sha1.cpp",
-            "source/Irrlicht/aesGladman/sha2.cpp",
-            "source/Irrlicht/bzip2/blocksort.c",
-            "source/Irrlicht/bzip2/bzcompress.c",
-            "source/Irrlicht/bzip2/bzlib.c",
-            "source/Irrlicht/bzip2/crctable.c",
-            "source/Irrlicht/bzip2/decompress.c",
-            "source/Irrlicht/bzip2/huffman.c",
-            "source/Irrlicht/bzip2/randtable.c" }
+            "source/Irrlicht/aesGladman/sha2.cpp" }
 
     filter { "system:windows" }
         defines { "_IRR_WCHAR_FILESYSTEM" }
