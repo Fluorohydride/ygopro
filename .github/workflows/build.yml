@@ -1,0 +1,349 @@
+name: Automated Test Build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019, windows-2022]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout repository with submodules
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+        submodules: true
+
+    - name: Update submodules
+      run: |
+        cd ocgcore
+        git checkout master
+        git pull origin master
+        cd ..
+#        cd script
+#        git checkout master
+#        git pull origin master
+#        cd ..
+
+    - name: Download premake
+      id: premake
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta5/premake-5.0.0-beta5-windows.zip
+        filename: premake5.zip
+
+    - name: Extract premake
+      run: |
+        7z x ${{ steps.premake.outputs.filepath }}
+
+    - name: Download libevent
+      id: libevent
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/libevent/libevent/releases/download/release-2.0.22-stable/libevent-2.0.22-stable.tar.gz
+        filename: libevent.tar.gz
+
+    - name: Extract libevent
+      run: |
+        tar xf ${{ steps.libevent.outputs.filepath }}
+        move libevent-2.0.22-stable event
+        xcopy /E event\WIN32-Code event\include
+
+    - name: Download freetype
+      id: freetype
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: http://downloads.sourceforge.net/freetype/freetype-2.13.3.tar.gz
+
+    - name: Extract freetype
+      run: |
+        tar xf ${{ steps.freetype.outputs.filepath }}
+        move freetype-2.13.3 freetype
+
+    - name: Download lua
+      id: lua
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
+
+    - name: Extract lua
+      run: |
+        tar xf ${{ steps.lua.outputs.filepath }}
+        move lua-5.4.7 lua
+
+    - name: Download sqlite
+      id: sqlite
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+
+    - name: Extract sqlite
+      run: |
+        7z x ${{ steps.sqlite.outputs.filepath }}
+        move sqlite-amalgamation-3490100 sqlite3
+
+    - name: Download irrKlang
+      id: irrKlang
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.ambiera.at/downloads/irrKlang-32bit-1.6.0.zip
+
+    - name: Extract irrKlang
+      run: |
+        7z x ${{ steps.irrKlang.outputs.filepath }}
+        move irrKlang-1.6.0 irrKlang
+
+    - name: Download irrlicht
+      run: |
+        git clone --depth=1 https://github.com/mercury233/irrlicht
+
+    - name: Check DirectX SDK
+      id: dxsdk
+      uses: actions/cache@v4
+      with:
+        key: dxsdk
+        path: DXSDK
+
+    - name: Download DirectX SDK
+      if: steps.dxsdk.outputs.cache-hit != 'true'
+      id: dxsdk-download
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe
+
+    - name: Install DirectX SDK
+      if: steps.dxsdk.outputs.cache-hit != 'true'
+      run: |
+        7z x ${{ steps.dxsdk-download.outputs.filepath }} -aoa
+
+    - name: Set DirectX SDK environment variable
+      run: |
+        $dxsdkPath = Resolve-Path 'DXSDK'
+        "DXSDK_DIR=$($dxsdkPath.ProviderPath)\" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+    - name: Copy premake files
+      run: |
+        xcopy /E premake\* .
+
+    - name: Use premake to generate Visual Studio solution (2019)
+      if: matrix.os == 'windows-2019'
+      run: |
+        .\premake5.exe vs2019 --winxp-support
+
+    - name: Use premake to generate Visual Studio solution (2022)
+      if: matrix.os == 'windows-2022'
+      run: |
+        .\premake5.exe vs2022
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Build solution
+      run: |
+        MSBuild.exe build\YGOPro.sln /m /p:Configuration=Release
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: YGOPro-${{ matrix.os }}
+        path: |
+          bin/release/YGOPro.exe
+
+  build-linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+#          - ubuntu-20.04
+          - ubuntu-22.04
+          - ubuntu-24.04
+        include:
+#          - os: ubuntu-20.04
+#            env:
+#              PREMAKE_VERSION: 5.0.0-beta2
+          - os: ubuntu-22.04
+            env:
+              PREMAKE_VERSION: 5.0.0-beta4
+          - os: ubuntu-24.04
+            env:
+              PREMAKE_VERSION: 5.0.0-beta5
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout repository with submodules
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+        submodules: true
+
+    - name: Update submodules
+      run: |
+        cd ocgcore
+        git checkout master
+        git pull origin master
+        cd ..
+#        cd script
+#        git checkout master
+#        git pull origin master
+#        cd ..
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libevent-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libsqlite3-dev libxxf86vm-dev
+
+    - name: Download premake
+      id: premake
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/premake/premake-core/releases/download/v${{ matrix.env.PREMAKE_VERSION }}/premake-${{ matrix.env.PREMAKE_VERSION }}-linux.tar.gz
+        filename: premake5.tar.gz
+
+    - name: Extract premake
+      run: |
+        tar xf ${{ steps.premake.outputs.filepath }}
+        chmod +x ./premake5
+
+    - name: Download lua
+      id: lua
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
+
+    - name: Extract lua
+      run: |
+        tar xf ${{ steps.lua.outputs.filepath }}
+        mv lua-5.4.7 lua
+
+    - name: Download irrlicht
+      run: |
+        git clone --depth=1 https://github.com/mercury233/irrlicht
+
+    - name: Copy premake files
+      run: |
+        cp -r premake/* .
+
+    - name: Use premake to generate make files
+      run: |
+        ./premake5 gmake --no-use-irrklang
+
+    - name: Make
+      run: |
+        cd build
+        make -j 4 config=release
+        cd ..
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: YGOPro-${{ matrix.os }}
+        path: |
+          bin/release/YGOPro
+
+  build-macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-13
+          - macos-15
+        include:
+          - os: macos-13
+            env:
+              PREMAKE_VERSION: 5.0.0-beta5
+          - os: macos-15
+            env:
+              PREMAKE_VERSION: 5.0.0-beta5
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout repository with submodules
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+        submodules: true
+
+    - name: Update submodules
+      run: |
+        cd ocgcore
+        git checkout master
+        git pull origin master
+        cd ..
+#        cd script
+#        git checkout master
+#        git pull origin master
+#        cd ..
+
+#    - name: Install dependencies
+#      run: |
+#        brew install freetype libevent libx11 sqlite zlib
+
+    - name: Download premake
+      id: premake
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/premake/premake-core/releases/download/v${{ matrix.env.PREMAKE_VERSION }}/premake-${{ matrix.env.PREMAKE_VERSION }}-macosx.tar.gz
+        filename: premake5.tar.gz
+
+    - name: Extract premake
+      run: |
+        tar xf ${{ steps.premake.outputs.filepath }}
+        chmod +x ./premake5
+
+    - name: Download lua
+      id: lua
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
+
+    - name: Extract lua
+      run: |
+        tar xf ${{ steps.lua.outputs.filepath }}
+        mv lua-5.4.7 lua
+
+    - name: Download irrlicht
+      run: |
+        git clone --depth=1 https://github.com/mercury233/irrlicht
+
+    - name: Build irrlicht
+      run: |
+        cd irrlicht/source/Irrlicht/MacOSX
+        xcodebuild -project MacOSX.xcodeproj
+        cd ../../../..
+
+    - name: Copy premake files
+      run: |
+        cp -r premake/* .
+
+    - name: Use premake to generate make files (Intel)
+      if: runner.arch == 'X64'
+      run: |
+        ./premake5 gmake --cc=clang --no-use-irrklang
+
+    - name: Use premake to generate make files (ARM)
+      if: runner.arch == 'ARM64'
+      run: |
+        ./premake5 gmake --cc=clang --no-use-irrklang --mac-arm
+
+    - name: Make
+      run: |
+        cd build
+        make -j 3 config=release
+        cd ..
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: YGOPro-${{ matrix.os }}
+        path: |
+          bin/*
