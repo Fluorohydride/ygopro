@@ -854,17 +854,14 @@ void CGUITTFont::createSharedPlane() {
 		0---1
 	*/
 
-	using namespace core;
-	using namespace video;
-	using namespace scene;
-	S3DVertex vertices[4];
+	video::S3DVertex vertices[4];
 	u16 indices[6] = {0, 2, 3, 3, 1, 0};
-	vertices[0] = S3DVertex(vector3df(0, -1, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(0, 1));
-	vertices[1] = S3DVertex(vector3df(1, -1, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(1, 1));
-	vertices[2] = S3DVertex(vector3df(0, 0, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vertices[3] = S3DVertex(vector3df(1, 0, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(1, 0));
+	vertices[0] = video::S3DVertex(core::vector3df(0, -1, 0), core::vector3df(0, 0, -1), video::SColor(255, 255, 255, 255), core::vector2df(0, 1));
+	vertices[1] = video::S3DVertex(core::vector3df(1, -1, 0), core::vector3df(0, 0, -1), video::SColor(255, 255, 255, 255), core::vector2df(1, 1));
+	vertices[2] = video::S3DVertex(core::vector3df(0, 0, 0), core::vector3df(0, 0, -1), video::SColor(255, 255, 255, 255), core::vector2df(0, 0));
+	vertices[3] = video::S3DVertex(core::vector3df(1, 0, 0), core::vector3df(0, 0, -1), video::SColor(255, 255, 255, 255), core::vector2df(1, 0));
 
-	SMeshBuffer* buf = new SMeshBuffer();
+	scene::SMeshBuffer* buf = new scene::SMeshBuffer();
 	buf->append(vertices, 4, indices, 6);
 
 	shared_plane_.addMeshBuffer( buf );
