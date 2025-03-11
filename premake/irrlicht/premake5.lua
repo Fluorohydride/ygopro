@@ -3,7 +3,7 @@ project "irrlicht"
 
     includedirs { "include", "source/Irrlicht", "source/Irrlicht/jpeglib", "source/Irrlicht/libpng", "source/Irrlicht/zlib" }
     
-    defines { "_IRR_STATIC_LIB_" }
+    dofile("defines.lua")
     exceptionhandling "Off"
     rtti "Off"
     
