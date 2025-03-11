@@ -284,6 +284,8 @@ public:
 	irr::scene::ISceneManager* smgr;
 	irr::scene::ICameraSceneNode* camera;
 
+	wchar_t currentCardName[256];
+
 #ifdef _WIN32
 	HWND hWnd;
 #endif
@@ -831,6 +833,7 @@ extern Game* mainGame;
 #define BUTTON_BIG_CARD_ZOOM_IN		381
 #define BUTTON_BIG_CARD_ZOOM_OUT	382
 #define BUTTON_BIG_CARD_ORIG_SIZE	383
+#define TEXT_CARD_NAME	384
 
 #define AVAIL_OCG					0x1
 #define AVAIL_TCG					0x2

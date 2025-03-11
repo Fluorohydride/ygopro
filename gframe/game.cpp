@@ -265,7 +265,7 @@ bool Game::Initialize() {
 	default:
 		cbRule->setSelected(5);
 		break;
-	}	
+	}
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
@@ -365,7 +365,7 @@ bool Game::Initialize() {
 	wInfos->setVisible(false);
 	//info
 	irr::gui::IGUITab* tabInfo = wInfos->addTab(dataManager.GetSysString(1270));
-	stName = env->addStaticText(L"", rect<s32>(10, 10, 287, 32), true, false, tabInfo, -1, false);
+	stName = env->addStaticText(L"", rect<s32>(10, 10, 287, 32), true, false, tabInfo, TEXT_CARD_NAME, false);
 	stName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stInfo = env->addStaticText(L"", rect<s32>(15, 37, 296, 60), false, true, tabInfo, -1, false);
 	stInfo->setOverrideColor(SColor(255, 0, 0, 255));
@@ -1555,10 +1555,13 @@ void Game::ShowCardInfo(int code, bool resize) {
 	imgCard->setImage(imageManager.GetTexture(code, true));
 	if (is_valid) {
 		auto& cd = cit->second;
-		if (cd.is_alternative())
+		if (cd.is_alternative()) {
 			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
-		else
+		}
+		else {
 			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
+		}
+		myswprintf(currentCardName, formatBuffer);
 	}
 	else {
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);

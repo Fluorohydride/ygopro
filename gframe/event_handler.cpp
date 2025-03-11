@@ -303,9 +303,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_OPTION_0:
-			case BUTTON_OPTION_1: 
-			case BUTTON_OPTION_2: 
-			case BUTTON_OPTION_3: 
+			case BUTTON_OPTION_1:
+			case BUTTON_OPTION_2:
+			case BUTTON_OPTION_3:
 			case BUTTON_OPTION_4: {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				int step = mainGame->scrOption->isVisible() ? mainGame->scrOption->getPos() : 0;
@@ -2069,6 +2069,24 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		}
 		default: break;
 		}
+	}
+	case irr::EET_MOUSE_INPUT_EVENT: {
+		switch (event.MouseInput.Event) {
+		case irr::EMIE_LMOUSE_LEFT_UP: {
+			s32 id = mainGame->env->getHovered()->getID();
+			switch (id) {
+				case TEXT_CARD_NAME: {
+					mainGame->env->getOSOperator()->copyToClipboard(mainGame->currentCardName);
+					soundManager.PlaySoundEffect(SOUND_COMMON_FEEDBACK);
+					return true;
+					break;
+				}
+				default: break;
+			}
+			break;
+		}
+		default: break;
+		}
 		break;
 	}
 	default: break;
@@ -2573,16 +2591,16 @@ void ClientField::CancelOrFinish() {
 		break;
 	}
 	case MSG_SELECT_UNSELECT_CARD: {
-        if (select_cancelable) {
-            DuelClient::SetResponseI(-1);
-            ShowCancelOrFinishButton(0);
-            if (mainGame->wCardSelect->isVisible())
-                mainGame->HideElement(mainGame->wCardSelect, true);
-            else
-                DuelClient::SendResponse();
-        }
-        break;
-    }
+		if (select_cancelable) {
+			DuelClient::SetResponseI(-1);
+			ShowCancelOrFinishButton(0);
+			if (mainGame->wCardSelect->isVisible())
+				mainGame->HideElement(mainGame->wCardSelect, true);
+			else
+				DuelClient::SendResponse();
+		}
+		break;
+	}
 	case MSG_SELECT_TRIBUTE: {
 		if(selected_cards.size() == 0) {
 			if(select_cancelable) {
