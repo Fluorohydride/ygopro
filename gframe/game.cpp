@@ -83,19 +83,6 @@ bool Game::Initialize() {
 #ifndef _DEBUG
 	device->getLogger()->setLogLevel(irr::ELOG_LEVEL::ELL_ERROR);
 #endif
-	xScale = 1;
-	yScale = 1;
-	linePatternD3D = 0;
-	linePatternGL = 0x0f0f;
-	waitFrame = 0;
-	signalFrame = 0;
-	showcard = 0;
-	is_attacking = false;
-	lpframe = 0;
-	always_chain = false;
-	ignore_chain = false;
-	chain_when_avail = false;
-	is_building = false;
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
@@ -982,8 +969,6 @@ bool Game::Initialize() {
 		yScale = window_size.Height / 640.0;
 		OnResize();
 	}
-	hideChat = false;
-	hideChatTimer = 0;
 	return true;
 }
 void Game::MainLoop() {
