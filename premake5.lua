@@ -49,7 +49,7 @@ newoption { trigger = "irrklang-pro-debug-lib-dir", category = "YGOPro - irrklan
 newoption { trigger = 'build-ikpmp3', category = "YGOPro - irrklang - ikpmp3", description = "" }
 
 newoption { trigger = "winxp-support", category = "YGOPro", description = "" }
-newoption { trigger = "mac-arm", category = "YGOPro", description = "M1" }
+newoption { trigger = "mac-arm", category = "YGOPro", description = "Cross compile for Apple Silicon" }
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))

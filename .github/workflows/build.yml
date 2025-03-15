@@ -325,15 +325,9 @@ jobs:
       run: |
         cp -r premake/* .
 
-    - name: Use premake to generate make files (Intel)
-      if: runner.arch == 'X64'
+    - name: Use premake to generate make files
       run: |
         ./premake5 gmake --cc=clang --no-use-irrklang
-
-    - name: Use premake to generate make files (ARM)
-      if: runner.arch == 'ARM64'
-      run: |
-        ./premake5 gmake --cc=clang --no-use-irrklang --mac-arm
 
     - name: Make
       run: |
