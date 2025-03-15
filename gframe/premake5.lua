@@ -4,7 +4,7 @@ include "spmemvfs/."
 project "YGOPro"
     kind "WindowedApp"
     cdialect "C11"
-    cppdialect "C++14"
+    cppdialect "C++17"
 
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore" }
