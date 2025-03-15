@@ -33,7 +33,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
-		s32 id = caller->getID();
+		irr::s32 id = caller->getID();
 		if(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) {
 			mainGame->wQuery->getParent()->bringToFront(mainGame->wQuery);
 			break;
@@ -400,7 +400,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					char arg3[8];
 					std::snprintf(arg3, sizeof arg3, "%d", mainGame->gameConf.serverport);
 					execl("./bot", "bot", arg1, arg2, arg3, nullptr);
-					exit(0);
+					std::exit(0);
 				} else {
 					if(!NetServer::StartServer(mainGame->gameConf.serverport)) {
 						soundManager.PlaySoundEffect(SOUND_INFO);

@@ -96,6 +96,7 @@ public:
 	~ClientField();
 	void Clear();
 	void Initial(int player, int deckc, int extrac);
+	void ResetSequence(std::vector<ClientCard*>& list, bool reset_height);
 	ClientCard* GetCard(int controler, int location, int sequence, int sub_seq = 0);
 	void AddCard(ClientCard* pcard, int controler, int location, int sequence);
 	ClientCard* RemoveCard(int controler, int location, int sequence);
