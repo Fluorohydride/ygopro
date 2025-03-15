@@ -49,7 +49,7 @@ newoption { trigger = "irrklang-pro-debug-lib-dir", category = "YGOPro - irrklan
 newoption { trigger = 'build-ikpmp3', category = "YGOPro - irrklang - ikpmp3", description = "" }
 
 newoption { trigger = "winxp-support", category = "YGOPro", description = "" }
-newoption { trigger = "mac-arm", category = "YGOPro", description = "M1" }
+newoption { trigger = "mac-arm", category = "YGOPro", description = "Cross compile for Apple Silicon" }
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
@@ -63,9 +63,9 @@ end
 if not BUILD_LUA then
     -- at most times you need to change this if you change BUILD_LUA to false
     -- make sure your lua lib is built with C++ and version >= 5.3
-    LUA_INCLUDE_DIR = GetParam("lua-include-dir") or "/usr/local/include/lua"
-    LUA_LIB_DIR = GetParam("lua-lib-dir") or "/usr/local/lib"
     LUA_LIB_NAME = GetParam("lua-lib-name")
+    LUA_INCLUDE_DIR = GetParam("lua-include-dir") or os.findheader(LUA_LIB_NAME)
+    LUA_LIB_DIR = GetParam("lua-lib-dir") or os.findlib(LUA_LIB_NAME)
 end
 
 if GetParam("build-event") then
@@ -74,8 +74,8 @@ elseif GetParam("no-build-event") then
     BUILD_EVENT = false
 end
 if not BUILD_EVENT then
-    EVENT_INCLUDE_DIR = GetParam("event-include-dir") or "/usr/local/include/event2"
-    EVENT_LIB_DIR = GetParam("event-lib-dir") or "/usr/local/lib"
+    EVENT_INCLUDE_DIR = GetParam("event-include-dir") or os.findheader("event")
+    EVENT_LIB_DIR = GetParam("event-lib-dir") or os.findlib("event")
 end
 
 if GetParam("build-freetype") then
@@ -84,13 +84,8 @@ elseif GetParam("no-build-freetype") then
     BUILD_FREETYPE = false
 end
 if not BUILD_FREETYPE then
-    if os.istarget("linux") then
-        FREETYPE_INCLUDE_DIR = "/usr/include/freetype2"
-    elseif os.istarget("macosx") then
-        FREETYPE_INCLUDE_DIR = "/usr/local/include/freetype2"
-    end
-    FREETYPE_INCLUDE_DIR = GetParam("freetype-include-dir") or FREETYPE_INCLUDE_DIR
-    FREETYPE_LIB_DIR = GetParam("freetype-lib-dir") or "/usr/local/lib"
+    FREETYPE_INCLUDE_DIR = GetParam("freetype-include-dir") or os.findheader("freetype")
+    FREETYPE_LIB_DIR = GetParam("freetype-lib-dir") or os.findlib("freetype")
 end
 
 if GetParam("build-sqlite") then
@@ -99,8 +94,8 @@ elseif GetParam("no-build-sqlite") then
     BUILD_SQLITE = false
 end
 if not BUILD_SQLITE then
-    SQLITE_INCLUDE_DIR = GetParam("sqlite-include-dir") or "/usr/local/include"
-    SQLITE_LIB_DIR = GetParam("sqlite-lib-dir") or "/usr/local/lib"
+    SQLITE_INCLUDE_DIR = GetParam("sqlite-include-dir") or os.findheader("sqlite3")
+    SQLITE_LIB_DIR = GetParam("sqlite-lib-dir") or os.findlib("sqlite3")
 end
 
 if GetParam("build-irrlicht") then
@@ -109,8 +104,8 @@ elseif GetParam("no-build-irrlicht") then
     BUILD_IRRLICHT = false
 end
 if not BUILD_IRRLICHT then
-    IRRLICHT_INCLUDE_DIR = GetParam("irrlicht-include-dir") or "/usr/local/include/irrlicht"
-    IRRLICHT_LIB_DIR = GetParam("irrlicht-lib-dir") or "/usr/local/lib"
+    IRRLICHT_INCLUDE_DIR = GetParam("irrlicht-include-dir") or os.findheader("irrlicht")
+    IRRLICHT_LIB_DIR = GetParam("irrlicht-lib-dir") or os.findlib("irrlicht")
 end
 
 if GetParam("use-irrklang") then
@@ -139,7 +134,7 @@ end
 if IRRKLANG_PRO then
     -- irrklang pro can't use the pro lib to debug
     IRRKLANG_PRO_RELEASE_LIB_DIR = GetParam("irrklang-pro-release-lib-dir") or "../irrklang/lib/Win32-vs2019"
-    IRRKLANG_PRO_DEBUG_LIB_DIR = GetParam("irrklang-pro-debug-lib-dir") or "../irrklang/lib/Win32-visualStudio-debug"  
+    IRRKLANG_PRO_DEBUG_LIB_DIR = GetParam("irrklang-pro-debug-lib-dir") or "../irrklang/lib/Win32-visualStudio-debug"
 end
 
 BUILD_IKPMP3 = USE_IRRKLANG and (GetParam("build-ikpmp3") or IRRKLANG_PRO)
@@ -191,7 +186,7 @@ workspace "YGOPro"
         targetdir "bin/debug"
 
     filter { "configurations:Release", "action:vs*" }
-        flags { "LinkTimeOptimization" }
+        linktimeoptimization "On"
         staticruntime "On"
         disablewarnings { "4244", "4267", "4838", "4577", "4018", "4996", "4477", "4091", "4800", "6011", "6031", "6054", "6262" }
 
@@ -209,7 +204,7 @@ workspace "YGOPro"
         vectorextensions "SSE2"
         buildoptions { "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
-    
+
     filter "not action:vs*"
         buildoptions { "-fno-strict-aliasing", "-Wno-multichar", "-Wno-format-security" }
 
