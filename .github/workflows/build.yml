@@ -234,7 +234,9 @@ jobs:
 
     - name: Use premake to generate make files
       run: |
-        ./premake5 gmake --no-use-irrklang
+        ./premake5 gmake \
+          --no-use-irrklang \
+          --freetype-include-dir="/usr/include/freetype2"
 
     - name: Make
       run: |
@@ -325,9 +327,30 @@ jobs:
       run: |
         cp -r premake/* .
 
-    - name: Use premake to generate make files
+    - name: Use premake to generate make files (Intel)
+      if: runner.arch == 'X64'
       run: |
-        ./premake5 gmake --cc=clang --no-use-irrklang
+        ./premake5 gmake \
+          --cc=clang \
+          --no-use-irrklang \
+          --freetype-include-dir="/usr/local/include/freetype2" \
+          --irrlicht-include-dir="../irrlicht/include" \
+          --irrlicht-lib-dir="../irrlicht/source/Irrlicht/MacOSX/build/Release"
+
+    - name: Use premake to generate make files (ARM64)
+      if: runner.arch == 'ARM64'
+      run: |
+        ./premake5 gmake \
+          --cc=clang \
+          --no-use-irrklang \
+          --event-include-dir="/opt/homebrew/include" \
+          --event-lib-dir="/opt/homebrew/lib" \
+          --freetype-include-dir="/opt/homebrew/include/freetype2" \
+          --freetype-lib-dir="/opt/homebrew/lib" \
+          --sqlite-include-dir="/opt/homebrew/opt/sqlite/include" \
+          --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
+          --irrlicht-include-dir="../irrlicht/include" \
+          --irrlicht-lib-dir="../irrlicht/source/Irrlicht/MacOSX/build/Release"
 
     - name: Make
       run: |
