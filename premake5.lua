@@ -63,9 +63,9 @@ end
 if not BUILD_LUA then
     -- at most times you need to change this if you change BUILD_LUA to false
     -- make sure your lua lib is built with C++ and version >= 5.3
-    LUA_INCLUDE_DIR = GetParam("lua-include-dir") or os.findheader("lua")
-    LUA_LIB_DIR = GetParam("lua-lib-dir") or os.findlib("lua")
     LUA_LIB_NAME = GetParam("lua-lib-name")
+    LUA_INCLUDE_DIR = GetParam("lua-include-dir") or os.findheader(LUA_LIB_NAME)
+    LUA_LIB_DIR = GetParam("lua-lib-dir") or os.findlib(LUA_LIB_NAME)
 end
 
 if GetParam("build-event") then
