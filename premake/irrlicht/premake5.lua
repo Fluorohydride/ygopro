@@ -1,5 +1,7 @@
 project "irrlicht"
     kind "StaticLib"
+    cdialect "C11"
+    cppdialect "C++14"
 
     includedirs { "include", "source/Irrlicht", "source/Irrlicht/jpeglib", "source/Irrlicht/libpng", "source/Irrlicht/zlib" }
     
