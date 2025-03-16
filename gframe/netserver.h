@@ -50,7 +50,7 @@ public:
 			bufferevent_write(dp->bev, net_server_write, 3);
 	}
 	template<typename ST>
-	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, ST& st) {
+	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, const ST& st) {
 		auto p = net_server_write;
 		if (sizeof(ST) > MAX_DATA_SIZE)
 			return;

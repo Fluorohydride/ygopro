@@ -2,7 +2,7 @@
 #include "game.h"
 #include "data_manager.h"
 #include <event2/thread.h>
-#include <locale.h>
+#include <clocale>
 #include <memory>
 #ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
@@ -26,7 +26,7 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 
 int main(int argc, char* argv[]) {
 #ifndef _WIN32
-	setlocale(LC_CTYPE, "UTF-8");
+	std::setlocale(LC_CTYPE, "UTF-8");
 #endif
 #if defined __APPLE__ && !defined YGOPRO_SERVER_MODE
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
 		return 0;
 
 #ifdef _WIN32
-	int wargc;
+	int wargc = 0;
 	std::unique_ptr<wchar_t*[], void(*)(wchar_t**)> wargv(CommandLineToArgvW(GetCommandLineW(), &wargc), [](wchar_t** wargv) {
 		LocalFree(wargv);
 	});
@@ -138,6 +138,24 @@ int main(int argc, char* argv[]) {
 	bool keep_on_return = false;
 	bool deckCategorySpecified = false;
 	for(int i = 1; i < wargc; ++i) {
+		if (wargc == 2 && std::wcslen(wargv[1]) >= 4) {
+			wchar_t* pstrext = wargv[1] + std::wcslen(wargv[1]) - 4;
+			if (!mywcsncasecmp(pstrext, L".ydk", 4)) {
+				open_file = true;
+				BufferIO::CopyWideString(wargv[1], open_file_name);
+				exit_on_return = true;
+				ClickButton(ygo::mainGame->btnDeckEdit);
+				break;
+			}
+			if (!mywcsncasecmp(pstrext, L".yrp", 4)) {
+				open_file = true;
+				BufferIO::CopyWideString(wargv[1], open_file_name);
+				exit_on_return = true;
+				ClickButton(ygo::mainGame->btnReplayMode);
+				ClickButton(ygo::mainGame->btnLoadReplay);
+				break;
+			}
+		}
 		if(wargv[i][0] == L'-' && wargv[i][1] == L'e' && wargv[i][2] != L'\0') {
 			ygo::dataManager.LoadDB(&wargv[i][2]);
 			continue;
@@ -233,23 +251,6 @@ int main(int argc, char* argv[]) {
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
-		} else if(wargc == 2 && std::wcslen(wargv[1]) >= 4) {
-			wchar_t* pstrext = wargv[1] + std::wcslen(wargv[1]) - 4;
-			if(!mywcsncasecmp(pstrext, L".ydk", 4)) {
-				open_file = true;
-				BufferIO::CopyWideString(wargv[i], open_file_name);
-				exit_on_return = !keep_on_return;
-				ClickButton(ygo::mainGame->btnDeckEdit);
-				break;
-			}
-			if(!mywcsncasecmp(pstrext, L".yrp", 4)) {
-				open_file = true;
-				BufferIO::CopyWideString(wargv[i], open_file_name);
-				exit_on_return = !keep_on_return;
-				ClickButton(ygo::mainGame->btnReplayMode);
-				ClickButton(ygo::mainGame->btnLoadReplay);
-				break;
-			}
 		}
 	}
 	ygo::mainGame->MainLoop();
