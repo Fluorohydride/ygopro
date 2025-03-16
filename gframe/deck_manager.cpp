@@ -196,7 +196,7 @@ int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_pa
 		if (linebuf[0] < '0' || linebuf[0] > '9')
 			continue;
 		errno = 0;
-		code = strtol(linebuf.c_str(), nullptr, 10);
+		code = std::strtol(linebuf.c_str(), nullptr, 10);
 		if (errno == ERANGE)
 			continue;
 		cardlist[ct++] = code;
@@ -279,7 +279,7 @@ irr::io::IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
 }
 bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	current_deck.clear();
-	IReadFile* reader = OpenDeckReader(file);
+	auto reader = OpenDeckReader(file);
 	if(!reader) {
 		wchar_t localfile[256];
 		myswprintf(localfile, L"./deck/%ls.ydk", file);
