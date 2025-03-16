@@ -1,5 +1,6 @@
 project "event"
     kind "StaticLib"
+    cdialect "C11"
 
     includedirs { "include", "compat" }
 

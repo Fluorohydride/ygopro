@@ -84,17 +84,17 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	char file[256];
 	BufferIO::EncodeUTF8(wfile, file);
 #ifdef _WIN32
-	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
+	auto reader = FileSystem->createAndOpenFile(wfile);
 #else
-	IReadFile* reader = FileSystem->createAndOpenFile(file);
+	auto reader = FileSystem->createAndOpenFile(file);
 #endif
 	if(reader == nullptr)
 		return false;
 	spmemvfs_db_t db;
-	spmembuffer_t* mem = (spmembuffer_t*)calloc(sizeof(spmembuffer_t), 1);
+	spmembuffer_t* mem = (spmembuffer_t*)std::calloc(sizeof(spmembuffer_t), 1);
 	spmemvfs_env_init();
 	mem->total = mem->used = reader->getSize();
-	mem->data = (char*)malloc(mem->total + 1);
+	mem->data = (char*)std::malloc(mem->total + 1);
 	reader->read(mem->data, mem->total);
 	reader->drop();
 	(mem->data)[mem->total] = '\0';
@@ -417,9 +417,9 @@ unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* sl
 #ifdef _WIN32
 	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
-	IReadFile* reader = FileSystem->createAndOpenFile(fname);
+	auto reader = FileSystem->createAndOpenFile(fname);
 #else
-	IReadFile* reader = FileSystem->createAndOpenFile(script_name);
+	auto reader = FileSystem->createAndOpenFile(script_name);
 #endif
 	if (!reader)
 		return nullptr;

@@ -1,7 +1,7 @@
 #ifndef REPLAY_MODE_H
 #define REPLAY_MODE_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 #include "replay.h"
 

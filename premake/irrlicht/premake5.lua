@@ -1,5 +1,6 @@
 project "irrlicht"
     kind "StaticLib"
+    cdialect "C11"
 
     includedirs { "include", "source/Irrlicht", "source/Irrlicht/jpeglib", "source/Irrlicht/libpng", "source/Irrlicht/zlib" }
     
