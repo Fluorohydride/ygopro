@@ -90,17 +90,6 @@ jobs:
         7z x ${{ steps.sqlite.outputs.filepath }}
         move sqlite-amalgamation-3490100 sqlite3
 
-    - name: Download irrKlang
-      id: irrKlang
-      uses: mercury233/action-cache-download-file@v1.0.0
-      with:
-        url: https://www.ambiera.at/downloads/irrKlang-32bit-1.6.0.zip
-
-    - name: Extract irrKlang
-      run: |
-        7z x ${{ steps.irrKlang.outputs.filepath }}
-        move irrKlang-1.6.0 irrKlang
-
     - name: Download irrlicht
       run: |
         git clone --depth=1 https://github.com/mercury233/irrlicht
@@ -232,7 +221,6 @@ jobs:
     - name: Use premake to generate make files
       run: |
         ./premake5 gmake \
-          --no-use-irrklang \
           --freetype-include-dir="/usr/include/freetype2"
 
     - name: Make
@@ -327,7 +315,6 @@ jobs:
       run: |
         ./premake5 gmake \
           --cc=clang \
-          --no-use-irrklang \
           --freetype-include-dir="/usr/local/include/freetype2" \
           --irrlicht-include-dir="../irrlicht/include" \
           --irrlicht-lib-dir="../irrlicht/source/Irrlicht/MacOSX/build/Release"
@@ -337,7 +324,6 @@ jobs:
       run: |
         ./premake5 gmake \
           --cc=clang \
-          --no-use-irrklang \
           --event-include-dir="/opt/homebrew/include" \
           --event-lib-dir="/opt/homebrew/lib" \
           --freetype-include-dir="/opt/homebrew/include/freetype2" \
