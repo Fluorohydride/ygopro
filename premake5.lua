@@ -186,7 +186,11 @@ workspace "YGOPro"
         targetdir "bin/debug"
 
     filter { "configurations:Release", "action:vs*" }
-        linktimeoptimization "On"
+        if linktimeoptimization then
+            linktimeoptimization "On"
+        else
+            flags { "LinkTimeOptimization" }
+        end
         staticruntime "On"
         disablewarnings { "4244", "4267", "4838", "4577", "4018", "4996", "4477", "4091", "4800", "6011", "6031", "6054", "6262" }
 
