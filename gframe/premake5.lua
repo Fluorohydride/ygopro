@@ -3,7 +3,6 @@ include "spmemvfs/."
 
 project "YGOPro"
     kind "WindowedApp"
-    cdialect "C11"
     cppdialect "C++14"
 
     files { "*.cpp", "*.h" }
