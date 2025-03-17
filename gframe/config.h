@@ -72,14 +72,8 @@ inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
 	return fp;
 }
 
-#ifndef YGOPRO_SERVER_MODE
+#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 #include <irrlicht.h>
-#endif
-
-#ifdef SERVER_ZIP_SUPPORT
-#include <irrlicht.h>
-using namespace irr;
-using namespace io;
 #endif
 
 extern const unsigned short PRO_VERSION;
