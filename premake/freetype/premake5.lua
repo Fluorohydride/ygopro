@@ -1,5 +1,6 @@
 project "freetype"
     kind "StaticLib"
+    cdialect "C11"
 
     includedirs { "include" }
     defines { "FT2_BUILD_LIBRARY" }
@@ -42,6 +43,10 @@ project "freetype"
             "src/type1/type1.c",
             "src/type42/type42.c",
             "src/winfonts/winfnt.c" }
+
+    if os.isfile("src/svg/svg.c") then
+        files { "src/svg/svg.c" }
+    end
 
     filter "system:windows"
         files { "builds/windows/ftsystem.c",

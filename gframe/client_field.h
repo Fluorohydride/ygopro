@@ -13,13 +13,13 @@ class ClientCard;
 
 struct ChainInfo {
 	irr::core::vector3df chain_pos;
-	ClientCard* chain_card;
-	int code;
-	int desc;
-	int controler;
-	int location;
-	int sequence;
-	bool solved;
+	ClientCard* chain_card{ nullptr };
+	int code{ 0 };
+	int desc{ 0 };
+	int controler{ 0 };
+	int location{ 0 };
+	int sequence{ 0 };
+	bool solved{ false };
 	std::set<ClientCard*> target;
 };
 
@@ -33,6 +33,7 @@ public:
 	std::vector<ClientCard*> remove[2];
 	std::vector<ClientCard*> extra[2];
 	std::set<ClientCard*> overlay_cards;
+
 	std::vector<ClientCard*> summonable_cards;
 	std::vector<ClientCard*> spsummonable_cards;
 	std::vector<ClientCard*> msetable_cards;
@@ -45,55 +46,62 @@ public:
 	std::vector<int> select_options;
 	std::vector<int> select_options_index;
 	std::vector<ChainInfo> chains;
-	int extra_p_count[2];
+	int extra_p_count[2]{};
 
-	size_t selected_option;
-	ClientCard* attacker;
-	ClientCard* attack_target;
-	unsigned int disabled_field;
-	unsigned int selectable_field;
-	unsigned int selected_field;
-	int select_min;
-	int select_max;
-	int must_select_count;
-	int select_sumval;
-	int select_mode;
-	bool select_cancelable;
-	bool select_panalmode;
-	bool select_ready;
-	int announce_count;
-	int select_counter_count;
-	int select_counter_type;
+	size_t selected_option{ 0 };
+	ClientCard* attacker{ nullptr };
+	ClientCard* attack_target{ nullptr };
+	unsigned int disabled_field{ 0 };
+	unsigned int selectable_field{ 0 };
+	unsigned int selected_field{ 0 };
+	int select_min{ 0 };
+	int select_max{ 0 };
+	int must_select_count{ 0 };
+	int select_curval_l{ 0 };
+	int select_curval_h{ 0 };
+	int select_sumval{ 0 };
+	int select_mode{ 0 };
+	int select_hint{0};
+	bool select_cancelable{false};
+	bool select_panalmode{ false };
+	bool select_ready{ false };
+	int announce_count{ 0 };
+	int select_counter_count{ 0 };
+	int select_counter_type{ 0 };
 	std::vector<ClientCard*> selectable_cards;
 	std::vector<ClientCard*> selected_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
-	std::vector<int> declare_opcodes;
+	std::vector<unsigned int> declare_opcodes;
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
-	bool grave_act;
-	bool remove_act;
-	bool deck_act;
-	bool extra_act;
-	bool pzone_act[2];
-	bool conti_act;
-	bool chain_forced;
+	bool grave_act{ false };
+	bool remove_act{ false };
+	bool deck_act{ false };
+	bool extra_act{ false };
+	bool pzone_act[2]{};
+	bool conti_act{ false };
+	bool chain_forced{ false };
 	ChainInfo current_chain;
-	bool last_chain;
-	bool deck_reversed;
-	bool conti_selecting;
-	bool cant_check_grave;
+	bool last_chain{ false };
+	bool deck_reversed{ false };
+	bool conti_selecting{ false };
+	bool cant_check_grave{ false };
+	bool tag_surrender{ false };
+	bool tag_teammate_surrender{ false };
 	mt19937 rnd;
 
 	ClientField();
+	~ClientField();
 	void Clear();
 	void Initial(int player, int deckc, int extrac);
+	void ResetSequence(std::vector<ClientCard*>& list, bool reset_height);
 	ClientCard* GetCard(int controler, int location, int sequence, int sub_seq = 0);
 	void AddCard(ClientCard* pcard, int controler, int location, int sequence);
 	ClientCard* RemoveCard(int controler, int location, int sequence);
-	void UpdateCard(int controler, int location, int sequence, char* data);
-	void UpdateFieldCard(int controler, int location, char* data);
+	void UpdateCard(int controler, int location, int sequence, unsigned char* data);
+	void UpdateFieldCard(int controler, int location, unsigned char* data);
 	void ClearCommandFlag();
 	void ClearSelect();
 	void ClearChainSelect();
@@ -121,24 +129,24 @@ public:
 
 	void UpdateDeclarableList();
 
-	irr::gui::IGUIElement* panel;
+	irr::gui::IGUIElement* panel{ nullptr };
 	std::vector<int> ancard;
-	int hovered_controler;
-	int hovered_location;
-	size_t hovered_sequence;
-	int command_controler;
-	int command_location;
-	size_t command_sequence;
-	ClientCard* hovered_card;
-	int hovered_player;
-	ClientCard* clicked_card;
-	ClientCard* command_card;
-	ClientCard* highlighting_card;
-	ClientCard* menu_card;
-	int list_command;
+	int hovered_controler{ 0 };
+	int hovered_location{ 0 };
+	size_t hovered_sequence{ 0 };
+	int command_controler{ 0 };
+	int command_location{ 0 };
+	size_t command_sequence{ 0 };
+	ClientCard* hovered_card{ nullptr };
+	int hovered_player{ 0 };
+	ClientCard* clicked_card{ nullptr };
+	ClientCard* command_card{ nullptr };
+	ClientCard* highlighting_card{ nullptr };
+	ClientCard* menu_card{ nullptr };
+	int list_command{ 0 };
 
-	virtual bool OnEvent(const irr::SEvent& event);
-	virtual bool OnCommonEvent(const irr::SEvent& event);
+	bool OnEvent(const irr::SEvent& event) override;
+	bool OnCommonEvent(const irr::SEvent& event);
 	void GetHoverField(int x, int y);
 	void ShowMenu(int flag, int x, int y);
 	void HideMenu();
@@ -154,8 +162,6 @@ public:
 }
 
 //special cards
-#define CARD_MARINE_DOLPHIN	78734254
-#define CARD_TWINKLE_MOSS	13857930
 #define CARD_QUESTION		38723936
 
 #endif //CLIENT_FIELD_H
