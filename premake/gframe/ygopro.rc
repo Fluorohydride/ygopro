@@ -1,8 +1,8 @@
 1 ICON "ygopro.ico"
 
 1 VERSIONINFO
-FILEVERSION 1, 0, 35, 3
-PRODUCTVERSION 1, 0, 35, 3
+FILEVERSION 1, 0, 36, 1
+PRODUCTVERSION 1, 0, 36, 1
 FILEOS 0x4
 FILETYPE 0x1
 
@@ -13,11 +13,11 @@ BLOCK "080404b0"
 BEGIN
 VALUE "FileDescription", "YGOPro"
 VALUE "InternalName", "YGOPro"
-VALUE "LegalCopyright", "Copyright (C) 2022 Fluorohydride"
+VALUE "LegalCopyright", "Copyright (C) 2025 Fluorohydride"
 VALUE "OriginalFilename", "YGOPro.exe"
 VALUE "ProductName", "YGOPro"
-VALUE "FileVersion", "1.035.3"
-VALUE "ProductVersion", "1.035.3"
+VALUE "FileVersion", "1.036.1"
+VALUE "ProductVersion", "1.036.1"
 END
 END
 BLOCK "VarFileInfo"
