@@ -56,7 +56,7 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 	}
 	if(flag & QUERY_POSITION) {
 		int pdata = (BufferIO::ReadInt32(buf) >> 24) & 0xff;
-		if((location & (LOCATION_EXTRA | LOCATION_REMOVED)) && (u8)pdata != position) {
+		if((location & (LOCATION_EXTRA | LOCATION_REMOVED)) && pdata != position) {
 			position = pdata;
 			mainGame->dField.MoveCard(this, 1);
 		} else

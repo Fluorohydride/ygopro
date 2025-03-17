@@ -53,7 +53,7 @@ public:
 		bufferevent_write(client_bev, duel_client_write, 3);
 	}
 	template<typename ST>
-	static void SendPacketToServer(unsigned char proto, ST& st) {
+	static void SendPacketToServer(unsigned char proto, const ST& st) {
 		auto p = duel_client_write;
 		if (sizeof(ST) > MAX_DATA_SIZE)
 			return;

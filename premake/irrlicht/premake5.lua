@@ -1,5 +1,6 @@
 project "irrlicht"
     kind "StaticLib"
+    cdialect "C11"
 
     includedirs { "include", "source/Irrlicht", "source/Irrlicht/jpeglib", "source/Irrlicht/libpng", "source/Irrlicht/zlib" }
     
@@ -318,7 +319,7 @@ project "irrlicht"
 
     filter { "system:windows" }
         defines { "_IRR_WCHAR_FILESYSTEM" }
-        includedirs { "$(DXSDK_DIR)include" }
+        includedirs { "$(DXSDK_DIR)Include" }
         libdirs { "$(DXSDK_DIR)Lib/x86" }
         links { "imm32" }
 

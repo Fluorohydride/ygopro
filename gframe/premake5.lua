@@ -3,6 +3,7 @@ include "spmemvfs/."
 
 project "YGOPro"
     kind "WindowedApp"
+    cppdialect "C++14"
 
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore" }
@@ -65,7 +66,7 @@ project "YGOPro"
         end
         links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32" }
     filter "not action:vs*"
-        buildoptions { "-std=c++14", "-fno-rtti" }
+        buildoptions { "-fno-rtti" }
     filter "not system:windows"
         links { "event_pthreads", "dl", "pthread" }
     filter "system:macosx"

@@ -69,7 +69,18 @@ void DeckBuilder::Initialize() {
 	mainGame->btnSideShuffle->setVisible(false);
 	mainGame->btnSideSort->setVisible(false);
 	mainGame->btnSideReload->setVisible(false);
-	filterList = &deckManager._lfList[mainGame->gameConf.use_lflist ? mainGame->gameConf.default_lflist : deckManager._lfList.size() - 1].content;
+	if (mainGame->gameConf.use_lflist) {
+		if (mainGame->gameConf.default_lflist >= 0 && mainGame->gameConf.default_lflist < (int)deckManager._lfList.size()) {
+			filterList = &deckManager._lfList[mainGame->gameConf.default_lflist];
+		}
+		else {
+			mainGame->gameConf.default_lflist = 0;
+			filterList = &deckManager._lfList.front();
+		}
+	}
+	else {
+		filterList = &deckManager._lfList.back();
+	}
 	ClearSearch();
 	rnd.reset((uint_fast32_t)std::time(nullptr));
 	mouse_pos.set(0, 0);
@@ -126,7 +137,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		return false;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
-		s32 id = event.GUIEvent.Caller->getID();
+		irr::s32 id = event.GUIEvent.Caller->getID();
 		if(((mainGame->wCategories->isVisible() && id != BUTTON_CATEGORY_OK) ||
 			(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) ||
 			(mainGame->wLinkMarks->isVisible() && id != BUTTON_MARKERS_OK) ||
@@ -1259,7 +1270,7 @@ void DeckBuilder::GetHoveredCard() {
 	irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 	if(root->getElementFromPoint(mouse_pos) != root)
 		return;
-	position2di pos = mainGame->ResizeReverse(mouse_pos.X, mouse_pos.Y);
+	irr::core::vector2di pos = mainGame->ResizeReverse(mouse_pos.X, mouse_pos.Y);
 	int x = pos.X;
 	int y = pos.Y;
 	is_lastcard = 0;
@@ -1515,7 +1526,7 @@ void DeckBuilder::FilterCards() {
 		if(filter_marks && (data.link_marker & filter_marks) != filter_marks)
 			continue;
 		if(filter_lm) {
-			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList).at(ptr->first) != filter_lm - 1))
+			if(filter_lm <= 3 && (!filterList->content.count(ptr->first) || filterList->content.at(ptr->first) != filter_lm - 1))
 				continue;
 			if(filter_lm == 4 && !(data.ot & AVAIL_OCG))
 				continue;
@@ -1704,13 +1715,13 @@ void DeckBuilder::ShowDeckManage() {
 void DeckBuilder::ShowBigCard(int code, float zoom) {
 	bigcard_code = code;
 	bigcard_zoom = zoom;
-	ITexture* img = imageManager.GetBigPicture(code, zoom);
+	auto img = imageManager.GetBigPicture(code, zoom);
 	mainGame->imgBigCard->setImage(img);
 	auto size = img->getSize();
-	s32 left = mainGame->window_size.Width / 2 - size.Width / 2;
-	s32 top = mainGame->window_size.Height / 2 - size.Height / 2;
-	mainGame->imgBigCard->setRelativePosition(recti(0, 0, size.Width, size.Height));
-	mainGame->wBigCard->setRelativePosition(recti(left, top, left + size.Width, top + size.Height));
+	irr::s32 left = mainGame->window_size.Width / 2 - size.Width / 2;
+	irr::s32 top = mainGame->window_size.Height / 2 - size.Height / 2;
+	mainGame->imgBigCard->setRelativePosition(irr::core::recti(0, 0, size.Width, size.Height));
+	mainGame->wBigCard->setRelativePosition(irr::core::recti(left, top, left + size.Width, top + size.Height));
 	mainGame->gMutex.lock();
 	mainGame->btnBigCardOriginalSize->setVisible(true);
 	mainGame->btnBigCardZoomIn->setVisible(true);
@@ -1720,12 +1731,12 @@ void DeckBuilder::ShowBigCard(int code, float zoom) {
 	mainGame->env->getRootGUIElement()->bringToFront(mainGame->wBigCard);
 	mainGame->gMutex.unlock();
 }
-void DeckBuilder::ZoomBigCard(s32 centerx, s32 centery) {
+void DeckBuilder::ZoomBigCard(irr::s32 centerx, irr::s32 centery) {
 	if(bigcard_zoom >= 4)
 		bigcard_zoom = 4;
 	if(bigcard_zoom <= 0.2f)
 		bigcard_zoom = 0.2f;
-	ITexture* img = imageManager.GetBigPicture(bigcard_code, bigcard_zoom);
+	auto img = imageManager.GetBigPicture(bigcard_code, bigcard_zoom);
 	mainGame->imgBigCard->setImage(img);
 	auto size = img->getSize();
 	auto pos = mainGame->wBigCard->getRelativePosition();
@@ -1735,10 +1746,10 @@ void DeckBuilder::ZoomBigCard(s32 centerx, s32 centery) {
 	}
 	float posx = (float)(centerx - pos.UpperLeftCorner.X) / pos.getWidth();
 	float posy = (float)(centery - pos.UpperLeftCorner.Y) / pos.getHeight();
-	s32 left = centerx - size.Width * posx;
-	s32 top = centery - size.Height * posy;
-	mainGame->imgBigCard->setRelativePosition(recti(0, 0, size.Width, size.Height));
-	mainGame->wBigCard->setRelativePosition(recti(left, top, left + size.Width, top + size.Height));
+	irr::s32 left = centerx - size.Width * posx;
+	irr::s32 top = centery - size.Height * posy;
+	mainGame->imgBigCard->setRelativePosition(irr::core::recti(0, 0, size.Width, size.Height));
+	mainGame->wBigCard->setRelativePosition(irr::core::recti(left, top, left + size.Width, top + size.Height));
 }
 void DeckBuilder::CloseBigCard() {
 	mainGame->HideElement(mainGame->wBigCard);
@@ -1857,8 +1868,8 @@ void DeckBuilder::pop_side(int seq) {
 bool DeckBuilder::check_limit(code_pointer pointer) {
 	unsigned int limitcode = pointer->second.alias ? pointer->second.alias : pointer->first;
 	int limit = 3;
-	auto flit = filterList->find(limitcode);
-	if(flit != filterList->end())
+	auto flit = filterList->content.find(limitcode);
+	if(flit != filterList->content.end())
 		limit = flit->second;
 	for(auto it = deckManager.current_deck.main.begin(); it != deckManager.current_deck.main.end(); ++it) {
 		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
