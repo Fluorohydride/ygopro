@@ -1,20 +1,24 @@
 #include "image_manager.h"
 #include "game.h"
+#include <thread>
 
 namespace ygo {
 
 ImageManager imageManager;
 
 bool ImageManager::Initial() {
-	tCover[0] = NULL;
-	tCover[1] = NULL;
+	tCover[0] = nullptr;
+	tCover[1] = nullptr;
 	tCover[2] = GetTextureFromFile("textures/cover.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	tCover[3] = GetTextureFromFile("textures/cover2.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	if(!tCover[3])
 		tCover[3] = tCover[2];
-	tUnknown = NULL;
-	tUnknownFit = NULL;
-	tUnknownThumb = NULL;
+	tUnknown = nullptr;
+	tUnknownFit = nullptr;
+	tUnknownThumb = nullptr;
+	tBigPicture = nullptr;
+	tLoading = nullptr;
+	tThumbLoadingThreadRunning = false;
 	tAct = driver->getTexture("textures/act.png");
 	tAttack = driver->getTexture("textures/attack.png");
 	tChain = driver->getTexture("textures/chain.png");
@@ -31,9 +35,9 @@ bool ImageManager::Initial() {
 	tHand[0] = driver->getTexture("textures/f1.jpg");
 	tHand[1] = driver->getTexture("textures/f2.jpg");
 	tHand[2] = driver->getTexture("textures/f3.jpg");
-	tBackGround = NULL;
-	tBackGround_menu = NULL;
-	tBackGround_deck = NULL;
+	tBackGround = nullptr;
+	tBackGround_menu = nullptr;
+	tBackGround_deck = nullptr;
 	tField[0] = driver->getTexture("textures/field2.png");
 	tFieldTransparent[0] = driver->getTexture("textures/field-transparent2.png");
 	tField[1] = driver->getTexture("textures/field3.png");
@@ -55,12 +59,22 @@ void ImageManager::ClearTexture() {
 			driver->removeTexture(tit->second);
 	}
 	for(auto tit = tThumb.begin(); tit != tThumb.end(); ++tit) {
-		if(tit->second)
+		if(tit->second && tit->second != tLoading)
 			driver->removeTexture(tit->second);
+	}
+	if(tBigPicture != nullptr) {
+		driver->removeTexture(tBigPicture);
+		tBigPicture = nullptr;
 	}
 	tMap[0].clear();
 	tMap[1].clear();
 	tThumb.clear();
+	tThumbLoadingMutex.lock();
+	tThumbLoading.clear();
+	while(!tThumbLoadingCodes.empty())
+		tThumbLoadingCodes.pop();
+	tThumbLoadingThreadRunning = false;
+	tThumbLoadingMutex.unlock();
 	tFields.clear();
 }
 void ImageManager::RemoveTexture(int code) {
@@ -96,9 +110,11 @@ void ImageManager::ResizeTexture() {
 	driver->removeTexture(tUnknown);
 	driver->removeTexture(tUnknownFit);
 	driver->removeTexture(tUnknownThumb);
+	driver->removeTexture(tLoading);
 	tUnknown = GetTextureFromFile("textures/unknown.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	tUnknownFit = GetTextureFromFile("textures/unknown.jpg", imgWidthFit, imgHeightFit);
 	tUnknownThumb = GetTextureFromFile("textures/unknown.jpg", imgWidthThumb, imgHeightThumb);
+	tLoading = GetTextureFromFile("textures/cover.jpg", imgWidthThumb, imgHeightThumb);
 	driver->removeTexture(tBackGround);
 	tBackGround = GetTextureFromFile("textures/bg.jpg", bgWidth, bgHeight);
 	driver->removeTexture(tBackGround_menu);
@@ -113,7 +129,7 @@ void ImageManager::ResizeTexture() {
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
 void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 	double sx, sy, minsx, maxsx, minsy, maxsy, area, ra, ga, ba, aa, pw, ph, pa;
-	u32 dy, dx;
+	irr::u32 dy, dx;
 	irr::video::SColor pxl;
 
 	// Cache rectsngle boundaries.
@@ -122,7 +138,7 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 
 	// Walk each destination image pixel.
 	// Note: loop y around x for better cache locality.
-	irr::core::dimension2d<u32> dim = dest->getDimension();
+	irr::core::dimension2d<irr::u32> dim = dest->getDimension();
 	for(dy = 0; dy < dim.Height; dy++)
 		for(dx = 0; dx < dim.Width; dx++) {
 
@@ -160,7 +176,7 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 
 					// Get source pixel and add it to totals, weighted
 					// by covered area and alpha.
-					pxl = src->getPixel((u32)sx, (u32)sy);
+					pxl = src->getPixel((irr::u32)sx, (irr::u32)sy);
 					area += pa;
 					ra += pa * pxl.getRed();
 					ga += pa * pxl.getGreen();
@@ -183,16 +199,16 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 			dest->setPixel(dx, dy, pxl);
 		}
 }
-irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, s32 width, s32 height) {
+irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, irr::s32 width, irr::s32 height) {
 	if(mainGame->gameConf.use_image_scale) {
 		irr::video::ITexture* texture;
 		irr::video::IImage* srcimg = driver->createImageFromFile(file);
-		if(srcimg == NULL)
-			return NULL;
-		if(srcimg->getDimension() == irr::core::dimension2d<u32>(width, height)) {
+		if(srcimg == nullptr)
+			return nullptr;
+		if(srcimg->getDimension() == irr::core::dimension2d<irr::u32>(width, height)) {
 			texture = driver->addTexture(file, srcimg);
 		} else {
-			video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<u32>(width, height));
+			irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
 			imageScaleNNAA(srcimg, destimg);
 			texture = driver->addTexture(file, destimg);
 			destimg->drop();
@@ -218,48 +234,139 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	auto tit = tMap[fit ? 1 : 0].find(code);
 	if(tit == tMap[fit ? 1 : 0].end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/%d.jpg", code);
+		std::snprintf(file, sizeof file, "expansions/pics/%d.jpg", code);
 		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
-		if(img == NULL) {
-			sprintf(file, "pics/%d.jpg", code);
+		if(img == nullptr) {
+			std::snprintf(file, sizeof file, "pics/%d.jpg", code);
 			img = GetTextureFromFile(file, width, height);
 		}
-		if(img == NULL && !mainGame->gameConf.use_image_scale) {
-			tMap[fit ? 1 : 0][code] = NULL;
+		if(img == nullptr && !mainGame->gameConf.use_image_scale) {
+			tMap[fit ? 1 : 0][code] = nullptr;
 			return GetTextureThumb(code);
 		}
 		tMap[fit ? 1 : 0][code] = img;
-		return (img == NULL) ? (fit ? tUnknownFit : tUnknown) : img;
+		return (img == nullptr) ? (fit ? tUnknownFit : tUnknown) : img;
 	}
 	if(tit->second)
 		return tit->second;
 	else
 		return mainGame->gameConf.use_image_scale ? (fit ? tUnknownFit : tUnknown) : GetTextureThumb(code);
 }
+irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
+	if(code == 0)
+		return tUnknown;
+	if(tBigPicture != nullptr) {
+		driver->removeTexture(tBigPicture);
+		tBigPicture = nullptr;
+	}
+	irr::video::ITexture* texture;
+	char file[256];
+	std::snprintf(file, sizeof file, "expansions/pics/%d.jpg", code);
+	irr::video::IImage* srcimg = driver->createImageFromFile(file);
+	if(srcimg == nullptr) {
+		std::snprintf(file, sizeof file, "pics/%d.jpg", code);
+		srcimg = driver->createImageFromFile(file);
+	}
+	if(srcimg == nullptr) {
+		return tUnknown;
+	}
+	if(zoom == 1) {
+		texture = driver->addTexture(file, srcimg);
+	} else {
+		auto origsize = srcimg->getDimension();
+		irr::video::IImage* destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(origsize.Width * zoom, origsize.Height * zoom));
+		imageScaleNNAA(srcimg, destimg);
+		texture = driver->addTexture(file, destimg);
+		destimg->drop();
+	}
+	srcimg->drop();
+	tBigPicture = texture;
+	return texture;
+}
+int ImageManager::LoadThumbThread() {
+	while(true) {
+		imageManager.tThumbLoadingMutex.lock();
+		int code = imageManager.tThumbLoadingCodes.front();
+		imageManager.tThumbLoadingCodes.pop();
+		imageManager.tThumbLoadingMutex.unlock();
+		char file[256];
+		std::snprintf(file, sizeof file, "expansions/pics/thumbnail/%d.jpg", code);
+		irr::video::IImage* img = imageManager.driver->createImageFromFile(file);
+		if(img == nullptr) {
+			std::snprintf(file, sizeof file, "pics/thumbnail/%d.jpg", code);
+			img = imageManager.driver->createImageFromFile(file);
+		}
+		if(img == nullptr && mainGame->gameConf.use_image_scale) {
+			std::snprintf(file, sizeof file, "expansions/pics/%d.jpg", code);
+			img = imageManager.driver->createImageFromFile(file);
+		}
+		if(img == nullptr && mainGame->gameConf.use_image_scale) {
+			std::snprintf(file, sizeof file, "pics/%d.jpg", code);
+			img = imageManager.driver->createImageFromFile(file);
+		}
+		if(img != nullptr) {
+			int width = CARD_THUMB_WIDTH * mainGame->xScale;
+			int height = CARD_THUMB_HEIGHT * mainGame->yScale;
+			if(img->getDimension() == irr::core::dimension2d<irr::u32>(width, height)) {
+				img->grab();
+				imageManager.tThumbLoadingMutex.lock();
+				if(imageManager.tThumbLoadingThreadRunning)
+					imageManager.tThumbLoading[code] = img;
+				imageManager.tThumbLoadingMutex.unlock();
+			} else {
+				irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
+				imageScaleNNAA(img, destimg);
+				img->drop();
+				destimg->grab();
+				imageManager.tThumbLoadingMutex.lock();
+				if(imageManager.tThumbLoadingThreadRunning)
+					imageManager.tThumbLoading[code] = destimg;
+				imageManager.tThumbLoadingMutex.unlock();
+			}
+		} else {
+			imageManager.tThumbLoadingMutex.lock();
+			if(imageManager.tThumbLoadingThreadRunning)
+				imageManager.tThumbLoading[code] = nullptr;
+			imageManager.tThumbLoadingMutex.unlock();
+		}
+		imageManager.tThumbLoadingMutex.lock();
+		imageManager.tThumbLoadingThreadRunning = !imageManager.tThumbLoadingCodes.empty();
+		if(!imageManager.tThumbLoadingThreadRunning)
+			break;
+		imageManager.tThumbLoadingMutex.unlock();
+	}
+	imageManager.tThumbLoadingMutex.unlock();
+	return 0;
+}
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(code == 0)
 		return tUnknownThumb;
+	imageManager.tThumbLoadingMutex.lock();
+	auto lit = tThumbLoading.find(code);
+	if(lit != tThumbLoading.end()) {
+		if(lit->second != nullptr) {
+			char file[256];
+			std::snprintf(file, sizeof file, "pics/thumbnail/%d.jpg", code);
+			irr::video::ITexture* texture = driver->addTexture(file, lit->second); // textures must be added in the main thread due to OpenGL
+			lit->second->drop();
+			tThumb[code] = texture;
+		} else {
+			tThumb[code] = nullptr;
+		}
+		tThumbLoading.erase(lit);
+	}
+	imageManager.tThumbLoadingMutex.unlock();
 	auto tit = tThumb.find(code);
-	int width = CARD_THUMB_WIDTH * mainGame->xScale;
-	int height = CARD_THUMB_HEIGHT * mainGame->yScale;
 	if(tit == tThumb.end()) {
-		char file[256];
-		sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
-		if(img == NULL) {
-			sprintf(file, "pics/thumbnail/%d.jpg", code);
-			img = GetTextureFromFile(file, width, height);
+		tThumb[code] = tLoading;
+		imageManager.tThumbLoadingMutex.lock();
+		tThumbLoadingCodes.push(code);
+		if(!tThumbLoadingThreadRunning) {
+			tThumbLoadingThreadRunning = true;
+			std::thread(LoadThumbThread).detach();
 		}
-		if(img == NULL && mainGame->gameConf.use_image_scale) {
-			sprintf(file, "expansions/pics/%d.jpg", code);
-			img = GetTextureFromFile(file, width, height);
-			if(img == NULL) {
-				sprintf(file, "pics/%d.jpg", code);
-				img = GetTextureFromFile(file, width, height);
-			}
-		}
-		tThumb[code] = img;
-		return (img == NULL) ? tUnknownThumb : img;
+		imageManager.tThumbLoadingMutex.unlock();
+		return tLoading;
 	}
 	if(tit->second)
 		return tit->second;
@@ -268,26 +375,26 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 }
 irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	if(code == 0)
-		return NULL;
+		return nullptr;
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/field/%d.png", code);
+		std::snprintf(file, sizeof file, "expansions/pics/field/%d.png", code);
 		irr::video::ITexture* img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
-		if(img == NULL) {
-			sprintf(file, "expansions/pics/field/%d.jpg", code);
+		if(img == nullptr) {
+			std::snprintf(file, sizeof file, "expansions/pics/field/%d.jpg", code);
 			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 		}
-		if(img == NULL) {
-			sprintf(file, "pics/field/%d.png", code);
+		if(img == nullptr) {
+			std::snprintf(file, sizeof file, "pics/field/%d.png", code);
 			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 		}
-		if(img == NULL) {
-			sprintf(file, "pics/field/%d.jpg", code);
+		if(img == nullptr) {
+			std::snprintf(file, sizeof file, "pics/field/%d.jpg", code);
 			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
-			if(img == NULL) {
-				tFields[code] = NULL;
-				return NULL;
+			if(img == nullptr) {
+				tFields[code] = nullptr;
+				return nullptr;
 			} else {
 				tFields[code] = img;
 				return img;
@@ -300,6 +407,6 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	if(tit->second)
 		return tit->second;
 	else
-		return NULL;
+		return nullptr;
 }
 }

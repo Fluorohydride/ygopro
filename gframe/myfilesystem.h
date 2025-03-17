@@ -1,7 +1,7 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
-#include <string.h>
+#include <cstdio>
 #include <functional>
 #include "bufferio.h"
 
@@ -14,10 +14,16 @@
 
 #ifdef _WIN32
 
+#define NOMINMAX
 #include <Windows.h>
 
 class FileSystem {
 public:
+	static void SafeFileName(wchar_t* wfile) {
+		while((wfile = std::wcspbrk(wfile, L"<>:\"/\\|?*")) != nullptr)
+			*wfile++ = '_';
+	}
+
 	static bool IsFileExists(const wchar_t* wfile) {
 		DWORD attr = GetFileAttributesW(wfile);
 		return attr != INVALID_FILE_ATTRIBUTES && !(attr & FILE_ATTRIBUTE_DIRECTORY);
@@ -41,7 +47,7 @@ public:
 	}
 
 	static bool MakeDir(const wchar_t* wdir) {
-		return CreateDirectoryW(wdir, NULL);
+		return CreateDirectoryW(wdir, nullptr);
 	}
 
 	static bool MakeDir(const char* dir) {
@@ -50,16 +56,46 @@ public:
 		return MakeDir(wdir);
 	}
 
+	static bool Rename(const wchar_t* woldname, const wchar_t* wnewname) {
+		return MoveFileW(woldname, wnewname);
+	}
+
+	static bool Rename(const char* oldname, const char* newname) {
+		wchar_t woldname[1024];
+		wchar_t wnewname[1024];
+		BufferIO::DecodeUTF8(oldname, woldname);
+		BufferIO::DecodeUTF8(newname, wnewname);
+		return Rename(woldname, wnewname);
+	}
+
+	static bool DeleteDir(const wchar_t* wdir) {
+		wchar_t pdir[256];
+		BufferIO::CopyWideString(wdir, pdir);
+		SHFILEOPSTRUCTW lpFileOp{};
+		lpFileOp.hwnd = nullptr;
+		lpFileOp.wFunc = FO_DELETE;
+		lpFileOp.pFrom = pdir;
+		lpFileOp.pTo = 0;
+		lpFileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
+		return SHFileOperationW(&lpFileOp) == 0;
+	}
+
+	static bool DeleteDir(const char* dir) {
+		wchar_t wdir[1024];
+		BufferIO::DecodeUTF8(dir, wdir);
+		return DeleteDir(wdir);
+	}
+
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
-		wcscpy(findstr, wpath);
-		wcscat(findstr, L"/*");
+		std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%ls/*", wpath);
 		WIN32_FIND_DATAW fdataw;
 		HANDLE fh = FindFirstFileW(findstr, &fdataw);
 		if(fh == INVALID_HANDLE_VALUE)
 			return;
 		do {
-			cb(fdataw.cFileName, (fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+			if(std::wcscmp(fdataw.cFileName, L".") && std::wcscmp(fdataw.cFileName, L".."))
+				cb(fdataw.cFileName, (fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
 	}
@@ -79,6 +115,11 @@ public:
 
 class FileSystem {
 public:
+	static void SafeFileName(wchar_t* wfile) {
+		while((wfile = std::wcspbrk(wfile, L"/")) != nullptr)
+			*wfile++ = '_';
+	}
+
 	static bool IsFileExists(const char* file) {
 		struct stat fileStat;
 		return (stat(file, &fileStat) == 0) && !S_ISDIR(fileStat.st_mode);
@@ -111,6 +152,49 @@ public:
 		return MakeDir(dir);
 	}
 
+	static bool Rename(const wchar_t* woldname, const wchar_t* wnewname) {
+		char oldname[1024];
+		char newname[1024];
+		BufferIO::EncodeUTF8(woldname, oldname);
+		BufferIO::EncodeUTF8(wnewname, newname);
+		return Rename(oldname, newname);
+	}
+
+	static bool Rename(const char* oldname, const char* newname) {
+		return rename(oldname, newname) == 0;
+	}
+
+	static bool DeleteDir(const wchar_t* wdir) {
+		char dir[1024];
+		BufferIO::EncodeUTF8(wdir, dir);
+		return DeleteDir(dir);
+	}
+
+	static bool DeleteDir(const char* dir) {
+		bool success = true;
+		TraversalDir(dir, [dir, &success](const char *name, bool isdir) {
+			char full_path[1024];
+			int len = std::snprintf(full_path, sizeof full_path, "%s/%s", dir, name);
+			if (len < 0 || len >= (int)(sizeof full_path)) {
+				success = false;
+				return;
+			}
+			if (isdir)
+			{
+				if(!DeleteDir(full_path))
+					success = false;
+			}
+			else
+			{
+				if(unlink(full_path) != 0)
+					success = false;
+			}
+		});
+		if (rmdir(dir) != 0)
+			success = false;
+		return success;
+	}
+
 	struct file_unit {
 		std::string filename;
 		bool is_dir;
@@ -126,12 +210,14 @@ public:
 		while((dirp = readdir(dir)) != nullptr) {
 			file_unit funit;
 			char fname[1024];
-			strcpy(fname, path);
-			strcat(fname, "/");
-			strcat(fname, dirp->d_name);
+			int len = std::snprintf(fname, sizeof fname, "%s/%s", path, dirp->d_name);
+			if (len < 0 || len >= (int)(sizeof fname))
+				continue;
 			stat(fname, &fileStat);
 			funit.filename = std::string(dirp->d_name);
 			funit.is_dir = S_ISDIR(fileStat.st_mode);
+			if(funit.is_dir && (std::strcmp(dirp->d_name, ".") == 0 || std::strcmp(dirp->d_name, "..") == 0))
+				continue;
 			file_list.push_back(funit);
 		}
 		closedir(dir);

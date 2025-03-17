@@ -1,4 +1,5 @@
 #include "sound_manager.h"
+#include "myfilesystem.h"
 #ifdef IRRKLANG_STATIC
 #include "../ikpmp3/ikpMP3.h"
 #endif
@@ -11,6 +12,7 @@ bool SoundManager::Init() {
 #ifdef YGOPRO_USE_IRRKLANG
 	bgm_scene = -1;
 	RefreshBGMList();
+	rnd.reset((unsigned int)std::time(nullptr));
 	engineSound = irrklang::createIrrKlangDevice();
 	engineMusic = irrklang::createIrrKlangDevice();
 	if(!engineSound || !engineMusic) {
@@ -38,7 +40,7 @@ void SoundManager::RefreshBGMList() {
 void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 	std::wstring search = L"./sound/BGM/" + path;
 	FileSystem::TraversalDir(search.c_str(), [this, &path, scene](const wchar_t* name, bool isdir) {
-		if(!isdir && wcsrchr(name, '.') && (!mywcsncasecmp(wcsrchr(name, '.'), L".mp3", 4) || !mywcsncasecmp(wcsrchr(name, '.'), L".ogg", 4))) {
+		if(!isdir && (IsExtension(name, L".mp3") || IsExtension(name, L".ogg"))) {
 			std::wstring filename = path + L"/" + name;
 			BGMList[BGM_ALL].push_back(filename);
 			BGMList[scene].push_back(filename);
@@ -222,7 +224,7 @@ void SoundManager::PlayBGM(int scene) {
 		if(count <= 0)
 			return;
 		bgm_scene = scene;
-		int bgm = rand() % count;
+		int bgm = rnd.get_random_integer(0, count -1);
 		auto name = BGMList[scene][bgm].c_str();
 		wchar_t fname[1024];
 		myswprintf(fname, L"./sound/BGM/%ls", name);
