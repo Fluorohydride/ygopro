@@ -2,103 +2,130 @@
 #define GAME_H
 
 #include "config.h"
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else //__APPLE__
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif //__APPLE__
+#include "CGUIImageButton.h"
+#include "CGUITTFont.h"
+#include "mysignal.h"
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
+#include <ctime>
 #include <unordered_map>
 #include <vector>
 #include <list>
+#include <mutex>
+#include <functional>
+
+constexpr int DEFAULT_DUEL_RULE = 5;
+constexpr int CONFIG_LINE_SIZE = 1024;
+constexpr int TEXT_LINE_SIZE = 256;
 
 namespace ygo {
 
+bool IsExtension(const wchar_t* filename, const wchar_t* extension);
+bool IsExtension(const char* filename, const char* extension);
+
 struct Config {
-	bool use_d3d;
-	bool use_image_scale;
-	unsigned short antialias;
-	unsigned short serverport;
-	unsigned char textfontsize;
-	wchar_t lasthost[100];
-	wchar_t lastport[10];
-	wchar_t nickname[20];
-	wchar_t gamename[20];
-	wchar_t lastcategory[64];
-	wchar_t lastdeck[64];
-	wchar_t textfont[256];
-	wchar_t numfont[256];
-	wchar_t roompass[20];
-	wchar_t startupcmd[256];
-	wchar_t bot_deck_path[64];
+	bool use_d3d{ false };
+	bool use_image_scale{ true };
+	unsigned short antialias{ 0 };
+	unsigned short serverport{ 7911 };
+	unsigned char textfontsize{ 14 };
+	wchar_t lasthost[100]{};
+	wchar_t lastport[10]{};
+	wchar_t nickname[20]{};
+	wchar_t gamename[20]{};
+	wchar_t roompass[20]{};
+	//path
+	wchar_t lastcategory[256]{};
+	wchar_t lastdeck[256]{};
+	wchar_t textfont[256]{};
+	wchar_t numfont[256]{};
+	wchar_t startupcmd[256]{};
+	wchar_t bot_deck_path[256]{};
 	//settings
-	int chkMAutoPos;
-	int chkSTAutoPos;
-	int chkRandomPos;
-	int chkAutoChain;
-	int chkWaitChain;
-	int chkIgnore1;
-	int chkIgnore2;
-	int use_lflist;
-	int default_lflist;
-	int default_rule;
-	int hide_setname;
-	int hide_hint_button;
-	int control_mode;
-	int draw_field_spell;
-	int separate_clear_button;
-	int auto_search_limit;
-	int search_multiple_keywords;
-	int chkIgnoreDeckChanges;
-	int defaultOT;
-	int enable_bot_mode;
-	int quick_animation;
-	int auto_save_replay;
-	int draw_single_chain;
-	int prefer_expansion_script;
-	bool enable_sound;
-	bool enable_music;
-	double sound_volume;
-	double music_volume;
-	int music_mode;
-	bool window_maximized;
-	int window_width;
-	int window_height;
-	bool resize_popup_menu;
+	int chkMAutoPos{ 0 };
+	int chkSTAutoPos{ 1 };
+	int chkRandomPos{ 0 };
+	int chkAutoChain{ 0 };
+	int chkWaitChain{ 0 };
+	int chkDefaultShowChain{ 0 };
+	int chkIgnore1{ 0 };
+	int chkIgnore2{ 0 };
+	int use_lflist{ 1 };
+	int default_lflist{ 0 };
+	int default_rule{ DEFAULT_DUEL_RULE };
+	int hide_setname{ 0 };
+	int hide_hint_button{ 0 };
+	int control_mode{ 0 };
+	int draw_field_spell{ 1 };
+	int separate_clear_button{ 1 };
+	int auto_search_limit{ -1 };
+	int search_multiple_keywords{ 1 };
+	int chkIgnoreDeckChanges{ 0 };
+	int defaultOT{ 1 };
+	int enable_bot_mode{ 0 };
+	int quick_animation{ 0 };
+	int auto_save_replay{ 0 };
+	int draw_single_chain{ 0 };
+	int hide_player_name{ 0 };
+	int prefer_expansion_script{ 0 };
+	bool enable_sound{ true };
+	bool enable_music{ true };
+	double sound_volume{ 0.5 };
+	double music_volume{ 0.5 };
+	int music_mode{ 1 };
+	bool window_maximized{ false };
+	int window_width{ 1024 };
+	int window_height{ 640 };
+	bool resize_popup_menu{ false };
 };
 
 struct DuelInfo {
-	bool isStarted;
-	bool isFinished;
-	bool isReplay;
-	bool isReplaySkiping;
-	bool isFirst;
-	bool isTag;
-	bool isSingleMode;
-	bool is_shuffling;
-	bool tag_player[2];
-	int lp[2];
-	int duel_rule;
-	int turn;
-	short curMsg;
-	wchar_t hostname[20];
-	wchar_t clientname[20];
-	wchar_t hostname_tag[20];
-	wchar_t clientname_tag[20];
-	wchar_t strLP[2][16];
-	wchar_t* vic_string;
-	unsigned char player_type;
-	unsigned char time_player;
-	unsigned short time_limit;
-	unsigned short time_left[2];
-	bool isReplaySwapped;
+	bool isStarted{ false };
+	bool isInDuel{ false };
+	bool isFinished{false};
+	bool isReplay{ false };
+	bool isReplaySkiping{ false };
+	bool isFirst{ false };
+	bool isTag{ false };
+	bool isSingleMode{ false };
+	bool is_shuffling{ false };
+	bool tag_player[2]{};
+	bool isReplaySwapped{ false };
+	int lp[2]{};
+	int start_lp{ 0 };
+	int duel_rule{ 0 };
+	int turn{ 0 };
+	short curMsg{ 0 };
+	wchar_t hostname[20]{};
+	wchar_t clientname[20]{};
+	wchar_t hostname_tag[20]{};
+	wchar_t clientname_tag[20]{};
+	wchar_t strLP[2][16]{};
+	std::wstring vic_string;
+	unsigned char player_type{ 0 };
+	unsigned char time_player{ 0 };
+	unsigned short time_limit{ 0 };
+	unsigned short time_left[2]{};
+
+	void Clear();
 };
 
 struct BotInfo {
-	wchar_t name[256];
-	wchar_t command[256];
-	wchar_t desc[256];
-	bool support_master_rule_3;
-	bool support_new_master_rule;
-	bool support_master_rule_2020;
-	bool select_deckfile;
+	wchar_t name[256]{};
+	wchar_t command[256]{};
+	wchar_t desc[256]{};
+	bool support_master_rule_3{ false };
+	bool support_new_master_rule{ false };
+	bool support_master_rule_2020{ false };
+	bool select_deckfile{ false };
 };
 
 struct FadingUnit {
@@ -118,13 +145,13 @@ class Game {
 public:
 	bool Initialize();
 	void MainLoop();
-	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
-	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
-	std::wstring SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos = 0);
+	void BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f32 left, irr::f32 right, irr::f32 bottom, irr::f32 top, irr::f32 znear, irr::f32 zfar);
+	void InitStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cWidth, irr::u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
+	std::wstring SetStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, irr::u32 pos = 0);
 	void LoadExpansions();
 	void RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck, bool selectlastused = true);
 	void RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
-	void RefreshDeck(const wchar_t* deckpath, irr::gui::IGUIComboBox* cbDeck);
+	void RefreshDeck(const wchar_t* deckpath, const std::function<void(const wchar_t*)>& additem);
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void RefreshBot();
@@ -135,7 +162,6 @@ public:
 	void CheckMutual(ClientCard* pcard, int mark);
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
-	void DrawShadowText(irr::gui::CGUITTFont* font, const core::stringw& text, const core::rect<s32>& position, const core::rect<s32>& padding, video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const core::rect<s32>* clip = 0);
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
 	void DrawGUI();
@@ -145,14 +171,14 @@ public:
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
 	void WaitFrameSignal(int frame);
-	void DrawThumb(code_pointer cp, position2di pos, const std::unordered_map<int,int>* lflist, bool drag = false);
+	void DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lflist, bool drag = false);
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
 	void AddLog(const wchar_t* msg, int param = 0);
-	void AddChatMsg(const wchar_t* msg, int player);
+	void AddChatMsg(const wchar_t* msg, int player, bool play_sound = false);
 	void ClearChatMsg();
 	void AddDebugMsg(const char* msgbuf);
 	void ErrorLog(const char* msgbuf);
@@ -161,10 +187,12 @@ public:
 	void CloseGameWindow();
 	void CloseDuelWindow();
 
-	int LocalPlayer(int player);
+	int LocalPlayer(int player) const;
+	int OppositePlayer(int player);
+	int ChatLocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
 
-	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
+	bool HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();
 		return focus && focus->hasType(type);
 	}
@@ -176,24 +204,28 @@ public:
 	}
 
 	void OnResize();
-	recti Resize(s32 x, s32 y, s32 x2, s32 y2);
-	recti Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2);
-	position2di Resize(s32 x, s32 y);
-	position2di ResizeReverse(s32 x, s32 y);
-	recti ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width);
-	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2);
-	recti ResizeCardImgWin(s32 x, s32 y, s32 mx, s32 my);
-	recti ResizeCardHint(s32 x, s32 y, s32 x2, s32 y2);
-	position2di ResizeCardHint(s32 x, s32 y);
-	recti ResizeCardMid(s32 x, s32 y, s32 x2, s32 y2, s32 midx, s32 midy);
-	position2di ResizeCardMid(s32 x, s32 y, s32 midx, s32 midy);
-	recti ResizeFit(s32 x, s32 y, s32 x2, s32 y2);
+	void ResizeChatInputWindow();
+	irr::core::recti Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2);
+	irr::core::recti Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 dx, irr::s32 dy, irr::s32 dx2, irr::s32 dy2);
+	irr::core::vector2di Resize(irr::s32 x, irr::s32 y);
+	irr::core::vector2di ResizeReverse(irr::s32 x, irr::s32 y);
+	irr::core::recti ResizePhaseHint(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 width);
+	irr::core::recti ResizeWin(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2);
+	irr::core::recti ResizeCardImgWin(irr::s32 x, irr::s32 y, irr::s32 mx, irr::s32 my);
+	irr::core::recti ResizeCardHint(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2);
+	irr::core::vector2di ResizeCardHint(irr::s32 x, irr::s32 y);
+	irr::core::recti ResizeCardMid(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 midx, irr::s32 midy);
+	irr::core::vector2di ResizeCardMid(irr::s32 x, irr::s32 y, irr::s32 midx, irr::s32 midy);
+	irr::core::recti ResizeFit(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2);
 
 	void SetWindowsIcon();
 	void SetWindowsScale(float scale);
 	void FlashWindow();
-	void SetCursor(ECURSOR_ICON icon);
+	void SetCursor(irr::gui::ECURSOR_ICON icon);
 	bool StartProcess(const wchar_t* cmd, const wchar_t* param1 = L"", const wchar_t* param2 = L"");
+	template<typename T>
+	static void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const irr::core::rect<irr::s32>& position, const irr::core::rect<irr::s32>& padding,
+		irr::video::SColor color = 0xffffffff, irr::video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const irr::core::rect<irr::s32>* clip = nullptr);
 
 	std::mutex gMutex;
 	Signal frameSignal;
@@ -210,41 +242,41 @@ public:
 	std::wstring chatMsg[8];
 	std::vector<BotInfo> botInfo;
 
-	int hideChatTimer;
-	bool hideChat;
-	int chatTiming[8];
-	int chatType[8];
-	unsigned short linePatternD3D;
-	unsigned short linePatternGL;
-	int waitFrame;
-	int signalFrame;
-	int actionParam;
-	int showingcode;
-	const wchar_t* showingtext;
-	int showcard;
-	int showcardcode;
-	int showcarddif;
-	int showcardp;
-	int is_attacking;
-	int attack_sv;
+	int hideChatTimer{};
+	bool hideChat{};
+	int chatTiming[8]{};
+	int chatType[8]{};
+	unsigned short linePatternD3D{};
+	unsigned short linePatternGL{ 0x0f0f };
+	int waitFrame{};
+	int signalFrame{};
+	int actionParam{};
+	int showingcode{};
+	const wchar_t* showingtext{};
+	int showcard{};
+	int showcardcode{};
+	int showcarddif{};
+	int showcardp{};
+	int is_attacking{};
+	int attack_sv{};
 	irr::core::vector3df atk_r;
 	irr::core::vector3df atk_t;
-	float atkdy;
-	int lpframe;
-	int lpd;
-	int lpplayer;
-	int lpccolor;
-	wchar_t* lpcstring;
-	bool always_chain;
-	bool ignore_chain;
-	bool chain_when_avail;
+	float atkdy{};
+	int lpframe{};
+	int lpd{};
+	int lpplayer{};
+	int lpccolor{};
+	std::wstring lpcstring;
+	bool always_chain{};
+	bool ignore_chain{};
+	bool chain_when_avail{};
 
-	bool is_building;
-	bool is_siding;
+	bool is_building{};
+	bool is_siding{};
 
 	irr::core::dimension2d<irr::u32> window_size;
-	float xScale;
-	float yScale;
+	float xScale{ 1.0f };
+	float yScale{ 1.0f };
 
 	ClientField dField;
 	DeckBuilder deckBuilder;
@@ -292,9 +324,11 @@ public:
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
+	irr::gui::IGUICheckBox* chkDefaultShowChain;
 	irr::gui::IGUICheckBox* chkQuickAnimation;
 	irr::gui::IGUICheckBox* chkAutoSaveReplay;
 	irr::gui::IGUICheckBox* chkDrawSingleChain;
+	irr::gui::IGUICheckBox* chkHidePlayerName;
 	irr::gui::IGUIWindow* tabSystem;
 	irr::gui::IGUIElement* elmTabSystemLast;
 	irr::gui::IGUIScrollBar* scrTabSystem;
@@ -455,7 +489,7 @@ public:
 	irr::gui::IGUICheckBox* chkAttribute[7];
 	//announce race
 	irr::gui::IGUIWindow* wANRace;
-	irr::gui::IGUICheckBox* chkRace[25];
+	irr::gui::IGUICheckBox* chkRace[RACES_COUNT];
 	//cmd menu
 	irr::gui::IGUIWindow* wCmdMenu;
 	irr::gui::IGUIButton* btnActivate;
@@ -527,6 +561,7 @@ public:
 	irr::gui::IGUIComboBox* cbDMCategory;
 	irr::gui::IGUIButton* btnDMOK;
 	irr::gui::IGUIButton* btnDMCancel;
+	irr::gui::IGUIScrollBar* scrPackCards;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
 	irr::gui::IGUIScrollBar* scrFilter;
@@ -588,6 +623,8 @@ public:
 extern Game* mainGame;
 
 }
+
+#define SIZE_QUERY_BUFFER	0x4000
 
 #define CARD_IMG_WIDTH		177
 #define CARD_IMG_HEIGHT		254
@@ -791,6 +828,7 @@ extern Game* mainGame;
 #define CHECKBOX_PREFER_EXPANSION	373
 #define CHECKBOX_DRAW_SINGLE_CHAIN	374
 #define CHECKBOX_LFLIST				375
+#define CHECKBOX_HIDE_PLAYER_NAME	376
 #define BUTTON_BIG_CARD_CLOSE		380
 #define BUTTON_BIG_CARD_ZOOM_IN		381
 #define BUTTON_BIG_CARD_ZOOM_OUT	382
@@ -802,7 +840,5 @@ extern Game* mainGame;
 #define AVAIL_SC					0x8
 #define AVAIL_OCGTCG				(AVAIL_OCG|AVAIL_TCG)
 
-#define DEFAULT_DUEL_RULE			5
-
-#define CARD_ARTWORK_VERSIONS_OFFSET	10
+#define MAX_LAYER_COUNT	6
 #endif // GAME_H
