@@ -51,13 +51,13 @@ mat_linux:
   script:
     - apt update; apt -y install git wget tar
     - git clone --depth=1 https://code.mycard.moe/mycard/irrlicht-new irrlicht
-    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-beta2-linux.tar.gz | tar zfx -
-    - env PROCESSOR_COUNT=$(nproc) ./.ci/libevent-prebuild.sh
+    # - wget -O - https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-beta5-linux.tar.gz | tar zfx -
+    # - env PROCESSOR_COUNT=$(nproc) ./.ci/libevent-prebuild.sh
   artifacts:
     paths:
-      - premake5
+      # - premake5
       - irrlicht
-      - libevent-stable
+      # - libevent-stable
   image: git-registry.mycard.moe/mycard/docker-runner-base:debian11
 
 mat_windows:
@@ -67,8 +67,8 @@ mat_windows:
   script:
     - apt update; apt -y install wget tar patch p7zip-full
     # premake5.exe
-    - wget https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-beta2-windows.zip
-    - 7z x -y premake-5.0.0-beta2-windows.zip
+    - wget https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-beta5-windows.zip
+    - 7z x -y premake-5.0.0-beta5-windows.zip
     # event
     - wget -O - https://cdn01.moecube.com/ygopro-build-materials/libevent-2.0.22-stable.tar.gz | tar zfx -
     - mv libevent-2.0.22-stable event
@@ -117,7 +117,7 @@ exec_linux:
     - mat_submodules
   script:
     - apt update; apt -y install git build-essential
-    - ./premake5 gmake --build-sqlite --server-zip-support
+    - premake5 gmake --build-sqlite --server-zip-support
     - cd build
     - make config=release -j$(nproc)
     - cd ..
@@ -126,7 +126,7 @@ exec_linux:
   artifacts:
     paths:
       - ygopro
-  image: git-registry.mycard.moe/mycard/docker-runner-base:debian11
+  image: git-registry.moenext.com/mycard/docker-ygopro-builder:latest
 
 exec_debian:
   extends: ._exec_build
@@ -138,7 +138,7 @@ exec_debian:
     - mat_submodules
   script:
     - apt update; apt -y install git build-essential liblua5.3-dev libsqlite3-dev libevent-dev
-    - ./premake5 gmake --lua-deb
+    - premake5 gmake --lua-deb
     - cd build
     - make config=release -j$(nproc)
     - cd ..
@@ -147,6 +147,7 @@ exec_debian:
   artifacts:
     paths:
       - ygopro
+  image: git-registry.moenext.com/mycard/docker-ygopro-builder:latest
 
 #win_server_pack:
 #  stage: pack

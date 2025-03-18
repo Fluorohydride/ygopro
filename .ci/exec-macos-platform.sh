@@ -11,6 +11,7 @@ export IRRLICHT_LIB_DIR=$PWD/irrlicht
 
 ./.ci/libevent-prebuild.sh
 
+chmod +x ./premake5
 ./premake5 gmake --cc=clang --build-freetype --build-sqlite --no-use-irrklang
 
 cd build
