@@ -13,6 +13,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	FILE* fp = std::fopen(path, "r");
 	char linebuf[256]{};
 	wchar_t strBuffer[256]{};
+	char str1[16]{};
 	if(fp) {
 		while(std::fgets(linebuf, sizeof linebuf, fp)) {
 			if(linebuf[0] == '#')
@@ -32,10 +33,11 @@ void DeckManager::LoadLFListSingle(const char* path) {
 				continue;
 			unsigned int code = 0;
 			int count = -1;
-			if (std::sscanf(linebuf, "%9u%*[ ]%9d", &code, &count) != 2)
+			if (std::sscanf(linebuf, "%10s%*[ ]%1d", str1, &count) != 2)
 				continue;
 			if (count < 0 || count > 2)
 				continue;
+			code = std::strtoul(str1, nullptr, 10);
 			cur->content[code] = count;
 			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 		}
