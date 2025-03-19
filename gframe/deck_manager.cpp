@@ -141,13 +141,12 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 	}
 	return 0;
 }
-int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_packlist) {
+uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec, bool is_packlist) {
 	deck.clear();
-	int code;
-	int errorcode = 0;
+	uint32_t errorcode = 0;
 	CardData cd;
 	for(int i = 0; i < mainc; ++i) {
-		code = dbuf[i];
+		auto code = dbuf[i];
 		if(!dataManager.GetData(code, &cd)) {
 			errorcode = code;
 			continue;
@@ -170,7 +169,7 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 		}
 	}
 	for(int i = 0; i < sidec; ++i) {
-		code = dbuf[mainc + i];
+		auto code = dbuf[mainc + i];
 		if(!dataManager.GetData(code, &cd)) {
 			errorcode = code;
 			continue;
@@ -184,22 +183,21 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 	}
 	return errorcode;
 }
-int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
-	size_t ct = 0;
-	int mainc = 0, sidec = 0, code = 0;
-	int cardlist[PACK_MAX_SIZE]{};
+uint32_t DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
+	int ct = 0;
+	int mainc = 0, sidec = 0;
+	uint32_t cardlist[PACK_MAX_SIZE]{};
 	bool is_side = false;
 	std::string linebuf;
-	while (std::getline(deckStream, linebuf, '\n') && ct < (sizeof cardlist / sizeof cardlist[0])) {
+	while (std::getline(deckStream, linebuf, '\n') && ct < PACK_MAX_SIZE) {
 		if (linebuf[0] == '!') {
 			is_side = true;
 			continue;
 		}
 		if (linebuf[0] < '0' || linebuf[0] > '9')
 			continue;
-		errno = 0;
-		code = std::strtol(linebuf.c_str(), nullptr, 10);
-		if (errno == ERANGE)
+		auto code = std::strtoul(linebuf.c_str(), nullptr, 10);
+		if (code >= UINT32_MAX)
 			continue;
 		cardlist[ct++] = code;
 		if (is_side)
@@ -209,25 +207,25 @@ int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_pa
 	}
 	return LoadDeck(deck, cardlist, mainc, sidec, is_packlist);
 }
-bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
-	std::unordered_map<int, int> pcount;
-	std::unordered_map<int, int> ncount;
+bool DeckManager::LoadSide(Deck& deck, uint32_t dbuf[], int mainc, int sidec) {
+	std::unordered_map<uint32_t, int> pcount;
+	std::unordered_map<uint32_t, int> ncount;
 	for(size_t i = 0; i < deck.main.size(); ++i)
-		++pcount[deck.main[i]->first];
+		pcount[deck.main[i]->first]++;
 	for(size_t i = 0; i < deck.extra.size(); ++i)
-		++pcount[deck.extra[i]->first];
+		pcount[deck.extra[i]->first]++;
 	for(size_t i = 0; i < deck.side.size(); ++i)
-		++pcount[deck.side[i]->first];
+		pcount[deck.side[i]->first]++;
 	Deck ndeck;
 	LoadDeck(ndeck, dbuf, mainc, sidec);
 	if (ndeck.main.size() != deck.main.size() || ndeck.extra.size() != deck.extra.size() || ndeck.side.size() != deck.side.size())
 		return false;
 	for(size_t i = 0; i < ndeck.main.size(); ++i)
-		++ncount[ndeck.main[i]->first];
+		ncount[ndeck.main[i]->first]++;
 	for(size_t i = 0; i < ndeck.extra.size(); ++i)
-		++ncount[ndeck.extra[i]->first];
+		ncount[ndeck.extra[i]->first]++;
 	for(size_t i = 0; i < ndeck.side.size(); ++i)
-		++ncount[ndeck.side[i]->first];
+		ncount[ndeck.side[i]->first]++;
 	for (auto& cdit : ncount)
 		if (cdit.second != pcount[cdit.first])
 			return false;
