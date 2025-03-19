@@ -48,7 +48,7 @@ public:
 	const LFList* GetLFList(unsigned int lfhash);
 	unsigned int CheckDeck(const Deck& deck, unsigned int lfhash, int rule);
 	uint32_t LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec, bool is_packlist = false);
-	uint32_t LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist = false);
+	uint32_t LoadDeckFromStream(Deck& deck, std::istringstream& deckStream, bool is_packlist = false);
 	bool LoadSide(Deck& deck, uint32_t dbuf[], int mainc, int sidec);
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);
 	void GetDeckFile(wchar_t* ret, int category_index, const wchar_t* category_name, const wchar_t* deckname);

@@ -183,7 +183,7 @@ uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec
 	}
 	return errorcode;
 }
-uint32_t DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
+uint32_t DeckManager::LoadDeckFromStream(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
 	int ct = 0;
 	int mainc = 0, sidec = 0;
 	uint32_t cardlist[PACK_MAX_SIZE]{};
@@ -299,8 +299,8 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 		return false;
 	}
 	std::istringstream deckStream(deckBuffer);
-	LoadDeck(current_deck, deckStream, is_packlist);
-	return true;  // the above LoadDeck has return value but we ignore it here for now
+	LoadDeckFromStream(current_deck, deckStream, is_packlist);
+	return true;  // the above function has return value but we ignore it here for now
 }
 bool DeckManager::LoadCurrentDeck(int category_index, const wchar_t* category_name, const wchar_t* deckname) {
 	wchar_t filepath[256];
