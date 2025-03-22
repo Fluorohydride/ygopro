@@ -299,6 +299,8 @@ void ReplayMode::Restart(bool refresh) {
 	skip_turn = 0;
 }
 void ReplayMode::Undo() {
+	if (cur_replay.pheader.flag & REPLAY_SINGLE_MODE)
+		return;
 	if(skip_step > 0 || current_step == 0)
 		return;
 	is_restarting = true;
