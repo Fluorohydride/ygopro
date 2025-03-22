@@ -323,6 +323,7 @@ jobs:
     - name: Copy premake files
       run: |
         cp -r premake/* .
+        cp -r resource/* .
 
     - name: Use premake to generate make files (Intel)
       if: runner.arch == 'X64'
