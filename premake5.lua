@@ -206,6 +206,9 @@ workspace "YGOPro"
 
     filter "action:vs*"
         cdialect "C11"
+        if not WINXP_SUPPORT then
+           conformancemode "On" 
+        end
         vectorextensions "SSE2"
         buildoptions { "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
