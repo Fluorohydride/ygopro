@@ -1,5 +1,7 @@
 -- default global settings
 
+-- test things again
+
 BUILD_LUA = true
 BUILD_EVENT = os.istarget("windows")
 BUILD_FREETYPE = os.istarget("windows")
