@@ -228,7 +228,7 @@ jobs:
 
     - name: Copy premake files
       run: |
-        cp -r premake/* .
+        ./copy.sh
         cp -r resource/* .
 
     - name: Use premake to generate make files
@@ -322,7 +322,7 @@ jobs:
 
     - name: Copy premake files
       run: |
-        cp -r premake/* .
+        ./copy.sh
         cp -r resource/* .
 
     - name: Use premake to generate make files (Intel)
