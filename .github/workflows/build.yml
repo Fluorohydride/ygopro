@@ -136,7 +136,7 @@ jobs:
     - name: Use premake to generate Visual Studio solution (2019)
       if: matrix.os == 'windows-2019'
       run: |
-        .\premake5.exe vs2019 --winxp-support
+        .\premake5.exe vs2019
 
     - name: Use premake to generate Visual Studio solution (2022)
       if: matrix.os == 'windows-2022'
