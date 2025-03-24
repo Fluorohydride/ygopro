@@ -253,6 +253,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnReplayPause->setVisible(true);
 				mainGame->btnReplayStep->setVisible(false);
 				mainGame->btnReplayUndo->setVisible(false);
+				if (ReplayMode::cur_replay.pheader.flag & REPLAY_SINGLE_MODE)
+					mainGame->btnReplayUndo->setEnabled(false);
+				else
+					mainGame->btnReplayUndo->setEnabled(true);
 				mainGame->wPhase->setVisible(true);
 				mainGame->dField.Clear();
 				mainGame->HideElement(mainGame->wReplay);
