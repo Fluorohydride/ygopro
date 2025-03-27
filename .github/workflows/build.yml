@@ -369,13 +369,14 @@ jobs:
     - name: Download miniaudio
       run: |
         git --version
-        git clone --depth=1 https://github.com/mackron/miniaudio.git
+        git clone --depth=1 https://github.com/mackron/miniaudio
         cd miniaudio
+        ls
         cp extras/miniaudio_split/* .
         cp extras/decoders/libopus/* .
         cp extras/decoders/libvorbis/* .
-        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libopus.h
-        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libvorbis.h
+        sed -i '' 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libopus.h
+        sed -i '' 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libvorbis.h
         cd ..
 
     - name: Download irrlicht
