@@ -279,7 +279,8 @@ jobs:
     - name: Use premake to generate make files
       run: |
         ./premake5 gmake \
-          --freetype-include-dir="/usr/include/freetype2"
+          --freetype-include-dir="/usr/include/freetype2" \
+          --opus-include-dir="/usr/include/opus"
 
     - name: Make
       run: |
@@ -375,6 +376,7 @@ jobs:
         ./premake5 gmake \
           --cc=clang \
           --freetype-include-dir="/usr/local/include/freetype2" \
+          --opus-include-dir="/usr/local/include/opus" \
           --irrlicht-include-dir="../irrlicht/include" \
           --irrlicht-lib-dir="../irrlicht/source/Irrlicht/MacOSX/build/Release"
 
