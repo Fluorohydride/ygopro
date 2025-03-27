@@ -1,6 +1,8 @@
 project "miniaudio"
     kind "StaticLib"
     files { "*.c", "*.h" }
+    includedirs { "." }
+
     if MINIAUDIO_SUPPORT_OPUS_VORBIS then
         if BUILD_OPUS_VORBIS then
             files { "external/ogg/src/**.c", "external/ogg/src/**.h" }
@@ -17,14 +19,15 @@ project "miniaudio"
 
             defines { "USE_ALLOCA", "OPUS_BUILD" }
 
-            includedirs { ".",
+            includedirs {
                 "external/ogg/include",
                 "external/opus/include",
                 "external/opus/celt",
                 "external/opus/silk",
                 "external/opus/silk/float",
                 "external/opusfile/include",
-                "external/vorbis/include" }
+                "external/vorbis/include"
+            }
         else
             print("OPUS_INCLUDE_DIR:")
             print(OPUS_INCLUDE_DIR)
