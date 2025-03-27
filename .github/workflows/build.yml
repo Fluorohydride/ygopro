@@ -279,7 +279,8 @@ jobs:
     - name: Use premake to generate make files
       run: |
         ./premake5 gmake \
-          --freetype-include-dir="/usr/include/freetype2"
+          --freetype-include-dir="/usr/include/freetype2" \
+          --opus-include-dir="/usr/include/opus" \
 
     - name: Make
       run: |
@@ -372,6 +373,8 @@ jobs:
     - name: Use premake to generate make files (Intel)
       if: runner.arch == 'X64'
       run: |
+        ls /usr/local/include
+        ls /usr/local/include/opus
         ./premake5 gmake \
           --cc=clang \
           --freetype-include-dir="/usr/local/include/freetype2" \
@@ -382,6 +385,8 @@ jobs:
     - name: Use premake to generate make files (ARM64)
       if: runner.arch == 'ARM64'
       run: |
+        ls /opt/homebrew/include
+        ls /opt/homebrew/include/opus
         ./premake5 gmake \
           --cc=clang \
           --event-include-dir="/opt/homebrew/include" \
