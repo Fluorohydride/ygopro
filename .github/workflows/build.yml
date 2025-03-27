@@ -375,6 +375,7 @@ jobs:
         ./premake5 gmake \
           --cc=clang \
           --freetype-include-dir="/usr/local/include/freetype2" \
+          --opus-include-dir="/usr/local/include/opus" \
           --irrlicht-include-dir="../irrlicht/include" \
           --irrlicht-lib-dir="../irrlicht/source/Irrlicht/MacOSX/build/Release"
 
@@ -391,7 +392,7 @@ jobs:
           --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
           --miniaudio-include-dir="/opt/homebrew/include" \
           --miniaudio-lib-dir="/opt/homebrew/lib" \
-          --opus-include-dir="/opt/homebrew/include" \
+          --opus-include-dir="/opt/homebrew/include/opus" \
           --opus-lib-dir="/opt/homebrew/lib" \
           --vorbis-include-dir="/opt/homebrew/include" \
           --vorbis-lib-dir="/opt/homebrew/lib" \

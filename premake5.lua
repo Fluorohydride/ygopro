@@ -133,7 +133,7 @@ if MINIAUDIO_SUPPORT_OPUS_VORBIS then
         BUILD_OPUS_VORBIS = false
     end
     if not BUILD_OPUS_VORBIS then
-        OPUS_INCLUDE_DIR = GetParam("opus-include-dir") or os.findheader("opusfile")
+        OPUS_INCLUDE_DIR = GetParam("opus-include-dir") or os.findheader("opus")
         OPUS_LIB_DIR = GetParam("opus-lib-dir") or os.findlib("opusfile")
         VORBIS_INCLUDE_DIR = GetParam("vorbis-include-dir") or os.findheader("vorbis")
         VORBIS_LIB_DIR = GetParam("vorbis-lib-dir") or os.findlib("vorbis")
