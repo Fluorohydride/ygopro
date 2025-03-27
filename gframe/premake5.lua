@@ -6,6 +6,7 @@ end
 project "ygopro"
 if SERVER_MODE then
     kind "ConsoleApp"
+    cppdialect "C++14"
 
     defines { "YGOPRO_SERVER_MODE" }
 
