@@ -94,7 +94,7 @@ jobs:
       shell: bash
       run: |
         git clone https://github.com/mackron/miniaudio -b 0.11.22 --depth=1
-        cd miniaduio
+        cd miniaudio
         cp extras/miniaudio_split/* .
         cp extras/decoders/libopus/* .
         cp extras/decoders/libvorbis/* .
@@ -270,7 +270,7 @@ jobs:
     - name: Download miniaudio
       run: |
         git clone https://github.com/mackron/miniaudio -b 0.11.22 --depth=1
-        cd miniaduio
+        cd miniaudio
         cp extras/miniaudio_split/* .
         cp extras/decoders/libopus/* .
         cp extras/decoders/libvorbis/* .
@@ -369,7 +369,7 @@ jobs:
     - name: Download miniaudio
       run: |
         git clone https://github.com/mackron/miniaudio -b 0.11.22 --depth=1
-        cd miniaduio
+        cd miniaudio
         cp extras/miniaudio_split/* .
         cp extras/decoders/libopus/* .
         cp extras/decoders/libvorbis/* .
