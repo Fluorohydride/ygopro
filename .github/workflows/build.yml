@@ -385,8 +385,8 @@ jobs:
           --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
           --miniaudio-include-dir="/opt/homebrew/include" \
           --miniaudio-lib-dir="/opt/homebrew/lib" \
-          --opusfile-include-dir="/opt/homebrew/include" \
-          --opusfile-lib-dir="/opt/homebrew/lib" \
+          --opus-include-dir="/opt/homebrew/include" \
+          --opus-lib-dir="/opt/homebrew/lib" \
           --vorbis-include-dir="/opt/homebrew/include" \
           --vorbis-lib-dir="/opt/homebrew/lib" \
           --irrlicht-include-dir="../irrlicht/include" \
