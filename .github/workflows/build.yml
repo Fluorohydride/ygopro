@@ -90,10 +90,16 @@ jobs:
         7z x ${{ steps.sqlite.outputs.filepath }}
         move sqlite-amalgamation-3490100 sqlite3
 
-    - name: Create miniaudio directory
+    - name: Download miniaudio
+      shell: bash
       run: |
-        cd miniaudio
-        mkdir external
+        git clone https://github.com/mackron/miniaudio -b 0.11.22 --depth=1
+        cd miniaduio
+        cp extras/miniaudio_split/* .
+        cp extras/decoders/libopus/* .
+        cp extras/decoders/libvorbis/* .
+        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libopus.h
+        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libvorbis.h
         cd ..
 
     - name: Download ogg
@@ -261,11 +267,16 @@ jobs:
         tar xf ${{ steps.lua.outputs.filepath }}
         mv lua-5.4.7 lua
 
-#    - name: Download miniaudio
-#      id: miniaudio
-#      uses: mercury233/action-cache-download-file@v1.0.0
-#      with:
-#        url: 
+    - name: Download miniaudio
+      run: |
+        git clone https://github.com/mackron/miniaudio -b 0.11.22 --depth=1
+        cd miniaduio
+        cp extras/miniaudio_split/* .
+        cp extras/decoders/libopus/* .
+        cp extras/decoders/libvorbis/* .
+        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libopus.h
+        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libvorbis.h
+        cd ..
 
     - name: Download irrlicht
       run: |
@@ -354,6 +365,17 @@ jobs:
       run: |
         tar xf ${{ steps.lua.outputs.filepath }}
         mv lua-5.4.7 lua
+
+    - name: Download miniaudio
+      run: |
+        git clone https://github.com/mackron/miniaudio -b 0.11.22 --depth=1
+        cd miniaduio
+        cp extras/miniaudio_split/* .
+        cp extras/decoders/libopus/* .
+        cp extras/decoders/libvorbis/* .
+        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libopus.h
+        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libvorbis.h
+        cd ..
 
     - name: Download irrlicht
       run: |
