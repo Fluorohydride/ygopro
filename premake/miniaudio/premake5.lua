@@ -29,13 +29,12 @@ project "miniaudio"
                 "external/vorbis/include"
             }
         else
-            print("OPUS_INCLUDE_DIR:")
-            print(OPUS_INCLUDE_DIR)
-            print("VORBIS_INCLUDE_DIR:")
-            print(VORBIS_INCLUDE_DIR)
+            print("OPUS_LIB_DIR:")
+            print(OPUS_LIB_DIR)
+            print("VORBIS_LIB_DIR:")
+            print(VORBIS_LIB_DIR)
             includedirs { OPUS_INCLUDE_DIR, VORBIS_INCLUDE_DIR }
             libdirs { OPUS_LIB_DIR, VORBIS_LIB_DIR }
-            links { "opusfile", "vorbis" }
         end
     end
 
