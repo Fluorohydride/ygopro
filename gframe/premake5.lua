@@ -43,7 +43,7 @@ project "YGOPro"
         includedirs { "../miniaudio" }
         links { "miniaudio" }
         if not BUILD_OPUS_VORBIS and MINIAUDIO_SUPPORT_OPUS_VORBIS then
-            links { "opusfile", "vorbis" }
+            links { "opusfile", "vorbisfile" }
         end
     end
 
