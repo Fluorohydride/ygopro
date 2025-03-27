@@ -42,6 +42,14 @@ project "YGOPro"
         defines { "YGOPRO_USE_AUDIO" }
         includedirs { "../miniaudio" }
         links { "miniaudio" }
+        if not BUILD_MINIAUDIO then
+            includedirs { MINIAUDIO_INCLUDE_DIR }
+            libdirs { MINIAUDIO_LIB_DIR }
+            links { "miniaudio" }
+            if MINIAUDIO_SUPPORT_OPUS_VORBIS then
+                links { "opusfile", "vorbis" }
+            end
+        end
     end
 
     filter "system:windows"

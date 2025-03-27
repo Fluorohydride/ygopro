@@ -1,10 +1,14 @@
 -- default global settings
 
+USE_AUDIO = true
 BUILD_LUA = true
 BUILD_EVENT = os.istarget("windows")
 BUILD_FREETYPE = os.istarget("windows")
 BUILD_SQLITE = os.istarget("windows")
 BUILD_IRRLICHT = not os.istarget("macosx")
+BUILD_MINIAUDIO = os.istarget("windows")
+BUILD_OPUS_VORBIS = os.istarget("windows")
+MINIAUDIO_SUPPORT_OPUS_VORBIS = true
 LUA_LIB_NAME = "lua"
 
 -- read settings from command line or environment variables
@@ -40,6 +44,21 @@ newoption { trigger = "no-irrklang-pro", category = "YGOPro - irrklang - pro", d
 newoption { trigger = "irrklang-pro-release-lib-dir", category = "YGOPro - irrklang - pro", description = "", value = "PATH" }
 newoption { trigger = "irrklang-pro-debug-lib-dir", category = "YGOPro - irrklang - pro", description = "", value = "PATH" }
 newoption { trigger = 'build-ikpmp3', category = "YGOPro - irrklang - ikpmp3", description = "" }
+
+newoption { trigger = "no-audio", category = "YGOPro", description = "" }
+
+newoption { trigger = "build-miniaudio", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "no-build-miniaudio", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "miniaudio-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "miniaudio-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "no-build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "opus-include-dir", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "opus-lib-dir", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "vorbis-include-dir", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "vorbis-lib-dir", category = "YGOPro - miniaudio", description = "" }
 
 newoption { trigger = "winxp-support", category = "YGOPro", description = "" }
 newoption { trigger = "mac-arm", category = "YGOPro", description = "Cross compile for Apple Silicon" }
@@ -101,7 +120,38 @@ if not BUILD_IRRLICHT then
     IRRLICHT_LIB_DIR = GetParam("irrlicht-lib-dir") or os.findlib("irrlicht")
 end
 
-USE_AUDIO = not GetParam("no-audio")
+if GetParam("no-audio") then
+    USE_AUDIO = false
+end
+
+if GetParam("build-miniaudio") then
+    BUILD_MINIAUDIO = true
+elseif GetParam("nobuild-miniaudio") then
+    BUILD_MINIAUDIO = false
+end
+if not BUILD_MINIAUDIO then
+    MINIAUDIO_SUPPORT_OPUS_VORBIS = false
+    MINIAUDIO_INCLUDE_DIR = GetParam("miniaudio-include-dir") or os.findheader("miniaudio")
+    MINIAUDIO_LIB_DIR = GetParam("miniaudio-lib-dir") or os.findlib("miniaudio")
+end
+if GetParam("miniaudio-support-opus-vorbis") then
+    MINIAUDIO_SUPPORT_OPUS_VORBIS = true
+elseif GetParam("no-miniaudio-support-opus-vorbis") then
+    MINIAUDIO_SUPPORT_OPUS_VORBIS = false
+end
+if MINIAUDIO_SUPPORT_OPUS_VORBIS then
+    if GetParam("build-opus-vorbis") then
+        BUILD_OPUS_VORBIS = true
+    elseif GetParam("no-build-opus-vorbis") then
+        BUILD_OPUS_VORBIS = false
+    end
+    if not BUILD_OPUS_VORBIS then
+        OPUS_INCLUDE_DIR = GetParam("opus-include-dir") or os.findheader("opusfile")
+        OPUS_LIB_DIR = GetParam("opus-lib-dir") or os.findlib("opusfile")
+        VORBIS_INCLUDE_DIR = GetParam("vorbis-include-dir") or os.findheader("vorbis")
+        VORBIS_LIB_DIR = GetParam("vorbis-lib-dir") or os.findlib("vorbis")
+    end
+end
 
 if GetParam("winxp-support") and os.istarget("windows") then
     WINXP_SUPPORT = true
@@ -199,6 +249,6 @@ workspace "YGOPro"
     if BUILD_SQLITE then
         include "sqlite3"
     end
-    if USE_AUDIO then
+    if USE_AUDIO and BUILD_MINIAUDIO then
         include "miniaudio"
     end

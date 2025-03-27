@@ -1,7 +1,7 @@
 #include "sound_manager.h"
 #ifdef YGOPRO_USE_AUDIO
-#include "../miniaudio/miniaudio_libvorbis.h"
-#include "../miniaudio/miniaudio_libopus.h"
+#include <miniaudio_libvorbis.h>
+#include <miniaudio_libopus.h>
 #endif
 #include "myfilesystem.h"
 

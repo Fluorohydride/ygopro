@@ -236,7 +236,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libevent-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libsqlite3-dev libxxf86vm-dev
+        sudo apt-get install -y libevent-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libsqlite3-dev libxxf86vm-dev libminiaudio-dev libopusfile-dev libvorbis-dev
 
     - name: Download premake
       id: premake
@@ -321,9 +321,9 @@ jobs:
 #        git pull origin master
 #        cd ..
 
-#    - name: Install dependencies
-#      run: |
-#        brew install freetype libevent libx11 sqlite zlib
+    - name: Install dependencies
+      run: |
+        brew install freetype libevent libx11 sqlite zlib opus opusfile libvorbis
 
     - name: Download premake
       id: premake
@@ -383,6 +383,12 @@ jobs:
           --freetype-lib-dir="/opt/homebrew/lib" \
           --sqlite-include-dir="/opt/homebrew/opt/sqlite/include" \
           --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
+          --miniaudio-include-dir="/opt/homebrew/include" \
+          --miniaudio-lib-dir="/opt/homebrew/lib" \
+          --opusfile-include-dir="/opt/homebrew/include" \
+          --opusfile-lib-dir="/opt/homebrew/lib" \
+          --vorbis-include-dir="/opt/homebrew/include" \
+          --vorbis-lib-dir="/opt/homebrew/lib" \
           --irrlicht-include-dir="../irrlicht/include" \
           --irrlicht-lib-dir="../irrlicht/source/Irrlicht/MacOSX/build/Release"
 
