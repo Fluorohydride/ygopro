@@ -90,6 +90,12 @@ jobs:
         7z x ${{ steps.sqlite.outputs.filepath }}
         move sqlite-amalgamation-3490100 sqlite3
 
+    - name: Create miniaudio directory
+      run: |
+        cd miniaudio
+        mkdir external
+        cd ..
+
     - name: Download ogg
       id: ogg
       uses: mercury233/action-cache-download-file@v1.0.0
@@ -99,7 +105,7 @@ jobs:
     - name: Extract ogg
       run: |
         tar xf ${{ steps.ogg.outputs.filepath }}
-        move libogg-1.3.5 miniaudio/ogg
+        move libogg-1.3.5 miniaudio/external/ogg
 
     - name: Download opus
       id: opus
@@ -110,7 +116,7 @@ jobs:
     - name: Extract opus
       run: |
         tar xf ${{ steps.opus.outputs.filepath }}
-        move opus-1.5.2 miniaudio/opus
+        move opus-1.5.2 miniaudio/external/opus
 
     - name: Download opusfile
       id: opusfile
@@ -121,7 +127,7 @@ jobs:
     - name: Extract opusfile
       run: |
         tar xf ${{ steps.opusfile.outputs.filepath }}
-        move opusfile-0.12 miniaudio/opusfile
+        move opusfile-0.12 miniaudio/external/opusfile
 
     - name: Download vorbis
       id: vorbis
@@ -132,7 +138,7 @@ jobs:
     - name: Extract vorbis
       run: |
         tar xf ${{ steps.vorbis.outputs.filepath }}
-        move libvorbis-1.3.7 miniaudio/vorbis
+        move libvorbis-1.3.7 miniaudio/external/vorbis
 
     - name: Download irrlicht
       run: |
