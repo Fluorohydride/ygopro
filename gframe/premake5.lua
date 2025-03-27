@@ -44,6 +44,7 @@ project "YGOPro"
         links { "miniaudio" }
         if not BUILD_OPUS_VORBIS and MINIAUDIO_SUPPORT_OPUS_VORBIS then
             links { "opusfile", "vorbisfile" }
+            libdirs { OPUS_LIB_DIR, VORBIS_LIB_DIR }
         end
     end
 
