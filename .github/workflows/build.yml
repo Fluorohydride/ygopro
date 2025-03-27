@@ -341,7 +341,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install freetype libevent libx11 sqlite zlib opus opusfile libvorbis
+        brew install freetype libevent libx11 sqlite opus opusfile libvorbis
 
     - name: Download premake
       id: premake
@@ -368,7 +368,8 @@ jobs:
 
     - name: Download miniaudio
       run: |
-        git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
+        git --version
+        git clone --depth=1 https://github.com/mackron/miniaudio
         cd miniaudio
         cp extras/miniaudio_split/* .
         cp extras/decoders/libopus/* .
