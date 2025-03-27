@@ -199,6 +199,6 @@ workspace "YGOPro"
     if BUILD_SQLITE then
         include "sqlite3"
     end
-    --if BUILD_IKPMP3 then
-    --    include "ikpmp3"
-    --end
+    if USE_AUDIO then
+        include "miniaudio"
+    end

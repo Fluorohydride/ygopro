@@ -4,7 +4,7 @@
 #include "game.h"
 #include "../ocgcore/mtrandom.h"
 #ifdef YGOPRO_USE_AUDIO
-#include "miniaudio/miniaudio.h"
+#include "../miniaudio/miniaudio.h"
 #endif
 
 namespace ygo {
@@ -15,6 +15,9 @@ private:
 	int bgm_scene;
 	mt19937 rnd;
 #ifdef YGOPRO_USE_AUDIO
+	ma_resource_manager_config resourceManagerConfig;
+	ma_resource_manager resourceManager;
+	ma_engine_config engineConfig;
 	ma_engine engineSound;
 	ma_engine engineMusic;
 	ma_sound soundBGM;

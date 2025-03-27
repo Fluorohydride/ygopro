@@ -1,8 +1,5 @@
 include "lzma/."
 include "spmemvfs/."
-if USE_AUDIO then
-    include "miniaudio/."
-end
 
 project "YGOPro"
     kind "WindowedApp"
@@ -43,7 +40,8 @@ project "YGOPro"
 
     if USE_AUDIO then
         defines { "YGOPRO_USE_AUDIO" }
-        links { "cminiaudio" }
+        includedirs { "../miniaudio" }
+        links { "miniaudio" }
     end
 
     filter "system:windows"

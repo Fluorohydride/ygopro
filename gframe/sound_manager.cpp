@@ -1,4 +1,8 @@
 #include "sound_manager.h"
+#ifdef YGOPRO_USE_AUDIO
+#include "../miniaudio/miniaudio_libvorbis.h"
+#include "../miniaudio/miniaudio_libopus.h"
+#endif
 #include "myfilesystem.h"
 
 namespace ygo {
@@ -10,7 +14,21 @@ bool SoundManager::Init() {
 	bgm_scene = -1;
 	RefreshBGMList();
 	rnd.reset((unsigned int)std::time(nullptr));
-	if(ma_engine_init(nullptr, &engineSound) || ma_engine_init(nullptr, &engineMusic)) {
+	ma_decoding_backend_vtable* pCustomBackendVTables[] =
+	{
+		ma_decoding_backend_libvorbis,
+		ma_decoding_backend_libopus
+	};
+	resourceManagerConfig = ma_resource_manager_config_init();
+	resourceManagerConfig.ppCustomDecodingBackendVTables = pCustomBackendVTables;
+	resourceManagerConfig.customDecodingBackendCount = sizeof(pCustomBackendVTables) / sizeof(pCustomBackendVTables[0]);
+	resourceManagerConfig.pCustomDecodingBackendUserData = NULL;
+	if(ma_resource_manager_init(&resourceManagerConfig, &resourceManager) != MA_SUCCESS) {
+		return false;
+	}
+	engineConfig = ma_engine_config_init();
+	engineConfig.pResourceManager = &resourceManager;
+	if(ma_engine_init(&engineConfig, &engineSound) != MA_SUCCESS || ma_engine_init(&engineConfig, &engineMusic) != MA_SUCCESS) {
 		return false;
 	} else {
 		return true;
