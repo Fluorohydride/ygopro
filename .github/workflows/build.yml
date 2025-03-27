@@ -236,7 +236,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libevent-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libsqlite3-dev libxxf86vm-dev libminiaudio-dev libopusfile-dev libvorbis-dev
+        sudo apt-get install -y libevent-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libsqlite3-dev libxxf86vm-dev libopusfile-dev libvorbis-dev
 
     - name: Download premake
       id: premake
@@ -260,6 +260,12 @@ jobs:
       run: |
         tar xf ${{ steps.lua.outputs.filepath }}
         mv lua-5.4.7 lua
+
+#    - name: Download miniaudio
+#      id: miniaudio
+#      uses: mercury233/action-cache-download-file@v1.0.0
+#      with:
+#        url: 
 
     - name: Download irrlicht
       run: |
