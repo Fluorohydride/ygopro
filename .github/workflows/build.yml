@@ -121,6 +121,7 @@ jobs:
     - name: Copy premake files
       run: |
         xcopy /E premake\* .
+        xcopy /E resource\* .
 
     - name: Use premake to generate Visual Studio solution (2019)
       if: matrix.os == 'windows-2019'
@@ -217,6 +218,7 @@ jobs:
     - name: Copy premake files
       run: |
         cp -r premake/* .
+        cp -r resource/* .
 
     - name: Use premake to generate make files
       run: |
@@ -309,6 +311,7 @@ jobs:
     - name: Copy premake files
       run: |
         cp -r premake/* .
+        cp -r resource/* .
 
     - name: Use premake to generate make files (Intel)
       if: runner.arch == 'X64'

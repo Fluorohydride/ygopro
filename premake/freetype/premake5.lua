@@ -1,6 +1,5 @@
 project "freetype"
     kind "StaticLib"
-    cdialect "C11"
 
     includedirs { "include" }
     defines { "FT2_BUILD_LIBRARY" }
