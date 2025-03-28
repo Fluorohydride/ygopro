@@ -29,7 +29,9 @@ project "miniaudio"
                 "external/vorbis/include"
             }
         else
-            includedirs { OPUS_INCLUDE_DIR, VORBIS_INCLUDE_DIR }
+            includedirs { OPUS_INCLUDE_DIR, VORBIS_INCLUDE_DIR, OGG_INCLUDE_DIR }
+            links { "opusfile", "vorbisfile", "opus", "vorbis", "ogg" }
+            libdirs { OPUS_LIB_DIR, VORBIS_LIB_DIR, OGG_LIBDIR }
         end
     end
 
