@@ -12,6 +12,7 @@ USE_AUDIO = true
 AUDIO_LIB = "miniaudio"
 MINIAUDIO_SUPPORT_OPUS_VORBIS = true
 MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
+IRRKLANG_PRO = false
 IRRKLANG_PRO_BUILD_IKPMP3 = false
 
 -- read settings from command line or environment variables
