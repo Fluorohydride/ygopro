@@ -51,10 +51,12 @@ newoption { trigger = "miniaudio-support-opus-vorbis", category = "YGOPro - mini
 newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
 newoption { trigger = "build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
 newoption { trigger = "no-build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
-newoption { trigger = "opus-include-dir", category = "YGOPro - miniaudio", description = "" }
-newoption { trigger = "opus-lib-dir", category = "YGOPro - miniaudio", description = "" }
-newoption { trigger = "vorbis-include-dir", category = "YGOPro - miniaudio", description = "" }
-newoption { trigger = "vorbis-lib-dir", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "opus-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "opus-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "vorbis-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "vorbis-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "ogg-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "ogg-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 
 newoption { trigger = "use-irrklang", category = "YGOPro - irrklang", description = "Deprecated, use audio-lib=irrklang" }
 newoption { trigger = "no-use-irrklang", category = "YGOPro - irrklang", description = "Deprecated, use no-audio" }
@@ -164,6 +166,8 @@ if USE_AUDIO then
                 OPUS_LIB_DIR = GetParam("opus-lib-dir") or os.findlib("opusfile")
                 VORBIS_INCLUDE_DIR = GetParam("vorbis-include-dir") or os.findheader("vorbis")
                 VORBIS_LIB_DIR = GetParam("vorbis-lib-dir") or os.findlib("vorbis")
+                OGG_INCLUDE_DIR = GetParam("ogg-include-dir") or os.findheader("ogg")
+                OCG_LIB_DIR = GetParam("ogg-lib-dir") or os.findlib("ogg")
             end
         end
     elseif AUDIO_LIB == "irrklang" then
