@@ -43,10 +43,9 @@ bool SoundManager::Init() {
 #ifdef YGOPRO_USE_IRRKLANG
 	engineSound = irrklang::createIrrKlangDevice();
 	engineMusic = irrklang::createIrrKlangDevice();
-	if (!engineSound || !engineMusic) {
+	if(!engineSound || !engineMusic) {
 		return false;
-	}
-	else {
+	} else {
 #ifdef IRRKLANG_STATIC
 		irrklang::ikpMP3Init(engineMusic);
 #endif
@@ -84,6 +83,7 @@ void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 	});
 }
 void SoundManager::PlaySoundEffect(int sound) {
+#ifdef YGOPRO_USE_AUDIO
 	if(!mainGame->chkEnableSound->isChecked())
 		return;
 	char soundName[32];
@@ -221,6 +221,7 @@ void SoundManager::PlaySoundEffect(int sound) {
 	engineSound->setSoundVolume(mainGame->gameConf.sound_volume);
 	engineSound->play2D(soundPath);
 #endif
+#endif // YGOPRO_USE_AUDIO
 }
 void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 	if(element == mainGame->wMessage) {
