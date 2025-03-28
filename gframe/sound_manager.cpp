@@ -1,5 +1,5 @@
 #include "sound_manager.h"
-#ifdef YGOPRO_USE_AUDIO
+#if defined(YGOPRO_USE_AUDIO) && defined(YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS)
 #include <miniaudio_libvorbis.h>
 #include <miniaudio_libopus.h>
 #endif
@@ -14,6 +14,8 @@ bool SoundManager::Init() {
 	bgm_scene = -1;
 	RefreshBGMList();
 	rnd.reset((unsigned int)std::time(nullptr));
+	engineConfig = ma_engine_config_init();
+#ifdef YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS
 	ma_decoding_backend_vtable* pCustomBackendVTables[] =
 	{
 		ma_decoding_backend_libvorbis,
@@ -26,8 +28,8 @@ bool SoundManager::Init() {
 	if(ma_resource_manager_init(&resourceManagerConfig, &resourceManager) != MA_SUCCESS) {
 		return false;
 	}
-	engineConfig = ma_engine_config_init();
 	engineConfig.pResourceManager = &resourceManager;
+#endif
 	if(ma_engine_init(&engineConfig, &engineSound) != MA_SUCCESS || ma_engine_init(&engineConfig, &engineMusic) != MA_SUCCESS) {
 		return false;
 	} else {
@@ -51,7 +53,12 @@ void SoundManager::RefreshBGMList() {
 void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 	std::wstring search = L"./sound/BGM/" + path;
 	FileSystem::TraversalDir(search.c_str(), [this, &path, scene](const wchar_t* name, bool isdir) {
-		if(!isdir && (IsExtension(name, L".mp3") || IsExtension(name, L".ogg"))) {
+		if(!isdir && (
+			IsExtension(name, L".mp3")
+#ifdef YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS
+			|| IsExtension(name, L".ogg")
+#endif
+			)) {
 			std::wstring filename = path + L"/" + name;
 			BGMList[BGM_ALL].push_back(filename);
 			BGMList[scene].push_back(filename);

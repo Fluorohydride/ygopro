@@ -15,9 +15,11 @@ private:
 	int bgm_scene;
 	mt19937 rnd;
 #ifdef YGOPRO_USE_AUDIO
+	ma_engine_config engineConfig;
+#ifdef YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS
 	ma_resource_manager_config resourceManagerConfig;
 	ma_resource_manager resourceManager;
-	ma_engine_config engineConfig;
+#endif
 	ma_engine engineSound;
 	ma_engine engineMusic;
 	ma_sound soundBGM;

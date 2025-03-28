@@ -94,13 +94,6 @@ jobs:
       shell: bash
       run: |
         git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
-        cd miniaudio
-        cp extras/miniaudio_split/* .
-        cp extras/decoders/libopus/* .
-        cp extras/decoders/libvorbis/* .
-        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libopus.h
-        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libvorbis.h
-        cd ..
 
     - name: Download ogg
       id: ogg
@@ -270,13 +263,6 @@ jobs:
     - name: Download miniaudio
       run: |
         git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
-        cd miniaudio
-        cp extras/miniaudio_split/* .
-        cp extras/decoders/libopus/* .
-        cp extras/decoders/libvorbis/* .
-        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libopus.h
-        sed -i 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libvorbis.h
-        cd ..
 
     - name: Download irrlicht
       run: |
@@ -369,13 +355,6 @@ jobs:
     - name: Download miniaudio
       run: |
         git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
-        cd miniaudio
-        cp extras/miniaudio_split/* .
-        cp extras/decoders/libopus/* .
-        cp extras/decoders/libvorbis/* .
-        sed -i '' 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libopus.h
-        sed -i '' 's|#include "../../../miniaudio.h"|#include <miniaudio.h>|' miniaudio_libvorbis.h
-        cd ..
 
     - name: Download irrlicht
       run: |
@@ -405,7 +384,6 @@ jobs:
     - name: Use premake to generate make files (ARM64)
       if: runner.arch == 'ARM64'
       run: |
-        ls /opt/homebrew/lib
         ./premake5 gmake \
           --cc=clang \
           --event-include-dir="/opt/homebrew/include" \

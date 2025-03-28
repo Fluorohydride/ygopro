@@ -1,9 +1,9 @@
 project "miniaudio"
     kind "StaticLib"
-    files { "*.c", "*.h" }
-    includedirs { "." }
+    files { "extras/miniaudio_split/miniaudio.*" }
 
     if MINIAUDIO_SUPPORT_OPUS_VORBIS then
+        files { "extras/decoders/libopus/*", "extras/decoders/libvorbis/*" }
         if BUILD_OPUS_VORBIS then
             files { "external/ogg/src/**.c", "external/ogg/src/**.h" }
             files { "external/opus/src/**.c", "external/opus/src/**.h" }
