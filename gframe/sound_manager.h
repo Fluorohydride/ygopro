@@ -3,8 +3,11 @@
 
 #include "game.h"
 #include "../ocgcore/mtrandom.h"
-#ifdef YGOPRO_USE_AUDIO
+#ifdef YGOPRO_USE_MINIAUDIO
 #include <miniaudio.h>
+#endif
+#ifdef YGOPRO_USE_IRRKLANG
+#include <irrKlang.h>
 #endif
 
 namespace ygo {
@@ -14,7 +17,7 @@ private:
 	std::vector<std::wstring> BGMList[8];
 	int bgm_scene;
 	mt19937 rnd;
-#ifdef YGOPRO_USE_AUDIO
+#ifdef YGOPRO_USE_MINIAUDIO
 	ma_engine_config engineConfig;
 #ifdef YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS
 	ma_resource_manager_config resourceManagerConfig;
@@ -24,6 +27,11 @@ private:
 	ma_engine engineMusic;
 	ma_sound soundBGM;
 	char currentPlayingMusic[1024]{};
+#endif
+#ifdef YGOPRO_USE_IRRKLANG
+	irrklang::ISoundEngine* engineSound;
+	irrklang::ISoundEngine* engineMusic;
+	irrklang::ISound* soundBGM;
 #endif
 	void RefershBGMDir(std::wstring path, int scene);
 
