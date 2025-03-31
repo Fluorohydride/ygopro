@@ -57,7 +57,7 @@ static_assert(sizeof(HostRequest) == 2, "size mismatch: HostRequest");
 struct CTOS_DeckData {
 	int32_t mainc{};
 	int32_t sidec{};
-	int32_t list[MAINC_MAX + SIDEC_MAX]{};
+	uint32_t list[MAINC_MAX + SIDEC_MAX]{};
 };
 check_trivially_copyable(CTOS_DeckData);
 

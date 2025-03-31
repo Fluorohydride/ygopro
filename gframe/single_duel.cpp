@@ -411,9 +411,9 @@ void SingleDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 		return;
 	}
 	if(duel_count == 0) {
-		deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], deckbuf.list, deckbuf.mainc, deckbuf.sidec);
+		deck_error[dp->type] = DeckManager::LoadDeck(pdeck[dp->type], deckbuf.list, deckbuf.mainc, deckbuf.sidec);
 	} else {
-		if(deckManager.LoadSide(pdeck[dp->type], deckbuf.list, deckbuf.mainc, deckbuf.sidec)) {
+		if(DeckManager::LoadSide(pdeck[dp->type], deckbuf.list, deckbuf.mainc, deckbuf.sidec)) {
 			ready[dp->type] = true;
 			NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 			if(ready[0] && ready[1]) {

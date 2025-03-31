@@ -15,6 +15,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	FILE* fp = std::fopen(path, "r");
 	char linebuf[256]{};
 	wchar_t strBuffer[256]{};
+	char str1[16]{};
 	if(fp) {
 		while(std::fgets(linebuf, sizeof linebuf, fp)) {
 			if(linebuf[0] == '#')
@@ -34,10 +35,11 @@ void DeckManager::LoadLFListSingle(const char* path) {
 				continue;
 			unsigned int code = 0;
 			int count = -1;
-			if (std::sscanf(linebuf, "%9u%*[ ]%9d", &code, &count) != 2)
+			if (std::sscanf(linebuf, "%10s%*[ ]%1d", str1, &count) != 2)
 				continue;
 			if (count < 0 || count > 2)
 				continue;
+			code = std::strtoul(str1, nullptr, 10);
 			cur->content[code] = count;
 			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 		}
@@ -80,7 +82,7 @@ static unsigned int checkAvail(unsigned int ot, unsigned int avail) {
 		return DECKERROR_TCGONLY;
 	return DECKERROR_NOTAVAIL;
 }
-unsigned int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
+unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int rule) {
 	std::unordered_map<int, int> ccount;
 	// rule
 	if(deck.main.size() < DECK_MIN_SIZE || deck.main.size() > DECK_MAX_SIZE)
@@ -144,13 +146,12 @@ unsigned int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 	}
 	return 0;
 }
-int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_packlist) {
+uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec, bool is_packlist) {
 	deck.clear();
-	int code;
-	int errorcode = 0;
+	uint32_t errorcode = 0;
 	CardData cd;
 	for(int i = 0; i < mainc; ++i) {
-		code = dbuf[i];
+		auto code = dbuf[i];
 		if(!dataManager.GetData(code, &cd)) {
 			errorcode = code;
 			continue;
@@ -173,7 +174,7 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 		}
 	}
 	for(int i = 0; i < sidec; ++i) {
-		code = dbuf[mainc + i];
+		auto code = dbuf[mainc + i];
 		if(!dataManager.GetData(code, &cd)) {
 			errorcode = code;
 			continue;
@@ -187,22 +188,21 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 	}
 	return errorcode;
 }
-int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
-	size_t ct = 0;
-	int mainc = 0, sidec = 0, code = 0;
-	int cardlist[PACK_MAX_SIZE]{};
+uint32_t DeckManager::LoadDeckFromStream(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
+	int ct = 0;
+	int mainc = 0, sidec = 0;
+	uint32_t cardlist[PACK_MAX_SIZE]{};
 	bool is_side = false;
 	std::string linebuf;
-	while (std::getline(deckStream, linebuf, '\n') && ct < (sizeof cardlist / sizeof cardlist[0])) {
+	while (std::getline(deckStream, linebuf, '\n') && ct < PACK_MAX_SIZE) {
 		if (linebuf[0] == '!') {
 			is_side = true;
 			continue;
 		}
 		if (linebuf[0] < '0' || linebuf[0] > '9')
 			continue;
-		errno = 0;
-		code = std::strtol(linebuf.c_str(), nullptr, 10);
-		if (errno == ERANGE)
+		auto code = std::strtoul(linebuf.c_str(), nullptr, 10);
+		if (code >= UINT32_MAX)
 			continue;
 		cardlist[ct++] = code;
 		if (is_side)
@@ -212,15 +212,15 @@ int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_pa
 	}
 	return LoadDeck(deck, cardlist, mainc, sidec, is_packlist);
 }
-bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
-	std::unordered_map<int, int> pcount;
-	std::unordered_map<int, int> ncount;
+bool DeckManager::LoadSide(Deck& deck, uint32_t dbuf[], int mainc, int sidec) {
+	std::unordered_map<uint32_t, int> pcount;
+	std::unordered_map<uint32_t, int> ncount;
 	for(size_t i = 0; i < deck.main.size(); ++i)
-		++pcount[deck.main[i]->first];
+		pcount[deck.main[i]->first]++;
 	for(size_t i = 0; i < deck.extra.size(); ++i)
-		++pcount[deck.extra[i]->first];
+		pcount[deck.extra[i]->first]++;
 	for(size_t i = 0; i < deck.side.size(); ++i)
-		++pcount[deck.side[i]->first];
+		pcount[deck.side[i]->first]++;
 	Deck ndeck;
 	LoadDeck(ndeck, dbuf, mainc, sidec);
 #ifndef YGOPRO_NO_SIDE_CHECK
@@ -228,11 +228,11 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 		return false;
 #endif
 	for(size_t i = 0; i < ndeck.main.size(); ++i)
-		++ncount[ndeck.main[i]->first];
+		ncount[ndeck.main[i]->first]++;
 	for(size_t i = 0; i < ndeck.extra.size(); ++i)
-		++ncount[ndeck.extra[i]->first];
+		ncount[ndeck.extra[i]->first]++;
 	for(size_t i = 0; i < ndeck.side.size(); ++i)
-		++ncount[ndeck.side[i]->first];
+		ncount[ndeck.side[i]->first]++;
 #ifndef YGOPRO_NO_SIDE_CHECK
 	for (auto& cdit : ncount)
 		if (cdit.second != pcount[cdit.first])
@@ -309,8 +309,8 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 		return false;
 	}
 	std::istringstream deckStream(deckBuffer);
-	LoadDeck(current_deck, deckStream, is_packlist);
-	return true;  // the above LoadDeck has return value but we ignore it here for now
+	LoadDeckFromStream(current_deck, deckStream, is_packlist);
+	return true;  // the above function has return value but we ignore it here for now
 }
 bool DeckManager::LoadCurrentDeck(int category_index, const wchar_t* category_name, const wchar_t* deckname) {
 	wchar_t filepath[256];
