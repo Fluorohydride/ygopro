@@ -27,6 +27,7 @@ install:
 
 before_build:
   - xcopy /E premake\* .
+  - xcopy /E resource\* .
   - premake5 vs2022
   
 configuration: Release
