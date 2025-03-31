@@ -99,7 +99,7 @@ exec_windows:
     - mat_windows
     - mat_submodules
   script:
-    - bash -c 'cp -rf premake/* .'
+    - bash -c 'cp -rf premake/* . ; cp -rf resource/* .'
     - '.\premake5.exe vs2019'
     - cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe" build\YGOPro.sln /m /p:Configuration=Release'
     - copy bin\release\ygopro.exe .
