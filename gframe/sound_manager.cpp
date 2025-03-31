@@ -149,7 +149,7 @@ void SoundManager::PlaySoundEffect(int sound) {
 		break;
 	}
 	case SOUND_RECOVER: {
-		strcpy(soundName, "recover");
+		strcpy(soundName, "gainlp");
 		break;
 	}
 	case SOUND_COUNTER_ADD: {
@@ -161,11 +161,11 @@ void SoundManager::PlaySoundEffect(int sound) {
 		break;
 	}
 	case SOUND_COIN: {
-		strcpy(soundName, "coin");
+		strcpy(soundName, "coinflip");
 		break;
 	}
 	case SOUND_DICE: {
-		strcpy(soundName, "dice");
+		strcpy(soundName, "diceroll");
 		break;
 	}
 	case SOUND_NEXT_TURN: {
@@ -205,7 +205,7 @@ void SoundManager::PlaySoundEffect(int sound) {
 		break;
 	}
 	case SOUND_CHAT: {
-		strcpy(soundName, "chat");
+		strcpy(soundName, "chatmessage");
 		break;
 	}
 	default:
