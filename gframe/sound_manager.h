@@ -26,7 +26,7 @@ private:
 	ma_engine engineSound;
 	ma_engine engineMusic;
 	ma_sound soundBGM;
-	char currentPlayingMusic[1024]{};
+	wchar_t currentPlayingMusic[1024]{};
 #endif
 #ifdef YGOPRO_USE_IRRKLANG
 	irrklang::ISoundEngine* engineSound;
@@ -40,8 +40,8 @@ public:
 	void RefreshBGMList();
 	void PlaySoundEffect(int sound);
 	void PlayDialogSound(irr::gui::IGUIElement * element);
-	bool IsCurrentlyPlaying(char* song);
-	void PlayMusic(char* song, bool loop);
+	bool IsCurrentlyPlaying(wchar_t* music);
+	void PlayMusic(wchar_t* music, bool loop);
 	void PlayBGM(int scene);
 	void StopBGM();
 	void SetSoundVolume(double volume);
