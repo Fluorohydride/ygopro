@@ -24,7 +24,7 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 
 int main(int argc, char* argv[]) {
 #ifndef _WIN32
-	std::setlocale(LC_CTYPE, "UTF-8");
+	std::setlocale(LC_ALL, "C.UTF-8");
 #endif
 #ifdef __APPLE__
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
