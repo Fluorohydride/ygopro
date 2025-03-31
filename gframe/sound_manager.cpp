@@ -128,6 +128,10 @@ void SoundManager::PlaySoundEffect(int sound) {
 		strcpy(soundName, "token");
 		break;
 	}
+	case SOUND_NEGATE: {
+		strcpy(soundName, "negate");
+		break;
+	}
 	case SOUND_ATTACK: {
 		strcpy(soundName, "attack");
 		break;
