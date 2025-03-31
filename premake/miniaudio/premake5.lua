@@ -1,6 +1,6 @@
 project "miniaudio"
     kind "StaticLib"
-    files { "extras/miniaudio_split/miniaudio.*" }
+    files { "miniaudio.c", "miniaudio.h" }
     defines { "MA_NO_ENCODING", "MA_NO_GENERATION", "MA_NO_NEON" }
 
     if MINIAUDIO_SUPPORT_OPUS_VORBIS then
