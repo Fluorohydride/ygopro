@@ -217,12 +217,11 @@ void SoundManager::PlaySoundEffect(int sound) {
 	}
 	char soundPath[40];
 	std::snprintf(soundPath, 40, "./sound/%s.wav", soundName);
+	SetSoundVolume(mainGame->gameConf.sound_volume);
 #ifdef YGOPRO_USE_MINIAUDIO
-	ma_engine_set_volume(&engineSound, mainGame->gameConf.sound_volume);
 	ma_engine_play_sound(&engineSound, soundPath, nullptr);
 #endif
 #ifdef YGOPRO_USE_IRRKLANG
-	engineSound->setSoundVolume(mainGame->gameConf.sound_volume);
 	engineSound->play2D(soundPath);
 #endif
 #endif // YGOPRO_USE_AUDIO
@@ -265,6 +264,7 @@ void SoundManager::PlayMusic(char* song, bool loop) {
 		return;
 	if(!IsCurrentlyPlaying(song)) {
 		StopBGM();
+	SetMusicVolume(mainGame->gameConf.music_volume);
 #ifdef YGOPRO_USE_MINIAUDIO
 		strcpy(currentPlayingMusic, song);
 #ifdef _WIN32
@@ -278,8 +278,6 @@ void SoundManager::PlayMusic(char* song, bool loop) {
 		ma_sound_start(&soundBGM);
 #endif
 #ifdef YGOPRO_USE_IRRKLANG
-		engineMusic->stopAllSounds();
-		engineMusic->setSoundVolume(mainGame->gameConf.music_volume);
 		soundBGM = engineMusic->play2D(song, loop, false, true);
 #endif
 	}
