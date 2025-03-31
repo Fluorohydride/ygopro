@@ -50,6 +50,7 @@ for:
     - move irrlicht-1.8.5 irrlicht
 
     - xcopy /E premake\* .
+    - xcopy /E resource\* .
 
     - cd irrlicht
     - patch -p1 < irrlicht.patch
