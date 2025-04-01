@@ -103,7 +103,7 @@ jobs:
 
     - name: Download irrlicht
       run: |
-        git clone --depth=1 https://github.com/mercury233/irrlicht
+        git clone --depth=1 --branch patch-libpng https://github.com/mercury233/irrlicht
 
     - name: Check DirectX SDK
       id: dxsdk
@@ -224,7 +224,7 @@ jobs:
 
     - name: Download irrlicht
       run: |
-        git clone --depth=1 https://github.com/mercury233/irrlicht
+        git clone --depth=1 --branch patch-libpng https://github.com/mercury233/irrlicht
 
     - name: Copy premake files
       run: |
@@ -312,7 +312,7 @@ jobs:
 
     - name: Download irrlicht
       run: |
-        git clone --depth=1 https://github.com/mercury233/irrlicht
+        git clone --depth=1 --branch patch-libpng https://github.com/mercury233/irrlicht
 
     - name: Build irrlicht
       run: |
