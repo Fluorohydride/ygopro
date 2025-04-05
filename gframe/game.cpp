@@ -1230,7 +1230,7 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBo
 		return;
 	}
 	wchar_t catepath[256];
-	deckManager.GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
+	DeckManager::GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
 	cbDeck->clear();
 	RefreshDeck(catepath, [cbDeck](const wchar_t* item) { cbDeck->addItem(item); });
 }
