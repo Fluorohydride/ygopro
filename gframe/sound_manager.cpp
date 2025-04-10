@@ -227,6 +227,7 @@ void SoundManager::PlaySoundEffect(int sound) {
 #endif // YGOPRO_USE_AUDIO
 }
 void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
+#ifdef YGOPRO_USE_AUDIO
 	if(element == mainGame->wMessage) {
 		PlaySoundEffect(SOUND_INFO);
 	} else if(element == mainGame->wQuery) {
@@ -248,15 +249,24 @@ void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 	} else if(element == mainGame->wFTSelect) {
 		PlaySoundEffect(SOUND_QUESTION);
 	}
+#endif // YGOPRO_USE_AUDIO
 }
-bool SoundManager::IsCurrentlyPlaying(wchar_t* music) {
+bool SoundManager::IsPlayingMusic(wchar_t* music) {
 #ifdef YGOPRO_USE_MINIAUDIO
-	return currentPlayingMusic[0] && !mywcsncasecmp(currentPlayingMusic, music, 1024) && ma_sound_is_playing(&soundBGM);
+	if(music) {
+		return !mywcsncasecmp(currentPlayingMusic, music, 1024) && ma_sound_is_playing(&soundBGM);
+	} else {
+		return ma_sound_is_playing(&soundBGM);
+	}
 #endif
 #ifdef YGOPRO_USE_IRRKLANG
-	char cmusic[1024];
-	BufferIO::EncodeUTF8(music, cmusic);
-	return engineMusic->isCurrentlyPlaying(cmusic);
+	if(music) {
+		char cmusic[1024];
+		BufferIO::EncodeUTF8(music, cmusic);
+		return engineMusic->isCurrentlyPlaying(cmusic);
+	} else {
+		return soundBGM && !soundBGM->isFinished();
+	}
 #endif
 	return false;
 }
@@ -264,7 +274,7 @@ void SoundManager::PlayMusic(wchar_t* music, bool loop) {
 #ifdef YGOPRO_USE_AUDIO
 	if(!mainGame->chkEnableMusic->isChecked())
 		return;
-	if(!IsCurrentlyPlaying(music)) {
+	if(!IsPlayingMusic(music)) {
 		StopBGM();
 	SetMusicVolume(mainGame->gameConf.music_volume);
 #ifdef YGOPRO_USE_MINIAUDIO
@@ -287,11 +297,7 @@ void SoundManager::PlayBGM(int scene) {
 		return;
 	if(!mainGame->chkMusicMode->isChecked())
 		scene = BGM_ALL;
-#if defined(YGOPRO_USE_MINIAUDIO)
-	if(scene != bgm_scene || !IsCurrentlyPlaying(currentPlayingMusic)) {
-#elif defined(YGOPRO_USE_IRRKLANG)
-	if(scene != bgm_scene || (soundBGM && soundBGM->isFinished())) {
-#endif
+	if(scene != bgm_scene || !IsPlayingMusic()) {
 		int count = BGMList[scene].size();
 		if(count <= 0)
 			return;

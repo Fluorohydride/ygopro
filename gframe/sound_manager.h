@@ -15,7 +15,7 @@ namespace ygo {
 class SoundManager {
 private:
 	std::vector<std::wstring> BGMList[8];
-	int bgm_scene;
+	int bgm_scene{};
 	mt19937 rnd;
 #ifdef YGOPRO_USE_MINIAUDIO
 	ma_engine_config engineConfig;
@@ -40,7 +40,7 @@ public:
 	void RefreshBGMList();
 	void PlaySoundEffect(int sound);
 	void PlayDialogSound(irr::gui::IGUIElement * element);
-	bool IsCurrentlyPlaying(wchar_t* music);
+	bool IsPlayingMusic(wchar_t* music = 0);
 	void PlayMusic(wchar_t* music, bool loop);
 	void PlayBGM(int scene);
 	void StopBGM();
