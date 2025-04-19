@@ -172,7 +172,7 @@ public:
 	void WaitFrameSignal(int frame);
 	void DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lflist, bool drag = false);
 	void DrawDeckBd();
-	void LoadConfig();
+	void LoadConfig(const char* file);
 	void SaveConfig();
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
