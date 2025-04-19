@@ -138,6 +138,7 @@ bool Game::Initialize() {
 			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc",
 			L"/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
 			L"/System/Library/Fonts/PingFang.ttc",
+			L"/System/Library/Fonts/STHeiti Medium.ttc",
 			L"./fonts/textFont.ttf",
 			L"./fonts/textFont.ttc",
 			L"./fonts/textFont.otf"
