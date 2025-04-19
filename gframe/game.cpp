@@ -1711,6 +1711,11 @@ void Game::AddDebugMsg(const char* msg) {
 	}
 }
 void Game::ErrorLog(const char* msg) {
+#ifdef _WIN32
+	OutputDebugStringA(msg);
+#else
+	std::fprintf(stderr, "%s\n", msg);
+#endif
 	FILE* fp = std::fopen("error.log", "a");
 	if(!fp)
 		return;
