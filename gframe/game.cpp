@@ -158,7 +158,7 @@ bool Game::Initialize() {
 			}
 		});
 		if(fpath[0] == 0) {
-			ErrorLog("Failed to load font(s)!");
+			ErrorLog("No fonts found! Please manually edit system.conf or place appropriate font file in the fonts directory.");
 			return false;
 		}
 		if(!numFont) {
@@ -169,6 +169,10 @@ bool Game::Initialize() {
 			BufferIO::CopyWideString(fpath, gameConf.textfont);
 			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 		}
+	}
+	if(!numFont || !textFont) {
+		ErrorLog("Failed to load font(s)!");
+		return false;
 	}
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
