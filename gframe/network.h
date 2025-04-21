@@ -27,7 +27,7 @@ struct HostInfo {
 	uint8_t no_shuffle_deck{};
 	// byte padding[3]
 
-	uint32_t start_lp{};
+	int32_t start_lp{};
 	uint8_t start_hand{};
 	uint8_t draw_count{};
 	uint16_t time_limit{};
@@ -57,7 +57,7 @@ static_assert(sizeof(HostRequest) == 2, "size mismatch: HostRequest");
 struct CTOS_DeckData {
 	int32_t mainc{};
 	int32_t sidec{};
-	int32_t list[MAINC_MAX + SIDEC_MAX]{};
+	uint32_t list[MAINC_MAX + SIDEC_MAX]{};
 };
 check_trivially_copyable(CTOS_DeckData);
 
