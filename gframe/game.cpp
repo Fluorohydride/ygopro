@@ -1271,7 +1271,7 @@ void Game::RefreshBot() {
 	if(!gameConf.enable_bot_mode)
 		return;
 	botInfo.clear();
-	FILE* fp = std::fopen("bot.conf", "r");
+	FILE* fp = myfopen("bot.conf", "r");
 	char linebuf[256]{};
 	char strbuf[256]{};
 	if(fp) {
@@ -1324,7 +1324,7 @@ void Game::RefreshBot() {
 	}
 }
 void Game::LoadConfig() {
-	FILE* fp = std::fopen("system.conf", "r");
+	FILE* fp = myfopen("system.conf", "r");
 	if(!fp)
 		return;
 	char linebuf[CONFIG_LINE_SIZE]{};
@@ -1462,7 +1462,7 @@ void Game::LoadConfig() {
 	std::fclose(fp);
 }
 void Game::SaveConfig() {
-	FILE* fp = std::fopen("system.conf", "w");
+	FILE* fp = myfopen("system.conf", "w");
 	std::fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[CONFIG_LINE_SIZE];
 	std::fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
@@ -1715,7 +1715,7 @@ void Game::AddDebugMsg(const char* msg) {
 	}
 }
 void Game::ErrorLog(const char* msg) {
-	FILE* fp = std::fopen("error.log", "a");
+	FILE* fp = myfopen("error.log", "a");
 	if(!fp)
 		return;
 	time_t nowtime = std::time(nullptr);
