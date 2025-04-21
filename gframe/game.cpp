@@ -2058,10 +2058,12 @@ irr::core::vector2di Game::ResizeReverse(irr::s32 x, irr::s32 y) {
 irr::core::recti Game::ResizeWin(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2) {
 	irr::s32 w = x2 - x;
 	irr::s32 h = y2 - y;
-	x = (x + w / 2) * xScale - w / 2;
-	y = (y + h / 2) * yScale - h / 2;
-	x2 = w + x;
-	y2 = h + y;
+	irr::s32 w1 = w * xScale;
+	irr::s32 h1 = h * yScale;
+	x = (x + w / 2) * xScale - w1 / 2;
+	y = (y + h / 2) * yScale - h1 / 2;
+	x2 = w1 + x;
+	y2 = h1 + y;
 	return irr::core::recti(x, y, x2, y2);
 }
 irr::core::recti Game::ResizePhaseHint(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 width) {
