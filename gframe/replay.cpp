@@ -24,7 +24,7 @@ void Replay::BeginRecord() {
 #else
 	if(is_recording)
 		std::fclose(fp);
-	fp = std::fopen("./replay/_LastReplay.yrp", "wb");
+	fp = myfopen("./replay/_LastReplay.yrp", "wb");
 	if(!fp)
 		return;
 #endif
@@ -154,15 +154,7 @@ bool Replay::CheckReplay(const wchar_t* name) {
 bool Replay::DeleteReplay(const wchar_t* name) {
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls", name);
-#ifdef _WIN32
-	BOOL result = DeleteFileW(fname);
-	return !!result;
-#else
-	char filefn[256];
-	BufferIO::EncodeUTF8(fname, filefn);
-	int result = unlink(filefn);
-	return result == 0;
-#endif
+	return FileSystem::RemoveFile(fname);
 }
 bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 	wchar_t oldfname[256];

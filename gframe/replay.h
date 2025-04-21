@@ -17,13 +17,13 @@ constexpr int MAX_REPLAY_SIZE = 0x20000;
 constexpr int MAX_COMP_SIZE = UINT16_MAX + 1;
 
 struct ReplayHeader {
-	unsigned int id{};
-	unsigned int version{};
-	unsigned int flag{};
-	unsigned int seed{};
-	unsigned int datasize{};
-	unsigned int start_time{};
-	unsigned char props[8]{};
+	uint32_t id{};
+	uint32_t version{};
+	uint32_t flag{};
+	uint32_t seed{};
+	uint32_t datasize{};
+	uint32_t start_time{};
+	uint8_t props[8]{};
 };
 
 class Replay {
