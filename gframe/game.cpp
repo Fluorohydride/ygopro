@@ -1440,7 +1440,9 @@ void Game::LoadConfig() {
 				char* last_space = std::strrchr(valbuf, ' ');
 				if (last_space == nullptr)
 					continue;
-				gameConf.textfontsize = std::strtol(last_space + 1, nullptr, 10);
+				int fontsize = std::strtol(last_space + 1, nullptr, 10);
+				if (fontsize > 0)
+					gameConf.textfontsize = fontsize;
 				*last_space = 0;
 				BufferIO::DecodeUTF8(valbuf, gameConf.textfont);
 			} else if (!std::strcmp(strbuf, "numfont")) {
