@@ -8,6 +8,8 @@
 /pics
 /replay
 /single
+/sound
+!/sound/files.txt
 /WindBot
 /cards.cdb
 /error.log

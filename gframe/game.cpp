@@ -138,6 +138,7 @@ bool Game::Initialize() {
 			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc",
 			L"/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
 			L"/System/Library/Fonts/PingFang.ttc",
+			L"/System/Library/Fonts/STHeiti Medium.ttc",
 			L"./fonts/textFont.ttf",
 			L"./fonts/textFont.ttc",
 			L"./fonts/textFont.otf"
@@ -158,7 +159,7 @@ bool Game::Initialize() {
 			}
 		});
 		if(fpath[0] == 0) {
-			ErrorLog("Failed to load font(s)!");
+			ErrorLog("No fonts found! Please manually edit system.conf or place appropriate font file in the fonts directory.");
 			return false;
 		}
 		if(!numFont) {
@@ -169,6 +170,10 @@ bool Game::Initialize() {
 			BufferIO::CopyWideString(fpath, gameConf.textfont);
 			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 		}
+	}
+	if(!numFont || !textFont) {
+		ErrorLog("Failed to load font(s)!");
+		return false;
 	}
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
@@ -1267,7 +1272,7 @@ void Game::RefreshBot() {
 	if(!gameConf.enable_bot_mode)
 		return;
 	botInfo.clear();
-	FILE* fp = std::fopen("bot.conf", "r");
+	FILE* fp = myfopen("bot.conf", "r");
 	char linebuf[256]{};
 	char strbuf[256]{};
 	if(fp) {
@@ -1320,7 +1325,7 @@ void Game::RefreshBot() {
 	}
 }
 void Game::LoadConfig() {
-	FILE* fp = std::fopen("system.conf", "r");
+	FILE* fp = myfopen("system.conf", "r");
 	if(!fp)
 		return;
 	char linebuf[CONFIG_LINE_SIZE]{};
@@ -1338,14 +1343,6 @@ void Game::LoadConfig() {
 		} else if(!std::strcmp(strbuf, "errorlog")) {
 			unsigned int val = std::strtol(valbuf, nullptr, 10);
 			enable_log = val & 0xff;
-		} else if(!std::strcmp(strbuf, "textfont")) {
-			int textfontsize = 0;
-			if (std::sscanf(linebuf, "%63s = %959s %d", strbuf, valbuf, &textfontsize) != 3)
-				continue;
-			gameConf.textfontsize = textfontsize;
-			BufferIO::DecodeUTF8(valbuf, gameConf.textfont);
-		} else if(!std::strcmp(strbuf, "numfont")) {
-			BufferIO::DecodeUTF8(valbuf, gameConf.numfont);
 		} else if(!std::strcmp(strbuf, "serverport")) {
 			gameConf.serverport = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "lasthost")) {
@@ -1440,7 +1437,18 @@ void Game::LoadConfig() {
 			// options allowing multiple words
 			if (std::sscanf(linebuf, "%63s = %959[^\n]", strbuf, valbuf) != 2)
 				continue;
-			if (!std::strcmp(strbuf, "nickname")) {
+			if (!std::strcmp(strbuf, "textfont")) {
+				char* last_space = std::strrchr(valbuf, ' ');
+				if (last_space == nullptr)
+					continue;
+				int fontsize = std::strtol(last_space + 1, nullptr, 10);
+				if (fontsize > 0)
+					gameConf.textfontsize = fontsize;
+				*last_space = 0;
+				BufferIO::DecodeUTF8(valbuf, gameConf.textfont);
+			} else if (!std::strcmp(strbuf, "numfont")) {
+				BufferIO::DecodeUTF8(valbuf, gameConf.numfont);
+			} else if (!std::strcmp(strbuf, "nickname")) {
 				BufferIO::DecodeUTF8(valbuf, gameConf.nickname);
 			} else if (!std::strcmp(strbuf, "gamename")) {
 				BufferIO::DecodeUTF8(valbuf, gameConf.gamename);
@@ -1458,7 +1466,7 @@ void Game::LoadConfig() {
 	std::fclose(fp);
 }
 void Game::SaveConfig() {
-	FILE* fp = std::fopen("system.conf", "w");
+	FILE* fp = myfopen("system.conf", "w");
 	std::fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[CONFIG_LINE_SIZE];
 	std::fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
@@ -1711,7 +1719,7 @@ void Game::AddDebugMsg(const char* msg) {
 	}
 }
 void Game::ErrorLog(const char* msg) {
-	FILE* fp = std::fopen("error.log", "a");
+	FILE* fp = myfopen("error.log", "a");
 	if(!fp)
 		return;
 	time_t nowtime = std::time(nullptr);
