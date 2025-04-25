@@ -155,8 +155,6 @@ project "irrlicht"
     filter { "system:windows" }
         defines { "_IRR_WCHAR_FILESYSTEM" }
         includedirs { "$(DXSDK_DIR)Include" }
-        libdirs { "$(DXSDK_DIR)Lib/x86" }
-        links { "imm32" }
 
     filter { "system:linux" }
         links { "X11", "Xxf86vm" }

@@ -53,7 +53,6 @@ project "YGOPro"
     filter "system:windows"
         defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
-        libdirs { "$(DXSDK_DIR)Lib/x86" }
         if USE_IRRKLANG then
             links { "irrKlang" }
             if IRRKLANG_PRO then
