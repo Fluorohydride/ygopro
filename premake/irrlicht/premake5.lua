@@ -53,6 +53,7 @@ project "irrlicht"
               "NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_",
               "NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_",
               "NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_",
+              "NO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_",
               "PNG_INTEL_SSE",
     }
 
@@ -141,8 +142,6 @@ project "irrlicht"
             "source/Irrlicht/libpng/pngwutil.c",
             "source/Irrlicht/libpng/intel/intel_init.c",
             "source/Irrlicht/libpng/intel/filter_sse2_intrinsics.c",
-            "source/Irrlicht/aesGladman/*.h",
-            "source/Irrlicht/aesGladman/*.cpp",
     }
 
     filter { "system:windows" }
