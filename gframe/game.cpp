@@ -138,6 +138,7 @@ bool Game::Initialize() {
 			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc",
 			L"/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
 			L"/System/Library/Fonts/PingFang.ttc",
+			L"/System/Library/Fonts/STHeiti Medium.ttc",
 			L"./fonts/textFont.ttf",
 			L"./fonts/textFont.ttc",
 			L"./fonts/textFont.otf"
@@ -1342,14 +1343,6 @@ void Game::LoadConfig() {
 		} else if(!std::strcmp(strbuf, "errorlog")) {
 			unsigned int val = std::strtol(valbuf, nullptr, 10);
 			enable_log = val & 0xff;
-		} else if(!std::strcmp(strbuf, "textfont")) {
-			int textfontsize = 0;
-			if (std::sscanf(linebuf, "%63s = %959s %d", strbuf, valbuf, &textfontsize) != 3)
-				continue;
-			gameConf.textfontsize = textfontsize;
-			BufferIO::DecodeUTF8(valbuf, gameConf.textfont);
-		} else if(!std::strcmp(strbuf, "numfont")) {
-			BufferIO::DecodeUTF8(valbuf, gameConf.numfont);
 		} else if(!std::strcmp(strbuf, "serverport")) {
 			gameConf.serverport = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "lasthost")) {
@@ -1444,7 +1437,18 @@ void Game::LoadConfig() {
 			// options allowing multiple words
 			if (std::sscanf(linebuf, "%63s = %959[^\n]", strbuf, valbuf) != 2)
 				continue;
-			if (!std::strcmp(strbuf, "nickname")) {
+			if (!std::strcmp(strbuf, "textfont")) {
+				char* last_space = std::strrchr(valbuf, ' ');
+				if (last_space == nullptr)
+					continue;
+				int fontsize = std::strtol(last_space + 1, nullptr, 10);
+				if (fontsize > 0)
+					gameConf.textfontsize = fontsize;
+				*last_space = 0;
+				BufferIO::DecodeUTF8(valbuf, gameConf.textfont);
+			} else if (!std::strcmp(strbuf, "numfont")) {
+				BufferIO::DecodeUTF8(valbuf, gameConf.numfont);
+			} else if (!std::strcmp(strbuf, "nickname")) {
 				BufferIO::DecodeUTF8(valbuf, gameConf.nickname);
 			} else if (!std::strcmp(strbuf, "gamename")) {
 				BufferIO::DecodeUTF8(valbuf, gameConf.gamename);

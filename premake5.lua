@@ -214,7 +214,6 @@ workspace "YGOPro"
     configurations { "Release", "Debug" }
 
     filter "system:windows"
-        defines { "WIN32", "_WIN32" }
         entrypoint "mainCRTStartup"
         systemversion "latest"
         startproject "YGOPro"

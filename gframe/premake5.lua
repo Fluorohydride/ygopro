@@ -68,7 +68,6 @@ project "YGOPro"
     filter "system:windows"
         defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
-        libdirs { "$(DXSDK_DIR)Lib/x86" }
         links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrKlang" }
