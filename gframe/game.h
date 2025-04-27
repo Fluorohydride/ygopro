@@ -108,7 +108,7 @@ struct DuelInfo {
 	wchar_t hostname_tag[20]{};
 	wchar_t clientname_tag[20]{};
 	wchar_t strLP[2][16]{};
-	std::wstring vic_string;
+	irr::core::stringw vic_string;
 	unsigned char player_type{ 0 };
 	unsigned char time_player{ 0 };
 	unsigned short time_limit{ 0 };

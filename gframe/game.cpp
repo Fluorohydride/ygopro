@@ -103,7 +103,7 @@ bool Game::Initialize() {
 	}
 	LoadExpansions();
 	env = device->getGUIEnvironment();
-	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+	numFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.numfont, 16);
 	if(!numFont) {
 		const wchar_t* numFontPaths[] = {
 			L"C:/Windows/Fonts/arialbd.ttf",
@@ -119,12 +119,12 @@ bool Game::Initialize() {
 		};
 		for(const wchar_t* path : numFontPaths) {
 			BufferIO::CopyWideString(path, gameConf.numfont);
-			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+			numFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.numfont, 16);
 			if(numFont)
 				break;
 		}
 	}
-	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	textFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.textfont, gameConf.textfontsize);
 	if(!textFont) {
 		const wchar_t* textFontPaths[] = {
 			L"C:/Windows/Fonts/msyh.ttc",
@@ -145,7 +145,7 @@ bool Game::Initialize() {
 		};
 		for(const wchar_t* path : textFontPaths) {
 			BufferIO::CopyWideString(path, gameConf.textfont);
-			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+			textFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.textfont, gameConf.textfontsize);
 			if(textFont)
 				break;
 		}
@@ -164,20 +164,20 @@ bool Game::Initialize() {
 		}
 		if(!numFont) {
 			BufferIO::CopyWideString(fpath, gameConf.numfont);
-			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
+			numFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.numfont, 16);
 		}
 		if(!textFont) {
 			BufferIO::CopyWideString(fpath, gameConf.textfont);
-			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+			textFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.textfont, gameConf.textfontsize);
 		}
 	}
 	if(!numFont || !textFont) {
 		ErrorLog("Failed to load font(s)!");
 		return false;
 	}
-	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
-	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
-	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	adFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.numfont, 12);
+	lpcFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.numfont, 48);
+	guiFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.textfont, gameConf.textfontsize);
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"YGOPro");
 	device->setResizable(true);
@@ -1111,7 +1111,7 @@ std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cW
 
 	for(size_t i = 0; text[i] != 0 && i < std::wcslen(text); ++i) {
 		wchar_t c = text[i];
-		irr::u32 w = font->getCharDimension(c).Width + font->getKerningWidth(c, prev);
+		irr::u32 w = font->getCharDimension(c).Width + font->getKerningWidth(&c, &prev);
 		prev = c;
 		if(text[i] == L'\r') {
 			continue;
@@ -1850,10 +1850,10 @@ void Game::OnResize() {
 	irr::gui::CGUITTFont* old_adFont = adFont;
 	irr::gui::CGUITTFont* old_lpcFont = lpcFont;
 	irr::gui::CGUITTFont* old_textFont = textFont;
-	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, (yScale > 0.5 ? 16 * yScale : 8));
-	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, (yScale > 0.75 ? 12 * yScale : 9));
-	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48 * yScale);
-	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, (yScale > 0.642 ? gameConf.textfontsize * yScale : 9));
+	numFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.numfont, (yScale > 0.5 ? 16 * yScale : 8));
+	adFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.numfont, (yScale > 0.75 ? 12 * yScale : 9));
+	lpcFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.numfont, 48 * yScale);
+	textFont = irr::gui::CGUITTFont::createTTFont(driver, DataManager::FileSystem, gameConf.textfont, (yScale > 0.642 ? gameConf.textfontsize * yScale : 9));
 	old_numFont->drop();
 	old_adFont->drop();
 	old_lpcFont->drop();
