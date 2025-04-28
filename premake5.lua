@@ -165,8 +165,9 @@ workspace "YGOPro"
         end
 
     filter "system:macosx"
+        architecture "universal"
         libdirs { "/usr/local/lib" }
-        buildoptions { "-stdlib=libc++" }
+        --buildoptions { "-stdlib=libc++" }
         if MAC_ARM then
             buildoptions { "--target=arm64-apple-macos12" }
         end
