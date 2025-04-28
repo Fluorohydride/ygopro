@@ -314,12 +314,6 @@ jobs:
       run: |
         git clone --depth=1 https://github.com/mercury233/irrlicht
 
-    - name: Build irrlicht
-      run: |
-        cd irrlicht/source/Irrlicht/MacOSX
-        xcodebuild -project MacOSX.xcodeproj
-        cd ../../../..
-
     - name: Copy premake files
       run: |
         cp -r premake/* .
@@ -331,9 +325,7 @@ jobs:
         ./premake5 gmake \
           --cc=clang \
           --no-use-irrklang \
-          --freetype-include-dir="/usr/local/include/freetype2" \
-          --irrlicht-include-dir="../irrlicht/include" \
-          --irrlicht-lib-dir="../irrlicht/source/Irrlicht/MacOSX/build/Release"
+          --freetype-include-dir="/usr/local/include/freetype2"
 
     - name: Use premake to generate make files (ARM64)
       if: runner.arch == 'ARM64'
@@ -346,9 +338,7 @@ jobs:
           --freetype-include-dir="/opt/homebrew/include/freetype2" \
           --freetype-lib-dir="/opt/homebrew/lib" \
           --sqlite-include-dir="/opt/homebrew/opt/sqlite/include" \
-          --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
-          --irrlicht-include-dir="../irrlicht/include" \
-          --irrlicht-lib-dir="../irrlicht/source/Irrlicht/MacOSX/build/Release"
+          --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib"
 
     - name: Make
       run: |
