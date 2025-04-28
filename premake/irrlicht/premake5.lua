@@ -161,7 +161,7 @@ project "irrlicht"
 
     filter { "system:macosx" }
         cppdialect "gnu++14"
-        defines { "GL_SILENCE_DEPRECATION" }
+        defines { "GL_SILENCE_DEPRECATION", "PNG_ARM_NEON_OPT=0", "PNG_ARM_NEON_IMPLEMENTATION=0" }
         undefines { "NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_" }
         files {
             "source/Irrlicht/MacOSX/*.mm",
