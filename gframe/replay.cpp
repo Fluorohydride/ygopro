@@ -48,9 +48,9 @@ void Replay::BeginRecord() {
 	strftime(tmppath, 40, "./replay/%Y-%m-%d %H-%M-%S %%u.yrp", localedtime);
 	char path[40];
 	sprintf(path, tmppath, server_port);
-	fp = std::fopen(path, "wb");
+	fp = myfopen(path, "wb");
 #else
-	fp = std::fopen("./replay/_LastReplay.yrp", "wb");
+	fp = myfopen("./replay/_LastReplay.yrp", "wb");
 #endif //YGOPRO_SERVER_MODE
 	if(!fp)
 		return;
@@ -199,15 +199,7 @@ bool Replay::CheckReplay(const wchar_t* name) {
 bool Replay::DeleteReplay(const wchar_t* name) {
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls", name);
-#ifdef _WIN32
-	BOOL result = DeleteFileW(fname);
-	return !!result;
-#else
-	char filefn[256];
-	BufferIO::EncodeUTF8(fname, filefn);
-	int result = unlink(filefn);
-	return result == 0;
-#endif
+	return FileSystem::RemoveFile(fname);
 }
 bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 	wchar_t oldfname[256];

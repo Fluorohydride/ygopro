@@ -72,6 +72,21 @@ inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
 	return fp;
 }
 
+#if !defined(_WIN32)
+#define myfopen std::fopen
+#elif defined(WDK_NTDDI_VERSION) && (WDK_NTDDI_VERSION >= 0x0A000005) // Redstone 4, Version 1803, Build 17134.
+#define FOPEN_WINDOWS_SUPPORT_UTF8
+#define myfopen std::fopen
+#else
+inline FILE* myfopen(const char* filename, const char* mode) {
+	wchar_t wfilename[256]{};
+	BufferIO::DecodeUTF8(filename, wfilename);
+	wchar_t wmode[20]{};
+	BufferIO::CopyCharArray(mode, wmode);
+	return _wfopen(wfilename, wmode);
+}
+#endif
+
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 #include <irrlicht.h>
 #endif

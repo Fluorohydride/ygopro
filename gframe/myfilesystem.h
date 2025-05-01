@@ -86,6 +86,14 @@ public:
 		return DeleteDir(wdir);
 	}
 
+	static bool RemoveFile(const wchar_t* wfile) {
+		return DeleteFileW(wfile);
+	}
+
+	static bool RemoveFile(const char* file) {
+		return DeleteFileA(file);
+	}
+
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
 		std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%ls/*", wpath);
@@ -193,6 +201,16 @@ public:
 		if (rmdir(dir) != 0)
 			success = false;
 		return success;
+	}
+
+	static bool RemoveFile(const wchar_t* wfile) {
+		char file[1024];
+		BufferIO::EncodeUTF8(wfile, file);
+		return RemoveFile(file);
+	}
+
+	static bool RemoveFile(const char* file) {
+		return unlink(file) == 0;
 	}
 
 #ifndef YGOPRO_SERVER_MODE

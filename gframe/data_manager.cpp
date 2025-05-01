@@ -131,7 +131,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 }
 #ifndef YGOPRO_SERVER_MODE
 bool DataManager::LoadStrings(const char* file) {
-	FILE* fp = std::fopen(file, "r");
+	FILE* fp = myfopen(file, "r");
 	if(!fp)
 		return false;
 	char linebuf[TEXT_LINE_SIZE]{};
@@ -475,9 +475,7 @@ unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* sl
 }
 #endif //YGOPRO_SERVER_MODE
 unsigned char* DataManager::ReadScriptFromFile(const char* script_name, int* slen) {
-	wchar_t fname[256]{};
-	BufferIO::DecodeUTF8(script_name, fname);
-	FILE* fp = mywfopen(fname, "rb");
+	FILE* fp = myfopen(script_name, "rb");
 	if (!fp)
 		return nullptr;
 	size_t len = std::fread(scriptBuffer, 1, sizeof scriptBuffer, fp);
