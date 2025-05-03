@@ -359,34 +359,21 @@ bool DeckManager::DeleteCategory(const wchar_t* name) {
 		return false;
 	return FileSystem::DeleteDir(localname);
 }
-bool DeckManager::SaveDeckBuffer(const int deckbuf[], const wchar_t* name) {
+bool DeckManager::SaveDeckBuffer(const ReplayDeck& deck, const wchar_t* name) {
 	if (!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
 		return false;
 	FILE* fp = OpenDeckFile(name, "w");
 	if (!fp)
 		return false;
-	int it = 0;
-	const int mainc = deckbuf[it];
-	++it;
 	std::fprintf(fp, "#created by ...\n#main\n");
-	for (int i = 0; i < mainc; ++i) {
-		std::fprintf(fp, "%d\n", deckbuf[it]);
-		++it;
-	}
-	const int extrac = deckbuf[it];
-	++it;
+	for (const auto& code : deck.main)
+		std::fprintf(fp, "%u\n", code);
 	std::fprintf(fp, "#extra\n");
-	for (int i = 0; i < extrac; ++i) {
-		std::fprintf(fp, "%d\n", deckbuf[it]);
-		++it;
-	}
-	const int sidec = deckbuf[it];
-	++it;
+	for (const auto& code : deck.extra)
+		std::fprintf(fp, "%u\n", code);
 	std::fprintf(fp, "!side\n");
-	for (int i = 0; i < sidec; ++i) {
-		std::fprintf(fp, "%d\n", deckbuf[it]);
-		++it;
-	}
+	for (const auto& code : deck.side)
+		std::fprintf(fp, "%u\n", code);
 	std::fclose(fp);
 	return true;
 }

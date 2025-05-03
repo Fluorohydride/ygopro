@@ -2,6 +2,7 @@
 #define REPLAY_H
 
 #include "config.h"
+#include "deck_manager.h"
 
 namespace ygo {
 
@@ -31,11 +32,6 @@ struct DuelParameters {
 	int32_t start_hand{};
 	int32_t draw_count{};
 	uint32_t duel_flag{};
-};
-
-struct ReplayDeck {
-	std::vector<uint32_t> main;
-	std::vector<uint32_t> extra;
 };
 
 class Replay {
