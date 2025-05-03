@@ -539,17 +539,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					curtime = ReplayMode::cur_replay.pheader.seed;
 				std::wcsftime(infobuf, sizeof infobuf / sizeof infobuf[0], L"%Y/%m/%d %H:%M:%S\n", std::localtime(&curtime));
 				repinfo.append(infobuf);
-				wchar_t namebuf[4][20]{};
-				ReplayMode::cur_replay.ReadName(namebuf[0]);
-				ReplayMode::cur_replay.ReadName(namebuf[1]);
-				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG) {
-					ReplayMode::cur_replay.ReadName(namebuf[2]);
-					ReplayMode::cur_replay.ReadName(namebuf[3]);
-				}
+				const auto& namebuf = ReplayMode::cur_replay.players;
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
-					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3]);
+					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", namebuf[0].c_str(), namebuf[1].c_str(), namebuf[2].c_str(), namebuf[3].c_str());
 				else
-					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", namebuf[0], namebuf[1]);
+					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", namebuf[0].c_str(), namebuf[1].c_str());
 				repinfo.append(infobuf);
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, repinfo.c_str());
