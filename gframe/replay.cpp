@@ -1,5 +1,6 @@
 #include "replay.h"
 #include "myfilesystem.h"
+#include "network.h"
 #include "lzma/LzmaLib.h"
 
 namespace ygo {
@@ -28,9 +29,7 @@ void Replay::BeginRecord() {
 	if(!fp)
 		return;
 #endif
-	replay_size = 0;
-	comp_size = 0;
-	is_replaying = false;
+	Reset();
 	is_recording = true;
 }
 void Replay::WriteHeader(ReplayHeader& header) {
@@ -111,11 +110,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	if(!rfp)
 		return false;
 
-	data_position = 0;
-	is_recording = false;
-	is_replaying = false;
-	replay_size = 0;
-	comp_size = 0;
+	Reset();
 	if(std::fread(&pheader, sizeof pheader, 1, rfp) < 1) {
 		std::fclose(rfp);
 		return false;
@@ -138,6 +133,10 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		comp_size = 0;
 	}
 	is_replaying = true;
+	if (!ReadInfo()) {
+		Reset();
+		return false;
+	}
 	return true;
 }
 bool Replay::CheckReplay(const wchar_t* name) {
@@ -213,6 +212,63 @@ int32_t Replay::ReadInt32() {
 }
 void Replay::Rewind() {
 	data_position = 0;
+}
+void Replay::Reset() {
+	is_recording = false;
+	is_replaying = false;
+	replay_size = 0;
+	comp_size = 0;
+	data_position = 0;
+	players.clear();
+	params = { 0 };
+	decks.clear();
+	script_name.clear();
+}
+bool Replay::ReadInfo() {
+	int player_count = (pheader.flag & REPLAY_TAG) ? 4 : 2;
+	for (int i = 0; i < player_count; ++i) {
+		wchar_t name[20]{};
+		if (!ReadName(name))
+			return false;
+		players.push_back(name);
+	}
+	if (!ReadData(&params, sizeof DuelParameters))
+		return false;
+	bool is_tag1 = pheader.flag & REPLAY_TAG;
+	bool is_tag2 = params.duel_flag & DUEL_TAG_MODE;
+	if (is_tag1 != is_tag2)
+		return false;
+	if (pheader.flag & REPLAY_SINGLE_MODE) {
+		uint16_t slen = Read<uint16_t>();
+		char filename[256]{};
+		if (slen == 0 || slen > sizeof(filename) - 1)
+			return false;
+		if (!ReadData(filename, slen))
+			return false;
+		filename[slen] = 0;
+		script_name = filename;
+	}
+	else {
+		for (int p = 0; p < player_count; ++p) {
+			ReplayDeck deck;
+			uint32_t main = Read<uint32_t>();
+			if (main > MAINC_MAX)
+				return false;
+			if (main)
+				deck.main.resize(main);
+			if (!ReadData(deck.main.data(), main * sizeof(uint32_t)))
+				return false;
+			uint32_t extra = Read<uint32_t>();
+			if (extra > MAINC_MAX)
+				return false;
+			if (extra)
+				deck.extra.resize(extra);
+			if (!ReadData(deck.extra.data(), extra * sizeof(uint32_t)))
+				return false;
+			decks.push_back(deck);
+		}
+	}
+	return true;
 }
 
 }
