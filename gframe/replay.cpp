@@ -133,6 +133,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		comp_size = 0;
 	}
 	is_replaying = true;
+	can_read = true;
 	if (!ReadInfo()) {
 		Reset();
 		return false;
@@ -176,10 +177,6 @@ bool Replay::ReadNextResponse(unsigned char resp[]) {
 	unsigned char len{};
 	if (!ReadData(&len, sizeof len))
 		return false;
-	if (len > SIZE_RETURN_VALUE) {
-		is_replaying = false;
-		return false;
-	}
 	if (!ReadData(resp, len))
 		return false;
 	return true;
@@ -196,10 +193,10 @@ void Replay::ReadHeader(ReplayHeader& header) {
 	header = pheader;
 }
 bool Replay::ReadData(void* data, size_t length) {
-	if(!is_replaying)
+	if (!is_replaying || !can_read)
 		return false;
 	if (data_position + length > replay_size) {
-		is_replaying = false;
+		can_read = false;
 		return false;
 	}
 	if (length)
@@ -212,10 +209,12 @@ int32_t Replay::ReadInt32() {
 }
 void Replay::Rewind() {
 	data_position = 0;
+	can_read = true;
 }
 void Replay::Reset() {
 	is_recording = false;
 	is_replaying = false;
+	can_read = false;
 	replay_size = 0;
 	comp_size = 0;
 	data_position = 0;
