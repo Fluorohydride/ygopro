@@ -56,6 +56,16 @@ public:
 	static bool CheckReplay(const wchar_t* name);
 	static bool DeleteReplay(const wchar_t* name);
 	static bool RenameReplay(const wchar_t* oldname, const wchar_t* newname);
+	static size_t GetDeckPlayer(size_t deck_index) {
+		switch (deck_index) {
+		case 2:
+			return 3;
+		case 3:
+			return 2;
+		default:
+			return deck_index;
+		}
+	}
 	bool OpenReplay(const wchar_t* name);
 	bool ReadNextResponse(unsigned char resp[]);
 	bool ReadName(wchar_t* data);
