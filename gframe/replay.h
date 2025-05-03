@@ -53,10 +53,10 @@ public:
 	void SaveReplay(const wchar_t* name);
 
 	// play
-	bool OpenReplay(const wchar_t* name);
 	static bool CheckReplay(const wchar_t* name);
 	static bool DeleteReplay(const wchar_t* name);
 	static bool RenameReplay(const wchar_t* oldname, const wchar_t* newname);
+	bool OpenReplay(const wchar_t* name);
 	bool ReadNextResponse(unsigned char resp[]);
 	bool ReadName(wchar_t* data);
 	void ReadHeader(ReplayHeader& header);
