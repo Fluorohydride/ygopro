@@ -527,7 +527,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				wchar_t replay_path[256]{};
 				myswprintf(replay_path, L"./replay/%ls", mainGame->lstReplayList->getListItem(sel));
 				if (!ReplayMode::cur_replay.OpenReplay(replay_path)) {
-					mainGame->stReplayInfo->setText(L"");
+					mainGame->stReplayInfo->setText(L"Error");
 					break;
 				}
 				wchar_t infobuf[256]{};
@@ -539,6 +539,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					curtime = ReplayMode::cur_replay.pheader.seed;
 				std::wcsftime(infobuf, sizeof infobuf / sizeof infobuf[0], L"%Y/%m/%d %H:%M:%S\n", std::localtime(&curtime));
 				repinfo.append(infobuf);
+				if (ReplayMode::cur_replay.pheader.flag & REPLAY_SINGLE_MODE) {
+					wchar_t path[256]{};
+					BufferIO::DecodeUTF8(ReplayMode::cur_replay.script_name.c_str(), path);
+					repinfo.append(path);
+					repinfo.append(L"\n");
+				}
 				const auto& namebuf = ReplayMode::cur_replay.players;
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
 					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", namebuf[0].c_str(), namebuf[1].c_str(), namebuf[2].c_str(), namebuf[3].c_str());
