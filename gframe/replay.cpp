@@ -231,7 +231,7 @@ bool Replay::ReadInfo() {
 			return false;
 		players.push_back(name);
 	}
-	if (!ReadData(&params, sizeof DuelParameters))
+	if (!ReadData(&params, sizeof params))
 		return false;
 	bool is_tag1 = pheader.flag & REPLAY_TAG;
 	bool is_tag2 = params.duel_flag & DUEL_TAG_MODE;
