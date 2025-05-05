@@ -158,6 +158,7 @@ bool ReplayMode::StartDuel() {
 	const ReplayHeader& rh = cur_replay.pheader;
 	unsigned int seed = rh.seed;
 	std::mt19937 rnd(seed);
+	cur_replay.SkipInfo();
 	if(mainGame->dInfo.isTag) {
 		BufferIO::CopyWideString(cur_replay.players[0].c_str(), mainGame->dInfo.hostname);
 		BufferIO::CopyWideString(cur_replay.players[1].c_str(), mainGame->dInfo.hostname_tag);
