@@ -138,6 +138,8 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		Reset();
 		return false;
 	}
+	info_offset = data_position;
+	data_position = 0;
 	return true;
 }
 bool Replay::CheckReplay(const wchar_t* name) {
@@ -218,10 +220,14 @@ void Replay::Reset() {
 	replay_size = 0;
 	comp_size = 0;
 	data_position = 0;
+	info_offset = 0;
 	players.clear();
 	params = { 0 };
 	decks.clear();
 	script_name.clear();
+}
+void Replay::SkipInfo(){
+	data_position += info_offset;
 }
 bool Replay::ReadInfo() {
 	int player_count = (pheader.flag & REPLAY_TAG) ? 4 : 2;
