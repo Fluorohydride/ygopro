@@ -1859,6 +1859,10 @@ void Game::OnResize() {
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, (yScale > 0.75 ? 12 * yScale : 9));
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48 * yScale);
 	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, (yScale > 0.642 ? gameConf.textfontsize * yScale : 9));
+	textFont->setFontHinting(true, true);
+	guiFont->setFontHinting(true, true);
+  
+  
 	old_numFont->drop();
 	old_adFont->drop();
 	old_lpcFont->drop();
