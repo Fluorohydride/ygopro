@@ -362,19 +362,19 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	auto tit = tThumb.find(code);
 	if(tit == tThumb.end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
+		std::snprintf(file, sizeof file, "expansions/pics/thumbnail/%d.jpg", code);
 		int width = CARD_THUMB_WIDTH * mainGame->xScale;
 		int height = CARD_THUMB_HEIGHT * mainGame->yScale;
 		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
 		if(img == NULL) {
-			sprintf(file, "pics/thumbnail/%d.jpg", code);
+			std::snprintf(file, sizeof file, "pics/thumbnail/%d.jpg", code);
 			img = GetTextureFromFile(file, width, height);
 		}
 		if(img == NULL && mainGame->gameConf.use_image_scale) {
-			sprintf(file, "expansions/pics/%d.jpg", code);
+			std::snprintf(file, sizeof file, "expansions/pics/%d.jpg", code);
 			img = GetTextureFromFile(file, width, height);
 			if(img == NULL) {
-				sprintf(file, "pics/%d.jpg", code);
+				std::snprintf(file, sizeof file, "pics/%d.jpg", code);
 				img = GetTextureFromFile(file, width, height);
 			}
 		}
