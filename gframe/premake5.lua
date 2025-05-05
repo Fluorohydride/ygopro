@@ -69,6 +69,7 @@ project "YGOPro"
     filter "not system:windows"
         links { "event_pthreads", "dl", "pthread" }
     filter "system:macosx"
+        openmp "Off"
         links { "z" }
         defines { "GL_SILENCE_DEPRECATION" }
         if MAC_ARM then
@@ -80,6 +81,7 @@ project "YGOPro"
         end
     filter "system:linux"
         links { "GL", "X11", "Xxf86vm" }
+        linkoptions { "-fopenmp" }
         if USE_IRRKLANG then
             links { "IrrKlang" }
             linkoptions{ IRRKLANG_LINK_RPATH }
