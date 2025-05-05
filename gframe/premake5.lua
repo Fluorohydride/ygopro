@@ -5,6 +5,7 @@ project "YGOPro"
     kind "WindowedApp"
     cppdialect "C++14"
     rtti "Off"
+    openmp "On"
 
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore" }
