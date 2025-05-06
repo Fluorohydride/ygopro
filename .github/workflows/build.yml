@@ -401,12 +401,6 @@ jobs:
       run: |
         git clone --depth=1 https://github.com/mercury233/irrlicht
 
-    - name: Build irrlicht
-      run: |
-        cd irrlicht/source/Irrlicht/MacOSX
-        xcodebuild -project MacOSX.xcodeproj
-        cd ../../../..
-
     - name: Copy premake files
       run: |
         cp -r premake/* .
@@ -418,9 +412,7 @@ jobs:
         ./premake5 gmake \
           --cc=clang \
           --freetype-include-dir="/usr/local/include/freetype2" \
-          --opus-include-dir="/usr/local/include/opus" \
-          --irrlicht-include-dir="../irrlicht/include" \
-          --irrlicht-lib-dir="../irrlicht/source/Irrlicht/MacOSX/build/Release"
+          --opus-include-dir="/usr/local/include/opus"
 
     - name: Use premake to generate make files (ARM64)
       if: runner.arch == 'ARM64'
@@ -438,9 +430,7 @@ jobs:
           --opus-include-dir="/opt/homebrew/include/opus" \
           --opus-lib-dir="/opt/homebrew/lib" \
           --vorbis-include-dir="/opt/homebrew/include" \
-          --vorbis-lib-dir="/opt/homebrew/lib" \
-          --irrlicht-include-dir="../irrlicht/include" \
-          --irrlicht-lib-dir="../irrlicht/source/Irrlicht/MacOSX/build/Release"
+          --vorbis-lib-dir="/opt/homebrew/lib"
 
     - name: Make
       run: |

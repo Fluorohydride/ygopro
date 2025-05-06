@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 #if defined(FOPEN_WINDOWS_SUPPORT_UTF8)
 	std::setlocale(LC_CTYPE, ".UTF-8");
 #elif defined(__APPLE__)
-	std::setlocale(LC_CTYPE, "C.UTF-8");
+	std::setlocale(LC_CTYPE, "UTF-8");
 #elif !defined(_WIN32)
 	std::setlocale(LC_CTYPE, "");
 #endif
