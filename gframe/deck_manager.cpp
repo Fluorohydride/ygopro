@@ -10,7 +10,7 @@ DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
 	auto cur = _lfList.rend();
-	FILE* fp = std::fopen(path, "r");
+	FILE* fp = myfopen(path, "r");
 	char linebuf[256]{};
 	wchar_t strBuffer[256]{};
 	char str1[16]{};
@@ -315,7 +315,7 @@ bool DeckManager::LoadCurrentDeck(int category_index, const wchar_t* category_na
 		mainGame->deckBuilder.RefreshPackListScroll();
 	return res;
 }
-void DeckManager::SaveDeck(Deck& deck, std::stringstream& deckStream) {
+void DeckManager::SaveDeck(const Deck& deck, std::stringstream& deckStream) {
 	deckStream << "#created by ..." << std::endl;
 	deckStream << "#main" << std::endl;
 	for(size_t i = 0; i < deck.main.size(); ++i)
@@ -327,7 +327,7 @@ void DeckManager::SaveDeck(Deck& deck, std::stringstream& deckStream) {
 	for(size_t i = 0; i < deck.side.size(); ++i)
 		deckStream << deck.side[i]->first << std::endl;
 }
-bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
+bool DeckManager::SaveDeck(const Deck& deck, const wchar_t* file) {
 	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
 		return false;
 	FILE* fp = OpenDeckFile(file, "w");
@@ -340,15 +340,7 @@ bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
 	return true;
 }
 bool DeckManager::DeleteDeck(const wchar_t* file) {
-#ifdef _WIN32
-	BOOL result = DeleteFileW(file);
-	return !!result;
-#else
-	char filefn[256];
-	BufferIO::EncodeUTF8(file, filefn);
-	int result = unlink(filefn);
-	return result == 0;
-#endif
+	return FileSystem::RemoveFile(file);
 }
 bool DeckManager::CreateCategory(const wchar_t* name) {
 	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))

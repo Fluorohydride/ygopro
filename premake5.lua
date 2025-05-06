@@ -4,7 +4,7 @@ BUILD_LUA = true
 BUILD_EVENT = os.istarget("windows")
 BUILD_FREETYPE = os.istarget("windows")
 BUILD_SQLITE = os.istarget("windows")
-BUILD_IRRLICHT = not os.istarget("macosx")
+BUILD_IRRLICHT = true
 USE_IRRKLANG = true
 IRRKLANG_PRO = false
 LUA_LIB_NAME = "lua"
@@ -154,7 +154,6 @@ workspace "YGOPro"
     configurations { "Release", "Debug" }
 
     filter "system:windows"
-        defines { "WIN32", "_WIN32" }
         entrypoint "mainCRTStartup"
         systemversion "latest"
         startproject "YGOPro"
@@ -167,7 +166,6 @@ workspace "YGOPro"
 
     filter "system:macosx"
         libdirs { "/usr/local/lib" }
-        buildoptions { "-stdlib=libc++" }
         if MAC_ARM then
             buildoptions { "--target=arm64-apple-macos12" }
         end

@@ -59,8 +59,8 @@ public:
 	static void GetDeckFile(wchar_t* ret, int category_index, const wchar_t* category_name, const wchar_t* deckname);
 	static FILE* OpenDeckFile(const wchar_t* file, const char* mode);
 	static irr::io::IReadFile* OpenDeckReader(const wchar_t* file);
-	static bool SaveDeck(Deck& deck, const wchar_t* file);
-	static void SaveDeck(Deck& deck, std::stringstream& deckStream);
+	static bool SaveDeck(const Deck& deck, const wchar_t* file);
+	static void SaveDeck(const Deck& deck, std::stringstream& deckStream);
 	static bool DeleteDeck(const wchar_t* file);
 	static bool CreateCategory(const wchar_t* name);
 	static bool RenameCategory(const wchar_t* oldname, const wchar_t* newname);

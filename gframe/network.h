@@ -27,7 +27,7 @@ struct HostInfo {
 	uint8_t no_shuffle_deck{};
 	// byte padding[3]
 
-	uint32_t start_lp{};
+	int32_t start_lp{};
 	uint8_t start_hand{};
 	uint8_t draw_count{};
 	uint16_t time_limit{};
