@@ -1262,7 +1262,7 @@ void Game::DrawDeckBd() {
 		driver->draw2DRectangle(Resize(805, 160, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 		driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
 	}
-#ifdef YGOPRO_USE_THUMB_LOAD_THERAD
+#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
 	constexpr int MAX_RESULT = 9;
 #else
 	constexpr int MAX_RESULT = 7;
