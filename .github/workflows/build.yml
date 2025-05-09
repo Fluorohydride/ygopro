@@ -526,22 +526,12 @@ jobs:
     - name: Install dependencies
       if: matrix.dynamic-link == true
       run: |
-        brew install premake opus opusfile libvorbis
+        brew install opus opusfile libvorbis
 #        brew install sqlite libx11 freetype libevent
 
-    - name: Download premake
-      if: matrix.dynamic-link != true
-      id: premake
-      uses: mercury233/action-cache-download-file@v1.0.0
-      with:
-        url: https://github.com/premake/premake-core/releases/download/v${{ matrix.premake-version }}/premake-${{ matrix.premake-version }}-macosx.tar.gz
-        filename: premake5.tar.gz
-
-    - name: Extract premake
-      if: matrix.dynamic-link != true
+    - name: Install premake
       run: |
-        tar xf ${{ steps.premake.outputs.filepath }}
-        chmod +x ./premake5
+        brew install premake
 
     - name: Download libevent
       if: matrix.dynamic-link != true
