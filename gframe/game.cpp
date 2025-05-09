@@ -67,7 +67,8 @@ bool IsExtension(const char* filename, const char* extension) {
 }
 
 bool Game::Initialize() {
-	LoadConfig();
+	LoadConfig("system.conf");
+	LoadConfig("load-once.conf");
 	irr::SIrrlichtCreationParameters params{};
 	params.AntiAlias = gameConf.antialias;
 	if(gameConf.use_d3d)
@@ -1324,8 +1325,8 @@ void Game::RefreshBot() {
 		RefreshCategoryDeck(cbBotDeckCategory, cbBotDeck);
 	}
 }
-void Game::LoadConfig() {
-	FILE* fp = myfopen("system.conf", "r");
+void Game::LoadConfig(const char* file) {
+	FILE* fp = myfopen(file, "r");
 	if(!fp)
 		return;
 	char linebuf[CONFIG_LINE_SIZE]{};
@@ -1466,6 +1467,7 @@ void Game::LoadConfig() {
 	std::fclose(fp);
 }
 void Game::SaveConfig() {
+	FileSystem::RemoveFile("load-once.conf");
 	FILE* fp = myfopen("system.conf", "w");
 	std::fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[CONFIG_LINE_SIZE];
