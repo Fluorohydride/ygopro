@@ -1262,7 +1262,12 @@ void Game::DrawDeckBd() {
 		driver->draw2DRectangle(Resize(805, 160, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 		driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
 	}
-	for(int i = 0; i < 9 && i + scrFilter->getPos() < (int)deckBuilder.results.size(); ++i) {
+#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
+	constexpr int MAX_RESULT = 9;
+#else
+	constexpr int MAX_RESULT = 7;
+#endif
+	for(int i = 0; i < MAX_RESULT && i + scrFilter->getPos() < (int)deckBuilder.results.size(); ++i) {
 		code_pointer ptr = deckBuilder.results[i + scrFilter->getPos()];
 		if(i >= 7)
 		{
