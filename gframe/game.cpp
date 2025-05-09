@@ -1557,6 +1557,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	}
 	stName->setText(formatBuffer);
+	stName->setToolTipText(formatBuffer);
 	int offset = 0;
 	if (is_valid && !gameConf.hide_setname) {
 		auto& cd = cit->second;
