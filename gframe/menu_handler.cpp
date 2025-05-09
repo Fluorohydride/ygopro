@@ -300,12 +300,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(selected == -1)
 					break;
 				Replay replay;
-				wchar_t replay_name[256]{};
+				wchar_t replay_filename[256]{};
 				wchar_t namebuf[4][20]{};
 				wchar_t filename[256]{};
 				wchar_t replay_path[256]{};
-				BufferIO::CopyWideString(mainGame->lstReplayList->getListItem(selected), replay_name);
-				myswprintf(replay_path, L"./replay/%ls", replay_name);
+				BufferIO::CopyWideString(mainGame->lstReplayList->getListItem(selected), replay_filename);
+				myswprintf(replay_path, L"./replay/%ls", replay_filename);
 				if (!replay.OpenReplay(replay_path))
 					break;
 				if (replay.pheader.flag & REPLAY_SINGLE_MODE)
@@ -315,7 +315,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					FileSystem::SafeFileName(namebuf[i]);
 				}
 				for (size_t i = 0; i < replay.decks.size(); ++i) {
-					myswprintf(filename, L"./deck/%ls-%d %ls.ydk", replay_name, i + 1, namebuf[i]);
+					myswprintf(filename, L"./deck/%ls-%d %ls.ydk", replay_filename, i + 1, namebuf[i]);
 					DeckManager::SaveDeckBuffer(replay.decks[i], filename);
 				}
 				mainGame->stACMessage->setText(dataManager.GetSysString(1335));
