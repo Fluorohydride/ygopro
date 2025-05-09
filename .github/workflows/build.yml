@@ -61,7 +61,7 @@ jobs:
       id: freetype
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: http://downloads.sourceforge.net/freetype/freetype-2.13.3.tar.gz
+        url: https://downloads.sourceforge.net/freetype/freetype-2.13.3.tar.gz
 
     - name: Extract freetype
       run: |
@@ -234,17 +234,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-#          - ubuntu-20.04
-          - ubuntu-22.04
-          - ubuntu-24.04
+        name:
+          - ubuntu-22
+          - ubuntu-24
+          - ubuntu-dynamic-link
         include:
-#          - os: ubuntu-20.04
-#            premake_version: 5.0.0-beta2
-          - os: ubuntu-22.04
-            premake_version: 5.0.0-beta4
-          - os: ubuntu-24.04
-            premake_version: 5.0.0-beta5
+          - name: ubuntu-22
+            os: ubuntu-22.04
+            premake-version: 5.0.0-beta4
+          - name: ubuntu-24
+            os: ubuntu-24.04
+            premake-version: 5.0.0-beta6
+          - name: ubuntu-dynamic-link
+            os: ubuntu-22.04
+            premake-version: 5.0.0-beta4
+            dynamic-link: true
 
     runs-on: ${{ matrix.os }}
 
@@ -269,19 +273,59 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libevent-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libsqlite3-dev libxxf86vm-dev libopusfile-dev libvorbis-dev
+        sudo apt-get install -y libgl1-mesa-dev libglu1-mesa-dev libxxf86vm-dev
+
+    - name: Install dependencies (dynamic lib)
+      if: matrix.dynamic-link == true
+      run: |
+        sudo apt-get install -y libevent-dev libfreetype6-dev libsqlite3-dev libopusfile-dev libvorbis-dev
 
     - name: Download premake
       id: premake
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://github.com/premake/premake-core/releases/download/v${{ matrix.premake_version }}/premake-${{ matrix.premake_version }}-linux.tar.gz
+        url: https://github.com/premake/premake-core/releases/download/v${{ matrix.premake-version }}/premake-${{ matrix.premake-version }}-linux.tar.gz
         filename: premake5.tar.gz
 
     - name: Extract premake
       run: |
         tar xf ${{ steps.premake.outputs.filepath }}
         chmod +x ./premake5
+
+    - name: Download libevent
+      if: matrix.dynamic-link != true
+      id: libevent
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
+        filename: libevent.tar.gz
+
+    - name: Extract libevent
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.libevent.outputs.filepath }}
+        mv libevent-2.1.12-stable event
+
+    - name: Configure libevent
+      if: matrix.dynamic-link != true
+      run: |
+        cd event
+        ./configure --disable-openssl --enable-static=yes --enable-shared=no
+        sed -f make-event-config.sed < config.h > ./include/event2/event-config.h
+        cd ..
+
+    - name: Download freetype
+      if: matrix.dynamic-link != true
+      id: freetype
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://downloads.sourceforge.net/freetype/freetype-2.13.3.tar.gz
+
+    - name: Extract freetype
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.freetype.outputs.filepath }}
+        mv freetype-2.13.3 freetype
 
     - name: Download lua
       id: lua
@@ -294,12 +338,84 @@ jobs:
         tar xf ${{ steps.lua.outputs.filepath }}
         mv lua-5.4.7 lua
 
+    - name: Download sqlite
+      if: matrix.dynamic-link != true
+      id: sqlite
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+
+    - name: Extract sqlite
+      if: matrix.dynamic-link != true
+      run: |
+        7z x ${{ steps.sqlite.outputs.filepath }}
+        mv sqlite-amalgamation-3490100 sqlite3
+
     - name: Download miniaudio
       run: |
         git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
         cd miniaudio
         cp extras/miniaudio_split/miniaudio.* .
         cd ..
+
+    - name: Download ogg
+      if: matrix.dynamic-link != true
+      id: ogg
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/ogg/releases/download/v1.3.5/libogg-1.3.5.tar.gz
+
+    - name: Extract ogg
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.ogg.outputs.filepath }}
+        mv libogg-1.3.5 miniaudio/external/ogg
+
+    - name: Configure ogg
+      if: matrix.dynamic-link != true
+      run: |
+        cd miniaudio/external/ogg
+        ./configure
+        cd ../../..
+
+    - name: Download opus
+      if: matrix.dynamic-link != true
+      id: opus
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
+    
+    - name: Extract opus
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.opus.outputs.filepath }}
+        mv opus-1.5.2 miniaudio/external/opus
+
+    - name: Download opusfile
+      if: matrix.dynamic-link != true
+      id: opusfile
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/opusfile/releases/download/v0.12/opusfile-0.12.tar.gz
+
+    - name: Extract opusfile
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.opusfile.outputs.filepath }}
+        mv opusfile-0.12 miniaudio/external/opusfile
+
+    - name: Download vorbis
+      if: matrix.dynamic-link != true
+      id: vorbis
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/vorbis/releases/download/v1.3.7/libvorbis-1.3.7.tar.gz
+
+    - name: Extract vorbis
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.vorbis.outputs.filepath }}
+        mv libvorbis-1.3.7 miniaudio/external/vorbis
 
     - name: Download irrlicht
       run: |
@@ -310,11 +426,21 @@ jobs:
         cp -r premake/* .
         cp -r resource/* .
 
-    - name: Use premake to generate make files
+    - name: Use premake to generate make files (apt packages)
+      if: matrix.dynamic-link == true
       run: |
         ./premake5 gmake \
+          --no-build-event \
+          --no-build-freetype \
+          --no-build-sqlite \
+          --no-build-opus-vorbis \
           --freetype-include-dir="/usr/include/freetype2" \
           --opus-include-dir="/usr/include/opus"
+
+    - name: Use premake to generate make files
+      if: matrix.dynamic-link != true
+      run: |
+        ./premake5 gmake
 
     - name: Make
       run: |
@@ -322,10 +448,16 @@ jobs:
         make -j 4 config=release
         cd ..
 
+    - name: Strip symbols
+      run: |
+        cd bin/release
+        strip YGOPro
+        cd ../..
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: YGOPro-${{ matrix.os }}
+        name: YGOPro-${{ matrix.name }}
         path: |
           bin/release/YGOPro
 
@@ -333,14 +465,43 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - macos-13
-          - macos-15
+        name:
+          - macos-13-intel
+          - macos-13-arm-crossbuild
+          - macos-13-universal
+          - macos-15-arm
+          - macos-15-intel-crossbuild
+          - macos-15-universal
+          - macos-dynamic-link
         include:
-          - os: macos-13
-            premake_version: 5.0.0-beta5
-          - os: macos-15
-            premake_version: 5.0.0-beta5
+          - name: macos-13-intel
+            os: macos-13
+            premake-version: 5.0.0-beta6
+          - name: macos-13-arm-crossbuild
+            os: macos-13
+            premake-version: 5.0.0-beta6
+            cross-build-arm: true
+          - name: macos-13-universal
+            os: macos-13
+            premake-version: 5.0.0-beta6
+            cross-build-intel: true
+            cross-build-arm: true
+          - name: macos-15-arm
+            os: macos-15
+            premake-version: 5.0.0-beta6
+          - name: macos-15-intel-crossbuild
+            os: macos-15
+            premake-version: 5.0.0-beta6
+            cross-build-intel: true
+          - name: macos-15-universal
+            os: macos-15
+            premake-version: 5.0.0-beta6
+            cross-build-intel: true
+            cross-build-arm: true
+          - name: macos-dynamic-link
+            os: macos-13
+            premake-version: 5.0.0-beta6
+            dynamic-link: true
 
     runs-on: ${{ matrix.os }}
 
@@ -363,20 +524,59 @@ jobs:
 #        cd ..
 
     - name: Install dependencies
+      if: matrix.dynamic-link == true
       run: |
-        brew install freetype libevent libx11 sqlite opus opusfile libvorbis
+        brew install premake opus opusfile libvorbis
+#        brew install sqlite libx11 freetype libevent
 
     - name: Download premake
+      if: matrix.dynamic-link != true
       id: premake
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://github.com/premake/premake-core/releases/download/v${{ matrix.premake_version }}/premake-${{ matrix.premake_version }}-macosx.tar.gz
+        url: https://github.com/premake/premake-core/releases/download/v${{ matrix.premake-version }}/premake-${{ matrix.premake-version }}-macosx.tar.gz
         filename: premake5.tar.gz
 
     - name: Extract premake
+      if: matrix.dynamic-link != true
       run: |
         tar xf ${{ steps.premake.outputs.filepath }}
         chmod +x ./premake5
+
+    - name: Download libevent
+      if: matrix.dynamic-link != true
+      id: libevent
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
+        filename: libevent.tar.gz
+
+    - name: Extract libevent
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.libevent.outputs.filepath }}
+        mv libevent-2.1.12-stable event
+
+    - name: Configure libevent
+      if: matrix.dynamic-link != true
+      run: |
+        cd event
+        ./configure --disable-openssl --enable-static=yes --enable-shared=no
+        sed -f make-event-config.sed < config.h > ./include/event2/event-config.h
+        cd ..
+
+    - name: Download freetype
+      if: matrix.dynamic-link != true
+      id: freetype
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://downloads.sourceforge.net/freetype/freetype-2.13.3.tar.gz
+
+    - name: Extract freetype
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.freetype.outputs.filepath }}
+        mv freetype-2.13.3 freetype
 
     - name: Download lua
       id: lua
@@ -389,12 +589,77 @@ jobs:
         tar xf ${{ steps.lua.outputs.filepath }}
         mv lua-5.4.7 lua
 
+    - name: Download sqlite
+      if: matrix.dynamic-link != true
+      id: sqlite
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+
+    - name: Extract sqlite
+      if: matrix.dynamic-link != true
+      run: |
+        7z x ${{ steps.sqlite.outputs.filepath }}
+        mv sqlite-amalgamation-3490100 sqlite3
+
     - name: Download miniaudio
       run: |
         git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
         cd miniaudio
         cp extras/miniaudio_split/miniaudio.* .
         cd ..
+
+    - name: Download ogg
+      if: matrix.dynamic-link != true
+      id: ogg
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/ogg/releases/download/v1.3.5/libogg-1.3.5.tar.gz
+
+    - name: Extract ogg
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.ogg.outputs.filepath }}
+        mv libogg-1.3.5 miniaudio/external/ogg
+
+    - name: Download opus
+      if: matrix.dynamic-link != true
+      id: opus
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
+    
+    - name: Extract opus
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.opus.outputs.filepath }}
+        mv opus-1.5.2 miniaudio/external/opus
+
+    - name: Download opusfile
+      if: matrix.dynamic-link != true
+      id: opusfile
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/opusfile/releases/download/v0.12/opusfile-0.12.tar.gz
+
+    - name: Extract opusfile
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.opusfile.outputs.filepath }}
+        mv opusfile-0.12 miniaudio/external/opusfile
+
+    - name: Download vorbis
+      if: matrix.dynamic-link != true
+      id: vorbis
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/vorbis/releases/download/v1.3.7/libvorbis-1.3.7.tar.gz
+
+    - name: Extract vorbis
+      if: matrix.dynamic-link != true
+      run: |
+        tar xf ${{ steps.vorbis.outputs.filepath }}
+        mv libvorbis-1.3.7 miniaudio/external/vorbis
 
     - name: Download irrlicht
       run: |
@@ -405,31 +670,21 @@ jobs:
         cp -r premake/* .
         cp -r resource/* .
 
-    - name: Use premake to generate make files (Intel)
-      if: runner.arch == 'X64'
+    - name: Use premake to generate make files (homebrew packages)
+      if: matrix.dynamic-link == true
       run: |
-        ./premake5 gmake \
-          --cc=clang \
+        premake5 gmake \
+          --no-build-event \
+          --no-build-freetype \
+          --no-build-sqlite \
+          --no-build-opus-vorbis \
           --freetype-include-dir="/usr/local/include/freetype2" \
           --opus-include-dir="/usr/local/include/opus"
 
-    - name: Use premake to generate make files (ARM64)
-      if: runner.arch == 'ARM64'
+    - name: Use premake to generate make files
+      if: matrix.dynamic-link != true
       run: |
-        ./premake5 gmake \
-          --cc=clang \
-          --event-include-dir="/opt/homebrew/include" \
-          --event-lib-dir="/opt/homebrew/lib" \
-          --freetype-include-dir="/opt/homebrew/include/freetype2" \
-          --freetype-lib-dir="/opt/homebrew/lib" \
-          --sqlite-include-dir="/opt/homebrew/opt/sqlite/include" \
-          --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
-          --miniaudio-include-dir="/opt/homebrew/include" \
-          --miniaudio-lib-dir="/opt/homebrew/lib" \
-          --opus-include-dir="/opt/homebrew/include/opus" \
-          --opus-lib-dir="/opt/homebrew/lib" \
-          --vorbis-include-dir="/opt/homebrew/include" \
-          --vorbis-lib-dir="/opt/homebrew/lib"
+        ./premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }}
 
     - name: Make
       run: |
@@ -440,6 +695,6 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: YGOPro-${{ matrix.os }}
+        name: YGOPro-${{ matrix.name }}
         path: |
-          bin/*
+          bin/release/YGOPro.app

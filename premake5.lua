@@ -3,15 +3,18 @@
 BUILD_LUA = true
 LUA_LIB_NAME = "lua"
 
-BUILD_EVENT = os.istarget("windows")
-BUILD_FREETYPE = os.istarget("windows")
-BUILD_SQLITE = os.istarget("windows")
+BUILD_EVENT = true
+BUILD_FREETYPE = true
+BUILD_SQLITE = true
+
 BUILD_IRRLICHT = true
 
 USE_AUDIO = true
 AUDIO_LIB = "miniaudio"
+-- BUILD_MINIAUDIO is always true
 MINIAUDIO_SUPPORT_OPUS_VORBIS = true
-MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
+MINIAUDIO_BUILD_OPUS_VORBIS = true
+-- BUILD_IRRKLANG is impossible because irrKlang is not open source
 IRRKLANG_PRO = false
 IRRKLANG_PRO_BUILD_IKPMP3 = false
 
@@ -71,7 +74,8 @@ newoption { trigger = "irrklang-pro-debug-lib-dir", category = "YGOPro - irrklan
 newoption { trigger = 'build-ikpmp3', category = "YGOPro - irrklang - ikpmp3", description = "" }
 
 newoption { trigger = "winxp-support", category = "YGOPro", description = "" }
-newoption { trigger = "mac-arm", category = "YGOPro", description = "Cross compile for Apple Silicon" }
+newoption { trigger = "mac-arm", category = "YGOPro", description = "Compile for Apple Silicon Mac" }
+newoption { trigger = "mac-intel", category = "YGOPro", description = "Compile for Intel Mac" }
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
@@ -202,8 +206,26 @@ end
 if GetParam("winxp-support") and os.istarget("windows") then
     WINXP_SUPPORT = true
 end
-if GetParam("mac-arm") and os.istarget("macosx") then
-    MAC_ARM = true
+
+if os.istarget("macosx") then
+    if GetParam("mac-arm") then
+        MAC_ARM = true
+    end
+    if GetParam("mac-intel") then
+        MAC_INTEL = true
+    end
+    
+    if MAC_ARM then
+        TARGET_MAC_ARM = true
+    elseif not MAC_INTEL then
+        -- automatic target arm64, need extra detect
+        local uname = os.outputof("uname -m")
+        local proctranslated = os.outputof("sysctl sysctl.proc_translated")
+        if uname:find("arm") or proctranslated then
+            print("Detected Apple Silicon Mac")
+            TARGET_MAC_ARM = true
+        end
+    end
 end
 
 workspace "YGOPro"
@@ -227,7 +249,13 @@ workspace "YGOPro"
     filter "system:macosx"
         libdirs { "/usr/local/lib" }
         if MAC_ARM then
-            buildoptions { "--target=arm64-apple-macos12" }
+            buildoptions { "-arch arm64" }
+        end
+        if MAC_INTEL then
+            buildoptions { "-arch x86_64", "-mavx", "-mfma" }
+        end
+        if MAC_ARM and MAC_INTEL then
+            architecture "universal"
         end
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
 
@@ -255,9 +283,6 @@ workspace "YGOPro"
     filter { "configurations:Release", "not action:vs*" }
         symbols "On"
         defines "NDEBUG"
-        if not MAC_ARM then
-            buildoptions "-march=native"
-        end
 
     filter { "configurations:Debug", "action:vs*" }
         disablewarnings { "6011", "6031", "6054", "6262" }
@@ -273,6 +298,9 @@ workspace "YGOPro"
 
     filter "not action:vs*"
         buildoptions { "-fno-strict-aliasing", "-Wno-multichar", "-Wno-format-security" }
+        if not MAC_ARM and not MAC_INTEL then
+            buildoptions "-march=native"
+        end
 
     filter {}
 
