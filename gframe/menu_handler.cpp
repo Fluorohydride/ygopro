@@ -545,11 +545,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					repinfo.append(path);
 					repinfo.append(L"\n");
 				}
-				const auto& namebuf = ReplayMode::cur_replay.players;
+				const auto& player_names = ReplayMode::cur_replay.players;
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
-					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", namebuf[0].c_str(), namebuf[1].c_str(), namebuf[2].c_str(), namebuf[3].c_str());
+					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", player_names[0].c_str(), player_names[1].c_str(), player_names[2].c_str(), player_names[3].c_str());
 				else
-					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", namebuf[0].c_str(), namebuf[1].c_str());
+					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", player_names[0].c_str(), player_names[1].c_str());
 				repinfo.append(infobuf);
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, repinfo.c_str());
