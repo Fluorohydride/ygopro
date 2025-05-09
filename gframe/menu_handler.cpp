@@ -299,24 +299,24 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				auto selected = mainGame->lstReplayList->getSelected();
 				if(selected == -1)
 					break;
-				Replay replay1;
+				Replay replay;
 				wchar_t replay_name[256]{};
 				wchar_t namebuf[4][20]{};
 				wchar_t filename[256]{};
 				wchar_t replay_path[256]{};
 				BufferIO::CopyWideString(mainGame->lstReplayList->getListItem(selected), replay_name);
 				myswprintf(replay_path, L"./replay/%ls", replay_name);
-				if (!replay1.OpenReplay(replay_path))
+				if (!replay.OpenReplay(replay_path))
 					break;
-				if (replay1.pheader.flag & REPLAY_SINGLE_MODE)
+				if (replay.pheader.flag & REPLAY_SINGLE_MODE)
 					break;
-				for (size_t i = 0; i < replay1.decks.size(); ++i) {
-					BufferIO::CopyWideString(replay1.players[Replay::GetDeckPlayer(i)].c_str(), namebuf[i]);
+				for (size_t i = 0; i < replay.decks.size(); ++i) {
+					BufferIO::CopyWideString(replay.players[Replay::GetDeckPlayer(i)].c_str(), namebuf[i]);
 					FileSystem::SafeFileName(namebuf[i]);
 				}
-				for (size_t i = 0; i < replay1.decks.size(); ++i) {
+				for (size_t i = 0; i < replay.decks.size(); ++i) {
 					myswprintf(filename, L"./deck/%ls-%d %ls.ydk", replay_name, i + 1, namebuf[i]);
-					DeckManager::SaveDeckBuffer(replay1.decks[i], filename);
+					DeckManager::SaveDeckBuffer(replay.decks[i], filename);
 				}
 				mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 				mainGame->PopupElement(mainGame->wACMessage, 20);
