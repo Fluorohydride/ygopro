@@ -15,6 +15,7 @@ project "YGOPro"
     else
         includedirs { EVENT_INCLUDE_DIR }
         libdirs { EVENT_LIB_DIR }
+        links { "event_pthreads" }
     end
 
     if BUILD_IRRLICHT then
@@ -81,7 +82,7 @@ project "YGOPro"
             end
         end
     filter "not system:windows"
-        links { "event_pthreads", "dl", "pthread" }
+        links { "dl", "pthread" }
     filter "system:macosx"
         links { "z" }
         defines { "GL_SILENCE_DEPRECATION" }

@@ -91,7 +91,7 @@ if not BUILD_LUA then
 end
 
 if GetParam("build-event") then
-    BUILD_EVENT = os.istarget("windows") -- only on windows for now
+    BUILD_EVENT = true
 elseif GetParam("no-build-event") then
     BUILD_EVENT = false
 end

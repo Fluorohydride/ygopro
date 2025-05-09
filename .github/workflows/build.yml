@@ -56,7 +56,6 @@ jobs:
       run: |
         tar xf ${{ steps.libevent.outputs.filepath }}
         move libevent-2.0.22-stable event
-        xcopy /E event\WIN32-Code event\include
 
     - name: Download freetype
       id: freetype
