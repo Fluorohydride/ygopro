@@ -1,16 +1,22 @@
--- default global settings
+-- Supported systems: Windows, Linux, MacOS
+
+-- Global settings
+
+-- Default: Build Lua, Irrlicht from source on all systems.
+--          Don't build event, freetype, sqlite, opus, vorbis on Linux or MacOS, use apt or homebrew,
+--          but build them on Windows, due to the lack of package manager on Windows.
 
 BUILD_LUA = true
-LUA_LIB_NAME = "lua"
+LUA_LIB_NAME = "lua" -- change this if you don't build Lua
 
 BUILD_EVENT = os.istarget("windows")
 BUILD_FREETYPE = os.istarget("windows")
 BUILD_SQLITE = os.istarget("windows")
 
-BUILD_IRRLICHT = true
+BUILD_IRRLICHT = true -- modified Irrlicht is required, can't use the official one
 
 USE_AUDIO = true
-AUDIO_LIB = "miniaudio"
+AUDIO_LIB = "miniaudio" -- can be "miniaudio" or "irrklang"
 -- BUILD_MINIAUDIO is always true
 MINIAUDIO_SUPPORT_OPUS_VORBIS = true
 MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
@@ -18,7 +24,7 @@ MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
 IRRKLANG_PRO = false
 IRRKLANG_PRO_BUILD_IKPMP3 = false
 
--- read settings from command line or environment variables
+-- Read settings from command line or environment variables
 
 newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
 newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "" }
@@ -85,9 +91,9 @@ elseif GetParam("no-build-lua") then
     BUILD_LUA = false
 end
 if not BUILD_LUA then
-    -- at most times you need to change this if you change BUILD_LUA to false
+    -- at most times you need to change those if you change BUILD_LUA to false
     -- make sure your lua lib is built with C++ and version >= 5.3
-    LUA_LIB_NAME = GetParam("lua-lib-name")
+    LUA_LIB_NAME = GetParam("lua-lib-name") or LUA_LIB_NAME
     LUA_INCLUDE_DIR = GetParam("lua-include-dir") or os.findheader(LUA_LIB_NAME)
     LUA_LIB_DIR = GetParam("lua-lib-dir") or os.findlib(LUA_LIB_NAME)
 end
