@@ -208,7 +208,9 @@ bool ReplayMode::StartDuel() {
 				new_tag_card(pduel, code, 1, LOCATION_EXTRA);
 		}
 	} else {
-		if(!preload_script(pduel, cur_replay.script_name.c_str())) {
+		char filename[256]{};
+		std::snprintf(filename, sizeof filename, "./single/%s", cur_replay.script_name.c_str());
+		if(!preload_script(pduel, filename)) {
 			return false;
 		}
 	}
