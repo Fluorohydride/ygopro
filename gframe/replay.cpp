@@ -251,7 +251,11 @@ bool Replay::ReadInfo() {
 		if (!ReadData(filename, slen))
 			return false;
 		filename[slen] = 0;
-		script_name = filename;
+		if (std::strncmp(filename, "./single/", 9))
+			return false;
+		script_name = filename + 9;
+		if (script_name.find_first_of(R"(/\)") != std::string::npos)
+			return false;
 	}
 	else {
 		for (int p = 0; p < player_count; ++p) {
