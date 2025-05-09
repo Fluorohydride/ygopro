@@ -316,7 +316,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				for (size_t i = 0; i < replay.decks.size(); ++i) {
 					myswprintf(filename, L"./deck/%ls-%d %ls.ydk", replay_filename, i + 1, namebuf[i]);
-					DeckManager::SaveDeckBuffer(replay.decks[i], filename);
+					DeckManager::SaveReplayDeck(replay.decks[i], filename);
 				}
 				mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 				mainGame->PopupElement(mainGame->wACMessage, 20);
