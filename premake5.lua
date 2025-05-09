@@ -3,9 +3,9 @@
 BUILD_LUA = true
 LUA_LIB_NAME = "lua"
 
-BUILD_EVENT = true
-BUILD_FREETYPE = true
-BUILD_SQLITE = true
+BUILD_EVENT = os.istarget("windows")
+BUILD_FREETYPE = os.istarget("windows")
+BUILD_SQLITE = os.istarget("windows")
 
 BUILD_IRRLICHT = true
 
@@ -13,7 +13,7 @@ USE_AUDIO = true
 AUDIO_LIB = "miniaudio"
 -- BUILD_MINIAUDIO is always true
 MINIAUDIO_SUPPORT_OPUS_VORBIS = true
-MINIAUDIO_BUILD_OPUS_VORBIS = true
+MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
 -- BUILD_IRRKLANG is impossible because irrKlang is not open source
 IRRKLANG_PRO = false
 IRRKLANG_PRO_BUILD_IKPMP3 = false
