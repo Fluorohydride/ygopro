@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019, windows-2022]
+        os: [windows-2022]
         audiolib: [miniaudio, irrklang]
 
     runs-on: ${{ matrix.os }}
@@ -197,20 +197,10 @@ jobs:
         xcopy /E premake\* .
         xcopy /E resource\* .
 
-    - name: Use premake to generate Visual Studio solution (2019, miniaudio)
-      if: matrix.os == 'windows-2019' && matrix.audiolib == 'miniaudio'
-      run: |
-        .\premake5.exe vs2019 --winxp-support
-
     - name: Use premake to generate Visual Studio solution (2022, miniaudio)
       if: matrix.os == 'windows-2022' && matrix.audiolib == 'miniaudio'
       run: |
         .\premake5.exe vs2022
-
-    - name: Use premake to generate Visual Studio solution (2019, irrKlang)
-      if: matrix.os == 'windows-2019' && matrix.audiolib == 'irrklang'
-      run: |
-        .\premake5.exe vs2019 --winxp-support --audio-lib=irrklang
 
     - name: Use premake to generate Visual Studio solution (2022, irrKlang)
       if: matrix.os == 'windows-2022' && matrix.audiolib == 'irrklang'
