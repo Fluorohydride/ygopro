@@ -34,6 +34,7 @@
 /irrklang
 /ikpmp3
 /lua
+/miniaudio
 /sqlite3
 /gframe/*.ico
 /gframe/ygopro.rc

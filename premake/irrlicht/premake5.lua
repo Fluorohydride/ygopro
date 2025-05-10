@@ -62,13 +62,13 @@ project "irrlicht"
         "NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_",
         "NO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_",
         "PNG_INTEL_SSE",
+        "PNG_ARM_NEON_OPT=0",
+        "PNG_ARM_NEON_IMPLEMENTATION=0",
     }
 
     files {
         "include/*.h",
         "source/Irrlicht/*.cpp",
-        "source/Irrlicht/lzma/*.h",
-        "source/Irrlicht/lzma/*.c",
         "source/Irrlicht/zlib/zlib.h",
         "source/Irrlicht/zlib/adler32.c",
         "source/Irrlicht/zlib/compress.c",
@@ -158,3 +158,15 @@ project "irrlicht"
 
     filter { "system:linux" }
         links { "X11", "Xxf86vm" }
+
+    filter { "system:macosx" }
+        cppdialect "gnu++14"
+        defines { "GL_SILENCE_DEPRECATION" }
+        undefines { "NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_" }
+        files {
+            "source/Irrlicht/MacOSX/*.mm",
+            "source/Irrlicht/MacOSX/*.h",
+        }
+
+    filter { "system:macosx", "files:source/Irrlicht/Irrlicht.cpp or source/Irrlicht/COpenGLDriver.cpp" }
+        compileas "Objective-C++" 
