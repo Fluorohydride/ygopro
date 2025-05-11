@@ -39,3 +39,6 @@ project "irrlicht"
 
     filter { "system:windows" }
         defines { "_IRR_WCHAR_FILESYSTEM" }
+
+    filter { "system:macosx" }
+        cppdialect "gnu++14"
