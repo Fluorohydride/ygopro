@@ -33,11 +33,16 @@ int main(int argc, char* argv[]) {
 #ifdef __APPLE__
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(nullptr, bundle_url);
+	char path[PATH_MAX];
+	if (CFURLGetFileSystemRepresentation(bundle_base_url, true, (UInt8*)path, PATH_MAX)) {
+		CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
+		if (CFStringFind(bundle_path, CFSTR(".app"), kCFCompareCaseInsensitive).location != kCFNotFound) {
+			chdir(path);
+		}
+		CFRelease(bundle_path);
+	}
 	CFRelease(bundle_url);
-	CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
 	CFRelease(bundle_base_url);
-	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
-	CFRelease(path);
 #endif //__APPLE__
 #ifdef _WIN32
 	if (argc == 2 && (ygo::IsExtension(argv[1], ".ydk") || ygo::IsExtension(argv[1], ".yrp"))) { // open file from explorer
