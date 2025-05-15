@@ -33,13 +33,14 @@ int main(int argc, char* argv[]) {
 #ifdef __APPLE__
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(nullptr, bundle_url);
-	char path[PATH_MAX];
-	if (CFURLGetFileSystemRepresentation(bundle_base_url, true, (UInt8*)path, PATH_MAX)) {
-		CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
-		if (CFStringFind(bundle_path, CFSTR(".app"), kCFCompareCaseInsensitive).location != kCFNotFound) {
+	CFStringRef bundle_ext = CFURLCopyPathExtension(bundle_url);
+	if (bundle_ext) {
+		char path[PATH_MAX];
+		if (CFStringCompare(bundle_ext, CFSTR("app"), kCFCompareCaseInsensitive) == kCFCompareEqualTo
+			&& CFURLGetFileSystemRepresentation(bundle_base_url, true, (UInt8*)path, PATH_MAX)) {
 			chdir(path);
 		}
-		CFRelease(bundle_path);
+		CFRelease(bundle_ext);
 	}
 	CFRelease(bundle_url);
 	CFRelease(bundle_base_url);
