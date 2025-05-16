@@ -259,7 +259,7 @@ bool Replay::ReadInfo() {
 	}
 	else {
 		for (int p = 0; p < player_count; ++p) {
-			ReplayDeck deck;
+			DeckArray deck;
 			uint32_t main = Read<uint32_t>();
 			if (main > MAINC_MAX)
 				return false;

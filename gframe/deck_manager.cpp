@@ -359,7 +359,7 @@ bool DeckManager::DeleteCategory(const wchar_t* name) {
 		return false;
 	return FileSystem::DeleteDir(localname);
 }
-bool DeckManager::SaveReplayDeck(const ReplayDeck& deck, const wchar_t* name) {
+bool DeckManager::SaveReplayDeck(const DeckArray& deck, const wchar_t* name) {
 	if (!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
 		return false;
 	FILE* fp = OpenDeckFile(name, "w");

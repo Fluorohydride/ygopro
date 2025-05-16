@@ -35,7 +35,7 @@ struct Deck {
 	}
 };
 
-struct ReplayDeck {
+struct DeckArray {
 	std::vector<uint32_t> main;
 	std::vector<uint32_t> extra;
 	std::vector<uint32_t> side;
@@ -68,7 +68,7 @@ public:
 	static bool CreateCategory(const wchar_t* name);
 	static bool RenameCategory(const wchar_t* oldname, const wchar_t* newname);
 	static bool DeleteCategory(const wchar_t* name);
-	static bool SaveReplayDeck(const ReplayDeck& deck, const wchar_t* name);
+	static bool SaveReplayDeck(const DeckArray& deck, const wchar_t* name);
 };
 
 extern DeckManager deckManager;
