@@ -46,8 +46,6 @@ newoption { trigger = "irrlicht-lib-dir", category = "YGOPro - irrlicht", descri
 newoption { trigger = "no-audio", category = "YGOPro", description = "" }
 newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "miniaudio, irrklang", default = AUDIO_LIB }
 
-newoption { trigger = "miniaudio-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
-newoption { trigger = "miniaudio-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 newoption { trigger = "miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
 newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
 newoption { trigger = "build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }

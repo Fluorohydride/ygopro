@@ -425,8 +425,6 @@ jobs:
           --freetype-lib-dir="/opt/homebrew/lib" \
           --sqlite-include-dir="/opt/homebrew/opt/sqlite/include" \
           --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
-          --miniaudio-include-dir="/opt/homebrew/include" \
-          --miniaudio-lib-dir="/opt/homebrew/lib" \
           --opus-include-dir="/opt/homebrew/include/opus" \
           --opus-lib-dir="/opt/homebrew/lib" \
           --vorbis-include-dir="/opt/homebrew/include" \
