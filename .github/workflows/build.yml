@@ -426,6 +426,8 @@ jobs:
           --freetype-lib-dir="/opt/homebrew/lib" \
           --sqlite-include-dir="/opt/homebrew/opt/sqlite/include" \
           --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
+          --ogg-include-dir="/opt/homebrew/opt/ogg/include" \
+          --ogg-lib-dir="/opt/homebrew/opt/ogg/lib" \
           --opus-include-dir="/opt/homebrew/include/opus" \
           --opus-lib-dir="/opt/homebrew/lib" \
           --opusfile-include-dir="/opt/homebrew/include/opus" \

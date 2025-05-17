@@ -170,7 +170,7 @@ if USE_AUDIO then
                 VORBIS_INCLUDE_DIR = GetParam("vorbis-include-dir") or os.findheader("vorbis")
                 VORBIS_LIB_DIR = GetParam("vorbis-lib-dir") or os.findlib("vorbis")
                 OGG_INCLUDE_DIR = GetParam("ogg-include-dir") or os.findheader("ogg")
-                OCG_LIB_DIR = GetParam("ogg-lib-dir") or os.findlib("ogg")
+                OGG_LIB_DIR = GetParam("ogg-lib-dir") or os.findlib("ogg")
             end
         end
     elseif AUDIO_LIB == "irrklang" then
