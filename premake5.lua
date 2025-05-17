@@ -52,6 +52,8 @@ newoption { trigger = "build-opus-vorbis", category = "YGOPro - miniaudio", desc
 newoption { trigger = "no-build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
 newoption { trigger = "opus-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 newoption { trigger = "opus-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "opusfile-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "opusfile-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 newoption { trigger = "vorbis-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 newoption { trigger = "vorbis-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 newoption { trigger = "ogg-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
@@ -162,7 +164,9 @@ if USE_AUDIO then
             end
             if not MINIAUDIO_BUILD_OPUS_VORBIS then
                 OPUS_INCLUDE_DIR = GetParam("opus-include-dir") or os.findheader("opus")
-                OPUS_LIB_DIR = GetParam("opus-lib-dir") or os.findlib("opusfile")
+                OPUS_LIB_DIR = GetParam("opus-lib-dir") or os.findlib("opus")
+                OPUSFILE_INCLUDE_DIR = GetParam("opusfile-include-dir") or os.findheader("opusfile")
+                OPUSFILE_LIB_DIR = GetParam("opusfile-lib-dir") or os.findlib("opusfile")
                 VORBIS_INCLUDE_DIR = GetParam("vorbis-include-dir") or os.findheader("vorbis")
                 VORBIS_LIB_DIR = GetParam("vorbis-lib-dir") or os.findlib("vorbis")
                 OGG_INCLUDE_DIR = GetParam("ogg-include-dir") or os.findheader("ogg")

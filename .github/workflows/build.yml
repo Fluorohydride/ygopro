@@ -412,7 +412,8 @@ jobs:
         ./premake5 gmake \
           --cc=clang \
           --freetype-include-dir="/usr/local/include/freetype2" \
-          --opus-include-dir="/usr/local/include/opus"
+          --opus-include-dir="/usr/local/include/opus" \
+          --opusfile-include-dir="/usr/local/include/opus"
 
     - name: Use premake to generate make files (ARM64)
       if: runner.arch == 'ARM64'
@@ -427,6 +428,8 @@ jobs:
           --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
           --opus-include-dir="/opt/homebrew/include/opus" \
           --opus-lib-dir="/opt/homebrew/lib" \
+          --opusfile-include-dir="/opt/homebrew/include/opus" \
+          --opusfile-lib-dir="/opt/homebrew/lib" \
           --vorbis-include-dir="/opt/homebrew/include" \
           --vorbis-lib-dir="/opt/homebrew/lib"
 

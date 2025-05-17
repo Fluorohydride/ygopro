@@ -49,7 +49,7 @@ project "YGOPro"
                 includedirs { "../miniaudio/extras/decoders/libopus", "../miniaudio/extras/decoders/libvorbis" }
                 if not MINIAUDIO_BUILD_OPUS_VORBIS then
                     links { "opusfile", "vorbisfile", "opus", "vorbis", "ogg" }
-                    libdirs { OPUS_LIB_DIR, VORBIS_LIB_DIR, OGG_LIBDIR }
+                    libdirs { OPUS_LIB_DIR, OPUSFILE_LIB_DIR, VORBIS_LIB_DIR, OGG_LIBDIR }
                 end
             end
         end
