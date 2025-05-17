@@ -429,9 +429,7 @@ jobs:
     - name: Use premake to generate make files (apt packages)
       if: matrix.static-link != true
       run: |
-        ./premake5 gmake \
-          --freetype-include-dir="/usr/include/freetype2" \
-          --opus-include-dir="/usr/include/opus"
+        ./premake5 gmake
 
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true
@@ -653,27 +651,24 @@ jobs:
         cp -r premake/* .
         cp -r resource/* .
 
-    - name: Use premake to generate make files (homebrew packages, Intel)
-      if: matrix.static-link != true && runner.arch == 'X64'
+    - name: Use premake to generate make files (Homebrew packages)
+      if: matrix.static-link != true
       run: |
         premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }} \
-          --freetype-include-dir="/usr/local/include/freetype2" \
-          --opus-include-dir="/usr/local/include/opus"
-
-    - name: Use premake to generate make files (homebrew packages, Apple Silicon)
-      if: matrix.static-link != true && runner.arch == 'ARM64'
-      run: |
-        premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }} \
-          --event-include-dir="/opt/homebrew/include" \
-          --event-lib-dir="/opt/homebrew/lib" \
-          --freetype-include-dir="/opt/homebrew/include/freetype2" \
-          --freetype-lib-dir="/opt/homebrew/lib" \
-          --sqlite-include-dir="/opt/homebrew/opt/sqlite/include" \
-          --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
-          --opus-include-dir="/opt/homebrew/include/opus" \
-          --opus-lib-dir="/opt/homebrew/lib" \
-          --vorbis-include-dir="/opt/homebrew/include" \
-          --vorbis-lib-dir="/opt/homebrew/lib"
+          --event-include-dir="$(brew --prefix libevent)/include" \
+          --event-lib-dir="$(brew --prefix libevent)/lib" \
+          --freetype-include-dir="$(brew --prefix freetype)/include/freetype2" \
+          --freetype-lib-dir="$(brew --prefix freetype)/lib" \
+          --sqlite-include-dir="$(brew --prefix sqlite)/include" \
+          --sqlite-lib-dir="$(brew --prefix sqlite)/lib" \
+          --ogg-include-dir="$(brew --prefix libogg)/include" \
+          --ogg-lib-dir="$(brew --prefix libogg)/lib" \
+          --opus-include-dir="$(brew --prefix opus)/include/opus" \
+          --opus-lib-dir="$(brew --prefix opus)/lib" \
+          --opusfile-include-dir="$(brew --prefix opusfile)/include/opus" \
+          --opusfile-lib-dir="$(brew --prefix opusfile)/lib" \
+          --vorbis-include-dir="$(brew --prefix libvorbis)/include" \
+          --vorbis-lib-dir="$(brew --prefix libvorbis)/lib"
 
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true

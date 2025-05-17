@@ -132,7 +132,7 @@ project "miniaudio"
                 }
             end
         else
-            includedirs { OPUS_INCLUDE_DIR, VORBIS_INCLUDE_DIR, OGG_INCLUDE_DIR }
+            includedirs { OPUS_INCLUDE_DIR, OPUSFILE_INCLUDE_DIR, VORBIS_INCLUDE_DIR, OGG_INCLUDE_DIR }
         end
     end
 

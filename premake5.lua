@@ -61,6 +61,8 @@ newoption { trigger = "build-opus-vorbis", category = "YGOPro - miniaudio", desc
 newoption { trigger = "no-build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
 newoption { trigger = "opus-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 newoption { trigger = "opus-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "opusfile-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "opusfile-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 newoption { trigger = "vorbis-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 newoption { trigger = "vorbis-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 newoption { trigger = "ogg-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
@@ -94,7 +96,7 @@ if not BUILD_LUA then
     -- at most times you need to change those if you change BUILD_LUA to false
     -- make sure your lua lib is built with C++ and version >= 5.3
     LUA_LIB_NAME = GetParam("lua-lib-name") or LUA_LIB_NAME
-    LUA_INCLUDE_DIR = GetParam("lua-include-dir") or os.findheader(LUA_LIB_NAME)
+    LUA_INCLUDE_DIR = GetParam("lua-include-dir") or os.findheader("lua.h")
     LUA_LIB_DIR = GetParam("lua-lib-dir") or os.findlib(LUA_LIB_NAME)
 end
 
@@ -104,7 +106,7 @@ elseif GetParam("no-build-event") then
     BUILD_EVENT = false
 end
 if not BUILD_EVENT then
-    EVENT_INCLUDE_DIR = GetParam("event-include-dir") or os.findheader("event")
+    EVENT_INCLUDE_DIR = GetParam("event-include-dir") or os.findheader("event2/event.h")
     EVENT_LIB_DIR = GetParam("event-lib-dir") or os.findlib("event")
 end
 
@@ -114,7 +116,7 @@ elseif GetParam("no-build-freetype") then
     BUILD_FREETYPE = false
 end
 if not BUILD_FREETYPE then
-    FREETYPE_INCLUDE_DIR = GetParam("freetype-include-dir") or os.findheader("freetype")
+    FREETYPE_INCLUDE_DIR = GetParam("freetype-include-dir") or os.findheader("freetype2/ft2build.h") .. "/freetype2"
     FREETYPE_LIB_DIR = GetParam("freetype-lib-dir") or os.findlib("freetype")
 end
 
@@ -124,7 +126,7 @@ elseif GetParam("no-build-sqlite") then
     BUILD_SQLITE = false
 end
 if not BUILD_SQLITE then
-    SQLITE_INCLUDE_DIR = GetParam("sqlite-include-dir") or os.findheader("sqlite3")
+    SQLITE_INCLUDE_DIR = GetParam("sqlite-include-dir") or os.findheader("sqlite3.h")
     SQLITE_LIB_DIR = GetParam("sqlite-lib-dir") or os.findlib("sqlite3")
 end
 
@@ -134,7 +136,7 @@ elseif GetParam("no-build-irrlicht") then
     BUILD_IRRLICHT = false
 end
 if not BUILD_IRRLICHT then
-    IRRLICHT_INCLUDE_DIR = GetParam("irrlicht-include-dir") or os.findheader("irrlicht")
+    IRRLICHT_INCLUDE_DIR = GetParam("irrlicht-include-dir") or os.findheader("irrlicht.h")
     IRRLICHT_LIB_DIR = GetParam("irrlicht-lib-dir") or os.findlib("irrlicht")
 end
 
@@ -171,12 +173,14 @@ if USE_AUDIO then
                 MINIAUDIO_BUILD_OPUS_VORBIS = true
             end
             if not MINIAUDIO_BUILD_OPUS_VORBIS then
-                OPUS_INCLUDE_DIR = GetParam("opus-include-dir") or os.findheader("opus")
-                OPUS_LIB_DIR = GetParam("opus-lib-dir") or os.findlib("opusfile")
-                VORBIS_INCLUDE_DIR = GetParam("vorbis-include-dir") or os.findheader("vorbis")
+                OPUS_INCLUDE_DIR = GetParam("opus-include-dir") or os.findheader("opus/opus.h") .. "/opus"
+                OPUS_LIB_DIR = GetParam("opus-lib-dir") or os.findlib("opus")
+                OPUSFILE_INCLUDE_DIR = GetParam("opusfile-include-dir") or os.findheader("opus/opusfile.h") .. "/opus"
+                OPUSFILE_LIB_DIR = GetParam("opusfile-lib-dir") or os.findlib("opusfile")
+                VORBIS_INCLUDE_DIR = GetParam("vorbis-include-dir") or os.findheader("vorbis/vorbisfile.h")
                 VORBIS_LIB_DIR = GetParam("vorbis-lib-dir") or os.findlib("vorbis")
-                OGG_INCLUDE_DIR = GetParam("ogg-include-dir") or os.findheader("ogg")
-                OCG_LIB_DIR = GetParam("ogg-lib-dir") or os.findlib("ogg")
+                OGG_INCLUDE_DIR = GetParam("ogg-include-dir") or os.findheader("ogg/ogg.h")
+                OGG_LIB_DIR = GetParam("ogg-lib-dir") or os.findlib("ogg")
             end
         end
     elseif AUDIO_LIB == "irrklang" then
