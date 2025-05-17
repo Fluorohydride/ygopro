@@ -406,34 +406,24 @@ jobs:
         cp -r premake/* .
         cp -r resource/* .
 
-    - name: Use premake to generate make files (Intel)
-      if: runner.arch == 'X64'
+    - name: Use premake to generate make files
       run: |
         ./premake5 gmake \
           --cc=clang \
-          --freetype-include-dir="/usr/local/include/freetype2" \
-          --opus-include-dir="/usr/local/include/opus" \
-          --opusfile-include-dir="/usr/local/include/opus"
-
-    - name: Use premake to generate make files (ARM64)
-      if: runner.arch == 'ARM64'
-      run: |
-        ./premake5 gmake \
-          --cc=clang \
-          --event-include-dir="/opt/homebrew/include" \
-          --event-lib-dir="/opt/homebrew/lib" \
-          --freetype-include-dir="/opt/homebrew/include/freetype2" \
-          --freetype-lib-dir="/opt/homebrew/lib" \
-          --sqlite-include-dir="/opt/homebrew/opt/sqlite/include" \
-          --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
-          --ogg-include-dir="/opt/homebrew/opt/ogg/include" \
-          --ogg-lib-dir="/opt/homebrew/opt/ogg/lib" \
-          --opus-include-dir="/opt/homebrew/include/opus" \
-          --opus-lib-dir="/opt/homebrew/lib" \
-          --opusfile-include-dir="/opt/homebrew/include/opus" \
-          --opusfile-lib-dir="/opt/homebrew/lib" \
-          --vorbis-include-dir="/opt/homebrew/include" \
-          --vorbis-lib-dir="/opt/homebrew/lib"
+          --event-include-dir="$(brew --prefix libevent)/include" \
+          --event-lib-dir="$(brew --prefix libevent)/lib" \
+          --freetype-include-dir="$(brew --prefix freetype)/include/freetype2" \
+          --freetype-lib-dir="$(brew --prefix freetype)/lib" \
+          --sqlite-include-dir="$(brew --prefix sqlite)/include" \
+          --sqlite-lib-dir="$(brew --prefix sqlite)/lib" \
+          --ogg-include-dir="$(brew --prefix libogg)/include" \
+          --ogg-lib-dir="$(brew --prefix libogg)/lib" \
+          --opus-include-dir="$(brew --prefix opus)/include/opus" \
+          --opus-lib-dir="$(brew --prefix opus)/lib" \
+          --opusfile-include-dir="$(brew --prefix opusfile)/include/opus" \
+          --opusfile-lib-dir="$(brew --prefix opusfile)/lib" \
+          --vorbis-include-dir="$(brew --prefix libvorbis)/include" \
+          --vorbis-lib-dir="$(brew --prefix libvorbis)/lib"
 
     - name: Make
       run: |
