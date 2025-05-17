@@ -12,6 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2019, windows-2022]
+        audiolib: [miniaudio, irrklang]
 
     runs-on: ${{ matrix.os }}
 
@@ -90,13 +91,75 @@ jobs:
         7z x ${{ steps.sqlite.outputs.filepath }}
         move sqlite-amalgamation-3490100 sqlite3
 
+    - name: Download miniaudio
+      if: matrix.audiolib == 'miniaudio'
+      run: |
+        git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
+        cd miniaudio
+        xcopy /Y extras\miniaudio_split\miniaudio.* .
+        cd ..
+
+    - name: Download ogg
+      if: matrix.audiolib == 'miniaudio'
+      id: ogg
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/ogg/releases/download/v1.3.5/libogg-1.3.5.tar.gz
+
+    - name: Extract ogg
+      if: matrix.audiolib == 'miniaudio'
+      run: |
+        tar xf ${{ steps.ogg.outputs.filepath }}
+        move libogg-1.3.5 miniaudio/external/ogg
+
+    - name: Download opus
+      if: matrix.audiolib == 'miniaudio'
+      id: opus
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
+    
+    - name: Extract opus
+      if: matrix.audiolib == 'miniaudio'
+      run: |
+        tar xf ${{ steps.opus.outputs.filepath }}
+        move opus-1.5.2 miniaudio/external/opus
+
+    - name: Download opusfile
+      if: matrix.audiolib == 'miniaudio'
+      id: opusfile
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/opusfile/releases/download/v0.12/opusfile-0.12.tar.gz
+
+    - name: Extract opusfile
+      if: matrix.audiolib == 'miniaudio'
+      run: |
+        tar xf ${{ steps.opusfile.outputs.filepath }}
+        move opusfile-0.12 miniaudio/external/opusfile
+
+    - name: Download vorbis
+      if: matrix.audiolib == 'miniaudio'
+      id: vorbis
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/xiph/vorbis/releases/download/v1.3.7/libvorbis-1.3.7.tar.gz
+
+    - name: Extract vorbis
+      if: matrix.audiolib == 'miniaudio'
+      run: |
+        tar xf ${{ steps.vorbis.outputs.filepath }}
+        move libvorbis-1.3.7 miniaudio/external/vorbis
+
     - name: Download irrKlang
+      if: matrix.audiolib == 'irrklang'
       id: irrKlang
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
         url: https://www.ambiera.at/downloads/irrKlang-32bit-1.6.0.zip
 
     - name: Extract irrKlang
+      if: matrix.audiolib == 'irrklang'
       run: |
         7z x ${{ steps.irrKlang.outputs.filepath }}
         move irrKlang-1.6.0 irrKlang
@@ -134,15 +197,25 @@ jobs:
         xcopy /E premake\* .
         xcopy /E resource\* .
 
-    - name: Use premake to generate Visual Studio solution (2019)
-      if: matrix.os == 'windows-2019'
+    - name: Use premake to generate Visual Studio solution (2019, miniaudio)
+      if: matrix.os == 'windows-2019' && matrix.audiolib == 'miniaudio'
       run: |
         .\premake5.exe vs2019 --winxp-support
 
-    - name: Use premake to generate Visual Studio solution (2022)
-      if: matrix.os == 'windows-2022'
+    - name: Use premake to generate Visual Studio solution (2022, miniaudio)
+      if: matrix.os == 'windows-2022' && matrix.audiolib == 'miniaudio'
       run: |
         .\premake5.exe vs2022
+
+    - name: Use premake to generate Visual Studio solution (2019, irrKlang)
+      if: matrix.os == 'windows-2019' && matrix.audiolib == 'irrklang'
+      run: |
+        .\premake5.exe vs2019 --winxp-support --audio-lib=irrklang
+
+    - name: Use premake to generate Visual Studio solution (2022, irrKlang)
+      if: matrix.os == 'windows-2022' && matrix.audiolib == 'irrklang'
+      run: |
+        .\premake5.exe vs2022 --audio-lib=irrklang
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
@@ -154,7 +227,7 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: YGOPro-${{ matrix.os }}
+        name: YGOPro-${{ matrix.os }}-${{ matrix.audiolib }}
         path: |
           bin/release/YGOPro.exe
 
@@ -197,7 +270,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libevent-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libsqlite3-dev libxxf86vm-dev
+        sudo apt-get install -y libevent-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libsqlite3-dev libxxf86vm-dev libopusfile-dev libvorbis-dev
 
     - name: Download premake
       id: premake
@@ -222,6 +295,13 @@ jobs:
         tar xf ${{ steps.lua.outputs.filepath }}
         mv lua-5.4.7 lua
 
+    - name: Download miniaudio
+      run: |
+        git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
+        cd miniaudio
+        cp extras/miniaudio_split/miniaudio.* .
+        cd ..
+
     - name: Download irrlicht
       run: |
         git clone --depth=1 https://github.com/mercury233/irrlicht
@@ -234,8 +314,8 @@ jobs:
     - name: Use premake to generate make files
       run: |
         ./premake5 gmake \
-          --no-use-irrklang \
-          --freetype-include-dir="/usr/include/freetype2"
+          --freetype-include-dir="/usr/include/freetype2" \
+          --opus-include-dir="/usr/include/opus"
 
     - name: Make
       run: |
@@ -283,9 +363,9 @@ jobs:
 #        git pull origin master
 #        cd ..
 
-#    - name: Install dependencies
-#      run: |
-#        brew install freetype libevent libx11 sqlite zlib
+    - name: Install dependencies
+      run: |
+        brew install freetype libevent libx11 sqlite opus opusfile libvorbis
 
     - name: Download premake
       id: premake
@@ -310,6 +390,13 @@ jobs:
         tar xf ${{ steps.lua.outputs.filepath }}
         mv lua-5.4.7 lua
 
+    - name: Download miniaudio
+      run: |
+        git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
+        cd miniaudio
+        cp extras/miniaudio_split/miniaudio.* .
+        cd ..
+
     - name: Download irrlicht
       run: |
         git clone --depth=1 https://github.com/mercury233/irrlicht
@@ -324,21 +411,26 @@ jobs:
       run: |
         ./premake5 gmake \
           --cc=clang \
-          --no-use-irrklang \
-          --freetype-include-dir="/usr/local/include/freetype2"
+          --freetype-include-dir="/usr/local/include/freetype2" \
+          --opus-include-dir="/usr/local/include/opus"
 
     - name: Use premake to generate make files (ARM64)
       if: runner.arch == 'ARM64'
       run: |
         ./premake5 gmake \
           --cc=clang \
-          --no-use-irrklang \
           --event-include-dir="/opt/homebrew/include" \
           --event-lib-dir="/opt/homebrew/lib" \
           --freetype-include-dir="/opt/homebrew/include/freetype2" \
           --freetype-lib-dir="/opt/homebrew/lib" \
           --sqlite-include-dir="/opt/homebrew/opt/sqlite/include" \
-          --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib"
+          --sqlite-lib-dir="/opt/homebrew/opt/sqlite/lib" \
+          --miniaudio-include-dir="/opt/homebrew/include" \
+          --miniaudio-lib-dir="/opt/homebrew/lib" \
+          --opus-include-dir="/opt/homebrew/include/opus" \
+          --opus-lib-dir="/opt/homebrew/lib" \
+          --vorbis-include-dir="/opt/homebrew/include" \
+          --vorbis-lib-dir="/opt/homebrew/lib"
 
     - name: Make
       run: |

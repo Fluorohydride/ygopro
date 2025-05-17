@@ -1,5 +1,6 @@
 #include "replay.h"
 #include "myfilesystem.h"
+#include "network.h"
 #include "lzma/LzmaLib.h"
 
 namespace ygo {
@@ -28,9 +29,7 @@ void Replay::BeginRecord() {
 	if(!fp)
 		return;
 #endif
-	replay_size = 0;
-	comp_size = 0;
-	is_replaying = false;
+	Reset();
 	is_recording = true;
 }
 void Replay::WriteHeader(ReplayHeader& header) {
@@ -111,11 +110,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	if(!rfp)
 		return false;
 
-	data_position = 0;
-	is_recording = false;
-	is_replaying = false;
-	replay_size = 0;
-	comp_size = 0;
+	Reset();
 	if(std::fread(&pheader, sizeof pheader, 1, rfp) < 1) {
 		std::fclose(rfp);
 		return false;
@@ -138,6 +133,13 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		comp_size = 0;
 	}
 	is_replaying = true;
+	can_read = true;
+	if (!ReadInfo()) {
+		Reset();
+		return false;
+	}
+	info_offset = data_position;
+	data_position = 0;
 	return true;
 }
 bool Replay::CheckReplay(const wchar_t* name) {
@@ -177,10 +179,6 @@ bool Replay::ReadNextResponse(unsigned char resp[]) {
 	unsigned char len{};
 	if (!ReadData(&len, sizeof len))
 		return false;
-	if (len > SIZE_RETURN_VALUE) {
-		is_replaying = false;
-		return false;
-	}
 	if (!ReadData(resp, len))
 		return false;
 	return true;
@@ -197,10 +195,10 @@ void Replay::ReadHeader(ReplayHeader& header) {
 	header = pheader;
 }
 bool Replay::ReadData(void* data, size_t length) {
-	if(!is_replaying)
+	if (!is_replaying || !can_read)
 		return false;
 	if (data_position + length > replay_size) {
-		is_replaying = false;
+		can_read = false;
 		return false;
 	}
 	if (length)
@@ -213,6 +211,73 @@ int32_t Replay::ReadInt32() {
 }
 void Replay::Rewind() {
 	data_position = 0;
+	can_read = true;
+}
+void Replay::Reset() {
+	is_recording = false;
+	is_replaying = false;
+	can_read = false;
+	replay_size = 0;
+	comp_size = 0;
+	data_position = 0;
+	info_offset = 0;
+	players.clear();
+	params = { 0 };
+	decks.clear();
+	script_name.clear();
+}
+void Replay::SkipInfo(){
+	data_position += info_offset;
+}
+bool Replay::ReadInfo() {
+	int player_count = (pheader.flag & REPLAY_TAG) ? 4 : 2;
+	for (int i = 0; i < player_count; ++i) {
+		wchar_t name[20]{};
+		if (!ReadName(name))
+			return false;
+		players.push_back(name);
+	}
+	if (!ReadData(&params, sizeof params))
+		return false;
+	bool is_tag1 = pheader.flag & REPLAY_TAG;
+	bool is_tag2 = params.duel_flag & DUEL_TAG_MODE;
+	if (is_tag1 != is_tag2)
+		return false;
+	if (pheader.flag & REPLAY_SINGLE_MODE) {
+		uint16_t slen = Read<uint16_t>();
+		char filename[256]{};
+		if (slen == 0 || slen > sizeof(filename) - 1)
+			return false;
+		if (!ReadData(filename, slen))
+			return false;
+		filename[slen] = 0;
+		if (std::strncmp(filename, "./single/", 9))
+			return false;
+		script_name = filename + 9;
+		if (script_name.find_first_of(R"(/\)") != std::string::npos)
+			return false;
+	}
+	else {
+		for (int p = 0; p < player_count; ++p) {
+			DeckArray deck;
+			uint32_t main = Read<uint32_t>();
+			if (main > MAINC_MAX)
+				return false;
+			if (main)
+				deck.main.resize(main);
+			if (!ReadData(deck.main.data(), main * sizeof(uint32_t)))
+				return false;
+			uint32_t extra = Read<uint32_t>();
+			if (extra > MAINC_MAX)
+				return false;
+			if (extra)
+				deck.extra.resize(extra);
+			if (!ReadData(deck.extra.data(), extra * sizeof(uint32_t)))
+				return false;
+			decks.push_back(deck);
+		}
+	}
+	return true;
 }
 
 }
