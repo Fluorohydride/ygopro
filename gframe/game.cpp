@@ -1621,6 +1621,10 @@ void Game::ShowCardInfo(int code, bool resize) {
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	}
 	stName->setText(formatBuffer);
+	if(guiFont->getDimension(formatBuffer).Width > stName->getRelativePosition().getWidth() - gameConf.textfontsize)
+		stName->setToolTipText(formatBuffer);
+	else
+		stName->setToolTipText(nullptr);
 	int offset = 0;
 	if (is_valid && !gameConf.hide_setname) {
 		auto& cd = cit->second;
@@ -2103,6 +2107,9 @@ void Game::OnResize() {
 	btnBigCardZoomIn->setRelativePosition(Resize(205, 140, 295, 175));
 	btnBigCardZoomOut->setRelativePosition(Resize(205, 180, 295, 215));
 	btnBigCardClose->setRelativePosition(Resize(205, 230, 295, 265));
+
+	irr::s32 barWidth = (xScale > 1) ? gameConf.textfontsize * xScale : gameConf.textfontsize;
+	env->getSkin()->setSize(irr::gui::EGDS_SCROLLBAR_SIZE, barWidth);
 }
 void Game::ResizeChatInputWindow() {
 	irr::s32 x = wInfos->getRelativePosition().LowerRightCorner.X + 6;
