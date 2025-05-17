@@ -313,9 +313,7 @@ jobs:
 
     - name: Use premake to generate make files
       run: |
-        ./premake5 gmake \
-          --freetype-include-dir="/usr/include/freetype2" \
-          --opus-include-dir="/usr/include/opus"
+        ./premake5 gmake
 
     - name: Make
       run: |
