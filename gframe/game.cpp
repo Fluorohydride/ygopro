@@ -2037,6 +2037,9 @@ void Game::OnResize() {
 	btnBigCardZoomIn->setRelativePosition(Resize(205, 140, 295, 175));
 	btnBigCardZoomOut->setRelativePosition(Resize(205, 180, 295, 215));
 	btnBigCardClose->setRelativePosition(Resize(205, 230, 295, 265));
+
+	irr::s32 barWidth = (xScale > 1) ? gameConf.textfontsize * xScale : gameConf.textfontsize;
+	env->getSkin()->setSize(irr::gui::EGDS_SCROLLBAR_SIZE, barWidth);
 }
 void Game::ResizeChatInputWindow() {
 	irr::s32 x = wInfos->getRelativePosition().LowerRightCorner.X + 6;
