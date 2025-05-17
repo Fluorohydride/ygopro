@@ -69,6 +69,7 @@ project "irrlicht"
     files {
         "include/*.h",
         "source/Irrlicht/*.cpp",
+        "source/Irrlicht/lzma/*.h",
         "source/Irrlicht/zlib/zlib.h",
         "source/Irrlicht/zlib/adler32.c",
         "source/Irrlicht/zlib/compress.c",
