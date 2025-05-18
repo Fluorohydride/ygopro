@@ -654,7 +654,7 @@ jobs:
     - name: Use premake to generate make files (Homebrew packages)
       if: matrix.static-link != true
       run: |
-        DYLD_LIBRARY_PATH=$(brew --prefix)/lib premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }}
+        DYLD_LIBRARY_PATH=$(brew --prefix)/lib premake5 gmake
 
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true
