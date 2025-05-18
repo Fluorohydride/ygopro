@@ -654,21 +654,7 @@ jobs:
     - name: Use premake to generate make files (Homebrew packages)
       if: matrix.static-link != true
       run: |
-        premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }} \
-          --event-include-dir="$(brew --prefix libevent)/include" \
-          --event-lib-dir="$(brew --prefix libevent)/lib" \
-          --freetype-include-dir="$(brew --prefix freetype)/include/freetype2" \
-          --freetype-lib-dir="$(brew --prefix freetype)/lib" \
-          --sqlite-include-dir="$(brew --prefix sqlite)/include" \
-          --sqlite-lib-dir="$(brew --prefix sqlite)/lib" \
-          --ogg-include-dir="$(brew --prefix libogg)/include" \
-          --ogg-lib-dir="$(brew --prefix libogg)/lib" \
-          --opus-include-dir="$(brew --prefix opus)/include/opus" \
-          --opus-lib-dir="$(brew --prefix opus)/lib" \
-          --opusfile-include-dir="$(brew --prefix opusfile)/include/opus" \
-          --opusfile-lib-dir="$(brew --prefix opusfile)/lib" \
-          --vorbis-include-dir="$(brew --prefix libvorbis)/include" \
-          --vorbis-lib-dir="$(brew --prefix libvorbis)/lib"
+        DYLD_LIBRARY_PATH=$(brew --prefix)/lib premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }}
 
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true
