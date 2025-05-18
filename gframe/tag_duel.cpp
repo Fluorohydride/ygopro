@@ -707,7 +707,7 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 		case MSG_SELECT_CHAIN: {
 			player = BufferIO::ReadUInt8(pbuf);
 			count = BufferIO::ReadUInt8(pbuf);
-			pbuf += 10 + count * 13;
+			pbuf += 9 + count * 14;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
