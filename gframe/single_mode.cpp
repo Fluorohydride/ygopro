@@ -749,10 +749,12 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 		case MSG_AI_NAME: {
 			char namebuf[128]{};
 			wchar_t wname[20]{};
-			int len = BufferIO::ReadInt16(pbuf);
-			auto begin = pbuf;
-			pbuf += len + 1;
-			std::memcpy(namebuf, begin, len + 1);
+			int name_len = buffer_read<uint16_t>(pbuf);
+			if (name_len + 1 <= (int)sizeof namebuf) {
+				std::memcpy(namebuf, pbuf, name_len);
+				namebuf[name_len] = 0;
+			}
+			pbuf += name_len + 1;
 			BufferIO::DecodeUTF8(namebuf, wname);
 			BufferIO::CopyCharArray(wname, mainGame->dInfo.clientname);
 			break;
