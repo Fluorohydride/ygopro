@@ -32,7 +32,7 @@ public:
 	* @brief Copy a C-style string to another C-style string.
 	* @param src The source wide string
 	* @param pstr The destination char string
-	* @param bufsize The size of the destination buffer
+	* @param bufsize The length of the destination buffer
 	* @return The length of the copied string
 	*/
 	template<typename T1, typename T2>
