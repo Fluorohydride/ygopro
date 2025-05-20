@@ -62,13 +62,13 @@ public:
 	}
 	template<size_t N>
 	static void CopyString(const char* src, char(&dst)[N]) {
-		dst[0] = 0;
-		std::strncat(dst, src, N - 1);
+		std::strncpy(dst, src, N - 1);
+		dst[N - 1] = 0;
 	}
 	template<size_t N>
 	static void CopyWideString(const wchar_t* src, wchar_t(&dst)[N]) {
-		dst[0] = 0;
-		std::wcsncat(dst, src, N - 1);
+		std::wcsncpy(dst, src, N - 1);
+		dst[N - 1] = 0;
 	}
 	template<typename T>
 	static bool CheckUTF8Byte(const T* str, int len) {
