@@ -232,6 +232,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_REPLAY: {
+				int start_turn = 1;
 				if(open_file) {
 					ReplayMode::cur_replay.OpenReplay(open_file_name);
 					open_file = false;
@@ -243,6 +244,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					myswprintf(replay_path, L"./replay/%ls", mainGame->lstReplayList->getListItem(selected));
 					if (!ReplayMode::cur_replay.OpenReplay(replay_path))
 						break;
+					start_turn = std::wcstol(mainGame->ebRepStartTurn->getText(), nullptr, 10);
 				}
 				mainGame->ClearCardInfo();
 				mainGame->wCardImg->setVisible(true);
@@ -257,7 +259,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->dField.Clear();
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->device->setEventReceiver(&mainGame->dField);
-				unsigned int start_turn = std::wcstol(mainGame->ebRepStartTurn->getText(), nullptr, 10);
 				if(start_turn == 1)
 					start_turn = 0;
 				ReplayMode::StartReplay(start_turn);
