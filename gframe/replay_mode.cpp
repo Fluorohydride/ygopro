@@ -824,12 +824,12 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_AI_NAME: {
-			int len = BufferIO::ReadInt16(pbuf);
+			int len = buffer_read<uint16_t>(pbuf);
 			pbuf += len + 1;
 			break;
 		}
 		case MSG_SHOW_HINT: {
-			int len = BufferIO::ReadInt16(pbuf);
+			int len = buffer_read<uint16_t>(pbuf);
 			pbuf += len + 1;
 			break;
 		}
