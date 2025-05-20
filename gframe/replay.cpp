@@ -227,7 +227,11 @@ void Replay::Reset() {
 	script_name.clear();
 }
 void Replay::SkipInfo(){
-	data_position += info_offset;
+	if (data_position == 0)
+		data_position += info_offset;
+}
+bool Replay::IsReplaying() const {
+	return is_replaying;
 }
 bool Replay::ReadInfo() {
 	int player_count = (pheader.flag & REPLAY_TAG) ? 4 : 2;
