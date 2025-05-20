@@ -55,7 +55,7 @@ public:
 	template<typename ST>
 	static void SendPacketToServer(unsigned char proto, const ST& st) {
 		auto p = duel_client_write;
-		if (sizeof(ST) > MAX_DATA_SIZE)
+		if constexpr (sizeof(ST) > MAX_DATA_SIZE)
 			return;
 		buffer_write<uint16_t>(p, (uint16_t)(1 + sizeof(ST)));
 		buffer_write<uint8_t>(p, proto);
