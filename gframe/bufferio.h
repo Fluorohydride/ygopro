@@ -32,7 +32,7 @@ public:
 	* @brief Copy a C-style string to another C-style string.
 	* @param src The source wide string
 	* @param pstr The destination char string
-	* @param bufsize The size of the destination buffer
+	* @param bufsize The length of the destination buffer
 	* @return The length of the copied string
 	*/
 	template<typename T1, typename T2>
@@ -62,13 +62,13 @@ public:
 	}
 	template<size_t N>
 	static void CopyString(const char* src, char(&dst)[N]) {
-		dst[0] = 0;
-		std::strncat(dst, src, N - 1);
+		std::strncpy(dst, src, N - 1);
+		dst[N - 1] = 0;
 	}
 	template<size_t N>
 	static void CopyWideString(const wchar_t* src, wchar_t(&dst)[N]) {
-		dst[0] = 0;
-		std::wcsncat(dst, src, N - 1);
+		std::wcsncpy(dst, src, N - 1);
+		dst[N - 1] = 0;
 	}
 	template<typename T>
 	static bool CheckUTF8Byte(const T* str, int len) {
