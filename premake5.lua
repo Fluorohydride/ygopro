@@ -104,7 +104,7 @@ if GetParam("lua-deb") then
     local lua_versions = { "5.4", "5.3" }
     local lua_version = nil
     for _, version in ipairs(lua_versions) do
-        local lua_lib_dir = os.findlib("lua" .. version)
+        local lua_lib_dir = os.findlib("lua" .. version .. "-c++")
         if lua_lib_dir then
             print("Found lua " .. version .. " at " .. lua_lib_dir)
             lua_version = version
