@@ -37,6 +37,7 @@ else
     kind "WindowedApp"
     cppdialect "C++14"
     rtti "Off"
+    openmp "On"
 
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore" }
@@ -82,7 +83,7 @@ end
                 includedirs { "../miniaudio/extras/decoders/libopus", "../miniaudio/extras/decoders/libvorbis" }
                 if not MINIAUDIO_BUILD_OPUS_VORBIS then
                     links { "opusfile", "vorbisfile", "opus", "vorbis", "ogg" }
-                    libdirs { OPUS_LIB_DIR, VORBIS_LIB_DIR, OGG_LIBDIR }
+                    libdirs { OPUS_LIB_DIR, OPUSFILE_LIB_DIR, VORBIS_LIB_DIR, OGG_LIB_DIR }
                 end
             end
         end
@@ -124,6 +125,7 @@ end
         links { "event_pthreads", "dl", "pthread" }
     filter "system:macosx"
 if not SERVER_MODE then
+        openmp "Off"
         links { "z" }
         defines { "GL_SILENCE_DEPRECATION" }
 end
@@ -137,6 +139,7 @@ end
     filter "system:linux"
 if not SERVER_MODE then
         links { "GL", "X11", "Xxf86vm" }
+        linkoptions { "-fopenmp" }
 end
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "IrrKlang" }

@@ -232,6 +232,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_REPLAY: {
+				int start_turn = 1;
 				if(open_file) {
 					ReplayMode::cur_replay.OpenReplay(open_file_name);
 					open_file = false;
@@ -243,6 +244,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					myswprintf(replay_path, L"./replay/%ls", mainGame->lstReplayList->getListItem(selected));
 					if (!ReplayMode::cur_replay.OpenReplay(replay_path))
 						break;
+					start_turn = std::wcstol(mainGame->ebRepStartTurn->getText(), nullptr, 10);
 				}
 				mainGame->ClearCardInfo();
 				mainGame->wCardImg->setVisible(true);
@@ -257,7 +259,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->dField.Clear();
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->device->setEventReceiver(&mainGame->dField);
-				unsigned int start_turn = std::wcstol(mainGame->ebRepStartTurn->getText(), nullptr, 10);
 				if(start_turn == 1)
 					start_turn = 0;
 				ReplayMode::StartReplay(start_turn);
@@ -526,27 +527,27 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				wchar_t replay_path[256]{};
 				myswprintf(replay_path, L"./replay/%ls", mainGame->lstReplayList->getListItem(sel));
-				if (!ReplayMode::cur_replay.OpenReplay(replay_path)) {
+				if (!temp_replay.OpenReplay(replay_path)) {
 					mainGame->stReplayInfo->setText(L"Error");
 					break;
 				}
 				wchar_t infobuf[256]{};
 				std::wstring repinfo;
 				time_t curtime;
-				if(ReplayMode::cur_replay.pheader.flag & REPLAY_UNIFORM)
-					curtime = ReplayMode::cur_replay.pheader.start_time;
+				if(temp_replay.pheader.flag & REPLAY_UNIFORM)
+					curtime = temp_replay.pheader.start_time;
 				else
-					curtime = ReplayMode::cur_replay.pheader.seed;
+					curtime = temp_replay.pheader.seed;
 				std::wcsftime(infobuf, sizeof infobuf / sizeof infobuf[0], L"%Y/%m/%d %H:%M:%S\n", std::localtime(&curtime));
 				repinfo.append(infobuf);
-				if (ReplayMode::cur_replay.pheader.flag & REPLAY_SINGLE_MODE) {
+				if (temp_replay.pheader.flag & REPLAY_SINGLE_MODE) {
 					wchar_t path[256]{};
-					BufferIO::DecodeUTF8(ReplayMode::cur_replay.script_name.c_str(), path);
+					BufferIO::DecodeUTF8(temp_replay.script_name.c_str(), path);
 					repinfo.append(path);
 					repinfo.append(L"\n");
 				}
-				const auto& player_names = ReplayMode::cur_replay.players;
-				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
+				const auto& player_names = temp_replay.players;
+				if(temp_replay.pheader.flag & REPLAY_TAG)
 					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", player_names[0].c_str(), player_names[1].c_str(), player_names[2].c_str(), player_names[3].c_str());
 				else
 					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", player_names[0].c_str(), player_names[1].c_str());

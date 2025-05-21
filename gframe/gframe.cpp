@@ -35,11 +35,17 @@ int main(int argc, char* argv[]) {
 #if defined __APPLE__ && !defined YGOPRO_SERVER_MODE
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(nullptr, bundle_url);
+	CFStringRef bundle_ext = CFURLCopyPathExtension(bundle_url);
+	if (bundle_ext) {
+		char path[PATH_MAX];
+		if (CFStringCompare(bundle_ext, CFSTR("app"), kCFCompareCaseInsensitive) == kCFCompareEqualTo
+			&& CFURLGetFileSystemRepresentation(bundle_base_url, true, (UInt8*)path, PATH_MAX)) {
+			chdir(path);
+		}
+		CFRelease(bundle_ext);
+	}
 	CFRelease(bundle_url);
-	CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
 	CFRelease(bundle_base_url);
-	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
-	CFRelease(path);
 #endif //__APPLE__
 #ifdef _WIN32
 	if (argc == 2 && (ygo::IsExtension(argv[1], ".ydk") || ygo::IsExtension(argv[1], ".yrp"))) { // open file from explorer
