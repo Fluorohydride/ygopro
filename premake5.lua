@@ -22,6 +22,7 @@ newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "
 newoption { trigger = "lua-include-dir", category = "YGOPro - lua", description = "", value = "PATH" }
 newoption { trigger = "lua-lib-dir", category = "YGOPro - lua", description = "", value = "PATH" }
 newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME", default = LUA_LIB_NAME }
+newoption { trigger = "lua-deb", category = "YGOPro - lua", description = "Use Debian lua package" }
 
 newoption { trigger = "build-event", category = "YGOPro - event", description = "" }
 newoption { trigger = "no-build-event", category = "YGOPro - event", description = "" }
@@ -96,6 +97,26 @@ if not BUILD_LUA then
     LUA_LIB_NAME = GetParam("lua-lib-name")
     LUA_INCLUDE_DIR = GetParam("lua-include-dir") or os.findheader("lua.h")
     LUA_LIB_DIR = GetParam("lua-lib-dir") or os.findlib(LUA_LIB_NAME)
+end
+
+if GetParam("lua-deb") then
+    BUILD_LUA = false
+    local lua_versions = { "5.4", "5.3" }
+    local lua_version = nil
+    for _, version in ipairs(lua_versions) do
+        local lua_lib_dir = os.findlib("lua" .. version)
+        if lua_lib_dir then
+            print("Found lua " .. version .. " at " .. lua_lib_dir)
+            lua_version = version
+            LUA_LIB_DIR = lua_lib_dir
+            break
+        end
+    end
+    if not lua_version then
+        error("Lua library not found. Please install lua by command 'sudo apt -y install liblua5.4-dev'")
+    end
+    LUA_LIB_NAME = "lua" .. lua_version .. "-c++"
+    LUA_INCLUDE_DIR = path.join("/usr/include", "lua" .. lua_version)
 end
 
 if GetParam("build-event") then

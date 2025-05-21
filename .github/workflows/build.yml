@@ -239,6 +239,10 @@ jobs:
 #          - ubuntu-20.04
           - ubuntu-22.04
           - ubuntu-24.04
+        lua_package:
+          - liblua5.3-dev
+          - liblua5.4-dev
+          - source
         include:
 #          - os: ubuntu-20.04
 #            premake_version: 5.0.0-beta2
@@ -272,6 +276,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y libevent-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libsqlite3-dev libxxf86vm-dev libopusfile-dev libvorbis-dev
 
+    - name: Install Lua from APT
+      if: matrix.lua_package != 'source'
+      run: |
+        sudo apt-get install -y ${{ matrix.lua_package }}
+
     - name: Download premake
       id: premake
       uses: mercury233/action-cache-download-file@v1.0.0
@@ -284,13 +293,15 @@ jobs:
         tar xf ${{ steps.premake.outputs.filepath }}
         chmod +x ./premake5
 
-    - name: Download lua
+    - name: Download lua (source)
+      if: matrix.lua_package == 'source'
       id: lua
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
         url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
 
-    - name: Extract lua
+    - name: Extract lua (source)
+      if: matrix.lua_package == 'source'
       run: |
         tar xf ${{ steps.lua.outputs.filepath }}
         mv lua-5.4.7 lua
@@ -311,7 +322,13 @@ jobs:
         cp -r premake/* .
         cp -r resource/* .
 
-    - name: Use premake to generate make files
+    - name: Use premake to generate make files (with apt lua)
+      if: matrix.lua_package != 'source'
+      run: |
+        ./premake5 gmake --lua-deb
+
+    - name: Use premake to generate make files (with source lua)
+      if: matrix.lua_package == 'source'
       run: |
         ./premake5 gmake
 
