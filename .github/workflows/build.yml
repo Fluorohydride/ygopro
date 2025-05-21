@@ -341,7 +341,7 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: YGOPro-${{ matrix.os }}
+        name: YGOPro-${{ matrix.os }}-${{ matrix.lua_package }}
         path: |
           bin/release/YGOPro
 
