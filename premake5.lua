@@ -77,6 +77,14 @@ function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
 end
 
+function FindHeaderWithSubDir(header, subdir)
+    local result = os.findheader(header)
+    if result and subdir then
+        result = path.join(result, subdir)
+    end
+    return result
+end
+
 if GetParam("build-lua") then
     BUILD_LUA = true
 elseif GetParam("no-build-lua") then
@@ -106,7 +114,7 @@ elseif GetParam("no-build-freetype") then
     BUILD_FREETYPE = false
 end
 if not BUILD_FREETYPE then
-    FREETYPE_INCLUDE_DIR = GetParam("freetype-include-dir") or os.findheader("freetype2/ft2build.h") .. "/freetype2"
+    FREETYPE_INCLUDE_DIR = GetParam("freetype-include-dir") or FindHeaderWithSubDir("freetype2/ft2build.h", "freetype2")
     FREETYPE_LIB_DIR = GetParam("freetype-lib-dir") or os.findlib("freetype")
 end
 
@@ -163,9 +171,9 @@ if USE_AUDIO then
                 MINIAUDIO_BUILD_OPUS_VORBIS = true
             end
             if not MINIAUDIO_BUILD_OPUS_VORBIS then
-                OPUS_INCLUDE_DIR = GetParam("opus-include-dir") or os.findheader("opus/opus.h") .. "/opus"
+                OPUS_INCLUDE_DIR = GetParam("opus-include-dir") or FindHeaderWithSubDir("opus/opus.h", "opus")
                 OPUS_LIB_DIR = GetParam("opus-lib-dir") or os.findlib("opus")
-                OPUSFILE_INCLUDE_DIR = GetParam("opusfile-include-dir") or os.findheader("opus/opusfile.h") .. "/opus"
+                OPUSFILE_INCLUDE_DIR = GetParam("opusfile-include-dir") or FindHeaderWithSubDir("opus/opusfile.h", "opus")
                 OPUSFILE_LIB_DIR = GetParam("opusfile-lib-dir") or os.findlib("opusfile")
                 VORBIS_INCLUDE_DIR = GetParam("vorbis-include-dir") or os.findheader("vorbis/vorbisfile.h")
                 VORBIS_LIB_DIR = GetParam("vorbis-lib-dir") or os.findlib("vorbis")
