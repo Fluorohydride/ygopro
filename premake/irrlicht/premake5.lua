@@ -155,7 +155,11 @@ project "irrlicht"
 
     filter { "system:windows" }
         defines { "_IRR_WCHAR_FILESYSTEM" }
-        includedirs { "$(DXSDK_DIR)Include" }
+        if USE_DXSDK then
+            includedirs { "$(DXSDK_DIR)Include" }
+        else
+            defines { "NO_IRR_COMPILE_WITH_DIRECT3D_9_" }
+        end
 
     filter { "system:linux" }
         links { "X11", "Xxf86vm" }
