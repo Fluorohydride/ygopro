@@ -8,7 +8,12 @@ project "event"
             "evmap.c", "log.c", "evutil.c", "evutil_rand.c", "strlcpy.c", "signal.c", 
             "event_tagging.c", "http.c", "evdns.c", "evrpc.c" }
 
+    if os.isfile("evutil_time.c") then
+        files { "evutil_time.c" }
+    end
+
     filter "system:windows"
-        prebuildcommands { "xcopy /E /Y $(ProjectDir)..\\event\\WIN32-Code $(ProjectDir)..\\event\\include" }
+        prebuildcommands { "xcopy /E /Y $(ProjectDir)..\\event\\WIN32-Code $(ProjectDir)..\\event\\include",
+                           "xcopy /E /Y $(ProjectDir)..\\event\\WIN32-Code\\nmake $(ProjectDir)..\\event\\include" }
         files { "win32select.c", "evthread_win32.c", "buffer_iocp.c", "event_iocp.c", "bufferevent_async.c" }
-        defines { "WIN32" } -- quirk of old libevent
+        defines { "UINT32_MAX=0xffffffffui32" } -- quirk of libevent 2.1.2
