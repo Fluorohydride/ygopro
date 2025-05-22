@@ -236,7 +236,6 @@ workspace "YGOPro"
     configurations { "Release", "Debug" }
 
     filter "system:windows"
-        entrypoint "mainCRTStartup"
         systemversion "latest"
         startproject "YGOPro"
         if WINXP_SUPPORT then
