@@ -143,8 +143,8 @@ void ImageManager::ResizeTexture() {
 }
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
 void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
-	const irr::core::dimension2d<irr::u32> srcDim = src->getDimension();
-	const irr::core::dimension2d<irr::u32> destDim = dest->getDimension();
+	const auto& srcDim = src->getDimension();
+	const auto& destDim = dest->getDimension();
 
 	// Cache scale ratios.
 	const double rx = (double)srcDim.Width / destDim.Width;
@@ -157,8 +157,8 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 
 	// Walk each destination image pixel.
 #pragma omp for schedule(dynamic)
-	for(irr::s32 dy = 0; dy < destDim.Height; dy++) {
-		for(irr::s32 dx = 0; dx < destDim.Width; dx++) {
+	for(irr::u32 dy = 0; dy < destDim.Height; dy++) {
+		for(irr::u32 dx = 0; dx < destDim.Width; dx++) {
 			// Calculate floating-point source rectangle bounds.
 			minsx = dx * rx;
 			maxsx = minsx + rx;
