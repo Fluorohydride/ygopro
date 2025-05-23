@@ -523,10 +523,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_REPLAY_LIST: {
 				int sel = mainGame->lstReplayList->getSelected();
-				if(sel == -1)
+				if(sel < 0)
+					break;
+				auto filename = mainGame->lstReplayList->getListItem(sel);
+				if (!filename)
 					break;
 				wchar_t replay_path[256]{};
-				myswprintf(replay_path, L"./replay/%ls", mainGame->lstReplayList->getListItem(sel));
+				myswprintf(replay_path, L"./replay/%ls", filename);
 				if (!temp_replay.OpenReplay(replay_path)) {
 					mainGame->stReplayInfo->setText(L"Error");
 					break;
@@ -536,8 +539,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				time_t curtime;
 				if(temp_replay.pheader.flag & REPLAY_UNIFORM)
 					curtime = temp_replay.pheader.start_time;
-				else
+				else{
 					curtime = temp_replay.pheader.seed;
+					wchar_t version_info[256]{};
+					myswprintf(version_info, L"version 0x%X", temp_replay.pheader.version);
+					repinfo.append(version_info);
+					repinfo.append(L"\n");
+				}
 				std::wcsftime(infobuf, sizeof infobuf / sizeof infobuf[0], L"%Y/%m/%d %H:%M:%S\n", std::localtime(&curtime));
 				repinfo.append(infobuf);
 				if (temp_replay.pheader.flag & REPLAY_SINGLE_MODE) {

@@ -1256,7 +1256,7 @@ void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const w
 void Game::RefreshReplay() {
 	lstReplayList->clear();
 	FileSystem::TraversalDir(L"./replay", [this](const wchar_t* name, bool isdir) {
-		if (!isdir && IsExtension(name, L".yrp") && Replay::CheckReplay(name))
+		if (!isdir && IsExtension(name, L".yrp"))
 			lstReplayList->addItem(name);
 	});
 }
