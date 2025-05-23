@@ -111,15 +111,16 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		return false;
 
 	Reset();
-	if(std::fread(&pheader, sizeof pheader, 1, rfp) < 1) {
-		std::fclose(rfp);
-		return false;
-	}
-	if(pheader.id != 0x31707279 || pheader.version < 0x12d0u) {
-		std::fclose(rfp);
-		return false;
-	}
-	if (pheader.version >= 0x1353u && !(pheader.flag & REPLAY_UNIFORM)) {
+	bool correct_header = true;
+	if (std::fread(&pheader, sizeof pheader, 1, rfp) < 1)
+		correct_header = false;
+	else if (pheader.id != 0x31707279)
+		correct_header = false;
+	else if (pheader.version < 0x12d0u)
+		correct_header = false;
+	else if (pheader.version >= 0x1353u && !(pheader.flag & REPLAY_UNIFORM))
+		correct_header = false;
+	if (!correct_header) {
 		std::fclose(rfp);
 		return false;
 	}
