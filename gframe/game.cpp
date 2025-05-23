@@ -1141,19 +1141,21 @@ std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cW
 }
 void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
+		if (isdir)
+			return;
 		wchar_t fpath[1024];
 		myswprintf(fpath, L"./expansions/%ls", name);
-		if (!isdir && IsExtension(name, L".cdb")) {
+		if (IsExtension(name, L".cdb")) {
 			dataManager.LoadDB(fpath);
 			return;
 		}
-		if (!isdir && IsExtension(name, L".conf")) {
+		if (IsExtension(name, L".conf")) {
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
 			dataManager.LoadStrings(upath);
 			return;
 		}
-		if (!isdir && (IsExtension(name, L".zip") || IsExtension(name, L".ypk"))) {
+		if (IsExtension(name, L".zip") || IsExtension(name, L".ypk")) {
 #ifdef _WIN32
 			DataManager::FileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
 #else
