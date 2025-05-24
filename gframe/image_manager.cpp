@@ -157,8 +157,8 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 
 	// Walk each destination image pixel.
 #pragma omp for schedule(dynamic)
-	for(irr::u32 dy = 0; dy < destDim.Height; dy++) {
-		for(irr::u32 dx = 0; dx < destDim.Width; dx++) {
+	for(irr::s32 dy = 0; dy < (irr::s32)destDim.Height; dy++) {
+		for(irr::s32 dx = 0; dx < (irr::s32)destDim.Width; dx++) {
 			// Calculate floating-point source rectangle bounds.
 			minsx = dx * rx;
 			maxsx = minsx + rx;
