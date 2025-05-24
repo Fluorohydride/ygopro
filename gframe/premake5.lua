@@ -70,8 +70,6 @@ project "YGOPro"
         defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
         links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32" }
-        openmp "Off"
-        buildoptions { "/openmp:llvm" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrKlang" }
             if IRRKLANG_PRO then
