@@ -318,6 +318,7 @@ jobs:
     - name: Make
       run: |
         cd build
+        make --just-print
         make -j 4 config=release
         cd ..
 
