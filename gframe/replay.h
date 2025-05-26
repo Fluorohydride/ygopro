@@ -81,6 +81,7 @@ public:
 	void Rewind();
 	void Reset();
 	void SkipInfo();
+	bool IsReplaying() const;
 
 	FILE* fp{ nullptr };
 #ifdef _WIN32
