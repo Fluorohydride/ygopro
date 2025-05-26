@@ -130,6 +130,9 @@ project "miniaudio"
                     "OPUS_X86_PRESUME_SSE", "OPUS_X86_PRESUME_SSE2",
                     "OPUS_X86_MAY_HAVE_SSE", "OPUS_X86_MAY_HAVE_SSE4_1", "OPUS_X86_MAY_HAVE_AVX2",
                 }
+                filter "system:linux"
+                    buildoptions { "-mavx", "-mfma" }
+                filter {}
             end
         else
             includedirs { OPUS_INCLUDE_DIR, OPUSFILE_INCLUDE_DIR, VORBIS_INCLUDE_DIR, OGG_INCLUDE_DIR }
