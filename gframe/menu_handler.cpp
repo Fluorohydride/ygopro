@@ -542,9 +542,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				else{
 					curtime = temp_replay.pheader.seed;
 					wchar_t version_info[256]{};
-					myswprintf(version_info, L"version 0x%X", temp_replay.pheader.version);
+					myswprintf(version_info, L"version 0x%X\n", temp_replay.pheader.version);
 					repinfo.append(version_info);
-					repinfo.append(L"\n");
 				}
 				std::wcsftime(infobuf, sizeof infobuf / sizeof infobuf[0], L"%Y/%m/%d %H:%M:%S\n", std::localtime(&curtime));
 				repinfo.append(infobuf);
