@@ -111,7 +111,16 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		return false;
 
 	Reset();
-	if(std::fread(&pheader, sizeof pheader, 1, rfp) < 1) {
+	bool correct_header = true;
+	if (std::fread(&pheader, sizeof pheader, 1, rfp) < 1)
+		correct_header = false;
+	else if (pheader.id != 0x31707279)
+		correct_header = false;
+	else if (pheader.version < 0x12d0u)
+		correct_header = false;
+	else if (pheader.version >= 0x1353u && !(pheader.flag & REPLAY_UNIFORM))
+		correct_header = false;
+	if (!correct_header) {
 		std::fclose(rfp);
 		return false;
 	}
@@ -141,17 +150,6 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	info_offset = data_position;
 	data_position = 0;
 	return true;
-}
-bool Replay::CheckReplay(const wchar_t* name) {
-	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls", name);
-	FILE* rfp = mywfopen(fname, "rb");
-	if(!rfp)
-		return false;
-	ReplayHeader rheader;
-	size_t count = std::fread(&rheader, sizeof rheader, 1, rfp);
-	std::fclose(rfp);
-	return count == 1 && rheader.id == 0x31707279 && rheader.version >= 0x12d0u && (rheader.version < 0x1353u || (rheader.flag & REPLAY_UNIFORM));
 }
 bool Replay::DeleteReplay(const wchar_t* name) {
 	wchar_t fname[256];
