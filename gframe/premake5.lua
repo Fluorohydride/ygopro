@@ -11,6 +11,10 @@ project "YGOPro"
     includedirs { "../ocgcore" }
     links { "ocgcore", "clzma", "cspmemvfs", LUA_LIB_NAME, "sqlite3", "irrlicht", "freetype", "event" }
 
+    if not BUILD_LUA then
+        libdirs { LUA_LIB_DIR }
+    end
+
     if BUILD_EVENT then
         includedirs { "../event/include" }
     else
@@ -71,7 +75,7 @@ project "YGOPro"
         entrypoint "mainCRTStartup"
         defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
-        links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32", "iphlpapi" }
+        links { "ws2_32", "iphlpapi" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrKlang" }
             if IRRKLANG_PRO then
@@ -83,11 +87,10 @@ project "YGOPro"
                 filter {}
             end
         end
-    filter "not system:windows"
-        links { "dl", "pthread" }
+
     filter "system:macosx"
         openmp "Off"
-        links { "z" }
+        links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
         defines { "GL_SILENCE_DEPRECATION" }
         if MAC_ARM then
             linkoptions { "-arch arm64" }
@@ -98,6 +101,7 @@ project "YGOPro"
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrklang" }
         end
+
     filter "system:linux"
         links { "GL", "X11", "Xxf86vm" }
         linkoptions { "-fopenmp" }
