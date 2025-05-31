@@ -16,6 +16,7 @@ project "YGOPro"
     else
         includedirs { EVENT_INCLUDE_DIR }
         libdirs { EVENT_LIB_DIR }
+        links { "event_pthreads" }
     end
 
     if BUILD_IRRLICHT then
@@ -67,6 +68,7 @@ project "YGOPro"
     end
 
     filter "system:windows"
+        entrypoint "mainCRTStartup"
         defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
         links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32", "iphlpapi" }
@@ -82,14 +84,16 @@ project "YGOPro"
             end
         end
     filter "not system:windows"
-        links { "event_pthreads", "dl", "pthread" }
+        links { "dl", "pthread" }
     filter "system:macosx"
         openmp "Off"
         links { "z" }
         defines { "GL_SILENCE_DEPRECATION" }
         if MAC_ARM then
-            buildoptions { "--target=arm64-apple-macos12" }
             linkoptions { "-arch arm64" }
+        end
+        if MAC_INTEL then
+            linkoptions { "-arch x86_64" }
         end
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrklang" }

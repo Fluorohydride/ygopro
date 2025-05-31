@@ -50,22 +50,6 @@ void DuelInfo::Clear() {
 	time_left[1] = 0;
 }
 
-bool IsExtension(const wchar_t* filename, const wchar_t* extension) {
-	auto flen = std::wcslen(filename);
-	auto elen = std::wcslen(extension);
-	if (!elen || flen < elen)
-		return false;
-	return !mywcsncasecmp(filename + (flen - elen), extension, elen);
-}
-
-bool IsExtension(const char* filename, const char* extension) {
-	auto flen = std::strlen(filename);
-	auto elen = std::strlen(extension);
-	if (!elen || flen < elen)
-		return false;
-	return !mystrncasecmp(filename + (flen - elen), extension, elen);
-}
-
 bool Game::Initialize() {
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params{};
@@ -1141,19 +1125,21 @@ std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cW
 }
 void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
+		if (isdir)
+			return;
 		wchar_t fpath[1024];
 		myswprintf(fpath, L"./expansions/%ls", name);
-		if (!isdir && IsExtension(name, L".cdb")) {
+		if (IsExtension(name, L".cdb")) {
 			dataManager.LoadDB(fpath);
 			return;
 		}
-		if (!isdir && IsExtension(name, L".conf")) {
+		if (IsExtension(name, L".conf")) {
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
 			dataManager.LoadStrings(upath);
 			return;
 		}
-		if (!isdir && (IsExtension(name, L".zip") || IsExtension(name, L".ypk"))) {
+		if (IsExtension(name, L".zip") || IsExtension(name, L".ypk")) {
 #ifdef _WIN32
 			DataManager::FileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
 #else
@@ -1256,7 +1242,7 @@ void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const w
 void Game::RefreshReplay() {
 	lstReplayList->clear();
 	FileSystem::TraversalDir(L"./replay", [this](const wchar_t* name, bool isdir) {
-		if (!isdir && IsExtension(name, L".yrp") && Replay::CheckReplay(name))
+		if (!isdir && IsExtension(name, L".yrp"))
 			lstReplayList->addItem(name);
 	});
 }

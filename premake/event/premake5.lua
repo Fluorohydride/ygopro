@@ -17,3 +17,10 @@ project "event"
                            "xcopy /E /Y $(ProjectDir)..\\event\\WIN32-Code\\nmake $(ProjectDir)..\\event\\include" }
         files { "win32select.c", "evthread_win32.c", "buffer_iocp.c", "event_iocp.c", "bufferevent_async.c" }
         defines { "UINT32_MAX=0xffffffffui32" } -- quirk of libevent 2.1.2
+        --defines { "WIN32" } -- quirk of old libevent
+
+    filter "system:linux"
+        files { "evthread_pthread.c", "epoll.c", "epoll_sub.c", "poll.c", "select.c" }
+
+    filter "system:macosx"
+        files { "evthread_pthread.c", "kqueue.c", "poll.c", "select.c" }
