@@ -13,7 +13,6 @@ jobs:
       matrix:
         name:
           - windows
-#          - windows-xp
 #          - windows-irrklang
 #          - windows-no-dxsdk
           - windows-x64
@@ -23,11 +22,6 @@ jobs:
             os: windows-2022
             vs: vs2022
             audiolib: miniaudio
-#          - name: windows-xp
-#            os: windows-2019
-#            vs: vs2019
-#            audiolib: miniaudio
-#            xp: true
 #          - name: windows-irrklang
 #            os: windows-2022
 #            vs: vs2022
@@ -44,7 +38,7 @@ jobs:
             x64: true
 #          - name: windows-2025
 #            os: windows-2025
-#            vs: vs2022
+#            vs: vs2025 # to be enabled after the release of Visual Studio 2025
 #            audiolib: miniaudio
 
     runs-on: ${{ matrix.os }}
@@ -233,7 +227,7 @@ jobs:
 
     - name: Use premake to generate Visual Studio solution
       run: |
-        .\premake5.exe ${{ matrix.vs }} --audio-lib=${{ matrix.audiolib }} ${{ matrix.xp && '--winxp-support' || '' }}
+        .\premake5.exe ${{ matrix.vs }} --audio-lib=${{ matrix.audiolib }}
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
