@@ -68,6 +68,7 @@ project "YGOPro"
     end
 
     filter "system:windows"
+        entrypoint "mainCRTStartup"
         defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
         links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32" }

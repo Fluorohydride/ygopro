@@ -10,10 +10,13 @@ BUILD_LUA = true
 LUA_LIB_NAME = "lua" -- change this if you don't build Lua
 
 BUILD_EVENT = os.istarget("windows")
+
 BUILD_FREETYPE = os.istarget("windows")
+
 BUILD_SQLITE = os.istarget("windows")
 
 BUILD_IRRLICHT = true -- modified Irrlicht is required, can't use the official one
+USE_DXSDK = true
 
 USE_AUDIO = true
 AUDIO_LIB = "miniaudio" -- can be "miniaudio" or "irrklang"
@@ -51,6 +54,7 @@ newoption { trigger = "build-irrlicht", category = "YGOPro - irrlicht", descript
 newoption { trigger = "no-build-irrlicht", category = "YGOPro - irrlicht", description = "" }
 newoption { trigger = "irrlicht-include-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
 newoption { trigger = "irrlicht-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
+newoption { trigger = "no-dxsdk", category = "YGOPro - irrlicht", description = "" }
 
 newoption { trigger = "no-audio", category = "YGOPro", description = "" }
 newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "miniaudio, irrklang", default = AUDIO_LIB }
@@ -146,6 +150,16 @@ end
 if not BUILD_IRRLICHT then
     IRRLICHT_INCLUDE_DIR = GetParam("irrlicht-include-dir") or os.findheader("irrlicht.h")
     IRRLICHT_LIB_DIR = GetParam("irrlicht-lib-dir") or os.findlib("irrlicht")
+end
+
+if GetParam("no-dxsdk") then
+    USE_DXSDK = false
+end
+if USE_DXSDK and os.istarget("windows") then
+    if not os.getenv("DXSDK_DIR") then
+        print("DXSDK_DIR environment variable not set, it seems you don't have the DirectX SDK installed. DirectX mode will be disabled.")
+        USE_DXSDK = false
+    end
 end
 
 if GetParam("no-audio") then
@@ -252,7 +266,6 @@ workspace "YGOPro"
     configurations { "Release", "Debug" }
 
     filter "system:windows"
-        entrypoint "mainCRTStartup"
         systemversion "latest"
         startproject "YGOPro"
         if WINXP_SUPPORT then
@@ -261,6 +274,13 @@ workspace "YGOPro"
         else
             defines { "WINVER=0x0601" } -- WIN7
         end
+        platforms { "Win32", "x64" }
+
+    filter { "system:windows", "platforms:Win32" }
+        architecture "x86"
+
+    filter { "system:windows", "platforms:x64" }
+        architecture "x86_64"
 
     filter "system:macosx"
         libdirs { "/usr/local/lib" }
@@ -286,6 +306,18 @@ workspace "YGOPro"
         symbols "On"
         defines "_DEBUG"
         targetdir "bin/debug"
+
+    filter { "system:windows", "platforms:Win32", "configurations:Release" }
+        targetdir "bin/release/x86"
+
+    filter { "system:windows", "platforms:Win32", "configurations:Debug" }
+        targetdir "bin/debug/x86"
+
+    filter { "system:windows", "platforms:x64", "configurations:Release" }
+        targetdir "bin/release/x64"
+
+    filter { "system:windows", "platforms:x64", "configurations:Debug" }
+        targetdir "bin/debug/x64"
 
     filter { "configurations:Release", "action:vs*" }
         if linktimeoptimization then

@@ -11,8 +11,41 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019, windows-2022]
-        audiolib: [miniaudio, irrklang]
+        name:
+          - windows
+          - windows-xp
+          - windows-irrklang
+          - windows-no-dxsdk
+          - windows-x64
+#          - windows-2025
+        include:
+          - name: windows
+            os: windows-2022
+            vs: vs2022
+            audiolib: miniaudio
+          - name: windows-xp
+            os: windows-2019
+            vs: vs2019
+            audiolib: miniaudio
+            xp: true
+          - name: windows-irrklang
+            os: windows-2022
+            vs: vs2022
+            audiolib: irrklang
+          - name: windows-no-dxsdk
+            os: windows-2022
+            vs: vs2022
+            audiolib: miniaudio
+            nodxsdk: true
+          - name: windows-x64
+            os: windows-2022
+            vs: vs2022
+            audiolib: miniaudio
+            x64: true
+#          - name: windows-2025
+#            os: windows-2025
+#            vs: vs2022
+#            audiolib: miniaudio
 
     runs-on: ${{ matrix.os }}
 
@@ -38,7 +71,7 @@ jobs:
       id: premake
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta5/premake-5.0.0-beta5-windows.zip
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta6/premake-5.0.0-beta6-windows.zip
         filename: premake5.zip
 
     - name: Extract premake
@@ -168,6 +201,7 @@ jobs:
         git clone --depth=1 https://github.com/mercury233/irrlicht
 
     - name: Check DirectX SDK
+      if: matrix.nodxsdk != true
       id: dxsdk
       uses: actions/cache@v4
       with:
@@ -175,18 +209,19 @@ jobs:
         path: DXSDK
 
     - name: Download DirectX SDK
-      if: steps.dxsdk.outputs.cache-hit != 'true'
+      if: matrix.nodxsdk != true && steps.dxsdk.outputs.cache-hit != 'true'
       id: dxsdk-download
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
         url: https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe
 
     - name: Install DirectX SDK
-      if: steps.dxsdk.outputs.cache-hit != 'true'
+      if: matrix.nodxsdk != true && steps.dxsdk.outputs.cache-hit != 'true'
       run: |
         7z x ${{ steps.dxsdk-download.outputs.filepath }} -aoa
 
     - name: Set DirectX SDK environment variable
+      if: matrix.nodxsdk != true
       run: |
         $dxsdkPath = Resolve-Path 'DXSDK'
         "DXSDK_DIR=$($dxsdkPath.ProviderPath)\" | Out-File -FilePath $env:GITHUB_ENV -Append
@@ -196,39 +231,24 @@ jobs:
         xcopy /E premake\* .
         xcopy /E resource\* .
 
-    - name: Use premake to generate Visual Studio solution (2019, miniaudio)
-      if: matrix.os == 'windows-2019' && matrix.audiolib == 'miniaudio'
+    - name: Use premake to generate Visual Studio solution
       run: |
-        .\premake5.exe vs2019 --winxp-support
-
-    - name: Use premake to generate Visual Studio solution (2022, miniaudio)
-      if: matrix.os == 'windows-2022' && matrix.audiolib == 'miniaudio'
-      run: |
-        .\premake5.exe vs2022
-
-    - name: Use premake to generate Visual Studio solution (2019, irrKlang)
-      if: matrix.os == 'windows-2019' && matrix.audiolib == 'irrklang'
-      run: |
-        .\premake5.exe vs2019 --winxp-support --audio-lib=irrklang
-
-    - name: Use premake to generate Visual Studio solution (2022, irrKlang)
-      if: matrix.os == 'windows-2022' && matrix.audiolib == 'irrklang'
-      run: |
-        .\premake5.exe vs2022 --audio-lib=irrklang
+        .\premake5.exe ${{ matrix.vs }} --audio-lib=${{ matrix.audiolib }} ${{ matrix.xp && '--winxp-support' || '' }}
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
 
     - name: Build solution
       run: |
-        MSBuild.exe build\YGOPro.sln /m /p:Configuration=Release
+        MSBuild.exe build\YGOPro.sln /m /p:Configuration=Release /p:Platform=${{ matrix.x64 && 'x64' || 'Win32' }}
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: YGOPro-${{ matrix.os }}-${{ matrix.audiolib }}
+        name: YGOPro-${{ matrix.name }}
         path: |
-          bin/release/YGOPro.exe
+          bin/release/x86/YGOPro.exe
+          bin/release/x64/YGOPro.exe
 
   build-linux:
     strategy:
