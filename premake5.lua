@@ -328,7 +328,6 @@ workspace "YGOPro"
         disablewarnings { "4244", "4267", "4838", "4996", "6011", "6031", "6054", "6262" }
 
     filter { "configurations:Release", "not action:vs*" }
-        symbols "On"
         defines "NDEBUG"
 
     filter { "configurations:Debug", "action:vs*" }
