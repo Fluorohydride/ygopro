@@ -138,6 +138,3 @@ project "miniaudio"
             includedirs { OPUS_INCLUDE_DIR, OPUSFILE_INCLUDE_DIR, VORBIS_INCLUDE_DIR, OGG_INCLUDE_DIR }
         end
     end
-
-    filter "system:linux"
-        links { "dl", "pthread", "m" }
