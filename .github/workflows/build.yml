@@ -13,9 +13,8 @@ jobs:
       matrix:
         name:
           - windows
-          - windows-xp
-          - windows-irrklang
-          - windows-no-dxsdk
+#          - windows-irrklang
+#          - windows-no-dxsdk
           - windows-x64
 #          - windows-2025
         include:
@@ -23,20 +22,15 @@ jobs:
             os: windows-2022
             vs: vs2022
             audiolib: miniaudio
-          - name: windows-xp
-            os: windows-2019
-            vs: vs2019
-            audiolib: miniaudio
-            xp: true
-          - name: windows-irrklang
-            os: windows-2022
-            vs: vs2022
-            audiolib: irrklang
-          - name: windows-no-dxsdk
-            os: windows-2022
-            vs: vs2022
-            audiolib: miniaudio
-            nodxsdk: true
+#          - name: windows-irrklang
+#            os: windows-2022
+#            vs: vs2022
+#            audiolib: irrklang
+#          - name: windows-no-dxsdk
+#            os: windows-2022
+#            vs: vs2022
+#            audiolib: miniaudio
+#            nodxsdk: true
           - name: windows-x64
             os: windows-2022
             vs: vs2022
@@ -44,7 +38,7 @@ jobs:
             x64: true
 #          - name: windows-2025
 #            os: windows-2025
-#            vs: vs2022
+#            vs: vs2025 # to be enabled after the release of Visual Studio 2025
 #            audiolib: miniaudio
 
     runs-on: ${{ matrix.os }}
@@ -233,7 +227,7 @@ jobs:
 
     - name: Use premake to generate Visual Studio solution
       run: |
-        .\premake5.exe ${{ matrix.vs }} --audio-lib=${{ matrix.audiolib }} ${{ matrix.xp && '--winxp-support' || '' }}
+        .\premake5.exe ${{ matrix.vs }} --audio-lib=${{ matrix.audiolib }}
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
@@ -485,18 +479,18 @@ jobs:
       matrix:
         name:
           - macos-13-intel
-          - macos-13-arm-cross-compile-static-link
+#          - macos-13-arm-cross-compile-static-link
           - macos-13-universal-static-link
           - macos-15-arm
-          - macos-15-intel-cross-compile-static-link
-          - macos-15-universal-static-link
+#          - macos-15-intel-cross-compile-static-link
+#          - macos-15-universal-static-link
         include:
           - name: macos-13-intel
             os: macos-13
-          - name: macos-13-arm-cross-compile-static-link
-            os: macos-13
-            cross-build-arm: true
-            static-link: true
+#          - name: macos-13-arm-cross-compile-static-link
+#            os: macos-13
+#            cross-build-arm: true
+#            static-link: true
           - name: macos-13-universal-static-link
             os: macos-13
             cross-build-intel: true
@@ -504,15 +498,15 @@ jobs:
             static-link: true
           - name: macos-15-arm
             os: macos-15
-          - name: macos-15-intel-cross-compile-static-link
-            os: macos-15
-            cross-build-intel: true
-            static-link: true
-          - name: macos-15-universal-static-link
-            os: macos-15
-            cross-build-intel: true
-            cross-build-arm: true
-            static-link: true
+#          - name: macos-15-intel-cross-compile-static-link
+#            os: macos-15
+#            cross-build-intel: true
+#            static-link: true
+#          - name: macos-15-universal-static-link
+#            os: macos-15
+#            cross-build-intel: true
+#            cross-build-arm: true
+#            static-link: true
 
     runs-on: ${{ matrix.os }}
 
