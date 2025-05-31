@@ -161,9 +161,6 @@ project "irrlicht"
             defines { "NO_IRR_COMPILE_WITH_DIRECT3D_9_" }
         end
 
-    filter { "system:linux" }
-        links { "X11", "Xxf86vm" }
-
     filter { "system:macosx" }
         cppdialect "gnu++14"
         defines { "GL_SILENCE_DEPRECATION" }

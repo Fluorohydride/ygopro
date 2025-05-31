@@ -293,7 +293,6 @@ workspace "YGOPro"
         if MAC_ARM and MAC_INTEL then
             architecture "universal"
         end
-        links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
 
     filter "system:linux"
         buildoptions { "-U_FORTIFY_SOURCE" }
