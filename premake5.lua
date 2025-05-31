@@ -1,22 +1,33 @@
--- default global settings
+-- Supported systems: Windows, Linux, MacOS
+
+-- Global settings
+
+-- Default: Build Lua, Irrlicht from source on all systems.
+--          Don't build event, freetype, sqlite, opus, vorbis on Linux or MacOS, use apt or homebrew,
+--          but build them on Windows, due to the lack of package manager on Windows.
 
 BUILD_LUA = true
-LUA_LIB_NAME = "lua"
+LUA_LIB_NAME = "lua" -- change this if you don't build Lua
 
 BUILD_EVENT = os.istarget("windows")
+
 BUILD_FREETYPE = os.istarget("windows")
+
 BUILD_SQLITE = os.istarget("windows")
-BUILD_IRRLICHT = true
+
+BUILD_IRRLICHT = true -- modified Irrlicht is required, can't use the official one
 USE_DXSDK = true
 
 USE_AUDIO = true
-AUDIO_LIB = "miniaudio"
+AUDIO_LIB = "miniaudio" -- can be "miniaudio" or "irrklang"
+-- BUILD_MINIAUDIO is always true
 MINIAUDIO_SUPPORT_OPUS_VORBIS = true
 MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
+-- BUILD_IRRKLANG is impossible because irrKlang is not open source
 IRRKLANG_PRO = false
 IRRKLANG_PRO_BUILD_IKPMP3 = false
 
--- read settings from command line or environment variables
+-- Read settings from command line or environment variables
 
 newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
 newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "" }
@@ -73,7 +84,8 @@ newoption { trigger = "irrklang-pro-debug-lib-dir", category = "YGOPro - irrklan
 newoption { trigger = 'build-ikpmp3', category = "YGOPro - irrklang - ikpmp3", description = "" }
 
 newoption { trigger = "winxp-support", category = "YGOPro", description = "" }
-newoption { trigger = "mac-arm", category = "YGOPro", description = "Cross compile for Apple Silicon" }
+newoption { trigger = "mac-arm", category = "YGOPro", description = "Compile for Apple Silicon Mac" }
+newoption { trigger = "mac-intel", category = "YGOPro", description = "Compile for Intel Mac" }
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
@@ -93,15 +105,15 @@ elseif GetParam("no-build-lua") then
     BUILD_LUA = false
 end
 if not BUILD_LUA then
-    -- at most times you need to change this if you change BUILD_LUA to false
+    -- at most times you need to change those if you change BUILD_LUA to false
     -- make sure your lua lib is built with C++ and version >= 5.3
-    LUA_LIB_NAME = GetParam("lua-lib-name")
+    LUA_LIB_NAME = GetParam("lua-lib-name") or LUA_LIB_NAME
     LUA_INCLUDE_DIR = GetParam("lua-include-dir") or os.findheader("lua.h")
     LUA_LIB_DIR = GetParam("lua-lib-dir") or os.findlib(LUA_LIB_NAME)
 end
 
 if GetParam("build-event") then
-    BUILD_EVENT = os.istarget("windows") -- only on windows for now
+    BUILD_EVENT = true
 elseif GetParam("no-build-event") then
     BUILD_EVENT = false
 end
@@ -224,8 +236,26 @@ end
 if GetParam("winxp-support") and os.istarget("windows") then
     WINXP_SUPPORT = true
 end
-if GetParam("mac-arm") and os.istarget("macosx") then
-    MAC_ARM = true
+
+if os.istarget("macosx") then
+    if GetParam("mac-arm") then
+        MAC_ARM = true
+    end
+    if GetParam("mac-intel") then
+        MAC_INTEL = true
+    end
+    
+    if MAC_ARM then
+        TARGET_MAC_ARM = true
+    elseif not MAC_INTEL then
+        -- automatic target arm64, need extra detect
+        local uname = os.outputof("uname -m")
+        local proctranslated = os.outputof("sysctl sysctl.proc_translated")
+        if uname:find("arm") or proctranslated then
+            print("Detected Apple Silicon Mac")
+            TARGET_MAC_ARM = true
+        end
+    end
 end
 
 workspace "YGOPro"
@@ -255,7 +285,13 @@ workspace "YGOPro"
     filter "system:macosx"
         libdirs { "/usr/local/lib" }
         if MAC_ARM then
-            buildoptions { "--target=arm64-apple-macos12" }
+            buildoptions { "-arch arm64" }
+        end
+        if MAC_INTEL then
+            buildoptions { "-arch x86_64", "-mavx", "-mfma" }
+        end
+        if MAC_ARM and MAC_INTEL then
+            architecture "universal"
         end
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
 
@@ -295,9 +331,6 @@ workspace "YGOPro"
     filter { "configurations:Release", "not action:vs*" }
         symbols "On"
         defines "NDEBUG"
-        if not MAC_ARM then
-            buildoptions "-march=native"
-        end
 
     filter { "configurations:Debug", "action:vs*" }
         disablewarnings { "6011", "6031", "6054", "6262" }
@@ -313,6 +346,9 @@ workspace "YGOPro"
 
     filter "not action:vs*"
         buildoptions { "-fno-strict-aliasing", "-Wno-multichar", "-Wno-format-security" }
+        if not MAC_ARM and not MAC_INTEL then
+            buildoptions "-march=native"
+        end
 
     filter {}
 
