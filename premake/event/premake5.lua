@@ -30,7 +30,7 @@ project "event"
         files { "win32select.c", "evthread_win32.c", "buffer_iocp.c", "event_iocp.c", "bufferevent_async.c" }
         if EVENT_VERSION>=0x02010000 then
             prebuildcommands { "xcopy /E /Y $(ProjectDir)..\\event\\WIN32-Code\\nmake $(ProjectDir)..\\event\\include" }
-            defines { "UINT32_MAX=0xffffffffui32" } -- quirk of libevent 2.1
+            defines { "UINT32_MAX=0xffffffffU" } -- quirk of libevent 2.1
         end
         if EVENT_VERSION<0x02010000 then
             defines { "WIN32" } -- quirk of old libevent
