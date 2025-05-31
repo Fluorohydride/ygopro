@@ -17,6 +17,9 @@ project "event"
         files { "win32select.c", "evthread_win32.c", "buffer_iocp.c", "event_iocp.c", "bufferevent_async.c" }
         defines { "WIN32" } -- quirk of old libevent
 
+    filter { "system:windows", "action:gmake" }
+        defines { "EVENT__HAVE_STRTOK_R" }
+
     filter "system:linux"
         files { "evthread_pthread.c", "epoll.c", "epoll_sub.c", "poll.c", "select.c" }
 

@@ -17,6 +17,7 @@ jobs:
 #          - windows-no-dxsdk
           - windows-x64
 #          - windows-2025
+          - windows-mingw
         include:
           - name: windows
             os: windows-2022
@@ -40,6 +41,10 @@ jobs:
 #            os: windows-2025
 #            vs: vs2025 # to be enabled after the release of Visual Studio 2025
 #            audiolib: miniaudio
+          - name: windows-mingw
+            os: windows-2022
+            audiolib: miniaudio
+            mingw: true
 
     runs-on: ${{ matrix.os }}
 
@@ -226,21 +231,47 @@ jobs:
         xcopy /E resource\* .
 
     - name: Use premake to generate Visual Studio solution
+      if: matrix.mingw != true
       run: |
         .\premake5.exe ${{ matrix.vs }} --audio-lib=${{ matrix.audiolib }}
 
     - name: Add msbuild to PATH
+      if: matrix.mingw != true
       uses: microsoft/setup-msbuild@v2
 
     - name: Build solution
+      if: matrix.mingw != true
       run: |
         MSBuild.exe build\YGOPro.sln /m /p:Configuration=Release /p:Platform=${{ matrix.x64 && 'x64' || 'Win32' }}
+
+    - name: Install MinGW
+      if: matrix.mingw == true
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: UCRT64
+        update: true
+        install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make
+
+    - name: Use premake to generate make files
+      if: matrix.mingw == true
+      shell: msys2 {0}
+      run: |
+        ./premake5.exe gmake --audio-lib=${{ matrix.audiolib }}
+
+    - name: Make
+      if: matrix.mingw == true
+      shell: msys2 {0}
+      run: |
+        cd build
+        mingw32-make -j 4 config=release
+        cd ..
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: YGOPro-${{ matrix.name }}
         path: |
+          bin/release/YGOPro.exe
           bin/release/x86/YGOPro.exe
           bin/release/x64/YGOPro.exe
 
