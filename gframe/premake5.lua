@@ -11,6 +11,10 @@ project "YGOPro"
     includedirs { "../ocgcore" }
     links { "ocgcore", "clzma", "cspmemvfs", LUA_LIB_NAME, "sqlite3", "irrlicht", "freetype", "event" }
 
+    if not BUILD_LUA then
+        libdirs { LUA_LIB_DIR }
+    end
+
     if BUILD_EVENT then
         includedirs { "../event/include" }
     else
