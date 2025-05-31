@@ -260,9 +260,18 @@ jobs:
 
     - name: Make
       if: matrix.mingw == true
+      continue-on-error: true
       shell: msys2 {0}
       run: |
         cd build
+        mingw32-make -j 4 config=release
+
+    - name: Workaround fix for MinGW build
+      if: matrix.mingw == true
+      shell: msys2 {0}
+      run: |
+        sed -i '/OBJECTS += $(OBJDIR)\/.*\.o/d' irrlicht.make
+        sed -i '/^# Rules/i\OBJECTS += $(OBJDIR)/*.o' irrlicht.make
         mingw32-make -j 4 config=release
         cd ..
 
