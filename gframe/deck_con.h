@@ -80,7 +80,7 @@ public:
 	bool is_modified{};
 	bool readonly{};
 	bool showing_pack{};
-	mt19937 rnd;
+	std::mt19937 rnd;
 
 	const LFList* filterList{};
 	std::vector<code_pointer> results;
