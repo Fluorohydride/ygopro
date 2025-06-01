@@ -1,8 +1,6 @@
 #include "image_manager.h"
 #include "game.h"
-#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
 #include <thread>
-#endif
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -22,10 +20,8 @@ bool ImageManager::Initial() {
 	tUnknownFit = nullptr;
 	tUnknownThumb = nullptr;
 	tBigPicture = nullptr;
-#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
 	tLoading = nullptr;
 	tThumbLoadingThreadRunning = false;
-#endif
 	tAct = driver->getTexture("textures/act.png");
 	tAttack = driver->getTexture("textures/attack.png");
 	tChain = driver->getTexture("textures/chain.png");
@@ -66,11 +62,7 @@ void ImageManager::ClearTexture() {
 			driver->removeTexture(tit->second);
 	}
 	for(auto tit = tThumb.begin(); tit != tThumb.end(); ++tit) {
-#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
 		if(tit->second && tit->second != tLoading)
-#else
-		if(tit->second)
-#endif
 			driver->removeTexture(tit->second);
 	}
 	if(tBigPicture != nullptr) {
@@ -80,14 +72,12 @@ void ImageManager::ClearTexture() {
 	tMap[0].clear();
 	tMap[1].clear();
 	tThumb.clear();
-#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
 	tThumbLoadingMutex.lock();
 	tThumbLoading.clear();
 	while(!tThumbLoadingCodes.empty())
 		tThumbLoadingCodes.pop();
 	tThumbLoadingThreadRunning = false;
 	tThumbLoadingMutex.unlock();
-#endif
 	tFields.clear();
 }
 void ImageManager::RemoveTexture(int code) {
@@ -123,10 +113,8 @@ void ImageManager::ResizeTexture() {
 	driver->removeTexture(tUnknown);
 	driver->removeTexture(tUnknownFit);
 	driver->removeTexture(tUnknownThumb);
-#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
 	driver->removeTexture(tLoading);
 	tLoading = GetTextureFromFile("textures/cover.jpg", imgWidthThumb, imgHeightThumb);
-#endif
 	tUnknown = GetTextureFromFile("textures/unknown.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	tUnknownFit = GetTextureFromFile("textures/unknown.jpg", imgWidthFit, imgHeightFit);
 	tUnknownThumb = GetTextureFromFile("textures/unknown.jpg", imgWidthThumb, imgHeightThumb);
@@ -298,7 +286,6 @@ irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 	tBigPicture = texture;
 	return texture;
 }
-#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
 int ImageManager::LoadThumbThread() {
 	while(true) {
 		imageManager.tThumbLoadingMutex.lock();
@@ -354,13 +341,11 @@ int ImageManager::LoadThumbThread() {
 	imageManager.tThumbLoadingMutex.unlock();
 	return 0;
 }
-#endif // YGOPRO_USE_THUMB_LOAD_THREAD
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(code == 0)
 		return tUnknownThumb;
-#ifndef YGOPRO_USE_THUMB_LOAD_THREAD
 	auto tit = tThumb.find(code);
-	if(tit == tThumb.end()) {
+	if(tit == tThumb.end() && !mainGame->gameConf.use_image_load_background_thread) {
 		char file[256];
 		std::snprintf(file, sizeof file, "expansions/pics/thumbnail/%d.jpg", code);
 		int width = CARD_THUMB_WIDTH * mainGame->xScale;
@@ -381,7 +366,6 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		tThumb[code] = img;
 		return (img == NULL) ? tUnknownThumb : img;
 	}
-#else // YGOPRO_USE_THUMB_LOAD_THREAD
 	imageManager.tThumbLoadingMutex.lock();
 	auto lit = tThumbLoading.find(code);
 	if(lit != tThumbLoading.end()) {
@@ -397,7 +381,7 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		tThumbLoading.erase(lit);
 	}
 	imageManager.tThumbLoadingMutex.unlock();
-	auto tit = tThumb.find(code);
+	tit = tThumb.find(code);
 	if(tit == tThumb.end()) {
 		tThumb[code] = tLoading;
 		imageManager.tThumbLoadingMutex.lock();
@@ -409,7 +393,6 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		imageManager.tThumbLoadingMutex.unlock();
 		return tLoading;
 	}
-#endif // YGOPRO_USE_THUMB_LOAD_THREAD
 	if(tit->second)
 		return tit->second;
 	else

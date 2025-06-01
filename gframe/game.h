@@ -49,6 +49,7 @@ bool IsExtension(const char* filename, const char(&extension)[N]) {
 struct Config {
 	bool use_d3d{ false };
 	bool use_image_scale{ true };
+	bool use_image_load_background_thread{ false };
 	unsigned short antialias{ 0 };
 	unsigned short serverport{ 7911 };
 	unsigned char textfontsize{ 14 };

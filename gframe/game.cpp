@@ -1326,6 +1326,8 @@ void Game::LoadConfig() {
 			gameConf.use_d3d = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "use_image_scale")) {
 			gameConf.use_image_scale = std::strtol(valbuf, nullptr, 10) > 0;
+		} else if (!std::strcmp(strbuf, "use_image_load_background_thread")) {
+			gameConf.use_image_load_background_thread = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "errorlog")) {
 			unsigned int val = std::strtol(valbuf, nullptr, 10);
 			enable_log = val & 0xff;
