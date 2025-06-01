@@ -1,7 +1,7 @@
 project "event"
     kind "StaticLib"
 
-    local EVENT_VERSION = io.readfile("configure"):match("NUMERIC_VERSION%s+0x(%x+)")
+    local EVENT_VERSION = (io.readfile("configure") or ""):match("NUMERIC_VERSION%s+0x(%x+)")
     if not EVENT_VERSION then
         print("Warning: Could not determine libevent version from the configure file, assuming 2.1.12.")
         EVENT_VERSION = "02010c00" -- 2.1.12
