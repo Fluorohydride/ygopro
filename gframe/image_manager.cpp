@@ -138,7 +138,7 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 	const double rx = (double)srcDim.Width / destDim.Width;
 	const double ry = (double)srcDim.Height / destDim.Height;
 
-#pragma omp parallel
+#pragma omp parallel if(mainGame->gameConf.use_image_scale_multi_thread)
 {
 	double sx, sy, minsx, maxsx, minsy, maxsy, area, ra, ga, ba, aa, pw, ph, pa;
 	irr::video::SColor pxl, npxl;
