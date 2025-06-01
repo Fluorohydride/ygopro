@@ -460,12 +460,6 @@ jobs:
         make -j 4 config=release
         cd ..
 
-    - name: Strip symbols
-      run: |
-        cd bin/release
-        strip YGOPro
-        cd ../..
-
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
