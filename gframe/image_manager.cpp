@@ -366,22 +366,24 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		tThumb[code] = img;
 		return (img == NULL) ? tUnknownThumb : img;
 	}
-	imageManager.tThumbLoadingMutex.lock();
-	auto lit = tThumbLoading.find(code);
-	if(lit != tThumbLoading.end()) {
-		if(lit->second != nullptr) {
-			char file[256];
-			std::snprintf(file, sizeof file, "pics/thumbnail/%d.jpg", code);
-			irr::video::ITexture* texture = driver->addTexture(file, lit->second); // textures must be added in the main thread due to OpenGL
-			lit->second->drop();
-			tThumb[code] = texture;
-		} else {
-			tThumb[code] = nullptr;
+	if(tit == tThumb.end() || tit->second == tLoading) {
+		imageManager.tThumbLoadingMutex.lock();
+		auto lit = tThumbLoading.find(code);
+		if(lit != tThumbLoading.end()) {
+			if(lit->second != nullptr) {
+				char file[256];
+				std::snprintf(file, sizeof file, "pics/thumbnail/%d.jpg", code);
+				irr::video::ITexture* texture = driver->addTexture(file, lit->second); // textures must be added in the main thread due to OpenGL
+				lit->second->drop();
+				tThumb[code] = texture;
+			} else {
+				tThumb[code] = nullptr;
+			}
+			tThumbLoading.erase(lit);
 		}
-		tThumbLoading.erase(lit);
+		imageManager.tThumbLoadingMutex.unlock();
+		tit = tThumb.find(code);
 	}
-	imageManager.tThumbLoadingMutex.unlock();
-	tit = tThumb.find(code);
 	if(tit == tThumb.end()) {
 		tThumb[code] = tLoading;
 		imageManager.tThumbLoadingMutex.lock();
