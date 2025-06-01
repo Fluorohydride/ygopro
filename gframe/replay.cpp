@@ -81,7 +81,7 @@ void Replay::EndRecord() {
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
 	comp_size = MAX_COMP_SIZE;
-	int ret = LzmaCompress(comp_data, &comp_size, replay_data, replay_size, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
+	int ret = LzmaCompress(comp_data, &comp_size, replay_data, replay_size, pheader.props, &propsize, 5, 0x1U << 24, 3, 0, 2, 32, 1);
 	if (ret != SZ_OK) {
 		std::memcpy(comp_data, &ret, sizeof ret);
 		comp_size = sizeof ret;
