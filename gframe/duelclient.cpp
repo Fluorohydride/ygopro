@@ -1856,7 +1856,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 					std::uniform_int_distribution<> dist(0, 6);
 					do {
 						respbuf[2] = dist(rnd);
-					} while(!(filter & (1 << respbuf[2])));
+					} while(!(filter & (0x1U << respbuf[2])));
 				} else {
 					if (filter & 0x40) respbuf[2] = 6;
 					else if (filter & 0x20) respbuf[2] = 5;
