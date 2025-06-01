@@ -737,14 +737,14 @@ bool Game::Initialize() {
 	cbAttribute = env->addComboBox(irr::core::rect<irr::s32>(60, 20 + 50 / 6, 195, 40 + 50 / 6), wFilter, COMBOBOX_ATTRIBUTE);
 	cbAttribute->setMaxSelectionRows(10);
 	cbAttribute->addItem(dataManager.GetSysString(1310), 0);
-	for(int filter = 0x1; filter != 0x80; filter <<= 1)
-		cbAttribute->addItem(dataManager.FormatAttribute(filter).c_str(), filter);
+	for (int filter = 0; filter < ATTRIBUTES_COUNT; ++filter)
+		cbAttribute->addItem(dataManager.FormatAttribute(0x1U << filter).c_str(), 0x1U << filter);
 	stRace = env->addStaticText(dataManager.GetSysString(1321), irr::core::rect<irr::s32>(10, 42 + 75 / 6, 70, 62 + 75 / 6), false, false, wFilter);
 	cbRace = env->addComboBox(irr::core::rect<irr::s32>(60, 40 + 75 / 6, 195, 60 + 75 / 6), wFilter, COMBOBOX_RACE);
 	cbRace->setMaxSelectionRows(10);
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
-	for(int filter = 0x1; filter < (1 << RACES_COUNT); filter <<= 1)
-		cbRace->addItem(dataManager.FormatRace(filter).c_str(), filter);
+	for (int filter = 0; filter < RACES_COUNT; ++filter)
+		cbRace->addItem(dataManager.FormatRace(0x1U << filter).c_str(), 0x1U << filter);
 	stAttack = env->addStaticText(dataManager.GetSysString(1322), irr::core::rect<irr::s32>(205, 22 + 50 / 6, 280, 42 + 50 / 6), false, false, wFilter);
 	ebAttack = env->addEditBox(L"", irr::core::rect<irr::s32>(260, 20 + 50 / 6, 340, 40 + 50 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebAttack->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
