@@ -27,7 +27,7 @@ private:
 	static size_t last_successful_msg_length;
 	static wchar_t event_string[256];
 	static std::mt19937 rnd;
-	static std::uniform_real_distribution<float> dist;
+	static std::uniform_real_distribution<float> real_dist;
 	static bool is_refreshing;
 	static int match_kill;
 	static event* resp_event;
