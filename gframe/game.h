@@ -50,7 +50,11 @@ struct Config {
 	bool use_d3d{ false };
 	bool use_image_scale{ true };
 	bool use_image_scale_multi_thread{ true };
+#ifdef _OPENMP
 	bool use_image_load_background_thread{ false };
+#else
+	bool use_image_load_background_thread{ true };
+#endif
 	unsigned short antialias{ 0 };
 	unsigned short serverport{ 7911 };
 	unsigned char textfontsize{ 14 };
