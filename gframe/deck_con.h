@@ -3,10 +3,10 @@
 
 #include <unordered_map>
 #include <vector>
+#include <random>
 #include <irrlicht.h>
 #include "data_manager.h"
 #include "deck_manager.h"
-#include "../ocgcore/mtrandom.h"
 
 namespace ygo {
 

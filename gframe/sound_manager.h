@@ -2,7 +2,7 @@
 #define SOUNDMANAGER_H
 
 #include "game.h"
-#include "../ocgcore/mtrandom.h"
+#include <random>
 #ifdef YGOPRO_USE_MINIAUDIO
 #include <miniaudio.h>
 #endif

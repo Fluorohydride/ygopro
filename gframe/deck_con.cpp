@@ -1,3 +1,4 @@
+#include <array>
 #include "config.h"
 #include "deck_con.h"
 #include "myfilesystem.h"
@@ -56,10 +57,10 @@ static inline void load_current_deck(irr::gui::IGUIComboBox* cbCategory, irr::gu
 
 DeckBuilder::DeckBuilder() {
 	std::random_device rd;
-	uint32_t generator[8]{};
+	std::array<uint32_t, 8> generator{};
 	for (auto& x : generator)
 		x = rd();
-	std::seed_seq seq{ generator, generator + 8 };
+	std::seed_seq seq(generator.begin(), generator.end());
 	rnd.seed(seq);
 }
 void DeckBuilder::Initialize() {

@@ -3,8 +3,8 @@
 
 #include <vector>
 #include <set>
+#include <random>
 #include "network.h"
-#include "../ocgcore/mtrandom.h"
 
 namespace ygo {
 
