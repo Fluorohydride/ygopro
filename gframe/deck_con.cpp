@@ -54,6 +54,14 @@ static inline void load_current_deck(irr::gui::IGUIComboBox* cbCategory, irr::gu
 	deckManager.LoadCurrentDeck(cbCategory->getSelected(), cbCategory->getText(), cbDeck->getText());
 }
 
+DeckBuilder::DeckBuilder() {
+	std::random_device rd;
+	uint32_t generator[8]{};
+	for (auto& x : generator)
+		x = rd();
+	std::seed_seq seq{ generator, generator + 8 };
+	rnd.seed(seq);
+}
 void DeckBuilder::Initialize() {
 	mainGame->is_building = true;
 	mainGame->is_siding = false;
@@ -82,12 +90,6 @@ void DeckBuilder::Initialize() {
 		filterList = &deckManager._lfList.back();
 	}
 	ClearSearch();
-	std::random_device rd;
-	uint32_t generator[8]{};
-	for(auto& x : generator)
-		x = rd();
-	std::seed_seq seq{ generator, generator + 8 };
-	rnd.seed(seq);
 	mouse_pos.set(0, 0);
 	hovered_code = 0;
 	hovered_pos = 0;

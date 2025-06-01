@@ -12,6 +12,7 @@ namespace ygo {
 
 class DeckBuilder: public irr::IEventReceiver {
 public:
+	DeckBuilder();
 	bool OnEvent(const irr::SEvent& event) override;
 	void Initialize();
 	void Terminate();
