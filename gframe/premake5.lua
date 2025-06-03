@@ -77,7 +77,7 @@ end
         libdirs { SQLITE_LIB_DIR }
     end
 
-    if USE_AUDIO then
+    if USE_AUDIO and not SERVER_MODE then
         defines { "YGOPRO_USE_AUDIO" }
         if AUDIO_LIB == "miniaudio" then
             defines { "YGOPRO_USE_MINIAUDIO" }

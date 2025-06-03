@@ -18,7 +18,7 @@ BUILD_SQLITE = os.istarget("windows")
 BUILD_IRRLICHT = true -- modified Irrlicht is required, can't use the official one
 USE_DXSDK = true
 
-USE_AUDIO = false
+USE_AUDIO = true
 AUDIO_LIB = "miniaudio" -- can be "miniaudio" or "irrklang"
 -- BUILD_MINIAUDIO is always true
 MINIAUDIO_SUPPORT_OPUS_VORBIS = true
@@ -145,6 +145,20 @@ function ApplyNumber(param)
     end
 end
 
+if GetParam("server-mode") then
+    SERVER_MODE = true
+end
+if GetParam("server-zip-support") then
+    SERVER_ZIP_SUPPORT = true
+end
+if GetParam("server-pro2-support") then
+    SERVER_PRO2_SUPPORT = true
+    SERVER_ZIP_SUPPORT = true
+end
+if GetParam("server-tag-surrender-confirm") then
+    SERVER_TAG_SURRENDER_CONFIRM = true
+end
+
 if GetParam("build-lua") then
     BUILD_LUA = true
 elseif GetParam("no-build-lua") then
@@ -233,7 +247,7 @@ elseif GetParam("use-irrklang") then
     AUDIO_LIB = "irrklang"
 end
 
-if USE_AUDIO then
+if USE_AUDIO and not SERVER_MODE then
     AUDIO_LIB = GetParam("audio-lib") or AUDIO_LIB
     if AUDIO_LIB == "miniaudio" then
         if GetParam("miniaudio-support-opus-vorbis") then
@@ -309,19 +323,6 @@ if os.istarget("macosx") then
             TARGET_MAC_ARM = true
         end
     end
-end
-if GetParam("server-mode") then
-    SERVER_MODE = true
-end
-if GetParam("server-zip-support") then
-    SERVER_ZIP_SUPPORT = true
-end
-if GetParam("server-pro2-support") then
-    SERVER_PRO2_SUPPORT = true
-    SERVER_ZIP_SUPPORT = true
-end
-if GetParam("server-tag-surrender-confirm") then
-    SERVER_TAG_SURRENDER_CONFIRM = true
 end
 
 workspace "YGOPro"
