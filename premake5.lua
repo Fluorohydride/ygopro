@@ -445,7 +445,7 @@ workspace "YGOPro"
     if BUILD_SQLITE then
         include "sqlite3"
     end
-    if USE_AUDIO then
+    if USE_AUDIO and not SERVER_MODE then
         if AUDIO_LIB=="miniaudio" then
             include "miniaudio"
         end
