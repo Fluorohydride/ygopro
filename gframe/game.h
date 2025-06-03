@@ -36,8 +36,23 @@ constexpr int TEXT_LINE_SIZE = 256;
 
 namespace ygo {
 
-bool IsExtension(const wchar_t* filename, const wchar_t* extension);
-bool IsExtension(const char* filename, const char* extension);
+template<size_t N>
+bool IsExtension(const wchar_t* filename, const wchar_t(&extension)[N]) {
+	auto flen = std::wcslen(filename);
+	constexpr size_t elen = N - 1;
+	if (!elen || flen < elen)
+		return false;
+	return !mywcsncasecmp(filename + (flen - elen), extension, elen);
+}
+
+template<size_t N>
+bool IsExtension(const char* filename, const char(&extension)[N]) {
+	auto flen = std::strlen(filename);
+	constexpr size_t elen = N - 1;
+	if (!elen || flen < elen)
+		return false;
+	return !mystrncasecmp(filename + (flen - elen), extension, elen);
+}
 
 #ifndef YGOPRO_SERVER_MODE
 struct Config {

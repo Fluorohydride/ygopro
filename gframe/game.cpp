@@ -68,22 +68,6 @@ void DuelInfo::Clear() {
 }
 #endif
 
-bool IsExtension(const wchar_t* filename, const wchar_t* extension) {
-	auto flen = std::wcslen(filename);
-	auto elen = std::wcslen(extension);
-	if (!elen || flen < elen)
-		return false;
-	return !mywcsncasecmp(filename + (flen - elen), extension, elen);
-}
-
-bool IsExtension(const char* filename, const char* extension) {
-	auto flen = std::strlen(filename);
-	auto elen = std::strlen(extension);
-	if (!elen || flen < elen)
-		return false;
-	return !mystrncasecmp(filename + (flen - elen), extension, elen);
-}
-
 #ifdef YGOPRO_SERVER_MODE
 unsigned short server_port;
 unsigned short replay_mode;
@@ -798,14 +782,14 @@ bool Game::Initialize() {
 	cbAttribute = env->addComboBox(irr::core::rect<irr::s32>(60, 20 + 50 / 6, 195, 40 + 50 / 6), wFilter, COMBOBOX_ATTRIBUTE);
 	cbAttribute->setMaxSelectionRows(10);
 	cbAttribute->addItem(dataManager.GetSysString(1310), 0);
-	for(int filter = 0x1; filter != 0x80; filter <<= 1)
-		cbAttribute->addItem(dataManager.FormatAttribute(filter).c_str(), filter);
+	for (int filter = 0; filter < ATTRIBUTES_COUNT; ++filter)
+		cbAttribute->addItem(dataManager.FormatAttribute(0x1U << filter).c_str(), 0x1U << filter);
 	stRace = env->addStaticText(dataManager.GetSysString(1321), irr::core::rect<irr::s32>(10, 42 + 75 / 6, 70, 62 + 75 / 6), false, false, wFilter);
 	cbRace = env->addComboBox(irr::core::rect<irr::s32>(60, 40 + 75 / 6, 195, 60 + 75 / 6), wFilter, COMBOBOX_RACE);
 	cbRace->setMaxSelectionRows(10);
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
-	for(int filter = 0x1; filter < (1 << RACES_COUNT); filter <<= 1)
-		cbRace->addItem(dataManager.FormatRace(filter).c_str(), filter);
+	for (int filter = 0; filter < RACES_COUNT; ++filter)
+		cbRace->addItem(dataManager.FormatRace(0x1U << filter).c_str(), 0x1U << filter);
 	stAttack = env->addStaticText(dataManager.GetSysString(1322), irr::core::rect<irr::s32>(205, 22 + 50 / 6, 280, 42 + 50 / 6), false, false, wFilter);
 	ebAttack = env->addEditBox(L"", irr::core::rect<irr::s32>(260, 20 + 50 / 6, 340, 40 + 50 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebAttack->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -1188,22 +1172,26 @@ std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cW
 void Game::LoadExpansions() {
 #ifdef SERVER_PRO2_SUPPORT
 	FileSystem::TraversalDir(L"./cdb", [](const wchar_t* name, bool isdir) {
+		if (isdir)
+			return;
 		wchar_t fpath[1024];
 		myswprintf(fpath, L"./cdb/%ls", name);
-		if(!isdir && IsExtension(name, L".cdb")) {
+		if(IsExtension(name, L".cdb")) {
 			dataManager.LoadDB(fpath);
 		}
 	});
 #endif // SERVER_PRO2_SUPPORT
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
+		if (isdir)
+			return;
 		wchar_t fpath[1024];
 		myswprintf(fpath, L"./expansions/%ls", name);
-		if (!isdir && IsExtension(name, L".cdb")) {
+		if (IsExtension(name, L".cdb")) {
 			dataManager.LoadDB(fpath);
 			return;
 		}
 #ifndef YGOPRO_SERVER_MODE
-		if (!isdir && IsExtension(name, L".conf")) {
+		if (IsExtension(name, L".conf")) {
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
 			dataManager.LoadStrings(upath);
@@ -1211,7 +1199,7 @@ void Game::LoadExpansions() {
 		}
 #endif // YGOPRO_SERVER_MODE
 #if defined(SERVER_ZIP_SUPPORT) || !defined(YGOPRO_SERVER_MODE)
-		if (!isdir && (IsExtension(name, L".zip") || IsExtension(name, L".ypk"))) {
+		if (IsExtension(name, L".zip") || IsExtension(name, L".ypk")) {
 #ifdef _WIN32
 			DataManager::FileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
 #else
@@ -1320,7 +1308,7 @@ void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const w
 void Game::RefreshReplay() {
 	lstReplayList->clear();
 	FileSystem::TraversalDir(L"./replay", [this](const wchar_t* name, bool isdir) {
-		if (!isdir && IsExtension(name, L".yrp") && Replay::CheckReplay(name))
+		if (!isdir && IsExtension(name, L".yrp"))
 			lstReplayList->addItem(name);
 	});
 }

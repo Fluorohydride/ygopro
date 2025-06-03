@@ -13,7 +13,7 @@
 #include <windows.h>
 #include <ws2tcpip.h>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) or defined(__MINGW32__)
 #define mywcsncasecmp _wcsnicmp
 #define mystrncasecmp _strnicmp
 #else
