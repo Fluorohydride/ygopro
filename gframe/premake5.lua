@@ -145,6 +145,9 @@ if not SERVER_MODE then
         links { "GL", "X11", "Xxf86vm" }
         linkoptions { "-fopenmp" }
 end
+if SERVER_MODE then -- support old gcc
+        links { "pthread", "dl" }
+end
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "IrrKlang" }
             linkoptions{ IRRKLANG_LINK_RPATH }
