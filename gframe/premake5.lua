@@ -75,7 +75,7 @@ project "YGOPro"
         entrypoint "mainCRTStartup"
         defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
-        links { "ws2_32" }
+        links { "ws2_32", "iphlpapi" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrKlang" }
             if IRRKLANG_PRO then
