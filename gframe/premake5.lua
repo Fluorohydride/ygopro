@@ -109,3 +109,6 @@ project "YGOPro"
             links { "IrrKlang" }
             linkoptions{ IRRKLANG_LINK_RPATH }
         end
+        if GLIBC_VERSION < 546 then -- glibc less than 2.34
+            links { "dl", "pthread" }
+        end
