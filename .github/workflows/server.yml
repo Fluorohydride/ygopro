@@ -274,7 +274,7 @@ jobs:
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
-        pattern: YGOPro-Server-windows-*
+        pattern: YGOPro-Server-windows-* # the "windows" (no hyphen) artifact is ignored
         merge-multiple: true
 
     - name: GitHub Release
@@ -285,6 +285,5 @@ jobs:
         prerelease: true
         title: "Development Build"
         files: |
-          x86/ygopro.exe
           x64/ygopro.exe
           x64/AI.Server.exe
