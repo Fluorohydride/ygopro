@@ -61,7 +61,7 @@ project "YGOPro"
         end
         if AUDIO_LIB == "irrklang" then
             defines { "YGOPRO_USE_IRRKLANG" }
-                includedirs { IRRKLANG_INCLUDE_DIR }
+            includedirs { IRRKLANG_INCLUDE_DIR }
             if not IRRKLANG_PRO then
                 libdirs { IRRKLANG_LIB_DIR }
             end
