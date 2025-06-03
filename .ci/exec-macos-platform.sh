@@ -4,18 +4,15 @@ set -o errexit
 
 TARGET_PLATFORM=$(arch)
 TARGET_YGOPRO_BINARY_PATH=./ygopro-platforms/ygopro-platform-$TARGET_PLATFORM
-export EVENT_INCLUDE_DIR=$PWD/libevent-stable/include
-export EVENT_LIB_DIR=$PWD/libevent-stable/lib
-export IRRLICHT_INCLUDE_DIR=$PWD/irrlicht/include
-export IRRLICHT_LIB_DIR=$PWD/irrlicht
 
-./.ci/libevent-prebuild.sh
+./.ci/configure-audio.sh
 
-chmod +x ./premake5
-./premake5 gmake --cc=clang --build-freetype --build-sqlite --no-use-irrklang
+rm -rf sqlite3/VERSION sqlite3/version
+
+./premake5 gmake --cc=clang
 
 cd build
-make config=release -j4
+make config=release -j$(sysctl -n hw.ncpu)
 cd ..
 
 mkdir ygopro-platforms

@@ -14,14 +14,21 @@ mat_common:
     - linux
   script:
     # lua
-    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/lua-5.4.4.tar.gz | tar zfx -
-    - mv lua-5.4.4 lua
+    - wget -O - https://cdn02.moecube.com:444/ygopro-build-materials/lua-5.4.7.tar.gz | tar zfx -
+    - mv lua-5.4.7 lua
     # sqlite3
-    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/sqlite-autoconf-3390300.tar.gz | tar zfx -
-    - mv sqlite-autoconf-3390300 sqlite3
+    - wget -O - https://cdn02.moecube.com:444/ygopro-build-materials/sqlite-autoconf-3490100.tar.gz | tar zfx -
+    - mv sqlite-autoconf-3490100 sqlite3
     # freetype
-    #- wget -O - https://cdn01.moecube.com/ygopro-build-materials/freetype-2.11.1.tar.gz | tar zfx -
-    #- mv freetype-2.11.1 freetype
+    #- wget -O - https://cdn02.moecube.com:444/ygopro-build-materials/freetype-2.13.3.tar.gz | tar zfx -
+    #- mv freetype-2.13.3 freetype
+    # event
+    - wget -O - https://cdn02.moecube.com:444/ygopro-build-materials/libevent-2.1.12-stable.tar.gz | tar zfx -
+    - mv libevent-2.1.12-stable event
+    # irrlicht
+    - ./.ci/prepare-irrlicht.sh
+    # miniaudio
+    #- ./.ci/prepare-miniaudio.sh
     # premake
     - cp -rf premake/* .;
   artifacts:
@@ -29,6 +36,9 @@ mat_common:
       - lua
       #- freetype
       - sqlite3
+      - event
+      - irrlicht
+      #- miniaudio
 
 mat_submodules:
   stage: prepare
@@ -44,21 +54,29 @@ mat_submodules:
       - ocgcore
       - script
 
-mat_linux:
+#mat_linux:
+#  stage: prepare
+#  tags:
+#    - linux
+#  image: git-registry.mycard.moe/mycard/docker-runner-base:debian11
+#  script:
+#    - apt update; apt -y install git wget tar
+#    - ./.ci/prepare-irrlicht.sh
+#  artifacts:
+#    paths:
+#      - irrlicht
+
+mat_macos:
   stage: prepare
   tags:
     - linux
   script:
-    - apt update; apt -y install git wget tar
-    - git clone --depth=1 https://code.mycard.moe/mycard/irrlicht-new irrlicht
-    # - wget -O - https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-beta5-linux.tar.gz | tar zfx -
-    # - env PROCESSOR_COUNT=$(nproc) ./.ci/libevent-prebuild.sh
+    - apt update; apt -y install wget tar
+    - wget -O - https://cdn02.moecube.com:444/ygopro-build-materials/premake-5.0.0-beta6-macosx.tar.gz | tar zfx -
+    - chmod +x premake5
   artifacts:
     paths:
-      # - premake5
-      - irrlicht
-      # - libevent-stable
-  image: git-registry.mycard.moe/mycard/docker-runner-base:debian11
+      - premake5
 
 mat_windows:
   stage: prepare
@@ -67,30 +85,23 @@ mat_windows:
   script:
     - apt update; apt -y install wget tar patch p7zip-full
     # premake5.exe
-    - wget https://cdn01.moecube.com/ygopro-build-materials/premake-5.0.0-beta5-windows.zip
-    - 7z x -y premake-5.0.0-beta5-windows.zip
-    # event
-    - wget -O - https://cdn01.moecube.com/ygopro-build-materials/libevent-2.0.22-stable.tar.gz | tar zfx -
-    - mv libevent-2.0.22-stable event
-    # irrlicht
-    # - git clone --depth=1 https://code.mycard.moe/mycard/irrlicht-new irrlicht
+    - wget https://cdn02.moecube.com:444/ygopro-build-materials/premake-5.0.0-beta6-windows.zip
+    - 7z x -y premake-5.0.0-beta6-windows.zip
   artifacts:
     paths:
       - premake5.exe
-      - event
-      # - irrlicht
 
 ._exec_build:
   stage: build
   #variables:
   #  NO_LUA_SAFE: '1' # on client no lua safe
-  cache:
-    key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
-    paths:
-      - bin/
-      - obj/
+  #cache:
+  #  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+  #  paths:
+  #    - bin/
+  #    - obj/
 
-exec_windows:
+.exec_windows:
   extends: ._exec_build
   tags:
     - vs
@@ -98,56 +109,125 @@ exec_windows:
     - mat_common
     - mat_windows
     - mat_submodules
-  script:
+  before_script:
     - bash -c 'cp -rf premake/* . ; cp -rf resource/* .'
-    - '.\premake5.exe vs2019'
-    - cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe" build\YGOPro.sln /m /p:Configuration=Release'
-    - copy bin\release\ygopro.exe .
   artifacts:
     paths:
-      - ygopro.exe
+      - dist
+
+exec_windows:
+  extends: .exec_windows
+  script:
+    - '.\premake5.exe vs2019 --server-zip-support'
+    - cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe" build\YGOPro.sln /m /p:Configuration=Release /p:Platform=x64'
+    - mkdir dist
+    - mkdir dist\windows
+    - copy bin\release\x64\ygopro.exe dist\windows\ygopro.exe
+
+.exec_unix_common:
+  extends: ._exec_build
+  variables:
+    RELEASE_DIR: ''
+    TARGET_FILE: ygopro
+    PREMAKE5_BIN: premake5
+  script:
+    - ./.ci/configure-libevent.sh
+    - $PREMAKE5_BIN gmake
+    - cd build
+    - make config=release -j$(nproc)
+    - cd ..
+    - mkdir -p dist/$RELEASE_DIR
+    - mv bin/release/$TARGET_FILE dist/$RELEASE_DIR/$TARGET_FILE
+    - |
+      if [ "$TARGET_FILE" = "ygopro" ]; then
+        strip dist/$RELEASE_DIR/$TARGET_FILE
+      fi
+  artifacts:
+    paths:
+      - dist
+
+.exec_linux_common:
+  extends: .exec_unix_common
+  tags:
+    - linux
+  image: git-registry.moenext.com/mycard/docker-ygopro-builder
+  dependencies:
+    - mat_common
+    #- mat_linux
+    - mat_submodules
+
+.exec_linux:
+  extends: .exec_linux_common
+  variables:
+    BUILD_SQLITE: '1'
+    SERVER_ZIP_SUPPORT: '1'
+    RELEASE_DIR: linux-x64
+
+.exec_debian:
+  extends: .exec_linux_common
+  variables:
+    LUA_DEB: '1'
+    RELEASE_DIR: debian-x64
+  before_script:
+    - apt update; apt -y install git build-essential liblua5.4-dev libsqlite3-dev libevent-dev
+
+.use_arm:
+  image: git-registry.moenext.com/mycard/docker-ygopro-builder:fpic
+  tags:
+    - arm
 
 exec_linux:
-  extends: ._exec_build
+  extends: .exec_linux
   tags:
-    - linux
-  dependencies:
-    - mat_common
-    - mat_linux
-    - mat_submodules
-  script:
-    - apt update; apt -y install git build-essential
-    - premake5 gmake --build-sqlite --server-zip-support
-    - cd build
-    - make config=release -j$(nproc)
-    - cd ..
-    - mv bin/release/ygopro ./ygopro
-    - strip ygopro
-  artifacts:
-    paths:
-      - ygopro
-  image: git-registry.moenext.com/mycard/docker-ygopro-builder:latest
+    - noavx2
+
 
 exec_debian:
-  extends: ._exec_build
-  tags:
-    - linux
+  extends: .exec_debian
+
+
+.exec_macos_platform:
+  extends: .exec_unix_common
   dependencies:
     - mat_common
-    - mat_linux
+    - mat_macos
     - mat_submodules
+  variables:
+    PREMAKE5_BIN: ./premake5
+    BUILD_SQLITE: '1'
+    BUILD_EVENT: '1'
+    SERVER_ZIP_SUPPORT: '1'
+  before_script:
+    - rm -rf sqlite3/VERSION sqlite3/version
+
+exec_macos_x64:
+  extends: .exec_macos_platform
+  tags:
+    - macos
+  variables:
+    RELEASE_DIR: macos-x64
+
+exec_macos_arm64:
+  extends: .exec_macos_platform
+  tags:
+    - macos-m1
+  variables:
+    RELEASE_DIR: macos-arm64
+
+exec_macos:
+  stage: combine
+  tags:
+    - macos
+  dependencies:
+    - exec_macos_x64
+    - exec_macos_arm64
   script:
-    - apt update; apt -y install git build-essential liblua5.3-dev libsqlite3-dev libevent-dev
-    - premake5 gmake --lua-deb
-    - cd build
-    - make config=release -j$(nproc)
-    - cd ..
-    - mv bin/release/ygopro ./ygopro
-    - strip ygopro
+    - mkdir -p dist/macos
+    - lipo -create -output dist/macos/ygopro dist/macos-x64/ygopro dist/macos-arm64/ygopro
+    - rm -rf dist/macos-x64 dist/macos-arm64
   artifacts:
     paths:
-      - ygopro
-  image: git-registry.moenext.com/mycard/docker-ygopro-builder:latest
+      - dist
 
 #win_server_pack:
 #  stage: pack
@@ -158,3 +238,18 @@ exec_debian:
 #  script:
 #    - apt update; apt -y install p7zip-full wget
 #    - wget https://nodejs.org/dist/v14.17.0/node-v14.17.0-win-x64.7z
+
+upload_to_minio:
+  stage: deploy
+  dependencies:
+    - exec_windows
+    - exec_linux
+    - exec_debian
+    - exec_macos
+  tags: 
+    - linux
+  script:
+    - aws s3 --endpoint=https://minio.mycard.moe:9000 sync --delete dist/ s3://mycard/ygopro-server-builds
+  only:
+    - server
+    - tags
