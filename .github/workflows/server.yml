@@ -264,3 +264,27 @@ jobs:
         name: YGOPro-Server-${{ matrix.name }}
         path: |
           bin/release/ygopro
+
+  publish:
+    needs: [build-windows]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: YGOPro-Server-windows-*
+        merge-multiple: true
+
+    - name: GitHub Release
+      uses: salix5/action-automatic-releases@node20
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "server-latest"
+        prerelease: true
+        title: "Development Build"
+        files: |
+          x86/ygopro.exe
+          x64/ygopro.exe
+          x64/AI.Server.exe
