@@ -747,7 +747,7 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_AI_NAME: {
-			char namebuf[128]{};
+			char namebuf[SIZE_AI_NAME]{};
 			wchar_t wname[20]{};
 			int name_len = buffer_read<uint16_t>(pbuf);
 			if (name_len + 1 <= (int)sizeof namebuf) {
@@ -760,8 +760,8 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_SHOW_HINT: {
-			char msgbuf[1024]{};
-			wchar_t msg[1024]{};
+			char msgbuf[SIZE_HINT_MSG]{};
+			wchar_t msg[SIZE_HINT_MSG]{};
 			int msg_len = buffer_read<uint16_t>(pbuf);
 			if (msg_len + 1 <= (int)sizeof msgbuf) {
 				std::memcpy(msgbuf, pbuf, msg_len);
