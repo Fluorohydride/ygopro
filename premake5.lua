@@ -258,6 +258,30 @@ if os.istarget("macosx") then
     end
 end
 
+function getGlibcVersion()
+    local output = os.outputof("getconf GNU_LIBC_VERSION")
+    local major, minor, patch = output:match("glibc (%d+)%.(%d+)%.?(%d*)")
+
+    if major and minor then
+        major = tonumber(major)
+        minor = tonumber(minor)
+        patch = tonumber(patch) or 0
+        return (major << 16) | (minor << 8) | patch
+    end
+
+    return 0
+end
+
+GLIBC_VERSION=0
+if os.ishost("linux") then
+    GLIBC_VERSION = getGlibcVersion()
+    if GLIBC_VERSION>0 then
+        print("Detected glibc version: " .. string.format("%d.%d.%d", GLIBC_VERSION >> 16, (GLIBC_VERSION >> 8) & 0xFF, GLIBC_VERSION & 0xFF))
+    else
+        print("Could not detect glibc version, assuming it is insufficient.")
+    end
+end
+
 workspace "YGOPro"
     location "build"
     language "C++"
