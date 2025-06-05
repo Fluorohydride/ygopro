@@ -269,7 +269,7 @@ function getGlibcVersion()
         return (major << 16) | (minor << 8) | patch
     end
 
-    return nil
+    return 0
 end
 
 GLIBC_VERSION=0
@@ -278,7 +278,7 @@ if os.ishost("linux") then
     if GLIBC_VERSION>0 then
         print("Detected glibc version: " .. string.format("%d.%d.%d", GLIBC_VERSION >> 16, (GLIBC_VERSION >> 8) & 0xFF, GLIBC_VERSION & 0xFF))
     else
-        print("Could not detect glibc version, assuming it is sufficient.")
+        print("Could not detect glibc version, assuming it is insufficient.")
     end
 end
 
