@@ -2,7 +2,7 @@
 #include "duelclient.h"
 #include "game.h"
 #include "data_manager.h"
-#include "../ocgcore/mtrandom.h"
+#include <random>
 #include <thread>
 
 namespace ygo {
@@ -36,12 +36,22 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dInfo.Clear();
 	int opt = 0;
 	std::random_device rd;
-	unsigned int seed = rd();
-	mt19937 rnd((uint_fast32_t)seed);
+	ExtendedReplayHeader rh;
+	rh.base.id = REPLAY_ID_YRP2;
+	rh.base.version = PRO_VERSION;
+	rh.base.flag = REPLAY_UNIFORM | REPLAY_SINGLE_MODE;
+	rh.base.start_time = (uint32_t)std::time(nullptr);
+	for (auto& x : rh.seed_sequence)
+		x = rd();
+	std::seed_seq seed(rh.seed_sequence, rh.seed_sequence + SEED_COUNT);
+	std::mt19937 rnd(seed);
+	uint32_t duel_seed[SEED_COUNT]{};
+	for (auto& x : duel_seed)
+		x = rnd();
 	set_script_reader(DataManager::ScriptReaderEx);
 	set_card_reader(DataManager::CardReader);
 	set_message_handler(SingleMode::MessageHandler);
-	pduel = create_duel(rnd.rand());
+	pduel = create_duel_v2(duel_seed);
 	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
 	mainGame->dInfo.lp[0] = start_lp;
@@ -79,12 +89,6 @@ int SingleMode::SinglePlayThread() {
 		end_duel(pduel);
 		return 0;
 	}
-	ReplayHeader rh;
-	rh.id = 0x31707279;
-	rh.version = PRO_VERSION;
-	rh.flag = REPLAY_UNIFORM | REPLAY_SINGLE_MODE;
-	rh.seed = seed;
-	rh.start_time = (unsigned int)std::time(nullptr);
 	mainGame->gMutex.lock();
 	mainGame->HideElement(mainGame->wSinglePlay);
 	mainGame->ClearCardInfo();
