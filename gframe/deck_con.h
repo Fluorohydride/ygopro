@@ -3,15 +3,16 @@
 
 #include <unordered_map>
 #include <vector>
+#include <random>
 #include <irrlicht.h>
 #include "data_manager.h"
 #include "deck_manager.h"
-#include "../ocgcore/mtrandom.h"
 
 namespace ygo {
 
 class DeckBuilder: public irr::IEventReceiver {
 public:
+	DeckBuilder();
 	bool OnEvent(const irr::SEvent& event) override;
 	void Initialize();
 	void Terminate();
@@ -80,7 +81,7 @@ public:
 	bool is_modified{};
 	bool readonly{};
 	bool showing_pack{};
-	mt19937 rnd;
+	std::mt19937 rnd;
 
 	const LFList* filterList{};
 	std::vector<code_pointer> results;
