@@ -16,7 +16,7 @@ bool SoundManager::Init() {
 #ifdef YGOPRO_USE_AUDIO
 	bgm_scene = -1;
 	RefreshBGMList();
-	rnd.seed((unsigned int)std::time(nullptr));
+	rnd.seed(std::random_device()());
 #ifdef YGOPRO_USE_MINIAUDIO
 	engineConfig = ma_engine_config_init();
 #ifdef YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS
