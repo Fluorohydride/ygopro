@@ -13,6 +13,9 @@ namespace ygo {
 #define REPLAY_SINGLE_MODE	0x8
 #define REPLAY_UNIFORM		0x10
 
+#define REPLAY_ID_YRP1	0x31707279
+#define REPLAY_ID_YRP2	0x32707279
+
 // max size
 constexpr int MAX_REPLAY_SIZE = 0x80000;
 constexpr int MAX_COMP_SIZE = UINT16_MAX + 1;
@@ -25,6 +28,11 @@ struct ReplayHeader {
 	uint32_t datasize{};
 	uint32_t start_time{};
 	uint8_t props[8]{};
+};
+
+struct ExtendedReplayHeader {
+	ReplayHeader base;
+	uint32_t seed_sequence[SEED_COUNT]{};
 };
 
 struct DuelParameters {
@@ -41,7 +49,7 @@ public:
 
 	// record
 	void BeginRecord();
-	void WriteHeader(ReplayHeader& header);
+	void WriteHeader(ExtendedReplayHeader& header);
 	void WriteData(const void* data, size_t length, bool flush = true);
 	template<typename T>
 	void Write(T data, bool flush = true) {
@@ -68,7 +76,7 @@ public:
 	bool OpenReplay(const wchar_t* name);
 	bool ReadNextResponse(unsigned char resp[]);
 	bool ReadName(wchar_t* data);
-	void ReadHeader(ReplayHeader& header);
+	void ReadHeader(ExtendedReplayHeader& header);
 	bool ReadData(void* data, size_t length);
 	template<typename T>
 	T Read() {
@@ -87,7 +95,7 @@ public:
 	HANDLE recording_fp{ nullptr };
 #endif
 
-	ReplayHeader pheader;
+	ExtendedReplayHeader pheader;
 	unsigned char* comp_data;
 	size_t comp_size{};
 
