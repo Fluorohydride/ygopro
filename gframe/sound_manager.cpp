@@ -302,7 +302,7 @@ void SoundManager::PlayBGM(int scene) {
 		if(count <= 0)
 			return;
 		bgm_scene = scene;
-		int bgm = std::uniform_int_distribution<>(0, count - 1)(rnd);
+		int bgm = (count > 1) ? std::uniform_int_distribution<>(0, count - 1)(rnd) : 0;
 		auto name = BGMList[scene][bgm].c_str();
 		wchar_t BGMName[1024];
 		myswprintf(BGMName, L"./sound/BGM/%ls", name);
