@@ -71,6 +71,8 @@ protected:
 	DuelPlayer* replay_recorder{};
 	unsigned char turn_player{ 0 };
 	unsigned short phase{ 0 };
+	bool deck_reversed{ false };
+	uint32_t deck_top[2]{};
 #endif
 	Replay last_replay;
 	bool match_mode{ false };
