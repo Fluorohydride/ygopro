@@ -1854,9 +1854,9 @@ void SingleDuel::RequestField(DuelPlayer* dp) {
 	WriteMsg([&](uint8_t*& pbuf) {
 		BufferIO::WriteInt8(pbuf, MSG_START);
 		BufferIO::WriteInt8(pbuf, player);
-		BufferIO::WriteInt8(pbuf, this->host_info.duel_rule);
-		BufferIO::WriteInt32(pbuf, this->host_info.start_lp);
-		BufferIO::WriteInt32(pbuf, this->host_info.start_lp);
+		BufferIO::WriteInt8(pbuf, host_info.duel_rule);
+		BufferIO::WriteInt32(pbuf, host_info.start_lp);
+		BufferIO::WriteInt32(pbuf, host_info.start_lp);
 		BufferIO::WriteInt16(pbuf, 0);
 		BufferIO::WriteInt16(pbuf, 0);
 		BufferIO::WriteInt16(pbuf, 0);
@@ -1873,11 +1873,11 @@ void SingleDuel::RequestField(DuelPlayer* dp) {
 
 	WriteMsg([&](uint8_t*& pbuf) {
 		BufferIO::WriteInt8(pbuf, MSG_NEW_PHASE);
-		BufferIO::WriteInt16(pbuf, this->phase);
+		BufferIO::WriteInt16(pbuf, phase);
 	});
 
 	WriteMsg([&](uint8_t*& pbuf) {
-		auto length = query_field_info(this->pduel, pbuf);
+		auto length = query_field_info(pduel, pbuf);
 		pbuf += length;
 	});
 
@@ -1905,7 +1905,7 @@ void SingleDuel::RequestField(DuelPlayer* dp) {
 				BufferIO::WriteInt8(pbuf, MSG_DECK_TOP);
 				BufferIO::WriteInt8(pbuf, i);
 				BufferIO::WriteInt8(pbuf, 0);
-				BufferIO::WriteInt32(pbuf, this->deck_top[i]);
+				BufferIO::WriteInt32(pbuf, deck_top[i]);
 			});
 		}
 	}
