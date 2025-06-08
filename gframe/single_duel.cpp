@@ -12,10 +12,6 @@ extern unsigned short replay_mode;
 #endif
 SingleDuel::SingleDuel(bool is_match) {
 	match_mode = is_match;
-#ifdef YGOPRO_SERVER_MODE
-	cache_recorder = 0;
-	replay_recorder = 0;
-#endif
 }
 SingleDuel::~SingleDuel() {
 }

@@ -16,10 +16,6 @@ TagDuel::TagDuel() {
 		ready[i] = false;
 		surrender[i] = false;
 	}
-#ifdef YGOPRO_SERVER_MODE
-	cache_recorder = 0;
-	replay_recorder = 0;
-#endif
 }
 TagDuel::~TagDuel() {
 }
