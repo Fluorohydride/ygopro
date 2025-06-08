@@ -1,0 +1,289 @@
+name: Automated Test Build (Server Mode)
+
+on:
+  push:
+    branches: [ "server" ]
+  pull_request:
+    branches: [ "server" ]
+
+jobs:
+  build-windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        name:
+          - windows
+          - windows-x64
+          - windows-ygopro2-ai-server
+#          - windows-2025
+        include:
+          - name: windows
+            os: windows-2022
+            vs: vs2022
+          - name: windows-x64
+            os: windows-2022
+            vs: vs2022
+            x64: true
+#          - name: windows-2025
+#            os: windows-2025
+#            vs: vs2025 # to be enabled after the release of Visual Studio 2025
+          - name: windows-ygopro2-ai-server
+            os: windows-2022
+            vs: vs2022
+            x64: true
+            ygopro2: true
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout repository with submodules
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+        submodules: true
+
+    - name: Update submodules
+      run: |
+        cd ocgcore
+        git checkout master
+        git pull origin master
+        cd ..
+#        cd script
+#        git checkout master
+#        git pull origin master
+#        cd ..
+
+    - name: Download premake
+      id: premake
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta6/premake-5.0.0-beta6-windows.zip
+        filename: premake5.zip
+
+    - name: Extract premake
+      run: |
+        7z x ${{ steps.premake.outputs.filepath }}
+
+    - name: Download libevent
+      id: libevent
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/libevent/libevent/releases/download/release-2.0.22-stable/libevent-2.0.22-stable.tar.gz
+        filename: libevent.tar.gz
+
+    - name: Extract libevent
+      run: |
+        tar xf ${{ steps.libevent.outputs.filepath }}
+        move libevent-2.0.22-stable event
+
+    - name: Download lua
+      id: lua
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
+
+    - name: Extract lua
+      run: |
+        tar xf ${{ steps.lua.outputs.filepath }}
+        move lua-5.4.7 lua
+
+    - name: Download sqlite
+      id: sqlite
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+
+    - name: Extract sqlite
+      run: |
+        7z x ${{ steps.sqlite.outputs.filepath }}
+        move sqlite-amalgamation-3490100 sqlite3
+
+    - name: Download irrlicht
+      if: matrix.ygopro2 == true
+      run: |
+        git clone --depth=1 https://github.com/mercury233/irrlicht
+
+    - name: Copy premake files
+      run: |
+        xcopy /E premake\* .
+        xcopy /E resource\* .
+
+    - name: Use premake to generate Visual Studio solution
+      run: |
+        .\premake5.exe ${{ matrix.vs }} ${{ matrix.ygopro2 && '--server-pro2-support' || '' }}
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Build solution
+      run: |
+        MSBuild.exe build\YGOPro.sln /m /p:Configuration=Release /p:Platform=${{ matrix.x64 && 'x64' || 'Win32' }}
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: YGOPro-Server-${{ matrix.name }}
+        path: |
+          bin/release/x86/ygopro.exe
+          bin/release/x64/ygopro.exe
+          bin/release/x64/AI.Server.exe
+
+  build-linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        name:
+          - ubuntu-22
+          - ubuntu-24
+          - ubuntu-static-link
+          - ubuntu-zip-support
+        include:
+          - name: ubuntu-22
+            os: ubuntu-22.04
+            premake-version: 5.0.0-beta4
+          - name: ubuntu-24
+            os: ubuntu-24.04
+            premake-version: 5.0.0-beta6
+          - name: ubuntu-static-link
+            os: ubuntu-22.04
+            premake-version: 5.0.0-beta4
+            static-link: true
+          - name: ubuntu-zip-support
+            os: ubuntu-22.04
+            premake-version: 5.0.0-beta4
+            zip-support: true
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout repository with submodules
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+        submodules: true
+
+    - name: Update submodules
+      run: |
+        cd ocgcore
+        git checkout master
+        git pull origin master
+        cd ..
+#        cd script
+#        git checkout master
+#        git pull origin master
+#        cd ..
+
+    - name: Install dependencies
+      if: matrix.static-link != true
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libevent-dev libsqlite3-dev
+
+    - name: Download premake
+      id: premake
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/premake/premake-core/releases/download/v${{ matrix.premake-version }}/premake-${{ matrix.premake-version }}-linux.tar.gz
+        filename: premake5.tar.gz
+
+    - name: Extract premake
+      run: |
+        tar xf ${{ steps.premake.outputs.filepath }}
+        chmod +x ./premake5
+
+    - name: Download libevent
+      if: matrix.static-link == true
+      id: libevent
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
+        filename: libevent.tar.gz
+
+    - name: Extract libevent
+      if: matrix.static-link == true
+      run: |
+        tar xf ${{ steps.libevent.outputs.filepath }}
+        mv libevent-2.1.12-stable event
+
+    - name: Configure libevent
+      if: matrix.static-link == true
+      run: |
+        cd event
+        ./configure --disable-openssl --enable-static=yes --enable-shared=no
+        sed -f make-event-config.sed < config.h > ./include/event2/event-config.h
+        cd ..
+
+    - name: Download lua
+      id: lua
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
+
+    - name: Extract lua
+      run: |
+        tar xf ${{ steps.lua.outputs.filepath }}
+        mv lua-5.4.7 lua
+
+    - name: Download sqlite
+      if: matrix.static-link == true
+      id: sqlite
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+
+    - name: Extract sqlite
+      if: matrix.static-link == true
+      run: |
+        7z x ${{ steps.sqlite.outputs.filepath }}
+        mv sqlite-amalgamation-3490100 sqlite3
+
+    - name: Download irrlicht
+      if: matrix.zip-support == true
+      run: |
+        git clone --depth=1 https://github.com/mercury233/irrlicht
+
+    - name: Copy premake files
+      run: |
+        cp -r premake/* .
+        cp -r resource/* .
+
+    - name: Use premake to generate make files
+      run: |
+        ./premake5 gmake ${{ matrix.zip-support && '--server-zip-support' || '' }} \
+          ${{ matrix.static-link && '--build-sqlite --build-event' || '' }}
+
+    - name: Make
+      run: |
+        cd build
+        make -j 4 config=release
+        cd ..
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: YGOPro-Server-${{ matrix.name }}
+        path: |
+          bin/release/ygopro
+
+  publish:
+    needs: [build-windows]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: YGOPro-Server-windows-* # the "windows" (no hyphen) artifact is ignored
+        merge-multiple: true
+
+    - name: GitHub Release
+      uses: salix5/action-automatic-releases@node20
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "server-latest"
+        prerelease: true
+        title: "Development Build"
+        files: |
+          x64/ygopro.exe
+          x64/AI.Server.exe
