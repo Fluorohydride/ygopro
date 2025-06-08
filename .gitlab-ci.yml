@@ -137,7 +137,7 @@ exec_debian:
     - mat_linux
     - mat_submodules
   script:
-    - apt update; apt -y install git build-essential liblua5.3-dev libsqlite3-dev libevent-dev
+    - apt update; apt -y install git build-essential liblua5.4-dev libsqlite3-dev libevent-dev
     - premake5 gmake --lua-deb
     - cd build
     - make config=release -j$(nproc)
