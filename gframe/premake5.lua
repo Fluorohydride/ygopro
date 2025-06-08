@@ -111,7 +111,7 @@ end
 if SERVER_PRO2_SUPPORT then
         targetname ("AI.Server")
 end
-        links { "ws2_32" }
+        links { "ws2_32", "iphlpapi" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrKlang" }
             if IRRKLANG_PRO then
