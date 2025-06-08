@@ -253,6 +253,10 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 		BufferIO::CopyCharArray(pkt->name, dp->name);
 		break;
 	}
+	case CTOS_HOSTNAME: {
+		// for other server impl use only
+		break;
+	}
 	case CTOS_CREATE_GAME: {
 		if(dp->game || duel_mode)
 			return;

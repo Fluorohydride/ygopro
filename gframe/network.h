@@ -164,6 +164,13 @@ constexpr int LEN_CHAT_PLAYER = 1;
 constexpr int LEN_CHAT_MSG = 256;
 constexpr int SIZE_STOC_CHAT = (LEN_CHAT_PLAYER + LEN_CHAT_MSG) * sizeof(uint16_t);
 
+/*
+* STOC_HOSTNAME
+* uint16_t hostname[256]; (UTF-16 string)
+*/
+
+constexpr int LEN_HOSTNAME = 256;
+
 struct STOC_HS_PlayerEnter {
 	uint16_t name[20]{};
 	uint8_t pos{};
@@ -269,6 +276,7 @@ public:
 #define CTOS_SURRENDER		0x14	// no data
 #define CTOS_TIME_CONFIRM	0x15	// no data
 #define CTOS_CHAT			0x16	// uint16_t array
+#define CTOS_HOSTNAME	0x17	// uint16_t array
 #define CTOS_HS_TODUELIST	0x20	// no data
 #define CTOS_HS_TOOBSERVER	0x21	// no data
 #define CTOS_HS_READY		0x22	// no data
