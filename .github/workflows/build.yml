@@ -225,6 +225,13 @@ jobs:
         xcopy /E premake\* .
         xcopy /E resource\* .
 
+    - name: Patch miniaudio
+      if: matrix.audiolib == 'miniaudio'
+      run: |
+        cd miniaudio
+        patch < miniaudio.patch
+        cd ..
+
     - name: Use premake to generate Visual Studio solution
       run: |
         .\premake5.exe ${{ matrix.vs }} --audio-lib=${{ matrix.audiolib }}
