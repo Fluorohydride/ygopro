@@ -227,6 +227,7 @@ jobs:
 
     - name: Patch miniaudio
       if: matrix.audiolib == 'miniaudio'
+      shell: bash
       run: |
         cd miniaudio
         patch < miniaudio.patch
