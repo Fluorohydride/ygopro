@@ -89,134 +89,165 @@ void SoundManager::PlaySoundEffect(int sound) {
 	char soundName[32];
 	switch(sound) {
 	case SOUND_SUMMON: {
-		strcpy(soundName, "summon");
+		std::strncpy(soundName, "summon", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_SPECIAL_SUMMON: {
-		strcpy(soundName, "specialsummon");
+		std::strncpy(soundName, "specialsummon", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_ACTIVATE: {
-		strcpy(soundName, "activate");
+		std::strncpy(soundName, "activate", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_SET: {
-		strcpy(soundName, "set");
+		std::strncpy(soundName, "set", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_FILP: {
-		strcpy(soundName, "flip");
+		std::strncpy(soundName, "flip", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_REVEAL: {
-		strcpy(soundName, "reveal");
+		std::strncpy(soundName, "reveal", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_EQUIP: {
-		strcpy(soundName, "equip");
+		std::strncpy(soundName, "equip", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_DESTROYED: {
-		strcpy(soundName, "destroyed");
+		std::strncpy(soundName, "destroyed", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_BANISHED: {
-		strcpy(soundName, "banished");
+		std::strncpy(soundName, "banished", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_TOKEN: {
-		strcpy(soundName, "token");
+		std::strncpy(soundName, "token", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_NEGATE: {
-		strcpy(soundName, "negate");
+		std::strncpy(soundName, "negate", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_ATTACK: {
-		strcpy(soundName, "attack");
+		std::strncpy(soundName, "attack", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_DIRECT_ATTACK: {
-		strcpy(soundName, "directattack");
+		std::strncpy(soundName, "directattack", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_DRAW: {
-		strcpy(soundName, "draw");
+		std::strncpy(soundName, "draw", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_SHUFFLE: {
-		strcpy(soundName, "shuffle");
+		std::strncpy(soundName, "shuffle", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_DAMAGE: {
-		strcpy(soundName, "damage");
+		std::strncpy(soundName, "damage", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_RECOVER: {
-		strcpy(soundName, "gainlp");
+		std::strncpy(soundName, "gainlp", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_COUNTER_ADD: {
-		strcpy(soundName, "addcounter");
+		std::strncpy(soundName, "addcounter", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_COUNTER_REMOVE: {
-		strcpy(soundName, "removecounter");
+		std::strncpy(soundName, "removecounter", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_COIN: {
-		strcpy(soundName, "coinflip");
+		std::strncpy(soundName, "coinflip", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_DICE: {
-		strcpy(soundName, "diceroll");
+		std::strncpy(soundName, "diceroll", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_NEXT_TURN: {
-		strcpy(soundName, "nextturn");
+		std::strncpy(soundName, "nextturn", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_PHASE: {
-		strcpy(soundName, "phase");
+		std::strncpy(soundName, "phase", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_MENU: {
-		strcpy(soundName, "menu");
+		std::strncpy(soundName, "menu", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_BUTTON: {
-		strcpy(soundName, "button");
+		std::strncpy(soundName, "button", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_INFO: {
-		strcpy(soundName, "info");
+		std::strncpy(soundName, "info", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_QUESTION: {
-		strcpy(soundName, "question");
+		std::strncpy(soundName, "question", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_CARD_PICK: {
-		strcpy(soundName, "cardpick");
+		std::strncpy(soundName, "cardpick", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_CARD_DROP: {
-		strcpy(soundName, "carddrop");
+		std::strncpy(soundName, "carddrop", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_PLAYER_ENTER: {
-		strcpy(soundName, "playerenter");
+		std::strncpy(soundName, "playerenter", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	case SOUND_CHAT: {
-		strcpy(soundName, "chatmessage");
+		std::strncpy(soundName, "chatmessage", sizeof soundName);
+		soundName[sizeof soundName - 1] = 0;
 		break;
 	}
 	default:
 		break;
 	}
 	char soundPath[40];
-	std::snprintf(soundPath, 40, "./sound/%s.wav", soundName);
+	std::snprintf(soundPath, sizeof soundPath, "./sound/%s.wav", soundName);
 	SetSoundVolume(mainGame->gameConf.sound_volume);
 #ifdef YGOPRO_USE_MINIAUDIO
 	ma_engine_play_sound(&engineSound, soundPath, nullptr);
