@@ -7,7 +7,7 @@
 
 class BufferIO {
 public:
-	static int ReadInt32(unsigned char*& p) {
+	static int32_t ReadInt32(unsigned char*& p) {
 		return buffer_read<int32_t>(p);
 	}
 	static uint16_t ReadUInt16(unsigned char*& p) {
@@ -16,7 +16,7 @@ public:
 	static uint8_t ReadUInt8(unsigned char*& p) {
 		return buffer_read<uint8_t>(p);
 	}
-	static void WriteInt32(unsigned char*& p, int val) {
+	static void WriteInt32(unsigned char*& p, int32_t val) {
 		buffer_write<int32_t>(p, val);
 	}
 	static void WriteUInt16(unsigned char*& p, uint16_t val) {
