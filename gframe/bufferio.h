@@ -13,11 +13,8 @@ public:
 	static short ReadInt16(unsigned char*& p) {
 		return buffer_read<int16_t>(p);
 	}
-	static char ReadInt8(unsigned char*& p) {
-		return buffer_read<char>(p);
-	}
-	static unsigned char ReadUInt8(unsigned char*& p) {
-		return buffer_read<unsigned char>(p);
+	static uint8_t ReadUInt8(unsigned char*& p) {
+		return buffer_read<uint8_t>(p);
 	}
 	static void WriteInt32(unsigned char*& p, int val) {
 		buffer_write<int32_t>(p, val);
