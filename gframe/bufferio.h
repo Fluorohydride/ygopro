@@ -19,8 +19,8 @@ public:
 	static void WriteInt32(unsigned char*& p, int val) {
 		buffer_write<int32_t>(p, val);
 	}
-	static void WriteInt16(unsigned char*& p, short val) {
-		buffer_write<int16_t>(p, val);
+	static void WriteUInt16(unsigned char*& p, uint16_t val) {
+		buffer_write<uint16_t>(p, val);
 	}
 	static void WriteUInt8(unsigned char*& p, uint8_t val) {
 		buffer_write<uint8_t>(p, val);
