@@ -1273,11 +1273,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		mainGame->dInfo.lp[mainGame->LocalPlayer(1)] = BufferIO::ReadInt32(pbuf);
 		myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
 		myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
-		int deckc = BufferIO::ReadInt16(pbuf);
-		int extrac = BufferIO::ReadInt16(pbuf);
+		int deckc = BufferIO::ReadUInt16(pbuf);
+		int extrac = BufferIO::ReadUInt16(pbuf);
 		mainGame->dField.Initial(mainGame->LocalPlayer(0), deckc, extrac);
-		deckc = BufferIO::ReadInt16(pbuf);
-		extrac = BufferIO::ReadInt16(pbuf);
+		deckc = BufferIO::ReadUInt16(pbuf);
+		extrac = BufferIO::ReadUInt16(pbuf);
 		mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
 		mainGame->dInfo.turn = 0;
 		mainGame->dInfo.is_shuffling = false;
@@ -1993,8 +1993,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	}
 	case MSG_SELECT_COUNTER: {
 		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.select_counter_type = BufferIO::ReadInt16(pbuf);
-		mainGame->dField.select_counter_count = BufferIO::ReadInt16(pbuf);
+		mainGame->dField.select_counter_type = BufferIO::ReadUInt16(pbuf);
+		mainGame->dField.select_counter_count = BufferIO::ReadUInt16(pbuf);
 		int count = BufferIO::ReadUInt8(pbuf);
 		mainGame->dField.selectable_cards.clear();
 		int c, s, t/*, code*/;
@@ -2005,7 +2005,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
 			l = BufferIO::ReadUInt8(pbuf);
 			s = BufferIO::ReadUInt8(pbuf);
-			t = BufferIO::ReadInt16(pbuf);
+			t = BufferIO::ReadUInt16(pbuf);
 			pcard = mainGame->dField.GetCard(c, l, s);
 			mainGame->dField.selectable_cards.push_back(pcard);
 			pcard->opParam = (t << 16) | t;
@@ -2540,7 +2540,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_NEW_PHASE: {
-		unsigned short phase = BufferIO::ReadInt16(pbuf);
+		unsigned short phase = BufferIO::ReadUInt16(pbuf);
 		mainGame->btnPhaseStatus->setVisible(false);
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
@@ -3383,11 +3383,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_ADD_COUNTER: {
-		int type = BufferIO::ReadInt16(pbuf);
+		int type = BufferIO::ReadUInt16(pbuf);
 		int c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
 		unsigned int l = BufferIO::ReadUInt8(pbuf);
 		int s = BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadInt16(pbuf);
+		int count = BufferIO::ReadUInt16(pbuf);
 		ClientCard* pc = mainGame->dField.GetCard(c, l, s);
 		if (pc->counters.count(type))
 			pc->counters[type] += count;
@@ -3406,11 +3406,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_REMOVE_COUNTER: {
-		int type = BufferIO::ReadInt16(pbuf);
+		int type = BufferIO::ReadUInt16(pbuf);
 		int c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
 		unsigned int l = BufferIO::ReadUInt8(pbuf);
 		int s = BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadInt16(pbuf);
+		int count = BufferIO::ReadUInt16(pbuf);
 		ClientCard* pc = mainGame->dField.GetCard(c, l, s);
 		pc->counters[type] -= count;
 		if (pc->counters[type] <= 0)
