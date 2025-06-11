@@ -16,6 +16,7 @@ project "irrlicht"
         "_IRR_STATIC_LIB_",
         "NO_IRR_USE_NON_SYSTEM_BZLIB_",
         "NO_IRR_COMPILE_WITH_BZIP2_",
+        "NO_IRR_COMPILE_WITH_LZMA_",
         "NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_",
         "NO_IRR_COMPILE_WITH_DIRECT3D_8_",
         "NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_",
@@ -154,10 +155,11 @@ project "irrlicht"
 
     filter { "system:windows" }
         defines { "_IRR_WCHAR_FILESYSTEM" }
-        includedirs { "$(DXSDK_DIR)Include" }
-
-    filter { "system:linux" }
-        links { "X11", "Xxf86vm" }
+        if USE_DXSDK then
+            includedirs { "$(DXSDK_DIR)Include" }
+        else
+            defines { "NO_IRR_COMPILE_WITH_DIRECT3D_9_" }
+        end
 
     filter { "system:macosx" }
         cppdialect "gnu++14"

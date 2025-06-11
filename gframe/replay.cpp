@@ -81,7 +81,7 @@ void Replay::EndRecord() {
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
 	comp_size = MAX_COMP_SIZE;
-	int ret = LzmaCompress(comp_data, &comp_size, replay_data, replay_size, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
+	int ret = LzmaCompress(comp_data, &comp_size, replay_data, replay_size, pheader.props, &propsize, 5, 0x1U << 24, 3, 0, 2, 32, 1);
 	if (ret != SZ_OK) {
 		std::memcpy(comp_data, &ret, sizeof ret);
 		comp_size = sizeof ret;
@@ -111,7 +111,16 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		return false;
 
 	Reset();
-	if(std::fread(&pheader, sizeof pheader, 1, rfp) < 1) {
+	bool correct_header = true;
+	if (std::fread(&pheader, sizeof pheader, 1, rfp) < 1)
+		correct_header = false;
+	else if (pheader.id != 0x31707279)
+		correct_header = false;
+	else if (pheader.version < 0x12d0u)
+		correct_header = false;
+	else if (pheader.version >= 0x1353u && !(pheader.flag & REPLAY_UNIFORM))
+		correct_header = false;
+	if (!correct_header) {
 		std::fclose(rfp);
 		return false;
 	}
@@ -141,17 +150,6 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	info_offset = data_position;
 	data_position = 0;
 	return true;
-}
-bool Replay::CheckReplay(const wchar_t* name) {
-	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls", name);
-	FILE* rfp = mywfopen(fname, "rb");
-	if(!rfp)
-		return false;
-	ReplayHeader rheader;
-	size_t count = std::fread(&rheader, sizeof rheader, 1, rfp);
-	std::fclose(rfp);
-	return count == 1 && rheader.id == 0x31707279 && rheader.version >= 0x12d0u && (rheader.version < 0x1353u || (rheader.flag & REPLAY_UNIFORM));
 }
 bool Replay::DeleteReplay(const wchar_t* name) {
 	wchar_t fname[256];
@@ -227,7 +225,11 @@ void Replay::Reset() {
 	script_name.clear();
 }
 void Replay::SkipInfo(){
-	data_position += info_offset;
+	if (data_position == 0)
+		data_position += info_offset;
+}
+bool Replay::IsReplaying() const {
+	return is_replaying;
 }
 bool Replay::ReadInfo() {
 	int player_count = (pheader.flag & REPLAY_TAG) ? 4 : 2;

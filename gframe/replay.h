@@ -53,7 +53,6 @@ public:
 	void SaveReplay(const wchar_t* name);
 
 	// play
-	static bool CheckReplay(const wchar_t* name);
 	static bool DeleteReplay(const wchar_t* name);
 	static bool RenameReplay(const wchar_t* oldname, const wchar_t* newname);
 	static size_t GetDeckPlayer(size_t deck_index) {
@@ -81,6 +80,7 @@ public:
 	void Rewind();
 	void Reset();
 	void SkipInfo();
+	bool IsReplaying() const;
 
 	FILE* fp{ nullptr };
 #ifdef _WIN32
