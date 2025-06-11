@@ -389,10 +389,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_IMPORT_DECK_CODE: {
-				time_t currentTime = time(nullptr);
-				tm* localedtime = localtime(&currentTime);
+				time_t nowtime = std::time(nullptr);
 				wchar_t timetext[40];
-				wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
+				std::wcsftime(timetext, sizeof timetext / sizeof timetext[0], L"%Y-%m-%d %H-%M-%S", std::localtime(&nowtime));
 				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1471));
 				mainGame->ebDMName->setVisible(true);
