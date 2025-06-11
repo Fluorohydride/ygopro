@@ -634,10 +634,10 @@ bool Game::Initialize() {
 	wDeckEdit->setVisible(false);
 	btnManageDeck = env->addButton(irr::core::rect<irr::s32>(225, 5, 290, 30), wDeckEdit, BUTTON_MANAGE_DECK, dataManager.GetSysString(1328));
 	//deck manage
-	wDeckManage = env->addWindow(irr::core::rect<irr::s32>(310, 135, 800, 465), false, dataManager.GetSysString(1460), 0, WINDOW_DECK_MANAGE);
+	wDeckManage = env->addWindow(irr::core::rect<irr::s32>(310, 135, 800, 515), false, dataManager.GetSysString(1460), 0, WINDOW_DECK_MANAGE);
 	wDeckManage->setVisible(false);
-	lstCategories = env->addListBox(irr::core::rect<irr::s32>(10, 30, 140, 320), wDeckManage, LISTBOX_CATEGORIES, true);
-	lstDecks = env->addListBox(irr::core::rect<irr::s32>(150, 30, 340, 320), wDeckManage, LISTBOX_DECKS, true);
+	lstCategories = env->addListBox(irr::core::rect<irr::s32>(10, 30, 140, 370), wDeckManage, LISTBOX_CATEGORIES, true);
+	lstDecks = env->addListBox(irr::core::rect<irr::s32>(150, 30, 340, 370), wDeckManage, LISTBOX_DECKS, true);
 	posY = 30;
 	btnNewCategory = env->addButton(irr::core::rect<irr::s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_NEW_CATEGORY, dataManager.GetSysString(1461));
 	posY += 35;
@@ -654,6 +654,10 @@ bool Game::Initialize() {
 	btnMoveDeck = env->addButton(irr::core::rect<irr::s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_MOVE_DECK, dataManager.GetSysString(1467));
 	posY += 35;
 	btnCopyDeck = env->addButton(irr::core::rect<irr::s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_COPY_DECK, dataManager.GetSysString(1468));
+	posY += 35;
+	btnImportDeckCode = env->addButton(irr::core::rect<irr::s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_IMPORT_DECK_CODE, dataManager.GetSysString(1478));
+	posY += 35;
+	btnExportDeckCode = env->addButton(irr::core::rect<irr::s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_EXPORT_DECK_CODE, dataManager.GetSysString(1479));
 	//deck manage query
 	wDMQuery = env->addWindow(irr::core::rect<irr::s32>(400, 200, 710, 320), false, dataManager.GetSysString(1460));
 	wDMQuery->getCloseButton()->setVisible(false);
@@ -1868,7 +1872,7 @@ void Game::OnResize() {
 	ebDeckname->setRelativePosition(Resize(80, 65, 220, 90));
 	cbDBCategory->setRelativePosition(Resize(80, 5, 220, 30));
 	btnManageDeck->setRelativePosition(Resize(225, 5, 290, 30));
-	wDeckManage->setRelativePosition(ResizeWin(310, 135, 800, 465));
+	wDeckManage->setRelativePosition(ResizeWin(310, 135, 800, 515));
 	scrPackCards->setRelativePosition(Resize(775, 161, 795, 629));
 
 	wSort->setRelativePosition(Resize(930, 132, 1020, 156));
