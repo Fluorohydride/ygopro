@@ -774,8 +774,12 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_CHAT: {
+		if (len < 1 + sizeof(uint16_t) + sizeof(uint16_t) * 1)
+			return;
+		if (len > 1 + sizeof(uint16_t) + sizeof(uint16_t) * LEN_CHAT_MSG)
+			return;
 		const int chat_msg_size = len - 1 - sizeof(uint16_t);
-		if (!check_msg_size(chat_msg_size))
+		if (chat_msg_size % sizeof(uint16_t))
 			return;
 		uint16_t chat_player_type = buffer_read<uint16_t>(pdata);
 		uint16_t chat_msg[LEN_CHAT_MSG];
