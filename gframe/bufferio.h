@@ -27,6 +27,12 @@ public:
 	}
 
 	// for compatibility
+	static short ReadInt16(unsigned char*& p) {
+		return buffer_read<int16_t>(p);
+	}
+	static char ReadInt8(unsigned char*& p) {
+		return buffer_read<char>(p);
+	}
 	static void WriteInt16(unsigned char*& p, short val) {
 		buffer_write<int16_t>(p, val);
 	}
