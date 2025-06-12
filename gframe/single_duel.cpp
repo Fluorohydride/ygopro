@@ -331,12 +331,12 @@ void SingleDuel::StartDuel(DuelPlayer* dp) {
 	}
 	unsigned char deckbuff[12];
 	auto pbuf = deckbuff;
-	BufferIO::WriteUInt16(pbuf, (uint16_t)pdeck[0].main.size());
-	BufferIO::WriteUInt16(pbuf, (uint16_t)pdeck[0].extra.size());
-	BufferIO::WriteUInt16(pbuf, (uint16_t)pdeck[0].side.size());
-	BufferIO::WriteUInt16(pbuf, (uint16_t)pdeck[1].main.size());
-	BufferIO::WriteUInt16(pbuf, (uint16_t)pdeck[1].extra.size());
-	BufferIO::WriteUInt16(pbuf, (uint16_t)pdeck[1].side.size());
+	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[0].main.size());
+	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[0].extra.size());
+	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[0].side.size());
+	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[1].main.size());
+	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[1].extra.size());
+	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[1].side.size());
 	NetServer::SendBufferToPlayer(players[0], STOC_DECK_COUNT, deckbuff, 12);
 	char tempbuff[6];
 	std::memcpy(tempbuff, deckbuff, 6);
@@ -462,10 +462,10 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	BufferIO::WriteUInt8(pbuf, host_info.duel_rule);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
-	BufferIO::WriteUInt16(pbuf, query_field_count(pduel, 0, LOCATION_DECK));
-	BufferIO::WriteUInt16(pbuf, query_field_count(pduel, 0, LOCATION_EXTRA));
-	BufferIO::WriteUInt16(pbuf, query_field_count(pduel, 1, LOCATION_DECK));
-	BufferIO::WriteUInt16(pbuf, query_field_count(pduel, 1, LOCATION_EXTRA));
+	buffer_write<uint16_t>(pbuf, query_field_count(pduel, 0, LOCATION_DECK));
+	buffer_write<uint16_t>(pbuf, query_field_count(pduel, 0, LOCATION_EXTRA));
+	buffer_write<uint16_t>(pbuf, query_field_count(pduel, 1, LOCATION_DECK));
+	buffer_write<uint16_t>(pbuf, query_field_count(pduel, 1, LOCATION_EXTRA));
 	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, startbuf, 19);
 	startbuf[1] = 1;
 	NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, startbuf, 19);
