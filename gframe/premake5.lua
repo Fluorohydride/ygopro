@@ -3,7 +3,7 @@ include "spmemvfs/."
 
 project "YGOPro"
     kind "WindowedApp"
-    cppdialect "C++14"
+    cppdialect "C++17"
     rtti "Off"
     openmp "On"
 
