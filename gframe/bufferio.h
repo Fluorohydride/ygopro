@@ -10,9 +10,6 @@ public:
 	static int32_t ReadInt32(unsigned char*& p) {
 		return buffer_read<int32_t>(p);
 	}
-	static uint16_t ReadUInt16(unsigned char*& p) {
-		return buffer_read<uint16_t>(p);
-	}
 	static uint8_t ReadUInt8(unsigned char*& p) {
 		return buffer_read<uint8_t>(p);
 	}
