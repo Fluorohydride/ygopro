@@ -16,9 +16,6 @@ public:
 	static void WriteInt32(unsigned char*& p, int32_t val) {
 		buffer_write<int32_t>(p, val);
 	}
-	static void WriteUInt8(unsigned char*& p, uint8_t val) {
-		buffer_write<uint8_t>(p, val);
-	}
 
 	// for compatibility
 	static short ReadInt16(unsigned char*& p) {
