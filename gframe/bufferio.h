@@ -25,6 +25,14 @@ public:
 	static void WriteUInt8(unsigned char*& p, uint8_t val) {
 		buffer_write<uint8_t>(p, val);
 	}
+
+	// for compatibility
+	static void WriteInt16(unsigned char*& p, short val) {
+		buffer_write<int16_t>(p, val);
+	}
+	static void WriteInt8(unsigned char*& p, char val) {
+		buffer_write<char>(p, val);
+	}
 	/**
 	* @brief Copy a C-style string to another C-style string.
 	* @param src The source wide string
