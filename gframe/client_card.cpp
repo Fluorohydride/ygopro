@@ -145,8 +145,8 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 	if(flag & QUERY_COUNTERS) {
 		int count = BufferIO::ReadInt32(buf);
 		for(int i = 0; i < count; ++i) {
-			int ctype = BufferIO::ReadUInt16(buf);
-			int ccount = BufferIO::ReadUInt16(buf);
+			int ctype = buffer_read<uint16_t>(buf);
+			int ccount = buffer_read<uint16_t>(buf);
 			counters[ctype] = ccount;
 		}
 	}
