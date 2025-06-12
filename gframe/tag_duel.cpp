@@ -446,9 +446,9 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.Flush();
 	unsigned char startbuf[32]{};
 	auto pbuf = startbuf;
-	BufferIO::WriteUInt8(pbuf, MSG_START);
-	BufferIO::WriteUInt8(pbuf, 0);
-	BufferIO::WriteUInt8(pbuf, host_info.duel_rule);
+	buffer_write<uint8_t>(pbuf, MSG_START);
+	buffer_write<uint8_t>(pbuf, 0);
+	buffer_write<uint8_t>(pbuf, host_info.duel_rule);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
 	buffer_write<uint16_t>(pbuf, query_field_count(pduel, 0, LOCATION_DECK));
@@ -1571,9 +1571,9 @@ void TagDuel::TimeConfirm(DuelPlayer* dp) {
 }
 inline int TagDuel::WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache) {
 	flag |= (QUERY_CODE | QUERY_POSITION);
-	BufferIO::WriteUInt8(qbuf, MSG_UPDATE_DATA);
-	BufferIO::WriteUInt8(qbuf, player);
-	BufferIO::WriteUInt8(qbuf, location);
+	buffer_write<uint8_t>(qbuf, MSG_UPDATE_DATA);
+	buffer_write<uint8_t>(qbuf, player);
+	buffer_write<uint8_t>(qbuf, location);
 	int len = query_field_card(pduel, player, location, flag, qbuf, use_cache);
 	return len;
 }
@@ -1673,10 +1673,10 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	flag |= (QUERY_CODE | QUERY_POSITION);
 	unsigned char query_buffer[0x1000];
 	auto qbuf = query_buffer;
-	BufferIO::WriteUInt8(qbuf, MSG_UPDATE_CARD);
-	BufferIO::WriteUInt8(qbuf, player);
-	BufferIO::WriteUInt8(qbuf, location);
-	BufferIO::WriteUInt8(qbuf, sequence);
+	buffer_write<uint8_t>(qbuf, MSG_UPDATE_CARD);
+	buffer_write<uint8_t>(qbuf, player);
+	buffer_write<uint8_t>(qbuf, location);
+	buffer_write<uint8_t>(qbuf, sequence);
 	int len = query_card(pduel, player, location, sequence, flag, qbuf, 0);
 	auto position = GetPosition(qbuf, 12);
 	if(location & LOCATION_ONFIELD) {
