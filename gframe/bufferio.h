@@ -27,18 +27,23 @@ public:
 	}
 
 	// for compatibility
+	[[deprecated]]
 	static short ReadInt16(unsigned char*& p) {
 		return Read<int16_t>(p);
 	}
+	[[deprecated]]
 	static char ReadInt8(unsigned char*& p) {
 		return Read<char>(p);
 	}
+	[[deprecated]]
 	static unsigned char ReadUInt8(unsigned char*& p) {
 		return Read<unsigned char>(p);
 	}
+	[[deprecated]]
 	static void WriteInt16(unsigned char*& p, short val) {
 		Write<int16_t>(p, val);
 	}
+	[[deprecated]]
 	static void WriteInt8(unsigned char*& p, char val) {
 		Write<char>(p, val);
 	}
