@@ -528,9 +528,17 @@ jobs:
         brew install opus opusfile libvorbis
 #        brew install sqlite libx11 freetype libevent
 
-    - name: Install premake
+    - name: Download premake
+      id: premake
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta7/premake-5.0.0-beta7-macosx.tar.gz
+        filename: premake5.tar.gz
+
+    - name: Extract premake
       run: |
-        brew install premake
+        tar xf ${{ steps.premake.outputs.filepath }}
+        chmod +x ./premake5
 
     - name: Download libevent
       if: matrix.static-link == true
@@ -662,12 +670,12 @@ jobs:
     - name: Use premake to generate make files (Homebrew packages)
       if: matrix.static-link != true
       run: |
-        DYLD_LIBRARY_PATH=$(brew --prefix)/lib premake5 gmake
+        DYLD_LIBRARY_PATH=$(brew --prefix)/lib ./premake5 gmake
 
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true
       run: |
-        premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }} \
+        ./premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }} \
           --build-event \
           --build-freetype \
           --build-sqlite \
@@ -684,4 +692,4 @@ jobs:
       with:
         name: YGOPro-${{ matrix.name }}
         path: |
-          bin/release/YGOPro.app
+          bin/release/YGOPro

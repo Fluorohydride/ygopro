@@ -244,18 +244,9 @@ if os.istarget("macosx") then
     if GetParam("mac-intel") then
         MAC_INTEL = true
     end
-    
-    if MAC_ARM then
+    if MAC_ARM or (not MAC_INTEL and os.hostarch() == "ARM64") then
+        -- building on ARM CPU will target ARM automatically
         TARGET_MAC_ARM = true
-    elseif not MAC_INTEL then
-        -- automatic target arm64, need extra detect
-        -- currently, os.hostarch cannot detect architectures that have been automatically translated by macOS
-        local uname = os.outputof("uname -m")
-        local proctranslated = os.outputof("sysctl sysctl.proc_translated")
-        if uname:find("arm") or proctranslated then
-            print("Detected Apple Silicon Mac")
-            TARGET_MAC_ARM = true
-        end
     end
 end
 
@@ -320,11 +311,7 @@ workspace "YGOPro"
         targetdir "bin/debug/x64"
 
     filter { "configurations:Release", "action:vs*" }
-        if linktimeoptimization then -- available since premake 5.0-beta4
-            linktimeoptimization "On"
-        else
-            flags { "LinkTimeOptimization" }
-        end
+        linktimeoptimization "On"
         staticruntime "On"
         disablewarnings { "4244", "4267", "4838", "4996", "6011", "6031", "6054", "6262" }
 
