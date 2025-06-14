@@ -65,7 +65,7 @@ jobs:
       id: premake
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta6/premake-5.0.0-beta6-windows.zip
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta7/premake-5.0.0-beta7-windows.zip
         filename: premake5.zip
 
     - name: Extract premake
@@ -258,7 +258,7 @@ jobs:
             premake-version: 5.0.0-beta4
           - name: ubuntu-24
             os: ubuntu-24.04
-            premake-version: 5.0.0-beta6
+            premake-version: 5.0.0-beta7
           - name: ubuntu-static-link
             os: ubuntu-22.04
             premake-version: 5.0.0-beta4

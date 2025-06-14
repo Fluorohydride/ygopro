@@ -249,6 +249,7 @@ if os.istarget("macosx") then
         TARGET_MAC_ARM = true
     elseif not MAC_INTEL then
         -- automatic target arm64, need extra detect
+        -- os.hostarch can't be relied on in premake 5.0-beta6 and older
         local uname = os.outputof("uname -m")
         local proctranslated = os.outputof("sysctl sysctl.proc_translated")
         if uname:find("arm") or proctranslated then
@@ -319,7 +320,7 @@ workspace "YGOPro"
         targetdir "bin/debug/x64"
 
     filter { "configurations:Release", "action:vs*" }
-        if linktimeoptimization then
+        if linktimeoptimization then -- available since premake 5.0-beta4
             linktimeoptimization "On"
         else
             flags { "LinkTimeOptimization" }
