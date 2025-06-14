@@ -112,10 +112,10 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 	if(flag & QUERY_REASON_CARD)
 		buf += 4;
 	if(flag & QUERY_EQUIP_CARD) {
-		int c = buffer_read<uint8_t>(buf);
-		unsigned int l = buffer_read<uint8_t>(buf);
-		int s = buffer_read<uint8_t>(buf);
-		buffer_read<uint8_t>(buf);
+		int c = BufferIO::Read<uint8_t>(buf);
+		unsigned int l = BufferIO::Read<uint8_t>(buf);
+		int s = BufferIO::Read<uint8_t>(buf);
+		BufferIO::Read<uint8_t>(buf);
 		ClientCard* ecard = mainGame->dField.GetCard(mainGame->LocalPlayer(c), l, s);
 		if (ecard) {
 			equipTarget = ecard;
@@ -125,10 +125,10 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 	if(flag & QUERY_TARGET_CARD) {
 		int count = BufferIO::ReadInt32(buf);
 		for(int i = 0; i < count; ++i) {
-			int c = buffer_read<uint8_t>(buf);
-			unsigned int l = buffer_read<uint8_t>(buf);
-			int s = buffer_read<uint8_t>(buf);
-			buffer_read<uint8_t>(buf);
+			int c = BufferIO::Read<uint8_t>(buf);
+			unsigned int l = BufferIO::Read<uint8_t>(buf);
+			int s = BufferIO::Read<uint8_t>(buf);
+			BufferIO::Read<uint8_t>(buf);
 			ClientCard* tcard = mainGame->dField.GetCard(mainGame->LocalPlayer(c), l, s);
 			if (tcard) {
 				cardTarget.insert(tcard);
@@ -145,8 +145,8 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 	if(flag & QUERY_COUNTERS) {
 		int count = BufferIO::ReadInt32(buf);
 		for(int i = 0; i < count; ++i) {
-			int ctype = buffer_read<uint16_t>(buf);
-			int ccount = buffer_read<uint16_t>(buf);
+			int ctype = BufferIO::Read<uint16_t>(buf);
+			int ccount = BufferIO::Read<uint16_t>(buf);
 			counters[ctype] = ccount;
 		}
 	}
