@@ -57,7 +57,7 @@ bool ReplayMode::ReadReplayResponse() {
 	return result;
 }
 int ReplayMode::ReplayThread() {
-	const ReplayHeader& rh = cur_replay.pheader;
+	const auto& rh = cur_replay.pheader.base;
 	mainGame->dInfo.Clear();
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
@@ -155,9 +155,7 @@ int ReplayMode::ReplayThread() {
 	return 0;
 }
 bool ReplayMode::StartDuel() {
-	const ReplayHeader& rh = cur_replay.pheader;
-	unsigned int seed = rh.seed;
-	std::mt19937 rnd(seed);
+	const auto& rh = cur_replay.pheader.base;
 	cur_replay.SkipInfo();
 	if(rh.flag & REPLAY_TAG) {
 		BufferIO::CopyWideString(cur_replay.players[0].c_str(), mainGame->dInfo.hostname);
@@ -168,7 +166,12 @@ bool ReplayMode::StartDuel() {
 		BufferIO::CopyWideString(cur_replay.players[0].c_str(), mainGame->dInfo.hostname);
 		BufferIO::CopyWideString(cur_replay.players[1].c_str(), mainGame->dInfo.clientname);
 	}
-	pduel = create_duel(rnd());
+	if(rh.id == REPLAY_ID_YRP1) {
+		std::mt19937 rnd(rh.seed);
+		pduel = create_duel(rnd());
+	} else {
+		pduel = create_duel_v2(cur_replay.pheader.seed_sequence);
+	}
 	mainGame->dInfo.duel_rule = cur_replay.params.duel_flag >> 16;
 	set_player_info(pduel, 0, cur_replay.params.start_lp, cur_replay.params.start_hand, cur_replay.params.draw_count);
 	set_player_info(pduel, 1, cur_replay.params.start_lp, cur_replay.params.start_hand, cur_replay.params.draw_count);
@@ -214,8 +217,6 @@ bool ReplayMode::StartDuel() {
 			return false;
 		}
 	}
-	if (!(rh.flag & REPLAY_UNIFORM))
-		cur_replay.params.duel_flag |= DUEL_OLD_REPLAY;
 	start_duel(pduel, cur_replay.params.duel_flag);
 	return true;
 }
