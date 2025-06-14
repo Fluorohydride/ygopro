@@ -381,7 +381,8 @@ size_t NetServer::CreateChatPacket(unsigned char* src, int src_size, unsigned ch
 	// STOC_Chat packet
 	auto pdst = dst;
 	BufferIO::Write<uint16_t>(pdst, dst_player_type);
-	buffer_write_block(pdst, src_msg, src_size);
+	std::memcpy(pdst, src_msg, src_size);
+	pdst += src_size;
 	return sizeof(dst_player_type) + src_size;
 }
 

@@ -793,7 +793,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 			return;
 		uint16_t chat_player_type = BufferIO::Read<uint16_t>(pdata);
 		uint16_t chat_msg[LEN_CHAT_MSG];
-		buffer_read_block(pdata, chat_msg, chat_msg_size);
+		std::memcpy(chat_msg, pdata, chat_msg_size);
+		pdata += chat_msg_size;
 		const int chat_msg_len = chat_msg_size / sizeof(uint16_t);
 		if (chat_msg[chat_msg_len - 1] != 0)
 			return;

@@ -2,8 +2,8 @@
 #define BUFFERIO_H
 
 #include <cstdint>
+#include <cstring>
 #include <cwchar>
-#include "../ocgcore/buffer.h"
 
 class BufferIO {
 public:
