@@ -16,7 +16,7 @@ bool SoundManager::Init() {
 #ifdef YGOPRO_USE_AUDIO
 	bgm_scene = -1;
 	RefreshBGMList();
-	rnd.reset((unsigned int)std::time(nullptr));
+	rnd.seed(std::random_device()());
 #ifdef YGOPRO_USE_MINIAUDIO
 	engineConfig = ma_engine_config_init();
 #ifdef YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS
@@ -304,7 +304,7 @@ void SoundManager::PlayBGM(int scene) {
 		if(count <= 0)
 			return;
 		bgm_scene = scene;
-		int bgm = rnd.get_random_integer(0, count -1);
+		int bgm = (count > 1) ? std::uniform_int_distribution<>(0, count - 1)(rnd) : 0;
 		auto name = BGMList[scene][bgm].c_str();
 		wchar_t BGMName[1024];
 		myswprintf(BGMName, L"./sound/BGM/%ls", name);
