@@ -185,7 +185,7 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 }
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	auto pdata = data;
-	unsigned char pktType = buffer_read<uint8_t>(pdata);
+	unsigned char pktType = BufferIO::Read<uint8_t>(pdata);
 	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
 		return;
 	switch(pktType) {

@@ -20,7 +20,7 @@ public:
 		p += sizeof(T);
 	}
 	static int32_t ReadInt32(unsigned char*& p) {
-		return buffer_read<int32_t>(p);
+		return Read<int32_t>(p);
 	}
 	static void WriteInt32(unsigned char*& p, int32_t val) {
 		buffer_write<int32_t>(p, val);
@@ -28,13 +28,13 @@ public:
 
 	// for compatibility
 	static short ReadInt16(unsigned char*& p) {
-		return buffer_read<int16_t>(p);
+		return Read<int16_t>(p);
 	}
 	static char ReadInt8(unsigned char*& p) {
-		return buffer_read<char>(p);
+		return Read<char>(p);
 	}
 	static unsigned char ReadUInt8(unsigned char*& p) {
-		return buffer_read<unsigned char>(p);
+		return Read<unsigned char>(p);
 	}
 	static void WriteInt16(unsigned char*& p, short val) {
 		buffer_write<int16_t>(p, val);

@@ -299,7 +299,7 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 		}
 		auto offset = pbuf;
 		bool pauseable = true;
-		mainGame->dInfo.curMsg = buffer_read<uint8_t>(pbuf);
+		mainGame->dInfo.curMsg = BufferIO::Read<uint8_t>(pbuf);
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_RETRY: {
 			if(mainGame->dInfo.isReplaySkiping) {
@@ -331,141 +331,141 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			return false;
 		}
 		case MSG_SELECT_BATTLECMD: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 11;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 8 + 2;
 			ReplayRefresh();
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_IDLECMD: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 11 + 3;
 			ReplayRefresh();
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_EFFECTYN: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 12;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_YESNO: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 4;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_OPTION: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 4;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_CARD:
 		case MSG_SELECT_TRIBUTE: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 3;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 8;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_UNSELECT_CARD: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 4;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 8;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 8;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_CHAIN: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 10 + count * 13;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_PLACE:
 		case MSG_SELECT_DISFIELD: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 5;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_POSITION: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 5;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_COUNTER: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 4;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 9;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_SUM: {
 			pbuf++;
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 6;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 11;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 11;
 			return ReadReplayResponse();
 		}
 		case MSG_SORT_CARD: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
 			return ReadReplayResponse();
 		}
 		case MSG_CONFIRM_DECKTOP: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_CONFIRM_EXTRATOP: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_CONFIRM_CARDS: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_SHUFFLE_DECK: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			ReplayRefreshDeck(player);
 			break;
 		}
 		case MSG_SHUFFLE_HAND: {
-			/*int oplayer = */buffer_read<uint8_t>(pbuf);
-			int count = buffer_read<uint8_t>(pbuf);
+			/*int oplayer = */BufferIO::Read<uint8_t>(pbuf);
+			int count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_SHUFFLE_EXTRA: {
-			/*int oplayer = */buffer_read<uint8_t>(pbuf);
-			int count = buffer_read<uint8_t>(pbuf);
+			/*int oplayer = */BufferIO::Read<uint8_t>(pbuf);
+			int count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
@@ -476,7 +476,7 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_SWAP_GRAVE_DECK: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			ReplayRefreshGrave(player);
 			break;
@@ -494,7 +494,7 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 		}
 		case MSG_SHUFFLE_SET_CARD: {
 			pbuf++;
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 8;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
@@ -508,7 +508,7 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 					mainGame->gMutex.unlock();
 				}
 			}
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
@@ -632,22 +632,22 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 		}
 		case MSG_CARD_SELECTED:
 		case MSG_RANDOM_SELECTED: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			pauseable = false;
 			break;
 		}
 		case MSG_BECOME_TARGET: {
-			count = buffer_read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_DRAW: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
@@ -740,21 +740,21 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_TOSS_COIN: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_TOSS_DICE: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_ROCK_PAPER_SCISSORS: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			return ReadReplayResponse();
 		}
 		case MSG_HAND_RES: {
@@ -763,19 +763,19 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_ANNOUNCE_RACE: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 5;
 			return ReadReplayResponse();
 		}
 		case MSG_ANNOUNCE_ATTRIB: {
-			player = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 5;
 			return ReadReplayResponse();
 		}
 		case MSG_ANNOUNCE_CARD:
 		case MSG_ANNOUNCE_NUMBER: {
-			player = buffer_read<uint8_t>(pbuf);
-			count = buffer_read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 4 * count;
 			return ReadReplayResponse();
 		}
@@ -806,12 +806,12 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			for(int p = 0; p < 2; ++p) {
 				pbuf += 4;
 				for(int seq = 0; seq < 7; ++seq) {
-					int val = buffer_read<uint8_t>(pbuf);
+					int val = BufferIO::Read<uint8_t>(pbuf);
 					if(val)
 						pbuf += 2;
 				}
 				for(int seq = 0; seq < 8; ++seq) {
-					int val = buffer_read<uint8_t>(pbuf);
+					int val = BufferIO::Read<uint8_t>(pbuf);
 					if(val)
 						pbuf++;
 				}
@@ -824,12 +824,12 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_AI_NAME: {
-			int len = buffer_read<uint16_t>(pbuf);
+			int len = BufferIO::Read<uint16_t>(pbuf);
 			pbuf += len + 1;
 			break;
 		}
 		case MSG_SHOW_HINT: {
-			int len = buffer_read<uint16_t>(pbuf);
+			int len = BufferIO::Read<uint16_t>(pbuf);
 			pbuf += len + 1;
 			break;
 		}
