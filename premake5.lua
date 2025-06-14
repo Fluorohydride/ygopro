@@ -245,7 +245,7 @@ if os.istarget("macosx") then
         MAC_INTEL = true
     end
     
-    if MAC_ARM or os.hostarch() == "ARM64" then
+    if MAC_ARM or (not MAC_INTEL and os.hostarch() == "ARM64") then
         TARGET_MAC_ARM = true
     end
 end
