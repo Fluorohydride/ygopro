@@ -196,17 +196,6 @@ struct DuelPlayer {
 	bufferevent* bev{};
 };
 
-inline bool check_msg_size(int size) {
-	// empty string is not allowed
-	if (size < 2 * sizeof(uint16_t))
-		return false;
-	if (size > LEN_CHAT_MSG * sizeof(uint16_t))
-		return false;
-	if (size % sizeof(uint16_t) != 0)
-		return false;
-	return true;
-}
-
 inline unsigned int GetPosition(unsigned char* qbuf, size_t offset) {
 	unsigned int info = 0;
 	std::memcpy(&info, qbuf + offset, sizeof info);
