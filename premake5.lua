@@ -245,17 +245,8 @@ if os.istarget("macosx") then
         MAC_INTEL = true
     end
     
-    if MAC_ARM then
+    if MAC_ARM or os.hostarch() == "ARM64" then
         TARGET_MAC_ARM = true
-    elseif not MAC_INTEL then
-        -- automatic target arm64, need extra detect
-        -- currently, os.hostarch cannot detect architectures that have been automatically translated by macOS
-        local uname = os.outputof("uname -m")
-        local proctranslated = os.outputof("sysctl sysctl.proc_translated")
-        if uname:find("arm") or proctranslated then
-            print("Detected Apple Silicon Mac")
-            TARGET_MAC_ARM = true
-        end
     end
 end
 
