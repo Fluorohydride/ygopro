@@ -23,7 +23,7 @@ public:
 		return Read<int32_t>(p);
 	}
 	static void WriteInt32(unsigned char*& p, int32_t val) {
-		buffer_write<int32_t>(p, val);
+		Write<int32_t>(p, val);
 	}
 
 	// for compatibility
@@ -37,10 +37,10 @@ public:
 		return Read<unsigned char>(p);
 	}
 	static void WriteInt16(unsigned char*& p, short val) {
-		buffer_write<int16_t>(p, val);
+		Write<int16_t>(p, val);
 	}
 	static void WriteInt8(unsigned char*& p, char val) {
-		buffer_write<char>(p, val);
+		Write<char>(p, val);
 	}
 	/**
 	* @brief Copy a C-style string to another C-style string.
