@@ -11,7 +11,6 @@
 #include "replay_mode.h"
 #include "single_mode.h"
 #include "materials.h"
-#include "../ocgcore/common.h"
 
 namespace ygo {
 
