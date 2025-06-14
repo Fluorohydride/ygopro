@@ -10,9 +10,6 @@ public:
 	static int32_t ReadInt32(unsigned char*& p) {
 		return buffer_read<int32_t>(p);
 	}
-	static uint8_t ReadUInt8(unsigned char*& p) {
-		return buffer_read<uint8_t>(p);
-	}
 	static void WriteInt32(unsigned char*& p, int32_t val) {
 		buffer_write<int32_t>(p, val);
 	}
@@ -23,6 +20,9 @@ public:
 	}
 	static char ReadInt8(unsigned char*& p) {
 		return buffer_read<char>(p);
+	}
+	static unsigned char ReadUInt8(unsigned char*& p) {
+		return buffer_read<unsigned char>(p);
 	}
 	static void WriteInt16(unsigned char*& p, short val) {
 		buffer_write<int16_t>(p, val);
