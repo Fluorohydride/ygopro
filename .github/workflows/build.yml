@@ -99,12 +99,12 @@ jobs:
       id: lua
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
+        url: https://www.lua.org/ftp/lua-5.4.8.tar.gz
 
     - name: Extract lua
       run: |
         tar xf ${{ steps.lua.outputs.filepath }}
-        move lua-5.4.7 lua
+        move lua-5.4.8 lua
 
     - name: Download sqlite
       id: sqlite
@@ -345,12 +345,12 @@ jobs:
       id: lua
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
+        url: https://www.lua.org/ftp/lua-5.4.8.tar.gz
 
     - name: Extract lua
       run: |
         tar xf ${{ steps.lua.outputs.filepath }}
-        mv lua-5.4.7 lua
+        mv lua-5.4.8 lua
 
     - name: Download sqlite
       if: matrix.static-link == true
@@ -571,12 +571,12 @@ jobs:
       id: lua
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
+        url: https://www.lua.org/ftp/lua-5.4.8.tar.gz
 
     - name: Extract lua
       run: |
         tar xf ${{ steps.lua.outputs.filepath }}
-        mv lua-5.4.7 lua
+        mv lua-5.4.8 lua
 
     - name: Download sqlite
       if: matrix.static-link == true
