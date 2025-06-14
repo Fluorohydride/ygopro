@@ -331,12 +331,12 @@ void SingleDuel::StartDuel(DuelPlayer* dp) {
 	}
 	unsigned char deckbuff[12];
 	auto pbuf = deckbuff;
-	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[0].main.size());
-	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[0].extra.size());
-	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[0].side.size());
-	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[1].main.size());
-	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[1].extra.size());
-	buffer_write<uint16_t>(pbuf, (uint16_t)pdeck[1].side.size());
+	BufferIO::Write<uint16_t>(pbuf, (uint16_t)pdeck[0].main.size());
+	BufferIO::Write<uint16_t>(pbuf, (uint16_t)pdeck[0].extra.size());
+	BufferIO::Write<uint16_t>(pbuf, (uint16_t)pdeck[0].side.size());
+	BufferIO::Write<uint16_t>(pbuf, (uint16_t)pdeck[1].main.size());
+	BufferIO::Write<uint16_t>(pbuf, (uint16_t)pdeck[1].extra.size());
+	BufferIO::Write<uint16_t>(pbuf, (uint16_t)pdeck[1].side.size());
 	NetServer::SendBufferToPlayer(players[0], STOC_DECK_COUNT, deckbuff, 12);
 	char tempbuff[6];
 	std::memcpy(tempbuff, deckbuff, 6);
@@ -457,15 +457,15 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.Flush();
 	unsigned char startbuf[32]{};
 	auto pbuf = startbuf;
-	buffer_write<uint8_t>(pbuf, MSG_START);
-	buffer_write<uint8_t>(pbuf, 0);
-	buffer_write<uint8_t>(pbuf, host_info.duel_rule);
+	BufferIO::Write<uint8_t>(pbuf, MSG_START);
+	BufferIO::Write<uint8_t>(pbuf, 0);
+	BufferIO::Write<uint8_t>(pbuf, host_info.duel_rule);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
-	buffer_write<uint16_t>(pbuf, query_field_count(pduel, 0, LOCATION_DECK));
-	buffer_write<uint16_t>(pbuf, query_field_count(pduel, 0, LOCATION_EXTRA));
-	buffer_write<uint16_t>(pbuf, query_field_count(pduel, 1, LOCATION_DECK));
-	buffer_write<uint16_t>(pbuf, query_field_count(pduel, 1, LOCATION_EXTRA));
+	BufferIO::Write<uint16_t>(pbuf, query_field_count(pduel, 0, LOCATION_DECK));
+	BufferIO::Write<uint16_t>(pbuf, query_field_count(pduel, 0, LOCATION_EXTRA));
+	BufferIO::Write<uint16_t>(pbuf, query_field_count(pduel, 1, LOCATION_DECK));
+	BufferIO::Write<uint16_t>(pbuf, query_field_count(pduel, 1, LOCATION_EXTRA));
 	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, startbuf, 19);
 	startbuf[1] = 1;
 	NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, startbuf, 19);
@@ -1462,9 +1462,9 @@ void SingleDuel::TimeConfirm(DuelPlayer* dp) {
 }
 inline int SingleDuel::WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache) {
 	flag |= (QUERY_CODE | QUERY_POSITION);
-	buffer_write<uint8_t>(qbuf, MSG_UPDATE_DATA);
-	buffer_write<uint8_t>(qbuf, player);
-	buffer_write<uint8_t>(qbuf, location);
+	BufferIO::Write<uint8_t>(qbuf, MSG_UPDATE_DATA);
+	BufferIO::Write<uint8_t>(qbuf, player);
+	BufferIO::Write<uint8_t>(qbuf, location);
 	int len = query_field_card(pduel, player, location, flag, qbuf, use_cache);
 	return len;
 }
@@ -1552,10 +1552,10 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	flag |= (QUERY_CODE | QUERY_POSITION);
 	unsigned char query_buffer[0x1000];
 	auto qbuf = query_buffer;
-	buffer_write<uint8_t>(qbuf, MSG_UPDATE_CARD);
-	buffer_write<uint8_t>(qbuf, player);
-	buffer_write<uint8_t>(qbuf, location);
-	buffer_write<uint8_t>(qbuf, sequence);
+	BufferIO::Write<uint8_t>(qbuf, MSG_UPDATE_CARD);
+	BufferIO::Write<uint8_t>(qbuf, player);
+	BufferIO::Write<uint8_t>(qbuf, location);
+	BufferIO::Write<uint8_t>(qbuf, sequence);
 	int len = query_card(pduel, player, location, sequence, flag, qbuf, 0);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 4);
 	if (len <= LEN_HEADER)
