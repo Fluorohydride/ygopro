@@ -249,7 +249,7 @@ if os.istarget("macosx") then
         TARGET_MAC_ARM = true
     elseif not MAC_INTEL then
         -- automatic target arm64, need extra detect
-        -- os.hostarch can't be relied on in premake 5.0-beta6 and older
+        -- currently, os.hostarch cannot detect architectures that have been automatically translated by macOS
         local uname = os.outputof("uname -m")
         local proctranslated = os.outputof("sysctl sysctl.proc_translated")
         if uname:find("arm") or proctranslated then
