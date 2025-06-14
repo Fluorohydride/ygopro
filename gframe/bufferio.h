@@ -7,6 +7,18 @@
 
 class BufferIO {
 public:
+	template<typename T>
+	static T Read(unsigned char*& p) {
+		T ret{};
+		std::memcpy(&ret, p, sizeof(T));
+		p += sizeof(T);
+		return ret;
+	}
+	template<typename T>
+	static void Write(unsigned char*& p, T value) {
+		std::memcpy(p, &value, sizeof(T));
+		p += sizeof(T);
+	}
 	static int32_t ReadInt32(unsigned char*& p) {
 		return buffer_read<int32_t>(p);
 	}
