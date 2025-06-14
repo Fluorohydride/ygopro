@@ -185,7 +185,7 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 }
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	auto pdata = data;
-	unsigned char pktType = BufferIO::ReadUInt8(pdata);
+	unsigned char pktType = BufferIO::Read<uint8_t>(pdata);
 	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
 		return;
 	switch(pktType) {
@@ -369,8 +369,9 @@ size_t NetServer::CreateChatPacket(unsigned char* src, int src_size, unsigned ch
 		return 0;
 	// STOC_Chat packet
 	auto pdst = dst;
-	buffer_write<uint16_t>(pdst, dst_player_type);
-	buffer_write_block(pdst, src_msg, src_size);
+	BufferIO::Write<uint16_t>(pdst, dst_player_type);
+	std::memcpy(pdst, src_msg, src_size);
+	pdst += src_size;
 	return sizeof(dst_player_type) + src_size;
 }
 
