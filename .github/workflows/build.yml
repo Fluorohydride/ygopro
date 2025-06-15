@@ -110,7 +110,7 @@ jobs:
       id: sqlite
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3500100.zip
 
     - name: Extract sqlite
       run: |
@@ -357,7 +357,7 @@ jobs:
       id: sqlite
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3500100.zip
 
     - name: Extract sqlite
       if: matrix.static-link == true
@@ -583,7 +583,7 @@ jobs:
       id: sqlite
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3500100.zip
 
     - name: Extract sqlite
       if: matrix.static-link == true
