@@ -283,7 +283,7 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "server-latest"
         prerelease: true
-        title: "Development Build"
+        title: "Development Build (Server Mode)"
         files: |
           x64/ygopro.exe
           x64/AI.Server.exe
