@@ -189,8 +189,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 }
 #endif //YGOPRO_SERVER_MODE
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	errmsg[0] = '\0';
-	std::strncat(errmsg, sqlite3_errmsg(pDB), sizeof errmsg - 1);
+	std::snprintf(errmsg, sizeof errmsg, "%s", sqlite3_errmsg(pDB));
 	if(pStmt)
 		sqlite3_finalize(pStmt);
 	return false;

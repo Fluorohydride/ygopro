@@ -116,9 +116,9 @@ end
             links { "irrKlang" }
             if IRRKLANG_PRO then
                 defines { "IRRKLANG_STATIC" }
-                filter { "not configurations:Debug" }
+                filter { "system:windows", "not configurations:Debug" }
                     libdirs { IRRKLANG_PRO_RELEASE_LIB_DIR }
-                filter { "configurations:Debug" }
+                filter { "system:windows", "configurations:Debug" }
                     libdirs { IRRKLANG_PRO_DEBUG_LIB_DIR }
                 filter {}
             end
@@ -142,7 +142,7 @@ end
 
     filter "system:linux"
 if not SERVER_MODE then
-        links { "GL", "X11", "Xxf86vm" }
+        links { "GL", "X11", "Xxf86vm", "dl", "pthread" }
         linkoptions { "-fopenmp" }
 end
 if SERVER_MODE then -- support old gcc
