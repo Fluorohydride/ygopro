@@ -588,7 +588,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 		case MSG_HINT: {
 			type = BufferIO::Read<uint8_t>(pbuf);
 			player = BufferIO::Read<uint8_t>(pbuf);
-			BufferIO::ReadInt32(pbuf);
+			BufferIO::Read<int32_t>(pbuf);
 			switch (type) {
 			case 1:
 			case 2:
@@ -708,7 +708,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			int c/*, l, s, ss, code*/;
 			for (int i = 0; i < count; ++i) {
 				pbufw = pbuf;
-				/*code = */BufferIO::ReadInt32(pbuf);
+				/*code = */BufferIO::Read<int32_t>(pbuf);
 				c = BufferIO::Read<uint8_t>(pbuf);
 				/*l = */BufferIO::Read<uint8_t>(pbuf);
 				/*s = */BufferIO::Read<uint8_t>(pbuf);
@@ -726,7 +726,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			int c/*, l, s, ss, code*/;
 			for (int i = 0; i < count; ++i) {
 				pbufw = pbuf;
-				/*code = */BufferIO::ReadInt32(pbuf);
+				/*code = */BufferIO::Read<int32_t>(pbuf);
 				c = BufferIO::Read<uint8_t>(pbuf);
 				/*l = */BufferIO::Read<uint8_t>(pbuf);
 				/*s = */BufferIO::Read<uint8_t>(pbuf);
@@ -736,7 +736,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			count = BufferIO::Read<uint8_t>(pbuf);
 			for (int i = 0; i < count; ++i) {
 				pbufw = pbuf;
-				/*code = */BufferIO::ReadInt32(pbuf);
+				/*code = */BufferIO::Read<int32_t>(pbuf);
 				c = BufferIO::Read<uint8_t>(pbuf);
 				/*l = */BufferIO::Read<uint8_t>(pbuf);
 				/*s = */BufferIO::Read<uint8_t>(pbuf);
@@ -1390,7 +1390,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_MATCH_KILL: {
-			int code = BufferIO::ReadInt32(pbuf);
+			int code = BufferIO::Read<int32_t>(pbuf);
 			if(match_mode) {
 				match_kill = code;
 				NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
@@ -1476,7 +1476,7 @@ void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	int qlen = 0;
 	while(qlen < len) {
-		const int clen = BufferIO::ReadInt32(qbuf);
+		const int clen = BufferIO::Read<int32_t>(qbuf);
 		qlen += clen;
 		if (clen <= LEN_HEADER)
 			continue;
@@ -1497,7 +1497,7 @@ void SingleDuel::RefreshSzone(int player, int flag, int use_cache) {
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	int qlen = 0;
 	while(qlen < len) {
-		const int clen = BufferIO::ReadInt32(qbuf);
+		const int clen = BufferIO::Read<int32_t>(qbuf);
 		qlen += clen;
 		if (clen <= LEN_HEADER)
 			continue;
@@ -1518,7 +1518,7 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	int qlen = 0;
 	while(qlen < len) {
-		const int slen = BufferIO::ReadInt32(qbuf);
+		const int slen = BufferIO::Read<int32_t>(qbuf);
 		qlen += slen;
 		if (slen <= LEN_HEADER)
 			continue;
@@ -1560,7 +1560,7 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 4);
 	if (len <= LEN_HEADER)
 		return;
-	const int clen = BufferIO::ReadInt32(qbuf);
+	const int clen = BufferIO::Read<int32_t>(qbuf);
 	auto position = GetPosition(qbuf, 8);
 	if (position & POS_FACEDOWN) {
 		BufferIO::WriteInt32(qbuf, QUERY_CODE);

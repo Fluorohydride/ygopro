@@ -200,7 +200,7 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 		case MSG_HINT: {
 			/*int type = */BufferIO::Read<uint8_t>(pbuf);
 			int player = BufferIO::Read<uint8_t>(pbuf);
-			/*int data = */BufferIO::ReadInt32(pbuf);
+			/*int data = */BufferIO::Read<int32_t>(pbuf);
 			if(player == 0)
 				DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;

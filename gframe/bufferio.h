@@ -19,14 +19,15 @@ public:
 		std::memcpy(p, &value, sizeof(T));
 		p += sizeof(T);
 	}
-	static int32_t ReadInt32(unsigned char*& p) {
-		return Read<int32_t>(p);
-	}
 	static void WriteInt32(unsigned char*& p, int32_t val) {
 		Write<int32_t>(p, val);
 	}
 
 	// for compatibility
+	[[deprecated]]
+	static int32_t ReadInt32(unsigned char*& p) {
+		return Read<int32_t>(p);
+	}
 	[[deprecated]]
 	static short ReadInt16(unsigned char*& p) {
 		return Read<int16_t>(p);
