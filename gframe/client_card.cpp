@@ -39,13 +39,13 @@ void ClientCard::SetCode(unsigned int x) {
 		code = x;
 }
 void ClientCard::UpdateInfo(unsigned char* buf) {
-	int flag = BufferIO::ReadInt32(buf);
+	int flag = BufferIO::Read<int32_t>(buf);
 	if (flag == 0) {
 		ClearData();
 		return;
 	}
 	if(flag & QUERY_CODE) {
-		int pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::Read<int32_t>(buf);
 		if (!pdata)
 			ClearData();
 		if((location == LOCATION_HAND) && ((unsigned int)pdata != code)) {
@@ -55,7 +55,7 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 			code = pdata;
 	}
 	if(flag & QUERY_POSITION) {
-		int pdata = (BufferIO::ReadInt32(buf) >> 24) & 0xff;
+		int pdata = (BufferIO::Read<int32_t>(buf) >> 24) & 0xff;
 		if((location & (LOCATION_EXTRA | LOCATION_REMOVED)) && pdata != position) {
 			position = pdata;
 			mainGame->dField.MoveCard(this, 1);
@@ -63,29 +63,29 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 			position = pdata;
 	}
 	if(flag & QUERY_ALIAS)
-		alias = BufferIO::ReadInt32(buf);
+		alias = BufferIO::Read<int32_t>(buf);
 	if(flag & QUERY_TYPE)
-		type = BufferIO::ReadInt32(buf);
+		type = BufferIO::Read<int32_t>(buf);
 	if(flag & QUERY_LEVEL) {
-		int pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::Read<int32_t>(buf);
 		if(level != (unsigned int)pdata) {
 			level = pdata;
 			myswprintf(lvstring, L"L%d", level);
 		}
 	}
 	if(flag & QUERY_RANK) {
-		int pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::Read<int32_t>(buf);
 		if(pdata && rank != (unsigned int)pdata) {
 			rank = pdata;
 			myswprintf(lvstring, L"R%d", rank);
 		}
 	}
 	if(flag & QUERY_ATTRIBUTE)
-		attribute = BufferIO::ReadInt32(buf);
+		attribute = BufferIO::Read<int32_t>(buf);
 	if(flag & QUERY_RACE)
-		race = BufferIO::ReadInt32(buf);
+		race = BufferIO::Read<int32_t>(buf);
 	if(flag & QUERY_ATTACK) {
-		attack = BufferIO::ReadInt32(buf);
+		attack = BufferIO::Read<int32_t>(buf);
 		if(attack < 0) {
 			atkstring[0] = '?';
 			atkstring[1] = 0;
@@ -93,7 +93,7 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 			myswprintf(atkstring, L"%d", attack);
 	}
 	if(flag & QUERY_DEFENSE) {
-		defense = BufferIO::ReadInt32(buf);
+		defense = BufferIO::Read<int32_t>(buf);
 		if(type & TYPE_LINK) {
 			defstring[0] = '-';
 			defstring[1] = 0;
@@ -104,11 +104,11 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 			myswprintf(defstring, L"%d", defense);
 	}
 	if(flag & QUERY_BASE_ATTACK)
-		base_attack = BufferIO::ReadInt32(buf);
+		base_attack = BufferIO::Read<int32_t>(buf);
 	if(flag & QUERY_BASE_DEFENSE)
-		base_defense = BufferIO::ReadInt32(buf);
+		base_defense = BufferIO::Read<int32_t>(buf);
 	if(flag & QUERY_REASON)
-		reason = BufferIO::ReadInt32(buf);
+		reason = BufferIO::Read<int32_t>(buf);
 	if(flag & QUERY_REASON_CARD)
 		buf += 4;
 	if(flag & QUERY_EQUIP_CARD) {
@@ -123,7 +123,7 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 		}
 	}
 	if(flag & QUERY_TARGET_CARD) {
-		int count = BufferIO::ReadInt32(buf);
+		int count = BufferIO::Read<int32_t>(buf);
 		for(int i = 0; i < count; ++i) {
 			int c = BufferIO::Read<uint8_t>(buf);
 			unsigned int l = BufferIO::Read<uint8_t>(buf);
@@ -137,13 +137,13 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 		}
 	}
 	if(flag & QUERY_OVERLAY_CARD) {
-		int count = BufferIO::ReadInt32(buf);
+		int count = BufferIO::Read<int32_t>(buf);
 		for(int i = 0; i < count; ++i) {
-			overlayed[i]->SetCode(BufferIO::ReadInt32(buf));
+			overlayed[i]->SetCode(BufferIO::Read<int32_t>(buf));
 		}
 	}
 	if(flag & QUERY_COUNTERS) {
-		int count = BufferIO::ReadInt32(buf);
+		int count = BufferIO::Read<int32_t>(buf);
 		for(int i = 0; i < count; ++i) {
 			int ctype = BufferIO::Read<uint16_t>(buf);
 			int ccount = BufferIO::Read<uint16_t>(buf);
@@ -151,24 +151,24 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 		}
 	}
 	if(flag & QUERY_OWNER)
-		owner = BufferIO::ReadInt32(buf);
+		owner = BufferIO::Read<int32_t>(buf);
 	if(flag & QUERY_STATUS)
-		status = BufferIO::ReadInt32(buf);
+		status = BufferIO::Read<int32_t>(buf);
 	if(flag & QUERY_LSCALE) {
-		lscale = BufferIO::ReadInt32(buf);
+		lscale = BufferIO::Read<int32_t>(buf);
 		myswprintf(lscstring, L"%d", lscale);
 	}
 	if(flag & QUERY_RSCALE) {
-		rscale = BufferIO::ReadInt32(buf);
+		rscale = BufferIO::Read<int32_t>(buf);
 		myswprintf(rscstring, L"%d", rscale);
 	}
 	if(flag & QUERY_LINK) {
-		int pdata = BufferIO::ReadInt32(buf);
+		int pdata = BufferIO::Read<int32_t>(buf);
 		if (link != (unsigned int)pdata) {
 			link = pdata;
 		}
 		myswprintf(linkstring, L"L\x2012%d", link);
-		pdata = BufferIO::ReadInt32(buf);
+		pdata = BufferIO::Read<int32_t>(buf);
 		if (link_marker != (unsigned int)pdata) {
 			link_marker = pdata;
 		}
