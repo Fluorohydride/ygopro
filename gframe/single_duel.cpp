@@ -460,8 +460,8 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	BufferIO::Write<uint8_t>(pbuf, MSG_START);
 	BufferIO::Write<uint8_t>(pbuf, 0);
 	BufferIO::Write<uint8_t>(pbuf, host_info.duel_rule);
-	BufferIO::WriteInt32(pbuf, host_info.start_lp);
-	BufferIO::WriteInt32(pbuf, host_info.start_lp);
+	BufferIO::Write<int32_t>(pbuf, host_info.start_lp);
+	BufferIO::Write<int32_t>(pbuf, host_info.start_lp);
 	BufferIO::Write<uint16_t>(pbuf, query_field_count(pduel, 0, LOCATION_DECK));
 	BufferIO::Write<uint16_t>(pbuf, query_field_count(pduel, 0, LOCATION_EXTRA));
 	BufferIO::Write<uint16_t>(pbuf, query_field_count(pduel, 1, LOCATION_DECK));
@@ -713,7 +713,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 				/*l = */BufferIO::Read<uint8_t>(pbuf);
 				/*s = */BufferIO::Read<uint8_t>(pbuf);
 				/*ss = */BufferIO::Read<uint8_t>(pbuf);
-				if (c != player) BufferIO::WriteInt32(pbufw, 0);
+				if (c != player) BufferIO::Write<int32_t>(pbufw, 0);
 			}
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
@@ -731,7 +731,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 				/*l = */BufferIO::Read<uint8_t>(pbuf);
 				/*s = */BufferIO::Read<uint8_t>(pbuf);
 				/*ss = */BufferIO::Read<uint8_t>(pbuf);
-				if (c != player) BufferIO::WriteInt32(pbufw, 0);
+				if (c != player) BufferIO::Write<int32_t>(pbufw, 0);
 			}
 			count = BufferIO::Read<uint8_t>(pbuf);
 			for (int i = 0; i < count; ++i) {
@@ -741,7 +741,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 				/*l = */BufferIO::Read<uint8_t>(pbuf);
 				/*s = */BufferIO::Read<uint8_t>(pbuf);
 				/*ss = */BufferIO::Read<uint8_t>(pbuf);
-				if (c != player) BufferIO::WriteInt32(pbufw, 0);
+				if (c != player) BufferIO::Write<int32_t>(pbufw, 0);
 			}
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
@@ -848,7 +848,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			count = BufferIO::Read<uint8_t>(pbuf);
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, (pbuf - offset) + count * 4);
 			for(int i = 0; i < count; ++i)
-				BufferIO::WriteInt32(pbuf, 0);
+				BufferIO::Write<int32_t>(pbuf, 0);
 			NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
@@ -860,7 +860,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			count = BufferIO::Read<uint8_t>(pbuf);
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, (pbuf - offset) + count * 4);
 			for (int i = 0; i < count; ++i)
-				BufferIO::WriteInt32(pbuf, 0);
+				BufferIO::Write<int32_t>(pbuf, 0);
 			NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, offset, pbuf - offset);
 			for (auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
@@ -960,7 +960,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			pbuf += 16;
 			NetServer::SendBufferToPlayer(players[cc], STOC_GAME_MSG, offset, pbuf - offset);
 			if (!(cl & (LOCATION_GRAVE + LOCATION_OVERLAY)) && ((cl & (LOCATION_DECK + LOCATION_HAND)) || (cp & POS_FACEDOWN)))
-				BufferIO::WriteInt32(pbufw, 0);
+				BufferIO::Write<int32_t>(pbufw, 0);
 			NetServer::SendBufferToPlayer(players[1 - cc], STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
@@ -984,7 +984,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_SET: {
-			BufferIO::WriteInt32(pbuf, 0);
+			BufferIO::Write<int32_t>(pbuf, 0);
 			pbuf += 4;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
@@ -1180,7 +1180,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 			for (int i = 0; i < count; ++i) {
 				if(!(pbufw[3] & 0x80))
-					BufferIO::WriteInt32(pbufw, 0);
+					BufferIO::Write<int32_t>(pbufw, 0);
 				else
 					pbufw += 4;
 			}
@@ -1563,8 +1563,8 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	const int clen = BufferIO::Read<int32_t>(qbuf);
 	auto position = GetPosition(qbuf, 8);
 	if (position & POS_FACEDOWN) {
-		BufferIO::WriteInt32(qbuf, QUERY_CODE);
-		BufferIO::WriteInt32(qbuf, 0);
+		BufferIO::Write<int32_t>(qbuf, QUERY_CODE);
+		BufferIO::Write<int32_t>(qbuf, 0);
 		std::memset(qbuf, 0, clen - 12);
 	}
 	NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer, len + 4);

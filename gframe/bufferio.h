@@ -19,9 +19,6 @@ public:
 		std::memcpy(p, &value, sizeof(T));
 		p += sizeof(T);
 	}
-	static void WriteInt32(unsigned char*& p, int32_t val) {
-		Write<int32_t>(p, val);
-	}
 
 	// for compatibility
 	[[deprecated]]
@@ -39,6 +36,10 @@ public:
 	[[deprecated]]
 	static unsigned char ReadUInt8(unsigned char*& p) {
 		return Read<unsigned char>(p);
+	}
+	[[deprecated]]
+	static void WriteInt32(unsigned char*& p, int32_t val) {
+		Write<int32_t>(p, val);
 	}
 	[[deprecated]]
 	static void WriteInt16(unsigned char*& p, short val) {
