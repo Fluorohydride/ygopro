@@ -105,7 +105,7 @@ static_assert(sizeof(CTOS_Kick) == 1, "size mismatch: CTOS_Kick");
 
 /*
 * CTOS_ExternalAddress
-* uint32_t real_ip; (IPv4 address, BE)
+* uint32_t real_ip; (IPv4 address, BE, alway 0 in normal client)
 * uint16_t hostname[256]; (UTF-16 string)
 */
 

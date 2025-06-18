@@ -123,9 +123,9 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 			auto hostname_len = BufferIO::CopyCharArray(mainGame->ebJoinHost->getText(), hostname_buf);
 			auto hostname_msglen = (hostname_len + 1) * sizeof(uint16_t);
 			char buf[LEN_HOSTNAME * sizeof(int16_t) + sizeof(uint32_t)];
-			memset(buf, 0, sizeof(uint32_t));
+			memset(buf, 0, sizeof(uint32_t)); // real_ip
 			memcpy(buf + sizeof(uint32_t), hostname_buf, hostname_msglen);
-			DuelClient::SendBufferToServer(CTOS_EXTERNAL_ADDRESS, buf, hostname_msglen + sizeof(uint32_t));
+			SendBufferToServer(CTOS_EXTERNAL_ADDRESS, buf, hostname_msglen + sizeof(uint32_t));
 		}
 		CTOS_PlayerInfo cspi;
 		BufferIO::CopyCharArray(mainGame->ebNickName->getText(), cspi.name);
