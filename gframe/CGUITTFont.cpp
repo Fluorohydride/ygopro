@@ -28,6 +28,7 @@
    john@suckerfreegames.com
 */
 
+#define _IRR_STATIC_LIB_
 #include <irrlicht.h>
 #include "CGUITTFont.h"
 
@@ -79,9 +80,9 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 		const u32 image_pitch = image->getPitch() / sizeof(u16);
 		u16* image_data = (u16*)image->lock();
 		u8* glyph_data = bits.buffer;
-		for (s32 y = 0; y < bits.rows; ++y) {
+		for (s32 y = 0; y < (s32)bits.rows; ++y) {
 			u16* row = image_data;
-			for (s32 x = 0; x < bits.width; ++x) {
+			for (s32 x = 0; x < (s32)bits.width; ++x) {
 				// Monochrome bitmaps store 8 pixels per byte.  The left-most pixel is the bit 0x80.
 				// So, we go through the data each bit at a time.
 				if ((glyph_data[y * bits.pitch + (x / 8)] & (0x80 >> (x % 8))) != 0)
@@ -105,9 +106,9 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 		const u32 image_pitch = image->getPitch() / sizeof(u32);
 		u32* image_data = (u32*)image->lock();
 		u8* glyph_data = bits.buffer;
-		for (s32 y = 0; y < bits.rows; ++y) {
+		for (s32 y = 0; y < (s32)bits.rows; ++y) {
 			u8* row = glyph_data;
-			for (s32 x = 0; x < bits.width; ++x) {
+			for (s32 x = 0; x < (s32)bits.width; ++x) {
 				image_data[y * image_pitch + x] |= static_cast<u32>(255.0f * (static_cast<float>(*row++) / gray_count)) << 24;
 				//data[y * image_pitch + x] |= ((u32)(*bitsdata++) << 24);
 			}
@@ -154,8 +155,8 @@ void SGUITTGlyph::preload(u32 char_index, FT_Face face, video::IVideoDriver* dri
 
 	glyph_page = parent->getLastGlyphPageIndex();
 	u32 texture_side_length = page->texture_size.Width - font_size;
-	u32 margin = font_size * 0.5;
-	u32 sprite_size = font_size * 1.5;
+	u32 margin = (u32)(font_size * 0.5);
+	u32 sprite_size = (u32)(font_size * 1.5);
 	core::vector2di page_position(
 		(s32)(page->used_slots % (s32)(texture_side_length / sprite_size)) * sprite_size + margin,
 		(s32)(page->used_slots / (s32)(texture_side_length / sprite_size)) * sprite_size + margin
@@ -269,7 +270,7 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 
 	// Log.
 	if (logger)
-		logger->log(L"CGUITTFont", core::stringw(core::stringw(L"Creating new font: ") + core::ustring(filename).toWCHAR_s() + L" " + core::stringc(size) + L"pt " + (antialias ? L"+antialias " : L"-antialias ") + (transparency ? L"+transparency" : L"-transparency")).c_str(), irr::ELL_INFORMATION);
+		logger->log(L"CGUITTFont", core::stringw(core::stringw(L"Creating new font: ") + core::stringc(filename) + L" " + core::stringc(size) + L"pt " + (antialias ? L"+antialias " : L"-antialias ") + (transparency ? L"+transparency" : L"-transparency")).c_str(), irr::ELL_INFORMATION);
 
 	// Grab the face.
 	SGUITTFace* face = 0;
@@ -304,15 +305,12 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 				return false;
 			}
 		} else {
-			core::ustring converter(filename);
-			if (FT_New_Face(c_library, reinterpret_cast<const char*>(converter.toUTF8_s().c_str()), 0, &face->face)) {
-				if (logger) logger->log(L"CGUITTFont", L"FT_New_Face failed.", irr::ELL_INFORMATION);
+			if (logger) logger->log(L"CGUITTFont", L"FT_New_Face failed.", irr::ELL_INFORMATION);
 
-				c_faces.remove(filename);
-				delete face;
-				face = 0;
-				return false;
-			}
+			c_faces.remove(filename);
+			delete face;
+			face = 0;
+			return false;
 		}
 	} else {
 		// Using another instance of this face.
@@ -493,6 +491,12 @@ void CGUITTFont::setFontHinting(const bool enable, const bool enable_auto_hintin
 void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position, video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
 	if (!Driver)
 		return;
+	drawUstring(text, position, color, hcenter, vcenter, clip);
+}
+
+void CGUITTFont::drawUstring(const core::ustring& utext, const core::rect<s32>&position, video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>*clip) {
+	if (!Driver)
+		return;
 
 	// Clear the glyph pages of their render information.
 	for (u32 i = 0; i < Glyph_Pages.size(); ++i) {
@@ -502,11 +506,11 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 
 	// Set up some variables.
 	core::dimension2d<s32> textDimension;
-	core::position2d<s32> offset = position.UpperLeftCorner;
+	core::vector2d<s32> offset = position.UpperLeftCorner;
 
 	// Determine offset positions.
 	if (hcenter || vcenter) {
-		textDimension = getDimension(text.c_str());
+		textDimension = getDimension(utext);
 
 		if (hcenter)
 			offset.X = ((position.getWidth() - textDimension.Width) >> 1) + offset.X;
@@ -514,9 +518,6 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 		if (vcenter)
 			offset.Y = ((position.getHeight() - textDimension.Height) >> 1) + offset.Y;
 	}
-
-	// Convert to a unicode string.
-	core::ustring utext(text);
 
 	// Set up our render map.
 	core::map<u32, CGUITTGlyphPage*> Render_Map;
@@ -527,29 +528,28 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 	core::ustring::const_iterator iter(utext);
 	while (!iter.atEnd()) {
 		uchar32_t currentChar = *iter;
+
+		bool lineBreak = false;
+		if (currentChar == L'\r') { // Mac or Windows breaks
+			lineBreak = true;
+			if (*(iter + 1) == L'\n')	// Windows line breaks.
+				currentChar = *(++iter);
+		} else if (currentChar == L'\n') { // Unix breaks
+			lineBreak = true;
+		}
+		if (lineBreak) {
+			previousChar = 0;
+			offset.Y += supposed_line_height; //font_metrics.ascender / 64;
+			offset.X = position.UpperLeftCorner.X;
+			if (hcenter)
+				offset.X += (position.getWidth() - textDimension.Width) >> 1;
+			++iter;
+			continue;
+		}
+
 		n = getGlyphIndexByChar(currentChar);
 		bool visible = (Invisible.findFirst(currentChar) == -1);
 		if (n > 0 && visible) {
-			bool lineBreak = false;
-			if (currentChar == L'\r') { // Mac or Windows breaks
-				lineBreak = true;
-				if (*(iter + 1) == (uchar32_t)'\n')	// Windows line breaks.
-					currentChar = *(++iter);
-			} else if (currentChar == (uchar32_t)'\n') { // Unix breaks
-				lineBreak = true;
-			}
-
-			if (lineBreak) {
-				previousChar = 0;
-				offset.Y += supposed_line_height; //font_metrics.ascender / 64;
-				offset.X = position.UpperLeftCorner.X;
-
-				if (hcenter)
-					offset.X += (position.getWidth() - textDimension.Width) >> 1;
-				++iter;
-				continue;
-			}
-
 			// Calculate the glyph offset.
 			s32 offx = Glyphs[n - 1].offset.X;
 			s32 offy = (font_metrics.ascender / 64) - Glyphs[n - 1].offset.Y;
@@ -562,7 +562,7 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 			// Determine rendering information.
 			SGUITTGlyph& glyph = Glyphs[n - 1];
 			CGUITTGlyphPage* const page = Glyph_Pages[glyph.glyph_page];
-			page->render_positions.push_back(core::position2di(offset.X + offx, offset.Y + offy));
+			page->render_positions.push_back(irr::core::vector2di(offset.X + offx, offset.Y + offy));
 			page->render_source_rects.push_back(glyph.source_rect);
 			Render_Map.set(glyph.glyph_page, page);
 		}
@@ -810,11 +810,6 @@ core::vector2di CGUITTFont::getKerning(const uchar32_t thisLetter, const uchar32
 }
 
 void CGUITTFont::setInvisibleCharacters(const wchar_t *s) {
-	core::ustring us(s);
-	Invisible = us;
-}
-
-void CGUITTFont::setInvisibleCharacters(const core::ustring& s) {
 	Invisible = s;
 }
 
@@ -838,7 +833,7 @@ video::IImage* CGUITTFont::createTextureFromChar(const uchar32_t& ch) {
 	// Copy the image data out of the page texture.
 	core::dimension2du glyph_size(glyph.source_rect.getSize());
 	video::IImage* image = Driver->createImage(format, glyph_size);
-	pageholder->copyTo(image, core::position2di(0, 0), glyph.source_rect);
+	pageholder->copyTo(image, irr::core::vector2di(0, 0), glyph.source_rect);
 
 	tex->unlock();
 	return image;
@@ -860,17 +855,14 @@ void CGUITTFont::createSharedPlane() {
 		0---1
 	*/
 
-	using namespace core;
-	using namespace video;
-	using namespace scene;
-	S3DVertex vertices[4];
+	video::S3DVertex vertices[4];
 	u16 indices[6] = {0, 2, 3, 3, 1, 0};
-	vertices[0] = S3DVertex(vector3df(0, -1, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(0, 1));
-	vertices[1] = S3DVertex(vector3df(1, -1, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(1, 1));
-	vertices[2] = S3DVertex(vector3df(0, 0, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vertices[3] = S3DVertex(vector3df(1, 0, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(1, 0));
+	vertices[0] = video::S3DVertex(core::vector3df(0, -1, 0), core::vector3df(0, 0, -1), video::SColor(255, 255, 255, 255), core::vector2df(0, 1));
+	vertices[1] = video::S3DVertex(core::vector3df(1, -1, 0), core::vector3df(0, 0, -1), video::SColor(255, 255, 255, 255), core::vector2df(1, 1));
+	vertices[2] = video::S3DVertex(core::vector3df(0, 0, 0), core::vector3df(0, 0, -1), video::SColor(255, 255, 255, 255), core::vector2df(0, 0));
+	vertices[3] = video::S3DVertex(core::vector3df(1, 0, 0), core::vector3df(0, 0, -1), video::SColor(255, 255, 255, 255), core::vector2df(1, 0));
 
-	SMeshBuffer* buf = new SMeshBuffer();
+	scene::SMeshBuffer* buf = new scene::SMeshBuffer();
 	buf->append(vertices, 4, indices, 6);
 
 	shared_plane_.addMeshBuffer( buf );
@@ -888,11 +880,7 @@ core::dimension2d<u32> CGUITTFont::getDimensionUntilEndOfLine(const wchar_t* p) 
 }
 
 core::array<scene::ISceneNode*> CGUITTFont::addTextSceneNode(const wchar_t* text, scene::ISceneManager* smgr, scene::ISceneNode* parent, const video::SColor& color, bool center) {
-	using namespace core;
-	using namespace video;
-	using namespace scene;
-
-	array<scene::ISceneNode*> container;
+	core::array<scene::ISceneNode*> container;
 
 	if (!Driver || !smgr) return container;
 	if (!parent)
@@ -903,8 +891,8 @@ core::array<scene::ISceneNode*> CGUITTFont::addTextSceneNode(const wchar_t* text
 	if (!shared_plane_ptr_) //this points to a static mesh that contains the plane
 		createSharedPlane(); //if it's not initialized, we create one.
 
-	dimension2d<s32> text_size(getDimension(text)); //convert from unsigned to signed.
-	vector3df start_point(0, 0, 0), offset;
+	core::dimension2d<s32> text_size(getDimension(text)); //convert from unsigned to signed.
+	core::vector3df start_point(0, 0, 0), offset;
 
 	/** NOTICE:
 		Because we are considering adding texts into 3D world, all Y axis vectors are inverted.
@@ -918,7 +906,7 @@ core::array<scene::ISceneNode*> CGUITTFont::addTextSceneNode(const wchar_t* text
 	}
 
 	// the default font material
-	SMaterial mat;
+	video::SMaterial mat;
 	mat.setFlag(video::EMF_LIGHTING, true);
 	mat.setFlag(video::EMF_ZWRITE_ENABLE, false);
 	mat.setFlag(video::EMF_NORMALIZE_NORMALS, true);
@@ -930,7 +918,7 @@ core::array<scene::ISceneNode*> CGUITTFont::addTextSceneNode(const wchar_t* text
 	wchar_t current_char = 0, previous_char = 0;
 	u32 n = 0;
 
-	array<u32> glyph_indices;
+	core::array<u32> glyph_indices;
 
 	while (*text) {
 		current_char = *text;
@@ -963,23 +951,23 @@ core::array<scene::ISceneNode*> CGUITTFont::addTextSceneNode(const wchar_t* text
 				s32 offy = (font_metrics.ascender / 64) - glyph.offset.Y;
 
 				// Apply kerning.
-				vector2di k = getKerning(current_char, previous_char);
+				core::vector2di k = getKerning(current_char, previous_char);
 				offset.X += k.X;
 				offset.Y += k.Y;
 
-				vector3df current_pos(offset.X + offx, offset.Y - offy, 0);
-				dimension2d<u32> letter_size = dimension2d<u32>(texw, texh);
+				core::vector3df current_pos(offset.X + offx, offset.Y - offy, 0);
+				core::dimension2d<u32> letter_size = core::dimension2d<u32>(texw, texh);
 
 				// Now we copy planes corresponding to the letter size.
-				IMeshManipulator* mani = smgr->getMeshManipulator();
-				IMesh* meshcopy = mani->createMeshCopy(shared_plane_ptr_);
-				mani->scale(meshcopy, vector3df((f32)letter_size.Width, (f32)letter_size.Height, 1));
+				scene::IMeshManipulator* mani = smgr->getMeshManipulator();
+				scene::IMesh* meshcopy = mani->createMeshCopy(shared_plane_ptr_);
+				mani->scale(meshcopy, core::vector3df((f32)letter_size.Width, (f32)letter_size.Height, 1));
 
-				ISceneNode* current_node = smgr->addMeshSceneNode(meshcopy, parent, -1, current_pos);
+				scene::ISceneNode* current_node = smgr->addMeshSceneNode(meshcopy, parent, -1, current_pos);
 				meshcopy->drop();
 
 				current_node->getMaterial(0) = mat;
-				current_node->setAutomaticCulling(EAC_OFF);
+				current_node->setAutomaticCulling(scene::EAC_OFF);
 				current_node->setIsDebugObject(true);  //so the picking won't have any effect on individual letter
 				//current_node->setDebugDataVisible(EDS_BBOX); //de-comment this when debugging
 
@@ -997,7 +985,7 @@ core::array<scene::ISceneNode*> CGUITTFont::addTextSceneNode(const wchar_t* text
 	for (u32 i = 0; i < glyph_indices.size(); ++i) {
 		u32 n = glyph_indices[i];
 		SGUITTGlyph const& glyph = Glyphs[n - 1];
-		ITexture* current_tex = Glyph_Pages[glyph.glyph_page]->texture;
+		video::ITexture* current_tex = Glyph_Pages[glyph.glyph_page]->texture;
 		f32 page_texture_size = (f32)current_tex->getSize().Width;
 		//Now we calculate the UV position according to the texture size and the source rect.
 		//
@@ -1013,15 +1001,15 @@ core::array<scene::ISceneNode*> CGUITTFont::addTextSceneNode(const wchar_t* text
 		f32 v2 = v1 + (glyph.source_rect.getHeight() / page_texture_size);
 
 		//we can be quite sure that this is IMeshSceneNode, because we just added them in the above loop.
-		IMeshSceneNode* node = static_cast<IMeshSceneNode*>(container[i]);
+		scene::IMeshSceneNode* node = static_cast<scene::IMeshSceneNode*>(container[i]);
 
-		S3DVertex* pv = static_cast<S3DVertex*>(node->getMesh()->getMeshBuffer(0)->getVertices());
+		video::S3DVertex* pv = static_cast<video::S3DVertex*>(node->getMesh()->getMeshBuffer(0)->getVertices());
 		//pv[0].TCoords.Y = pv[1].TCoords.Y = (letter_size.Height - 1) / static_cast<f32>(letter_size.Height);
 		//pv[1].TCoords.X = pv[3].TCoords.X = (letter_size.Width - 1)  / static_cast<f32>(letter_size.Width);
-		pv[0].TCoords = vector2df(u1, v2);
-		pv[1].TCoords = vector2df(u2, v2);
-		pv[2].TCoords = vector2df(u1, v1);
-		pv[3].TCoords = vector2df(u2, v1);
+		pv[0].TCoords = core::vector2df(u1, v2);
+		pv[1].TCoords = core::vector2df(u2, v2);
+		pv[2].TCoords = core::vector2df(u1, v1);
+		pv[3].TCoords = core::vector2df(u2, v1);
 
 		container[i]->getMaterial(0).setTexture(0, current_tex);
 	}

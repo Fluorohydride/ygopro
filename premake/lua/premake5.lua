@@ -1,14 +1,12 @@
 project "lua"
     kind "StaticLib"
+    compileas "C++"
 
-    files { "src/*.c", "src/*.h", "src/*.hpp" }
-    removefiles { "src/lua.c", "src/luac.c" }
+    files { "src/*.c", "src/*.h" }
+    removefiles { "src/lua.c", "src/luac.c", "src/linit.c", "src/onelua.c" }
 
-    filter "action:vs*"
-        buildoptions { "/TP" }
-
-    filter "not action:vs*"
-        buildoptions { "-x c++" }
+    filter "configurations:Debug"
+        defines { "LUA_USE_APICHECK" }
 
     filter "system:bsd"
         defines { "LUA_USE_POSIX" }

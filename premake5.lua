@@ -1,21 +1,39 @@
--- default global settings
+-- Supported systems: Windows, Linux, MacOS
+
+-- Global settings
+
+-- Default: Build Lua, Irrlicht from source on all systems.
+--          Don't build event, freetype, sqlite, opus, vorbis on Linux or MacOS, use apt or homebrew,
+--          but build them on Windows, due to the lack of package manager on Windows.
 
 BUILD_LUA = true
-BUILD_EVENT = os.istarget("windows")
-BUILD_FREETYPE = os.istarget("windows")
-BUILD_SQLITE = os.istarget("windows")
-BUILD_IRRLICHT = not os.istarget("macosx")
-USE_IRRKLANG = true
-IRRKLANG_PRO = false
-LUA_LIB_NAME = "lua"
+LUA_LIB_NAME = "lua" -- change this if you don't build Lua
 
--- read settings from command line or environment variables
+BUILD_EVENT = os.istarget("windows")
+
+BUILD_FREETYPE = os.istarget("windows")
+
+BUILD_SQLITE = os.istarget("windows")
+
+BUILD_IRRLICHT = true -- modified Irrlicht is required, can't use the official one
+USE_DXSDK = true
+
+USE_AUDIO = true
+AUDIO_LIB = "miniaudio" -- can be "miniaudio" or "irrklang"
+-- BUILD_MINIAUDIO is always true
+MINIAUDIO_SUPPORT_OPUS_VORBIS = true
+MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
+-- BUILD_IRRKLANG is impossible because irrKlang is not open source
+IRRKLANG_PRO = false
+IRRKLANG_PRO_BUILD_IKPMP3 = false
+
+-- Read settings from command line or environment variables
 
 newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
 newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "" }
 newoption { trigger = "lua-include-dir", category = "YGOPro - lua", description = "", value = "PATH" }
 newoption { trigger = "lua-lib-dir", category = "YGOPro - lua", description = "", value = "PATH" }
-newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME", default = "lua" }
+newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME", default = LUA_LIB_NAME }
 
 newoption { trigger = "build-event", category = "YGOPro - event", description = "" }
 newoption { trigger = "no-build-event", category = "YGOPro - event", description = "" }
@@ -36,9 +54,26 @@ newoption { trigger = "build-irrlicht", category = "YGOPro - irrlicht", descript
 newoption { trigger = "no-build-irrlicht", category = "YGOPro - irrlicht", description = "" }
 newoption { trigger = "irrlicht-include-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
 newoption { trigger = "irrlicht-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
+newoption { trigger = "no-dxsdk", category = "YGOPro - irrlicht", description = "" }
 
-newoption { trigger = "use-irrklang", category = "YGOPro - irrklang", description = "" }
-newoption { trigger = "no-use-irrklang", category = "YGOPro - irrklang", description = "" }
+newoption { trigger = "no-audio", category = "YGOPro", description = "" }
+newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "miniaudio, irrklang", default = AUDIO_LIB }
+
+newoption { trigger = "miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "no-build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "opus-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "opus-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "opusfile-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "opusfile-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "vorbis-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "vorbis-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "ogg-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+newoption { trigger = "ogg-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+
+newoption { trigger = "use-irrklang", category = "YGOPro - irrklang", description = "Deprecated, use audio-lib=irrklang" }
+newoption { trigger = "no-use-irrklang", category = "YGOPro - irrklang", description = "Deprecated, use no-audio" }
 newoption { trigger = "irrklang-include-dir", category = "YGOPro - irrklang", description = "", value = "PATH" }
 newoption { trigger = "irrklang-lib-dir", category = "YGOPro - irrklang", description = "", value = "PATH" }
 
@@ -49,10 +84,19 @@ newoption { trigger = "irrklang-pro-debug-lib-dir", category = "YGOPro - irrklan
 newoption { trigger = 'build-ikpmp3', category = "YGOPro - irrklang - ikpmp3", description = "" }
 
 newoption { trigger = "winxp-support", category = "YGOPro", description = "" }
-newoption { trigger = "mac-arm", category = "YGOPro", description = "M1" }
+newoption { trigger = "mac-arm", category = "YGOPro", description = "Compile for Apple Silicon Mac" }
+newoption { trigger = "mac-intel", category = "YGOPro", description = "Compile for Intel Mac" }
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
+end
+
+function FindHeaderWithSubDir(header, subdir)
+    local result = os.findheader(header)
+    if result and subdir then
+        result = path.join(result, subdir)
+    end
+    return result
 end
 
 if GetParam("build-lua") then
@@ -61,21 +105,21 @@ elseif GetParam("no-build-lua") then
     BUILD_LUA = false
 end
 if not BUILD_LUA then
-    -- at most times you need to change this if you change BUILD_LUA to false
+    -- at most times you need to change those if you change BUILD_LUA to false
     -- make sure your lua lib is built with C++ and version >= 5.3
-    LUA_INCLUDE_DIR = GetParam("lua-include-dir") or "/usr/local/include/lua"
-    LUA_LIB_DIR = GetParam("lua-lib-dir") or "/usr/local/lib"
-    LUA_LIB_NAME = GetParam("lua-lib-name")
+    LUA_LIB_NAME = GetParam("lua-lib-name") or LUA_LIB_NAME
+    LUA_INCLUDE_DIR = GetParam("lua-include-dir") or os.findheader("lua.h")
+    LUA_LIB_DIR = GetParam("lua-lib-dir") or os.findlib(LUA_LIB_NAME)
 end
 
 if GetParam("build-event") then
-    BUILD_EVENT = os.istarget("windows") -- only on windows for now
+    BUILD_EVENT = true
 elseif GetParam("no-build-event") then
     BUILD_EVENT = false
 end
 if not BUILD_EVENT then
-    EVENT_INCLUDE_DIR = GetParam("event-include-dir") or "/usr/local/include/event2"
-    EVENT_LIB_DIR = GetParam("event-lib-dir") or "/usr/local/lib"
+    EVENT_INCLUDE_DIR = GetParam("event-include-dir") or os.findheader("event2/event.h")
+    EVENT_LIB_DIR = GetParam("event-lib-dir") or os.findlib("event")
 end
 
 if GetParam("build-freetype") then
@@ -84,13 +128,8 @@ elseif GetParam("no-build-freetype") then
     BUILD_FREETYPE = false
 end
 if not BUILD_FREETYPE then
-    if os.istarget("linux") then
-        FREETYPE_INCLUDE_DIR = "/usr/include/freetype2"
-    elseif os.istarget("macosx") then
-        FREETYPE_INCLUDE_DIR = "/usr/local/include/freetype2"
-    end
-    FREETYPE_INCLUDE_DIR = GetParam("freetype-include-dir") or FREETYPE_INCLUDE_DIR
-    FREETYPE_LIB_DIR = GetParam("freetype-lib-dir") or "/usr/local/lib"
+    FREETYPE_INCLUDE_DIR = GetParam("freetype-include-dir") or FindHeaderWithSubDir("freetype2/ft2build.h", "freetype2")
+    FREETYPE_LIB_DIR = GetParam("freetype-lib-dir") or os.findlib("freetype")
 end
 
 if GetParam("build-sqlite") then
@@ -99,8 +138,8 @@ elseif GetParam("no-build-sqlite") then
     BUILD_SQLITE = false
 end
 if not BUILD_SQLITE then
-    SQLITE_INCLUDE_DIR = GetParam("sqlite-include-dir") or "/usr/local/include"
-    SQLITE_LIB_DIR = GetParam("sqlite-lib-dir") or "/usr/local/lib"
+    SQLITE_INCLUDE_DIR = GetParam("sqlite-include-dir") or os.findheader("sqlite3.h")
+    SQLITE_LIB_DIR = GetParam("sqlite-lib-dir") or os.findlib("sqlite3")
 end
 
 if GetParam("build-irrlicht") then
@@ -109,46 +148,106 @@ elseif GetParam("no-build-irrlicht") then
     BUILD_IRRLICHT = false
 end
 if not BUILD_IRRLICHT then
-    IRRLICHT_INCLUDE_DIR = GetParam("irrlicht-include-dir") or "/usr/local/include/irrlicht"
-    IRRLICHT_LIB_DIR = GetParam("irrlicht-lib-dir") or "/usr/local/lib"
+    IRRLICHT_INCLUDE_DIR = GetParam("irrlicht-include-dir") or os.findheader("irrlicht.h")
+    IRRLICHT_LIB_DIR = GetParam("irrlicht-lib-dir") or os.findlib("irrlicht")
 end
 
-if GetParam("use-irrklang") then
-    USE_IRRKLANG = true
-elseif GetParam("no-use-irrklang") then
-    USE_IRRKLANG = false
+if GetParam("no-dxsdk") then
+    USE_DXSDK = false
 end
-if USE_IRRKLANG then
-    IRRKLANG_INCLUDE_DIR = GetParam("irrklang-include-dir") or "../irrklang/include"
-    if os.istarget("windows") then
-        IRRKLANG_LIB_DIR = "../irrklang/lib/Win32-visualStudio"
-    elseif os.istarget("linux") then
-        IRRKLANG_LIB_DIR = "../irrklang/bin/linux-gcc-64"
-        IRRKLANG_LINK_RPATH = "-Wl,-rpath=./irrklang/bin/linux-gcc-64/"
-    elseif os.istarget("macosx") then
-        IRRKLANG_LIB_DIR = "../irrklang/bin/macosx-gcc"
+if USE_DXSDK and os.istarget("windows") then
+    if not os.getenv("DXSDK_DIR") then
+        print("DXSDK_DIR environment variable not set, it seems you don't have the DirectX SDK installed. DirectX mode will be disabled.")
+        USE_DXSDK = false
     end
-    IRRKLANG_LIB_DIR = GetParam("irrklang-lib-dir") or IRRKLANG_LIB_DIR
 end
 
-if GetParam("irrklang-pro") and os.istarget("windows") then
-    IRRKLANG_PRO = true
-elseif GetParam("no-irrklang-pro") then
-    IRRKLANG_PRO = false
-end
-if IRRKLANG_PRO then
-    -- irrklang pro can't use the pro lib to debug
-    IRRKLANG_PRO_RELEASE_LIB_DIR = GetParam("irrklang-pro-release-lib-dir") or "../irrklang/lib/Win32-vs2019"
-    IRRKLANG_PRO_DEBUG_LIB_DIR = GetParam("irrklang-pro-debug-lib-dir") or "../irrklang/lib/Win32-visualStudio-debug"  
+if GetParam("no-audio") then
+    USE_AUDIO = false
+elseif GetParam("no-use-miniaudio") then
+    print("Warning: --no-use-miniaudio is deprecated, use --no-audio")
+    USE_AUDIO = false
+elseif GetParam("use-miniaudio") then
+    print("Warning: --use-miniaudio is deprecated, use --audio-lib=miniaudio")
+    USE_AUDIO = true
+    AUDIO_LIB = "miniaudio"
+elseif GetParam("no-use-irrklang") then
+    print("Warning: --no-use-irrklang is deprecated, use --no-audio")
+    USE_AUDIO = false
+elseif GetParam("use-irrklang") then
+    print("Warning: --use-irrklang is deprecated, use --audio-lib=irrklang")
+    USE_AUDIO = true
+    AUDIO_LIB = "irrklang"
 end
 
-BUILD_IKPMP3 = USE_IRRKLANG and (GetParam("build-ikpmp3") or IRRKLANG_PRO)
+if USE_AUDIO then
+    AUDIO_LIB = GetParam("audio-lib") or AUDIO_LIB
+    if AUDIO_LIB == "miniaudio" then
+        if GetParam("miniaudio-support-opus-vorbis") then
+            MINIAUDIO_SUPPORT_OPUS_VORBIS = true
+        elseif GetParam("no-miniaudio-support-opus-vorbis") then
+            MINIAUDIO_SUPPORT_OPUS_VORBIS = false
+        end
+        if MINIAUDIO_SUPPORT_OPUS_VORBIS then
+            if GetParam("no-build-opus-vorbis") then
+                MINIAUDIO_BUILD_OPUS_VORBIS = false
+            elseif GetParam("build-opus-vorbis") then
+                MINIAUDIO_BUILD_OPUS_VORBIS = true
+            end
+            if not MINIAUDIO_BUILD_OPUS_VORBIS then
+                OPUS_INCLUDE_DIR = GetParam("opus-include-dir") or FindHeaderWithSubDir("opus/opus.h", "opus")
+                OPUS_LIB_DIR = GetParam("opus-lib-dir") or os.findlib("opus")
+                OPUSFILE_INCLUDE_DIR = GetParam("opusfile-include-dir") or FindHeaderWithSubDir("opus/opusfile.h", "opus")
+                OPUSFILE_LIB_DIR = GetParam("opusfile-lib-dir") or os.findlib("opusfile")
+                VORBIS_INCLUDE_DIR = GetParam("vorbis-include-dir") or os.findheader("vorbis/vorbisfile.h")
+                VORBIS_LIB_DIR = GetParam("vorbis-lib-dir") or os.findlib("vorbis")
+                OGG_INCLUDE_DIR = GetParam("ogg-include-dir") or os.findheader("ogg/ogg.h")
+                OGG_LIB_DIR = GetParam("ogg-lib-dir") or os.findlib("ogg")
+            end
+        end
+    elseif AUDIO_LIB == "irrklang" then
+        print("Warning: irrKlang is deprecated and may be removed in future, please consider switching to miniaudio")
+        IRRKLANG_INCLUDE_DIR = GetParam("irrklang-include-dir") or "../irrklang/include"
+        if os.istarget("windows") then
+            IRRKLANG_LIB_DIR = "../irrklang/lib/Win32-visualStudio"
+        elseif os.istarget("linux") then
+            IRRKLANG_LIB_DIR = "../irrklang/bin/linux-gcc-64"
+            IRRKLANG_LINK_RPATH = "-Wl,-rpath=./irrklang/bin/linux-gcc-64/"
+        elseif os.istarget("macosx") then
+            IRRKLANG_LIB_DIR = "../irrklang/bin/macosx-gcc"
+        end
+        IRRKLANG_LIB_DIR = GetParam("irrklang-lib-dir") or IRRKLANG_LIB_DIR
+        if GetParam("irrklang-pro") and os.istarget("windows") then
+            IRRKLANG_PRO = true
+        elseif GetParam("no-irrklang-pro") then
+            IRRKLANG_PRO = false
+        end
+        if IRRKLANG_PRO then
+            -- irrklang pro can't use the pro lib to debug
+            IRRKLANG_PRO_RELEASE_LIB_DIR = GetParam("irrklang-pro-release-lib-dir") or "../irrklang/lib/Win32-vs2019"
+            IRRKLANG_PRO_DEBUG_LIB_DIR = GetParam("irrklang-pro-debug-lib-dir") or "../irrklang/lib/Win32-visualStudio-debug"
+        end
+        IRRKLANG_PRO_BUILD_IKPMP3 = GetParam("build-ikpmp3") or IRRKLANG_PRO
+    else
+        error("Unknown audio library: " .. AUDIO_LIB)
+    end
+end
 
 if GetParam("winxp-support") and os.istarget("windows") then
     WINXP_SUPPORT = true
 end
-if GetParam("mac-arm") and os.istarget("macosx") then
-    MAC_ARM = true
+
+if os.istarget("macosx") then
+    if GetParam("mac-arm") then
+        MAC_ARM = true
+    end
+    if GetParam("mac-intel") then
+        MAC_INTEL = true
+    end
+    if MAC_ARM or (not MAC_INTEL and os.hostarch() == "ARM64") then
+        -- building on ARM CPU will target ARM automatically
+        TARGET_MAC_ARM = true
+    end
 end
 
 workspace "YGOPro"
@@ -159,8 +258,6 @@ workspace "YGOPro"
     configurations { "Release", "Debug" }
 
     filter "system:windows"
-        defines { "WIN32", "_WIN32" }
-        entrypoint "mainCRTStartup"
         systemversion "latest"
         startproject "YGOPro"
         if WINXP_SUPPORT then
@@ -169,14 +266,25 @@ workspace "YGOPro"
         else
             defines { "WINVER=0x0601" } -- WIN7
         end
+        platforms { "Win32", "x64" }
+
+    filter { "system:windows", "platforms:Win32" }
+        architecture "x86"
+
+    filter { "system:windows", "platforms:x64" }
+        architecture "x86_64"
 
     filter "system:macosx"
         libdirs { "/usr/local/lib" }
-        buildoptions { "-stdlib=libc++" }
         if MAC_ARM then
-            buildoptions { "--target=arm64-apple-macos12" }
+            buildoptions { "-arch arm64" }
         end
-        links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
+        if MAC_INTEL then
+            buildoptions { "-arch x86_64", "-mavx", "-mfma" }
+        end
+        if MAC_ARM and MAC_INTEL then
+            architecture "universal"
+        end
 
     filter "system:linux"
         buildoptions { "-U_FORTIFY_SOURCE" }
@@ -190,28 +298,43 @@ workspace "YGOPro"
         defines "_DEBUG"
         targetdir "bin/debug"
 
+    filter { "system:windows", "platforms:Win32", "configurations:Release" }
+        targetdir "bin/release/x86"
+
+    filter { "system:windows", "platforms:Win32", "configurations:Debug" }
+        targetdir "bin/debug/x86"
+
+    filter { "system:windows", "platforms:x64", "configurations:Release" }
+        targetdir "bin/release/x64"
+
+    filter { "system:windows", "platforms:x64", "configurations:Debug" }
+        targetdir "bin/debug/x64"
+
     filter { "configurations:Release", "action:vs*" }
-        flags { "LinkTimeOptimization" }
+        linktimeoptimization "On"
         staticruntime "On"
-        disablewarnings { "4244", "4267", "4838", "4577", "4819", "4018", "4996", "4477", "4091", "4828", "4800", "6011", "6031", "6054", "6262" }
+        disablewarnings { "4244", "4267", "4838", "4996", "6011", "6031", "6054", "6262" }
 
     filter { "configurations:Release", "not action:vs*" }
-        symbols "On"
         defines "NDEBUG"
-        if not MAC_ARM then
-            buildoptions "-march=native"
-        end
 
     filter { "configurations:Debug", "action:vs*" }
-        disablewarnings { "4819", "4828", "6011", "6031", "6054", "6262" }
+        disablewarnings { "6011", "6031", "6054", "6262" }
 
     filter "action:vs*"
+        cdialect "C11"
+        if not WINXP_SUPPORT then
+           conformancemode "On" 
+        end
         vectorextensions "SSE2"
         buildoptions { "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
-    
+
     filter "not action:vs*"
         buildoptions { "-fno-strict-aliasing", "-Wno-multichar", "-Wno-format-security" }
+        if not MAC_ARM and not MAC_INTEL then
+            buildoptions "-march=native"
+        end
 
     filter {}
 
@@ -232,6 +355,11 @@ workspace "YGOPro"
     if BUILD_SQLITE then
         include "sqlite3"
     end
-    if BUILD_IKPMP3 then
-        include "ikpmp3"
+    if USE_AUDIO then
+        if AUDIO_LIB=="miniaudio" then
+            include "miniaudio"
+        end
+        if IRRKLANG_PRO_BUILD_IKPMP3 then
+            include "ikpmp3"
+        end
     end

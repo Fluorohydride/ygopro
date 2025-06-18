@@ -8,6 +8,8 @@
 /pics
 /replay
 /single
+/sound
+!/sound/files.txt
 /WindBot
 /cards.cdb
 /error.log
@@ -18,6 +20,8 @@
 /ygopro
 /ygopro.exe
 /ygopro.app
+/ikpMP3.dll
+/irrKlang.dll
 
 /bin
 /build
@@ -28,6 +32,7 @@
 /irrklang
 /ikpmp3
 /lua
+/miniaudio
 /sqlite3
 /gframe/*.ico
 /gframe/ygopro.rc

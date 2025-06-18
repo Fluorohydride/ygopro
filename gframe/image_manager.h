@@ -1,10 +1,17 @@
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
 
+#ifndef _OPENMP
+#define YGOPRO_USE_THUMB_LOAD_THREAD
+#endif
+
 #include "config.h"
 #include "data_manager.h"
 #include <unordered_map>
+#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
 #include <queue>
+#include <mutex>
+#endif
 
 namespace ygo {
 
@@ -15,20 +22,24 @@ public:
 	void ClearTexture();
 	void RemoveTexture(int code);
 	void ResizeTexture();
-	irr::video::ITexture* GetTextureFromFile(const char* file, s32 width, s32 height);
+	irr::video::ITexture* GetTextureFromFile(const char* file, irr::s32 width, irr::s32 height);
 	irr::video::ITexture* GetTexture(int code, bool fit = false);
 	irr::video::ITexture* GetBigPicture(int code, float zoom);
 	irr::video::ITexture* GetTextureThumb(int code);
 	irr::video::ITexture* GetTextureField(int code);
+#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
 	static int LoadThumbThread();
+#endif
 
 	std::unordered_map<int, irr::video::ITexture*> tMap[2];
 	std::unordered_map<int, irr::video::ITexture*> tThumb;
 	std::unordered_map<int, irr::video::ITexture*> tFields;
+#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
 	std::unordered_map<int, irr::video::IImage*> tThumbLoading;
 	std::queue<int> tThumbLoadingCodes;
 	std::mutex tThumbLoadingMutex;
 	bool tThumbLoadingThreadRunning;
+#endif
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
 	irr::video::ITexture* tCover[4];
@@ -36,7 +47,9 @@ public:
 	irr::video::ITexture* tUnknownFit;
 	irr::video::ITexture* tUnknownThumb;
 	irr::video::ITexture* tBigPicture;
+#ifdef YGOPRO_USE_THUMB_LOAD_THREAD
 	irr::video::ITexture* tLoading;
+#endif
 	irr::video::ITexture* tAct;
 	irr::video::ITexture* tAttack;
 	irr::video::ITexture* tNegated;
