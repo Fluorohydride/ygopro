@@ -76,13 +76,13 @@ jobs:
       id: libevent
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://github.com/libevent/libevent/releases/download/release-2.0.22-stable/libevent-2.0.22-stable.tar.gz
+        url: https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
         filename: libevent.tar.gz
 
     - name: Extract libevent
       run: |
         tar xf ${{ steps.libevent.outputs.filepath }}
-        move libevent-2.0.22-stable event
+        move libevent-2.1.12-stable event
 
     - name: Download freetype
       id: freetype
@@ -110,12 +110,12 @@ jobs:
       id: sqlite
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3500100.zip
 
     - name: Extract sqlite
       run: |
         7z x ${{ steps.sqlite.outputs.filepath }}
-        move sqlite-amalgamation-3490100 sqlite3
+        move sqlite-amalgamation-3500100 sqlite3
 
     - name: Download miniaudio
       if: matrix.audiolib == 'miniaudio'
@@ -357,13 +357,13 @@ jobs:
       id: sqlite
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3500100.zip
 
     - name: Extract sqlite
       if: matrix.static-link == true
       run: |
         7z x ${{ steps.sqlite.outputs.filepath }}
-        mv sqlite-amalgamation-3490100 sqlite3
+        mv sqlite-amalgamation-3500100 sqlite3
 
     - name: Download miniaudio
       run: |
@@ -583,13 +583,13 @@ jobs:
       id: sqlite
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3500100.zip
 
     - name: Extract sqlite
       if: matrix.static-link == true
       run: |
         7z x ${{ steps.sqlite.outputs.filepath }}
-        mv sqlite-amalgamation-3490100 sqlite3
+        mv sqlite-amalgamation-3500100 sqlite3
 
     - name: Download miniaudio
       run: |

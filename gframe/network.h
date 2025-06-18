@@ -204,17 +204,6 @@ struct DuelPlayer {
 	bufferevent* bev{};
 };
 
-inline bool check_msg_size(int size) {
-	// empty string is not allowed
-	if (size < 2 * sizeof(uint16_t))
-		return false;
-	if (size > LEN_CHAT_MSG * sizeof(uint16_t))
-		return false;
-	if (size % sizeof(uint16_t) != 0)
-		return false;
-	return true;
-}
-
 inline unsigned int GetPosition(unsigned char* qbuf, size_t offset) {
 	unsigned int info = 0;
 	std::memcpy(&info, qbuf + offset, sizeof info);
@@ -301,7 +290,7 @@ public:
 #define STOC_LEAVE_GAME		0x14	// reserved
 #define STOC_DUEL_START		0x15	// no data
 #define STOC_DUEL_END		0x16	// no data
-#define STOC_REPLAY			0x17	// ReplayHeader + byte array
+#define STOC_REPLAY			0x17	// ExtendedReplayHeader + byte array
 #define STOC_TIME_LIMIT		0x18	// STOC_TimeLimit
 #define STOC_CHAT			0x19	// uint16_t + uint16_t array
 #define STOC_HS_PLAYER_ENTER	0x20	// STOC_HS_PlayerEnter

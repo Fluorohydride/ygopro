@@ -1,8 +1,7 @@
+#include <array>
 #include "config.h"
 #include "deck_con.h"
 #include "myfilesystem.h"
-#include "data_manager.h"
-#include "deck_manager.h"
 #include "image_manager.h"
 #include "sound_manager.h"
 #include "game.h"
@@ -54,6 +53,14 @@ static inline void load_current_deck(irr::gui::IGUIComboBox* cbCategory, irr::gu
 	deckManager.LoadCurrentDeck(cbCategory->getSelected(), cbCategory->getText(), cbDeck->getText());
 }
 
+DeckBuilder::DeckBuilder() {
+	std::random_device rd;
+	std::array<uint32_t, 8> seed{};
+	for (auto& x : seed)
+		x = rd();
+	std::seed_seq seq(seed.begin(), seed.end());
+	rnd.seed(seq);
+}
 void DeckBuilder::Initialize() {
 	mainGame->is_building = true;
 	mainGame->is_siding = false;
@@ -82,7 +89,6 @@ void DeckBuilder::Initialize() {
 		filterList = &deckManager._lfList.back();
 	}
 	ClearSearch();
-	rnd.reset((uint_fast32_t)std::time(nullptr));
 	mouse_pos.set(0, 0);
 	hovered_code = 0;
 	hovered_pos = 0;
@@ -175,7 +181,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SHUFFLE_DECK: {
-				rnd.shuffle_vector(deckManager.current_deck.main);
+				std::shuffle(deckManager.current_deck.main.begin(), deckManager.current_deck.main.end(), rnd);
 				break;
 			}
 			case BUTTON_SAVE_DECK: {
@@ -388,6 +394,29 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				prev_operation = id;
 				break;
 			}
+			case BUTTON_IMPORT_DECK_CODE: {
+				time_t nowtime = std::time(nullptr);
+				wchar_t timetext[40];
+				std::wcsftime(timetext, sizeof timetext / sizeof timetext[0], L"%Y-%m-%d %H-%M-%S", std::localtime(&nowtime));
+				mainGame->gMutex.lock();
+				mainGame->stDMMessage->setText(dataManager.GetSysString(1471));
+				mainGame->ebDMName->setVisible(true);
+				mainGame->ebDMName->setText(timetext);
+				mainGame->PopupElement(mainGame->wDMQuery);
+				mainGame->gMutex.unlock();
+				prev_operation = id;
+				break;
+			}
+			case BUTTON_EXPORT_DECK_CODE: {
+				std::stringstream textStream;
+				deckManager.SaveDeck(deckManager.current_deck, textStream);
+				wchar_t text[0x10000];
+				BufferIO::DecodeUTF8(textStream.str().c_str(), text);
+				mainGame->env->getOSOperator()->copyToClipboard(text);
+				mainGame->stACMessage->setText(dataManager.GetSysString(1480));
+				mainGame->PopupElement(mainGame->wACMessage, 20);
+				break;
+			}
 			case BUTTON_DM_OK: {
 				switch(prev_operation) {
 				case BUTTON_NEW_CATEGORY: {
@@ -464,7 +493,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					}
 					break;
 				}
-				case BUTTON_NEW_DECK: {
+				case BUTTON_NEW_DECK:
+				case BUTTON_IMPORT_DECK_CODE: {
 					const wchar_t* deckname = mainGame->ebDMName->getText();
 					wchar_t catepath[256];
 					DeckManager::GetCategoryPath(catepath, mainGame->cbDBCategory->getSelected(), mainGame->cbDBCategory->getText());
@@ -472,9 +502,19 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					myswprintf(filepath, L"%ls/%ls.ydk", catepath, deckname);
 					bool res = false;
 					if(!FileSystem::IsFileExists(filepath)) {
-						deckManager.current_deck.main.clear();
-						deckManager.current_deck.extra.clear();
-						deckManager.current_deck.side.clear();
+						if(prev_operation == BUTTON_NEW_DECK) {
+							deckManager.current_deck.main.clear();
+							deckManager.current_deck.extra.clear();
+							deckManager.current_deck.side.clear();
+						} else {
+							const wchar_t* txt = mainGame->env->getOSOperator()->getTextFromClipboard();
+							if(txt) {
+								char text[0x10000];
+								BufferIO::EncodeUTF8(txt, text);
+								std::istringstream textStream(text);
+								deckManager.LoadCurrentDeck(textStream);
+							}
+						}
 						res = DeckManager::SaveDeck(deckManager.current_deck, filepath);
 						RefreshDeckList();
 						ChangeCategory(mainGame->lstCategories->getSelected());
