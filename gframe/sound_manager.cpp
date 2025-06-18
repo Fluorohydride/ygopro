@@ -68,6 +68,7 @@ void SoundManager::RefreshBGMList() {
 #endif
 }
 void SoundManager::RefershBGMDir(std::wstring path, int scene) {
+#ifdef YGOPRO_USE_AUDIO
 	std::wstring search = L"./sound/BGM/" + path;
 	FileSystem::TraversalDir(search.c_str(), [this, &path, scene](const wchar_t* name, bool isdir) {
 		if(!isdir && (
@@ -81,6 +82,7 @@ void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 			BGMList[scene].push_back(filename);
 		}
 	});
+#endif // YGOPRO_USE_AUDIO
 }
 void SoundManager::PlaySoundEffect(int sound) {
 #ifdef YGOPRO_USE_AUDIO
