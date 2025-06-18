@@ -309,7 +309,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				myswprintf(replay_path, L"./replay/%ls", replay_filename);
 				if (!replay.OpenReplay(replay_path))
 					break;
-				if (replay.pheader.flag & REPLAY_SINGLE_MODE)
+				if (replay.pheader.base.flag & REPLAY_SINGLE_MODE)
 					break;
 				for (size_t i = 0; i < replay.decks.size(); ++i) {
 					BufferIO::CopyWideString(replay.players[Replay::GetDeckPlayer(i)].c_str(), namebuf[i]);
@@ -537,24 +537,25 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				wchar_t infobuf[256]{};
 				std::wstring repinfo;
 				time_t curtime;
-				if(temp_replay.pheader.flag & REPLAY_UNIFORM)
-					curtime = temp_replay.pheader.start_time;
+				const auto& rh = temp_replay.pheader.base;
+				if(temp_replay.pheader.base.flag & REPLAY_UNIFORM)
+					curtime = rh.start_time;
 				else{
-					curtime = temp_replay.pheader.seed;
+					curtime = rh.seed;
 					wchar_t version_info[256]{};
-					myswprintf(version_info, L"version 0x%X\n", temp_replay.pheader.version);
+					myswprintf(version_info, L"version 0x%X\n", rh.version);
 					repinfo.append(version_info);
 				}
 				std::wcsftime(infobuf, sizeof infobuf / sizeof infobuf[0], L"%Y/%m/%d %H:%M:%S\n", std::localtime(&curtime));
 				repinfo.append(infobuf);
-				if (temp_replay.pheader.flag & REPLAY_SINGLE_MODE) {
+				if (rh.flag & REPLAY_SINGLE_MODE) {
 					wchar_t path[256]{};
 					BufferIO::DecodeUTF8(temp_replay.script_name.c_str(), path);
 					repinfo.append(path);
 					repinfo.append(L"\n");
 				}
 				const auto& player_names = temp_replay.players;
-				if(temp_replay.pheader.flag & REPLAY_TAG)
+				if(rh.flag & REPLAY_TAG)
 					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", player_names[0].c_str(), player_names[1].c_str(), player_names[2].c_str(), player_names[3].c_str());
 				else
 					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", player_names[0].c_str(), player_names[1].c_str());
