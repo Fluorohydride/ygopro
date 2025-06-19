@@ -2,26 +2,11 @@
 #define CLIENT_CARD_H
 
 #include "config.h"
-#include "../ocgcore/card_data.h"
 #include <vector>
 #include <set>
 #include <map>
-#include <unordered_map>
 
 namespace ygo {
-
-using CardData = card_data;
-struct CardDataC : card_data {
-	unsigned int ot{};
-	unsigned int category{};
-};
-struct CardString {
-	std::wstring name;
-	std::wstring text;
-	std::wstring desc[16];
-};
-typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer;
-typedef std::unordered_map<unsigned int, CardString>::const_iterator string_pointer;
 
 class ClientCard {
 public:
@@ -30,9 +15,9 @@ public:
 	irr::core::vector3df curRot;
 	irr::core::vector3df dPos;
 	irr::core::vector3df dRot;
-	u32 curAlpha{ 255 };
-	u32 dAlpha{ 0 };
-	u32 aniFrame{ 0 };
+	irr::u32 curAlpha{ 255 };
+	irr::u32 dAlpha{ 0 };
+	irr::u32 aniFrame{ 0 };
 	bool is_moving{ false };
 	bool is_fading{ false };
 	bool is_hovered{ false };
@@ -90,15 +75,11 @@ public:
 
 	ClientCard() = default;
 	~ClientCard();
-	void SetCode(int code);
+	void SetCode(unsigned int x);
 	void UpdateInfo(unsigned char* buf);
 	void ClearTarget();
 	void ClearData();
 	static bool client_card_sort(ClientCard* c1, ClientCard* c2);
-	static bool deck_sort_lv(code_pointer l1, code_pointer l2);
-	static bool deck_sort_atk(code_pointer l1, code_pointer l2);
-	static bool deck_sort_def(code_pointer l1, code_pointer l2);
-	static bool deck_sort_name(code_pointer l1, code_pointer l2);
 };
 
 }

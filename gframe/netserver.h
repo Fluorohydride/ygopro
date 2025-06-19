@@ -1,11 +1,7 @@
 #ifndef NETSERVER_H
 #define NETSERVER_H
 
-#include "config.h"
 #include "network.h"
-#include "data_manager.h"
-#include "deck_manager.h"
-#include <set>
 #include <unordered_map>
 
 namespace ygo {
@@ -18,9 +14,8 @@ private:
 	static event* broadcast_ev;
 	static evconnlistener* listener;
 	static DuelMode* duel_mode;
-	static unsigned char net_server_read[0x2000];
-	static unsigned char net_server_write[0x2000];
-	static unsigned short last_sent;
+	static unsigned char net_server_write[SIZE_NETWORK_BUFFER];
+	static size_t last_sent;
 
 public:
 	static bool StartServer(unsigned short port);
@@ -35,34 +30,37 @@ public:
 	static void ServerEchoEvent(bufferevent* bev, short events, void* ctx);
 	static int ServerThread();
 	static void DisconnectPlayer(DuelPlayer* dp);
-	static void HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, unsigned int len);
+	static void HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len);
+	static size_t CreateChatPacket(unsigned char* src, int src_size, unsigned char* dst, uint16_t dst_player_type);
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto) {
 		auto p = net_server_write;
-		BufferIO::WriteInt16(p, 1);
-		BufferIO::WriteInt8(p, proto);
+		buffer_write<uint16_t>(p, 1);
+		buffer_write<uint8_t>(p, proto);
 		last_sent = 3;
-		if(!dp)
-			return;
-		bufferevent_write(dp->bev, net_server_write, last_sent);
+		if (dp)
+			bufferevent_write(dp->bev, net_server_write, 3);
 	}
 	template<typename ST>
-	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, ST& st) {
+	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, const ST& st) {
 		auto p = net_server_write;
-		BufferIO::WriteInt16(p, 1 + sizeof(ST));
-		BufferIO::WriteInt8(p, proto);
-		memcpy(p, &st, sizeof(ST));
+		static_assert(sizeof(ST) <= MAX_DATA_SIZE, "Packet size is too large.");
+		buffer_write<uint16_t>(p, (uint16_t)(1 + sizeof(ST)));
+		buffer_write<uint8_t>(p, proto);
+		std::memcpy(p, &st, sizeof(ST));
 		last_sent = sizeof(ST) + 3;
-		if(dp)
-			bufferevent_write(dp->bev, net_server_write, last_sent);
+		if (dp)
+			bufferevent_write(dp->bev, net_server_write, sizeof(ST) + 3);
 	}
 	static void SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* buffer, size_t len) {
 		auto p = net_server_write;
-		BufferIO::WriteInt16(p, 1 + len);
-		BufferIO::WriteInt8(p, proto);
-		memcpy(p, buffer, len);
+		if (len > MAX_DATA_SIZE)
+			len = MAX_DATA_SIZE;
+		buffer_write<uint16_t>(p, (uint16_t)(1 + len));
+		buffer_write<uint8_t>(p, proto);
+		std::memcpy(p, buffer, len);
 		last_sent = len + 3;
-		if(dp)
-			bufferevent_write(dp->bev, net_server_write, last_sent);
+		if (dp)
+			bufferevent_write(dp->bev, net_server_write, len + 3);
 	}
 	static void ReSendToPlayer(DuelPlayer* dp) {
 		if(dp)

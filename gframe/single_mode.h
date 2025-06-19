@@ -1,7 +1,7 @@
 #ifndef SINGLE_MODE_H
 #define SINGLE_MODE_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 #include "replay.h"
 
@@ -30,7 +30,7 @@ public:
 	static void SinglePlayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 	static void SinglePlayReload();
 
-	static uint32 MessageHandler(intptr_t fduel, uint32 type);
+	static uint32_t MessageHandler(intptr_t fduel, uint32_t type);
 
 protected:
 	static Replay last_replay;

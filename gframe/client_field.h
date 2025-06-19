@@ -2,7 +2,7 @@
 #define CLIENT_FIELD_H
 
 #include "config.h"
-#include "../ocgcore/mtrandom.h"
+#include <random>
 #include <vector>
 #include <set>
 #include <map>
@@ -57,9 +57,12 @@ public:
 	int select_min{ 0 };
 	int select_max{ 0 };
 	int must_select_count{ 0 };
+	int select_curval_l{ 0 };
+	int select_curval_h{ 0 };
 	int select_sumval{ 0 };
 	int select_mode{ 0 };
-	bool select_cancelable{ false };
+	int select_hint{0};
+	bool select_cancelable{false};
 	bool select_panalmode{ false };
 	bool select_ready{ false };
 	int announce_count{ 0 };
@@ -69,15 +72,15 @@ public:
 	std::vector<ClientCard*> selected_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
-	std::vector<int> declare_opcodes;
+	std::vector<unsigned int> declare_opcodes;
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
-	bool grave_act{ false };
-	bool remove_act{ false };
-	bool deck_act{ false };
-	bool extra_act{ false };
-	bool pzone_act[2]{};
+	bool grave_act[2]{ false };
+	bool remove_act[2]{ false };
+	bool deck_act[2]{ false };
+	bool extra_act[2]{ false };
+	bool pzone_act[2]{ false };
 	bool conti_act{ false };
 	bool chain_forced{ false };
 	ChainInfo current_chain;
@@ -85,12 +88,15 @@ public:
 	bool deck_reversed{ false };
 	bool conti_selecting{ false };
 	bool cant_check_grave{ false };
-	mt19937 rnd;
+	bool tag_surrender{ false };
+	bool tag_teammate_surrender{ false };
+	std::mt19937 rnd;
 
 	ClientField();
 	~ClientField();
 	void Clear();
 	void Initial(int player, int deckc, int extrac);
+	void ResetSequence(std::vector<ClientCard*>& list, bool reset_height);
 	ClientCard* GetCard(int controler, int location, int sequence, int sub_seq = 0);
 	void AddCard(ClientCard* pcard, int controler, int location, int sequence);
 	ClientCard* RemoveCard(int controler, int location, int sequence);
@@ -139,8 +145,8 @@ public:
 	ClientCard* menu_card{ nullptr };
 	int list_command{ 0 };
 
-	virtual bool OnEvent(const irr::SEvent& event);
-	virtual bool OnCommonEvent(const irr::SEvent& event);
+	bool OnEvent(const irr::SEvent& event) override;
+	bool OnCommonEvent(const irr::SEvent& event);
 	void GetHoverField(int x, int y);
 	void ShowMenu(int flag, int x, int y);
 	void HideMenu();
@@ -156,8 +162,6 @@ public:
 }
 
 //special cards
-#define CARD_MARINE_DOLPHIN	78734254
-#define CARD_TWINKLE_MOSS	13857930
 #define CARD_QUESTION		38723936
 
 #endif //CLIENT_FIELD_H
