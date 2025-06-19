@@ -316,7 +316,7 @@ public:
 	irr::gui::CGUITTFont* numFont;
 	irr::gui::CGUITTFont* adFont;
 	irr::gui::CGUITTFont* lpcFont;
-	std::map<irr::gui::CGUIImageButton*, int> imageLoading;
+	std::unordered_map<irr::gui::CGUIImageButton*, int> imageLoading;
 	//card image
 	irr::gui::IGUIStaticText* wCardImg;
 	irr::gui::IGUIImage* imgCard;
