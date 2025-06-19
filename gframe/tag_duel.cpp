@@ -516,11 +516,6 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.base.version = PRO_VERSION;
 	rh.base.flag = REPLAY_UNIFORM | REPLAY_TAG;
 	rh.base.start_time = (uint32_t)std::time(nullptr);
-#ifdef YGOPRO_SERVER_MODE
-		if(pre_seed_specified[duel_count])
-			memcpy(rh.seed_sequence, pre_seed[duel_count], SEED_COUNT * sizeof(uint32_t));
-		else
-#endif
 	for (auto& x : rh.seed_sequence)
 		x = rd();
 	mtrandom rnd(rh.seed_sequence, SEED_COUNT);
