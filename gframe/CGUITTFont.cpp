@@ -28,6 +28,7 @@
    john@suckerfreegames.com
 */
 
+#define _IRR_STATIC_LIB_
 #include <irrlicht.h>
 #include "CGUITTFont.h"
 

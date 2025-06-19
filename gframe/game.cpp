@@ -50,22 +50,6 @@ void DuelInfo::Clear() {
 	time_left[1] = 0;
 }
 
-bool IsExtension(const wchar_t* filename, const wchar_t* extension) {
-	auto flen = std::wcslen(filename);
-	auto elen = std::wcslen(extension);
-	if (!elen || flen < elen)
-		return false;
-	return !mywcsncasecmp(filename + (flen - elen), extension, elen);
-}
-
-bool IsExtension(const char* filename, const char* extension) {
-	auto flen = std::strlen(filename);
-	auto elen = std::strlen(extension);
-	if (!elen || flen < elen)
-		return false;
-	return !mystrncasecmp(filename + (flen - elen), extension, elen);
-}
-
 bool Game::Initialize() {
 	LoadConfig("system.conf");
 	LoadConfig("load-once.conf");
@@ -107,6 +91,9 @@ bool Game::Initialize() {
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	if(!numFont) {
 		const wchar_t* numFontPaths[] = {
+			L"./fonts/numFont.ttf",
+			L"./fonts/numFont.ttc",
+			L"./fonts/numFont.otf",
 			L"C:/Windows/Fonts/arialbd.ttf",
 			L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
 			L"/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
@@ -114,9 +101,6 @@ bool Game::Initialize() {
 			L"/usr/share/fonts/noto-cjk/NotoSansCJK-Bold.ttc",
 			L"/System/Library/Fonts/SFNSTextCondensed-Bold.otf",
 			L"/System/Library/Fonts/SFNS.ttf",
-			L"./fonts/numFont.ttf",
-			L"./fonts/numFont.ttc",
-			L"./fonts/numFont.otf"
 		};
 		for(const wchar_t* path : numFontPaths) {
 			BufferIO::CopyWideString(path, gameConf.numfont);
@@ -128,6 +112,9 @@ bool Game::Initialize() {
 	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	if(!textFont) {
 		const wchar_t* textFontPaths[] = {
+			L"./fonts/textFont.ttf",
+			L"./fonts/textFont.ttc",
+			L"./fonts/textFont.otf",
 			L"C:/Windows/Fonts/msyh.ttc",
 			L"C:/Windows/Fonts/msyh.ttf",
 			L"C:/Windows/Fonts/simsun.ttc",
@@ -139,9 +126,7 @@ bool Game::Initialize() {
 			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc",
 			L"/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
 			L"/System/Library/Fonts/PingFang.ttc",
-			L"./fonts/textFont.ttf",
-			L"./fonts/textFont.ttc",
-			L"./fonts/textFont.otf"
+			L"/System/Library/Fonts/STHeiti Medium.ttc",
 		};
 		for(const wchar_t* path : textFontPaths) {
 			BufferIO::CopyWideString(path, gameConf.textfont);
@@ -159,7 +144,7 @@ bool Game::Initialize() {
 			}
 		});
 		if(fpath[0] == 0) {
-			ErrorLog("No fonts found! Please manually edit system.conf or place appropriate font file in the fonts directory.");
+			ErrorLog("No fonts found! Please place appropriate font file in the fonts directory, or edit system.conf manually.");
 			return false;
 		}
 		if(!numFont) {
@@ -650,10 +635,10 @@ bool Game::Initialize() {
 	wDeckEdit->setVisible(false);
 	btnManageDeck = env->addButton(irr::core::rect<irr::s32>(225, 5, 290, 30), wDeckEdit, BUTTON_MANAGE_DECK, dataManager.GetSysString(1328));
 	//deck manage
-	wDeckManage = env->addWindow(irr::core::rect<irr::s32>(310, 135, 800, 465), false, dataManager.GetSysString(1460), 0, WINDOW_DECK_MANAGE);
+	wDeckManage = env->addWindow(irr::core::rect<irr::s32>(310, 135, 800, 515), false, dataManager.GetSysString(1460), 0, WINDOW_DECK_MANAGE);
 	wDeckManage->setVisible(false);
-	lstCategories = env->addListBox(irr::core::rect<irr::s32>(10, 30, 140, 320), wDeckManage, LISTBOX_CATEGORIES, true);
-	lstDecks = env->addListBox(irr::core::rect<irr::s32>(150, 30, 340, 320), wDeckManage, LISTBOX_DECKS, true);
+	lstCategories = env->addListBox(irr::core::rect<irr::s32>(10, 30, 140, 370), wDeckManage, LISTBOX_CATEGORIES, true);
+	lstDecks = env->addListBox(irr::core::rect<irr::s32>(150, 30, 340, 370), wDeckManage, LISTBOX_DECKS, true);
 	posY = 30;
 	btnNewCategory = env->addButton(irr::core::rect<irr::s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_NEW_CATEGORY, dataManager.GetSysString(1461));
 	posY += 35;
@@ -670,6 +655,10 @@ bool Game::Initialize() {
 	btnMoveDeck = env->addButton(irr::core::rect<irr::s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_MOVE_DECK, dataManager.GetSysString(1467));
 	posY += 35;
 	btnCopyDeck = env->addButton(irr::core::rect<irr::s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_COPY_DECK, dataManager.GetSysString(1468));
+	posY += 35;
+	btnImportDeckCode = env->addButton(irr::core::rect<irr::s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_IMPORT_DECK_CODE, dataManager.GetSysString(1478));
+	posY += 35;
+	btnExportDeckCode = env->addButton(irr::core::rect<irr::s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_EXPORT_DECK_CODE, dataManager.GetSysString(1479));
 	//deck manage query
 	wDMQuery = env->addWindow(irr::core::rect<irr::s32>(400, 200, 710, 320), false, dataManager.GetSysString(1460));
 	wDMQuery->getCloseButton()->setVisible(false);
@@ -753,14 +742,14 @@ bool Game::Initialize() {
 	cbAttribute = env->addComboBox(irr::core::rect<irr::s32>(60, 20 + 50 / 6, 195, 40 + 50 / 6), wFilter, COMBOBOX_ATTRIBUTE);
 	cbAttribute->setMaxSelectionRows(10);
 	cbAttribute->addItem(dataManager.GetSysString(1310), 0);
-	for(int filter = 0x1; filter != 0x80; filter <<= 1)
-		cbAttribute->addItem(dataManager.FormatAttribute(filter).c_str(), filter);
+	for (int filter = 0; filter < ATTRIBUTES_COUNT; ++filter)
+		cbAttribute->addItem(dataManager.FormatAttribute(0x1U << filter).c_str(), 0x1U << filter);
 	stRace = env->addStaticText(dataManager.GetSysString(1321), irr::core::rect<irr::s32>(10, 42 + 75 / 6, 70, 62 + 75 / 6), false, false, wFilter);
 	cbRace = env->addComboBox(irr::core::rect<irr::s32>(60, 40 + 75 / 6, 195, 60 + 75 / 6), wFilter, COMBOBOX_RACE);
 	cbRace->setMaxSelectionRows(10);
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
-	for(int filter = 0x1; filter < (1 << RACES_COUNT); filter <<= 1)
-		cbRace->addItem(dataManager.FormatRace(filter).c_str(), filter);
+	for (int filter = 0; filter < RACES_COUNT; ++filter)
+		cbRace->addItem(dataManager.FormatRace(0x1U << filter).c_str(), 0x1U << filter);
 	stAttack = env->addStaticText(dataManager.GetSysString(1322), irr::core::rect<irr::s32>(205, 22 + 50 / 6, 280, 42 + 50 / 6), false, false, wFilter);
 	ebAttack = env->addEditBox(L"", irr::core::rect<irr::s32>(260, 20 + 50 / 6, 340, 40 + 50 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebAttack->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -1141,19 +1130,21 @@ std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cW
 }
 void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
+		if (isdir)
+			return;
 		wchar_t fpath[1024];
 		myswprintf(fpath, L"./expansions/%ls", name);
-		if (!isdir && IsExtension(name, L".cdb")) {
+		if (IsExtension(name, L".cdb")) {
 			dataManager.LoadDB(fpath);
 			return;
 		}
-		if (!isdir && IsExtension(name, L".conf")) {
+		if (IsExtension(name, L".conf")) {
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
 			dataManager.LoadStrings(upath);
 			return;
 		}
-		if (!isdir && (IsExtension(name, L".zip") || IsExtension(name, L".ypk"))) {
+		if (IsExtension(name, L".zip") || IsExtension(name, L".ypk")) {
 #ifdef _WIN32
 			DataManager::FileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
 #else
@@ -1256,7 +1247,7 @@ void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const w
 void Game::RefreshReplay() {
 	lstReplayList->clear();
 	FileSystem::TraversalDir(L"./replay", [this](const wchar_t* name, bool isdir) {
-		if (!isdir && IsExtension(name, L".yrp") && Replay::CheckReplay(name))
+		if (!isdir && IsExtension(name, L".yrp"))
 			lstReplayList->addItem(name);
 	});
 }
@@ -1340,17 +1331,13 @@ void Game::LoadConfig(const char* file) {
 			gameConf.use_d3d = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "use_image_scale")) {
 			gameConf.use_image_scale = std::strtol(valbuf, nullptr, 10) > 0;
+		} else if (!std::strcmp(strbuf, "use_image_scale_multi_thread")) {
+			gameConf.use_image_scale_multi_thread = std::strtol(valbuf, nullptr, 10) > 0;
+		} else if (!std::strcmp(strbuf, "use_image_load_background_thread")) {
+			gameConf.use_image_load_background_thread = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "errorlog")) {
 			unsigned int val = std::strtol(valbuf, nullptr, 10);
 			enable_log = val & 0xff;
-		} else if(!std::strcmp(strbuf, "textfont")) {
-			int textfontsize = 0;
-			if (std::sscanf(linebuf, "%63s = %959s %d", strbuf, valbuf, &textfontsize) != 3)
-				continue;
-			gameConf.textfontsize = textfontsize;
-			BufferIO::DecodeUTF8(valbuf, gameConf.textfont);
-		} else if(!std::strcmp(strbuf, "numfont")) {
-			BufferIO::DecodeUTF8(valbuf, gameConf.numfont);
 		} else if(!std::strcmp(strbuf, "serverport")) {
 			gameConf.serverport = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "lasthost")) {
@@ -1419,7 +1406,7 @@ void Game::LoadConfig(const char* file) {
 			gameConf.window_height = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "resize_popup_menu")) {
 			gameConf.resize_popup_menu = std::strtol(valbuf, nullptr, 10) > 0;
-#ifdef YGOPRO_USE_IRRKLANG
+#ifdef YGOPRO_USE_AUDIO
 		} else if(!std::strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "sound_volume")) {
@@ -1445,7 +1432,18 @@ void Game::LoadConfig(const char* file) {
 			// options allowing multiple words
 			if (std::sscanf(linebuf, "%63s = %959[^\n]", strbuf, valbuf) != 2)
 				continue;
-			if (!std::strcmp(strbuf, "nickname")) {
+			if (!std::strcmp(strbuf, "textfont")) {
+				char* last_space = std::strrchr(valbuf, ' ');
+				if (last_space == nullptr)
+					continue;
+				int fontsize = std::strtol(last_space + 1, nullptr, 10);
+				if (fontsize > 0)
+					gameConf.textfontsize = fontsize;
+				*last_space = 0;
+				BufferIO::DecodeUTF8(valbuf, gameConf.textfont);
+			} else if (!std::strcmp(strbuf, "numfont")) {
+				BufferIO::DecodeUTF8(valbuf, gameConf.numfont);
+			} else if (!std::strcmp(strbuf, "nickname")) {
 				BufferIO::DecodeUTF8(valbuf, gameConf.nickname);
 			} else if (!std::strcmp(strbuf, "gamename")) {
 				BufferIO::DecodeUTF8(valbuf, gameConf.gamename);
@@ -1469,6 +1467,8 @@ void Game::SaveConfig() {
 	char linebuf[CONFIG_LINE_SIZE];
 	std::fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
 	std::fprintf(fp, "use_image_scale = %d\n", gameConf.use_image_scale ? 1 : 0);
+	std::fprintf(fp, "use_image_scale_multi_thread = %d\n", gameConf.use_image_scale_multi_thread ? 1 : 0);
+	std::fprintf(fp, "use_image_load_background_thread = %d\n", gameConf.use_image_load_background_thread ? 1 : 0);
 	std::fprintf(fp, "antialias = %d\n", gameConf.antialias);
 	std::fprintf(fp, "errorlog = %u\n", enable_log);
 	BufferIO::CopyWideString(ebNickName->getText(), gameConf.nickname);
@@ -1525,7 +1525,7 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "window_width = %d\n", gameConf.window_width);
 	std::fprintf(fp, "window_height = %d\n", gameConf.window_height);
 	std::fprintf(fp, "resize_popup_menu = %d\n", gameConf.resize_popup_menu ? 1 : 0);
-#ifdef YGOPRO_USE_IRRKLANG
+#ifdef YGOPRO_USE_AUDIO
 	std::fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	std::fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
 	std::fprintf(fp, "#Volume of sound and music, between 0 and 100\n");
@@ -1555,6 +1555,10 @@ void Game::ShowCardInfo(int code, bool resize) {
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	}
 	stName->setText(formatBuffer);
+	if((int)guiFont->getDimension(formatBuffer).Width > stName->getRelativePosition().getWidth() - gameConf.textfontsize)
+		stName->setToolTipText(formatBuffer);
+	else
+		stName->setToolTipText(nullptr);
 	int offset = 0;
 	if (is_valid && !gameConf.hide_setname) {
 		auto& cd = cit->second;
@@ -1717,6 +1721,11 @@ void Game::AddDebugMsg(const char* msg) {
 	}
 }
 void Game::ErrorLog(const char* msg) {
+#ifdef _WIN32
+	OutputDebugStringA(msg);
+#else
+	std::fprintf(stderr, "%s\n", msg);
+#endif
 	FILE* fp = myfopen("error.log", "a");
 	if(!fp)
 		return;
@@ -1871,7 +1880,7 @@ void Game::OnResize() {
 	ebDeckname->setRelativePosition(Resize(80, 65, 220, 90));
 	cbDBCategory->setRelativePosition(Resize(80, 5, 220, 30));
 	btnManageDeck->setRelativePosition(Resize(225, 5, 290, 30));
-	wDeckManage->setRelativePosition(ResizeWin(310, 135, 800, 465));
+	wDeckManage->setRelativePosition(ResizeWin(310, 135, 800, 515));
 	scrPackCards->setRelativePosition(Resize(775, 161, 795, 629));
 
 	wSort->setRelativePosition(Resize(930, 132, 1020, 156));
@@ -2026,6 +2035,9 @@ void Game::OnResize() {
 	btnBigCardZoomIn->setRelativePosition(Resize(205, 140, 295, 175));
 	btnBigCardZoomOut->setRelativePosition(Resize(205, 180, 295, 215));
 	btnBigCardClose->setRelativePosition(Resize(205, 230, 295, 265));
+
+	irr::s32 barWidth = (xScale > 1) ? gameConf.textfontsize * xScale : gameConf.textfontsize;
+	env->getSkin()->setSize(irr::gui::EGDS_SCROLLBAR_SIZE, barWidth);
 }
 void Game::ResizeChatInputWindow() {
 	irr::s32 x = wInfos->getRelativePosition().LowerRightCorner.X + 6;

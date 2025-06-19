@@ -25,7 +25,6 @@ private:
 public:
 	static Replay cur_replay;
 	
-public:
 	static bool StartReplay(int skipturn);
 	static void StopReplay(bool is_exiting = false);
 	static void SwapField();

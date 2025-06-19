@@ -1,5 +1,6 @@
 #include "replay.h"
 #include "myfilesystem.h"
+#include "network.h"
 #include "lzma/LzmaLib.h"
 
 namespace ygo {
@@ -28,12 +29,10 @@ void Replay::BeginRecord() {
 	if(!fp)
 		return;
 #endif
-	replay_size = 0;
-	comp_size = 0;
-	is_replaying = false;
+	Reset();
 	is_recording = true;
 }
-void Replay::WriteHeader(ReplayHeader& header) {
+void Replay::WriteHeader(ExtendedReplayHeader& header) {
 	pheader = header;
 #ifdef _WIN32
 	DWORD size;
@@ -78,11 +77,11 @@ void Replay::EndRecord() {
 #else
 	std::fclose(fp);
 #endif
-	pheader.datasize = replay_size;
-	pheader.flag |= REPLAY_COMPRESSED;
+	pheader.base.datasize = replay_size;
+	pheader.base.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
 	comp_size = MAX_COMP_SIZE;
-	int ret = LzmaCompress(comp_data, &comp_size, replay_data, replay_size, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
+	int ret = LzmaCompress(comp_data, &comp_size, replay_data, replay_size, pheader.base.props, &propsize, 5, 0x1U << 24, 3, 0, 2, 32, 1);
 	if (ret != SZ_OK) {
 		std::memcpy(comp_data, &ret, sizeof ret);
 		comp_size = sizeof ret;
@@ -111,24 +110,33 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	if(!rfp)
 		return false;
 
-	data_position = 0;
-	is_recording = false;
-	is_replaying = false;
-	replay_size = 0;
-	comp_size = 0;
-	if(std::fread(&pheader, sizeof pheader, 1, rfp) < 1) {
+	Reset();
+	bool correct_header = true;
+	if (std::fread(&pheader, sizeof pheader.base, 1, rfp) < 1)
+		correct_header = false;
+	else if (pheader.base.id != REPLAY_ID_YRP1 && pheader.base.id != REPLAY_ID_YRP2)
+		correct_header = false;
+	else if (pheader.base.version < 0x12d0u)
+		correct_header = false;
+	else if (pheader.base.version >= 0x1353u && !(pheader.base.flag & REPLAY_UNIFORM))
+		correct_header = false;
+	if (!correct_header) {
 		std::fclose(rfp);
 		return false;
 	}
-	if(pheader.flag & REPLAY_COMPRESSED) {
+	if (pheader.base.id == REPLAY_ID_YRP2 && std::fread(&pheader.seed_sequence, sizeof pheader.seed_sequence, 1, rfp) < 1) {
+		std::fclose(rfp);
+		return false;
+	}
+	if(pheader.base.flag & REPLAY_COMPRESSED) {
 		comp_size = std::fread(comp_data, 1, MAX_COMP_SIZE, rfp);
 		std::fclose(rfp);
-		if (pheader.datasize > MAX_REPLAY_SIZE)
+		if (pheader.base.datasize > MAX_REPLAY_SIZE)
 			return false;
-		replay_size = pheader.datasize;
-		if (LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.props, 5) != SZ_OK)
+		replay_size = pheader.base.datasize;
+		if (LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.base.props, 5) != SZ_OK)
 			return false;
-		if (replay_size != pheader.datasize) {
+		if (replay_size != pheader.base.datasize) {
 			replay_size = 0;
 			return false;
 		}
@@ -138,18 +146,14 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		comp_size = 0;
 	}
 	is_replaying = true;
-	return true;
-}
-bool Replay::CheckReplay(const wchar_t* name) {
-	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls", name);
-	FILE* rfp = mywfopen(fname, "rb");
-	if(!rfp)
+	can_read = true;
+	if (!ReadInfo()) {
+		Reset();
 		return false;
-	ReplayHeader rheader;
-	size_t count = std::fread(&rheader, sizeof rheader, 1, rfp);
-	std::fclose(rfp);
-	return count == 1 && rheader.id == 0x31707279 && rheader.version >= 0x12d0u && (rheader.version < 0x1353u || (rheader.flag & REPLAY_UNIFORM));
+	}
+	info_offset = data_position;
+	data_position = 0;
+	return true;
 }
 bool Replay::DeleteReplay(const wchar_t* name) {
 	wchar_t fname[256];
@@ -177,10 +181,6 @@ bool Replay::ReadNextResponse(unsigned char resp[]) {
 	unsigned char len{};
 	if (!ReadData(&len, sizeof len))
 		return false;
-	if (len > SIZE_RETURN_VALUE) {
-		is_replaying = false;
-		return false;
-	}
 	if (!ReadData(resp, len))
 		return false;
 	return true;
@@ -193,14 +193,14 @@ bool Replay::ReadName(wchar_t* data) {
 	BufferIO::CopyWStr(buffer, data, 20);
 	return true;
 }
-void Replay::ReadHeader(ReplayHeader& header) {
+void Replay::ReadHeader(ExtendedReplayHeader& header) {
 	header = pheader;
 }
 bool Replay::ReadData(void* data, size_t length) {
-	if(!is_replaying)
+	if (!is_replaying || !can_read)
 		return false;
 	if (data_position + length > replay_size) {
-		is_replaying = false;
+		can_read = false;
 		return false;
 	}
 	if (length)
@@ -213,6 +213,77 @@ int32_t Replay::ReadInt32() {
 }
 void Replay::Rewind() {
 	data_position = 0;
+	can_read = true;
+}
+void Replay::Reset() {
+	is_recording = false;
+	is_replaying = false;
+	can_read = false;
+	replay_size = 0;
+	comp_size = 0;
+	data_position = 0;
+	info_offset = 0;
+	players.clear();
+	params = { 0 };
+	decks.clear();
+	script_name.clear();
+}
+void Replay::SkipInfo(){
+	if (data_position == 0)
+		data_position += info_offset;
+}
+bool Replay::IsReplaying() const {
+	return is_replaying;
+}
+bool Replay::ReadInfo() {
+	int player_count = (pheader.base.flag & REPLAY_TAG) ? 4 : 2;
+	for (int i = 0; i < player_count; ++i) {
+		wchar_t name[20]{};
+		if (!ReadName(name))
+			return false;
+		players.push_back(name);
+	}
+	if (!ReadData(&params, sizeof params))
+		return false;
+	bool is_tag1 = pheader.base.flag & REPLAY_TAG;
+	bool is_tag2 = params.duel_flag & DUEL_TAG_MODE;
+	if (is_tag1 != is_tag2)
+		return false;
+	if (pheader.base.flag & REPLAY_SINGLE_MODE) {
+		uint16_t slen = Read<uint16_t>();
+		char filename[256]{};
+		if (slen == 0 || slen > sizeof(filename) - 1)
+			return false;
+		if (!ReadData(filename, slen))
+			return false;
+		filename[slen] = 0;
+		if (std::strncmp(filename, "./single/", 9))
+			return false;
+		script_name = filename + 9;
+		if (script_name.find_first_of(R"(/\)") != std::string::npos)
+			return false;
+	}
+	else {
+		for (int p = 0; p < player_count; ++p) {
+			DeckArray deck;
+			uint32_t main = Read<uint32_t>();
+			if (main > MAINC_MAX)
+				return false;
+			if (main)
+				deck.main.resize(main);
+			if (!ReadData(deck.main.data(), main * sizeof(uint32_t)))
+				return false;
+			uint32_t extra = Read<uint32_t>();
+			if (extra > MAINC_MAX)
+				return false;
+			if (extra)
+				deck.extra.resize(extra);
+			if (!ReadData(deck.extra.data(), extra * sizeof(uint32_t)))
+				return false;
+			decks.push_back(deck);
+		}
+	}
+	return true;
 }
 
 }

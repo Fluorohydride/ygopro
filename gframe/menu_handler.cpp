@@ -232,6 +232,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_REPLAY: {
+				int start_turn = 1;
 				if(open_file) {
 					ReplayMode::cur_replay.OpenReplay(open_file_name);
 					open_file = false;
@@ -243,6 +244,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					myswprintf(replay_path, L"./replay/%ls", mainGame->lstReplayList->getListItem(selected));
 					if (!ReplayMode::cur_replay.OpenReplay(replay_path))
 						break;
+					start_turn = std::wcstol(mainGame->ebRepStartTurn->getText(), nullptr, 10);
 				}
 				mainGame->ClearCardInfo();
 				mainGame->wCardImg->setVisible(true);
@@ -257,7 +259,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->dField.Clear();
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->device->setEventReceiver(&mainGame->dField);
-				unsigned int start_turn = std::wcstol(mainGame->ebRepStartTurn->getText(), nullptr, 10);
 				if(start_turn == 1)
 					start_turn = 0;
 				ReplayMode::StartReplay(start_turn);
@@ -300,42 +301,23 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(selected == -1)
 					break;
 				Replay replay;
-				wchar_t ex_filename[256]{};
+				wchar_t replay_filename[256]{};
 				wchar_t namebuf[4][20]{};
 				wchar_t filename[256]{};
 				wchar_t replay_path[256]{};
-				BufferIO::CopyWideString(mainGame->lstReplayList->getListItem(selected), ex_filename);
-				myswprintf(replay_path, L"./replay/%ls", ex_filename);
+				BufferIO::CopyWideString(mainGame->lstReplayList->getListItem(selected), replay_filename);
+				myswprintf(replay_path, L"./replay/%ls", replay_filename);
 				if (!replay.OpenReplay(replay_path))
 					break;
-				const ReplayHeader& rh = replay.pheader;
-				if(rh.flag & REPLAY_SINGLE_MODE)
+				if (replay.pheader.base.flag & REPLAY_SINGLE_MODE)
 					break;
-				int player_count = (rh.flag & REPLAY_TAG) ? 4 : 2;
-				//player name
-				for(int i = 0; i < player_count; ++i)
-					replay.ReadName(namebuf[i]);
-				//skip pre infos
-				for(int i = 0; i < 4; ++i)
-					replay.ReadInt32();
-				//deck
-				std::vector<int> deckbuf;
-				for(int i = 0; i < player_count; ++i) {
-					deckbuf.clear();
-					int main = replay.ReadInt32();
-					deckbuf.push_back(main);
-					for (int j = 0; j < main; ++j) {
-						deckbuf.push_back(replay.ReadInt32());
-					}
-					int extra = replay.ReadInt32();
-					deckbuf.push_back(extra);
-					for (int j = 0; j < extra; ++j) {
-						deckbuf.push_back(replay.ReadInt32());
-					}
-					deckbuf.push_back(0);
+				for (size_t i = 0; i < replay.decks.size(); ++i) {
+					BufferIO::CopyWideString(replay.players[Replay::GetDeckPlayer(i)].c_str(), namebuf[i]);
 					FileSystem::SafeFileName(namebuf[i]);
-					myswprintf(filename, L"deck/%ls-%d %ls.ydk", ex_filename, i + 1, namebuf[i]);
-					deckManager.SaveDeckBuffer(deckbuf.data(), filename);
+				}
+				for (size_t i = 0; i < replay.decks.size(); ++i) {
+					myswprintf(filename, L"./deck/%ls-%d %ls.ydk", replay_filename, i + 1, namebuf[i]);
+					DeckManager::SaveDeckArray(replay.decks[i], filename);
 				}
 				mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 				mainGame->PopupElement(mainGame->wACMessage, 20);
@@ -541,34 +523,42 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_REPLAY_LIST: {
 				int sel = mainGame->lstReplayList->getSelected();
-				if(sel == -1)
+				if(sel < 0)
+					break;
+				auto filename = mainGame->lstReplayList->getListItem(sel);
+				if (!filename)
 					break;
 				wchar_t replay_path[256]{};
-				myswprintf(replay_path, L"./replay/%ls", mainGame->lstReplayList->getListItem(sel));
-				if (!ReplayMode::cur_replay.OpenReplay(replay_path)) {
-					mainGame->stReplayInfo->setText(L"");
+				myswprintf(replay_path, L"./replay/%ls", filename);
+				if (!temp_replay.OpenReplay(replay_path)) {
+					mainGame->stReplayInfo->setText(L"Error");
 					break;
 				}
 				wchar_t infobuf[256]{};
 				std::wstring repinfo;
 				time_t curtime;
-				if(ReplayMode::cur_replay.pheader.flag & REPLAY_UNIFORM)
-					curtime = ReplayMode::cur_replay.pheader.start_time;
-				else
-					curtime = ReplayMode::cur_replay.pheader.seed;
+				const auto& rh = temp_replay.pheader.base;
+				if(temp_replay.pheader.base.flag & REPLAY_UNIFORM)
+					curtime = rh.start_time;
+				else{
+					curtime = rh.seed;
+					wchar_t version_info[256]{};
+					myswprintf(version_info, L"version 0x%X\n", rh.version);
+					repinfo.append(version_info);
+				}
 				std::wcsftime(infobuf, sizeof infobuf / sizeof infobuf[0], L"%Y/%m/%d %H:%M:%S\n", std::localtime(&curtime));
 				repinfo.append(infobuf);
-				wchar_t namebuf[4][20]{};
-				ReplayMode::cur_replay.ReadName(namebuf[0]);
-				ReplayMode::cur_replay.ReadName(namebuf[1]);
-				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG) {
-					ReplayMode::cur_replay.ReadName(namebuf[2]);
-					ReplayMode::cur_replay.ReadName(namebuf[3]);
+				if (rh.flag & REPLAY_SINGLE_MODE) {
+					wchar_t path[256]{};
+					BufferIO::DecodeUTF8(temp_replay.script_name.c_str(), path);
+					repinfo.append(path);
+					repinfo.append(L"\n");
 				}
-				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
-					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3]);
+				const auto& player_names = temp_replay.players;
+				if(rh.flag & REPLAY_TAG)
+					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", player_names[0].c_str(), player_names[1].c_str(), player_names[2].c_str(), player_names[3].c_str());
 				else
-					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", namebuf[0], namebuf[1]);
+					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", player_names[0].c_str(), player_names[1].c_str());
 				repinfo.append(infobuf);
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, repinfo.c_str());

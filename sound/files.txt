@@ -8,6 +8,7 @@ equip.wav
 destroyed.wav
 banished.wav
 token.wav
+negate.wav
 attack.wav
 directattack.wav
 draw.wav
