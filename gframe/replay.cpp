@@ -125,7 +125,10 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		return false;
 	}
 	if (pheader.base.id == REPLAY_ID_YRP2) {
-		std::fseek(rfp, 0, SEEK_SET);
+		if (std::fseek(rfp, 0, SEEK_SET) != 0) {
+			std::fclose(rfp);
+			return false;
+		}
 		if (std::fread(&pheader, sizeof pheader, 1, rfp) < 1) {
 			std::fclose(rfp);
 			return false;
