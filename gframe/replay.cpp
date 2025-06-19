@@ -124,9 +124,12 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		std::fclose(rfp);
 		return false;
 	}
-	if (pheader.base.id == REPLAY_ID_YRP2 && std::fread(&pheader.seed_sequence, sizeof pheader.seed_sequence, 1, rfp) < 1) {
-		std::fclose(rfp);
-		return false;
+	if (pheader.base.id == REPLAY_ID_YRP2) {
+		std::fseek(rfp, 0, SEEK_SET);
+		if (std::fread(&pheader, sizeof pheader, 1, rfp) < 1) {
+			std::fclose(rfp);
+			return false;
+		}
 	}
 	if(pheader.base.flag & REPLAY_COMPRESSED) {
 		comp_size = std::fread(comp_data, 1, MAX_COMP_SIZE, rfp);
