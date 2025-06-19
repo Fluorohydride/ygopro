@@ -83,6 +83,9 @@ public:
 			return deck_index;
 		}
 	}
+#ifdef YGOPRO_SERVER_MODE
+	void Reset();
+#else
 	bool OpenReplay(const wchar_t* name);
 	bool ReadNextResponse(unsigned char resp[]);
 	bool ReadName(wchar_t* data);
@@ -99,6 +102,7 @@ public:
 	void Reset();
 	void SkipInfo();
 	bool IsReplaying() const;
+#endif // YGOPRO_SERVER_MODE
 
 	FILE* fp{ nullptr };
 #ifdef _WIN32
@@ -116,7 +120,9 @@ public:
 	std::string script_name;			// 2 bytes, script name (max: 256 bytes)
 
 private:
+#ifndef YGOPRO_SERVER_MODE
 	bool ReadInfo();
+#endif
 
 	unsigned char* replay_data;
 	size_t replay_size{};
