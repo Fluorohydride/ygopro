@@ -1,6 +1,5 @@
 #include "event_handler.h"
 #include "client_field.h"
-#include "math.h"
 #include "network.h"
 #include "game.h"
 #include "duelclient.h"
@@ -11,7 +10,6 @@
 #include "replay_mode.h"
 #include "single_mode.h"
 #include "materials.h"
-#include "../ocgcore/common.h"
 
 namespace ygo {
 
@@ -1305,7 +1303,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case MSG_SELECT_DISFIELD: {
 				if (!(hovered_location & LOCATION_ONFIELD))
 					break;
-				unsigned int flag = 1 << (hovered_sequence + (hovered_controler << 4) + ((hovered_location == LOCATION_MZONE) ? 0 : 8));
+				unsigned int flag = 0x1U << (hovered_sequence + (hovered_controler << 4) + ((hovered_location == LOCATION_MZONE) ? 0 : 8));
 				if (flag & selectable_field) {
 					if (flag & selected_field) {
 						selected_field &= ~flag;

@@ -29,7 +29,8 @@ int DuelClient::last_select_hint = 0;
 unsigned char DuelClient::last_successful_msg[SIZE_NETWORK_BUFFER];
 size_t DuelClient::last_successful_msg_length = 0;
 wchar_t DuelClient::event_string[256];
-mt19937 DuelClient::rnd;
+std::mt19937 DuelClient::rnd;
+std::uniform_real_distribution<float> DuelClient::real_dist;
 
 bool DuelClient::is_refreshing = false;
 int DuelClient::match_kill = 0;
@@ -58,7 +59,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 		return false;
 	}
 	connect_state = 0x1;
-	rnd.reset((uint_fast32_t)std::random_device()());
+	rnd.seed(std::random_device()());
 	if(!create_game) {
 		timeval timeout = {5, 0};
 		event* timeout_event = event_new(client_base, 0, EV_TIMEOUT, ConnectTimeout, 0);
@@ -431,11 +432,11 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		int deckc = BufferIO::ReadInt16(pdata);
 		int extrac = BufferIO::ReadInt16(pdata);
 		int sidec = BufferIO::ReadInt16(pdata);
-		mainGame->dField.Initial(0, deckc, extrac);
+		mainGame->dField.Initial(0, deckc, extrac, sidec);
 		deckc = BufferIO::ReadInt16(pdata);
 		extrac = BufferIO::ReadInt16(pdata);
 		sidec = BufferIO::ReadInt16(pdata);
-		mainGame->dField.Initial(1, deckc, extrac);
+		mainGame->dField.Initial(1, deckc, extrac, sidec);
 		mainGame->gMutex.unlock();
 		break;
 	}
@@ -714,7 +715,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_REPLAY: {
-		if (len < 1 + (int)sizeof(ReplayHeader))
+		if (len < 1 + (int)sizeof(ExtendedReplayHeader))
 			return;
 		mainGame->gMutex.lock();
 		mainGame->wPhase->setVisible(false);
@@ -725,10 +726,10 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		Replay new_replay;
 		std::memcpy(&new_replay.pheader, prep, sizeof(new_replay.pheader));
 		time_t starttime;
-		if (new_replay.pheader.flag & REPLAY_UNIFORM)
-			starttime = new_replay.pheader.start_time;
+		if (new_replay.pheader.base.flag & REPLAY_UNIFORM)
+			starttime = new_replay.pheader.base.start_time;
 		else
-			starttime = new_replay.pheader.seed;
+			starttime = new_replay.pheader.base.seed;
 		
 		wchar_t timetext[40];
 		std::wcsftime(timetext, sizeof timetext / sizeof timetext[0], L"%Y-%m-%d %H-%M-%S", std::localtime(&starttime));
@@ -750,9 +751,9 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 			mainGame->WaitFrameSignal(30);
 		}
 		if(mainGame->actionParam || !is_host) {
-			prep += sizeof(ReplayHeader);
-			std::memcpy(new_replay.comp_data, prep, len - sizeof(ReplayHeader) - 1);
-			new_replay.comp_size = len - sizeof(ReplayHeader) - 1;
+			prep += sizeof new_replay.pheader;
+			std::memcpy(new_replay.comp_data, prep, len - sizeof new_replay.pheader - 1);
+			new_replay.comp_size = len - sizeof new_replay.pheader - 1;
 			if(mainGame->actionParam)
 				new_replay.SaveReplay(mainGame->ebRSName->getText());
 			else
@@ -774,8 +775,12 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_CHAT: {
+		if (len < 1 + sizeof(uint16_t) + sizeof(uint16_t) * 1)
+			return;
+		if (len > 1 + sizeof(uint16_t) + sizeof(uint16_t) * LEN_CHAT_MSG)
+			return;
 		const int chat_msg_size = len - 1 - sizeof(uint16_t);
-		if (!check_msg_size(chat_msg_size))
+		if (chat_msg_size % sizeof(uint16_t))
 			return;
 		uint16_t chat_player_type = buffer_read<uint16_t>(pdata);
 		uint16_t chat_msg[LEN_CHAT_MSG];
@@ -1757,7 +1762,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			SetResponseI(-1);
 			mainGame->dField.ClearChainSelect();
 			if(mainGame->chkWaitChain->isChecked() && !mainGame->ignore_chain) {
-				mainGame->WaitFrameSignal(rnd.get_random_integer(20, 40));
+				mainGame->WaitFrameSignal(std::uniform_int_distribution<>(20, 40)(rnd));
 			}
 			DuelClient::SendResponse();
 			return true;
@@ -1862,9 +1867,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			}
 			if(!pzone) {
 				if(mainGame->chkRandomPos->isChecked()) {
+					std::uniform_int_distribution<> dist(0, 6);
 					do {
-						respbuf[2] = rnd.get_random_integer(0, 6);
-					} while(!(filter & (1 << respbuf[2])));
+						respbuf[2] = dist(rnd);
+					} while(!(filter & (0x1U << respbuf[2])));
 				} else {
 					if (filter & 0x40) respbuf[2] = 6;
 					else if (filter & 0x20) respbuf[2] = 5;
@@ -2269,7 +2275,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			soundManager.PlaySoundEffect(SOUND_SHUFFLE);
 			for (int i = 0; i < 5; ++i) {
 				for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-					(*cit)->dPos = irr::core::vector3df(rnd.rand() * 0.4f / rnd.rand_max - 0.2f, 0, 0);
+					(*cit)->dPos = irr::core::vector3df(real_dist(rnd) * 0.4f - 0.2f, 0, 0);
 					(*cit)->dRot = irr::core::vector3df(0, 0, 0);
 					(*cit)->is_moving = true;
 					(*cit)->aniFrame = 3;
@@ -2341,7 +2347,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			for (int i = 0; i < 5; ++i) {
 				for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 					if(!((*cit)->position & POS_FACEUP)) {
-						(*cit)->dPos = irr::core::vector3df(rnd.rand() * 0.4f / rnd.rand_max - 0.2f, 0, 0);
+						(*cit)->dPos = irr::core::vector3df(real_dist(rnd) * 0.4f - 0.2f, 0, 0);
 						(*cit)->dRot = irr::core::vector3df(0, 0, 0);
 						(*cit)->is_moving = true;
 						(*cit)->aniFrame = 3;

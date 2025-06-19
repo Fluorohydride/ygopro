@@ -6,7 +6,6 @@
 #include "image_manager.h"
 #include "game.h"
 #include "materials.h"
-#include "../ocgcore/common.h"
 
 namespace ygo {
 
@@ -15,7 +14,7 @@ ClientField::ClientField() {
 		mzone[p].resize(7, 0);
 		szone[p].resize(8, 0);
 	}
-	rnd.reset((uint_fast32_t)std::random_device()());
+	rnd.seed(std::random_device()());
 }
 ClientField::~ClientField() {
 	for (int i = 0; i < 2; ++i) {
@@ -119,28 +118,23 @@ void ClientField::Clear() {
 	tag_surrender = false;
 	tag_teammate_surrender = false;
 }
-void ClientField::Initial(int player, int deckc, int extrac) {
-	ClientCard* pcard;
-	for(int i = 0; i < deckc; ++i) {
-		pcard = new ClientCard;
-		deck[player].push_back(pcard);
-		pcard->owner = player;
-		pcard->controler = player;
-		pcard->location = LOCATION_DECK;
-		pcard->sequence = i;
-		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
-	}
-	for(int i = 0; i < extrac; ++i) {
-		pcard = new ClientCard;
-		extra[player].push_back(pcard);
-		pcard->owner = player;
-		pcard->controler = player;
-		pcard->location = LOCATION_EXTRA;
-		pcard->sequence = i;
-		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
-	}
+void ClientField::Initial(int player, int deckc, int extrac, int sidec) {
+	auto load_location = [&](std::vector<ClientCard*>& container, int count, uint8_t location) {
+		for(int i = 0; i < count; ++i) {
+			ClientCard* pcard = new ClientCard;
+			container.push_back(pcard);
+			pcard->owner = player;
+			pcard->controler = player;
+			pcard->location = location;
+			pcard->sequence = i;
+			pcard->position = POS_FACEDOWN_DEFENSE;
+			GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+		}
+	};
+
+	load_location(deck[player], deckc, LOCATION_DECK);
+	load_location(extra[player], extrac, LOCATION_EXTRA);
+	load_location(remove[player], sidec, LOCATION_REMOVED);
 }
 void ClientField::ResetSequence(std::vector<ClientCard*>& list, bool reset_height) {
 	unsigned char seq = 0;
@@ -413,7 +407,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			}
 		}
 		if(has_card_in_grave) {
-			rnd.shuffle_vector(selectable_cards);
+			std::shuffle(selectable_cards.begin(), selectable_cards.end(), rnd);
 		}
 	}
 	int startpos;
