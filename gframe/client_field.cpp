@@ -118,28 +118,23 @@ void ClientField::Clear() {
 	tag_surrender = false;
 	tag_teammate_surrender = false;
 }
-void ClientField::Initial(int player, int deckc, int extrac) {
-	ClientCard* pcard;
-	for(int i = 0; i < deckc; ++i) {
-		pcard = new ClientCard;
-		deck[player].push_back(pcard);
-		pcard->owner = player;
-		pcard->controler = player;
-		pcard->location = LOCATION_DECK;
-		pcard->sequence = i;
-		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
-	}
-	for(int i = 0; i < extrac; ++i) {
-		pcard = new ClientCard;
-		extra[player].push_back(pcard);
-		pcard->owner = player;
-		pcard->controler = player;
-		pcard->location = LOCATION_EXTRA;
-		pcard->sequence = i;
-		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
-	}
+void ClientField::Initial(int player, int deckc, int extrac, int sidec) {
+	auto load_location = [&](std::vector<ClientCard*>& container, int count, uint8_t location) {
+		for(int i = 0; i < count; ++i) {
+			ClientCard* pcard = new ClientCard;
+			container.push_back(pcard);
+			pcard->owner = player;
+			pcard->controler = player;
+			pcard->location = location;
+			pcard->sequence = i;
+			pcard->position = POS_FACEDOWN_DEFENSE;
+			GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+		}
+	};
+
+	load_location(deck[player], deckc, LOCATION_DECK);
+	load_location(extra[player], extrac, LOCATION_EXTRA);
+	load_location(remove[player], sidec, LOCATION_REMOVED);
 }
 void ClientField::ResetSequence(std::vector<ClientCard*>& list, bool reset_height) {
 	unsigned char seq = 0;

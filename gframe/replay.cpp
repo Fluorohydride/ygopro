@@ -170,7 +170,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		std::fclose(rfp);
 		return false;
 	}
-	if (pheader.base.id == REPLAY_ID_YRP2 && std::fread(&pheader.seed_sequence, sizeof pheader.seed_sequence, 1, rfp) < 1) {
+	if (pheader.base.id == REPLAY_ID_YRP2 && std::fread(reinterpret_cast<unsigned char*>(&pheader) + sizeof pheader.base, sizeof pheader - sizeof pheader.base, 1, rfp) < 1) {
 		std::fclose(rfp);
 		return false;
 	}
