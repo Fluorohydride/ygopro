@@ -302,7 +302,7 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 }
 void ClientField::UpdateCard(int controler, int location, int sequence, unsigned char* data) {
 	ClientCard* pcard = GetCard(controler, location, sequence);
-	int len = BufferIO::ReadInt32(data);
+	int len = BufferIO::Read<int32_t>(data);
 	if (pcard && len > LEN_HEADER)
 		pcard->UpdateInfo(data);
 }
@@ -335,7 +335,7 @@ void ClientField::UpdateFieldCard(int controler, int location, unsigned char* da
 		return;
 	int len;
 	for(auto cit = lst->begin(); cit != lst->end(); ++cit) {
-		len = BufferIO::ReadInt32(data);
+		len = BufferIO::Read<int32_t>(data);
 		if(len > LEN_HEADER)
 			(*cit)->UpdateInfo(data);
 		data += len - 4;
