@@ -162,7 +162,7 @@ project "irrlicht"
         end
 
     filter { "system:macosx" }
-        cppdialect "gnu++14"
+        cppdialect "C++14"
         defines { "GL_SILENCE_DEPRECATION" }
         undefines { "NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_" }
         files {
