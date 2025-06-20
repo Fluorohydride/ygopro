@@ -88,6 +88,7 @@ project "YGOPro"
         end
 
     filter "system:macosx"
+        cppdialect "C++14"
         openmp "Off"
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
         defines { "GL_SILENCE_DEPRECATION" }
