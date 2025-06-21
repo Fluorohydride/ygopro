@@ -260,7 +260,7 @@ public:
 #define CTOS_CHAT			0x16	// uint16_t array
 #define CTOS_HS_TODUELIST	0x20	// no data
 #define CTOS_HS_TOOBSERVER	0x21	// no data
-#define CTOS_HS_READY		0x22	// no data
+// #define CTOS_HS_READY		0x22	// no data
 #define CTOS_HS_NOTREADY	0x23	// no data
 #define CTOS_HS_KICK		0x24	// CTOS_Kick
 #define CTOS_HS_START		0x25	// no data

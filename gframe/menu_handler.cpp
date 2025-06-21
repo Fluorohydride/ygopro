@@ -184,7 +184,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				UpdateDeck();
-				DuelClient::SendPacketToServer(CTOS_HS_READY);
 				mainGame->cbCategorySelect->setEnabled(false);
 				mainGame->cbDeckSelect->setEnabled(false);
 				break;
@@ -636,7 +635,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						break;
 					}
 					UpdateDeck();
-					DuelClient::SendPacketToServer(CTOS_HS_READY);
 					mainGame->cbCategorySelect->setEnabled(false);
 					mainGame->cbDeckSelect->setEnabled(false);
 				} else {
