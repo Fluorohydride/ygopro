@@ -185,7 +185,6 @@ project "irrlicht"
         "source/Irrlicht/CImageWriterTGA.cpp",
         "source/Irrlicht/CIrrDeviceConsole.cpp",
         "source/Irrlicht/CIrrDeviceFB.cpp",
-        "source/Irrlicht/CIrrDeviceLinux.cpp",
         "source/Irrlicht/CIrrDeviceSDL.cpp",
         "source/Irrlicht/CIrrDeviceWinCE.cpp",
         "source/Irrlicht/CIrrMeshFileLoader.cpp",
