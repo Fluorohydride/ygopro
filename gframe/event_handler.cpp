@@ -1,6 +1,5 @@
 #include "event_handler.h"
 #include "client_field.h"
-#include "math.h"
 #include "network.h"
 #include "game.h"
 #include "duelclient.h"
@@ -11,7 +10,6 @@
 #include "replay_mode.h"
 #include "single_mode.h"
 #include "materials.h"
-#include "../ocgcore/common.h"
 
 namespace ygo {
 

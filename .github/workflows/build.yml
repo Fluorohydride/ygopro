@@ -70,7 +70,7 @@ jobs:
       id: premake
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta6/premake-5.0.0-beta6-windows.zip
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta7/premake-5.0.0-beta7-windows.zip
         filename: premake5.zip
 
     - name: Extract premake
@@ -81,13 +81,13 @@ jobs:
       id: libevent
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://github.com/libevent/libevent/releases/download/release-2.0.22-stable/libevent-2.0.22-stable.tar.gz
+        url: https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
         filename: libevent.tar.gz
 
     - name: Extract libevent
       run: |
         tar xf ${{ steps.libevent.outputs.filepath }}
-        move libevent-2.0.22-stable event
+        move libevent-2.1.12-stable event
 
     - name: Download freetype
       id: freetype
@@ -104,28 +104,28 @@ jobs:
       id: lua
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
+        url: https://www.lua.org/ftp/lua-5.4.8.tar.gz
 
     - name: Extract lua
       run: |
         tar xf ${{ steps.lua.outputs.filepath }}
-        move lua-5.4.7 lua
+        move lua-5.4.8 lua
 
     - name: Download sqlite
       id: sqlite
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3500100.zip
 
     - name: Extract sqlite
       run: |
         7z x ${{ steps.sqlite.outputs.filepath }}
-        move sqlite-amalgamation-3490100 sqlite3
+        move sqlite-amalgamation-3500100 sqlite3
 
     - name: Download miniaudio
       if: matrix.audiolib == 'miniaudio'
       run: |
-        git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
+        git clone --depth=1 https://github.com/mercury233/miniaudio
         cd miniaudio
         xcopy /Y extras\miniaudio_split\miniaudio.* .
         cd ..
@@ -300,7 +300,7 @@ jobs:
             premake-version: 5.0.0-beta4
           - name: ubuntu-24
             os: ubuntu-24.04
-            premake-version: 5.0.0-beta6
+            premake-version: 5.0.0-beta7
           - name: ubuntu-static-link
             os: ubuntu-22.04
             premake-version: 5.0.0-beta4
@@ -387,29 +387,29 @@ jobs:
       id: lua
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
+        url: https://www.lua.org/ftp/lua-5.4.8.tar.gz
 
     - name: Extract lua
       run: |
         tar xf ${{ steps.lua.outputs.filepath }}
-        mv lua-5.4.7 lua
+        mv lua-5.4.8 lua
 
     - name: Download sqlite
       if: matrix.static-link == true
       id: sqlite
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3500100.zip
 
     - name: Extract sqlite
       if: matrix.static-link == true
       run: |
         7z x ${{ steps.sqlite.outputs.filepath }}
-        mv sqlite-amalgamation-3490100 sqlite3
+        mv sqlite-amalgamation-3500100 sqlite3
 
     - name: Download miniaudio
       run: |
-        git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
+        git clone --depth=1 https://github.com/mercury233/miniaudio
         cd miniaudio
         cp extras/miniaudio_split/miniaudio.* .
         cd ..
@@ -570,9 +570,17 @@ jobs:
         brew install opus opusfile libvorbis
 #        brew install sqlite libx11 freetype libevent
 
-    - name: Install premake
+    - name: Download premake
+      id: premake
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta7/premake-5.0.0-beta7-macosx.tar.gz
+        filename: premake5.tar.gz
+
+    - name: Extract premake
       run: |
-        brew install premake
+        tar xf ${{ steps.premake.outputs.filepath }}
+        chmod +x ./premake5
 
     - name: Download libevent
       if: matrix.static-link == true
@@ -613,29 +621,29 @@ jobs:
       id: lua
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.lua.org/ftp/lua-5.4.7.tar.gz
+        url: https://www.lua.org/ftp/lua-5.4.8.tar.gz
 
     - name: Extract lua
       run: |
         tar xf ${{ steps.lua.outputs.filepath }}
-        mv lua-5.4.7 lua
+        mv lua-5.4.8 lua
 
     - name: Download sqlite
       if: matrix.static-link == true
       id: sqlite
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
-        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3500100.zip
 
     - name: Extract sqlite
       if: matrix.static-link == true
       run: |
         7z x ${{ steps.sqlite.outputs.filepath }}
-        mv sqlite-amalgamation-3490100 sqlite3
+        mv sqlite-amalgamation-3500100 sqlite3
 
     - name: Download miniaudio
       run: |
-        git clone --depth=1 --branch 0.11.22 https://github.com/mackron/miniaudio
+        git clone --depth=1 https://github.com/mercury233/miniaudio
         cd miniaudio
         cp extras/miniaudio_split/miniaudio.* .
         cd ..
@@ -704,12 +712,12 @@ jobs:
     - name: Use premake to generate make files (Homebrew packages)
       if: matrix.static-link != true
       run: |
-        DYLD_LIBRARY_PATH=$(brew --prefix)/lib premake5 gmake
+        DYLD_LIBRARY_PATH=$(brew --prefix)/lib ./premake5 gmake
 
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true
       run: |
-        premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }} \
+        ./premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }} \
           --build-event \
           --build-freetype \
           --build-sqlite \
@@ -726,4 +734,4 @@ jobs:
       with:
         name: YGOPro-${{ matrix.name }}
         path: |
-          bin/release/YGOPro.app
+          bin/release/YGOPro

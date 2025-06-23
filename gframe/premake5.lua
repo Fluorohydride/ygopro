@@ -3,7 +3,6 @@ include "spmemvfs/."
 
 project "YGOPro"
     kind "WindowedApp"
-    cppdialect "C++14"
     rtti "Off"
     openmp "On"
 
@@ -75,18 +74,20 @@ project "YGOPro"
         entrypoint "mainCRTStartup"
         defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
-        links { "ws2_32" }
+        links { "ws2_32", "iphlpapi" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrKlang" }
             if IRRKLANG_PRO then
                 defines { "IRRKLANG_STATIC" }
-                filter { "not configurations:Debug" }
+                filter { "system:windows", "not configurations:Debug" }
                     libdirs { IRRKLANG_PRO_RELEASE_LIB_DIR }
-                filter { "configurations:Debug" }
+                filter { "system:windows", "configurations:Debug" }
                     libdirs { IRRKLANG_PRO_DEBUG_LIB_DIR }
                 filter {}
             end
         end
+    filter "not action:vs*"
+        cppdialect "C++14"
 
     filter { "system:windows", "action:gmake" }
         links { "opengl32", "imm32" }
@@ -107,7 +108,7 @@ project "YGOPro"
         end
 
     filter "system:linux"
-        links { "GL", "X11", "Xxf86vm" }
+        links { "GL", "X11", "Xxf86vm", "dl", "pthread" }
         linkoptions { "-fopenmp" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "IrrKlang" }
