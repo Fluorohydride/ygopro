@@ -1,0 +1,83 @@
+/****************************************************************************
+ *
+ * ftoption.h
+ *
+ *   User-selectable configuration macros (specification only).
+ *
+ * This file is customized for YGOPro to include only the necessary
+ * configuration options for the TrueType font driver.
+ *
+ * See the original FreeType source code for more information.
+ * /include/freetype/config/ftoption.h
+ *
+ */
+
+#ifndef FTOPTION_H_
+#define FTOPTION_H_
+
+
+#include <ft2build.h>
+
+
+FT_BEGIN_HEADER
+
+#define FT_CONFIG_OPTION_ENVIRONMENT_PROPERTIES
+
+#undef FT_CONFIG_OPTION_FORCE_INT64
+
+#define FT_CONFIG_OPTION_INLINE_MULFIX
+
+#define FT_CONFIG_OPTION_INCREMENTAL
+
+#define FT_RENDER_POOL_SIZE  16384L
+
+#define FT_MAX_MODULES  32
+
+#undef FT_CONFIG_OPTION_USE_MODULE_ERRORS
+
+#define TT_CONFIG_OPTION_EMBEDDED_BITMAPS
+
+#define TT_CONFIG_OPTION_COLOR_LAYERS
+
+#define TT_CONFIG_CMAP_FORMAT_0
+#define TT_CONFIG_CMAP_FORMAT_2
+#define TT_CONFIG_CMAP_FORMAT_4
+#define TT_CONFIG_CMAP_FORMAT_6
+#define TT_CONFIG_CMAP_FORMAT_8
+#define TT_CONFIG_CMAP_FORMAT_10
+#define TT_CONFIG_CMAP_FORMAT_12
+#define TT_CONFIG_CMAP_FORMAT_13
+#define TT_CONFIG_CMAP_FORMAT_14
+
+#define TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+
+#define TT_CONFIG_OPTION_SUBPIXEL_HINTING
+
+#undef TT_CONFIG_OPTION_COMPONENT_OFFSET_SCALED
+
+#ifndef TT_CONFIG_OPTION_MAX_RUNNABLE_OPCODES
+#define TT_CONFIG_OPTION_MAX_RUNNABLE_OPCODES  1000000L
+#endif
+
+#define T1_MAX_SUBRS_CALLS  16
+
+#define T1_MAX_CHARSTRINGS_OPERANDS  256
+
+
+#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#define  TT_USE_BYTECODE_INTERPRETER
+#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+#define  TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
+#endif
+#endif
+
+#ifdef TT_CONFIG_OPTION_COLOR_LAYERS
+#define  TT_SUPPORT_COLRV1
+#endif
+
+FT_END_HEADER
+
+#endif /* FTOPTION_H_ */
+
+
+/* END */
