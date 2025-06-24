@@ -8,9 +8,13 @@ project "freetype"
         "src/base/ftinit.c",
         "src/base/ftbase.c",
         "src/base/ftbitmap.c",
-        "src/truetype/truetype.c",
+        "src/cff/cff.c",
+        "src/psaux/psaux.c",
+        "src/pshinter/pshinter.c",
+        "src/psnames/psnames.c",
         "src/sfnt/sfnt.c",
         "src/smooth/smooth.c",
+        "src/truetype/truetype.c",
     }
 
     filter "system:windows"
