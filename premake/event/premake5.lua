@@ -4,14 +4,14 @@ project "event"
     local EVENT_VERSION = (io.readfile("configure") or ""):match("NUMERIC_VERSION%s+0x(%x+)")
     if not EVENT_VERSION then
         print("Warning: Could not determine libevent version from the configure file, assuming 2.1.12.")
-        EVENT_VERSION = "02010c00" -- 2.1.12
+        EVENT_VERSION = "0x02010c00" -- 2.1.12
     end
     EVENT_VERSION = tonumber(EVENT_VERSION, 16)
     if EVENT_VERSION>=0x02020000 then
         print("Warning: Using libevent version 2.2.x is not supported, please use 2.1.x, otherwise you may encounter issues.")
     end
     if EVENT_VERSION>=0x02010000 and WINXP_SUPPORT then
-        print("Warning: libevent 2.1 uses some new APIs which require Windows Vista or later, so WinXP support will be not valid.")
+        print("Warning: libevent 2.1 uses some new APIs which require Windows Vista or later, so WinXP support will be invalid.")
     end
 
     includedirs { "include", "compat" }
