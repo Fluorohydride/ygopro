@@ -88,6 +88,10 @@ public:
 	// UTF-16/UTF-32 to UTF-8
 	// return: string length
 	static int EncodeUTF8String(const wchar_t* wsrc, char* str, size_t len) {
+		if (len == 0) {
+			str[0] = 0;
+			return 0;
+		}
 		std::mbstate_t state{};
 		size_t result_len = std::wcsrtombs(str, &wsrc, len - 1, &state);
 		if (result_len == static_cast<size_t>(-1))
@@ -98,6 +102,10 @@ public:
 	// UTF-8 to UTF-16/UTF-32
 	// return: string length
 	static int DecodeUTF8String(const char* src, wchar_t* wstr, size_t len) {
+		if (len == 0) {
+			wstr[0] = 0;
+			return 0;
+		}
 		std::mbstate_t state{};
 		size_t result_len = std::mbsrtowcs(wstr, &src, len - 1, &state);
 		if (result_len == static_cast<size_t>(-1))
