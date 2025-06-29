@@ -236,6 +236,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(open_file) {
 					open_file = false;
 					if (!ReplayMode::cur_replay.OpenReplay(open_file_name)) {
+						if (exit_on_return)
+							mainGame->device->closeDevice();
 						break;
 					}
 				} else {
