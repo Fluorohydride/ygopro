@@ -386,6 +386,11 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 	else if (len < (2 + deckbuf.mainc + deckbuf.sidec) * (int)sizeof(int32_t))
 		valid = false;
 	if (!valid) {
+#ifdef YGOPRO_SERVER_MODE
+		STOC_HS_PlayerChange scpc;
+		scpc.status = (dp->type << 4) | PLAYERCHANGE_NOTREADY;
+		NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
+#endif
 		STOC_ErrorMsg scem;
 		scem.msg = ERRMSG_DECKERROR;
 		scem.code = 0;
@@ -393,6 +398,9 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 		return;
 	}
 	deck_error[dp->type] = DeckManager::LoadDeck(pdeck[dp->type], deckbuf.list, deckbuf.mainc, deckbuf.sidec);
+#ifdef YGOPRO_SERVER_MODE
+	PlayerReady(dp, true);
+#endif
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)

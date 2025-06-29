@@ -424,6 +424,14 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 		duel_mode->ToObserver(dp);
 		break;
 	}
+#ifdef YGOPRO_SERVER_MODE
+	case CTOS_HS_NOTREADY: {
+		if (!duel_mode || duel_mode->pduel)
+			return;
+		duel_mode->PlayerReady(dp, false);
+		break;
+	}
+#else
 	case CTOS_HS_READY:
 	case CTOS_HS_NOTREADY: {
 		if (!duel_mode || duel_mode->pduel)
@@ -431,6 +439,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 		duel_mode->PlayerReady(dp, (CTOS_HS_NOTREADY - pktType) != 0);
 		break;
 	}
+#endif
 	case CTOS_HS_KICK: {
 		if (!duel_mode || duel_mode->pduel)
 			return;
