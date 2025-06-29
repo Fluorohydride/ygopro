@@ -1168,14 +1168,6 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 	}
 	return false;
 }
-static void get_sum_params(irr::u32 opParam, int& op1, int& op2) {
-	op1 = opParam & 0xffff;
-	op2 = (opParam >> 16) & 0xffff;
-	if(op2 & 0x8000) {
-		op1 = opParam & 0x7fffffff;
-		op2 = 0;
-	}
-}
 bool ClientField::CheckSelectSum() {
 	std::set<ClientCard*> selable;
 	for(auto sc : selectsum_all) {
@@ -1298,6 +1290,14 @@ bool ClientField::CheckSelectTribute() {
 		selectable_cards.push_back(*sit);
 	}
 	return ret;
+}
+void ClientField::get_sum_params(unsigned int opParam, int& op1, int& op2) {
+	op1 = opParam & 0xffff;
+	op2 = (opParam >> 16) & 0xffff;
+	if (op2 & 0x8000) {
+		op1 = opParam & 0x7fffffff;
+		op2 = 0;
+	}
 }
 bool ClientField::check_min(const std::set<ClientCard*>& left, std::set<ClientCard*>::const_iterator index, int min, int max) {
 	if (index == left.end())
