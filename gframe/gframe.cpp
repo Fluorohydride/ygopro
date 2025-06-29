@@ -7,6 +7,9 @@
 #ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
 #endif
+#ifdef YGOPRO_SERVER_MODE
+#include "base64.h"
+#endif
 
 unsigned int enable_log = 0x3;
 #ifndef YGOPRO_SERVER_MODE
@@ -82,8 +85,8 @@ int main(int argc, char* argv[]) {
 	ygo::game_info.no_shuffle_deck = false;
 	ygo::game_info.duel_rule = DEFAULT_DUEL_RULE;
 	ygo::game_info.time_limit = 180;
-	for (int i = 0; i < 3; ++i)
-		ygo::pre_seed[i] = (unsigned int)0;
+	std::memset(ygo::pre_seed, 0, sizeof(ygo::pre_seed));
+	std::memset(ygo::pre_seed_specified, 0, sizeof(ygo::pre_seed_specified));
 	if (argc > 1) {
 		ygo::server_port = atoi(argv[1]);
 		int lflist = atoi(argv[2]);
@@ -119,9 +122,28 @@ int main(int argc, char* argv[]) {
 		ygo::game_info.draw_count = atoi(argv[10]);
 		ygo::game_info.time_limit = atoi(argv[11]);
 		ygo::replay_mode = atoi(argv[12]);
-		for (int i = 13; (i < argc && i <= 15) ; ++i)
+		for (int i = 13; (i < argc && i < (13 + MAX_MATCH_COUNT)) ; ++i)
 		{
-			ygo::pre_seed[i - 13] = (unsigned int)atol(argv[i]);
+			auto ok = Base64::Decode(
+				reinterpret_cast<const unsigned char*>(argv[i]),
+				strlen(argv[i]),
+				reinterpret_cast<unsigned char*>(ygo::pre_seed[i - 13]),
+				SEED_COUNT * sizeof(uint32_t)
+			);
+			if(ok) {
+				// check if it isn't all zero
+				bool all_zero = true;
+				for (int j = 0; j < SEED_COUNT; ++j) {
+					if (ygo::pre_seed[i - 13][j] != 0) {
+						all_zero = false;
+						break;
+					}
+				}
+				if (!all_zero)
+					ygo::pre_seed_specified[i - 13] = 1;
+			}
+			else
+				std::fprintf(stderr, "Failed to decode seed %d: %s\n", i - 13, argv[i]);
 		}
 	}
 	ygo::mainGame = &_game;

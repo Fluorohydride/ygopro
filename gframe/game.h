@@ -660,10 +660,13 @@ public:
 extern Game* mainGame;
 
 #ifdef YGOPRO_SERVER_MODE
+#define MAX_MATCH_COUNT 3
+
 extern unsigned short server_port;
 extern unsigned short replay_mode;
 extern HostInfo game_info;
-extern unsigned int pre_seed[3];
+extern uint32_t pre_seed[MAX_MATCH_COUNT][SEED_COUNT];
+extern uint8_t pre_seed_specified[MAX_MATCH_COUNT];
 #endif
 }
 
