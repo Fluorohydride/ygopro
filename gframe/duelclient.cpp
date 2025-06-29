@@ -1715,8 +1715,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
 		int count = BufferIO::Read<uint8_t>(pbuf);
 		int specount = BufferIO::Read<uint8_t>(pbuf);
-		/*int hint0 = */BufferIO::ReadInt32(pbuf);
-		/*int hint1 = */BufferIO::ReadInt32(pbuf);
+		/*int hint0 = */BufferIO::Read<int32_t>(pbuf);
+		/*int hint1 = */BufferIO::Read<int32_t>(pbuf);
 		int c, s, ss, desc;
 		unsigned int code,l;
 		ClientCard* pcard;
@@ -1731,7 +1731,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			int flag = BufferIO::Read<uint8_t>(pbuf);
 			int forced = BufferIO::Read<uint8_t>(pbuf);
 			flag |= forced << 8;
-			code = BufferIO::ReadInt32(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
 			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 			l = BufferIO::Read<uint8_t>(pbuf);
 			s = BufferIO::Read<uint8_t>(pbuf);
