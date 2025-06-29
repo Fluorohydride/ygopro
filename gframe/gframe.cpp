@@ -1,6 +1,7 @@
 #include "config.h"
 #include "game.h"
 #include "data_manager.h"
+#include "replay_mode.h"
 #include <event2/thread.h>
 #include <clocale>
 #include <memory>
@@ -11,10 +12,10 @@
 unsigned int enable_log = 0x3;
 bool exit_on_return = false;
 bool open_file = false;
-wchar_t open_file_name[256] = L"";
+wchar_t open_file_name[256]{};
 bool bot_mode = false;
 
-void ClickButton(irr::gui::IGUIElement* btn) {
+static void ClickButton(irr::gui::IGUIElement* btn) {
 	irr::SEvent event;
 	event.EventType = irr::EET_GUI_EVENT;
 	event.GUIEvent.EventType = irr::gui::EGET_BUTTON_CLICKED;
@@ -100,7 +101,7 @@ int main(int argc, char* argv[]) {
 				BufferIO::CopyWideString(wargv[1], open_file_name);
 				exit_on_return = true;
 				ClickButton(ygo::mainGame->btnReplayMode);
-				ClickButton(ygo::mainGame->btnLoadReplay);
+				ygo::ReplayMode::LoadReplay(open_file_name);
 				break;
 			}
 		}
@@ -185,8 +186,8 @@ int main(int argc, char* argv[]) {
 				BufferIO::CopyWideString(wargv[i], open_file_name);
 			}
 			ClickButton(ygo::mainGame->btnReplayMode);
-			if(open_file)
-				ClickButton(ygo::mainGame->btnLoadReplay);
+			if (open_file)
+				ygo::ReplayMode::LoadReplay(open_file_name);
 			break;
 		} else if(!std::wcscmp(wargv[i], L"-s")) { // Single
 			exit_on_return = !keep_on_return;

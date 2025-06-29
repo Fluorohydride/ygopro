@@ -20,10 +20,34 @@ int ReplayMode::skip_turn = 0;
 int ReplayMode::current_step = 0;
 int ReplayMode::skip_step = 0;
 
+void ReplayMode::LoadReplay(const wchar_t* replay_path, int start_turn) {
+	if (!ReplayMode::cur_replay.OpenReplay(replay_path)) {
+		if (exit_on_return)
+			mainGame->device->closeDevice();
+		return;
+	}
+	open_file = false;
+	mainGame->ClearCardInfo();
+	mainGame->wCardImg->setVisible(true);
+	mainGame->wInfos->setVisible(true);
+	mainGame->wReplay->setVisible(true);
+	mainGame->wReplayControl->setVisible(true);
+	mainGame->btnReplayStart->setVisible(false);
+	mainGame->btnReplayPause->setVisible(true);
+	mainGame->btnReplayStep->setVisible(false);
+	mainGame->btnReplayUndo->setVisible(false);
+	mainGame->wPhase->setVisible(true);
+	mainGame->dField.Clear();
+	mainGame->HideElement(mainGame->wReplay);
+	mainGame->device->setEventReceiver(&mainGame->dField);
+	if (start_turn == 1)
+		start_turn = 0;
+	ReplayMode::StartReplay(start_turn);
+}
 bool ReplayMode::StartReplay(int skipturn) {
+	if (skipturn < 0)
+		skipturn = 0;
 	skip_turn = skipturn;
-	if(skip_turn < 0)
-		skip_turn = 0;
 	std::thread(ReplayThread).detach();
 	return true;
 }
