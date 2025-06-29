@@ -35,8 +35,12 @@ void ClientCard::SetCode(unsigned int x) {
 	if((location == LOCATION_HAND) && (code != x)) {
 		code = x;
 		mainGame->dField.MoveCard(this, 5);
-	} else
+	} else {
+		if (x == 0 && code != 0) {
+			chain_code = code;
+		}
 		code = x;
+	}
 }
 void ClientCard::UpdateInfo(unsigned char* buf) {
 	int flag = BufferIO::ReadInt32(buf);
@@ -48,11 +52,7 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 		int pdata = BufferIO::ReadInt32(buf);
 		if (!pdata)
 			ClearData();
-		if((location == LOCATION_HAND) && ((unsigned int)pdata != code)) {
-			code = pdata;
-			mainGame->dField.MoveCard(this, 5);
-		} else
-			code = pdata;
+		SetCode(pdata);
 	}
 	if(flag & QUERY_POSITION) {
 		int pdata = (BufferIO::ReadInt32(buf) >> 24) & 0xff;
