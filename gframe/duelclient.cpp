@@ -2145,6 +2145,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	}
 	case MSG_CONFIRM_CARDS: {
 		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
+		int skip_panel = BufferIO::ReadUInt8(pbuf);
 		int count = BufferIO::ReadUInt8(pbuf);
 		int c, s;
 		unsigned int code, l;
@@ -2231,7 +2232,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			}
 			mainGame->WaitFrameSignal(5);
 		}
-		if (panel_confirm.size() && mainGame->dInfo.player_type != 7) {
+		if (!skip_panel && panel_confirm.size() && mainGame->dInfo.player_type != 7) {
 			std::sort(panel_confirm.begin(), panel_confirm.end(), ClientCard::client_card_sort);
 			mainGame->gMutex.lock();
 			mainGame->dField.selectable_cards = panel_confirm;
