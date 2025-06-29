@@ -935,7 +935,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 		case MSG_SELECT_CHAIN: {
 			player = BufferIO::ReadUInt8(pbuf);
 			count = BufferIO::ReadUInt8(pbuf);
-			pbuf += 10 + count * 13;
+			pbuf += 9 + count * 14;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
@@ -1012,6 +1012,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 		}
 		case MSG_CONFIRM_CARDS: {
 			player = BufferIO::ReadUInt8(pbuf);
+			pbuf += 1;
 			count = BufferIO::ReadUInt8(pbuf);
 			if(pbuf[5] != LOCATION_DECK) {
 				pbuf += count * 7;
