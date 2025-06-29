@@ -257,6 +257,15 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 		BufferIO::CopyCharArray(pkt->name, dp->name);
 		break;
 	}
+	case CTOS_EXTERNAL_ADDRESS: {
+		// for other server & reverse proxy use only
+		/*
+		wchar_t hostname[LEN_HOSTNAME];
+		uint32_t real_ip = ntohl(BufferIO::ReadInt32(pdata));
+		BufferIO::CopyCharArray((uint16_t*)pdata, hostname);
+		*/
+		break;
+	}
 	case CTOS_CREATE_GAME: {
 		if(dp->game || duel_mode)
 			return;
