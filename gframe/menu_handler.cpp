@@ -235,8 +235,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int start_turn = 1;
 				if(open_file) {
 					open_file = false;
-					if (!ReplayMode::cur_replay.OpenReplay(open_file_name))
+					if (!ReplayMode::cur_replay.OpenReplay(open_file_name)) {
 						break;
+					}
 				} else {
 					auto selected = mainGame->lstReplayList->getSelected();
 					if(selected == -1)
