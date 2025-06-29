@@ -234,8 +234,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_LOAD_REPLAY: {
 				int start_turn = 1;
 				if(open_file) {
-					ReplayMode::cur_replay.OpenReplay(open_file_name);
 					open_file = false;
+					if (!ReplayMode::cur_replay.OpenReplay(open_file_name)) {
+						if (exit_on_return)
+							mainGame->device->closeDevice();
+						break;
+					}
 				} else {
 					auto selected = mainGame->lstReplayList->getSelected();
 					if(selected == -1)
