@@ -12,7 +12,7 @@
 #include "single_mode.h"
 #include <thread>
 
-const unsigned short PRO_VERSION = 0x1361;
+const unsigned short PRO_VERSION = 0x1362;
 
 namespace ygo {
 
