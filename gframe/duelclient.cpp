@@ -438,13 +438,13 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		if (len < 1 + (int)sizeof(int16_t) * 6)
 			return;
 		mainGame->gMutex.lock();
-		int deckc = BufferIO::ReadInt16(pdata);
-		int extrac = BufferIO::ReadInt16(pdata);
-		int sidec = BufferIO::ReadInt16(pdata);
+		int deckc = BufferIO::Read<uint16_t>(pdata);
+		int extrac = BufferIO::Read<uint16_t>(pdata);
+		int sidec = BufferIO::Read<uint16_t>(pdata);
 		mainGame->dField.Initial(0, deckc, extrac, sidec);
-		deckc = BufferIO::ReadInt16(pdata);
-		extrac = BufferIO::ReadInt16(pdata);
-		sidec = BufferIO::ReadInt16(pdata);
+		deckc = BufferIO::Read<uint16_t>(pdata);
+		extrac = BufferIO::Read<uint16_t>(pdata);
+		sidec = BufferIO::Read<uint16_t>(pdata);
 		mainGame->dField.Initial(1, deckc, extrac, sidec);
 		mainGame->gMutex.unlock();
 		break;
