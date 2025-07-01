@@ -20,26 +20,15 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 	wchar_t strBuffer[4096];
 	int step = 0;
 	do {
-		CardDataC cd;
-		CardString cs;
 		step = sqlite3_step(pStmt);
 		if (step == SQLITE_ROW) {
-			cd.code = sqlite3_column_int(pStmt, 0);
+			uint32_t code = sqlite3_column_int(pStmt, 0);
+			auto& cd = _datas[code];
+			cd.code = code;
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
 			uint64_t setcode = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 3));
-			if (setcode) {
-				auto it = extra_setcode.find(cd.code);
-				if (it != extra_setcode.end()) {
-					int len = it->second.size();
-					if (len > SIZE_SETCODE)
-						len = SIZE_SETCODE;
-					if (len)
-						std::memcpy(cd.setcode, it->second.data(), len * sizeof(uint16_t));
-				}
-				else
-					cd.set_setcode(setcode);
-			}
+			write_setcode(cd.setcode, setcode);
 			cd.type = static_cast<decltype(cd.type)>(sqlite3_column_int64(pStmt, 4));
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defense = sqlite3_column_int(pStmt, 6);
@@ -56,7 +45,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 			cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
 			cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
 			cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
-			_datas[cd.code] = cd;
+			auto& cs = _strings[code];
 			if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.name = strBuffer;
@@ -72,12 +61,21 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 					cs.desc[i] = strBuffer;
 				}
 			}
-			_strings[cd.code] = cs;
 		}
 		else if (step != SQLITE_DONE)
 			return Error(pDB, pStmt);
 	} while (step == SQLITE_ROW);
 	sqlite3_finalize(pStmt);
+	for (const auto& entry : extra_setcode) {
+		const auto& code = entry.first;
+		const auto& list = entry.second;
+		if (list.size() > SIZE_SETCODE || list.empty())
+			continue;
+		auto it = _datas.find(code);
+		if (it == _datas.end())
+			continue;
+		std::memcpy(it->second.setcode, list.data(), list.size() * sizeof(uint16_t));
+	}
 	return true;
 }
 bool DataManager::LoadDB(const wchar_t* wfile) {
