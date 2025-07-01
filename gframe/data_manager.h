@@ -37,8 +37,8 @@ struct CardString {
 	std::wstring text;
 	std::wstring desc[16];
 };
-using code_pointer = std::unordered_map<unsigned int, CardDataC>::const_iterator;
-using string_pointer = std::unordered_map<unsigned int, CardString>::const_iterator;
+using code_pointer = std::unordered_map<uint32_t, CardDataC>::const_iterator;
+using string_pointer = std::unordered_map<uint32_t, CardString>::const_iterator;
 
 class DataManager {
 public:
@@ -98,9 +98,9 @@ public:
 	static bool deck_sort_name(code_pointer l1, code_pointer l2);
 
 private:
-	std::unordered_map<unsigned int, CardDataC> _datas;
-	std::unordered_map<unsigned int, CardString> _strings;
-	std::unordered_map<unsigned int, std::vector<uint16_t>> extra_setcode;
+	std::unordered_map<uint32_t, CardDataC> _datas;
+	std::unordered_map<uint32_t, CardString> _strings;
+	std::unordered_map<uint32_t, std::vector<uint16_t>> extra_setcode;
 };
 
 extern DataManager dataManager;
