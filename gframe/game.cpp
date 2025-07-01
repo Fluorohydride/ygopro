@@ -1544,7 +1544,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 	imgCard->setImage(imageManager.GetTexture(code, true));
 	if (is_valid) {
 		auto& cd = cit->second;
-		if (cd.is_alternative())
+		if (is_alternative(cd.code,cd.alias))
 			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
 		else
 			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);

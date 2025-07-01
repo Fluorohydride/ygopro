@@ -1551,7 +1551,7 @@ void DeckBuilder::FilterCards() {
 				match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str());
 			} else if (elements_iterator->type == element_t::type_t::setcode) {
 				match = data.is_setcodes(elements_iterator->setcodes);
-			} else if (trycode && (data.code == trycode || data.alias == trycode && data.is_alternative())){
+			} else if (trycode && (data.code == trycode || data.alias == trycode && is_alternative(data.code, data.alias))){
 				match = true;
 			} else {
 				match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str())

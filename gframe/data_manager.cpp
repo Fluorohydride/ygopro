@@ -191,7 +191,7 @@ bool DataManager::GetData(unsigned int code, CardData* pData) const {
 	if(cdit == _datas.end())
 		return false;
 	if (pData) {
-		*pData = cdit->second;
+		std::memcpy(pData, &cdit->second, sizeof(CardData));
 	}
 	return true;
 }

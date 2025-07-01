@@ -20,14 +20,30 @@ constexpr unsigned int MIN_CARD_ID = (unsigned int)(MAX_STRING_ID + 1) >> 4;
 constexpr unsigned int MAX_CARD_ID = 0x0fffffffU;
 	
 using CardData = card_data;
-struct CardDataC : card_data {
+struct CardDataC {
+	uint32_t code{};
+	uint32_t alias{};
+	uint16_t setcode[SIZE_SETCODE]{};
+	uint32_t type{};
+	uint32_t level{};
+	uint32_t attribute{};
+	uint32_t race{};
+	int32_t attack{};
+	int32_t defense{};
+	uint32_t lscale{};
+	uint32_t rscale{};
+	uint32_t link_marker{};
 	uint32_t ot{};
 	uint32_t category{};
 
 	bool is_setcodes(const std::vector<unsigned int>& values) const {
 		for (auto& value : values) {
-			if (is_setcode(value))
-				return true;
+			for (const auto& x : setcode) {
+				if(!x)
+					break;
+				if(check_setcode(x, value))
+					return true;
+			}
 		}
 		return false;
 	}
