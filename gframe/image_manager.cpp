@@ -80,20 +80,6 @@ void ImageManager::ClearTexture() {
 	tThumbLoadingMutex.unlock();
 	tFields.clear();
 }
-void ImageManager::RemoveTexture(int code) {
-	auto tit = tMap[0].find(code);
-	if(tit != tMap[0].end()) {
-		if(tit->second)
-			driver->removeTexture(tit->second);
-		tMap[0].erase(tit);
-	}
-	tit = tMap[1].find(code);
-	if(tit != tMap[1].end()) {
-		if(tit->second)
-			driver->removeTexture(tit->second);
-		tMap[1].erase(tit);
-	}
-}
 void ImageManager::ResizeTexture() {
 	irr::s32 imgWidth = CARD_IMG_WIDTH * mainGame->xScale;
 	irr::s32 imgHeight = CARD_IMG_HEIGHT * mainGame->yScale;
