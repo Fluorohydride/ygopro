@@ -168,10 +168,10 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 		sqlite3_finalize(pStmt);
 	return false;
 }
-code_pointer DataManager::GetCodePointer(unsigned int code) const {
+code_pointer DataManager::GetCodePointer(uint32_t code) const {
 	return _datas.find(code);
 }
-string_pointer DataManager::GetStringPointer(unsigned int code) const {
+string_pointer DataManager::GetStringPointer(uint32_t code) const {
 	return _strings.find(code);
 }
 code_pointer DataManager::datas_begin() const {
@@ -186,7 +186,7 @@ string_pointer DataManager::strings_begin() const {
 string_pointer DataManager::strings_end() const {
 	return _strings.cend();
 }
-bool DataManager::GetData(unsigned int code, CardData* pData) const {
+bool DataManager::GetData(uint32_t code, CardData* pData) const {
 	auto cdit = _datas.find(code);
 	if(cdit == _datas.end())
 		return false;
@@ -195,7 +195,7 @@ bool DataManager::GetData(unsigned int code, CardData* pData) const {
 	}
 	return true;
 }
-bool DataManager::GetString(unsigned int code, CardString* pStr) const {
+bool DataManager::GetString(uint32_t code, CardString* pStr) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end()) {
 		pStr->name = unknown_string;
@@ -205,7 +205,7 @@ bool DataManager::GetString(unsigned int code, CardString* pStr) const {
 	*pStr = csit->second;
 	return true;
 }
-const wchar_t* DataManager::GetName(unsigned int code) const {
+const wchar_t* DataManager::GetName(uint32_t code) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -213,7 +213,7 @@ const wchar_t* DataManager::GetName(unsigned int code) const {
 		return csit->second.name.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetText(unsigned int code) const {
+const wchar_t* DataManager::GetText(uint32_t code) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -221,7 +221,7 @@ const wchar_t* DataManager::GetText(unsigned int code) const {
 		return csit->second.text.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetDesc(unsigned int strCode) const {
+const wchar_t* DataManager::GetDesc(uint32_t strCode) const {
 	if (strCode < (MIN_CARD_ID << 4))
 		return GetSysString(strCode);
 	unsigned int code = (strCode >> 4) & 0x0fffffff;
