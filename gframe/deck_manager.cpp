@@ -31,10 +31,11 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			}
 			if (cur == _lfList.rend())
 				continue;
-			unsigned int code = 0;
-			int count = -1;
-			if (std::sscanf(linebuf, "%10s%*[ ]%1d", str1, &count) != 2)
+			const char* pos = linebuf;
+			uint32_t code = std::strtoul(pos, &pos, 10);
+			if (pos == linebuf || code >= UINT32_MAX)
 				continue;
+			int count = std::strtol(pos, &pos, 10);
 			if (count < 0 || count > 2)
 				continue;
 			code = std::strtoul(str1, nullptr, 10);
