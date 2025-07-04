@@ -97,7 +97,7 @@ public:
 		if (result_len == static_cast<size_t>(-1))
 			result_len = 0;
 		str[result_len] = 0;
-		return result_len;
+		return static_cast<int>(result_len);
 	}
 	// UTF-8 to UTF-16/UTF-32
 	// return: string length
@@ -111,7 +111,7 @@ public:
 		if (result_len == static_cast<size_t>(-1))
 			result_len = 0;
 		wstr[result_len] = 0;
-		return result_len;
+		return static_cast<int>(result_len);
 	}
 	template<size_t N>
 	static int EncodeUTF8(const wchar_t* src, char(&dst)[N]) {
