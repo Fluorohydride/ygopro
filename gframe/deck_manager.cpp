@@ -13,7 +13,6 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	FILE* fp = myfopen(path, "r");
 	char linebuf[256]{};
 	wchar_t strBuffer[256]{};
-	char str1[16]{};
 	if(fp) {
 		while(std::fgets(linebuf, sizeof linebuf, fp)) {
 			if(linebuf[0] == '#')
@@ -31,13 +30,20 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			}
 			if (cur == _lfList.rend())
 				continue;
-			unsigned int code = 0;
-			int count = -1;
-			if (std::sscanf(linebuf, "%10s%*[ ]%1d", str1, &count) != 2)
+			char* pos = linebuf;
+			errno = 0;
+			auto result = std::strtoul(pos, &pos, 10);
+			if (errno || result > UINT32_MAX)
+				continue;
+			if (pos == linebuf || *pos != ' ')
+				continue;
+			uint32_t code = static_cast<uint32_t>(result);
+			errno = 0;
+			int count = std::strtol(pos, &pos, 10);
+			if (errno)
 				continue;
 			if (count < 0 || count > 2)
 				continue;
-			code = std::strtoul(str1, nullptr, 10);
 			cur->content[code] = count;
 			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 		}
@@ -196,8 +202,9 @@ uint32_t DeckManager::LoadDeckFromStream(Deck& deck, std::istringstream& deckStr
 		}
 		if (linebuf[0] < '0' || linebuf[0] > '9')
 			continue;
+		errno = 0;
 		auto code = std::strtoul(linebuf.c_str(), nullptr, 10);
-		if (code >= UINT32_MAX)
+		if (errno || code > UINT32_MAX)
 			continue;
 		cardlist[ct++] = code;
 		if (is_side)
