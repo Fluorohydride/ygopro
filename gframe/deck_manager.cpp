@@ -202,8 +202,9 @@ uint32_t DeckManager::LoadDeckFromStream(Deck& deck, std::istringstream& deckStr
 		}
 		if (linebuf[0] < '0' || linebuf[0] > '9')
 			continue;
+		errno = 0;
 		auto code = std::strtoul(linebuf.c_str(), nullptr, 10);
-		if (code >= UINT32_MAX)
+		if (errno || code > UINT32_MAX)
 			continue;
 		cardlist[ct++] = code;
 		if (is_side)
