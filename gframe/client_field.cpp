@@ -1402,7 +1402,8 @@ bool ClientField::check_sum_trib(std::set<ClientCard*>::const_iterator index, st
 		|| check_sum_trib(index, end, acc + l2)
 		|| check_sum_trib(index, end, acc);
 }
-static bool is_declarable(const CardData& cd, const std::vector<unsigned int>& opcode) {
+template <class T>
+static bool is_declarable(const T& cd, const std::vector<unsigned int>& opcode) {
 	std::stack<int> stack;
 	for(auto it = opcode.begin(); it != opcode.end(); ++it) {
 		switch(*it) {
@@ -1492,9 +1493,15 @@ static bool is_declarable(const CardData& cd, const std::vector<unsigned int>& o
 		}
 		case OPCODE_ISSETCARD: {
 			if (stack.size() >= 1) {
-				int set_code = stack.top();
+				uint32_t set_code = stack.top();
 				stack.pop();
-				bool res = cd.is_setcode(set_code);
+				bool res = false;
+				for (const auto& x : cd.setcode) {
+					if(check_setcode(x, set_code)) {
+						res = true;
+						break;
+					}
+				}
 				stack.push(res);
 			}
 			break;
