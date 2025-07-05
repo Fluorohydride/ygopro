@@ -165,9 +165,11 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 	}
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	std::snprintf(errmsg, sizeof errmsg, "%s", sqlite3_errmsg(pDB));
-	if(pStmt)
-		sqlite3_finalize(pStmt);
+	if (const char* msg = sqlite3_errmsg(pDB))
+		std::snprintf(errmsg, sizeof errmsg, "%s", msg);
+	else
+		errmsg[0] = '\0';
+	sqlite3_finalize(pStmt);
 	return false;
 }
 code_pointer DataManager::GetCodePointer(unsigned int code) const {
