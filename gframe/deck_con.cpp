@@ -1375,8 +1375,6 @@ void DeckBuilder::GetHoveredCard() {
 	if(!is_draging && pre_code != hovered_code) {
 		if(hovered_code)
 			mainGame->ShowCardInfo(hovered_code);
-		if(pre_code)
-			imageManager.RemoveTexture(pre_code);
 	}
 }
 void DeckBuilder::StartFilter() {
