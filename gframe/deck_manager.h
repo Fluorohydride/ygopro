@@ -16,7 +16,7 @@ namespace ygo {
 struct LFList {
 	unsigned int hash{};
 	std::wstring listName;
-	std::unordered_map<unsigned int, int> content;
+	std::unordered_map<uint32_t, int> content;
 };
 struct Deck {
 	std::vector<code_pointer> main;
