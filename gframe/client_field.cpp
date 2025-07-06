@@ -1545,12 +1545,12 @@ static bool is_declarable(const T& cd, const std::vector<unsigned int>& opcode) 
 void ClientField::UpdateDeclarableList() {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
-	CardString cstr;
 	CardData cd;
-	if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declare_opcodes)) {
+	if (dataManager.GetData(trycode, &cd) && is_declarable(cd, declare_opcodes)) {
+		auto it = dataManager.GetStringPointer(trycode);
 		mainGame->lstANCard->clear();
 		ancard.clear();
-		mainGame->lstANCard->addItem(cstr.name.c_str());
+		mainGame->lstANCard->addItem(it->second.name.c_str());
 		ancard.push_back(trycode);
 		return;
 	}
