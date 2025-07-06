@@ -1,8 +1,9 @@
 #ifndef NETSERVER_H
 #define NETSERVER_H
 
-#include "network.h"
 #include <unordered_map>
+#include "config.h"
+#include "network.h"
 
 namespace ygo {
 
