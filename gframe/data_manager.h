@@ -68,10 +68,18 @@ public:
 
 	code_pointer GetCodePointer(uint32_t code) const;
 	string_pointer GetStringPointer(uint32_t code) const;
-	code_pointer datas_begin() const;
-	code_pointer datas_end() const;
-	string_pointer strings_begin() const;
-	string_pointer strings_end() const;
+	code_pointer datas_begin() const {
+		return _datas.cbegin();
+	}
+	code_pointer datas_end() const {
+		return _datas.cend();
+	}
+	string_pointer strings_begin() const {
+		return _strings.cbegin();
+	}
+	string_pointer strings_end() const {
+		return _strings.cend();
+	}
 	bool GetData(uint32_t code, CardData* pData) const;
 	bool GetString(uint32_t code, CardString* pStr) const;
 	const wchar_t* GetName(uint32_t code) const;

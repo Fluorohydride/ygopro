@@ -176,18 +176,6 @@ code_pointer DataManager::GetCodePointer(uint32_t code) const {
 string_pointer DataManager::GetStringPointer(uint32_t code) const {
 	return _strings.find(code);
 }
-code_pointer DataManager::datas_begin() const {
-	return _datas.cbegin();
-}
-code_pointer DataManager::datas_end() const {
-	return _datas.cend();
-}
-string_pointer DataManager::strings_begin() const {
-	return _strings.cbegin();
-}
-string_pointer DataManager::strings_end() const {
-	return _strings.cend();
-}
 bool DataManager::GetData(uint32_t code, CardData* pData) const {
 	auto cdit = _datas.find(code);
 	if(cdit == _datas.end())
