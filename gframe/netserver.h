@@ -34,8 +34,8 @@ public:
 	static size_t CreateChatPacket(unsigned char* src, int src_size, unsigned char* dst, uint16_t dst_player_type);
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto) {
 		auto p = net_server_write;
-		buffer_write<uint16_t>(p, 1);
-		buffer_write<uint8_t>(p, proto);
+		BufferIO::Write<uint16_t>(p, 1);
+		BufferIO::Write<uint8_t>(p, proto);
 		last_sent = 3;
 		if (dp)
 			bufferevent_write(dp->bev, net_server_write, 3);
@@ -44,8 +44,8 @@ public:
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, const ST& st) {
 		auto p = net_server_write;
 		static_assert(sizeof(ST) <= MAX_DATA_SIZE, "Packet size is too large.");
-		buffer_write<uint16_t>(p, (uint16_t)(1 + sizeof(ST)));
-		buffer_write<uint8_t>(p, proto);
+		BufferIO::Write<uint16_t>(p, (uint16_t)(1 + sizeof(ST)));
+		BufferIO::Write<uint8_t>(p, proto);
 		std::memcpy(p, &st, sizeof(ST));
 		last_sent = sizeof(ST) + 3;
 		if (dp)
@@ -55,8 +55,8 @@ public:
 		auto p = net_server_write;
 		if (len > MAX_DATA_SIZE)
 			len = MAX_DATA_SIZE;
-		buffer_write<uint16_t>(p, (uint16_t)(1 + len));
-		buffer_write<uint8_t>(p, proto);
+		BufferIO::Write<uint16_t>(p, (uint16_t)(1 + len));
+		BufferIO::Write<uint8_t>(p, proto);
 		std::memcpy(p, buffer, len);
 		last_sent = len + 3;
 		if (dp)

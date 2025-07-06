@@ -2,31 +2,52 @@
 #define BUFFERIO_H
 
 #include <cstdint>
+#include <cstring>
 #include <cwchar>
-#include "../ocgcore/buffer.h"
 
 class BufferIO {
 public:
-	static int ReadInt32(unsigned char*& p) {
-		return buffer_read<int32_t>(p);
+	template<typename T>
+	static T Read(unsigned char*& p) {
+		T ret{};
+		std::memcpy(&ret, p, sizeof(T));
+		p += sizeof(T);
+		return ret;
 	}
+	template<typename T>
+	static void Write(unsigned char*& p, T value) {
+		std::memcpy(p, &value, sizeof(T));
+		p += sizeof(T);
+	}
+
+	// for compatibility
+	[[deprecated]]
+	static int32_t ReadInt32(unsigned char*& p) {
+		return Read<int32_t>(p);
+	}
+	[[deprecated]]
 	static short ReadInt16(unsigned char*& p) {
-		return buffer_read<int16_t>(p);
+		return Read<int16_t>(p);
 	}
+	[[deprecated]]
 	static char ReadInt8(unsigned char*& p) {
-		return buffer_read<char>(p);
+		return Read<char>(p);
 	}
+	[[deprecated]]
 	static unsigned char ReadUInt8(unsigned char*& p) {
-		return buffer_read<unsigned char>(p);
+		return Read<unsigned char>(p);
 	}
-	static void WriteInt32(unsigned char*& p, int val) {
-		buffer_write<int32_t>(p, val);
+	[[deprecated]]
+	static void WriteInt32(unsigned char*& p, int32_t val) {
+		Write<int32_t>(p, val);
 	}
+	[[deprecated]]
 	static void WriteInt16(unsigned char*& p, short val) {
-		buffer_write<int16_t>(p, val);
+		Write<int16_t>(p, val);
 	}
+	[[deprecated]]
 	static void WriteInt8(unsigned char*& p, char val) {
-		buffer_write<char>(p, val);
+		Write<char>(p, val);
 	}
 	/**
 	* @brief Copy a C-style string to another C-style string.
