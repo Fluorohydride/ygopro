@@ -4,6 +4,7 @@
 #include <vector>
 #include <set>
 #include <random>
+#include "config.h"
 #include "network.h"
 
 namespace ygo {
