@@ -17,14 +17,14 @@ void UpdateDeck() {
 	BufferIO::CopyWideString(mainGame->cbDeckSelect->getText(), mainGame->gameConf.lastdeck);
 	unsigned char deckbuf[1024]{};
 	auto pdeck = deckbuf;
-	BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
-	BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.side.size());
+	BufferIO::Write<int32_t>(pdeck, static_cast<int32_t>(deckManager.current_deck.main.size() + deckManager.current_deck.extra.size()));
+	BufferIO::Write<int32_t>(pdeck, static_cast<int32_t>(deckManager.current_deck.side.size()));
 	for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
-		BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.main[i]->first);
+		BufferIO::Write<uint32_t>(pdeck, deckManager.current_deck.main[i]->first);
 	for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
-		BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.extra[i]->first);
+		BufferIO::Write<uint32_t>(pdeck, deckManager.current_deck.extra[i]->first);
 	for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
-		BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.side[i]->first);
+		BufferIO::Write<uint32_t>(pdeck, deckManager.current_deck.side[i]->first);
 	DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 }
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
