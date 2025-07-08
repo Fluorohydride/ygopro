@@ -9,14 +9,13 @@
 #include <event2/buffer.h>
 #include <event2/thread.h>
 #include <type_traits>
+#include "deck_manager.h"
 
 #define check_trivially_copyable(T) static_assert(std::is_trivially_copyable<T>::value == true && std::is_standard_layout<T>::value == true, "not trivially copyable")
 
 namespace ygo {
 	constexpr int SIZE_NETWORK_BUFFER = 0x20000;
 	constexpr int MAX_DATA_SIZE = UINT16_MAX - 1;
-	constexpr int MAINC_MAX = 250;	// the limit of card_state
-	constexpr int SIDEC_MAX = MAINC_MAX;
 
 struct HostInfo {
 	uint32_t lflist{};
