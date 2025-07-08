@@ -1,6 +1,5 @@
 #include "replay.h"
 #include "myfilesystem.h"
-#include "network.h"
 #include "lzma/LzmaLib.h"
 
 namespace ygo {
