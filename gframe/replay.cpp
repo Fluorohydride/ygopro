@@ -1,3 +1,4 @@
+#include "config.h"
 #include "replay.h"
 #include "myfilesystem.h"
 #include "lzma/LzmaLib.h"
@@ -15,31 +16,18 @@ Replay::~Replay() {
 void Replay::BeginRecord() {
 	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
 		return;
-#ifdef _WIN32
-	if(is_recording)
-		CloseHandle(recording_fp);
-	recording_fp = CreateFileW(L"./replay/_LastReplay.yrp", GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, nullptr);
-	if(recording_fp == INVALID_HANDLE_VALUE)
-		return;
-#else
 	if(is_recording)
 		std::fclose(fp);
 	fp = myfopen("./replay/_LastReplay.yrp", "wb");
 	if(!fp)
 		return;
-#endif
 	Reset();
 	is_recording = true;
 }
 void Replay::WriteHeader(ExtendedReplayHeader& header) {
 	pheader = header;
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &header, sizeof(header), &size, nullptr);
-#else
-	std::fwrite(&header, sizeof(header), 1, fp);
+	std::fwrite(&header, sizeof header, 1, fp);
 	std::fflush(fp);
-#endif
 }
 void Replay::WriteData(const void* data, size_t length, bool flush) {
 	if(!is_recording)
@@ -48,14 +36,9 @@ void Replay::WriteData(const void* data, size_t length, bool flush) {
 		return;
 	std::memcpy(replay_data + replay_size, data, length);
 	replay_size += length;
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, data, length, &size, nullptr);
-#else
 	std::fwrite(data, length, 1, fp);
 	if(flush)
 		std::fflush(fp);
-#endif
 }
 void Replay::WriteInt32(int32_t data, bool flush) {
 	Write<int32_t>(data, flush);
@@ -63,19 +46,12 @@ void Replay::WriteInt32(int32_t data, bool flush) {
 void Replay::Flush() {
 	if(!is_recording)
 		return;
-#ifdef _WIN32
-#else
 	std::fflush(fp);
-#endif
 }
 void Replay::EndRecord() {
 	if(!is_recording)
 		return;
-#ifdef _WIN32
-	CloseHandle(recording_fp);
-#else
 	std::fclose(fp);
-#endif
 	pheader.base.datasize = replay_size;
 	pheader.base.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
