@@ -48,7 +48,6 @@ bool IsExtension(const char* filename, const char(&extension)[N]) {
 
 struct Config {
 	bool use_d3d{ false };
-	bool use_image_scale{ true };
 	bool use_image_scale_multi_thread{ true };
 #ifdef _OPENMP
 	bool use_image_load_background_thread{ false };
