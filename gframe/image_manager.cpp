@@ -203,24 +203,20 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 } // end of parallel region
 }
 irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, irr::s32 width, irr::s32 height) {
-	if(mainGame->gameConf.use_image_scale) {
-		irr::video::ITexture* texture;
-		irr::video::IImage* srcimg = driver->createImageFromFile(file);
-		if(srcimg == nullptr)
-			return nullptr;
-		if(srcimg->getDimension() == irr::core::dimension2d<irr::u32>(width, height)) {
-			texture = driver->addTexture(file, srcimg);
-		} else {
-			irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
-			imageScaleNNAA(srcimg, destimg);
-			texture = driver->addTexture(file, destimg);
-			destimg->drop();
-		}
-		srcimg->drop();
-		return texture;
+	irr::video::ITexture* texture;
+	irr::video::IImage* srcimg = driver->createImageFromFile(file);
+	if(srcimg == nullptr)
+		return nullptr;
+	if(srcimg->getDimension() == irr::core::dimension2d<irr::u32>(width, height)) {
+		texture = driver->addTexture(file, srcimg);
 	} else {
-		return driver->getTexture(file);
+		irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
+		imageScaleNNAA(srcimg, destimg);
+		texture = driver->addTexture(file, destimg);
+		destimg->drop();
 	}
+	srcimg->drop();
+	return texture;
 }
 irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	if(code == 0)
