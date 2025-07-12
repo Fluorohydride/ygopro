@@ -239,17 +239,13 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 			std::snprintf(file, sizeof file, "pics/%d.jpg", code);
 			img = GetTextureFromFile(file, width, height);
 		}
-		if(img == nullptr && !mainGame->gameConf.use_image_scale) {
-			tMap[fit ? 1 : 0][code] = nullptr;
-			return GetTextureThumb(code);
-		}
 		tMap[fit ? 1 : 0][code] = img;
 		return (img == nullptr) ? (fit ? tUnknownFit : tUnknown) : img;
 	}
-	if(tit->second)
+	if (tit->second)
 		return tit->second;
 	else
-		return mainGame->gameConf.use_image_scale ? (fit ? tUnknownFit : tUnknown) : GetTextureThumb(code);
+		return fit ? tUnknownFit : tUnknown;
 }
 irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 	if(code == 0)
