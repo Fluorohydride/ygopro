@@ -5,6 +5,8 @@ project "lua"
     files { "src/*.c", "src/*.h" }
     removefiles { "src/lua.c", "src/luac.c", "src/linit.c", "src/onelua.c" }
 
+    defines { "LUA_USE_LONGJMP" }
+
     filter "configurations:Debug"
         defines { "LUA_USE_APICHECK" }
 
