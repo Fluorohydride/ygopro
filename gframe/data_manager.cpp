@@ -22,7 +22,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 	do {
 		step = sqlite3_step(pStmt);
 		if (step == SQLITE_ROW) {
-			uint32_t code = sqlite3_column_int(pStmt, 0);
+			uint32_t code = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 0));
 			auto& cd = _datas[code];
 			cd.code = code;
 			cd.ot = sqlite3_column_int(pStmt, 1);
@@ -38,7 +38,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 			}
 			else
 				cd.link_marker = 0;
-			uint32_t level = static_cast<uint32_t>(sqlite3_column_int(pStmt, 7));
+			uint32_t level = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 7));
 			cd.level = level & 0xff;
 			cd.lscale = (level >> 24) & 0xff;
 			cd.rscale = (level >> 16) & 0xff;
