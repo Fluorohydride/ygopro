@@ -18,53 +18,49 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, nullptr) != SQLITE_OK)
 		return Error(pDB, pStmt);
 	wchar_t strBuffer[4096];
-	int step = 0;
-	do {
-		step = sqlite3_step(pStmt);
-		if (step == SQLITE_ROW) {
-			uint32_t code = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 0));
-			auto& cd = _datas[code];
-			cd.code = code;
-			cd.ot = sqlite3_column_int(pStmt, 1);
-			cd.alias = sqlite3_column_int(pStmt, 2);
-			uint64_t setcode = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 3));
-			write_setcode(cd.setcode, setcode);
-			cd.type = static_cast<decltype(cd.type)>(sqlite3_column_int64(pStmt, 4));
-			cd.attack = sqlite3_column_int(pStmt, 5);
-			cd.defense = sqlite3_column_int(pStmt, 6);
-			if (cd.type & TYPE_LINK) {
-				cd.link_marker = cd.defense;
-				cd.defense = 0;
-			}
-			else
-				cd.link_marker = 0;
-			uint32_t level = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 7));
-			cd.level = level & 0xff;
-			cd.lscale = (level >> 24) & 0xff;
-			cd.rscale = (level >> 16) & 0xff;
-			cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
-			cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
-			cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
-			auto& cs = _strings[code];
-			if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+	for (int step = sqlite3_step(pStmt); step != SQLITE_DONE; step = sqlite3_step(pStmt)) {
+		if (step != SQLITE_ROW)
+			return Error(pDB, pStmt);
+		uint32_t code = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 0));
+		auto& cd = _datas[code];
+		cd.code = code;
+		cd.ot = sqlite3_column_int(pStmt, 1);
+		cd.alias = sqlite3_column_int(pStmt, 2);
+		uint64_t setcode = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 3));
+		write_setcode(cd.setcode, setcode);
+		cd.type = static_cast<decltype(cd.type)>(sqlite3_column_int64(pStmt, 4));
+		cd.attack = sqlite3_column_int(pStmt, 5);
+		cd.defense = sqlite3_column_int(pStmt, 6);
+		if (cd.type & TYPE_LINK) {
+			cd.link_marker = cd.defense;
+			cd.defense = 0;
+		}
+		else
+			cd.link_marker = 0;
+		uint32_t level = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 7));
+		cd.level = level & 0xff;
+		cd.lscale = (level >> 24) & 0xff;
+		cd.rscale = (level >> 16) & 0xff;
+		cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
+		cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
+		cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
+		auto& cs = _strings[code];
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+			BufferIO::DecodeUTF8(text, strBuffer);
+			cs.name = strBuffer;
+		}
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
+			BufferIO::DecodeUTF8(text, strBuffer);
+			cs.text = strBuffer;
+		}
+		constexpr int desc_count = sizeof cs.desc / sizeof cs.desc[0];
+		for (int i = 0; i < desc_count; ++i) {
+			if (const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
-				cs.name = strBuffer;
-			}
-			if (const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
-				BufferIO::DecodeUTF8(text, strBuffer);
-				cs.text = strBuffer;
-			}
-			constexpr int desc_count = sizeof cs.desc / sizeof cs.desc[0];
-			for (int i = 0; i < desc_count; ++i) {
-				if (const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
-					BufferIO::DecodeUTF8(text, strBuffer);
-					cs.desc[i] = strBuffer;
-				}
+				cs.desc[i] = strBuffer;
 			}
 		}
-		else if (step != SQLITE_DONE)
-			return Error(pDB, pStmt);
-	} while (step == SQLITE_ROW);
+	}
 	sqlite3_finalize(pStmt);
 	for (const auto& entry : extra_setcode) {
 		const auto& code = entry.first;
