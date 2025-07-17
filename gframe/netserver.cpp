@@ -123,7 +123,7 @@ void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {
 * proto: 1 byte
 * [data]: (packet_len - 1) bytes
 */
-void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
+void NetServer::ServerEchoRead(bufferevent* bev, void* ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
 	int len = evbuffer_get_length(input);
 	if (len < 2)
