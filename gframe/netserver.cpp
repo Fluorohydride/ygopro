@@ -105,6 +105,8 @@ void NetServer::BroadcastEvent(evutil_socket_t fd, short events, void* arg) {
 }
 void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx) {
 	bufferevent* bev = bufferevent_socket_new(net_evbase, fd, BEV_OPT_CLOSE_ON_FREE);
+	if (!bev)
+		return;
 	DuelPlayer dp;
 	dp.name[0] = 0;
 	dp.type = 0xff;
@@ -151,11 +153,12 @@ void NetServer::ServerEchoEvent(bufferevent* bev, short events, void* ctx) {
 }
 int NetServer::ServerThread() {
 	event_base_dispatch(net_evbase);
-	for(auto bit = users.begin(); bit != users.end(); ++bit) {
-		bufferevent_disable(bit->first, EV_READ);
+	for (auto bit = users.begin(); bit != users.end();) {
+		bufferevent_disable(bit->first, EV_READ | EV_WRITE);
 		bufferevent_free(bit->first);
+		bit->second->bev = nullptr;
+		bit = users.erase(bit);
 	}
-	users.clear();
 	evconnlistener_free(listener);
 	listener = 0;
 	if(broadcast_ev) {
@@ -180,6 +183,7 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 		bufferevent_flush(dp->bev, EV_WRITE, BEV_FLUSH);
 		bufferevent_disable(dp->bev, EV_READ);
 		bufferevent_free(dp->bev);
+		dp->bev = nullptr;
 		users.erase(bit);
 	}
 }
