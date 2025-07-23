@@ -82,14 +82,18 @@ public:
 		return CopyWStr(src, dst, N);
 	}
 	template<size_t N>
-	static void CopyString(const char* src, char(&dst)[N]) {
-		std::strncpy(dst, src, N - 1);
-		dst[N - 1] = 0;
+	static void CopyString(const char* src, char(&dst)[N], size_t len = N - 1) {
+		if(len >= N)
+			len = N - 1;
+		std::strncpy(dst, src, len);
+		dst[len] = 0;
 	}
 	template<size_t N>
-	static void CopyWideString(const wchar_t* src, wchar_t(&dst)[N]) {
-		std::wcsncpy(dst, src, N - 1);
-		dst[N - 1] = 0;
+	static void CopyWideString(const wchar_t* src, wchar_t(&dst)[N], size_t len = N - 1) {
+		if(len >= N)
+			len = N - 1;
+		std::wcsncpy(dst, src, len);
+		dst[len] = 0;
 	}
 	static bool IsHighSurrogate(unsigned int c) {
 		return (c >= 0xd800U && c <= 0xdbffU);

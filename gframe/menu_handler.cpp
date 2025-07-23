@@ -428,8 +428,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					wchar_t *dot = std::wcsrchr(open_file_name, L'.');
 					if(dash && dot && !mywcsncasecmp(dot, L".ydk", 4)) { // full path
 						wchar_t deck_name[256];
-						std::wcsncpy(deck_name, dash + 1, dot - dash - 1);
-						deck_name[dot - dash - 1] = L'\0';
+						BufferIO::CopyWideString(dash + 1, deck_name, dot - dash - 1);
 						mainGame->ebDeckname->setText(deck_name);
 						mainGame->cbDBCategory->setSelected(-1);
 						mainGame->cbDBDecks->setSelected(-1);
@@ -438,7 +437,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDBDecks->setEnabled(false);
 					} else if(dash) { // has category
 						wchar_t deck_name[256];
-						std::wcsncpy(deck_name, dash + 1, 256);
+						BufferIO::CopyWideString(dash + 1, deck_name);
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 							if(!std::wcscmp(mainGame->cbDBDecks->getItem(i), deck_name)) {
 								BufferIO::CopyWideString(deck_name, mainGame->gameConf.lastdeck);
