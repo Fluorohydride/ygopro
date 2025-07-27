@@ -13,6 +13,8 @@ DataManager::DataManager() : _datas(32768), _strings(32768) {
 	extra_setcode = { {8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}}, };
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
+	if (sqlite3_db_config(pDB, SQLITE_DBCONFIG_TRUSTED_SCHEMA, 0, nullptr) != SQLITE_OK)
+		return Error(pDB);
 	sqlite3_stmt* pStmt = nullptr;
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, nullptr) != SQLITE_OK)
