@@ -1301,11 +1301,8 @@ void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const w
 	}
 	FileSystem::TraversalDir(deckpath, [additem](const wchar_t* name, bool isdir) {
 		if (!isdir && IsExtension(name, L".ydk")) {
-			size_t len = std::wcslen(name);
 			wchar_t deckname[256]{};
-			size_t count = std::min(len - 4, sizeof deckname / sizeof deckname[0] - 1);
-			std::wcsncpy(deckname, name, count);
-			deckname[count] = 0;
+			BufferIO::CopyWideString(name, deckname, std::wcslen(name) - 4);
 			additem(deckname);
 		}
 	});
@@ -1611,7 +1608,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 	imgCard->setImage(imageManager.GetTexture(code, true));
 	if (is_valid) {
 		auto& cd = cit->second;
-		if (cd.is_alternative())
+		if (is_alternative(cd.code,cd.alias))
 			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
 		else
 			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);

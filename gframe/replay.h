@@ -1,7 +1,10 @@
 #ifndef REPLAY_H
 #define REPLAY_H
 
-#include "config.h"
+#include <cstdio>
+#include <vector>
+#include <string>
+#include "../ocgcore/ocgapi.h"
 #include "deck_manager.h"
 
 namespace ygo {
@@ -105,10 +108,6 @@ public:
 #endif // YGOPRO_SERVER_MODE
 
 	FILE* fp{ nullptr };
-#ifdef _WIN32
-	HANDLE recording_fp{ nullptr };
-#endif
-
 	ExtendedReplayHeader pheader;
 	unsigned char* comp_data;
 	size_t comp_size{};

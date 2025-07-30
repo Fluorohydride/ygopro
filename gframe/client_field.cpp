@@ -317,7 +317,7 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 }
 void ClientField::UpdateCard(int controler, int location, int sequence, unsigned char* data) {
 	ClientCard* pcard = GetCard(controler, location, sequence);
-	int len = BufferIO::ReadInt32(data);
+	int len = BufferIO::Read<int32_t>(data);
 	if (pcard && len > LEN_HEADER)
 		pcard->UpdateInfo(data);
 }
@@ -350,7 +350,7 @@ void ClientField::UpdateFieldCard(int controler, int location, unsigned char* da
 		return;
 	int len;
 	for(auto cit = lst->begin(); cit != lst->end(); ++cit) {
-		len = BufferIO::ReadInt32(data);
+		len = BufferIO::Read<int32_t>(data);
 		if(len > LEN_HEADER)
 			(*cit)->UpdateInfo(data);
 		data += len - 4;
@@ -1402,7 +1402,8 @@ bool ClientField::check_sum_trib(std::set<ClientCard*>::const_iterator index, st
 		|| check_sum_trib(index, end, acc + l2)
 		|| check_sum_trib(index, end, acc);
 }
-static bool is_declarable(const CardData& cd, const std::vector<unsigned int>& opcode) {
+template <class T>
+static bool is_declarable(const T& cd, const std::vector<unsigned int>& opcode) {
 	std::stack<int> stack;
 	for(auto it = opcode.begin(); it != opcode.end(); ++it) {
 		switch(*it) {
@@ -1492,9 +1493,15 @@ static bool is_declarable(const CardData& cd, const std::vector<unsigned int>& o
 		}
 		case OPCODE_ISSETCARD: {
 			if (stack.size() >= 1) {
-				int set_code = stack.top();
+				uint32_t set_code = stack.top();
 				stack.pop();
-				bool res = cd.is_setcode(set_code);
+				bool res = false;
+				for (const auto& x : cd.setcode) {
+					if(check_setcode(x, set_code)) {
+						res = true;
+						break;
+					}
+				}
 				stack.push(res);
 			}
 			break;
@@ -1538,12 +1545,12 @@ static bool is_declarable(const CardData& cd, const std::vector<unsigned int>& o
 void ClientField::UpdateDeclarableList() {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
-	CardString cstr;
 	CardData cd;
-	if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declare_opcodes)) {
+	if (dataManager.GetData(trycode, &cd) && is_declarable(cd, declare_opcodes)) {
+		auto it = dataManager.GetStringPointer(trycode);
 		mainGame->lstANCard->clear();
 		ancard.clear();
-		mainGame->lstANCard->addItem(cstr.name.c_str());
+		mainGame->lstANCard->addItem(it->second.name.c_str());
 		ancard.push_back(trycode);
 		return;
 	}

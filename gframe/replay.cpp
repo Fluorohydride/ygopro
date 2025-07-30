@@ -1,6 +1,6 @@
+#include "config.h"
 #include "replay.h"
 #include "myfilesystem.h"
-#include "network.h"
 #include "lzma/LzmaLib.h"
 
 namespace ygo {
@@ -23,23 +23,6 @@ void Replay::BeginRecord() {
 #endif
 	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
 		return;
-#ifdef _WIN32
-	if(is_recording)
-		CloseHandle(recording_fp);
-#ifdef YGOPRO_SERVER_MODE
-	time_t nowtime = time(NULL);
-	struct tm *localedtime = localtime(&nowtime);
-	wchar_t tmppath[80];
-	wcsftime(tmppath, 80, L"./replay/%Y-%m-%d %H-%M-%S %%u.yrp", localedtime);
-	wchar_t path[80];
-	myswprintf(path, tmppath, server_port);
-	recording_fp = CreateFileW(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
-#else
-	recording_fp = CreateFileW(L"./replay/_LastReplay.yrp", GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, nullptr);
-#endif //YGOPRO_SERVER_MODE
-	if(recording_fp == INVALID_HANDLE_VALUE)
-		return;
-#else
 	if(is_recording)
 		std::fclose(fp);
 #ifdef YGOPRO_SERVER_MODE
@@ -55,7 +38,6 @@ void Replay::BeginRecord() {
 #endif //YGOPRO_SERVER_MODE
 	if(!fp)
 		return;
-#endif
 #ifdef YGOPRO_SERVER_MODE
 	}
 #endif //YGOPRO_SERVER_MODE
@@ -67,13 +49,8 @@ void Replay::WriteHeader(ExtendedReplayHeader& header) {
 #ifdef YGOPRO_SERVER_MODE
 	if(!(replay_mode & REPLAY_MODE_SAVE_IN_SERVER)) return;
 #endif
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &header, sizeof(header), &size, nullptr);
-#else
-	std::fwrite(&header, sizeof(header), 1, fp);
+	std::fwrite(&header, sizeof header, 1, fp);
 	std::fflush(fp);
-#endif
 }
 void Replay::WriteData(const void* data, size_t length, bool flush) {
 	if(!is_recording)
@@ -85,14 +62,9 @@ void Replay::WriteData(const void* data, size_t length, bool flush) {
 #ifdef YGOPRO_SERVER_MODE
 	if(!(replay_mode & REPLAY_MODE_SAVE_IN_SERVER)) return;
 #endif
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, data, length, &size, nullptr);
-#else
 	std::fwrite(data, length, 1, fp);
 	if(flush)
 		std::fflush(fp);
-#endif
 }
 void Replay::WriteInt32(int32_t data, bool flush) {
 	Write<int32_t>(data, flush);
@@ -103,10 +75,7 @@ void Replay::Flush() {
 #ifdef YGOPRO_SERVER_MODE
 	if(!(replay_mode & REPLAY_MODE_SAVE_IN_SERVER)) return;
 #endif
-#ifdef _WIN32
-#else
 	std::fflush(fp);
-#endif
 }
 void Replay::EndRecord() {
 	if(!is_recording)
@@ -114,11 +83,7 @@ void Replay::EndRecord() {
 #ifdef YGOPRO_SERVER_MODE
 	if(replay_mode & REPLAY_MODE_SAVE_IN_SERVER) {
 #endif
-#ifdef _WIN32
-	CloseHandle(recording_fp);
-#else
 	std::fclose(fp);
-#endif
 #ifdef YGOPRO_SERVER_MODE
 	}
 #endif

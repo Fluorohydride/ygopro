@@ -696,16 +696,16 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				mainGame->ClearCardInfo();
-				unsigned char deckbuf[1024];
+				unsigned char deckbuf[1024]{};
 				auto pdeck = deckbuf;
-				BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
-				BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
+				BufferIO::Write<int32_t>(pdeck, static_cast<int32_t>(deckManager.current_deck.main.size() + deckManager.current_deck.extra.size()));
+				BufferIO::Write<int32_t>(pdeck, static_cast<int32_t>(deckManager.current_deck.side.size()));
 				for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
-					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->first);
+					BufferIO::Write<uint32_t>(pdeck, deckManager.current_deck.main[i]->first);
 				for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
-					BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->first);
+					BufferIO::Write<uint32_t>(pdeck, deckManager.current_deck.extra[i]->first);
 				for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
-					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
+					BufferIO::Write<uint32_t>(pdeck, deckManager.current_deck.side[i]->first);
 				DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 				break;
 			}
@@ -1472,7 +1472,7 @@ void DeckBuilder::FilterCards() {
 		auto strpointer = dataManager.GetStringPointer(ptr->first);
 		if (strpointer == dataManager.strings_end())
 			continue;
-		const CardString& text = strpointer->second;
+		const CardString& strings = strpointer->second;
 		if(data.type & TYPE_TOKEN)
 			continue;
 		switch(filter_type) {
@@ -1548,14 +1548,14 @@ void DeckBuilder::FilterCards() {
 		for (auto elements_iterator = query_elements.begin(); elements_iterator != query_elements.end(); ++elements_iterator) {
 			bool match = false;
 			if (elements_iterator->type == element_t::type_t::name) {
-				match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str());
+				match = CardNameContains(strings.name.c_str(), elements_iterator->keyword.c_str());
 			} else if (elements_iterator->type == element_t::type_t::setcode) {
 				match = data.is_setcodes(elements_iterator->setcodes);
-			} else if (trycode && (data.code == trycode || data.alias == trycode && data.is_alternative())){
+			} else if (trycode && (data.code == trycode || data.alias == trycode && is_alternative(data.code, data.alias))){
 				match = true;
 			} else {
-				match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str())
-					|| text.text.find(elements_iterator->keyword) != std::wstring::npos
+				match = CardNameContains(strings.name.c_str(), elements_iterator->keyword.c_str())
+					|| strings.text.find(elements_iterator->keyword) != std::wstring::npos
 					|| data.is_setcodes(elements_iterator->setcodes);
 			}
 			if(elements_iterator->exclude)
@@ -1871,7 +1871,7 @@ void DeckBuilder::pop_side(int seq) {
 	GetHoveredCard();
 }
 bool DeckBuilder::check_limit(code_pointer pointer) {
-	unsigned int limitcode = pointer->second.alias ? pointer->second.alias : pointer->first;
+	auto limitcode = pointer->second.alias ? pointer->second.alias : pointer->first;
 	int limit = 3;
 	auto flit = filterList->content.find(limitcode);
 	if(flit != filterList->content.end())
