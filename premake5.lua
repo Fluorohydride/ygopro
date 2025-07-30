@@ -157,7 +157,7 @@ if GetParam("no-dxsdk") then
 end
 if USE_DXSDK and os.istarget("windows") then
     if not os.getenv("DXSDK_DIR") then
-        print("DXSDK_DIR environment variable not set, it seems you don't have the DirectX SDK installed. DirectX mode will be disabled.")
+        print("Warning: DXSDK_DIR environment variable not set, it seems you don't have the DirectX SDK installed. DirectX mode will be disabled.")
         USE_DXSDK = false
     end
 end
