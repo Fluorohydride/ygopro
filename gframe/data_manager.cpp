@@ -38,7 +38,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		else
 			cd.link_marker = 0;
 		uint32_t level = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 7));
-		cd.level = level & 0xff;
+		cd.level = level & 0xffff;
 		cd.lscale = (level >> 24) & 0xff;
 		cd.rscale = (level >> 16) & 0xff;
 		cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
