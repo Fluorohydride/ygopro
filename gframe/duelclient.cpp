@@ -739,7 +739,6 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 			starttime = new_replay.pheader.base.start_time;
 		else
 			starttime = new_replay.pheader.base.seed;
-		
 		wchar_t timetext[40];
 		std::wcsftime(timetext, sizeof timetext / sizeof timetext[0], L"%Y-%m-%d %H-%M-%S", std::localtime(&starttime));
 		mainGame->ebRSName->setText(timetext);
