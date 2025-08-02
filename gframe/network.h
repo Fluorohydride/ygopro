@@ -9,14 +9,13 @@
 #include <event2/buffer.h>
 #include <event2/thread.h>
 #include <type_traits>
+#include "deck_manager.h"
 
 #define check_trivially_copyable(T) static_assert(std::is_trivially_copyable<T>::value == true && std::is_standard_layout<T>::value == true, "not trivially copyable")
 
 namespace ygo {
 	constexpr int SIZE_NETWORK_BUFFER = 0x20000;
 	constexpr int MAX_DATA_SIZE = UINT16_MAX - 1;
-	constexpr int MAINC_MAX = 250;	// the limit of card_state
-	constexpr int SIDEC_MAX = MAINC_MAX;
 
 struct HostInfo {
 	uint32_t lflist{};
@@ -102,6 +101,14 @@ struct CTOS_Kick {
 };
 check_trivially_copyable(CTOS_Kick);
 static_assert(sizeof(CTOS_Kick) == 1, "size mismatch: CTOS_Kick");
+
+/*
+* CTOS_ExternalAddress
+* uint32_t real_ip; (IPv4 address, BE, alway 0 in normal client)
+* uint16_t hostname[256]; (UTF-16 string)
+*/
+
+constexpr int LEN_HOSTNAME = 256;
 
 // STOC
 struct STOC_ErrorMsg {
@@ -258,6 +265,7 @@ public:
 #define CTOS_SURRENDER		0x14	// no data
 #define CTOS_TIME_CONFIRM	0x15	// no data
 #define CTOS_CHAT			0x16	// uint16_t array
+#define CTOS_EXTERNAL_ADDRESS	0x17	// CTOS_ExternalAddress
 #define CTOS_HS_TODUELIST	0x20	// no data
 #define CTOS_HS_TOOBSERVER	0x21	// no data
 #define CTOS_HS_READY		0x22	// no data

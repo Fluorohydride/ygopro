@@ -2,31 +2,52 @@
 #define BUFFERIO_H
 
 #include <cstdint>
+#include <cstring>
 #include <cwchar>
-#include "../ocgcore/buffer.h"
 
 class BufferIO {
 public:
-	static int ReadInt32(unsigned char*& p) {
-		return buffer_read<int32_t>(p);
+	template<typename T>
+	static T Read(unsigned char*& p) {
+		T ret{};
+		std::memcpy(&ret, p, sizeof(T));
+		p += sizeof(T);
+		return ret;
 	}
+	template<typename T>
+	static void Write(unsigned char*& p, T value) {
+		std::memcpy(p, &value, sizeof(T));
+		p += sizeof(T);
+	}
+
+	// for compatibility
+	[[deprecated]]
+	static int32_t ReadInt32(unsigned char*& p) {
+		return Read<int32_t>(p);
+	}
+	[[deprecated]]
 	static short ReadInt16(unsigned char*& p) {
-		return buffer_read<int16_t>(p);
+		return Read<int16_t>(p);
 	}
+	[[deprecated]]
 	static char ReadInt8(unsigned char*& p) {
-		return buffer_read<char>(p);
+		return Read<char>(p);
 	}
+	[[deprecated]]
 	static unsigned char ReadUInt8(unsigned char*& p) {
-		return buffer_read<unsigned char>(p);
+		return Read<unsigned char>(p);
 	}
-	static void WriteInt32(unsigned char*& p, int val) {
-		buffer_write<int32_t>(p, val);
+	[[deprecated]]
+	static void WriteInt32(unsigned char*& p, int32_t val) {
+		Write<int32_t>(p, val);
 	}
+	[[deprecated]]
 	static void WriteInt16(unsigned char*& p, short val) {
-		buffer_write<int16_t>(p, val);
+		Write<int16_t>(p, val);
 	}
+	[[deprecated]]
 	static void WriteInt8(unsigned char*& p, char val) {
-		buffer_write<char>(p, val);
+		Write<char>(p, val);
 	}
 	/**
 	* @brief Copy a C-style string to another C-style string.
@@ -61,64 +82,18 @@ public:
 		return CopyWStr(src, dst, N);
 	}
 	template<size_t N>
-	static void CopyString(const char* src, char(&dst)[N]) {
-		std::strncpy(dst, src, N - 1);
-		dst[N - 1] = 0;
+	static void CopyString(const char* src, char(&dst)[N], size_t len = N - 1) {
+		if(len >= N)
+			len = N - 1;
+		std::strncpy(dst, src, len);
+		dst[len] = 0;
 	}
 	template<size_t N>
-	static void CopyWideString(const wchar_t* src, wchar_t(&dst)[N]) {
-		std::wcsncpy(dst, src, N - 1);
-		dst[N - 1] = 0;
-	}
-	template<typename T>
-	static bool CheckUTF8Byte(const T* str, int len) {
-		for (int i = 1; i < len; ++i) {
-			if ((str[i] & 0xc0U) != 0x80U)
-				return false;
-		}
-		return true;
-	}
-	static unsigned int ConvertUTF8(const char*& p) {
-		unsigned int cur = 0;
-		if ((p[0] & 0x80U) == 0) {
-			cur = p[0] & 0xffU;
-			p++;
-		}
-		else if ((p[0] & 0xe0U) == 0xc0U) {
-			if (!CheckUTF8Byte(p, 2)) {
-				p++;
-				return UINT32_MAX;
-			}
-			cur = ((p[0] & 0x1fU) << 6) | (p[1] & 0x3fU);
-			p += 2;
-			if(cur < 0x80U)
-				return UINT32_MAX;
-		}
-		else if ((p[0] & 0xf0U) == 0xe0U) {
-			if (!CheckUTF8Byte(p, 3)) {
-				p++;
-				return UINT32_MAX;
-			}
-			cur = ((p[0] & 0xfU) << 12) | ((p[1] & 0x3fU) << 6) | (p[2] & 0x3fU);
-			p += 3;
-			if (cur < 0x800U)
-				return UINT32_MAX;
-		}
-		else if ((p[0] & 0xf8U) == 0xf0U) {
-			if (!CheckUTF8Byte(p, 4)) {
-				p++;
-				return UINT32_MAX;
-			}
-			cur = ((p[0] & 0x7U) << 18) | ((p[1] & 0x3fU) << 12) | ((p[2] & 0x3fU) << 6) | (p[3] & 0x3fU);
-			p += 4;
-			if (cur < 0x10000U)
-				return UINT32_MAX;
-		}
-		else {
-			p++;
-			return UINT32_MAX;
-		}
-		return cur;
+	static void CopyWideString(const wchar_t* src, wchar_t(&dst)[N], size_t len = N - 1) {
+		if(len >= N)
+			len = N - 1;
+		std::wcsncpy(dst, src, len);
+		dst[len] = 0;
 	}
 	static bool IsHighSurrogate(unsigned int c) {
 		return (c >= 0xd800U && c <= 0xdbffU);
@@ -137,111 +112,31 @@ public:
 	}
 	// UTF-16/UTF-32 to UTF-8
 	// return: string length
-	static int EncodeUTF8String(const wchar_t* wsrc, char* str, int size) {
-		auto pw = wsrc;
-		auto pstr = str;
-		while (*pw != 0) {
-			unsigned cur = 0;
-			int codepoint_size = 0;
-			if (sizeof(wchar_t) == 2) {
-				if (IsHighSurrogate(pw[0])) {
-					if (pw[1] == 0)
-						break;
-					if (IsLowSurrogate(pw[1])) {
-						cur = ((pw[0] & 0x3ffU) << 10) | (pw[1] & 0x3ffU);
-						cur += 0x10000;
-						pw += 2;
-					}
-					else {
-						pw++;
-						continue;
-					}
-				}
-				else if (IsLowSurrogate(pw[0])) {
-					pw++;
-					continue;
-				}
-				else {
-					cur = *pw;
-					pw++;
-				}
-			}
-			else {
-				cur = *pw;
-				pw++;
-			}
-			if (!IsUnicodeChar(cur))
-				continue;
-			if (cur < 0x80U)
-				codepoint_size = 1;
-			else if (cur < 0x800U)
-				codepoint_size = 2;
-			else if (cur < 0x10000U)
-				codepoint_size = 3;
-			else
-				codepoint_size = 4;
-			if ((int)(pstr - str) + codepoint_size > size - 1)
-				break;
-			switch (codepoint_size) {
-			case 1:
-				*pstr = (char)cur;
-				break;
-			case 2:
-				pstr[0] = ((cur >> 6) & 0x1f) | 0xc0;
-				pstr[1] = (cur & 0x3f) | 0x80;
-				break;
-			case 3:
-				pstr[0] = ((cur >> 12) & 0xf) | 0xe0;
-				pstr[1] = ((cur >> 6) & 0x3f) | 0x80;
-				pstr[2] = (cur & 0x3f) | 0x80;
-				break;
-			case 4:
-				pstr[0] = ((cur >> 18) & 0x7) | 0xf0;
-				pstr[1] = ((cur >> 12) & 0x3f) | 0x80;
-				pstr[2] = ((cur >> 6) & 0x3f) | 0x80;
-				pstr[3] = (cur & 0x3f) | 0x80;
-				break;
-			default:
-				break;
-			}
-			pstr += codepoint_size;
+	static int EncodeUTF8String(const wchar_t* wsrc, char* str, size_t len) {
+		if (len == 0) {
+			str[0] = 0;
+			return 0;
 		}
-		*pstr = 0;
-		return (int)(pstr - str);
+		std::mbstate_t state{};
+		size_t result_len = std::wcsrtombs(str, &wsrc, len - 1, &state);
+		if (result_len == static_cast<size_t>(-1))
+			result_len = 0;
+		str[result_len] = 0;
+		return static_cast<int>(result_len);
 	}
 	// UTF-8 to UTF-16/UTF-32
 	// return: string length
-	static int DecodeUTF8String(const char* src, wchar_t* wstr, int size) {
-		const char* p = src;
-		wchar_t* wp = wstr;
-		while(*p != 0) {
-			unsigned int cur = ConvertUTF8(p);
-			int codepoint_size = 0;
-			if (!IsUnicodeChar(cur))
-				continue;
-			if (cur >= 0x10000) {
-				if (sizeof(wchar_t) == 2)
-					codepoint_size = 2;
-				else
-					codepoint_size = 1;
-			}
-			else
-				codepoint_size = 1;
-			if ((int)(wp - wstr) + codepoint_size > size - 1)
-				break;
-			if (codepoint_size == 1) {
-				wp[0] = cur;
-				wp++;
-			}
-			else {
-				cur -= 0x10000U;
-				wp[0] = (cur >> 10) | 0xd800;
-				wp[1] = (cur & 0x3ff) | 0xdc00;
-				wp += 2;
-			}
+	static int DecodeUTF8String(const char* src, wchar_t* wstr, size_t len) {
+		if (len == 0) {
+			wstr[0] = 0;
+			return 0;
 		}
-		*wp = 0;
-		return wp - wstr;
+		std::mbstate_t state{};
+		size_t result_len = std::mbsrtowcs(wstr, &src, len - 1, &state);
+		if (result_len == static_cast<size_t>(-1))
+			result_len = 0;
+		wstr[result_len] = 0;
+		return static_cast<int>(result_len);
 	}
 	template<size_t N>
 	static int EncodeUTF8(const wchar_t* src, char(&dst)[N]) {
@@ -267,7 +162,6 @@ public:
 		}
 		else
 			return 0;
-	
 	}
 };
 
