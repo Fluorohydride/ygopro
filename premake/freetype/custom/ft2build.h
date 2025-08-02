@@ -4,7 +4,7 @@
  *
  *   FreeType 2 build and setup macros.
  *
- * Use ygopro/ft2build.h instead of the default include/freetype/ft2build.h
+ * Use custom/ft2build.h instead of the default include/freetype/ft2build.h
  * to customize the FreeType 2 build of YGOPro.
  *
  */
