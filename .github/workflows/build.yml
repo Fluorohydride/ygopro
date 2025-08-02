@@ -144,7 +144,7 @@ jobs:
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
         url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
-    
+
     - name: Extract opus
       if: matrix.audiolib == 'miniaudio'
       run: |
@@ -398,7 +398,7 @@ jobs:
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
         url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
-    
+
     - name: Extract opus
       if: matrix.static-link == true
       run: |
@@ -625,7 +625,7 @@ jobs:
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
         url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
-    
+
     - name: Extract opus
       if: matrix.static-link == true
       run: |
@@ -679,7 +679,7 @@ jobs:
           --build-event \
           --build-freetype \
           --build-sqlite \
-          --build-opus-vorbis 
+          --build-opus-vorbis
 
     - name: Make
       run: |

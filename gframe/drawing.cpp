@@ -1125,7 +1125,7 @@ void Game::WaitFrameSignal(int frame) {
 	frameSignal.Wait();
 }
 void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lflist, bool drag) {
-	int code = cp->first;
+	auto code = cp->first;
 	auto lcode = cp->second.alias;
 	if(lcode == 0)
 		lcode = code;
