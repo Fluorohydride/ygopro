@@ -348,6 +348,7 @@ void Game::DrawCard(ClientCard* pcard) {
 		if(pcard->aniFrame == 0) {
 			pcard->is_moving = false;
 			pcard->is_fading = false;
+			pcard->chain_code = 0;
 		}
 	}
 	matManager.mCard.AmbientColor = 0xffffffff;
@@ -355,7 +356,10 @@ void Game::DrawCard(ClientCard* pcard) {
 	driver->setTransform(irr::video::ETS_WORLD, pcard->mTransform);
 	auto m22 = pcard->mTransform(2, 2);
 	if(m22 > -0.99 || pcard->is_moving) {
-		matManager.mCard.setTexture(0, imageManager.GetTexture(pcard->code));
+		auto code = pcard->code;
+		if (code == 0 && pcard->is_moving)
+			code = pcard->chain_code;
+		matManager.mCard.setTexture(0, imageManager.GetTexture(code));
 		driver->setMaterial(matManager.mCard);
 		driver->drawVertexPrimitiveList(matManager.vCardFront, 4, matManager.iRectangle, 2);
 	}
