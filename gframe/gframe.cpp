@@ -8,6 +8,10 @@
 #import <CoreFoundation/CoreFoundation.h>
 #endif
 
+#if defined(_WIN32) && (!defined(WDK_NTDDI_VERSION) || (WDK_NTDDI_VERSION < 0x0A000005)) // Redstone 4, Version 1803, Build 17134.
+#error "This program requires the Windows 10 SDK version 1803 or above to compile on Windows. Otherwise, non-ASCII characters will not be displayed or processed correctly."
+#endif
+
 unsigned int enable_log = 0x3;
 bool exit_on_return = false;
 bool open_file = false;
@@ -23,7 +27,7 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 }
 
 int main(int argc, char* argv[]) {
-#if defined(FOPEN_WINDOWS_SUPPORT_UTF8)
+#if defined(_WIN32)
 	std::setlocale(LC_CTYPE, ".UTF-8");
 #elif defined(__APPLE__)
 	std::setlocale(LC_CTYPE, "UTF-8");
