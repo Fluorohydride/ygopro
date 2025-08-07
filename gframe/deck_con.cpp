@@ -214,6 +214,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->addItem(dname);
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
+				prev_deck = mainGame->cbDBDecks->getSelected();
 				int catesel = mainGame->cbDBCategory->getSelected();
 				wchar_t catepath[256];
 				DeckManager::GetCategoryPath(catepath, catesel, mainGame->cbDBCategory->getText());
