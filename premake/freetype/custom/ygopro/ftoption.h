@@ -5,7 +5,7 @@
  *   User-selectable configuration macros (specification only).
  *
  * This file is customized for YGOPro to include only the necessary
- * configuration options for the TrueType font driver.
+ * configuration options for the TrueType and OpenType font driver.
  *
  * See the original FreeType source code for more information.
  * /include/freetype/config/ftoption.h

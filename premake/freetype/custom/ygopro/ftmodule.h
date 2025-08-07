@@ -1,7 +1,7 @@
 /*
  * This file registers the FreeType modules compiled into the library.
  *
- * YGOPro only uses modules that are needed for TrueType fonts.
+ * YGOPro only uses modules that are needed for TrueType and OpenType fonts.
  *
  */
 
