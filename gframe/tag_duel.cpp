@@ -1042,11 +1042,18 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_SPSUMMONING: {
+			pbufw = pbuf;
+			int cc = pbuf[4];
+			/*int cl = pbuf[5];*/
+			/*int cs = pbuf[6];*/
+			int cp = pbuf[7];
 			pbuf += 8;
-			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
-			NetServer::ReSendToPlayer(players[1]);
-			NetServer::ReSendToPlayer(players[2]);
-			NetServer::ReSendToPlayer(players[3]);
+			NetServer::SendBufferToPlayer(cur_player[cc], STOC_GAME_MSG, offset, pbuf - offset);
+			if (cp & POS_FACEDOWN)
+				BufferIO::Write<int32_t>(pbufw, 0);
+			for (int i = 0; i < 4; ++i)
+				if (players[i] != cur_player[cc])
+					NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			break;
