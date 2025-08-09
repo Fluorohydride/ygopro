@@ -2912,12 +2912,14 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			else
 				soundManager.PlaySoundEffect(SOUND_SPECIAL_SUMMON);
 			myswprintf(event_string, dataManager.GetSysString(1605), dataManager.GetName(code));
-			mainGame->showcardcode = code;
-			mainGame->showcarddif = 1;
-			mainGame->showcard = 5;
-			mainGame->WaitFrameSignal(30);
-			mainGame->showcard = 0;
-			mainGame->WaitFrameSignal(11);
+			if(code) {
+				mainGame->showcardcode = code;
+				mainGame->showcarddif = 1;
+				mainGame->showcard = 5;
+				mainGame->WaitFrameSignal(30);
+				mainGame->showcard = 0;
+				mainGame->WaitFrameSignal(11);
+			}
 		}
 		return true;
 	}
