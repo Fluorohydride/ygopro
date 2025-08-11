@@ -162,7 +162,6 @@ public:
 		}
 		else
 			return 0;
-	
 	}
 };
 

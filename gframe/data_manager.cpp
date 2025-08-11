@@ -160,7 +160,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	if (const char* msg = sqlite3_errmsg(pDB))
-		std::snprintf(errmsg, sizeof errmsg, "%s", msg);
+		mysnprintf(errmsg, "%s", msg);
 	else
 		errmsg[0] = '\0';
 	sqlite3_finalize(pStmt);
@@ -377,7 +377,7 @@ unsigned char* DataManager::ScriptReaderEx(const char* script_path, int* slen) {
 		return ReadScriptFromFile(script_path, slen);
 	const char* script_name = script_path + 2;
 	char expansions_path[1024]{};
-	std::snprintf(expansions_path, sizeof expansions_path, "./expansions/%s", script_name);
+	mysnprintf(expansions_path, "./expansions/%s", script_name);
 	if (mainGame->gameConf.prefer_expansion_script) { // debug script with raw file in expansions
 		if (ReadScriptFromFile(expansions_path, slen))
 			return scriptBuffer;
