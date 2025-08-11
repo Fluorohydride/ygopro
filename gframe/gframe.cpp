@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
 	std::setlocale(LC_CTYPE, ".UTF-8");
 #elif defined(__APPLE__)
 	std::setlocale(LC_CTYPE, "UTF-8");
-#elif !defined(_WIN32)
+#else
 	std::setlocale(LC_CTYPE, "");
 #endif
 #ifdef __APPLE__
