@@ -3,8 +3,9 @@
 
 #include <vector>
 #include <set>
+#include <random>
+#include "config.h"
 #include "network.h"
-#include "../ocgcore/mtrandom.h"
 
 namespace ygo {
 
@@ -26,7 +27,8 @@ private:
 	static unsigned char last_successful_msg[SIZE_NETWORK_BUFFER];
 	static size_t last_successful_msg_length;
 	static wchar_t event_string[256];
-	static mt19937 rnd;
+	static std::mt19937 rnd;
+	static std::uniform_real_distribution<float> real_dist;
 	static bool is_refreshing;
 	static int match_kill;
 	static event* resp_event;
@@ -48,17 +50,16 @@ public:
 	static void SendResponse();
 	static void SendPacketToServer(unsigned char proto) {
 		auto p = duel_client_write;
-		buffer_write<uint16_t>(p, 1);
-		buffer_write<uint8_t>(p, proto);
+		BufferIO::Write<uint16_t>(p, 1);
+		BufferIO::Write<uint8_t>(p, proto);
 		bufferevent_write(client_bev, duel_client_write, 3);
 	}
 	template<typename ST>
 	static void SendPacketToServer(unsigned char proto, const ST& st) {
 		auto p = duel_client_write;
-		if (sizeof(ST) > MAX_DATA_SIZE)
-			return;
-		buffer_write<uint16_t>(p, (uint16_t)(1 + sizeof(ST)));
-		buffer_write<uint8_t>(p, proto);
+		static_assert(sizeof(ST) <= MAX_DATA_SIZE, "Packet size is too large.");
+		BufferIO::Write<uint16_t>(p, (uint16_t)(1 + sizeof(ST)));
+		BufferIO::Write<uint8_t>(p, proto);
 		std::memcpy(p, &st, sizeof(ST));
 		bufferevent_write(client_bev, duel_client_write, sizeof(ST) + 3);
 	}
@@ -66,8 +67,8 @@ public:
 		auto p = duel_client_write;
 		if (len > MAX_DATA_SIZE)
 			len = MAX_DATA_SIZE;
-		buffer_write<uint16_t>(p, (uint16_t)(1 + len));
-		buffer_write<uint8_t>(p, proto);
+		BufferIO::Write<uint16_t>(p, (uint16_t)(1 + len));
+		BufferIO::Write<uint8_t>(p, proto);
 		std::memcpy(p, buffer, len);
 		bufferevent_write(client_bev, duel_client_write, len + 3);
 	}

@@ -6,7 +6,6 @@
 #include "image_manager.h"
 #include "game.h"
 #include "materials.h"
-#include "../ocgcore/common.h"
 
 namespace ygo {
 
@@ -15,7 +14,7 @@ ClientField::ClientField() {
 		mzone[p].resize(7, 0);
 		szone[p].resize(8, 0);
 	}
-	rnd.reset((uint_fast32_t)std::random_device()());
+	rnd.seed(std::random_device()());
 }
 ClientField::~ClientField() {
 	for (int i = 0; i < 2; ++i) {
@@ -119,28 +118,23 @@ void ClientField::Clear() {
 	tag_surrender = false;
 	tag_teammate_surrender = false;
 }
-void ClientField::Initial(int player, int deckc, int extrac) {
-	ClientCard* pcard;
-	for(int i = 0; i < deckc; ++i) {
-		pcard = new ClientCard;
-		deck[player].push_back(pcard);
-		pcard->owner = player;
-		pcard->controler = player;
-		pcard->location = LOCATION_DECK;
-		pcard->sequence = i;
-		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
-	}
-	for(int i = 0; i < extrac; ++i) {
-		pcard = new ClientCard;
-		extra[player].push_back(pcard);
-		pcard->owner = player;
-		pcard->controler = player;
-		pcard->location = LOCATION_EXTRA;
-		pcard->sequence = i;
-		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
-	}
+void ClientField::Initial(int player, int deckc, int extrac, int sidec) {
+	auto load_location = [&](std::vector<ClientCard*>& container, int count, uint8_t location) {
+		for(int i = 0; i < count; ++i) {
+			ClientCard* pcard = new ClientCard;
+			container.push_back(pcard);
+			pcard->owner = player;
+			pcard->controler = player;
+			pcard->location = location;
+			pcard->sequence = i;
+			pcard->position = POS_FACEDOWN_DEFENSE;
+			GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+		}
+	};
+
+	load_location(deck[player], deckc, LOCATION_DECK);
+	load_location(extra[player], extrac, LOCATION_EXTRA);
+	load_location(remove[player], sidec, LOCATION_REMOVED);
 }
 void ClientField::ResetSequence(std::vector<ClientCard*>& list, bool reset_height) {
 	unsigned char seq = 0;
@@ -228,12 +222,12 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 	case LOCATION_GRAVE: {
 		grave[controler].push_back(pcard);
-		ResetSequence(grave[controler], false);
+		pcard->sequence = (unsigned char)(grave[controler].size() - 1);
 		break;
 	}
 	case LOCATION_REMOVED: {
 		remove[controler].push_back(pcard);
-		ResetSequence(remove[controler], false);
+		pcard->sequence = (unsigned char)(remove[controler].size() - 1);
 		break;
 	}
 	case LOCATION_EXTRA: {
@@ -255,8 +249,13 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 	switch (location) {
 	case LOCATION_DECK: {
 		pcard = deck[controler][sequence];
-		deck[controler].erase(deck[controler].begin() + sequence);
-		ResetSequence(deck[controler], true);
+		for (size_t i = sequence; i < deck[controler].size() - 1; ++i) {
+			deck[controler][i] = deck[controler][i + 1];
+			deck[controler][i]->sequence--;
+			deck[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
+			deck[controler][i]->mTransform.setTranslation(deck[controler][i]->curPos);
+		}
+		deck[controler].erase(deck[controler].end() - 1);
 		break;
 	}
 	case LOCATION_HAND: {
@@ -277,20 +276,35 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 	}
 	case LOCATION_GRAVE: {
 		pcard = grave[controler][sequence];
-		grave[controler].erase(grave[controler].begin() + sequence);
-		ResetSequence(grave[controler], true);
+		for (size_t i = sequence; i < grave[controler].size() - 1; ++i) {
+			grave[controler][i] = grave[controler][i + 1];
+			grave[controler][i]->sequence--;
+			grave[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
+			grave[controler][i]->mTransform.setTranslation(grave[controler][i]->curPos);
+		}
+		grave[controler].erase(grave[controler].end() - 1);
 		break;
 	}
 	case LOCATION_REMOVED: {
 		pcard = remove[controler][sequence];
-		remove[controler].erase(remove[controler].begin() + sequence);
-		ResetSequence(remove[controler], true);
+		for (size_t i = sequence; i < remove[controler].size() - 1; ++i) {
+			remove[controler][i] = remove[controler][i + 1];
+			remove[controler][i]->sequence--;
+			remove[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
+			remove[controler][i]->mTransform.setTranslation(remove[controler][i]->curPos);
+		}
+		remove[controler].erase(remove[controler].end() - 1);
 		break;
 	}
 	case LOCATION_EXTRA: {
 		pcard = extra[controler][sequence];
-		extra[controler].erase(extra[controler].begin() + sequence);
-		ResetSequence(extra[controler], true);
+		for (size_t i = sequence; i < extra[controler].size() - 1; ++i) {
+			extra[controler][i] = extra[controler][i + 1];
+			extra[controler][i]->sequence--;
+			extra[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
+			extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
+		}
+		extra[controler].erase(extra[controler].end() - 1);
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]--;
 		break;
@@ -303,7 +317,7 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 }
 void ClientField::UpdateCard(int controler, int location, int sequence, unsigned char* data) {
 	ClientCard* pcard = GetCard(controler, location, sequence);
-	int len = BufferIO::ReadInt32(data);
+	int len = BufferIO::Read<int32_t>(data);
 	if (pcard && len > LEN_HEADER)
 		pcard->UpdateInfo(data);
 }
@@ -336,7 +350,7 @@ void ClientField::UpdateFieldCard(int controler, int location, unsigned char* da
 		return;
 	int len;
 	for(auto cit = lst->begin(); cit != lst->end(); ++cit) {
-		len = BufferIO::ReadInt32(data);
+		len = BufferIO::Read<int32_t>(data);
 		if(len > LEN_HEADER)
 			(*cit)->UpdateInfo(data);
 		data += len - 4;
@@ -413,7 +427,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			}
 		}
 		if(has_card_in_grave) {
-			rnd.shuffle_vector(selectable_cards);
+			std::shuffle(selectable_cards.begin(), selectable_cards.end(), rnd);
 		}
 	}
 	int startpos;
@@ -1194,8 +1208,8 @@ bool ClientField::CheckSelectSum() {
 		int mm = -1, mx = -1, max = 0, sumc = 0;
 		bool ret = false;
 		for (auto sc : selected_cards) {
-			int op1 = sc->opParam & 0xffff;
-			int op2 = sc->opParam >> 16;
+			int op1, op2;
+			get_sum_params(sc->opParam, op1, op2);
 			int opmin = (op2 > 0 && op1 > op2) ? op2 : op1;
 			int opmax = op2 > op1 ? op2 : op1;
 			if (mm == -1 || opmin < mm)
@@ -1210,8 +1224,8 @@ bool ClientField::CheckSelectSum() {
 		if (select_sumval <= max && select_sumval > max - mx)
 			ret = true;
 		for(auto sc : selable) {
-			int op1 = sc->opParam & 0xffff;
-			int op2 = sc->opParam >> 16;
+			int op1, op2;
+			get_sum_params(sc->opParam, op1, op2);
 			int m = op1;
 			int sums = sumc;
 			sums += m;
@@ -1277,11 +1291,19 @@ bool ClientField::CheckSelectTribute() {
 	}
 	return ret;
 }
+void ClientField::get_sum_params(unsigned int opParam, int& op1, int& op2) {
+	op1 = opParam & 0xffff;
+	op2 = (opParam >> 16) & 0xffff;
+	if (op2 & 0x8000) {
+		op1 = opParam & 0x7fffffff;
+		op2 = 0;
+	}
+}
 bool ClientField::check_min(const std::set<ClientCard*>& left, std::set<ClientCard*>::const_iterator index, int min, int max) {
 	if (index == left.end())
 		return false;
-	int op1 = (*index)->opParam & 0xffff;
-	int op2 = (*index)->opParam >> 16;
+	int op1, op2;
+	get_sum_params((*index)->opParam, op1, op2);
 	int m = (op2 > 0 && op1 > op2) ? op2 : op1;
 	if (m >= min && m <= max)
 		return true;
@@ -1300,9 +1322,8 @@ bool ClientField::check_sel_sum_s(const std::set<ClientCard*>& left, int index, 
 		check_sel_sum_t(left, acc);
 		return false;
 	}
-	int l = selected_cards[index]->opParam;
-	int l1 = l & 0xffff;
-	int l2 = l >> 16;
+	int l1, l2;
+	get_sum_params(selected_cards[index]->opParam, l1, l2);
 	bool res1 = false, res2 = false;
 	res1 = check_sel_sum_s(left, index + 1, acc - l1);
 	if (l2 > 0)
@@ -1316,9 +1337,8 @@ void ClientField::check_sel_sum_t(const std::set<ClientCard*>& left, int acc) {
 			continue;
 		std::set<ClientCard*> testlist(left);
 		testlist.erase(*sit);
-		int l = (*sit)->opParam;
-		int l1 = l & 0xffff;
-		int l2 = l >> 16;
+		int l1, l2;
+		get_sum_params((*sit)->opParam, l1, l2);
 		if (check_sum(testlist.begin(), testlist.end(), acc - l1, count)
 		        || (l2 > 0 && check_sum(testlist.begin(), testlist.end(), acc - l2, count))) {
 			selectsum_cards.insert(*sit);
@@ -1330,9 +1350,8 @@ bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::se
 		return count >= select_min && count <= select_max;
 	if (acc < 0 || index == end)
 		return false;
-	int l = (*index)->opParam;
-	int l1 = l & 0xffff;
-	int l2 = l >> 16;
+	int l1, l2;
+	get_sum_params((*index)->opParam, l1, l2);
 	if ((l1 == acc || (l2 > 0 && l2 == acc)) && (count + 1 >= select_min) && (count + 1 <= select_max))
 		return true;
 	++index;
@@ -1347,9 +1366,8 @@ bool ClientField::check_sel_sum_trib_s(const std::set<ClientCard*>& left, int in
 		check_sel_sum_trib_t(left, acc);
 		return acc >= select_min && acc <= select_max;
 	}
-	int l = selected_cards[index]->opParam;
-	int l1 = l & 0xffff;
-	int l2 = l >> 16;
+	int l1, l2;
+	get_sum_params(selected_cards[index]->opParam, l1, l2);
 	bool res1 = false, res2 = false;
 	res1 = check_sel_sum_trib_s(left, index + 1, acc + l1);
 	if(l2 > 0)
@@ -1362,9 +1380,8 @@ void ClientField::check_sel_sum_trib_t(const std::set<ClientCard*>& left, int ac
 			continue;
 		std::set<ClientCard*> testlist(left);
 		testlist.erase(*sit);
-		int l = (*sit)->opParam;
-		int l1 = l & 0xffff;
-		int l2 = l >> 16;
+		int l1, l2;
+		get_sum_params((*sit)->opParam, l1, l2);
 		if(check_sum_trib(testlist.begin(), testlist.end(), acc + l1)
 			|| (l2 > 0 && check_sum_trib(testlist.begin(), testlist.end(), acc + l2))) {
 			selectsum_cards.insert(*sit);
@@ -1376,9 +1393,8 @@ bool ClientField::check_sum_trib(std::set<ClientCard*>::const_iterator index, st
 		return true;
 	if(acc > select_max || index == end)
 		return false;
-	int l = (*index)->opParam;
-	int l1 = l & 0xffff;
-	int l2 = l >> 16;
+	int l1, l2;
+	get_sum_params((*index)->opParam, l1, l2);
 	if((acc + l1 >= select_min && acc + l1 <= select_max) || (acc + l2 >= select_min && acc + l2 <= select_max))
 		return true;
 	++index;
@@ -1386,7 +1402,8 @@ bool ClientField::check_sum_trib(std::set<ClientCard*>::const_iterator index, st
 		|| check_sum_trib(index, end, acc + l2)
 		|| check_sum_trib(index, end, acc);
 }
-static bool is_declarable(const CardData& cd, const std::vector<unsigned int>& opcode) {
+template <class T>
+static bool is_declarable(const T& cd, const std::vector<unsigned int>& opcode) {
 	std::stack<int> stack;
 	for(auto it = opcode.begin(); it != opcode.end(); ++it) {
 		switch(*it) {
@@ -1476,9 +1493,15 @@ static bool is_declarable(const CardData& cd, const std::vector<unsigned int>& o
 		}
 		case OPCODE_ISSETCARD: {
 			if (stack.size() >= 1) {
-				int set_code = stack.top();
+				uint32_t set_code = stack.top();
 				stack.pop();
-				bool res = cd.is_setcode(set_code);
+				bool res = false;
+				for (const auto& x : cd.setcode) {
+					if(check_setcode(x, set_code)) {
+						res = true;
+						break;
+					}
+				}
 				stack.push(res);
 			}
 			break;
@@ -1522,12 +1545,12 @@ static bool is_declarable(const CardData& cd, const std::vector<unsigned int>& o
 void ClientField::UpdateDeclarableList() {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
-	CardString cstr;
 	CardData cd;
-	if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declare_opcodes)) {
+	if (dataManager.GetData(trycode, &cd) && is_declarable(cd, declare_opcodes)) {
+		auto it = dataManager.GetStringPointer(trycode);
 		mainGame->lstANCard->clear();
 		ancard.clear();
-		mainGame->lstANCard->addItem(cstr.name.c_str());
+		mainGame->lstANCard->addItem(it->second.name.c_str());
 		ancard.push_back(trycode);
 		return;
 	}

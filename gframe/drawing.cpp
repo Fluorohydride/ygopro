@@ -5,7 +5,6 @@
 #include "deck_manager.h"
 #include "sound_manager.h"
 #include "duelclient.h"
-#include "../ocgcore/common.h"
 
 namespace ygo {
 
@@ -349,6 +348,7 @@ void Game::DrawCard(ClientCard* pcard) {
 		if(pcard->aniFrame == 0) {
 			pcard->is_moving = false;
 			pcard->is_fading = false;
+			pcard->chain_code = 0;
 		}
 	}
 	matManager.mCard.AmbientColor = 0xffffffff;
@@ -356,7 +356,10 @@ void Game::DrawCard(ClientCard* pcard) {
 	driver->setTransform(irr::video::ETS_WORLD, pcard->mTransform);
 	auto m22 = pcard->mTransform(2, 2);
 	if(m22 > -0.99 || pcard->is_moving) {
-		matManager.mCard.setTexture(0, imageManager.GetTexture(pcard->code));
+		auto code = pcard->code;
+		if (code == 0 && pcard->is_moving)
+			code = pcard->chain_code;
+		matManager.mCard.setTexture(0, imageManager.GetTexture(code));
 		driver->setMaterial(matManager.mCard);
 		driver->drawVertexPrimitiveList(matManager.vCardFront, 4, matManager.iRectangle, 2);
 	}
@@ -1122,7 +1125,7 @@ void Game::WaitFrameSignal(int frame) {
 	frameSignal.Wait();
 }
 void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lflist, bool drag) {
-	int code = cp->first;
+	auto code = cp->first;
 	auto lcode = cp->second.alias;
 	if(lcode == 0)
 		lcode = code;
@@ -1262,7 +1265,8 @@ void Game::DrawDeckBd() {
 		driver->draw2DRectangle(Resize(805, 160, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 		driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
 	}
-	for(int i = 0; i < 9 && i + scrFilter->getPos() < (int)deckBuilder.results.size(); ++i) {
+	int max_result = mainGame->gameConf.use_image_load_background_thread ? 9 : 7;
+	for(int i = 0; i < max_result && i + scrFilter->getPos() < (int)deckBuilder.results.size(); ++i) {
 		code_pointer ptr = deckBuilder.results[i + scrFilter->getPos()];
 		if(i >= 7)
 		{

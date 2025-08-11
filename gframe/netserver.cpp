@@ -185,7 +185,7 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 }
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	auto pdata = data;
-	unsigned char pktType = BufferIO::ReadUInt8(pdata);
+	unsigned char pktType = BufferIO::Read<uint8_t>(pdata);
 	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
 		return;
 	switch(pktType) {
@@ -206,7 +206,11 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	case CTOS_CHAT: {
 		if(!dp->game)
 			return;
-		if (len < 1 + (int)sizeof(unsigned char))
+		if (len < 1 + sizeof(uint16_t) * 1)
+			return;
+		if (len > 1 + sizeof(uint16_t) * LEN_CHAT_MSG)
+			return;
+		if ((len - 1) % sizeof(uint16_t))
 			return;
 		duel_mode->Chat(dp, pdata, len - 1);
 		break;
@@ -251,6 +255,15 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 		auto pkt = &packet;
 		BufferIO::NullTerminate(pkt->name);
 		BufferIO::CopyCharArray(pkt->name, dp->name);
+		break;
+	}
+	case CTOS_EXTERNAL_ADDRESS: {
+		// for other server & reverse proxy use only
+		/*
+		wchar_t hostname[LEN_HOSTNAME];
+		uint32_t real_ip = ntohl(BufferIO::Read<int32_t>(pdata));
+		BufferIO::CopyCharArray((uint16_t*)pdata, hostname);
+		*/
 		break;
 	}
 	case CTOS_CREATE_GAME: {
@@ -360,8 +373,6 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	}
 }
 size_t NetServer::CreateChatPacket(unsigned char* src, int src_size, unsigned char* dst, uint16_t dst_player_type) {
-	if (!check_msg_size(src_size))
-		return 0;
 	uint16_t src_msg[LEN_CHAT_MSG];
 	std::memcpy(src_msg, src, src_size);
 	const int src_len = src_size / sizeof(uint16_t);
@@ -369,8 +380,9 @@ size_t NetServer::CreateChatPacket(unsigned char* src, int src_size, unsigned ch
 		return 0;
 	// STOC_Chat packet
 	auto pdst = dst;
-	buffer_write<uint16_t>(pdst, dst_player_type);
-	buffer_write_block(pdst, src_msg, src_size);
+	BufferIO::Write<uint16_t>(pdst, dst_player_type);
+	std::memcpy(pdst, src_msg, src_size);
+	pdst += src_size;
 	return sizeof(dst_player_type) + src_size;
 }
 

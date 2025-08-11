@@ -10,74 +10,71 @@ irr::io::IFileSystem* DataManager::FileSystem = nullptr;
 DataManager dataManager;
 
 DataManager::DataManager() : _datas(32768), _strings(32768) {
-	extra_setcode = { {8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}}, };
+	extra_setcode = { 
+		{8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}},
+		{55088578u, {0x8f, 0x54, 0x59, 0x82, 0x13a}},
+	};
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt = nullptr;
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
-	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
+	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, nullptr) != SQLITE_OK)
 		return Error(pDB, pStmt);
 	wchar_t strBuffer[4096];
-	int step = 0;
-	do {
-		CardDataC cd;
-		CardString cs;
-		step = sqlite3_step(pStmt);
-		if (step == SQLITE_ROW) {
-			cd.code = sqlite3_column_int(pStmt, 0);
-			cd.ot = sqlite3_column_int(pStmt, 1);
-			cd.alias = sqlite3_column_int(pStmt, 2);
-			uint64_t setcode = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 3));
-			if (setcode) {
-				auto it = extra_setcode.find(cd.code);
-				if (it != extra_setcode.end()) {
-					int len = it->second.size();
-					if (len > SIZE_SETCODE)
-						len = SIZE_SETCODE;
-					if (len)
-						std::memcpy(cd.setcode, it->second.data(), len * sizeof(uint16_t));
-				}
-				else
-					cd.set_setcode(setcode);
-			}
-			cd.type = static_cast<decltype(cd.type)>(sqlite3_column_int64(pStmt, 4));
-			cd.attack = sqlite3_column_int(pStmt, 5);
-			cd.defense = sqlite3_column_int(pStmt, 6);
-			if (cd.type & TYPE_LINK) {
-				cd.link_marker = cd.defense;
-				cd.defense = 0;
-			}
-			else
-				cd.link_marker = 0;
-			uint32_t level = static_cast<uint32_t>(sqlite3_column_int(pStmt, 7));
-			cd.level = level & 0xff;
-			cd.lscale = (level >> 24) & 0xff;
-			cd.rscale = (level >> 16) & 0xff;
-			cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
-			cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
-			cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
-			_datas[cd.code] = cd;
-			if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
-				BufferIO::DecodeUTF8(text, strBuffer);
-				cs.name = strBuffer;
-			}
-			if (const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
-				BufferIO::DecodeUTF8(text, strBuffer);
-				cs.text = strBuffer;
-			}
-			constexpr int desc_count = sizeof cs.desc / sizeof cs.desc[0];
-			for (int i = 0; i < desc_count; ++i) {
-				if (const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
-					BufferIO::DecodeUTF8(text, strBuffer);
-					cs.desc[i] = strBuffer;
-				}
-			}
-			_strings[cd.code] = cs;
-		}
-		else if (step != SQLITE_DONE)
+	for (int step = sqlite3_step(pStmt); step != SQLITE_DONE; step = sqlite3_step(pStmt)) {
+		if (step != SQLITE_ROW)
 			return Error(pDB, pStmt);
-	} while (step == SQLITE_ROW);
+		uint32_t code = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 0));
+		auto& cd = _datas[code];
+		cd.code = code;
+		cd.ot = sqlite3_column_int(pStmt, 1);
+		cd.alias = sqlite3_column_int(pStmt, 2);
+		uint64_t setcode = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 3));
+		write_setcode(cd.setcode, setcode);
+		cd.type = static_cast<decltype(cd.type)>(sqlite3_column_int64(pStmt, 4));
+		cd.attack = sqlite3_column_int(pStmt, 5);
+		cd.defense = sqlite3_column_int(pStmt, 6);
+		if (cd.type & TYPE_LINK) {
+			cd.link_marker = cd.defense;
+			cd.defense = 0;
+		}
+		else
+			cd.link_marker = 0;
+		uint32_t level = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 7));
+		cd.level = level & 0xff;
+		cd.lscale = (level >> 24) & 0xff;
+		cd.rscale = (level >> 16) & 0xff;
+		cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
+		cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
+		cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
+		auto& cs = _strings[code];
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+			BufferIO::DecodeUTF8(text, strBuffer);
+			cs.name = strBuffer;
+		}
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
+			BufferIO::DecodeUTF8(text, strBuffer);
+			cs.text = strBuffer;
+		}
+		constexpr int desc_count = sizeof cs.desc / sizeof cs.desc[0];
+		for (int i = 0; i < desc_count; ++i) {
+			if (const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
+				BufferIO::DecodeUTF8(text, strBuffer);
+				cs.desc[i] = strBuffer;
+			}
+		}
+	}
 	sqlite3_finalize(pStmt);
+	for (const auto& entry : extra_setcode) {
+		const auto& code = entry.first;
+		const auto& list = entry.second;
+		if (list.size() > SIZE_SETCODE || list.empty())
+			continue;
+		auto it = _datas.find(code);
+		if (it == _datas.end())
+			continue;
+		std::memcpy(it->second.setcode, list.data(), list.size() * sizeof(uint16_t));
+	}
 	return true;
 }
 bool DataManager::LoadDB(const wchar_t* wfile) {
@@ -165,40 +162,29 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 	}
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	errmsg[0] = '\0';
-	std::strncat(errmsg, sqlite3_errmsg(pDB), sizeof errmsg - 1);
-	if(pStmt)
-		sqlite3_finalize(pStmt);
+	if (const char* msg = sqlite3_errmsg(pDB))
+		mysnprintf(errmsg, "%s", msg);
+	else
+		errmsg[0] = '\0';
+	sqlite3_finalize(pStmt);
 	return false;
 }
-code_pointer DataManager::GetCodePointer(unsigned int code) const {
+code_pointer DataManager::GetCodePointer(uint32_t code) const {
 	return _datas.find(code);
 }
-string_pointer DataManager::GetStringPointer(unsigned int code) const {
+string_pointer DataManager::GetStringPointer(uint32_t code) const {
 	return _strings.find(code);
 }
-code_pointer DataManager::datas_begin() const {
-	return _datas.cbegin();
-}
-code_pointer DataManager::datas_end() const {
-	return _datas.cend();
-}
-string_pointer DataManager::strings_begin() const {
-	return _strings.cbegin();
-}
-string_pointer DataManager::strings_end() const {
-	return _strings.cend();
-}
-bool DataManager::GetData(unsigned int code, CardData* pData) const {
+bool DataManager::GetData(uint32_t code, CardData* pData) const {
 	auto cdit = _datas.find(code);
 	if(cdit == _datas.end())
 		return false;
 	if (pData) {
-		*pData = cdit->second;
+		std::memcpy(pData, &cdit->second, sizeof(CardData));
 	}
 	return true;
 }
-bool DataManager::GetString(unsigned int code, CardString* pStr) const {
+bool DataManager::GetString(uint32_t code, CardString* pStr) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end()) {
 		pStr->name = unknown_string;
@@ -208,7 +194,7 @@ bool DataManager::GetString(unsigned int code, CardString* pStr) const {
 	*pStr = csit->second;
 	return true;
 }
-const wchar_t* DataManager::GetName(unsigned int code) const {
+const wchar_t* DataManager::GetName(uint32_t code) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -216,7 +202,7 @@ const wchar_t* DataManager::GetName(unsigned int code) const {
 		return csit->second.name.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetText(unsigned int code) const {
+const wchar_t* DataManager::GetText(uint32_t code) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -224,7 +210,7 @@ const wchar_t* DataManager::GetText(unsigned int code) const {
 		return csit->second.text.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetDesc(unsigned int strCode) const {
+const wchar_t* DataManager::GetDesc(uint32_t strCode) const {
 	if (strCode < (MIN_CARD_ID << 4))
 		return GetSysString(strCode);
 	unsigned int code = (strCode >> 4) & 0x0fffffff;
@@ -394,7 +380,7 @@ unsigned char* DataManager::ScriptReaderEx(const char* script_path, int* slen) {
 		return ReadScriptFromFile(script_path, slen);
 	const char* script_name = script_path + 2;
 	char expansions_path[1024]{};
-	std::snprintf(expansions_path, sizeof expansions_path, "./expansions/%s", script_name);
+	mysnprintf(expansions_path, "./expansions/%s", script_name);
 	if (mainGame->gameConf.prefer_expansion_script) { // debug script with raw file in expansions
 		if (ReadScriptFromFile(expansions_path, slen))
 			return scriptBuffer;
