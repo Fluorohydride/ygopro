@@ -36,6 +36,9 @@ project "event"
             defines { "WIN32" } -- quirk of old libevent
         end
 
+    filter { "system:windows", "action:gmake" }
+        defines { "_EVENT_HAVE_STRTOK_R", "EVENT__HAVE_STRTOK_R" }
+
     filter "system:linux"
         files { "evthread_pthread.c", "epoll.c", "epoll_sub.c", "poll.c", "select.c" }
 
