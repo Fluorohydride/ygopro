@@ -342,7 +342,7 @@ bool DeckManager::SaveDeck(const Deck& deck, const wchar_t* file) {
 		return false;
 	std::stringstream deckStream;
 	SaveDeck(deck, deckStream);
-	std::fwrite(deckStream.str().c_str(), 1, deckStream.str().length(), fp);
+	std::fputs(deckStream.str().c_str(), fp);
 	std::fclose(fp);
 	return true;
 }
