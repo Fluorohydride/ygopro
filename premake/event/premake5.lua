@@ -10,9 +10,6 @@ project "event"
     if EVENT_VERSION>=0x02020000 then
         print("Warning: Using libevent version 2.2.x is not supported, please use 2.1.x, otherwise you may encounter issues.")
     end
-    if EVENT_VERSION>=0x02010000 and WINXP_SUPPORT then
-        print("Warning: libevent 2.1 uses some new APIs which require Windows Vista or later, so WinXP support will be invalid.")
-    end
 
     includedirs { "include", "compat" }
 

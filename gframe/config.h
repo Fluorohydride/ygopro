@@ -13,7 +13,7 @@
 #include <windows.h>
 #include <ws2tcpip.h>
 
-#if defined(_MSC_VER) or defined(__MINGW32__)
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #define mywcsncasecmp _wcsnicmp
 #define mystrncasecmp _strnicmp
 #else
@@ -54,8 +54,12 @@
 #include "../ocgcore/ocgapi.h"
 
 template<size_t N, typename... TR>
-inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
-	return std::swprintf(buf, N, fmt, args...);
+inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR&&... args) {
+	return std::swprintf(buf, N, fmt, std::forward<TR>(args)...);
+}
+template<size_t N, typename... TR>
+inline int mysnprintf(char(&buf)[N], const char* fmt, TR&&... args) {
+	return std::snprintf(buf, N, fmt, std::forward<TR>(args)...);
 }
 
 inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
@@ -72,20 +76,7 @@ inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
 	return fp;
 }
 
-#if !defined(_WIN32)
 #define myfopen std::fopen
-#elif defined(WDK_NTDDI_VERSION) && (WDK_NTDDI_VERSION >= 0x0A000005) // Redstone 4, Version 1803, Build 17134.
-#define FOPEN_WINDOWS_SUPPORT_UTF8
-#define myfopen std::fopen
-#else
-inline FILE* myfopen(const char* filename, const char* mode) {
-	wchar_t wfilename[256]{};
-	BufferIO::DecodeUTF8(filename, wfilename);
-	wchar_t wmode[20]{};
-	BufferIO::CopyCharArray(mode, wmode);
-	return _wfopen(wfilename, wmode);
-}
-#endif
 
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 #include <irrlicht.h>

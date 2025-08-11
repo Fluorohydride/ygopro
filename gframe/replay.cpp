@@ -176,17 +176,12 @@ bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 	wchar_t newfname[256];
 	myswprintf(oldfname, L"./replay/%ls", oldname);
 	myswprintf(newfname, L"./replay/%ls", newname);
-#ifdef _WIN32
-	BOOL result = MoveFileW(oldfname, newfname);
-	return !!result;
-#else
-	char oldfilefn[256];
-	char newfilefn[256];
+	char oldfilefn[1024];
+	char newfilefn[1024];
 	BufferIO::EncodeUTF8(oldfname, oldfilefn);
 	BufferIO::EncodeUTF8(newfname, newfilefn);
-	int result = rename(oldfilefn, newfilefn);
+	int result = std::rename(oldfilefn, newfilefn);
 	return result == 0;
-#endif
 }
 bool Replay::ReadNextResponse(unsigned char resp[]) {
 	unsigned char len{};

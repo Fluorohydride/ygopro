@@ -182,7 +182,7 @@ public:
 		bool success = true;
 		TraversalDir(dir, [dir, &success](const char *name, bool isdir) {
 			char full_path[1024];
-			int len = std::snprintf(full_path, sizeof full_path, "%s/%s", dir, name);
+			int len = mysnprintf(full_path, "%s/%s", dir, name);
 			if (len < 0 || len >= (int)(sizeof full_path)) {
 				success = false;
 				return;
@@ -234,7 +234,7 @@ public:
 			file_unit funit;
 #endif
 			char fname[1024];
-			int len = std::snprintf(fname, sizeof fname, "%s/%s", path, dirp->d_name);
+			int len = mysnprintf(fname, "%s/%s", path, dirp->d_name);
 			if (len < 0 || len >= (int)(sizeof fname))
 				continue;
 			stat(fname, &fileStat);
