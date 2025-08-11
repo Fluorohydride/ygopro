@@ -1,7 +1,7 @@
 project "freetype"
     kind "StaticLib"
 
-    includedirs { "custom", "include" }
+    includedirs { FirstPossibleDir("../premake/freetype/custom", "custom"), "include" }
     defines { "FT2_BUILD_LIBRARY" }
 
     files {

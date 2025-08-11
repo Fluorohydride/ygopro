@@ -98,6 +98,15 @@ function FindHeaderWithSubDir(header, subdir)
     return result
 end
 
+function FirstPossibleDir(...)
+    for _, dir in ipairs({...}) do
+        if os.isdir(dir) then
+            return dir
+        end
+    end
+    return nil
+end
+
 if GetParam("build-lua") then
     BUILD_LUA = true
 elseif GetParam("no-build-lua") then
