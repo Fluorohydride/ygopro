@@ -10,7 +10,10 @@ irr::io::IFileSystem* DataManager::FileSystem = nullptr;
 DataManager dataManager;
 
 DataManager::DataManager() : _datas(32768), _strings(32768) {
-	extra_setcode = { {8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}}, };
+	extra_setcode = { 
+		{8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}},
+		{55088578u, {0x8f, 0x54, 0x59, 0x82, 0x13a}},
+	};
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt = nullptr;
