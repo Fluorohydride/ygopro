@@ -1,7 +1,7 @@
 project "freetype"
     kind "StaticLib"
 
-    includedirs { "custom", "include" }
+    includedirs { "../gframe/freetype-custom", "include" }
     defines { "FT2_BUILD_LIBRARY" }
 
     files {
