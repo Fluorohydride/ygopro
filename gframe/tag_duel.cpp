@@ -1303,6 +1303,9 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			auto pid = (cc == 0) ? 0 : 2;
 			NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[pid + 1]);
+#ifdef YGOPRO_SERVER_MODE
+			NetServer::ReSendToPlayer(replay_recorder);
+#endif
 			if (cp & POS_FACEDOWN)
 				BufferIO::Write<int32_t>(pbufw, 0);
 			pid = 2 - pid;
@@ -1311,7 +1314,7 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 #ifdef YGOPRO_SERVER_MODE
-			NetServer::ReSendToPlayers(cache_recorder, replay_recorder);
+			NetServer::ReSendToPlayer(cache_recorder);
 #endif
 			break;
 		}
