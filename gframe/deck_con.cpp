@@ -1881,16 +1881,16 @@ bool DeckBuilder::check_limit(code_pointer pointer) {
 	auto flit = filterList->content.find(limitcode);
 	if(flit != filterList->content.end())
 		limit = flit->second;
-	for(auto it = deckManager.current_deck.main.begin(); it != deckManager.current_deck.main.end(); ++it) {
-		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
+	for (auto& card : deckManager.current_deck.main) {
+		if (card->first == limitcode || card->second.alias == limitcode)
 			limit--;
 	}
-	for(auto it = deckManager.current_deck.extra.begin(); it != deckManager.current_deck.extra.end(); ++it) {
-		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
+	for (auto& card : deckManager.current_deck.extra) {
+		if (card->first == limitcode || card->second.alias == limitcode)
 			limit--;
 	}
-	for(auto it = deckManager.current_deck.side.begin(); it != deckManager.current_deck.side.end(); ++it) {
-		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
+	for (auto& card : deckManager.current_deck.side) {
+		if (card->first == limitcode || card->second.alias == limitcode)
 			limit--;
 	}
 	return limit > 0;
