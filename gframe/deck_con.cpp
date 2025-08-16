@@ -141,6 +141,7 @@ void DeckBuilder::Terminate() {
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	if(mainGame->dField.OnCommonEvent(event))
 		return false;
+	auto& _datas = dataManager.GetDataTable();
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		irr::s32 id = event.GUIEvent.Caller->getID();
@@ -1074,8 +1075,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			dragx = event.MouseInput.X;
 			dragy = event.MouseInput.Y;
-			draging_pointer = dataManager.GetCodePointer(hovered_code);
-			if(draging_pointer == dataManager.datas_end())
+			draging_pointer = _datas.find(hovered_code);
+			if (draging_pointer == _datas.end())
 				break;
 			if(hovered_pos == 4) {
 				if(!check_limit(draging_pointer))
@@ -1128,8 +1129,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				if(hovered_pos == 0 || hovered_seq == -1)
 					break;
-				auto pointer = dataManager.GetCodePointer(hovered_code);
-				if(pointer == dataManager.datas_end())
+				auto pointer = _datas.find(hovered_code);
+				if (pointer == _datas.end())
 					break;
 				soundManager.PlaySoundEffect(SOUND_CARD_DROP);
 				if(hovered_pos == 1) {
@@ -1163,8 +1164,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				} else if(hovered_pos == 3) {
 					pop_side(hovered_seq);
 				} else {
-					auto pointer = dataManager.GetCodePointer(hovered_code);
-					if(pointer == dataManager.datas_end())
+					auto pointer = _datas.find(hovered_code);
+					if (pointer == _datas.end())
 						break;
 					if(!check_limit(pointer))
 						break;
@@ -1198,8 +1199,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			if (is_draging)
 				break;
-			auto pointer = dataManager.GetCodePointer(hovered_code);
-			if (pointer == dataManager.datas_end())
+			auto pointer = _datas.find(hovered_code);
+			if (pointer == _datas.end())
 				break;
 			if(!check_limit(pointer))
 				break;
@@ -1468,10 +1469,13 @@ void DeckBuilder::FilterCards() {
 			query_elements.push_back(element);
 		}
 	}
-	for(code_pointer ptr = dataManager.datas_begin(); ptr != dataManager.datas_end(); ++ptr) {
-		const CardDataC& data = ptr->second;
-		auto strpointer = dataManager.GetStringPointer(ptr->first);
-		if (strpointer == dataManager.strings_end())
+	auto& _datas = dataManager.GetDataTable();
+	auto& _strings = dataManager.GetStringTable();
+	for (code_pointer ptr = _datas.begin(); ptr != _datas.end(); ++ptr) {
+		auto& code = ptr->first;
+		auto& data = ptr->second;
+		auto strpointer = _strings.find(code);
+		if (strpointer == _strings.end())
 			continue;
 		const CardString& strings = strpointer->second;
 		if(data.type & TYPE_TOKEN)
@@ -1877,16 +1881,16 @@ bool DeckBuilder::check_limit(code_pointer pointer) {
 	auto flit = filterList->content.find(limitcode);
 	if(flit != filterList->content.end())
 		limit = flit->second;
-	for(auto it = deckManager.current_deck.main.begin(); it != deckManager.current_deck.main.end(); ++it) {
-		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
+	for (auto& card : deckManager.current_deck.main) {
+		if (card->first == limitcode || card->second.alias == limitcode)
 			limit--;
 	}
-	for(auto it = deckManager.current_deck.extra.begin(); it != deckManager.current_deck.extra.end(); ++it) {
-		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
+	for (auto& card : deckManager.current_deck.extra) {
+		if (card->first == limitcode || card->second.alias == limitcode)
 			limit--;
 	}
-	for(auto it = deckManager.current_deck.side.begin(); it != deckManager.current_deck.side.end(); ++it) {
-		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
+	for (auto& card : deckManager.current_deck.side) {
+		if (card->first == limitcode || card->second.alias == limitcode)
 			limit--;
 	}
 	return limit > 0;
