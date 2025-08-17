@@ -93,7 +93,8 @@ mat_windows:
 
 ._exec_build:
   stage: build
-  #variables:
+  variables:
+    GIT_STRATEGY: 'clone'
   #  NO_LUA_SAFE: '1' # on client no lua safe
   #cache:
   #  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
