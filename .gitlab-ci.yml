@@ -93,6 +93,10 @@ mat_windows:
 
 ._exec_build:
   stage: build
+  before_script:
+    - cd ocgcore
+    - git clean -dfx
+    - cd ..
   #variables:
   #  NO_LUA_SAFE: '1' # on client no lua safe
   #cache:
