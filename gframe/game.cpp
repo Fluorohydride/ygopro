@@ -76,7 +76,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load textures!");
 		return false;
 	}
-	DataManager::FileSystem = device->getFileSystem();
+	dataManager.FileSystem = device->getFileSystem();
 	if(!dataManager.LoadDB(L"cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");
 		return false;
@@ -1145,17 +1145,17 @@ void Game::LoadExpansions() {
 		}
 		if (IsExtension(name, L".zip") || IsExtension(name, L".ypk")) {
 #ifdef _WIN32
-			DataManager::FileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
+			dataManager.FileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
 #else
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
-			DataManager::FileSystem->addFileArchive(upath, true, false, irr::io::EFAT_ZIP);
+			dataManager.FileSystem->addFileArchive(upath, true, false, irr::io::EFAT_ZIP);
 #endif
 			return;
 		}
 	});
-	for(irr::u32 i = 0; i < DataManager::FileSystem->getFileArchiveCount(); ++i) {
-		auto archive = DataManager::FileSystem->getFileArchive(i)->getFileList();
+	for(irr::u32 i = 0; i < dataManager.FileSystem->getFileArchiveCount(); ++i) {
+		auto archive = dataManager.FileSystem->getFileArchive(i)->getFileList();
 		for(irr::u32 j = 0; j < archive->getFileCount(); ++j) {
 #ifdef _WIN32
 			const wchar_t* fname = archive->getFullFileName(j).c_str();
@@ -1170,9 +1170,9 @@ void Game::LoadExpansions() {
 			}
 			if (IsExtension(fname, L".conf")) {
 #ifdef _WIN32
-				auto reader = DataManager::FileSystem->createAndOpenFile(fname);
+				auto reader = dataManager.FileSystem->createAndOpenFile(fname);
 #else
-				auto reader = DataManager::FileSystem->createAndOpenFile(uname);
+				auto reader = dataManager.FileSystem->createAndOpenFile(uname);
 #endif
 				dataManager.LoadStrings(reader);
 				continue;
