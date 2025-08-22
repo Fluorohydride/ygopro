@@ -150,42 +150,46 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec, bool is_packlist) {
 	deck.clear();
 	uint32_t errorcode = 0;
-	CardData cd;
+	auto& _datas = dataManager.GetDataTable();
 	for(int i = 0; i < mainc; ++i) {
 		auto code = dbuf[i];
-		if(!dataManager.GetData(code, &cd)) {
+		auto it = _datas.find(code);
+		if(it == _datas.end()) {
 			errorcode = code;
 			continue;
 		}
+		auto& cd = it->second;
 		if (cd.type & TYPE_TOKEN) {
 			errorcode = code;
 			continue;
 		}
 		if(is_packlist) {
-			deck.main.push_back(dataManager.GetCodePointer(code));
+			deck.main.push_back(it);
 			continue;
 		}
 		if (cd.type & TYPES_EXTRA_DECK) {
 			if (deck.extra.size() < EXTRA_MAX_SIZE)
-				deck.extra.push_back(dataManager.GetCodePointer(code));
+				deck.extra.push_back(it);
 		}
 		else {
 			if (deck.main.size() < DECK_MAX_SIZE)
-				deck.main.push_back(dataManager.GetCodePointer(code));
+				deck.main.push_back(it);
 		}
 	}
 	for(int i = 0; i < sidec; ++i) {
 		auto code = dbuf[mainc + i];
-		if(!dataManager.GetData(code, &cd)) {
+		auto it = _datas.find(code);
+		if(it == _datas.end()) {
 			errorcode = code;
 			continue;
 		}
+		auto& cd = it->second;
 		if (cd.type & TYPE_TOKEN) {
 			errorcode = code;
 			continue;
 		}
 		if(deck.side.size() < SIDE_MAX_SIZE)
-			deck.side.push_back(dataManager.GetCodePointer(code));
+			deck.side.push_back(it);
 	}
 	return errorcode;
 }

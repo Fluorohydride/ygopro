@@ -1547,7 +1547,8 @@ void ClientField::UpdateDeclarableList() {
 	int trycode = BufferIO::GetVal(pname);
 	CardData cd;
 	if (dataManager.GetData(trycode, &cd) && is_declarable(cd, declare_opcodes)) {
-		auto it = dataManager.GetStringPointer(trycode);
+		auto& _strings = dataManager.GetStringTable();
+		auto it = _strings.find(trycode);
 		mainGame->lstANCard->clear();
 		ancard.clear();
 		mainGame->lstANCard->addItem(it->second.name.c_str());
@@ -1560,19 +1561,23 @@ void ClientField::UpdateDeclarableList() {
 	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
-	for(auto cit = dataManager.strings_begin(); cit != dataManager.strings_end(); ++cit) {
-		if(cit->second.name.find(pname) != std::wstring::npos) {
-			auto cp = dataManager.GetCodePointer(cit->first);
-			if (cp == dataManager.datas_end())
+	auto& _datas = dataManager.GetDataTable();
+	auto& _strings = dataManager.GetStringTable();
+	for(auto& entry : _strings) {
+		auto& code = entry.first;
+		auto& str = entry.second;
+		if(str.name.find(pname) != std::wstring::npos) {
+			auto cp = _datas.find(code);
+			if (cp == _datas.end())
 				continue;
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, declare_opcodes)) {
-				if(pname == cit->second.name || trycode == cit->first) { //exact match or last used
-					mainGame->lstANCard->insertItem(0, cit->second.name.c_str(), -1);
-					ancard.insert(ancard.begin(), cit->first);
+				if(pname == str.name || trycode == code) { //exact match or last used
+					mainGame->lstANCard->insertItem(0, str.name.c_str(), -1);
+					ancard.insert(ancard.begin(), code);
 				} else {
-					mainGame->lstANCard->addItem(cit->second.name.c_str());
-					ancard.push_back(cit->first);
+					mainGame->lstANCard->addItem(str.name.c_str());
+					ancard.push_back(code);
 				}
 			}
 		}
