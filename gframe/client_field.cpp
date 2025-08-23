@@ -455,7 +455,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			// text
 			wchar_t formatBuffer[2048];
 			if(conti_selecting)
-				myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
+				myswprintf(formatBuffer, L"%ls", dataManager.unknown_string);
 			else if(cant_check_grave && selectable_cards[i]->location == LOCATION_GRAVE)
 				myswprintf(formatBuffer, L"%ls", dataManager.FormatLocation(selectable_cards[i]->location, 0));
 			else if(selectable_cards[i]->location == LOCATION_OVERLAY)

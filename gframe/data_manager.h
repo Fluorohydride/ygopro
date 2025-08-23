@@ -97,9 +97,10 @@ public:
 	std::unordered_map<unsigned int, std::wstring> _setnameStrings;
 	std::unordered_map<unsigned int, std::wstring> _sysStrings;
 	char errmsg[512]{};
+	const wchar_t* unknown_string{ L"???" };
+	irr::io::IFileSystem* FileSystem{};
 
 	static unsigned char scriptBuffer[0x100000];
-	static const wchar_t* unknown_string;
 	static uint32_t CardReader(uint32_t, card_data*);
 	static unsigned char* ScriptReaderEx(const char* script_path, int* slen);
 	
@@ -108,8 +109,6 @@ public:
 	//read by fread
 	static unsigned char* ReadScriptFromFile(const char* script_name, int* slen);
 	
-	static irr::io::IFileSystem* FileSystem;
-
 	static bool deck_sort_lv(code_pointer l1, code_pointer l2);
 	static bool deck_sort_atk(code_pointer l1, code_pointer l2);
 	static bool deck_sort_def(code_pointer l1, code_pointer l2);
