@@ -1123,9 +1123,11 @@ void Game::WaitFrameSignal(int frame) {
 	signalFrame = (gameConf.quick_animation && frame >= 12) ? 12 : frame;
 	frameSignal.Wait();
 }
-void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lflist, bool drag) {
-	auto code = cp->first;
-	auto lcode = cp->second.get_duel_code();
+void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList* lflist, bool drag) {
+	if(!cp)
+		return;
+	auto code = cp->code;
+	auto lcode = cp->get_duel_code();
 	irr::video::ITexture* img = imageManager.GetTextureThumb(code);
 	if(img == nullptr)
 		return; //nullptr->getSize() will cause a crash
@@ -1156,26 +1158,26 @@ void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lf
 	bool showAvail = false;
 	bool showNotAvail = false;
 	int filter_lm = cbLimit->getSelected();
-	bool avail = !((filter_lm == 4 && !(cp->second.ot & AVAIL_OCG)
-				|| (filter_lm == 5 && !(cp->second.ot & AVAIL_TCG))
-				|| (filter_lm == 6 && !(cp->second.ot & AVAIL_SC))
-				|| (filter_lm == 7 && !(cp->second.ot & AVAIL_CUSTOM))
-				|| (filter_lm == 8 && (cp->second.ot & AVAIL_OCGTCG) != AVAIL_OCGTCG)));
+	bool avail = !((filter_lm == 4 && !(cp->ot & AVAIL_OCG)
+				|| (filter_lm == 5 && !(cp->ot & AVAIL_TCG))
+				|| (filter_lm == 6 && !(cp->ot & AVAIL_SC))
+				|| (filter_lm == 7 && !(cp->ot & AVAIL_CUSTOM))
+				|| (filter_lm == 8 && (cp->ot & AVAIL_OCGTCG) != AVAIL_OCGTCG)));
 	if(filter_lm >= 4) {
 		showAvail = avail;
 		showNotAvail = !avail;
-	} else if(!(cp->second.ot & gameConf.defaultOT)) {
+	} else if(!(cp->ot & gameConf.defaultOT)) {
 		showNotAvail = true;
 	}
 	if(showAvail) {
-		if((cp->second.ot & AVAIL_OCG) && !(cp->second.ot & AVAIL_TCG))
+		if((cp->ot & AVAIL_OCG) && !(cp->ot & AVAIL_TCG))
 			driver->draw2DImage(imageManager.tOT, otloc, irr::core::recti(0, 128, 128, 192), 0, 0, true);
-		else if((cp->second.ot & AVAIL_TCG) && !(cp->second.ot & AVAIL_OCG))
+		else if((cp->ot & AVAIL_TCG) && !(cp->ot & AVAIL_OCG))
 			driver->draw2DImage(imageManager.tOT, otloc, irr::core::recti(0, 192, 128, 256), 0, 0, true);
 	} else if(showNotAvail) {
-		if(cp->second.ot & AVAIL_OCG)
+		if(cp->ot & AVAIL_OCG)
 			driver->draw2DImage(imageManager.tOT, otloc, irr::core::recti(0, 0, 128, 64), 0, 0, true);
-		else if(cp->second.ot & AVAIL_TCG)
+		else if(cp->ot & AVAIL_TCG)
 			driver->draw2DImage(imageManager.tOT, otloc, irr::core::recti(0, 64, 128, 128), 0, 0, true);
 		else if(!avail)
 			driver->draw2DImage(imageManager.tLim, otloc, irr::core::recti(0, 0, 64, 64), 0, 0, true);
@@ -1264,60 +1266,57 @@ void Game::DrawDeckBd() {
 	}
 	int max_result = mainGame->gameConf.use_image_load_background_thread ? 9 : 7;
 	for(int i = 0; i < max_result && i + scrFilter->getPos() < (int)deckBuilder.results.size(); ++i) {
-		code_pointer ptr = deckBuilder.results[i + scrFilter->getPos()];
-		if(i >= 7)
-		{
-			imageManager.GetTextureThumb(ptr->second.code);
+		auto ptr = deckBuilder.results[i + scrFilter->getPos()];
+		if(i >= 7) {
+			imageManager.GetTextureThumb(ptr->code);
 			break;
 		}
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangle(0x80000000, Resize(806, 164 + i * 66, 1019, 230 + i * 66));
 		DrawThumb(ptr, irr::core::vector2di(810, 165 + i * 66), deckBuilder.filterList);
 		const wchar_t* availBuffer = L"";
-		if ((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_OCG)
+		if ((ptr->ot & AVAIL_OCGTCG) == AVAIL_OCG)
 			availBuffer = L" [OCG]";
-		else if ((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_TCG)
+		else if ((ptr->ot & AVAIL_OCGTCG) == AVAIL_TCG)
 			availBuffer = L" [TCG]";
-		else if ((ptr->second.ot & AVAIL_CUSTOM) == AVAIL_CUSTOM)
+		else if ((ptr->ot & AVAIL_CUSTOM) == AVAIL_CUSTOM)
 			availBuffer = L" [Custom]";
-		if(ptr->second.type & TYPE_MONSTER) {
-			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
+		if(ptr->type & TYPE_MONSTER) {
+			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->code));
 			DrawShadowText(textFont, textBuffer, Resize(860, 165 + i * 66, 955, 185 + i * 66), Resize(1, 1, 0, 0));
 			const wchar_t* form = L"\u2605";
 			wchar_t adBuffer[32]{};
 			wchar_t scaleBuffer[16]{};
-			if(!(ptr->second.type & TYPE_LINK)) {
-				if(ptr->second.type & TYPE_XYZ)
+			if(!(ptr->type & TYPE_LINK)) {
+				if(ptr->type & TYPE_XYZ)
 					form = L"\u2606";
-				if(ptr->second.attack < 0 && ptr->second.defense < 0)
+				if(ptr->attack < 0 && ptr->defense < 0)
 					myswprintf(adBuffer, L"?/?");
-				else if(ptr->second.attack < 0)
-					myswprintf(adBuffer, L"?/%d", ptr->second.defense);
-				else if(ptr->second.defense < 0)
-					myswprintf(adBuffer, L"%d/?", ptr->second.attack);
+				else if(ptr->attack < 0)
+					myswprintf(adBuffer, L"?/%d", ptr->defense);
+				else if(ptr->defense < 0)
+					myswprintf(adBuffer, L"%d/?", ptr->attack);
 				else
-					myswprintf(adBuffer, L"%d/%d", ptr->second.attack, ptr->second.defense);
+					myswprintf(adBuffer, L"%d/%d", ptr->attack, ptr->defense);
 			} else {
 				form = L"LINK-";
-				if(ptr->second.attack < 0)
+				if(ptr->attack < 0)
 					myswprintf(adBuffer, L"?/-");
 				else
-					myswprintf(adBuffer, L"%d/-", ptr->second.attack);
+					myswprintf(adBuffer, L"%d/-", ptr->attack);
 			}
-			const auto& attribute = dataManager.FormatAttribute(ptr->second.attribute);
-			const auto& race = dataManager.FormatRace(ptr->second.race);
-			myswprintf(textBuffer, L"%ls/%ls %ls%d", attribute.c_str(), race.c_str(), form, ptr->second.level);
+			myswprintf(textBuffer, L"%ls/%ls %ls%d", dataManager.FormatAttribute(ptr->attribute).c_str(), dataManager.FormatRace(ptr->race).c_str(),
+				form, ptr->level);
 			DrawShadowText(textFont, textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
-			if(ptr->second.type & TYPE_PENDULUM) {
-				myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
+			if(ptr->type & TYPE_PENDULUM) {
+				myswprintf(scaleBuffer, L" %d/%d", ptr->lscale, ptr->rscale);
 			}
 			myswprintf(textBuffer, L"%ls%ls%ls", adBuffer, scaleBuffer, availBuffer);
 			DrawShadowText(textFont, textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), Resize(1, 1, 0, 0));
 		} else {
-			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
+			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->code));
 			DrawShadowText(textFont, textBuffer, Resize(860, 165 + i * 66, 955, 185 + i * 66), Resize(1, 1, 0, 0));
-			const auto& type = dataManager.FormatType(ptr->second.type);
-			myswprintf(textBuffer, L"%ls", type.c_str());
+			myswprintf(textBuffer, L"%ls", dataManager.FormatType(ptr->type).c_str());
 			DrawShadowText(textFont, textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
 			myswprintf(textBuffer, L"%ls", availBuffer);
 			DrawShadowText(textFont, textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), Resize(1, 1, 0, 0));

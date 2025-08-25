@@ -35,13 +35,13 @@ public:
 
 	bool CardNameContains(const wchar_t *haystack, const wchar_t *needle);
 
-	bool push_main(code_pointer pointer, int seq = -1);
-	bool push_extra(code_pointer pointer, int seq = -1);
-	bool push_side(code_pointer pointer, int seq = -1);
+	bool push_main(const CardDataC* pointer, int seq = -1);
+	bool push_extra(const CardDataC* pointer, int seq = -1);
+	bool push_side(const CardDataC* pointer, int seq = -1);
 	void pop_main(int seq);
 	void pop_extra(int seq);
 	void pop_side(int seq);
-	bool check_limit(code_pointer pointer);
+	bool check_limit(const CardDataC* pointer);
 
 	unsigned long long filter_effect{};
 	unsigned int filter_type{};
@@ -73,7 +73,7 @@ public:
 	size_t pre_mainc{};
 	size_t pre_extrac{};
 	size_t pre_sidec{};
-	code_pointer draging_pointer;
+	const CardDataC* draging_pointer{};
 	int prev_category{};
 	int prev_deck{};
 	irr::s32 prev_operation{};
@@ -84,7 +84,7 @@ public:
 	std::mt19937 rnd;
 
 	const LFList* filterList{};
-	std::vector<code_pointer> results;
+	std::vector<const CardDataC*> results;
 	wchar_t result_string[8]{};
 	std::vector<std::wstring> expansionPacks;
 };
