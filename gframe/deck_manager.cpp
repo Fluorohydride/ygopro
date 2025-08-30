@@ -246,15 +246,15 @@ bool DeckManager::LoadSide(Deck& deck, uint32_t dbuf[], int mainc, int sidec) {
 void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) {
 	wchar_t catepath[256];
 	switch(index) {
-	case 0:
+	case DECK_CATEGORY_PACK:
 		myswprintf(catepath, L"./pack");
 		break;
-	case 1:
+	case DECK_CATEGORY_BOT:
 		BufferIO::CopyWideString(mainGame->gameConf.bot_deck_path, catepath);
 		break;
 	case -1:
-	case 2:
-	case 3:
+	case DECK_CATEGORY_NONE:
+	case DECK_CATEGORY_SEPARATOR:
 		myswprintf(catepath, L"./deck");
 		break;
 	default:
