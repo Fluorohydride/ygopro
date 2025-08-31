@@ -429,7 +429,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->lstCategories->addItem(catename);
 						catesel = mainGame->lstCategories->getItemCount() - 1;
 					} else {
-						for(irr::u32 i = DECK_CATEGORY_CUSTOM; i < mainGame->lstCategories->getItemCount(); i++) {
+						for(int i = DECK_CATEGORY_CUSTOM; i < (int)mainGame->lstCategories->getItemCount(); i++) {
 							if(!mywcsncasecmp(mainGame->lstCategories->getListItem(i), catename, 256)) {
 								catesel = i;
 								mainGame->stACMessage->setText(dataManager.GetSysString(1474));
@@ -461,7 +461,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						catesel = mainGame->lstCategories->getItemCount() - 1;
 					} else {
 						catesel = 0;
-						for(irr::u32 i = DECK_CATEGORY_CUSTOM; i < mainGame->lstCategories->getItemCount(); i++) {
+						for(int i = DECK_CATEGORY_CUSTOM; i < (int)mainGame->lstCategories->getItemCount(); i++) {
 							if(!mywcsncasecmp(mainGame->lstCategories->getListItem(i), newcatename, 256)) {
 								catesel = i;
 								mainGame->stACMessage->setText(dataManager.GetSysString(1474));
