@@ -324,7 +324,7 @@ bool DeckManager::LoadCurrentDeck(int category_index, const wchar_t* category_na
 		current_deck.clear();
 		return false;
 	}
-	bool is_packlist = (category_index == 0);
+	bool is_packlist = (category_index == DECK_CATEGORY_PACK);
 	if(!LoadCurrentDeck(filepath, is_packlist))
 		return false;
 	if (mainGame->is_building)
