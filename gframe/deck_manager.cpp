@@ -320,11 +320,16 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 bool DeckManager::LoadCurrentDeck(int category_index, const wchar_t* category_name, const wchar_t* deckname) {
 	wchar_t filepath[256];
 	GetDeckFile(filepath, category_index, category_name, deckname);
+	if (!filepath[0]) {
+		current_deck.clear();
+		return false;
+	}
 	bool is_packlist = (category_index == 0);
-	bool res = LoadCurrentDeck(filepath, is_packlist);
-	if (res && mainGame->is_building)
+	if(!LoadCurrentDeck(filepath, is_packlist))
+		return false;
+	if (mainGame->is_building)
 		mainGame->deckBuilder.RefreshPackListScroll();
-	return res;
+	return true;
 }
 void DeckManager::SaveDeck(const Deck& deck, std::stringstream& deckStream) {
 	deckStream << "#created by ..." << std::endl;
