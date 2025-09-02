@@ -5,7 +5,6 @@
 
 namespace ygo {
 
-char DeckManager::deckBuffer[0x10000]{};
 DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
