@@ -55,7 +55,7 @@ public:
 	Deck current_deck;
 	std::vector<LFList> _lfList;
 
-	static char deckBuffer[0x10000];
+	static constexpr int MAX_YDK_SIZE = 0x10000;
 
 	void LoadLFListSingle(const char* path);
 	void LoadLFList();
