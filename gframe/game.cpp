@@ -77,13 +77,13 @@ HostInfo game_info;
 
 void Game::MainServerLoop() {
 #ifdef SERVER_ZIP_SUPPORT
-	DataManager::FileSystem = new irr::io::CFileSystem();
+	dataManager.FileSystem = new irr::io::CFileSystem();
 #endif
 	deckManager.LoadLFList();
 	dataManager.LoadDB(L"cards.cdb");
 	LoadExpansions();
 #ifdef SERVER_PRO2_SUPPORT
-	DataManager::FileSystem->addFileArchive("data/script.zip", true, false, irr::io::EFAT_ZIP);
+	dataManager.FileSystem->addFileArchive("data/script.zip", true, false, irr::io::EFAT_ZIP);
 #endif
 
 	server_port = NetServer::StartServer(server_port);
@@ -122,7 +122,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load textures!");
 		return false;
 	}
-	DataManager::FileSystem = device->getFileSystem();
+	dataManager.FileSystem = device->getFileSystem();
 	if(!dataManager.LoadDB(L"cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");
 		return false;
@@ -1206,19 +1206,19 @@ void Game::LoadExpansions() {
 #if defined(SERVER_ZIP_SUPPORT) || !defined(YGOPRO_SERVER_MODE)
 		if (IsExtension(name, L".zip") || IsExtension(name, L".ypk")) {
 #ifdef _WIN32
-			DataManager::FileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
+			dataManager.FileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
 #else
 			char upath[1024];
 			BufferIO::EncodeUTF8(fpath, upath);
-			DataManager::FileSystem->addFileArchive(upath, true, false, irr::io::EFAT_ZIP);
+			dataManager.FileSystem->addFileArchive(upath, true, false, irr::io::EFAT_ZIP);
 #endif
 			return;
 		}
 #endif //SERVER_ZIP_SUPPORT
 	});
 #if defined(SERVER_ZIP_SUPPORT) || !defined(YGOPRO_SERVER_MODE)
-	for(irr::u32 i = 0; i < DataManager::FileSystem->getFileArchiveCount(); ++i) {
-		auto archive = DataManager::FileSystem->getFileArchive(i)->getFileList();
+	for(irr::u32 i = 0; i < dataManager.FileSystem->getFileArchiveCount(); ++i) {
+		auto archive = dataManager.FileSystem->getFileArchive(i)->getFileList();
 		for(irr::u32 j = 0; j < archive->getFileCount(); ++j) {
 #ifdef _WIN32
 			const wchar_t* fname = archive->getFullFileName(j).c_str();
@@ -1234,9 +1234,9 @@ void Game::LoadExpansions() {
 #ifndef YGOPRO_SERVER_MODE
 			if (IsExtension(fname, L".conf")) {
 #ifdef _WIN32
-				auto reader = DataManager::FileSystem->createAndOpenFile(fname);
+				auto reader = dataManager.FileSystem->createAndOpenFile(fname);
 #else
-				auto reader = DataManager::FileSystem->createAndOpenFile(uname);
+				auto reader = dataManager.FileSystem->createAndOpenFile(uname);
 #endif
 				dataManager.LoadStrings(reader);
 				continue;
@@ -1603,8 +1603,9 @@ void Game::ShowCardInfo(int code, bool resize) {
 	if(showingcode == code && !resize)
 		return;
 	wchar_t formatBuffer[256];
-	auto cit = dataManager.GetCodePointer(code);
-	bool is_valid = (cit != dataManager.datas_end());
+	auto& _datas = dataManager.GetDataTable();
+	auto cit = _datas.find(code);
+	bool is_valid = (cit != _datas.end());
 	imgCard->setImage(imageManager.GetTexture(code, true));
 	if (is_valid) {
 		auto& cd = cit->second;
@@ -1625,8 +1626,8 @@ void Game::ShowCardInfo(int code, bool resize) {
 	if (is_valid && !gameConf.hide_setname) {
 		auto& cd = cit->second;
 		auto target = cit;
-		if (cd.alias && dataManager.GetCodePointer(cd.alias) != dataManager.datas_end()) {
-			target = dataManager.GetCodePointer(cd.alias);
+		if (cd.alias && _datas.find(cd.alias) != _datas.end()) {
+			target = _datas.find(cd.alias);
 		}
 		if (target->second.setcode[0]) {
 			offset = 23;// *yScale;

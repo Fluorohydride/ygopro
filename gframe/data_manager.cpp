@@ -6,11 +6,7 @@
 
 namespace ygo {
 
-const wchar_t* DataManager::unknown_string = L"???";
 unsigned char DataManager::scriptBuffer[0x100000] = {};
-#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
-irr::io::IFileSystem* DataManager::FileSystem = nullptr;
-#endif
 DataManager dataManager;
 
 DataManager::DataManager() : _datas(32768), _strings(32768) {
@@ -446,9 +442,9 @@ unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* sl
 #ifdef _WIN32
 	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
-	auto reader = FileSystem->createAndOpenFile(fname);
+	auto reader = dataManager.FileSystem->createAndOpenFile(fname);
 #else
-	auto reader = FileSystem->createAndOpenFile(script_name);
+	auto reader = dataManager.FileSystem->createAndOpenFile(script_name);
 #endif
 	if (!reader)
 		return nullptr;

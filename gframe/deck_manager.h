@@ -32,6 +32,12 @@ namespace ygo {
 	constexpr int MAINC_MAX = 250;	// the limit of card_state
 	constexpr int SIDEC_MAX = MAINC_MAX;
 
+	constexpr int DECK_CATEGORY_PACK = 0;
+	constexpr int DECK_CATEGORY_BOT = 1;
+	constexpr int DECK_CATEGORY_NONE = 2;
+	constexpr int DECK_CATEGORY_SEPARATOR = 3;
+	constexpr int DECK_CATEGORY_CUSTOM = 4;
+
 struct LFList {
 	unsigned int hash{};
 	std::wstring listName;
@@ -65,9 +71,7 @@ public:
 	Deck current_deck;
 	std::vector<LFList> _lfList;
 
-#ifndef YGOPRO_SERVER_MODE
-	static char deckBuffer[0x10000];
-#endif
+	static constexpr int MAX_YDK_SIZE = 0x10000;
 
 	void LoadLFListSingle(const char* path);
 	void LoadLFList();
