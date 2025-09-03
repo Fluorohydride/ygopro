@@ -63,17 +63,22 @@ void Replay::EndRecord() {
 	}
 	is_recording = false;
 }
-void Replay::SaveReplay(const wchar_t* name) {
+bool Replay::SaveReplay(const wchar_t* base_name) {
 	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
-		return;
-	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls.yrp", name);
-	FILE* rfp = mywfopen(fname, "wb");
+		return false;
+	wchar_t filename[256];
+	wchar_t path[256];
+	BufferIO::CopyWideString(base_name, filename);
+	FileSystem::SafeFileName(filename);
+	if (myswprintf(path, L"./replay/%ls.yrp", filename) <= 0)
+		return false;
+	FILE* rfp = mywfopen(path, "wb");
 	if(!rfp)
-		return;
+		return false;
 	std::fwrite(&pheader, sizeof pheader, 1, rfp);
 	std::fwrite(comp_data, comp_size, 1, rfp);
 	std::fclose(rfp);
+	return true;
 }
 bool Replay::OpenReplay(const wchar_t* name) {
 	FILE* rfp = mywfopen(name, "rb");
