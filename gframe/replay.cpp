@@ -84,7 +84,8 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	FILE* rfp = mywfopen(name, "rb");
 	if(!rfp) {
 		wchar_t fname[256];
-		myswprintf(fname, L"./replay/%ls", name);
+		if (myswprintf(fname, L"./replay/%ls", name) <= 0)
+			return false;
 		rfp = mywfopen(fname, "rb");
 	}
 	if(!rfp)
@@ -136,19 +137,28 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	return true;
 }
 bool Replay::DeleteReplay(const wchar_t* name) {
+	if (std::wcschr(name, L'/') || std::wcschr(name, L'\\'))
+		return false;
 	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls", name);
+	if(myswprintf(fname, L"./replay/%ls", name) <= 0)
+		return false;
 	return FileSystem::RemoveFile(fname);
 }
 bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
-	wchar_t oldfname[256];
-	wchar_t newfname[256];
-	myswprintf(oldfname, L"./replay/%ls", oldname);
-	myswprintf(newfname, L"./replay/%ls", newname);
+	wchar_t old_path[256];
+	wchar_t new_path[256];
+	if (std::wcschr(oldname, L'/') || std::wcschr(oldname, L'\\'))
+		return false;
+	if (std::wcschr(newname, L'/') || std::wcschr(newname, L'\\'))
+		return false;
+	if (myswprintf(old_path, L"./replay/%ls", oldname) <= 0)
+		return false;
+	if (myswprintf(new_path, L"./replay/%ls", newname) <= 0)
+		return false;
 	char oldfilefn[1024];
 	char newfilefn[1024];
-	BufferIO::EncodeUTF8(oldfname, oldfilefn);
-	BufferIO::EncodeUTF8(newfname, newfilefn);
+	BufferIO::EncodeUTF8(old_path, oldfilefn);
+	BufferIO::EncodeUTF8(new_path, newfilefn);
 	int result = std::rename(oldfilefn, newfilefn);
 	return result == 0;
 }
