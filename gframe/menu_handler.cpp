@@ -487,7 +487,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
 					wchar_t newname[256];
 					BufferIO::CopyWideString(mainGame->ebRSName->getText(), newname);
-					if(mywcsncasecmp(newname + std::wcslen(newname) - 4, L".yrp", 4)) {
+					if (!IsExtension(newname, L".yrp")) {
 						myswprintf(newname, L"%ls.yrp", mainGame->ebRSName->getText());
 					}
 					if(Replay::RenameReplay(mainGame->lstReplayList->getListItem(prev_sel), newname)) {
