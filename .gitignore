@@ -1,16 +1,16 @@
 .DS_Store
 
-/deck/
-/expansions/
-/fonts/
+/deck
+/expansions
+/fonts
 /icon
-/pack/
-/pics/
-/replay/
-/single/
-/sound/
+/pack
+/pics
+/replay
+/single
+/sound
 !/sound/files.txt
-/WindBot/
+/WindBot
 /cards.cdb
 /error.log
 /bot.conf
@@ -25,7 +25,7 @@
 
 /.vscode/
 /bin/
-/build/
+/build
 /obj/
 /event
 /freetype
