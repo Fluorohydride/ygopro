@@ -762,8 +762,11 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 			prep += sizeof new_replay.pheader;
 			std::memcpy(new_replay.comp_data, prep, len - sizeof new_replay.pheader - 1);
 			new_replay.comp_size = len - sizeof new_replay.pheader - 1;
-			if(mainGame->actionParam)
-				new_replay.SaveReplay(mainGame->ebRSName->getText());
+			if (mainGame->actionParam) {
+				bool save_result = new_replay.SaveReplay(mainGame->ebRSName->getText());
+				if (!save_result)
+					new_replay.SaveReplay(L"_LastReplay");
+			}
 			else
 				new_replay.SaveReplay(L"_LastReplay");
 		}
