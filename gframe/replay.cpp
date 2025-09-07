@@ -66,8 +66,8 @@ void Replay::EndRecord() {
 bool Replay::SaveReplay(const wchar_t* base_name) {
 	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
 		return false;
-	wchar_t filename[256];
-	wchar_t path[256];
+	wchar_t filename[256]{};
+	wchar_t path[256]{};
 	BufferIO::CopyWideString(base_name, filename);
 	FileSystem::SafeFileName(filename);
 	if (myswprintf(path, L"./replay/%ls.yrp", filename) <= 0)
