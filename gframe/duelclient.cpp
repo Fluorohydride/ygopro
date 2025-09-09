@@ -1116,7 +1116,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			break;
 		}
 		case HINT_RACE: {
-			auto race = dataManager.FormatRace(data);
+			const auto& race = dataManager.FormatRace(data);
 			myswprintf(textBuffer, dataManager.GetSysString(1511), race.c_str());
 			mainGame->AddLog(textBuffer);
 			mainGame->gMutex.lock();
@@ -1127,7 +1127,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			break;
 		}
 		case HINT_ATTRIB: {
-			auto attribute = dataManager.FormatAttribute(data);
+			const auto& attribute = dataManager.FormatAttribute(data);
 			myswprintf(textBuffer, dataManager.GetSysString(1511), attribute.c_str());
 			mainGame->AddLog(textBuffer);
 			mainGame->gMutex.lock();

@@ -1307,8 +1307,8 @@ void Game::DrawDeckBd() {
 				else
 					myswprintf(adBuffer, L"%d/-", ptr->second.attack);
 			}
-			auto attribute = dataManager.FormatAttribute(ptr->second.attribute);
-			auto race = dataManager.FormatRace(ptr->second.race);
+			const auto& attribute = dataManager.FormatAttribute(ptr->second.attribute);
+			const auto& race = dataManager.FormatRace(ptr->second.race);
 			myswprintf(textBuffer, L"%ls/%ls %ls%d", attribute.c_str(), race.c_str(), form, ptr->second.level);
 			DrawShadowText(textFont, textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
 			if(ptr->second.type & TYPE_PENDULUM) {
@@ -1319,7 +1319,7 @@ void Game::DrawDeckBd() {
 		} else {
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
 			DrawShadowText(textFont, textBuffer, Resize(860, 165 + i * 66, 955, 185 + i * 66), Resize(1, 1, 0, 0));
-			auto type = dataManager.FormatType(ptr->second.type);
+			const auto& type = dataManager.FormatType(ptr->second.type);
 			myswprintf(textBuffer, L"%ls", type.c_str());
 			DrawShadowText(textFont, textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
 			myswprintf(textBuffer, L"%ls", availBuffer);
