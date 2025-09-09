@@ -1597,8 +1597,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									myswprintf(formatBuffer, L"\nLINK-%d", mcard->link);
 									str.append(formatBuffer);
 								}
-								auto race = dataManager.FormatRace(mcard->race);
-								auto attribute = dataManager.FormatAttribute(mcard->attribute);
+								const auto& race = dataManager.FormatRace(mcard->race);
+								const auto& attribute = dataManager.FormatAttribute(mcard->attribute);
 								myswprintf(formatBuffer, L" %ls/%ls", race.c_str(), attribute.c_str());
 								str.append(formatBuffer);
 								if(mcard->location == LOCATION_HAND && (mcard->type & TYPE_PENDULUM)) {
@@ -1625,11 +1625,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								else if(mcard->cHint == CHINT_CARD)
 									myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(212), dataManager.GetName(mcard->chValue));
 								else if(mcard->cHint == CHINT_RACE) {
-									auto race = dataManager.FormatRace(mcard->chValue);
+									const auto& race = dataManager.FormatRace(mcard->chValue);
 									myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(213), race.c_str());
 								}
 								else if(mcard->cHint == CHINT_ATTRIBUTE) {
-									auto attribute = dataManager.FormatAttribute(mcard->chValue);
+									const auto& attribute = dataManager.FormatAttribute(mcard->chValue);
 									myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(214), attribute.c_str());
 								}
 								else if(mcard->cHint == CHINT_NUMBER)

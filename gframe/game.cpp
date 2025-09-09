@@ -1564,7 +1564,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		}
 		if (target->second.setcode[0]) {
 			offset = 23;// *yScale;
-			auto setname = dataManager.FormatSetName(target->second.setcode);
+			const auto& setname = dataManager.FormatSetName(target->second.setcode);
 			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), setname.c_str());
 			stSetName->setText(formatBuffer);
 		}
@@ -1576,9 +1576,9 @@ void Game::ShowCardInfo(int code, bool resize) {
 	}
 	if(is_valid && cit->second.type & TYPE_MONSTER) {
 		auto& cd = cit->second;
-		auto type = dataManager.FormatType(cd.type);
-		auto race = dataManager.FormatRace(cd.race);
-		auto attribute = dataManager.FormatAttribute(cd.attribute);
+		const auto& type = dataManager.FormatType(cd.type);
+		const auto& race = dataManager.FormatRace(cd.race);
+		const auto& attribute = dataManager.FormatAttribute(cd.attribute);
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", type.c_str(), race.c_str(), attribute.c_str());
 		stInfo->setText(formatBuffer);
 		int offset_info = 0;
@@ -1601,7 +1601,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 				myswprintf(adBuffer, L"%d/%d", cd.attack, cd.defense);
 		} else {
 			form = L"LINK-";
-			auto link_marker = dataManager.FormatLinkMarker(cd.link_marker);
+			const auto& link_marker = dataManager.FormatLinkMarker(cd.link_marker);
 			if(cd.attack < 0)
 				myswprintf(adBuffer, L"?/-   %ls", link_marker.c_str());
 			else
@@ -1624,7 +1624,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 	}
 	else {
 		if (is_valid) {
-			auto type = dataManager.FormatType(cit->second.type);
+			const auto& type = dataManager.FormatType(cit->second.type);
 			myswprintf(formatBuffer, L"[%ls]", type.c_str());
 		}
 		else
