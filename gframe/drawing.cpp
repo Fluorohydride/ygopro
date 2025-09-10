@@ -1095,7 +1095,6 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 	if(win == wCardSelect) {
 		for(int i = 0; i < 5; ++i)
 			btnCardSelect[i]->setDrawImage(false);
-		dField.conti_selecting = false;
 		stCardListTip->setVisible(false);
 		for(auto& pcard : dField.selectable_cards)
 			dField.SetShowMark(pcard, false);

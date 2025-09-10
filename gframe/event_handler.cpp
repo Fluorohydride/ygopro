@@ -404,7 +404,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 				} else {
 					selectable_cards.clear();
-					conti_selecting = false;
+					bool is_continuous = false;
 					switch(command_location) {
 					case LOCATION_DECK: {
 						for(size_t i = 0; i < deck[command_controler].size(); ++i)
@@ -431,15 +431,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					}
 					case POSITION_HINT: {
+						is_continuous = true;
 						selectable_cards = conti_cards;
 						std::sort(selectable_cards.begin(), selectable_cards.end());
 						auto eit = std::unique(selectable_cards.begin(), selectable_cards.end());
 						selectable_cards.erase(eit, selectable_cards.end());
-						conti_selecting = true;
 						break;
 					}
 					}
-					if(!conti_selecting) {
+					if (!is_continuous) {
 						mainGame->wCardSelect->setText(dataManager.GetSysString(566));
 						list_command = COMMAND_ACTIVATE;
 					} else {
@@ -447,7 +447,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						list_command = COMMAND_OPERATION;
 					}
 					std::sort(selectable_cards.begin(), selectable_cards.end(), ClientCard::client_card_sort);
-					ShowSelectCard(true, true);
+					ShowSelectCard(true, is_continuous);
 				}
 				break;
 			}
@@ -892,7 +892,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					// image
 					if(selectable_cards[i + pos]->code)
 						mainGame->btnCardSelect[i]->setImage(imageManager.GetTexture(selectable_cards[i + pos]->code));
-					else if(conti_selecting)
+					else if(select_continuous)
 						mainGame->btnCardSelect[i]->setImage(imageManager.GetTexture(selectable_cards[i + pos]->chain_code));
 					else
 						mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i + pos]->controler + 2]);
@@ -905,7 +905,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						else
 							myswprintf(formatBuffer, L"");
 					} else {
-						if(conti_selecting)
+						if(select_continuous)
 							myswprintf(formatBuffer, L"%ls", dataManager.unknown_string);
 						else if(cant_check_grave && selectable_cards[i]->location == LOCATION_GRAVE)
 							myswprintf(formatBuffer, L"%ls", dataManager.FormatLocation(selectable_cards[i]->location, 0));
@@ -919,7 +919,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					mainGame->stCardPos[i]->setText(formatBuffer);
 					// color
-					if(conti_selecting)
+					if(select_continuous)
 						mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 					else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY) {
 						if(selectable_cards[i + pos]->owner != selectable_cards[i + pos]->overlayTarget->controler)
