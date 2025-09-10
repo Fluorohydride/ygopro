@@ -417,7 +417,8 @@ void ClientField::ClearChainSelect() {
 	conti_act = false;
 }
 // needs to be synchronized with EGET_SCROLL_BAR_CHANGED
-void ClientField::ShowSelectCard(bool buttonok, bool chain) {
+void ClientField::ShowSelectCard(bool buttonok, bool is_continuous) {
+	select_continuous = is_continuous;
 	if(cant_check_grave) {
 		bool has_card_in_grave = false;
 		for (auto& pcard : selectable_cards) {
@@ -444,7 +445,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		// image
 		if(selectable_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
-		else if(conti_selecting)
+		else if(select_continuous)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->chain_code));
 		else
 			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i]->controler + 2]);
@@ -454,7 +455,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		if(mainGame->dInfo.curMsg != MSG_SORT_CARD) {
 			// text
 			wchar_t formatBuffer[2048];
-			if(conti_selecting)
+			if(select_continuous)
 				myswprintf(formatBuffer, L"%ls", dataManager.unknown_string);
 			else if(cant_check_grave && selectable_cards[i]->location == LOCATION_GRAVE)
 				myswprintf(formatBuffer, L"%ls", dataManager.FormatLocation(selectable_cards[i]->location, 0));
@@ -470,7 +471,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			if (selectable_cards[i]->is_selected)
 				mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
 			else {
-				if(conti_selecting)
+				if(select_continuous)
 					mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 				else if(selectable_cards[i]->location == LOCATION_OVERLAY) {
 					if(selectable_cards[i]->owner != selectable_cards[i]->overlayTarget->controler)

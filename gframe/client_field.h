@@ -86,7 +86,7 @@ public:
 	ChainInfo current_chain;
 	bool last_chain{ false };
 	bool deck_reversed{ false };
-	bool conti_selecting{ false };
+	bool select_continuous{ false };
 	bool cant_check_grave{ false };
 	bool tag_surrender{ false };
 	bool tag_teammate_surrender{ false };
@@ -105,7 +105,7 @@ public:
 	void ClearCommandFlag();
 	void ClearSelect();
 	void ClearChainSelect();
-	void ShowSelectCard(bool buttonok = false, bool chain = false);
+	void ShowSelectCard(bool buttonok = false, bool is_continuous = false);
 	void ShowChainCard();
 	void ShowLocationCard();
 	void ShowSelectOption(int select_hint = 0);
