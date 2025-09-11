@@ -1091,41 +1091,48 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cWidth, i
 	scrCardText->setPos(0);
 }
 std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, irr::u32 pos) {
-	int pbuffer = 0;
+	size_t pbuffer = 0;
 	irr::u32 _width = 0, _height = 0;
 	wchar_t prev = 0;
-	wchar_t strBuffer[4096];
-	std::wstring ret;
+	wchar_t strBuffer[4096]{};
+	constexpr size_t buffer_len = sizeof strBuffer / sizeof strBuffer[0] - 1;
+	const size_t text_len = std::wcslen(text);
 
-	for(size_t i = 0; text[i] != 0 && i < std::wcslen(text); ++i) {
+	for(size_t i = 0; i < text_len ; ++i) {
+		if (pbuffer >= buffer_len)
+			break;
 		wchar_t c = text[i];
 		irr::u32 w = font->getCharDimension(c).Width + font->getKerningWidth(c, prev);
 		prev = c;
-		if(text[i] == L'\r') {
+		if (c == L'\r') {
 			continue;
-		} else if(text[i] == L'\n') {
+		}
+		if (c == L'\n') {
 			strBuffer[pbuffer++] = L'\n';
 			_width = 0;
 			_height++;
 			prev = 0;
-			if(_height == pos)
+			if (_height == pos)
 				pbuffer = 0;
 			continue;
-		} else if(_width > 0 && _width + w > cWidth) {
+		}
+		if (_width > 0 && _width + w > cWidth) {
 			strBuffer[pbuffer++] = L'\n';
 			_width = 0;
 			_height++;
 			prev = 0;
-			if(_height == pos)
+			if (_height == pos)
 				pbuffer = 0;
 		}
+		if (pbuffer >= buffer_len)
+			break;
 		_width += w;
 		strBuffer[pbuffer++] = c;
 	}
 	strBuffer[pbuffer] = 0;
-	if(pControl) pControl->setText(strBuffer);
-	ret.assign(strBuffer);
-	return ret;
+	if (pControl)
+		pControl->setText(strBuffer);
+	return std::wstring(strBuffer);
 }
 void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
