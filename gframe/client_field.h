@@ -93,7 +93,7 @@ public:
 	std::mt19937 rnd;
 
 	ClientField();
-	~ClientField();
+	~ClientField() override;
 	void Clear();
 	void Initial(int player, int deckc, int extrac, int sidec = 0);
 	void ResetSequence(std::vector<ClientCard*>& list, bool reset_height);
