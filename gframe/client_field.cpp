@@ -27,13 +27,11 @@ ClientField::~ClientField() {
 		}
 		hand[i].clear();
 		for (auto& card : mzone[i]) {
-			if (card)
-				delete card;
+			delete card;
 			card = nullptr;
 		}
 		for (auto& card : szone[i]) {
-			if (card)
-				delete card;
+			delete card;
 			card = nullptr;
 		}
 		for (auto& card : grave[i]) {
@@ -44,7 +42,6 @@ ClientField::~ClientField() {
 			delete card;
 		}
 		remove[i].clear();
-
 		for (auto& card : extra[i]) {
 			delete card;
 		}
@@ -57,30 +54,33 @@ ClientField::~ClientField() {
 }
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
-		for(auto cit = deck[i].begin(); cit != deck[i].end(); ++cit)
-			delete *cit;
+		for (auto& card : deck[i]) {
+			delete card;
+		}
 		deck[i].clear();
-		for(auto cit = hand[i].begin(); cit != hand[i].end(); ++cit)
-			delete *cit;
+		for (auto& card : hand[i]) {
+			delete card;
+		}
 		hand[i].clear();
-		for(auto cit = mzone[i].begin(); cit != mzone[i].end(); ++cit) {
-			if(*cit)
-				delete *cit;
-			*cit = 0;
+		for (auto& card : mzone[i]) {
+			delete card;
+			card = nullptr;
 		}
-		for(auto cit = szone[i].begin(); cit != szone[i].end(); ++cit) {
-			if(*cit)
-				delete *cit;
-			*cit = 0;
+		for (auto& card : szone[i]) {
+			delete card;
+			card = nullptr;
 		}
-		for(auto cit = grave[i].begin(); cit != grave[i].end(); ++cit)
-			delete *cit;
+		for (auto& card : grave[i]) {
+			delete card;
+		}
 		grave[i].clear();
-		for(auto cit = remove[i].begin(); cit != remove[i].end(); ++cit)
-			delete *cit;
+		for (auto& card : remove[i]) {
+			delete card;
+		}
 		remove[i].clear();
-		for(auto cit = extra[i].begin(); cit != extra[i].end(); ++cit)
-			delete *cit;
+		for (auto& card : extra[i]) {
+			delete card;
+		}
 		extra[i].clear();
 		deck_act[i] = false;
 		grave_act[i] = false;
@@ -88,8 +88,9 @@ void ClientField::Clear() {
 		extra_act[i] = false;
 		pzone_act[i] = false;
 	}
-	for(auto sit = overlay_cards.begin(); sit != overlay_cards.end(); ++sit)
-		delete *sit;
+	for (auto& card : overlay_cards) {
+		delete card;
+	}
 	overlay_cards.clear();
 	extra_p_count[0] = 0;
 	extra_p_count[1] = 0;
