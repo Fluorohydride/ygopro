@@ -21,7 +21,7 @@ class FileSystem {
 public:
 	static void SafeFileName(wchar_t* wfile) {
 		while((wfile = std::wcspbrk(wfile, L"<>:\"/\\|?*")) != nullptr)
-			*wfile++ = '_';
+			*wfile++ = L'_';
 	}
 
 	static bool IsFileExists(const wchar_t* wfile) {
@@ -86,6 +86,14 @@ public:
 		return DeleteDir(wdir);
 	}
 
+	static bool RemoveFile(const wchar_t* wfile) {
+		return DeleteFileW(wfile);
+	}
+
+	static bool RemoveFile(const char* file) {
+		return DeleteFileA(file);
+	}
+
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
 		std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%ls/*", wpath);
@@ -117,7 +125,7 @@ class FileSystem {
 public:
 	static void SafeFileName(wchar_t* wfile) {
 		while((wfile = std::wcspbrk(wfile, L"/")) != nullptr)
-			*wfile++ = '_';
+			*wfile++ = L'_';
 	}
 
 	static bool IsFileExists(const char* file) {
@@ -174,7 +182,7 @@ public:
 		bool success = true;
 		TraversalDir(dir, [dir, &success](const char *name, bool isdir) {
 			char full_path[1024];
-			int len = std::snprintf(full_path, sizeof full_path, "%s/%s", dir, name);
+			int len = mysnprintf(full_path, "%s/%s", dir, name);
 			if (len < 0 || len >= (int)(sizeof full_path)) {
 				success = false;
 				return;
@@ -195,6 +203,16 @@ public:
 		return success;
 	}
 
+	static bool RemoveFile(const wchar_t* wfile) {
+		char file[1024];
+		BufferIO::EncodeUTF8(wfile, file);
+		return RemoveFile(file);
+	}
+
+	static bool RemoveFile(const char* file) {
+		return unlink(file) == 0;
+	}
+
 	struct file_unit {
 		std::string filename;
 		bool is_dir;
@@ -210,7 +228,7 @@ public:
 		while((dirp = readdir(dir)) != nullptr) {
 			file_unit funit;
 			char fname[1024];
-			int len = std::snprintf(fname, sizeof fname, "%s/%s", path, dirp->d_name);
+			int len = mysnprintf(fname, "%s/%s", path, dirp->d_name);
 			if (len < 0 || len >= (int)(sizeof fname))
 				continue;
 			stat(fname, &fileStat);

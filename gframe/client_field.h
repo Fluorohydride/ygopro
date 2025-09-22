@@ -2,7 +2,7 @@
 #define CLIENT_FIELD_H
 
 #include "config.h"
-#include "../ocgcore/mtrandom.h"
+#include <random>
 #include <vector>
 #include <set>
 #include <map>
@@ -76,26 +76,27 @@ public:
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
-	bool grave_act{ false };
-	bool remove_act{ false };
-	bool deck_act{ false };
-	bool extra_act{ false };
-	bool pzone_act[2]{};
+	bool grave_act[2]{ false };
+	bool remove_act[2]{ false };
+	bool deck_act[2]{ false };
+	bool extra_act[2]{ false };
+	bool pzone_act[2]{ false };
 	bool conti_act{ false };
 	bool chain_forced{ false };
 	ChainInfo current_chain;
 	bool last_chain{ false };
 	bool deck_reversed{ false };
-	bool conti_selecting{ false };
+	bool select_continuous{ false };
 	bool cant_check_grave{ false };
 	bool tag_surrender{ false };
 	bool tag_teammate_surrender{ false };
-	mt19937 rnd;
+	std::mt19937 rnd;
 
 	ClientField();
-	~ClientField();
+	~ClientField() override;
 	void Clear();
-	void Initial(int player, int deckc, int extrac);
+	void Initial(int player, int deckc, int extrac, int sidec = 0);
+	void ResetSequence(std::vector<ClientCard*>& list, bool reset_height);
 	ClientCard* GetCard(int controler, int location, int sequence, int sub_seq = 0);
 	void AddCard(ClientCard* pcard, int controler, int location, int sequence);
 	ClientCard* RemoveCard(int controler, int location, int sequence);
@@ -104,7 +105,7 @@ public:
 	void ClearCommandFlag();
 	void ClearSelect();
 	void ClearChainSelect();
-	void ShowSelectCard(bool buttonok = false, bool chain = false);
+	void ShowSelectCard(bool buttonok = false, bool is_continuous = false);
 	void ShowChainCard();
 	void ShowLocationCard();
 	void ShowSelectOption(int select_hint = 0);
@@ -118,6 +119,7 @@ public:
 	bool ShowSelectSum(bool panelmode);
 	bool CheckSelectSum();
 	bool CheckSelectTribute();
+	void get_sum_params(unsigned int opParam, int& op1, int& op2);
 	bool check_min(const std::set<ClientCard*>& left, std::set<ClientCard*>::const_iterator index, int min, int max);
 	bool check_sel_sum_s(const std::set<ClientCard*>& left, int index, int acc);
 	void check_sel_sum_t(const std::set<ClientCard*>& left, int acc);

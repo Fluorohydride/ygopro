@@ -29,7 +29,8 @@ int DuelClient::last_select_hint = 0;
 unsigned char DuelClient::last_successful_msg[SIZE_NETWORK_BUFFER];
 size_t DuelClient::last_successful_msg_length = 0;
 wchar_t DuelClient::event_string[256];
-mt19937 DuelClient::rnd;
+std::mt19937 DuelClient::rnd;
+std::uniform_real_distribution<float> DuelClient::real_dist;
 
 bool DuelClient::is_refreshing = false;
 int DuelClient::match_kill = 0;
@@ -58,7 +59,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 		return false;
 	}
 	connect_state = 0x1;
-	rnd.reset((uint_fast32_t)std::random_device()());
+	rnd.seed(std::random_device()());
 	if(!create_game) {
 		timeval timeout = {5, 0};
 		event* timeout_event = event_new(client_base, 0, EV_TIMEOUT, ConnectTimeout, 0);
@@ -117,6 +118,15 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 	if (events & BEV_EVENT_CONNECTED) {
 		bool create_game = (intptr_t)ctx;
+		if(!create_game) {
+			uint16_t hostname_buf[LEN_HOSTNAME];
+			auto hostname_len = BufferIO::CopyCharArray(mainGame->ebJoinHost->getText(), hostname_buf);
+			auto hostname_msglen = (hostname_len + 1) * sizeof(uint16_t);
+			char buf[LEN_HOSTNAME * sizeof(uint16_t) + sizeof(uint32_t)];
+			memset(buf, 0, sizeof(uint32_t)); // real_ip
+			memcpy(buf + sizeof(uint32_t), hostname_buf, hostname_msglen);
+			SendBufferToServer(CTOS_EXTERNAL_ADDRESS, buf, hostname_msglen + sizeof(uint32_t));
+		}
 		CTOS_PlayerInfo cspi;
 		BufferIO::CopyCharArray(mainGame->ebNickName->getText(), cspi.name);
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
@@ -239,7 +249,7 @@ int DuelClient::ClientThread() {
 }
 void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 	unsigned char* pdata = data;
-	unsigned char pktType = BufferIO::ReadUInt8(pdata);
+	unsigned char pktType = BufferIO::Read<uint8_t>(pdata);
 	switch(pktType) {
 	case STOC_GAME_MSG: {
 		if (len < 1 + (int)sizeof(unsigned char))
@@ -428,14 +438,14 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		if (len < 1 + (int)sizeof(int16_t) * 6)
 			return;
 		mainGame->gMutex.lock();
-		int deckc = BufferIO::ReadInt16(pdata);
-		int extrac = BufferIO::ReadInt16(pdata);
-		int sidec = BufferIO::ReadInt16(pdata);
-		mainGame->dField.Initial(0, deckc, extrac);
-		deckc = BufferIO::ReadInt16(pdata);
-		extrac = BufferIO::ReadInt16(pdata);
-		sidec = BufferIO::ReadInt16(pdata);
-		mainGame->dField.Initial(1, deckc, extrac);
+		int deckc = BufferIO::Read<uint16_t>(pdata);
+		int extrac = BufferIO::Read<uint16_t>(pdata);
+		int sidec = BufferIO::Read<uint16_t>(pdata);
+		mainGame->dField.Initial(0, deckc, extrac, sidec);
+		deckc = BufferIO::Read<uint16_t>(pdata);
+		extrac = BufferIO::Read<uint16_t>(pdata);
+		sidec = BufferIO::Read<uint16_t>(pdata);
+		mainGame->dField.Initial(1, deckc, extrac, sidec);
 		mainGame->gMutex.unlock();
 		break;
 	}
@@ -500,9 +510,9 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		mainGame->dInfo.time_limit = pkt->info.time_limit;
 		mainGame->dInfo.time_left[0] = 0;
 		mainGame->dInfo.time_left[1] = 0;
-		mainGame->deckBuilder.filterList = deckManager.GetLFListContent(pkt->info.lflist);
+		mainGame->deckBuilder.filterList = deckManager.GetLFList(pkt->info.lflist);
 		if(mainGame->deckBuilder.filterList == nullptr)
-			mainGame->deckBuilder.filterList = &deckManager._lfList[0].content;
+			mainGame->deckBuilder.filterList = &deckManager._lfList[0];
 		mainGame->stHostPrepOB->setText(L"");
 		mainGame->SetStaticText(mainGame->stHostPrepRule, 180, mainGame->guiFont, str.c_str());
 		mainGame->RefreshCategoryDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect);
@@ -714,7 +724,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_REPLAY: {
-		if (len < 1 + (int)sizeof(ReplayHeader))
+		if (len < 1 + (int)sizeof(ExtendedReplayHeader))
 			return;
 		mainGame->gMutex.lock();
 		mainGame->wPhase->setVisible(false);
@@ -725,11 +735,10 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		Replay new_replay;
 		std::memcpy(&new_replay.pheader, prep, sizeof(new_replay.pheader));
 		time_t starttime;
-		if (new_replay.pheader.flag & REPLAY_UNIFORM)
-			starttime = new_replay.pheader.start_time;
+		if (new_replay.pheader.base.flag & REPLAY_UNIFORM)
+			starttime = new_replay.pheader.base.start_time;
 		else
-			starttime = new_replay.pheader.seed;
-		
+			starttime = new_replay.pheader.base.seed;
 		wchar_t timetext[40];
 		std::wcsftime(timetext, sizeof timetext / sizeof timetext[0], L"%Y-%m-%d %H-%M-%S", std::localtime(&starttime));
 		mainGame->ebRSName->setText(timetext);
@@ -750,11 +759,14 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 			mainGame->WaitFrameSignal(30);
 		}
 		if(mainGame->actionParam || !is_host) {
-			prep += sizeof(ReplayHeader);
-			std::memcpy(new_replay.comp_data, prep, len - sizeof(ReplayHeader) - 1);
-			new_replay.comp_size = len - sizeof(ReplayHeader) - 1;
-			if(mainGame->actionParam)
-				new_replay.SaveReplay(mainGame->ebRSName->getText());
+			prep += sizeof new_replay.pheader;
+			std::memcpy(new_replay.comp_data, prep, len - sizeof new_replay.pheader - 1);
+			new_replay.comp_size = len - sizeof new_replay.pheader - 1;
+			if (mainGame->actionParam) {
+				bool save_result = new_replay.SaveReplay(mainGame->ebRSName->getText());
+				if (!save_result)
+					new_replay.SaveReplay(L"_LastReplay");
+			}
 			else
 				new_replay.SaveReplay(L"_LastReplay");
 		}
@@ -774,12 +786,17 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_CHAT: {
-		const int chat_msg_size = len - 1 - sizeof(uint16_t);
-		if (!check_msg_size(chat_msg_size))
+		if (len < 1 + sizeof(uint16_t) + sizeof(uint16_t) * 1)
 			return;
-		uint16_t chat_player_type = buffer_read<uint16_t>(pdata);
+		if (len > 1 + sizeof(uint16_t) + sizeof(uint16_t) * LEN_CHAT_MSG)
+			return;
+		const int chat_msg_size = len - 1 - sizeof(uint16_t);
+		if (chat_msg_size % sizeof(uint16_t))
+			return;
+		uint16_t chat_player_type = BufferIO::Read<uint16_t>(pdata);
 		uint16_t chat_msg[LEN_CHAT_MSG];
-		buffer_read_block(pdata, chat_msg, chat_msg_size);
+		std::memcpy(chat_msg, pdata, chat_msg_size);
+		pdata += chat_msg_size;
 		const int chat_msg_len = chat_msg_size / sizeof(uint16_t);
 		if (chat_msg[chat_msg_len - 1] != 0)
 			return;
@@ -938,7 +955,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	unsigned char* pbuf = msg;
 	wchar_t textBuffer[256];
-	mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
+	mainGame->dInfo.curMsg = BufferIO::Read<uint8_t>(pbuf);
 	if(mainGame->dInfo.curMsg != MSG_RETRY) {
 		std::memcpy(last_successful_msg, msg, len);
 		last_successful_msg_length = len;
@@ -972,7 +989,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	case MSG_RETRY: {
 		if(last_successful_msg_length) {
 			auto p = last_successful_msg;
-			auto last_msg = BufferIO::ReadUInt8(p);
+			auto last_msg = BufferIO::Read<uint8_t>(p);
 			int err_desc = 1421;
 			switch(last_msg) {
 			case MSG_ANNOUNCE_CARD:
@@ -1057,9 +1074,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_HINT: {
-		int type = BufferIO::ReadUInt8(pbuf);
-		int player = BufferIO::ReadUInt8(pbuf);
-		int data = BufferIO::ReadInt32(pbuf);
+		int type = BufferIO::Read<uint8_t>(pbuf);
+		int player = BufferIO::Read<uint8_t>(pbuf);
+		int data = BufferIO::Read<int32_t>(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		switch (type) {
@@ -1099,7 +1116,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			break;
 		}
 		case HINT_RACE: {
-			myswprintf(textBuffer, dataManager.GetSysString(1511), dataManager.FormatRace(data).c_str());
+			const auto& race = dataManager.FormatRace(data);
+			myswprintf(textBuffer, dataManager.GetSysString(1511), race.c_str());
 			mainGame->AddLog(textBuffer);
 			mainGame->gMutex.lock();
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->guiFont, textBuffer);
@@ -1109,7 +1127,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			break;
 		}
 		case HINT_ATTRIB: {
-			myswprintf(textBuffer, dataManager.GetSysString(1511), dataManager.FormatAttribute(data).c_str());
+			const auto& attribute = dataManager.FormatAttribute(data);
+			myswprintf(textBuffer, dataManager.GetSysString(1511), attribute.c_str());
 			mainGame->AddLog(textBuffer);
 			mainGame->gMutex.lock();
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->guiFont, textBuffer);
@@ -1192,8 +1211,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	}
 	case MSG_WIN: {
 		mainGame->dInfo.isFinished = true;
-		int player = BufferIO::ReadUInt8(pbuf);
-		int type = BufferIO::ReadUInt8(pbuf);
+		int player = BufferIO::Read<uint8_t>(pbuf);
+		int type = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->showcarddif = 110;
 		mainGame->showcardp = 0;
 		mainGame->dInfo.vic_string = L"";
@@ -1244,7 +1263,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();
 		mainGame->dInfo.isInDuel = true;
-		int playertype = BufferIO::ReadUInt8(pbuf);
+		int playertype = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dInfo.isFirst =  (playertype & 0xf) ? false : true;
 		if(playertype & 0xf0)
 			mainGame->dInfo.player_type = 7;
@@ -1254,16 +1273,16 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			else
 				mainGame->dInfo.tag_player[0] = true;
 		}
-		mainGame->dInfo.duel_rule = BufferIO::ReadUInt8(pbuf);
-		mainGame->dInfo.lp[mainGame->LocalPlayer(0)] = BufferIO::ReadInt32(pbuf);
-		mainGame->dInfo.lp[mainGame->LocalPlayer(1)] = BufferIO::ReadInt32(pbuf);
+		mainGame->dInfo.duel_rule = BufferIO::Read<uint8_t>(pbuf);
+		mainGame->dInfo.lp[mainGame->LocalPlayer(0)] = BufferIO::Read<int32_t>(pbuf);
+		mainGame->dInfo.lp[mainGame->LocalPlayer(1)] = BufferIO::Read<int32_t>(pbuf);
 		myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
 		myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
-		int deckc = BufferIO::ReadInt16(pbuf);
-		int extrac = BufferIO::ReadInt16(pbuf);
+		int deckc = BufferIO::Read<uint16_t>(pbuf);
+		int extrac = BufferIO::Read<uint16_t>(pbuf);
 		mainGame->dField.Initial(mainGame->LocalPlayer(0), deckc, extrac);
-		deckc = BufferIO::ReadInt16(pbuf);
-		extrac = BufferIO::ReadInt16(pbuf);
+		deckc = BufferIO::Read<uint16_t>(pbuf);
+		extrac = BufferIO::Read<uint16_t>(pbuf);
 		mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
 		mainGame->dInfo.turn = 0;
 		mainGame->dInfo.is_shuffling = false;
@@ -1281,37 +1300,37 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_UPDATE_DATA: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int location = BufferIO::ReadUInt8(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int location = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->gMutex.lock();
 		mainGame->dField.UpdateFieldCard(player, location, pbuf);
 		mainGame->gMutex.unlock();
 		return true;
 	}
 	case MSG_UPDATE_CARD: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int loc = BufferIO::ReadUInt8(pbuf);
-		int seq = BufferIO::ReadUInt8(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int loc = BufferIO::Read<uint8_t>(pbuf);
+		int seq = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->gMutex.lock();
 		mainGame->dField.UpdateCard(player, loc, seq, pbuf);
 		mainGame->gMutex.unlock();
 		break;
 	}
 	case MSG_SELECT_BATTLECMD: {
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
 		int desc, count, con, seq/*, diratt*/;
 		unsigned int code, loc;
 		ClientCard* pcard;
 		mainGame->dField.activatable_cards.clear();
 		mainGame->dField.activatable_descs.clear();
 		mainGame->dField.conti_cards.clear();
-		count = BufferIO::ReadUInt8(pbuf);
+		count = BufferIO::Read<uint8_t>(pbuf);
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::ReadInt32(pbuf);
-			con = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			loc = BufferIO::ReadUInt8(pbuf);
-			seq = BufferIO::ReadUInt8(pbuf);
-			desc = BufferIO::ReadInt32(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			loc = BufferIO::Read<uint8_t>(pbuf);
+			seq = BufferIO::Read<uint8_t>(pbuf);
+			desc = BufferIO::Read<int32_t>(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
 			int flag = 0;
 			if(code & 0x80000000) {
@@ -1320,41 +1339,39 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			}
 			mainGame->dField.activatable_cards.push_back(pcard);
 			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, flag));
-			if(flag == EDESC_OPERATION) {
+			if(flag & EDESC_OPERATION) {
 				pcard->chain_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.conti_act = true;
 			} else {
 				pcard->cmdFlag |= COMMAND_ACTIVATE;
-				if(pcard->controler == 0) {
-					if(pcard->location == LOCATION_GRAVE)
-						mainGame->dField.grave_act = true;
-					else if(pcard->location == LOCATION_REMOVED)
-						mainGame->dField.remove_act = true;
-					else if(pcard->location == LOCATION_EXTRA)
-						mainGame->dField.extra_act = true;
-				}
+				if(pcard->location == LOCATION_GRAVE)
+					mainGame->dField.grave_act[con] = true;
+				else if(pcard->location == LOCATION_REMOVED)
+					mainGame->dField.remove_act[con] = true;
+				else if(pcard->location == LOCATION_EXTRA)
+					mainGame->dField.extra_act[con] = true;
 			}
 		}
 		mainGame->dField.attackable_cards.clear();
-		count = BufferIO::ReadUInt8(pbuf);
+		count = BufferIO::Read<uint8_t>(pbuf);
 		for (int i = 0; i < count; ++i) {
-			/*code = */BufferIO::ReadInt32(pbuf);
-			con = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			loc = BufferIO::ReadUInt8(pbuf);
-			seq = BufferIO::ReadUInt8(pbuf);
-			/*diratt = */BufferIO::ReadUInt8(pbuf);
+			/*code = */BufferIO::Read<int32_t>(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			loc = BufferIO::Read<uint8_t>(pbuf);
+			seq = BufferIO::Read<uint8_t>(pbuf);
+			/*diratt = */BufferIO::Read<uint8_t>(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
 			mainGame->dField.attackable_cards.push_back(pcard);
 			pcard->cmdFlag |= COMMAND_ATTACK;
 		}
 		mainGame->gMutex.lock();
-		if(BufferIO::ReadUInt8(pbuf)) {
+		if(BufferIO::Read<uint8_t>(pbuf)) {
 			mainGame->btnM2->setVisible(true);
 			mainGame->btnM2->setEnabled(true);
 			mainGame->btnM2->setPressed(false);
 		}
-		if(BufferIO::ReadUInt8(pbuf)) {
+		if(BufferIO::Read<uint8_t>(pbuf)) {
 			mainGame->btnEP->setVisible(true);
 			mainGame->btnEP->setEnabled(true);
 			mainGame->btnEP->setPressed(false);
@@ -1363,75 +1380,75 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_SELECT_IDLECMD: {
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
 		int desc, count, con, seq;
 		unsigned int code, loc;
 		ClientCard* pcard;
 		mainGame->dField.summonable_cards.clear();
-		count = BufferIO::ReadUInt8(pbuf);
+		count = BufferIO::Read<uint8_t>(pbuf);
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::ReadInt32(pbuf);
-			con = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			loc = BufferIO::ReadUInt8(pbuf);
-			seq = BufferIO::ReadUInt8(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			loc = BufferIO::Read<uint8_t>(pbuf);
+			seq = BufferIO::Read<uint8_t>(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
 			mainGame->dField.summonable_cards.push_back(pcard);
 			pcard->cmdFlag |= COMMAND_SUMMON;
 		}
 		mainGame->dField.spsummonable_cards.clear();
-		count = BufferIO::ReadUInt8(pbuf);
+		count = BufferIO::Read<uint8_t>(pbuf);
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::ReadInt32(pbuf);
-			con = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			loc = BufferIO::ReadUInt8(pbuf);
-			seq = BufferIO::ReadUInt8(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			loc = BufferIO::Read<uint8_t>(pbuf);
+			seq = BufferIO::Read<uint8_t>(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
 			mainGame->dField.spsummonable_cards.push_back(pcard);
 			pcard->cmdFlag |= COMMAND_SPSUMMON;
 			if (pcard->location == LOCATION_DECK) {
 				pcard->SetCode(code);
-				mainGame->dField.deck_act = true;
+				mainGame->dField.deck_act[con] = true;
 			} else if (pcard->location == LOCATION_GRAVE)
-				mainGame->dField.grave_act = true;
+				mainGame->dField.grave_act[con] = true;
 			else if (pcard->location == LOCATION_REMOVED)
-				mainGame->dField.remove_act = true;
+				mainGame->dField.remove_act[con] = true;
 			else if (pcard->location == LOCATION_EXTRA)
-				mainGame->dField.extra_act = true;
+				mainGame->dField.extra_act[con] = true;
 			else {
 				int left_seq = mainGame->dInfo.duel_rule >= 4 ? 0 : 6;
 				if (pcard->location == LOCATION_SZONE && pcard->sequence == left_seq && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget)
-					mainGame->dField.pzone_act[pcard->controler] = true;
+					mainGame->dField.pzone_act[con] = true;
 			}
 		}
 		mainGame->dField.reposable_cards.clear();
-		count = BufferIO::ReadUInt8(pbuf);
+		count = BufferIO::Read<uint8_t>(pbuf);
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::ReadInt32(pbuf);
-			con = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			loc = BufferIO::ReadUInt8(pbuf);
-			seq = BufferIO::ReadUInt8(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			loc = BufferIO::Read<uint8_t>(pbuf);
+			seq = BufferIO::Read<uint8_t>(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
 			mainGame->dField.reposable_cards.push_back(pcard);
 			pcard->cmdFlag |= COMMAND_REPOS;
 		}
 		mainGame->dField.msetable_cards.clear();
-		count = BufferIO::ReadUInt8(pbuf);
+		count = BufferIO::Read<uint8_t>(pbuf);
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::ReadInt32(pbuf);
-			con = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			loc = BufferIO::ReadUInt8(pbuf);
-			seq = BufferIO::ReadUInt8(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			loc = BufferIO::Read<uint8_t>(pbuf);
+			seq = BufferIO::Read<uint8_t>(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
 			mainGame->dField.msetable_cards.push_back(pcard);
 			pcard->cmdFlag |= COMMAND_MSET;
 		}
 		mainGame->dField.ssetable_cards.clear();
-		count = BufferIO::ReadUInt8(pbuf);
+		count = BufferIO::Read<uint8_t>(pbuf);
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::ReadInt32(pbuf);
-			con = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			loc = BufferIO::ReadUInt8(pbuf);
-			seq = BufferIO::ReadUInt8(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			loc = BufferIO::Read<uint8_t>(pbuf);
+			seq = BufferIO::Read<uint8_t>(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
 			mainGame->dField.ssetable_cards.push_back(pcard);
 			pcard->cmdFlag |= COMMAND_SSET;
@@ -1439,13 +1456,13 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		mainGame->dField.activatable_cards.clear();
 		mainGame->dField.activatable_descs.clear();
 		mainGame->dField.conti_cards.clear();
-		count = BufferIO::ReadUInt8(pbuf);
+		count = BufferIO::Read<uint8_t>(pbuf);
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::ReadInt32(pbuf);
-			con = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			loc = BufferIO::ReadUInt8(pbuf);
-			seq = BufferIO::ReadUInt8(pbuf);
-			desc = BufferIO::ReadInt32(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			loc = BufferIO::Read<uint8_t>(pbuf);
+			seq = BufferIO::Read<uint8_t>(pbuf);
+			desc = BufferIO::Read<int32_t>(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
 			int flag = 0;
 			if(code & 0x80000000) {
@@ -1454,33 +1471,31 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			}
 			mainGame->dField.activatable_cards.push_back(pcard);
 			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, flag));
-			if(flag == EDESC_OPERATION) {
+			if(flag & EDESC_OPERATION) {
 				pcard->chain_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.conti_act = true;
 			} else {
 				pcard->cmdFlag |= COMMAND_ACTIVATE;
-				if(pcard->controler == 0) {
-					if(pcard->location == LOCATION_GRAVE)
-						mainGame->dField.grave_act = true;
-					else if(pcard->location == LOCATION_REMOVED)
-						mainGame->dField.remove_act = true;
-					else if(pcard->location == LOCATION_EXTRA)
-						mainGame->dField.extra_act = true;
-				}
+				if(pcard->location == LOCATION_GRAVE)
+					mainGame->dField.grave_act[con] = true;
+				else if(pcard->location == LOCATION_REMOVED)
+					mainGame->dField.remove_act[con] = true;
+				else if(pcard->location == LOCATION_EXTRA)
+					mainGame->dField.extra_act[con] = true;
 			}
 		}
-		if(BufferIO::ReadUInt8(pbuf)) {
+		if(BufferIO::Read<uint8_t>(pbuf)) {
 			mainGame->btnBP->setVisible(true);
 			mainGame->btnBP->setEnabled(true);
 			mainGame->btnBP->setPressed(false);
 		}
-		if(BufferIO::ReadUInt8(pbuf)) {
+		if(BufferIO::Read<uint8_t>(pbuf)) {
 			mainGame->btnEP->setVisible(true);
 			mainGame->btnEP->setEnabled(true);
 			mainGame->btnEP->setPressed(false);
 		}
-		if (BufferIO::ReadUInt8(pbuf)) {
+		if (BufferIO::Read<uint8_t>(pbuf)) {
 			mainGame->btnShuffle->setVisible(true);
 		} else {
 			mainGame->btnShuffle->setVisible(false);
@@ -1488,20 +1503,20 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_SELECT_EFFECTYN: {
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
-		unsigned int code = BufferIO::ReadInt32(pbuf);
-		int c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l = BufferIO::ReadUInt8(pbuf);
-		int s = BufferIO::ReadUInt8(pbuf);
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
+		unsigned int code = BufferIO::Read<int32_t>(pbuf);
+		int c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l = BufferIO::Read<uint8_t>(pbuf);
+		int s = BufferIO::Read<uint8_t>(pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
 		if (pcard->code != code)
 			pcard->SetCode(code);
-		BufferIO::ReadUInt8(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
 		if(l != LOCATION_DECK) {
 			pcard->is_highlighting = true;
 			mainGame->dField.highlighting_card = pcard;
 		}
-		int desc = BufferIO::ReadInt32(pbuf);
+		int desc = BufferIO::Read<int32_t>(pbuf);
 		if(desc == 0) {
 			wchar_t ynbuf[256];
 			myswprintf(ynbuf, dataManager.GetSysString(200), dataManager.FormatLocation(l, s), dataManager.GetName(code));
@@ -1522,8 +1537,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_SELECT_YESNO: {
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
-		int desc = BufferIO::ReadInt32(pbuf);
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
+		int desc = BufferIO::Read<int32_t>(pbuf);
 		mainGame->dField.highlighting_card = 0;
 		mainGame->gMutex.lock();
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetDesc(desc));
@@ -1532,21 +1547,21 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_SELECT_OPTION: {
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadUInt8(pbuf);
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.select_options.clear();
 		for (int i = 0; i < count; ++i)
-			mainGame->dField.select_options.push_back(BufferIO::ReadInt32(pbuf));
+			mainGame->dField.select_options.push_back(BufferIO::Read<int32_t>(pbuf));
 		mainGame->dField.ShowSelectOption(select_hint);
 		select_hint = 0;
 		return false;
 	}
 	case MSG_SELECT_CARD: {
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.select_cancelable = BufferIO::ReadUInt8(pbuf) != 0;
-		mainGame->dField.select_min = BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.select_max = BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadUInt8(pbuf);
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
+		mainGame->dField.select_cancelable = BufferIO::Read<uint8_t>(pbuf) != 0;
+		mainGame->dField.select_min = BufferIO::Read<uint8_t>(pbuf);
+		mainGame->dField.select_max = BufferIO::Read<uint8_t>(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.selectable_cards.clear();
 		mainGame->dField.selected_cards.clear();
 		int c, s, ss;
@@ -1559,11 +1574,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		mainGame->dField.select_ready = select_ready;
 		ClientCard* pcard;
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::ReadInt32(pbuf);
-			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			l = BufferIO::ReadUInt8(pbuf);
-			s = BufferIO::ReadUInt8(pbuf);
-			ss = BufferIO::ReadUInt8(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			l = BufferIO::Read<uint8_t>(pbuf);
+			s = BufferIO::Read<uint8_t>(pbuf);
+			ss = BufferIO::Read<uint8_t>(pbuf);
 			if (l & LOCATION_OVERLAY)
 				pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
 			else
@@ -1606,13 +1621,13 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_SELECT_UNSELECT_CARD: {
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
-		bool finishable = BufferIO::ReadUInt8(pbuf) != 0;
-		bool cancelable = BufferIO::ReadUInt8(pbuf) != 0;
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
+		bool finishable = BufferIO::Read<uint8_t>(pbuf) != 0;
+		bool cancelable = BufferIO::Read<uint8_t>(pbuf) != 0;
 		mainGame->dField.select_cancelable = finishable || cancelable;
-		mainGame->dField.select_min = BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.select_max = BufferIO::ReadUInt8(pbuf);
-		int count1 = BufferIO::ReadUInt8(pbuf);
+		mainGame->dField.select_min = BufferIO::Read<uint8_t>(pbuf);
+		mainGame->dField.select_max = BufferIO::Read<uint8_t>(pbuf);
+		int count1 = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.selectable_cards.clear();
 		mainGame->dField.selected_cards.clear();
 		int c, s, ss;
@@ -1624,11 +1639,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		mainGame->dField.select_ready = false;
 		ClientCard* pcard;
 		for (int i = 0; i < count1; ++i) {
-			code = (unsigned int)BufferIO::ReadInt32(pbuf);
-			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			l = BufferIO::ReadUInt8(pbuf);
-			s = BufferIO::ReadUInt8(pbuf);
-			ss = BufferIO::ReadUInt8(pbuf);
+			code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			l = BufferIO::Read<uint8_t>(pbuf);
+			s = BufferIO::Read<uint8_t>(pbuf);
+			ss = BufferIO::Read<uint8_t>(pbuf);
 			if (l & LOCATION_OVERLAY)
 				pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
 			else
@@ -1646,13 +1661,13 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 					panelmode = true;
 			}
 		}
-		int count2 = BufferIO::ReadUInt8(pbuf);
+		int count2 = BufferIO::Read<uint8_t>(pbuf);
 		for (int i = count1; i < count1 + count2; ++i) {
-			code = (unsigned int)BufferIO::ReadInt32(pbuf);
-			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			l = BufferIO::ReadUInt8(pbuf);
-			s = BufferIO::ReadUInt8(pbuf);
-			ss = BufferIO::ReadUInt8(pbuf);
+			code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			l = BufferIO::Read<uint8_t>(pbuf);
+			s = BufferIO::Read<uint8_t>(pbuf);
+			ss = BufferIO::Read<uint8_t>(pbuf);
 			if (l & LOCATION_OVERLAY)
 				pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
 			else
@@ -1701,69 +1716,79 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_SELECT_CHAIN: {
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadUInt8(pbuf);
-		int specount = BufferIO::ReadUInt8(pbuf);
-		int forced = BufferIO::ReadUInt8(pbuf);
-		/*int hint0 = */BufferIO::ReadInt32(pbuf);
-		/*int hint1 = */BufferIO::ReadInt32(pbuf);
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
+		int specount = BufferIO::Read<uint8_t>(pbuf);
+		/*int hint0 = */BufferIO::Read<int32_t>(pbuf);
+		/*int hint1 = */BufferIO::Read<int32_t>(pbuf);
 		int c, s, ss, desc;
 		unsigned int code,l;
 		ClientCard* pcard;
 		bool panelmode = false;
 		bool conti_exist = false;
 		bool select_trigger = (specount == 0x7f);
-		mainGame->dField.chain_forced = (forced != 0);
+		mainGame->dField.chain_forced = false;
 		mainGame->dField.activatable_cards.clear();
 		mainGame->dField.activatable_descs.clear();
 		mainGame->dField.conti_cards.clear();
 		for (int i = 0; i < count; ++i) {
-			int flag = BufferIO::ReadUInt8(pbuf);
-			code = BufferIO::ReadInt32(pbuf);
-			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			l = BufferIO::ReadUInt8(pbuf);
-			s = BufferIO::ReadUInt8(pbuf);
-			ss = BufferIO::ReadUInt8(pbuf);
-			desc = BufferIO::ReadInt32(pbuf);
+			int flag = BufferIO::Read<uint8_t>(pbuf);
+			int forced = BufferIO::Read<uint8_t>(pbuf);
+			flag |= forced << 8;
+			code = BufferIO::Read<int32_t>(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			l = BufferIO::Read<uint8_t>(pbuf);
+			s = BufferIO::Read<uint8_t>(pbuf);
+			ss = BufferIO::Read<uint8_t>(pbuf);
+			desc = BufferIO::Read<int32_t>(pbuf);
 			pcard = mainGame->dField.GetCard(c, l, s, ss);
 			mainGame->dField.activatable_cards.push_back(pcard);
 			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, flag));
 			pcard->is_selected = false;
-			if(flag == EDESC_OPERATION) {
+			if(forced) {
+				mainGame->dField.chain_forced = true;
+			}
+			if(flag & EDESC_OPERATION) {
 				pcard->chain_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.conti_act = true;
 				conti_exist = true;
 			} else {
 				pcard->is_selectable = true;
-				if(flag == EDESC_RESET)
+				if(flag & EDESC_RESET)
 					pcard->cmdFlag |= COMMAND_RESET;
 				else
 					pcard->cmdFlag |= COMMAND_ACTIVATE;
 				if(pcard->location == LOCATION_DECK) {
 					pcard->SetCode(code);
-					mainGame->dField.deck_act = true;
+					mainGame->dField.deck_act[c] = true;
 				} else if(l == LOCATION_GRAVE)
-					mainGame->dField.grave_act = true;
+					mainGame->dField.grave_act[c] = true;
 				else if(l == LOCATION_REMOVED)
-					mainGame->dField.remove_act = true;
+					mainGame->dField.remove_act[c] = true;
 				else if(l == LOCATION_EXTRA)
-					mainGame->dField.extra_act = true;
+					mainGame->dField.extra_act[c] = true;
 				else if(l == LOCATION_OVERLAY)
 					panelmode = true;
 			}
 		}
-		if(!select_trigger && !forced && (mainGame->ignore_chain || ((count == 0 || specount == 0) && !mainGame->always_chain)) && (count == 0 || !mainGame->chain_when_avail)) {
+		if(!select_trigger && !mainGame->dField.chain_forced && (mainGame->ignore_chain || ((count == 0 || specount == 0) && !mainGame->always_chain)) && (count == 0 || !mainGame->chain_when_avail)) {
 			SetResponseI(-1);
 			mainGame->dField.ClearChainSelect();
 			if(mainGame->chkWaitChain->isChecked() && !mainGame->ignore_chain) {
-				mainGame->WaitFrameSignal(rnd.get_random_integer(20, 40));
+				mainGame->WaitFrameSignal(std::uniform_int_distribution<>(20, 40)(rnd));
 			}
 			DuelClient::SendResponse();
 			return true;
 		}
-		if(mainGame->chkAutoChain->isChecked() && forced && !(mainGame->always_chain || mainGame->chain_when_avail)) {
-			SetResponseI(0);
+		if(mainGame->chkAutoChain->isChecked() && mainGame->dField.chain_forced && !(mainGame->always_chain || mainGame->chain_when_avail)) {
+			for(size_t i = 0; i < mainGame->dField.activatable_descs.size();++i) {
+				auto it = mainGame->dField.activatable_descs[i];
+				if(it.second >> 8) {
+					SetResponseI((int)i);
+					break;
+				}
+			}
 			mainGame->dField.ClearChainSelect();
 			DuelClient::SendResponse();
 			return true;
@@ -1782,7 +1807,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			mainGame->dField.selectable_cards.erase(eit, mainGame->dField.selectable_cards.end());
 			mainGame->dField.ShowChainCard();
 		} else {
-			if(!forced) {
+			if(!mainGame->dField.chain_forced) {
 				if(count == 0)
 					myswprintf(textBuffer, L"%ls\n%ls", dataManager.GetSysString(201), dataManager.GetSysString(202));
 				else if(select_trigger)
@@ -1798,12 +1823,12 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	}
 	case MSG_SELECT_PLACE:
 	case MSG_SELECT_DISFIELD: {
-		int selecting_player = BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadUInt8(pbuf);
+		int selecting_player = BufferIO::Read<uint8_t>(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.select_min = count > 0 ? count : 1;
 		mainGame->dField.select_ready = false;
 		mainGame->dField.select_cancelable = count == 0;
-		mainGame->dField.selectable_field = ~BufferIO::ReadInt32(pbuf);
+		mainGame->dField.selectable_field = ~BufferIO::Read<int32_t>(pbuf);
 		if(selecting_player == mainGame->LocalPlayer(1))
 			mainGame->dField.selectable_field = (mainGame->dField.selectable_field >> 16) | (mainGame->dField.selectable_field << 16);
 		mainGame->dField.selected_field = 0;
@@ -1856,9 +1881,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			}
 			if(!pzone) {
 				if(mainGame->chkRandomPos->isChecked()) {
+					std::uniform_int_distribution<> dist(0, 6);
 					do {
-						respbuf[2] = rnd.get_random_integer(0, 6);
-					} while(!(filter & (1 << respbuf[2])));
+						respbuf[2] = dist(rnd);
+					} while(!(filter & (0x1U << respbuf[2])));
 				} else {
 					if (filter & 0x40) respbuf[2] = 6;
 					else if (filter & 0x20) respbuf[2] = 5;
@@ -1883,9 +1909,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_SELECT_POSITION: {
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
-		unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
-		unsigned int positions = BufferIO::ReadUInt8(pbuf);
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
+		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
+		unsigned int positions = BufferIO::Read<uint8_t>(pbuf);
 		if (positions == 0x1 || positions == 0x2 || positions == 0x4 || positions == 0x8) {
 			SetResponseI(positions);
 			return true;
@@ -1900,23 +1926,23 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		else startpos = 155;
 		if(positions & 0x1) {
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSAU, code));
-			mainGame->btnPSAU->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSAU->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSAU->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSAU->setVisible(false);
 		if(positions & 0x2) {
-			mainGame->btnPSAD->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSAD->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSAD->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSAD->setVisible(false);
 		if(positions & 0x4) {
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSDU, code));
-			mainGame->btnPSDU->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSDU->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSDU->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSDU->setVisible(false);
 		if(positions & 0x8) {
-			mainGame->btnPSDD->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSDD->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSDD->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSDD->setVisible(false);
@@ -1926,11 +1952,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_SELECT_TRIBUTE: {
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.select_cancelable = BufferIO::ReadUInt8(pbuf) != 0;
-		mainGame->dField.select_min = BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.select_max = BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadUInt8(pbuf);
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
+		mainGame->dField.select_cancelable = BufferIO::Read<uint8_t>(pbuf) != 0;
+		mainGame->dField.select_min = BufferIO::Read<uint8_t>(pbuf);
+		mainGame->dField.select_max = BufferIO::Read<uint8_t>(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.selectable_cards.clear();
 		mainGame->dField.selected_cards.clear();
 		mainGame->dField.selectsum_all.clear();
@@ -1941,11 +1967,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		ClientCard* pcard;
 		mainGame->dField.select_ready = false;
 		for (int i = 0; i < count; ++i) {
-			code = (unsigned int)BufferIO::ReadInt32(pbuf);
-			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			l = BufferIO::ReadUInt8(pbuf);
-			s = BufferIO::ReadUInt8(pbuf);
-			t = BufferIO::ReadUInt8(pbuf);
+			code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			l = BufferIO::Read<uint8_t>(pbuf);
+			s = BufferIO::Read<uint8_t>(pbuf);
+			t = BufferIO::Read<uint8_t>(pbuf);
 			pcard = mainGame->dField.GetCard(c, l, s);
 			if (code && pcard->code != code)
 				pcard->SetCode(code);
@@ -1971,20 +1997,20 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_SELECT_COUNTER: {
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.select_counter_type = BufferIO::ReadInt16(pbuf);
-		mainGame->dField.select_counter_count = BufferIO::ReadInt16(pbuf);
-		int count = BufferIO::ReadUInt8(pbuf);
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
+		mainGame->dField.select_counter_type = BufferIO::Read<uint16_t>(pbuf);
+		mainGame->dField.select_counter_count = BufferIO::Read<uint16_t>(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.selectable_cards.clear();
 		int c, s, t/*, code*/;
 		unsigned int l;
 		ClientCard* pcard;
 		for (int i = 0; i < count; ++i) {
-			/*code = */BufferIO::ReadInt32(pbuf);
-			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			l = BufferIO::ReadUInt8(pbuf);
-			s = BufferIO::ReadUInt8(pbuf);
-			t = BufferIO::ReadInt16(pbuf);
+			/*code = */BufferIO::Read<int32_t>(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			l = BufferIO::Read<uint8_t>(pbuf);
+			s = BufferIO::Read<uint8_t>(pbuf);
+			t = BufferIO::Read<uint16_t>(pbuf);
 			pcard = mainGame->dField.GetCard(c, l, s);
 			mainGame->dField.selectable_cards.push_back(pcard);
 			pcard->opParam = (t << 16) | t;
@@ -1998,38 +2024,38 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_SELECT_SUM: {
-		mainGame->dField.select_mode = BufferIO::ReadUInt8(pbuf);
-		/*int selecting_player = */BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.select_sumval = BufferIO::ReadInt32(pbuf);
-		mainGame->dField.select_min = BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.select_max = BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.must_select_count = BufferIO::ReadUInt8(pbuf);
+		mainGame->dField.select_mode = BufferIO::Read<uint8_t>(pbuf);
+		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
+		mainGame->dField.select_sumval = BufferIO::Read<int32_t>(pbuf);
+		mainGame->dField.select_min = BufferIO::Read<uint8_t>(pbuf);
+		mainGame->dField.select_max = BufferIO::Read<uint8_t>(pbuf);
+		mainGame->dField.must_select_count = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.selectsum_all.clear();
 		mainGame->dField.selected_cards.clear();
 		mainGame->dField.selectsum_cards.clear();
 		mainGame->dField.select_panalmode = false;
 		for (int i = 0; i < mainGame->dField.must_select_count; ++i) {
-			unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
-			int c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			unsigned int l = BufferIO::ReadUInt8(pbuf);
-			int s = BufferIO::ReadUInt8(pbuf);
+			unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
+			int c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			unsigned int l = BufferIO::Read<uint8_t>(pbuf);
+			int s = BufferIO::Read<uint8_t>(pbuf);
 			ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
 			if (code != 0 && pcard->code != code)
 				pcard->SetCode(code);
-			pcard->opParam = BufferIO::ReadInt32(pbuf);
+			pcard->opParam = BufferIO::Read<int32_t>(pbuf);
 			pcard->select_seq = 0;
 			mainGame->dField.selected_cards.push_back(pcard);
 		}
-		int count = BufferIO::ReadUInt8(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		for (int i = 0; i < count; ++i) {
-			unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
-			int c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			unsigned int l = BufferIO::ReadUInt8(pbuf);
-			int s = BufferIO::ReadUInt8(pbuf);
+			unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
+			int c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			unsigned int l = BufferIO::Read<uint8_t>(pbuf);
+			int s = BufferIO::Read<uint8_t>(pbuf);
 			ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
 			if (code != 0 && pcard->code != code)
 				pcard->SetCode(code);
-			pcard->opParam = BufferIO::ReadInt32(pbuf);
+			pcard->opParam = BufferIO::Read<int32_t>(pbuf);
 			pcard->select_seq = i;
 			mainGame->dField.selectsum_all.push_back(pcard);
 			if ((l & 0xe) == 0)
@@ -2041,8 +2067,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return mainGame->dField.ShowSelectSum(mainGame->dField.select_panalmode);
 	}
 	case MSG_SORT_CARD: {
-		/*int player = */BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadUInt8(pbuf);
+		/*int player = */BufferIO::Read<uint8_t>(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.selectable_cards.clear();
 		mainGame->dField.selected_cards.clear();
 		mainGame->dField.sort_list.clear();
@@ -2050,10 +2076,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		unsigned int code, l;
 		ClientCard* pcard;
 		for (int i = 0; i < count; ++i) {
-			code = (unsigned int)BufferIO::ReadInt32(pbuf);
-			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			l = BufferIO::ReadUInt8(pbuf);
-			s = BufferIO::ReadUInt8(pbuf);
+			code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			l = BufferIO::Read<uint8_t>(pbuf);
+			s = BufferIO::Read<uint8_t>(pbuf);
 			pcard = mainGame->dField.GetCard(c, l, s);
 			if (code != 0 && pcard->code != code)
 				pcard->SetCode(code);
@@ -2067,13 +2093,13 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_CONFIRM_DECKTOP: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int count = BufferIO::ReadUInt8(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		unsigned int code;
 		ClientCard* pcard;
 		mainGame->dField.selectable_cards.clear();
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::ReadInt32(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
 			pbuf += 3;
 			pcard = *(mainGame->dField.deck[player].rbegin() + i);
 			if (code != 0)
@@ -2105,13 +2131,13 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_CONFIRM_EXTRATOP: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int count = BufferIO::ReadUInt8(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		unsigned int code;
 		ClientCard* pcard;
 		mainGame->dField.selectable_cards.clear();
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::ReadInt32(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
 			pbuf += 3;
 			pcard = *(mainGame->dField.extra[player].rbegin() + i + mainGame->dField.extra_p_count[player]);
 			if (code != 0)
@@ -2142,8 +2168,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_CONFIRM_CARDS: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int count = BufferIO::ReadUInt8(pbuf);
+		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int skip_panel = BufferIO::Read<uint8_t>(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		int c, s;
 		unsigned int code, l;
 		std::vector<ClientCard*> field_confirm;
@@ -2157,10 +2184,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		myswprintf(textBuffer, dataManager.GetSysString(208), count);
 		mainGame->AddLog(textBuffer);
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::ReadInt32(pbuf);
-			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			l = BufferIO::ReadUInt8(pbuf);
-			s = BufferIO::ReadUInt8(pbuf);
+			code = BufferIO::Read<int32_t>(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			l = BufferIO::Read<uint8_t>(pbuf);
+			s = BufferIO::Read<uint8_t>(pbuf);
 			pcard = mainGame->dField.GetCard(c, l, s);
 			if (code != 0)
 				pcard->SetCode(code);
@@ -2229,7 +2256,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			}
 			mainGame->WaitFrameSignal(5);
 		}
-		if (panel_confirm.size() && mainGame->dInfo.player_type != 7) {
+		if (!skip_panel && panel_confirm.size() && mainGame->dInfo.player_type != 7) {
 			std::sort(panel_confirm.begin(), panel_confirm.end(), ClientCard::client_card_sort);
 			mainGame->gMutex.lock();
 			mainGame->dField.selectable_cards = panel_confirm;
@@ -2243,7 +2270,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_SHUFFLE_DECK: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		if(mainGame->dField.deck[player].size() < 2)
 			return true;
 		bool rev = mainGame->dField.deck_reversed;
@@ -2263,7 +2290,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			soundManager.PlaySoundEffect(SOUND_SHUFFLE);
 			for (int i = 0; i < 5; ++i) {
 				for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-					(*cit)->dPos = irr::core::vector3df(rnd.rand() * 0.4f / rnd.rand_max - 0.2f, 0, 0);
+					(*cit)->dPos = irr::core::vector3df(real_dist(rnd) * 0.4f - 0.2f, 0, 0);
 					(*cit)->dRot = irr::core::vector3df(0, 0, 0);
 					(*cit)->is_moving = true;
 					(*cit)->aniFrame = 3;
@@ -2282,8 +2309,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_SHUFFLE_HAND: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int count = BufferIO::ReadUInt8(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 			if(count > 1)
 				soundManager.PlaySoundEffect(SOUND_SHUFFLE);
@@ -2312,7 +2339,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			mainGame->WaitFrameSignal(11);
 		}
 		for(auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
-			(*cit)->SetCode(BufferIO::ReadInt32(pbuf));
+			(*cit)->SetCode(BufferIO::Read<int32_t>(pbuf));
 			(*cit)->desc_hints.clear();
 		}
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
@@ -2325,8 +2352,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_SHUFFLE_EXTRA: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int count = BufferIO::ReadUInt8(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		if((mainGame->dField.extra[player].size() - mainGame->dField.extra_p_count[player]) < 2)
 			return true;
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
@@ -2335,7 +2362,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			for (int i = 0; i < 5; ++i) {
 				for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 					if(!((*cit)->position & POS_FACEUP)) {
-						(*cit)->dPos = irr::core::vector3df(rnd.rand() * 0.4f / rnd.rand_max - 0.2f, 0, 0);
+						(*cit)->dPos = irr::core::vector3df(real_dist(rnd) * 0.4f - 0.2f, 0, 0);
 						(*cit)->dRot = irr::core::vector3df(0, 0, 0);
 						(*cit)->is_moving = true;
 						(*cit)->aniFrame = 3;
@@ -2350,15 +2377,15 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		}
 		for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit)
 			if(!((*cit)->position & POS_FACEUP))
-				(*cit)->SetCode(BufferIO::ReadInt32(pbuf));
+				(*cit)->SetCode(BufferIO::Read<int32_t>(pbuf));
 		return true;
 	}
 	case MSG_REFRESH_DECK: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
+		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		return true;
 	}
 	case MSG_SWAP_GRAVE_DECK: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
 			for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit)
@@ -2412,9 +2439,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_DECK_TOP: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int seq = BufferIO::ReadUInt8(pbuf);
-		unsigned int code = BufferIO::ReadInt32(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int seq = BufferIO::Read<uint8_t>(pbuf);
+		unsigned int code = BufferIO::Read<int32_t>(pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - seq);
 		pcard->SetCode(code & 0x7fffffff);
 		bool rev = (code & 0x80000000) != 0;
@@ -2426,8 +2453,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	}
 	case MSG_SHUFFLE_SET_CARD: {
 		std::vector<ClientCard*>* lst = 0;
-		unsigned int loc = BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadUInt8(pbuf);
+		unsigned int loc = BufferIO::Read<uint8_t>(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		if(loc == LOCATION_MZONE)
 			lst = mainGame->dField.mzone;
 		else
@@ -2437,10 +2464,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		int c, s, ps;
 		unsigned int l;
 		for (int i = 0; i < count; ++i) {
-			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			l = BufferIO::ReadUInt8(pbuf);
-			s = BufferIO::ReadUInt8(pbuf);
-			BufferIO::ReadUInt8(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			l = BufferIO::Read<uint8_t>(pbuf);
+			s = BufferIO::Read<uint8_t>(pbuf);
+			BufferIO::Read<uint8_t>(pbuf);
 			mc[i] = lst[c][s];
 			mc[i]->SetCode(0);
 			if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
@@ -2453,10 +2480,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
 			mainGame->WaitFrameSignal(20);
 		for (int i = 0; i < count; ++i) {
-			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			l = BufferIO::ReadUInt8(pbuf);
-			s = BufferIO::ReadUInt8(pbuf);
-			BufferIO::ReadUInt8(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			l = BufferIO::Read<uint8_t>(pbuf);
+			s = BufferIO::Read<uint8_t>(pbuf);
+			BufferIO::Read<uint8_t>(pbuf);
 			ps = mc[i]->sequence;
 			if (l > 0) {
 				swp = lst[c][s];
@@ -2478,7 +2505,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_NEW_TURN: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		mainGame->dInfo.turn++;
 		if(!mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
 			mainGame->dField.tag_surrender = false;
@@ -2518,7 +2545,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_NEW_PHASE: {
-		unsigned short phase = BufferIO::ReadInt16(pbuf);
+		unsigned short phase = BufferIO::Read<uint16_t>(pbuf);
 		mainGame->btnPhaseStatus->setVisible(false);
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
@@ -2563,16 +2590,16 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_MOVE: {
-		unsigned int code = BufferIO::ReadInt32(pbuf);
-		int pc = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int pl = BufferIO::ReadUInt8(pbuf);
-		int ps = BufferIO::ReadUInt8(pbuf);
-		unsigned int pp = BufferIO::ReadUInt8(pbuf);
-		int cc = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int cl = BufferIO::ReadUInt8(pbuf);
-		int cs = BufferIO::ReadUInt8(pbuf);
-		unsigned int cp = BufferIO::ReadUInt8(pbuf);
-		int reason = BufferIO::ReadInt32(pbuf);
+		unsigned int code = BufferIO::Read<int32_t>(pbuf);
+		int pc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int pl = BufferIO::Read<uint8_t>(pbuf);
+		int ps = BufferIO::Read<uint8_t>(pbuf);
+		unsigned int pp = BufferIO::Read<uint8_t>(pbuf);
+		int cc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int cl = BufferIO::Read<uint8_t>(pbuf);
+		int cs = BufferIO::Read<uint8_t>(pbuf);
+		unsigned int cp = BufferIO::Read<uint8_t>(pbuf);
+		int reason = BufferIO::Read<int32_t>(pbuf);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 			if(cl & LOCATION_REMOVED && pl != cl)
 				soundManager.PlaySoundEffect(SOUND_BANISHED);
@@ -2779,12 +2806,12 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_POS_CHANGE: {
-		unsigned int code = BufferIO::ReadInt32(pbuf);
-		int cc = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int cl = BufferIO::ReadUInt8(pbuf);
-		int cs = BufferIO::ReadUInt8(pbuf);
-		unsigned int pp = BufferIO::ReadUInt8(pbuf);
-		unsigned int cp = BufferIO::ReadUInt8(pbuf);
+		unsigned int code = BufferIO::Read<int32_t>(pbuf);
+		int cc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int cl = BufferIO::Read<uint8_t>(pbuf);
+		int cs = BufferIO::Read<uint8_t>(pbuf);
+		unsigned int pp = BufferIO::Read<uint8_t>(pbuf);
+		unsigned int cp = BufferIO::Read<uint8_t>(pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(cc, cl, cs);
 		if((pp & POS_FACEUP) && (cp & POS_FACEDOWN)) {
 			pcard->counters.clear();
@@ -2801,27 +2828,27 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_SET: {
-		/*int code = */BufferIO::ReadInt32(pbuf);
-		/*int cc = mainGame->LocalPlayer*/(BufferIO::ReadUInt8(pbuf));
-		/*int cl = */BufferIO::ReadUInt8(pbuf);
-		/*int cs = */BufferIO::ReadUInt8(pbuf);
-		/*int cp = */BufferIO::ReadUInt8(pbuf);
+		/*int code = */BufferIO::Read<int32_t>(pbuf);
+		/*int cc = mainGame->LocalPlayer*/(BufferIO::Read<uint8_t>(pbuf));
+		/*int cl = */BufferIO::Read<uint8_t>(pbuf);
+		/*int cs = */BufferIO::Read<uint8_t>(pbuf);
+		/*int cp = */BufferIO::Read<uint8_t>(pbuf);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
 			soundManager.PlaySoundEffect(SOUND_SET);
 		myswprintf(event_string, dataManager.GetSysString(1601));
 		return true;
 	}
 	case MSG_SWAP: {
-		/*int code1 = */BufferIO::ReadInt32(pbuf);
-		int c1 = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l1 = BufferIO::ReadUInt8(pbuf);
-		int s1 = BufferIO::ReadUInt8(pbuf);
-		/*int p1 = */BufferIO::ReadUInt8(pbuf);
-		/*int code2 = */BufferIO::ReadInt32(pbuf);
-		int c2 = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l2 = BufferIO::ReadUInt8(pbuf);
-		int s2 = BufferIO::ReadUInt8(pbuf);
-		/*int p2 = */BufferIO::ReadUInt8(pbuf);
+		/*int code1 = */BufferIO::Read<int32_t>(pbuf);
+		int c1 = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l1 = BufferIO::Read<uint8_t>(pbuf);
+		int s1 = BufferIO::Read<uint8_t>(pbuf);
+		/*int p1 = */BufferIO::Read<uint8_t>(pbuf);
+		/*int code2 = */BufferIO::Read<int32_t>(pbuf);
+		int c2 = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l2 = BufferIO::Read<uint8_t>(pbuf);
+		int s2 = BufferIO::Read<uint8_t>(pbuf);
+		/*int p2 = */BufferIO::Read<uint8_t>(pbuf);
 		myswprintf(event_string, dataManager.GetSysString(1602));
 		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
 		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
@@ -2848,18 +2875,18 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_FIELD_DISABLED: {
-		unsigned int disabled = BufferIO::ReadInt32(pbuf);
+		unsigned int disabled = BufferIO::Read<int32_t>(pbuf);
 		if (!mainGame->dInfo.isFirst)
 			disabled = (disabled >> 16) | (disabled << 16);
 		mainGame->dField.disabled_field = disabled;
 		return true;
 	}
 	case MSG_SUMMONING: {
-		unsigned int code = BufferIO::ReadInt32(pbuf);
-		/*int cc = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		/*int cl = */BufferIO::ReadUInt8(pbuf);
-		/*int cs = */BufferIO::ReadUInt8(pbuf);
-		/*int cp = */BufferIO::ReadUInt8(pbuf);
+		unsigned int code = BufferIO::Read<int32_t>(pbuf);
+		/*int cc = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		/*int cl = */BufferIO::Read<uint8_t>(pbuf);
+		/*int cs = */BufferIO::Read<uint8_t>(pbuf);
+		/*int cp = */BufferIO::Read<uint8_t>(pbuf);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 			soundManager.PlaySoundEffect(SOUND_SUMMON);
 			myswprintf(event_string, dataManager.GetSysString(1603), dataManager.GetName(code));
@@ -2878,11 +2905,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_SPSUMMONING: {
-		unsigned int code = BufferIO::ReadInt32(pbuf);
-		/*int cc = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		/*int cl = */BufferIO::ReadUInt8(pbuf);
-		/*int cs = */BufferIO::ReadUInt8(pbuf);
-		/*int cp = */BufferIO::ReadUInt8(pbuf);
+		unsigned int code = BufferIO::Read<int32_t>(pbuf);
+		/*int cc = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		/*int cl = */BufferIO::Read<uint8_t>(pbuf);
+		/*int cs = */BufferIO::Read<uint8_t>(pbuf);
+		/*int cp = */BufferIO::Read<uint8_t>(pbuf);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 			CardData cd;
 			if(dataManager.GetData(code, &cd) && (cd.type & TYPE_TOKEN))
@@ -2890,12 +2917,14 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			else
 				soundManager.PlaySoundEffect(SOUND_SPECIAL_SUMMON);
 			myswprintf(event_string, dataManager.GetSysString(1605), dataManager.GetName(code));
-			mainGame->showcardcode = code;
-			mainGame->showcarddif = 1;
-			mainGame->showcard = 5;
-			mainGame->WaitFrameSignal(30);
-			mainGame->showcard = 0;
-			mainGame->WaitFrameSignal(11);
+			if(code) {
+				mainGame->showcardcode = code;
+				mainGame->showcarddif = 1;
+				mainGame->showcard = 5;
+				mainGame->WaitFrameSignal(30);
+				mainGame->showcard = 0;
+				mainGame->WaitFrameSignal(11);
+			}
 		}
 		return true;
 	}
@@ -2904,11 +2933,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_FLIPSUMMONING: {
-		unsigned int code = BufferIO::ReadInt32(pbuf);
-		int cc = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int cl = BufferIO::ReadUInt8(pbuf);
-		int cs = BufferIO::ReadUInt8(pbuf);
-		unsigned int cp = BufferIO::ReadUInt8(pbuf);
+		unsigned int code = BufferIO::Read<int32_t>(pbuf);
+		int cc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int cl = BufferIO::Read<uint8_t>(pbuf);
+		int cs = BufferIO::Read<uint8_t>(pbuf);
+		unsigned int cp = BufferIO::Read<uint8_t>(pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(cc, cl, cs);
 		pcard->SetCode(code);
 		pcard->position = cp;
@@ -2932,16 +2961,16 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_CHAINING: {
-		unsigned int code = BufferIO::ReadInt32(pbuf);
-		int pcc = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int pcl = BufferIO::ReadUInt8(pbuf);
-		int pcs = BufferIO::ReadUInt8(pbuf);
-		int subs = BufferIO::ReadUInt8(pbuf);
-		int cc = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int cl = BufferIO::ReadUInt8(pbuf);
-		int cs = BufferIO::ReadUInt8(pbuf);
-		int desc = BufferIO::ReadInt32(pbuf);
-		/*int ct = */BufferIO::ReadUInt8(pbuf);
+		unsigned int code = BufferIO::Read<int32_t>(pbuf);
+		int pcc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int pcl = BufferIO::Read<uint8_t>(pbuf);
+		int pcs = BufferIO::Read<uint8_t>(pbuf);
+		int subs = BufferIO::Read<uint8_t>(pbuf);
+		int cc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int cl = BufferIO::Read<uint8_t>(pbuf);
+		int cs = BufferIO::Read<uint8_t>(pbuf);
+		int desc = BufferIO::Read<int32_t>(pbuf);
+		/*int ct = */BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		soundManager.PlaySoundEffect(SOUND_ACTIVATE);
@@ -2992,7 +3021,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_CHAINED: {
-		int ct = BufferIO::ReadUInt8(pbuf);
+		int ct = BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
@@ -3005,7 +3034,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_CHAIN_SOLVING: {
-		int ct = BufferIO::ReadUInt8(pbuf);
+		int ct = BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		if(mainGame->dField.chains.size() > 1 || mainGame->gameConf.draw_single_chain) {
@@ -3022,7 +3051,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_CHAIN_SOLVED: {
-		/*int ct = */BufferIO::ReadUInt8(pbuf);
+		/*int ct = */BufferIO::Read<uint8_t>(pbuf);
 		return true;
 	}
 	case MSG_CHAIN_END: {
@@ -3036,8 +3065,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	}
 	case MSG_CHAIN_NEGATED:
 	case MSG_CHAIN_DISABLED: {
-		int ct = BufferIO::ReadUInt8(pbuf);
+		int ct = BufferIO::Read<uint8_t>(pbuf);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			soundManager.PlaySoundEffect(SOUND_NEGATE);
 			mainGame->showcardcode = mainGame->dField.chains[ct - 1].code;
 			mainGame->showcarddif = 0;
 			mainGame->showcard = 3;
@@ -3050,8 +3080,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_RANDOM_SELECTED: {
-		/*int player = */BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadUInt8(pbuf);
+		/*int player = */BufferIO::Read<uint8_t>(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			pbuf += count * 4;
 			return true;
@@ -3059,10 +3089,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		soundManager.PlaySoundEffect(SOUND_DICE);
 		ClientCard* pcards[10];
 		for (int i = 0; i < count; ++i) {
-			int c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			unsigned int l = BufferIO::ReadUInt8(pbuf);
-			int s = BufferIO::ReadUInt8(pbuf);
-			int ss = BufferIO::ReadUInt8(pbuf);
+			int c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			unsigned int l = BufferIO::Read<uint8_t>(pbuf);
+			int s = BufferIO::Read<uint8_t>(pbuf);
+			int ss = BufferIO::Read<uint8_t>(pbuf);
 			if (l & LOCATION_OVERLAY)
 				pcards[i] = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
 			else
@@ -3076,16 +3106,16 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	}
 	case MSG_BECOME_TARGET: {
 		//soundManager.PlaySoundEffect(SOUND_TARGET);
-		int count = BufferIO::ReadUInt8(pbuf);
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			pbuf += count * 4;
 			return true;
 		}
 		for (int i = 0; i < count; ++i) {
-			int c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			unsigned int l = BufferIO::ReadUInt8(pbuf);
-			int s = BufferIO::ReadUInt8(pbuf);
-			/*int ss = */BufferIO::ReadUInt8(pbuf);
+			int c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			unsigned int l = BufferIO::Read<uint8_t>(pbuf);
+			int s = BufferIO::Read<uint8_t>(pbuf);
+			/*int ss = */BufferIO::Read<uint8_t>(pbuf);
 			ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
 			pcard->is_highlighting = true;
 			mainGame->dField.current_chain.target.insert(pcard);
@@ -3114,11 +3144,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_DRAW: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int count = BufferIO::ReadUInt8(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		ClientCard* pcard;
 		for (int i = 0; i < count; ++i) {
-			unsigned int code = BufferIO::ReadInt32(pbuf);
+			unsigned int code = BufferIO::Read<int32_t>(pbuf);
 			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - i);
 			if(!mainGame->dField.deck_reversed || code)
 				pcard->SetCode(code & 0x7fffffff);
@@ -3148,8 +3178,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_DAMAGE: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int val = BufferIO::ReadInt32(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int val = BufferIO::Read<int32_t>(pbuf);
 		int final = mainGame->dInfo.lp[player] - val;
 		if (final < 0)
 			final = 0;
@@ -3179,8 +3209,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_RECOVER: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int val = BufferIO::ReadInt32(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int val = BufferIO::Read<int32_t>(pbuf);
 		int final = mainGame->dInfo.lp[player] + val;
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			mainGame->dInfo.lp[player] = final;
@@ -3208,14 +3238,14 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_EQUIP: {
-		int c1 = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l1 = BufferIO::ReadUInt8(pbuf);
-		int s1 = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
-		int c2 = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l2 = BufferIO::ReadUInt8(pbuf);
-		int s2 = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
+		int c1 = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l1 = BufferIO::Read<uint8_t>(pbuf);
+		int s1 = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
+		int c2 = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l2 = BufferIO::Read<uint8_t>(pbuf);
+		int s2 = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
 		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
 		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
@@ -3242,8 +3272,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_LPUPDATE: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int val = BufferIO::ReadInt32(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int val = BufferIO::Read<int32_t>(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			mainGame->dInfo.lp[player] = val;
 			myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
@@ -3260,10 +3290,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_UNEQUIP: {
-		int c1 = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l1 = BufferIO::ReadUInt8(pbuf);
-		int s1 = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
+		int c1 = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l1 = BufferIO::Read<uint8_t>(pbuf);
+		int s1 = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
 		ClientCard* pc = mainGame->dField.GetCard(c1, l1, s1);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			pc->equipTarget->equipped.erase(pc);
@@ -3281,14 +3311,14 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_CARD_TARGET: {
-		int c1 = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l1 = BufferIO::ReadUInt8(pbuf);
-		int s1 = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
-		int c2 = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l2 = BufferIO::ReadUInt8(pbuf);
-		int s2 = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
+		int c1 = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l1 = BufferIO::Read<uint8_t>(pbuf);
+		int s1 = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
+		int c2 = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l2 = BufferIO::Read<uint8_t>(pbuf);
+		int s2 = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
 		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
 		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
@@ -3307,14 +3337,14 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		break;
 	}
 	case MSG_CANCEL_TARGET: {
-		int c1 = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l1 = BufferIO::ReadUInt8(pbuf);
-		int s1 = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
-		int c2 = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l2 = BufferIO::ReadUInt8(pbuf);
-		int s2 = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
+		int c1 = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l1 = BufferIO::Read<uint8_t>(pbuf);
+		int s1 = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
+		int c2 = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l2 = BufferIO::Read<uint8_t>(pbuf);
+		int s2 = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
 		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
 		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
@@ -3333,8 +3363,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		break;
 	}
 	case MSG_PAY_LPCOST: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int cost = BufferIO::ReadInt32(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int cost = BufferIO::Read<int32_t>(pbuf);
 		int final = mainGame->dInfo.lp[player] - cost;
 		if (final < 0)
 			final = 0;
@@ -3360,11 +3390,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_ADD_COUNTER: {
-		int type = BufferIO::ReadInt16(pbuf);
-		int c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l = BufferIO::ReadUInt8(pbuf);
-		int s = BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadInt16(pbuf);
+		int type = BufferIO::Read<uint16_t>(pbuf);
+		int c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l = BufferIO::Read<uint8_t>(pbuf);
+		int s = BufferIO::Read<uint8_t>(pbuf);
+		int count = BufferIO::Read<uint16_t>(pbuf);
 		ClientCard* pc = mainGame->dField.GetCard(c, l, s);
 		if (pc->counters.count(type))
 			pc->counters[type] += count;
@@ -3383,11 +3413,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_REMOVE_COUNTER: {
-		int type = BufferIO::ReadInt16(pbuf);
-		int c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l = BufferIO::ReadUInt8(pbuf);
-		int s = BufferIO::ReadUInt8(pbuf);
-		int count = BufferIO::ReadInt16(pbuf);
+		int type = BufferIO::Read<uint16_t>(pbuf);
+		int c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l = BufferIO::Read<uint8_t>(pbuf);
+		int s = BufferIO::Read<uint8_t>(pbuf);
+		int count = BufferIO::Read<uint16_t>(pbuf);
 		ClientCard* pc = mainGame->dField.GetCard(c, l, s);
 		pc->counters[type] -= count;
 		if (pc->counters[type] <= 0)
@@ -3406,15 +3436,15 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_ATTACK: {
-		int ca = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int la = BufferIO::ReadUInt8(pbuf);
-		int sa = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
+		int ca = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int la = BufferIO::Read<uint8_t>(pbuf);
+		int sa = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.attacker = mainGame->dField.GetCard(ca, la, sa);
-		int cd = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int ld = BufferIO::ReadUInt8(pbuf);
-		int sd = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
+		int cd = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int ld = BufferIO::Read<uint8_t>(pbuf);
+		int sd = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		float sy;
@@ -3428,11 +3458,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			float xd = mainGame->dField.attack_target->curPos.X;
 			float yd = mainGame->dField.attack_target->curPos.Y;
 			sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-			mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
+			mainGame->atk_t = irr::core::vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
 			if (ca == 0)
-				mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
 			else
-				mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
 		} else {
 			soundManager.PlaySoundEffect(SOUND_DIRECT_ATTACK);
 			myswprintf(event_string, dataManager.GetSysString(1620), dataManager.GetName(mainGame->dField.attacker->code));
@@ -3443,11 +3473,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			if (ca == 0)
 				yd = -3.5f;
 			sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-			mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
+			mainGame->atk_t = irr::core::vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
 			if (ca == 0)
-				mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
 			else
-				mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
 		}
 		matManager.GenArrow(sy);
 		mainGame->attack_sv = 0;
@@ -3457,20 +3487,20 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_BATTLE: {
-		int ca = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int la = BufferIO::ReadUInt8(pbuf);
-		int sa = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
-		int aatk = BufferIO::ReadInt32(pbuf);
-		int adef = BufferIO::ReadInt32(pbuf);
-		/*int da = */BufferIO::ReadUInt8(pbuf);
-		int cd = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int ld = BufferIO::ReadUInt8(pbuf);
-		int sd = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
-		int datk = BufferIO::ReadInt32(pbuf);
-		int ddef = BufferIO::ReadInt32(pbuf);
-		/*int dd = */BufferIO::ReadUInt8(pbuf);
+		int ca = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int la = BufferIO::Read<uint8_t>(pbuf);
+		int sa = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
+		int aatk = BufferIO::Read<int32_t>(pbuf);
+		int adef = BufferIO::Read<int32_t>(pbuf);
+		/*int da = */BufferIO::Read<uint8_t>(pbuf);
+		int cd = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int ld = BufferIO::Read<uint8_t>(pbuf);
+		int sd = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
+		int datk = BufferIO::Read<int32_t>(pbuf);
+		int ddef = BufferIO::Read<int32_t>(pbuf);
+		/*int dd = */BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		mainGame->gMutex.lock();
@@ -3508,19 +3538,19 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_MISSED_EFFECT: {
-		BufferIO::ReadInt32(pbuf);
-		unsigned int code = BufferIO::ReadInt32(pbuf);
+		BufferIO::Read<int32_t>(pbuf);
+		unsigned int code = BufferIO::Read<int32_t>(pbuf);
 		myswprintf(textBuffer, dataManager.GetSysString(1622), dataManager.GetName(code));
 		mainGame->AddLog(textBuffer, code);
 		return true;
 	}
 	case MSG_TOSS_COIN: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int count = BufferIO::ReadUInt8(pbuf);
+		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		wchar_t* pwbuf = textBuffer;
 		BufferIO::CopyWStrRef(dataManager.GetSysString(1623), pwbuf, 256);
 		for (int i = 0; i < count; ++i) {
-			int res = BufferIO::ReadUInt8(pbuf);
+			int res = BufferIO::Read<uint8_t>(pbuf);
 			*pwbuf++ = L'[';
 			BufferIO::CopyWStrRef(dataManager.GetSysString(res ? 60 : 61), pwbuf, 256);
 			*pwbuf++ = L']';
@@ -3538,12 +3568,12 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_TOSS_DICE: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int count = BufferIO::ReadUInt8(pbuf);
+		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		wchar_t* pwbuf = textBuffer;
 		BufferIO::CopyWStrRef(dataManager.GetSysString(1624), pwbuf, 256);
 		for (int i = 0; i < count; ++i) {
-			int res = BufferIO::ReadUInt8(pbuf);
+			int res = BufferIO::Read<uint8_t>(pbuf);
 			*pwbuf++ = L'[';
 			*pwbuf++ = L'0' + res;
 			*pwbuf++ = L']';
@@ -3561,7 +3591,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_ROCK_PAPER_SCISSORS: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
+		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		mainGame->gMutex.lock();
@@ -3570,7 +3600,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_HAND_RES: {
-		int res = BufferIO::ReadUInt8(pbuf);
+		int res = BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		mainGame->stHintMsg->setVisible(false);
@@ -3587,9 +3617,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_ANNOUNCE_RACE: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		mainGame->dField.announce_count = BufferIO::ReadUInt8(pbuf);
-		int available = BufferIO::ReadInt32(pbuf);
+		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		mainGame->dField.announce_count = BufferIO::Read<uint8_t>(pbuf);
+		int available = BufferIO::Read<int32_t>(pbuf);
 		for(int i = 0, filter = 0x1; i < RACES_COUNT; ++i, filter <<= 1) {
 			mainGame->chkRace[i]->setChecked(false);
 			if(filter & available)
@@ -3607,9 +3637,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_ANNOUNCE_ATTRIB: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		mainGame->dField.announce_count = BufferIO::ReadUInt8(pbuf);
-		int available = BufferIO::ReadInt32(pbuf);
+		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		mainGame->dField.announce_count = BufferIO::Read<uint8_t>(pbuf);
+		int available = BufferIO::Read<int32_t>(pbuf);
 		for(int i = 0, filter = 0x1; i < 7; ++i, filter <<= 1) {
 			mainGame->chkAttribute[i]->setChecked(false);
 			if(filter & available)
@@ -3627,11 +3657,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_ANNOUNCE_CARD: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int count = BufferIO::ReadUInt8(pbuf);
+		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.declare_opcodes.clear();
 		for (int i = 0; i < count; ++i)
-			mainGame->dField.declare_opcodes.push_back(buffer_read<uint32_t>(pbuf));
+			mainGame->dField.declare_opcodes.push_back(BufferIO::Read<uint32_t>(pbuf));
 		if(select_hint)
 			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
 		else myswprintf(textBuffer, dataManager.GetSysString(564));
@@ -3645,8 +3675,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_ANNOUNCE_NUMBER: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int count = BufferIO::ReadUInt8(pbuf);
+		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int count = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->gMutex.lock();
 		mainGame->cbANNumber->clear();
 		bool quickmode = count <= 12;
@@ -3658,7 +3688,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			}
 		}
 		for (int i = 0; i < count; ++i) {
-			int value = BufferIO::ReadInt32(pbuf);
+			int value = BufferIO::Read<int32_t>(pbuf);
 			myswprintf(textBuffer, L" % d", value);
 			mainGame->cbANNumber->addItem(textBuffer, value);
 			if(quickmode) {
@@ -3672,9 +3702,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		mainGame->cbANNumber->setSelected(0);
 		if(quickmode) {
 			mainGame->cbANNumber->setVisible(false);
-			mainGame->btnANNumberOK->setRelativePosition(rect<s32>(20, 195, 210, 230));
+			mainGame->btnANNumberOK->setRelativePosition(irr::core::rect<irr::s32>(20, 195, 210, 230));
 			mainGame->btnANNumberOK->setEnabled(false);
-			recti pos = mainGame->wANNumber->getRelativePosition();
+			irr::core::recti pos = mainGame->wANNumber->getRelativePosition();
 			pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + 250;
 			mainGame->wANNumber->setRelativePosition(pos);
 		} else {
@@ -3682,8 +3712,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				mainGame->btnANNumber[i]->setVisible(false);
 			}
 			mainGame->cbANNumber->setVisible(true);
-			mainGame->btnANNumberOK->setRelativePosition(rect<s32>(80, 60, 150, 85));
-			recti pos = mainGame->wANNumber->getRelativePosition();
+			mainGame->btnANNumberOK->setRelativePosition(irr::core::rect<irr::s32>(80, 60, 150, 85));
+			irr::core::recti pos = mainGame->wANNumber->getRelativePosition();
 			pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + 95;
 			mainGame->wANNumber->setRelativePosition(pos);
 		}
@@ -3697,12 +3727,12 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return false;
 	}
 	case MSG_CARD_HINT: {
-		int c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		unsigned int l = BufferIO::ReadUInt8(pbuf);
-		int s = BufferIO::ReadUInt8(pbuf);
-		BufferIO::ReadUInt8(pbuf);
-		int chtype = BufferIO::ReadUInt8(pbuf);
-		int value = BufferIO::ReadInt32(pbuf);
+		int c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		unsigned int l = BufferIO::Read<uint8_t>(pbuf);
+		int s = BufferIO::Read<uint8_t>(pbuf);
+		BufferIO::Read<uint8_t>(pbuf);
+		int chtype = BufferIO::Read<uint8_t>(pbuf);
+		int value = BufferIO::Read<int32_t>(pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
 		if(!pcard)
 			return true;
@@ -3734,9 +3764,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_PLAYER_HINT: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		int chtype = BufferIO::ReadUInt8(pbuf);
-		int value = BufferIO::ReadInt32(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		int chtype = BufferIO::Read<uint8_t>(pbuf);
+		int value = BufferIO::Read<int32_t>(pbuf);
 		auto& player_desc_hints = mainGame->dField.player_desc_hints[player];
 		if(value == CARD_QUESTION && player == 0) {
 			if(chtype == PHINT_DESC_ADD) {
@@ -3755,16 +3785,16 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		return true;
 	}
 	case MSG_MATCH_KILL: {
-		match_kill = BufferIO::ReadInt32(pbuf);
+		match_kill = BufferIO::Read<int32_t>(pbuf);
 		return true;
 	}
 	case MSG_TAG_SWAP: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-		size_t mcount = (size_t)BufferIO::ReadUInt8(pbuf);
-		size_t ecount = (size_t)BufferIO::ReadUInt8(pbuf);
-		size_t pcount = (size_t)BufferIO::ReadUInt8(pbuf);
-		size_t hcount = (size_t)BufferIO::ReadUInt8(pbuf);
-		int topcode = BufferIO::ReadInt32(pbuf);
+		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		size_t mcount = (size_t)BufferIO::Read<uint8_t>(pbuf);
+		size_t ecount = (size_t)BufferIO::Read<uint8_t>(pbuf);
+		size_t pcount = (size_t)BufferIO::Read<uint8_t>(pbuf);
+		size_t hcount = (size_t)BufferIO::Read<uint8_t>(pbuf);
+		int topcode = BufferIO::Read<int32_t>(pbuf);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
 				if(player == 0) (*cit)->dPos.Y = 0.4f;
@@ -3853,7 +3883,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				(*mainGame->dField.deck[player].rbegin())->code = topcode;
 			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
 				ClientCard* pcard = *cit;
-				pcard->code = BufferIO::ReadInt32(pbuf);
+				pcard->code = BufferIO::Read<int32_t>(pbuf);
 				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 				if(player == 0) pcard->curPos.Y += 2.0f;
 				else pcard->curPos.Y -= 3.0f;
@@ -3861,7 +3891,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			}
 			for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 				ClientCard* pcard = *cit;
-				pcard->code = BufferIO::ReadInt32(pbuf) & 0x7fffffff;
+				pcard->code = BufferIO::Read<int32_t>(pbuf) & 0x7fffffff;
 				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 				if(player == 0) pcard->curPos.Y += 2.0f;
 				else pcard->curPos.Y -= 3.0f;
@@ -3872,21 +3902,23 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		break;
 	}
 	case MSG_RELOAD_FIELD: {
-		mainGame->gMutex.lock();
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			mainGame->gMutex.lock();
+		}
 		mainGame->dField.Clear();
-		mainGame->dInfo.duel_rule = BufferIO::ReadUInt8(pbuf);
+		mainGame->dInfo.duel_rule = BufferIO::Read<uint8_t>(pbuf);
 		int val = 0;
 		for(int i = 0; i < 2; ++i) {
 			int p = mainGame->LocalPlayer(i);
-			mainGame->dInfo.lp[p] = BufferIO::ReadInt32(pbuf);
+			mainGame->dInfo.lp[p] = BufferIO::Read<int32_t>(pbuf);
 			myswprintf(mainGame->dInfo.strLP[p], L"%d", mainGame->dInfo.lp[p]);
 			for(int seq = 0; seq < 7; ++seq) {
-				val = BufferIO::ReadUInt8(pbuf);
+				val = BufferIO::Read<uint8_t>(pbuf);
 				if(val) {
 					ClientCard* ccard = new ClientCard;
 					mainGame->dField.AddCard(ccard, p, LOCATION_MZONE, seq);
-					ccard->position = BufferIO::ReadUInt8(pbuf);
-					val = BufferIO::ReadUInt8(pbuf);
+					ccard->position = BufferIO::Read<uint8_t>(pbuf);
+					val = BufferIO::Read<uint8_t>(pbuf);
 					if(val) {
 						for(int xyz = 0; xyz < val; ++xyz) {
 							ClientCard* xcard = new ClientCard;
@@ -3902,53 +3934,53 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				}
 			}
 			for(int seq = 0; seq < 8; ++seq) {
-				val = BufferIO::ReadUInt8(pbuf);
+				val = BufferIO::Read<uint8_t>(pbuf);
 				if(val) {
 					ClientCard* ccard = new ClientCard;
 					mainGame->dField.AddCard(ccard, p, LOCATION_SZONE, seq);
-					ccard->position = BufferIO::ReadUInt8(pbuf);
+					ccard->position = BufferIO::Read<uint8_t>(pbuf);
 				}
 			}
-			val = BufferIO::ReadUInt8(pbuf);
+			val = BufferIO::Read<uint8_t>(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
 				ClientCard* ccard = new ClientCard;
 				mainGame->dField.AddCard(ccard, p, LOCATION_DECK, seq);
 			}
-			val = BufferIO::ReadUInt8(pbuf);
+			val = BufferIO::Read<uint8_t>(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
 				ClientCard* ccard = new ClientCard;
 				mainGame->dField.AddCard(ccard, p, LOCATION_HAND, seq);
 			}
-			val = BufferIO::ReadUInt8(pbuf);
+			val = BufferIO::Read<uint8_t>(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
 				ClientCard* ccard = new ClientCard;
 				mainGame->dField.AddCard(ccard, p, LOCATION_GRAVE, seq);
 			}
-			val = BufferIO::ReadUInt8(pbuf);
+			val = BufferIO::Read<uint8_t>(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
 				ClientCard* ccard = new ClientCard;
 				mainGame->dField.AddCard(ccard, p, LOCATION_REMOVED, seq);
 			}
-			val = BufferIO::ReadUInt8(pbuf);
+			val = BufferIO::Read<uint8_t>(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
 				ClientCard* ccard = new ClientCard;
 				mainGame->dField.AddCard(ccard, p, LOCATION_EXTRA, seq);
 			}
-			val = BufferIO::ReadUInt8(pbuf);
+			val = BufferIO::Read<uint8_t>(pbuf);
 			mainGame->dField.extra_p_count[p] = val;
 		}
 		mainGame->dField.RefreshAllCards();
-		val = BufferIO::ReadUInt8(pbuf); //chains
+		val = BufferIO::Read<uint8_t>(pbuf); //chains
 		for(int i = 0; i < val; ++i) {
-			unsigned int code = BufferIO::ReadInt32(pbuf);
-			int pcc = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			unsigned int pcl = BufferIO::ReadUInt8(pbuf);
-			int pcs = BufferIO::ReadUInt8(pbuf);
-			int subs = BufferIO::ReadUInt8(pbuf);
-			int cc = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			unsigned int cl = BufferIO::ReadUInt8(pbuf);
-			int cs = BufferIO::ReadUInt8(pbuf);
-			int desc = BufferIO::ReadInt32(pbuf);
+			unsigned int code = BufferIO::Read<int32_t>(pbuf);
+			int pcc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			unsigned int pcl = BufferIO::Read<uint8_t>(pbuf);
+			int pcs = BufferIO::Read<uint8_t>(pbuf);
+			int subs = BufferIO::Read<uint8_t>(pbuf);
+			int cc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+			unsigned int cl = BufferIO::Read<uint8_t>(pbuf);
+			int cs = BufferIO::Read<uint8_t>(pbuf);
+			int desc = BufferIO::Read<int32_t>(pbuf);
 			ClientCard* pcard = mainGame->dField.GetCard(pcc, pcl, pcs, subs);
 			mainGame->dField.current_chain.chain_card = pcard;
 			mainGame->dField.current_chain.code = code;
@@ -3978,7 +4010,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
 			mainGame->dField.last_chain = true;
 		}
-		mainGame->gMutex.unlock();
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			mainGame->gMutex.unlock();
+		}
 		break;
 	}
 	}

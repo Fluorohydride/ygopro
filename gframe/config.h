@@ -3,6 +3,9 @@
 
 #define _IRR_STATIC_LIB_
 #define IRR_COMPILE_WITH_DX9_DEV_PACK
+
+#include <cerrno>
+
 #ifdef _WIN32
 
 #define NOMINMAX
@@ -10,7 +13,7 @@
 #include <windows.h>
 #include <ws2tcpip.h>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #define mywcsncasecmp _wcsnicmp
 #define mystrncasecmp _strnicmp
 #else
@@ -22,7 +25,6 @@
 
 #else //_WIN32
 
-#include <errno.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -44,7 +46,7 @@
 #endif
 
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <algorithm>
 #include <string>
@@ -52,8 +54,12 @@
 #include "../ocgcore/ocgapi.h"
 
 template<size_t N, typename... TR>
-inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
-	return std::swprintf(buf, N, fmt, args...);
+inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR&&... args) {
+	return std::swprintf(buf, N, fmt, std::forward<TR>(args)...);
+}
+template<size_t N, typename... TR>
+inline int mysnprintf(char(&buf)[N], const char* fmt, TR&&... args) {
+	return std::snprintf(buf, N, fmt, std::forward<TR>(args)...);
 }
 
 inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
@@ -70,13 +76,9 @@ inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
 	return fp;
 }
 
+#define myfopen std::fopen
+
 #include <irrlicht.h>
-using namespace irr;
-using namespace core;
-using namespace scene;
-using namespace video;
-using namespace io;
-using namespace gui;
 
 constexpr uint16_t PRO_VERSION = 0x1361;
 extern unsigned int enable_log;

@@ -1,7 +1,7 @@
 #ifndef REPLAY_MODE_H
 #define REPLAY_MODE_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 #include "replay.h"
 
@@ -25,7 +25,6 @@ private:
 public:
 	static Replay cur_replay;
 	
-public:
 	static bool StartReplay(int skipturn);
 	static void StopReplay(bool is_exiting = false);
 	static void SwapField();

@@ -2,10 +2,14 @@
 #include "game.h"
 #include "data_manager.h"
 #include <event2/thread.h>
-#include <locale.h>
+#include <clocale>
 #include <memory>
 #ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
+#endif
+
+#if defined(_WIN32) && (!defined(WDK_NTDDI_VERSION) || (WDK_NTDDI_VERSION < 0x0A000005)) // Redstone 4, Version 1803, Build 17134.
+#error "This program requires the Windows 10 SDK version 1803 or above to compile on Windows. Otherwise, non-ASCII characters will not be displayed or processed correctly."
 #endif
 
 unsigned int enable_log = 0x3;
@@ -23,30 +27,38 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 }
 
 int main(int argc, char* argv[]) {
-#ifndef _WIN32
-	setlocale(LC_CTYPE, "UTF-8");
+#if defined(_WIN32)
+	std::setlocale(LC_CTYPE, ".UTF-8");
+#elif defined(__APPLE__)
+	std::setlocale(LC_CTYPE, "UTF-8");
+#else
+	std::setlocale(LC_CTYPE, "");
 #endif
 #ifdef __APPLE__
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(nullptr, bundle_url);
+	CFStringRef bundle_ext = CFURLCopyPathExtension(bundle_url);
+	if (bundle_ext) {
+		char path[PATH_MAX];
+		if (CFStringCompare(bundle_ext, CFSTR("app"), kCFCompareCaseInsensitive) == kCFCompareEqualTo
+			&& CFURLGetFileSystemRepresentation(bundle_base_url, true, (UInt8*)path, PATH_MAX)) {
+			chdir(path);
+		}
+		CFRelease(bundle_ext);
+	}
 	CFRelease(bundle_url);
-	CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
 	CFRelease(bundle_base_url);
-	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
-	CFRelease(path);
 #endif //__APPLE__
 #ifdef _WIN32
-#ifndef _DEBUG
-	char* pstrext;
-	if(argc == 2 && (pstrext = std::strrchr(argv[1], '.'))
-		&& (!mystrncasecmp(pstrext, ".ydk", 4) || !mystrncasecmp(pstrext, ".yrp", 4))) {
+	if (argc == 2 && (ygo::IsExtension(argv[1], ".ydk") || ygo::IsExtension(argv[1], ".yrp"))) { // open file from explorer
 		wchar_t exepath[MAX_PATH];
 		GetModuleFileNameW(nullptr, exepath, MAX_PATH);
-		wchar_t* p = std::wcsrchr(exepath, '\\');
-		*p = '\0';
-		SetCurrentDirectoryW(exepath);
+		wchar_t* p = std::wcsrchr(exepath, L'\\');
+		if (p) {
+			*p = 0;
+			SetCurrentDirectoryW(exepath);
+		}
 	}
-#endif //_DEBUG
 #endif //_WIN32
 #ifdef _WIN32
 	WORD wVersionRequested;
@@ -63,7 +75,7 @@ int main(int argc, char* argv[]) {
 		return 0;
 
 #ifdef _WIN32
-	int wargc;
+	int wargc = 0;
 	std::unique_ptr<wchar_t*[], void(*)(wchar_t**)> wargv(CommandLineToArgvW(GetCommandLineW(), &wargc), [](wchar_t** wargv) {
 		LocalFree(wargv);
 	});
@@ -78,6 +90,24 @@ int main(int argc, char* argv[]) {
 	bool keep_on_return = false;
 	bool deckCategorySpecified = false;
 	for(int i = 1; i < wargc; ++i) {
+		if (wargc == 2 && std::wcslen(wargv[1]) >= 4) {
+			wchar_t* pstrext = wargv[1] + std::wcslen(wargv[1]) - 4;
+			if (!mywcsncasecmp(pstrext, L".ydk", 4)) {
+				open_file = true;
+				BufferIO::CopyWideString(wargv[1], open_file_name);
+				exit_on_return = true;
+				ClickButton(ygo::mainGame->btnDeckEdit);
+				break;
+			}
+			if (!mywcsncasecmp(pstrext, L".yrp", 4)) {
+				open_file = true;
+				BufferIO::CopyWideString(wargv[1], open_file_name);
+				exit_on_return = true;
+				ClickButton(ygo::mainGame->btnReplayMode);
+				ClickButton(ygo::mainGame->btnLoadReplay);
+				break;
+			}
+		}
 		if(wargv[i][0] == L'-' && wargv[i][1] == L'e' && wargv[i][2] != L'\0') {
 			ygo::dataManager.LoadDB(&wargv[i][2]);
 			continue;
@@ -173,23 +203,6 @@ int main(int argc, char* argv[]) {
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
-		} else if(wargc == 2 && std::wcslen(wargv[1]) >= 4) {
-			wchar_t* pstrext = wargv[1] + std::wcslen(wargv[1]) - 4;
-			if(!mywcsncasecmp(pstrext, L".ydk", 4)) {
-				open_file = true;
-				BufferIO::CopyWideString(wargv[i], open_file_name);
-				exit_on_return = !keep_on_return;
-				ClickButton(ygo::mainGame->btnDeckEdit);
-				break;
-			}
-			if(!mywcsncasecmp(pstrext, L".yrp", 4)) {
-				open_file = true;
-				BufferIO::CopyWideString(wargv[i], open_file_name);
-				exit_on_return = !keep_on_return;
-				ClickButton(ygo::mainGame->btnReplayMode);
-				ClickButton(ygo::mainGame->btnLoadReplay);
-				break;
-			}
 		}
 	}
 	ygo::mainGame->MainLoop();
