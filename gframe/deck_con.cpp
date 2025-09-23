@@ -1885,18 +1885,42 @@ bool DeckBuilder::check_limit(code_pointer pointer) {
 	auto flit = filterList->content.find(limitcode);
 	if(flit != filterList->content.end())
 		limit = flit->second;
-	for (auto& card : deckManager.current_deck.main) {
-		if (card->first == limitcode || card->second.alias == limitcode)
+	auto remaining_credits = filterList->credit_limits;
+	auto limitcode_credit_it = filterList->credits.find(limitcode);
+	auto handle_card = [&](ygo::code_pointer& card) {
+		if (card->first == limitcode || card->second.alias == limitcode) {
 			limit--;
+			if(limit <= 0)
+				return false;
+			if(limitcode_credit_it != filterList->credits.end()) {
+				auto limitcode_credits = limitcode_credit_it->second;
+				for(auto& credit : limitcode_credits) {
+					auto key = credit.first;
+					auto remaining_credit_it = remaining_credits.find(key);
+					if(remaining_credit_it != remaining_credits.end()) {
+						auto value = credit.second;
+						auto remaining_credit = remaining_credit_it->second;
+						if(remaining_credit < value)
+							return false;
+						remaining_credits[key] -= value;
+					}
+				}
+			}
+		}
+		return true;
+	};
+	for (auto& card : deckManager.current_deck.main) {
+		if(!handle_card(card))
+			return false;
 	}
 	for (auto& card : deckManager.current_deck.extra) {
-		if (card->first == limitcode || card->second.alias == limitcode)
-			limit--;
+		if(!handle_card(card))
+			return false;
 	}
 	for (auto& card : deckManager.current_deck.side) {
-		if (card->first == limitcode || card->second.alias == limitcode)
-			limit--;
+		if(!handle_card(card))
+			return false;
 	}
-	return limit > 0;
+	return true;
 }
 }

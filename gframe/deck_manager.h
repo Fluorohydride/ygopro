@@ -27,6 +27,8 @@ struct LFList {
 	unsigned int hash{};
 	std::wstring listName;
 	std::unordered_map<uint32_t, int> content;
+	std::unordered_map<std::wstring, uint32_t> credit_limits;
+	std::unordered_map<uint32_t, std::unordered_map<std::wstring, uint32_t>> credits;
 };
 struct Deck {
 	std::vector<code_pointer> main;
