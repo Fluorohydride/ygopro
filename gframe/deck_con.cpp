@@ -1885,28 +1885,36 @@ bool DeckBuilder::check_limit(code_pointer pointer) {
 	auto flit = filterList->content.find(limitcode);
 	if(flit != filterList->content.end())
 		limit = flit->second;
-	auto remaining_credits = filterList->credit_limits;
-	auto limitcode_credit_it = filterList->credits.find(limitcode);
+	std::unordered_map<std::wstring, uint32_t> credit_used;
+	auto spend_credit = [&](uint32_t code) {
+		auto code_credit_it = filterList->credits.find(code);
+		if(code_credit_it == filterList->credits.end())
+			return true;
+		auto code_credit = code_credit_it->second;
+		auto valid = true;
+		for(auto& credit_it : code_credit) {
+			auto key = credit_it.first;
+			auto credit_limit_it = filterList->credit_limits.find(key);
+			if(credit_limit_it == filterList->credit_limits.end())
+				continue;
+			auto credit_limit = credit_limit_it->second;
+			if(credit_used.find(key) == credit_used.end())
+				credit_used[key] = 0;
+			auto credit_after = credit_used[key] + credit_it.second;
+			if(credit_after > credit_limit)
+				valid = false;
+			credit_used[key] = credit_after;
+		}
+		return valid;
+	};
 	auto handle_card = [&](ygo::code_pointer& card) {
 		if (card->first == limitcode || card->second.alias == limitcode) {
 			limit--;
 			if(limit <= 0)
 				return false;
-			if(limitcode_credit_it != filterList->credits.end()) {
-				auto limitcode_credits = limitcode_credit_it->second;
-				for(auto& credit : limitcode_credits) {
-					auto key = credit.first;
-					auto remaining_credit_it = remaining_credits.find(key);
-					if(remaining_credit_it != remaining_credits.end()) {
-						auto value = credit.second;
-						auto remaining_credit = remaining_credit_it->second;
-						if(remaining_credit < value)
-							return false;
-						remaining_credits[key] -= value;
-					}
-				}
-			}
 		}
+		auto code = card->second.alias ? card->second.alias : card->first;
+		spend_credit(code);
 		return true;
 	};
 	for (auto& card : deckManager.current_deck.main) {
@@ -1921,6 +1929,6 @@ bool DeckBuilder::check_limit(code_pointer pointer) {
 		if(!handle_card(card))
 			return false;
 	}
-	return true;
+	return spend_credit(limitcode);
 }
 }
