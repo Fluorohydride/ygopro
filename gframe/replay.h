@@ -71,7 +71,7 @@ public:
 	void WriteInt32(int32_t data, bool flush = true);
 	void Flush();
 	void EndRecord();
-	void SaveReplay(const wchar_t* name);
+	bool SaveReplay(const wchar_t* base_name);
 
 	// play
 	static bool DeleteReplay(const wchar_t* name);

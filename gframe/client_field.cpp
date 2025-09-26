@@ -27,13 +27,11 @@ ClientField::~ClientField() {
 		}
 		hand[i].clear();
 		for (auto& card : mzone[i]) {
-			if (card)
-				delete card;
+			delete card;
 			card = nullptr;
 		}
 		for (auto& card : szone[i]) {
-			if (card)
-				delete card;
+			delete card;
 			card = nullptr;
 		}
 		for (auto& card : grave[i]) {
@@ -44,7 +42,6 @@ ClientField::~ClientField() {
 			delete card;
 		}
 		remove[i].clear();
-
 		for (auto& card : extra[i]) {
 			delete card;
 		}
@@ -57,30 +54,33 @@ ClientField::~ClientField() {
 }
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
-		for(auto cit = deck[i].begin(); cit != deck[i].end(); ++cit)
-			delete *cit;
+		for (auto& card : deck[i]) {
+			delete card;
+		}
 		deck[i].clear();
-		for(auto cit = hand[i].begin(); cit != hand[i].end(); ++cit)
-			delete *cit;
+		for (auto& card : hand[i]) {
+			delete card;
+		}
 		hand[i].clear();
-		for(auto cit = mzone[i].begin(); cit != mzone[i].end(); ++cit) {
-			if(*cit)
-				delete *cit;
-			*cit = 0;
+		for (auto& card : mzone[i]) {
+			delete card;
+			card = nullptr;
 		}
-		for(auto cit = szone[i].begin(); cit != szone[i].end(); ++cit) {
-			if(*cit)
-				delete *cit;
-			*cit = 0;
+		for (auto& card : szone[i]) {
+			delete card;
+			card = nullptr;
 		}
-		for(auto cit = grave[i].begin(); cit != grave[i].end(); ++cit)
-			delete *cit;
+		for (auto& card : grave[i]) {
+			delete card;
+		}
 		grave[i].clear();
-		for(auto cit = remove[i].begin(); cit != remove[i].end(); ++cit)
-			delete *cit;
+		for (auto& card : remove[i]) {
+			delete card;
+		}
 		remove[i].clear();
-		for(auto cit = extra[i].begin(); cit != extra[i].end(); ++cit)
-			delete *cit;
+		for (auto& card : extra[i]) {
+			delete card;
+		}
 		extra[i].clear();
 		deck_act[i] = false;
 		grave_act[i] = false;
@@ -88,8 +88,9 @@ void ClientField::Clear() {
 		extra_act[i] = false;
 		pzone_act[i] = false;
 	}
-	for(auto sit = overlay_cards.begin(); sit != overlay_cards.end(); ++sit)
-		delete *sit;
+	for (auto& card : overlay_cards) {
+		delete card;
+	}
 	overlay_cards.clear();
 	extra_p_count[0] = 0;
 	extra_p_count[1] = 0;
@@ -417,7 +418,8 @@ void ClientField::ClearChainSelect() {
 	conti_act = false;
 }
 // needs to be synchronized with EGET_SCROLL_BAR_CHANGED
-void ClientField::ShowSelectCard(bool buttonok, bool chain) {
+void ClientField::ShowSelectCard(bool buttonok, bool is_continuous) {
+	select_continuous = is_continuous;
 	if(cant_check_grave) {
 		bool has_card_in_grave = false;
 		for (auto& pcard : selectable_cards) {
@@ -444,7 +446,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		// image
 		if(selectable_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
-		else if(conti_selecting)
+		else if(select_continuous)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->chain_code));
 		else
 			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i]->controler + 2]);
@@ -454,7 +456,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		if(mainGame->dInfo.curMsg != MSG_SORT_CARD) {
 			// text
 			wchar_t formatBuffer[2048];
-			if(conti_selecting)
+			if(select_continuous)
 				myswprintf(formatBuffer, L"%ls", dataManager.unknown_string);
 			else if(cant_check_grave && selectable_cards[i]->location == LOCATION_GRAVE)
 				myswprintf(formatBuffer, L"%ls", dataManager.FormatLocation(selectable_cards[i]->location, 0));
@@ -470,7 +472,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			if (selectable_cards[i]->is_selected)
 				mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
 			else {
-				if(conti_selecting)
+				if(select_continuous)
 					mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 				else if(selectable_cards[i]->location == LOCATION_OVERLAY) {
 					if(selectable_cards[i]->owner != selectable_cards[i]->overlayTarget->controler)

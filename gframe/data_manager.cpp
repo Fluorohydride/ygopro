@@ -324,7 +324,7 @@ std::wstring DataManager::FormatAttribute(unsigned int attribute) const {
 		if (attribute & (0x1U << i)) {
 			if (!buffer.empty())
 				buffer.push_back(L'|');
-			buffer.append(GetSysString(1010 + i));
+			buffer.append(GetSysString(STRING_ID_ATTRIBUTE + i));
 		}
 	}
 	if (buffer.empty())
@@ -337,7 +337,7 @@ std::wstring DataManager::FormatRace(unsigned int race) const {
 		if(race & (0x1U << i)) {
 			if (!buffer.empty())
 				buffer.push_back(L'|');
-			buffer.append(GetSysString(1020 + i));
+			buffer.append(GetSysString(STRING_ID_RACE + i));
 		}
 	}
 	if (buffer.empty())
@@ -346,12 +346,11 @@ std::wstring DataManager::FormatRace(unsigned int race) const {
 }
 std::wstring DataManager::FormatType(unsigned int type) const {
 	std::wstring buffer;
-	int i = 1050;
-	for (unsigned filter = TYPE_MONSTER; filter <= TYPE_LINK; filter <<= 1, ++i) {
-		if (type & filter) {
+	for (int i = 0; i < TYPES_COUNT; ++i) {
+		if (type & (0x1U << i)) {
 			if (!buffer.empty())
 				buffer.push_back(L'|');
-			buffer.append(GetSysString(i));
+			buffer.append(GetSysString(STRING_ID_TYPE + i));
 		}
 	}
 	if (buffer.empty())
