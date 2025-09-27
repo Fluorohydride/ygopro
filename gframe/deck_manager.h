@@ -7,20 +7,21 @@
 #include "data_manager.h"
 
 namespace ygo {
-	constexpr int DECK_MAX_SIZE = 60;
-	constexpr int DECK_MIN_SIZE = 40;
-	constexpr int EXTRA_MAX_SIZE = 15;
-	constexpr int SIDE_MAX_SIZE = 15;
-	constexpr int PACK_MAX_SIZE = 1000;
 
-	constexpr int MAINC_MAX = 250;	// the limit of card_state
-	constexpr int SIDEC_MAX = MAINC_MAX;
+constexpr int DECK_MAX_SIZE = 60;
+constexpr int DECK_MIN_SIZE = 40;
+constexpr int EXTRA_MAX_SIZE = 15;
+constexpr int SIDE_MAX_SIZE = 15;
+constexpr int PACK_MAX_SIZE = 1000;
 
-	constexpr int DECK_CATEGORY_PACK = 0;
-	constexpr int DECK_CATEGORY_BOT = 1;
-	constexpr int DECK_CATEGORY_NONE = 2;
-	constexpr int DECK_CATEGORY_SEPARATOR = 3;
-	constexpr int DECK_CATEGORY_CUSTOM = 4;
+constexpr int MAINC_MAX = 250;	// the limit of card_state
+constexpr int SIDEC_MAX = MAINC_MAX;
+
+constexpr int DECK_CATEGORY_PACK = 0;
+constexpr int DECK_CATEGORY_BOT = 1;
+constexpr int DECK_CATEGORY_NONE = 2;
+constexpr int DECK_CATEGORY_SEPARATOR = 3;
+constexpr int DECK_CATEGORY_CUSTOM = 4;
 
 struct LFList {
 	unsigned int hash{};
