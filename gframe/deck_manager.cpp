@@ -146,7 +146,7 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 	auto spend_credit = [&](uint32_t code) {
 		auto code_credit_it = lflist->credits.find(code);
 		if(code_credit_it == lflist->credits.end())
-			return (uint32_t)0;
+			return static_cast<uint32_t>(0);
 		auto code_credit = code_credit_it->second;
 		for(auto& credit_it : code_credit) {
 			auto key = credit_it.first;
