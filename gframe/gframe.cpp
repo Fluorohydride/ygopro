@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
 	ygo::game_info.draw_count = 1;
 	ygo::game_info.no_check_deck = false;
 	ygo::game_info.no_shuffle_deck = false;
-	ygo::game_info.duel_rule = DEFAULT_DUEL_RULE;
+	ygo::game_info.duel_rule = ygo::DEFAULT_DUEL_RULE;
 	ygo::game_info.time_limit = 180;
 	std::memset(ygo::pre_seed, 0, sizeof(ygo::pre_seed));
 	std::memset(ygo::pre_seed_specified, 0, sizeof(ygo::pre_seed_specified));
@@ -103,15 +103,15 @@ int main(int argc, char* argv[]) {
 			mode = 0;
 		ygo::game_info.mode = mode;
 		if(argv[5][0] == 'T')
-			ygo::game_info.duel_rule = DEFAULT_DUEL_RULE - 1;
+			ygo::game_info.duel_rule = ygo::DEFAULT_DUEL_RULE - 1;
 		else if(argv[5][0] == 'F')
-			ygo::game_info.duel_rule = DEFAULT_DUEL_RULE;
+			ygo::game_info.duel_rule = ygo::DEFAULT_DUEL_RULE;
 		else {
 			int master_rule = atoi(argv[5]);
 			if(master_rule)
 				ygo::game_info.duel_rule = master_rule;
 			else
-				ygo::game_info.duel_rule = DEFAULT_DUEL_RULE;
+				ygo::game_info.duel_rule = ygo::DEFAULT_DUEL_RULE;
 		}
 		if(argv[6][0] == 'T')
 			ygo::game_info.no_check_deck = true;
