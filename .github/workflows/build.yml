@@ -472,21 +472,15 @@ jobs:
       fail-fast: false
       matrix:
         name:
-          - macos-13-intel
-#          - macos-13-arm-cross-compile-static-link
-          - macos-13-universal-static-link
+          - macos-15-intel
+          - macos-15-universal-static-link
           - macos-15-arm
 #          - macos-15-intel-cross-compile-static-link
-#          - macos-15-universal-static-link
         include:
-          - name: macos-13-intel
-            os: macos-13
-#          - name: macos-13-arm-cross-compile-static-link
-#            os: macos-13
-#            cross-build-arm: true
-#            static-link: true
-          - name: macos-13-universal-static-link
-            os: macos-13
+          - name: macos-15-intel
+            os: macos-15-intel
+          - name: macos-15-universal-static-link
+            os: macos-15
             cross-build-intel: true
             cross-build-arm: true
             static-link: true
@@ -495,11 +489,6 @@ jobs:
 #          - name: macos-15-intel-cross-compile-static-link
 #            os: macos-15
 #            cross-build-intel: true
-#            static-link: true
-#          - name: macos-15-universal-static-link
-#            os: macos-15
-#            cross-build-intel: true
-#            cross-build-arm: true
 #            static-link: true
 
     runs-on: ${{ matrix.os }}
