@@ -69,10 +69,14 @@ struct DeckArray {
 
 class DeckManager {
 public:
+#ifndef YGOPRO_SERVER_MODE
 	Deck current_deck;
+#endif
 	std::vector<LFList> _lfList;
 
+#ifndef YGOPRO_SERVER_MODE
 	static constexpr int MAX_YDK_SIZE = 0x10000;
+#endif
 
 	void LoadLFListSingle(const char* path);
 	void LoadLFList();
