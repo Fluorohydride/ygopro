@@ -28,8 +28,6 @@ namespace irr {
 #endif //YGOPRO_SERVER_MODE
 #include <thread>
 
-const unsigned short PRO_VERSION = 0x1362;
-
 namespace ygo {
 
 Game* mainGame;
