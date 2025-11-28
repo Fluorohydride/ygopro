@@ -15,8 +15,7 @@ DataManager::DataManager() : _datas(32768), _strings(32768) {
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt = nullptr;
-	const char* sql = "select * from datas,texts where datas.id=texts.id";
-	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, nullptr) != SQLITE_OK)
+	if (sqlite3_prepare_v2(pDB, SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK)
 		return Error(pDB, pStmt);
 	wchar_t strBuffer[4096];
 	for (int step = sqlite3_step(pStmt); step != SQLITE_DONE; step = sqlite3_step(pStmt)) {
@@ -46,17 +45,16 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
 		cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
 		auto& cs = _strings[code];
-		if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, 11)) {
 			BufferIO::DecodeUTF8(text, strBuffer);
 			cs.name = strBuffer;
 		}
-		if (const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 			BufferIO::DecodeUTF8(text, strBuffer);
 			cs.text = strBuffer;
 		}
-		constexpr int desc_count = sizeof cs.desc / sizeof cs.desc[0];
-		for (int i = 0; i < desc_count; ++i) {
-			if (const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
+		for (int i = 0; i < DESC_COUNT; ++i) {
+			if (const char* text = (const char*)sqlite3_column_text(pStmt, 13 + i)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.desc[i] = strBuffer;
 			}
