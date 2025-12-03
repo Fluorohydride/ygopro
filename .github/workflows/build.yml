@@ -124,7 +124,7 @@ jobs:
     - name: Download miniaudio
       if: matrix.audiolib == 'miniaudio'
       run: |
-        git clone --depth=1 https://github.com/mercury233/miniaudio
+        git clone --depth=1 -b 0.11.23 https://github.com/mackron/miniaudio
         cd miniaudio
         xcopy /Y extras\miniaudio_split\miniaudio.* .
         cd ..
@@ -371,7 +371,7 @@ jobs:
 
     - name: Download miniaudio
       run: |
-        git clone --depth=1 https://github.com/mercury233/miniaudio
+        git clone --depth=1 -b 0.11.23 https://github.com/mackron/miniaudio
         cd miniaudio
         cp extras/miniaudio_split/miniaudio.* .
         cd ..
@@ -594,7 +594,7 @@ jobs:
 
     - name: Download miniaudio
       run: |
-        git clone --depth=1 https://github.com/mercury233/miniaudio
+        git clone --depth=1 -b 0.11.23 https://github.com/mackron/miniaudio
         cd miniaudio
         cp extras/miniaudio_split/miniaudio.* .
         cd ..
