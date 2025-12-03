@@ -19,7 +19,7 @@ namespace ygo {
 constexpr int MAX_STRING_ID = 0x7ff;
 constexpr uint32_t MIN_CARD_ID = (uint32_t)(MAX_STRING_ID + 1) >> 4;
 constexpr uint32_t MAX_CARD_ID = 0x0fffffffU;
-	
+
 using CardData = card_data;
 struct CardDataC {
 	uint32_t code{};
@@ -49,10 +49,11 @@ struct CardDataC {
 		return false;
 	}
 };
+constexpr int DESC_COUNT = 16;
 struct CardString {
 	std::wstring name;
 	std::wstring text;
-	std::wstring desc[16];
+	std::wstring desc[DESC_COUNT];
 };
 using code_pointer = std::unordered_map<uint32_t, CardDataC>::const_iterator;
 using string_pointer = std::unordered_map<uint32_t, CardString>::const_iterator;
