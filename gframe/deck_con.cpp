@@ -1913,6 +1913,11 @@ bool DeckBuilder::check_limit(code_pointer pointer) {
 			if(limit < 0)
 				return false;
 		}
+
+		// No entry in credits => skip every card credit check
+		if(filterList->credits.find(limitcode) == filterList->credits.end())
+			return true;
+
 		auto code = card->second.alias ? card->second.alias : card->first;
 		return spend_credit(code);
 	};
