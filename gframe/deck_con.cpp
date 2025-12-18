@@ -1907,17 +1907,15 @@ bool DeckBuilder::check_limit(code_pointer pointer) {
 		}
 		return valid;
 	};
+	auto limitcode_has_credit = filterList->credits.find(limitcode) != filterList->credits.end();
 	auto handle_card = [&](ygo::code_pointer& card) {
 		if (card->first == limitcode || card->second.alias == limitcode) {
 			limit--;
 			if(limit < 0)
 				return false;
 		}
-
-		// No entry in credits => skip every card credit check
-		if(filterList->credits.find(limitcode) == filterList->credits.end())
+		if(!limitcode_has_credit)
 			return true;
-
 		auto code = card->second.alias ? card->second.alias : card->first;
 		return spend_credit(code);
 	};
