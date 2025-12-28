@@ -1,5 +1,9 @@
 name: Automated Test Build
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ "master" ]
@@ -120,7 +124,7 @@ jobs:
     - name: Download miniaudio
       if: matrix.audiolib == 'miniaudio'
       run: |
-        git clone --depth=1 https://github.com/mercury233/miniaudio
+        git clone --depth=1 -b 0.11.23 https://github.com/mackron/miniaudio
         cd miniaudio
         xcopy /Y extras\miniaudio_split\miniaudio.* .
         cd ..
@@ -144,7 +148,7 @@ jobs:
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
         url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
-    
+
     - name: Extract opus
       if: matrix.audiolib == 'miniaudio'
       run: |
@@ -367,7 +371,7 @@ jobs:
 
     - name: Download miniaudio
       run: |
-        git clone --depth=1 https://github.com/mercury233/miniaudio
+        git clone --depth=1 -b 0.11.23 https://github.com/mackron/miniaudio
         cd miniaudio
         cp extras/miniaudio_split/miniaudio.* .
         cd ..
@@ -398,7 +402,7 @@ jobs:
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
         url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
-    
+
     - name: Extract opus
       if: matrix.static-link == true
       run: |
@@ -437,8 +441,8 @@ jobs:
 
     - name: Copy premake files
       run: |
-        cp -r premake/* .
-        cp -r resource/* .
+        cp -pr premake/* .
+        cp -pr resource/* .
 
     - name: Use premake to generate make files (apt packages)
       if: matrix.static-link != true
@@ -472,21 +476,15 @@ jobs:
       fail-fast: false
       matrix:
         name:
-          - macos-13-intel
-#          - macos-13-arm-cross-compile-static-link
-          - macos-13-universal-static-link
+          - macos-15-intel
+          - macos-15-universal-static-link
           - macos-15-arm
 #          - macos-15-intel-cross-compile-static-link
-#          - macos-15-universal-static-link
         include:
-          - name: macos-13-intel
-            os: macos-13
-#          - name: macos-13-arm-cross-compile-static-link
-#            os: macos-13
-#            cross-build-arm: true
-#            static-link: true
-          - name: macos-13-universal-static-link
-            os: macos-13
+          - name: macos-15-intel
+            os: macos-15-intel
+          - name: macos-15-universal-static-link
+            os: macos-15
             cross-build-intel: true
             cross-build-arm: true
             static-link: true
@@ -495,11 +493,6 @@ jobs:
 #          - name: macos-15-intel-cross-compile-static-link
 #            os: macos-15
 #            cross-build-intel: true
-#            static-link: true
-#          - name: macos-15-universal-static-link
-#            os: macos-15
-#            cross-build-intel: true
-#            cross-build-arm: true
 #            static-link: true
 
     runs-on: ${{ matrix.os }}
@@ -601,7 +594,7 @@ jobs:
 
     - name: Download miniaudio
       run: |
-        git clone --depth=1 https://github.com/mercury233/miniaudio
+        git clone --depth=1 -b 0.11.23 https://github.com/mackron/miniaudio
         cd miniaudio
         cp extras/miniaudio_split/miniaudio.* .
         cd ..
@@ -625,7 +618,7 @@ jobs:
       uses: mercury233/action-cache-download-file@v1.0.0
       with:
         url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
-    
+
     - name: Extract opus
       if: matrix.static-link == true
       run: |
@@ -664,8 +657,8 @@ jobs:
 
     - name: Copy premake files
       run: |
-        cp -r premake/* .
-        cp -r resource/* .
+        cp -pr premake/* .
+        cp -pr resource/* .
 
     - name: Use premake to generate make files (Homebrew packages)
       if: matrix.static-link != true
@@ -679,7 +672,7 @@ jobs:
           --build-event \
           --build-freetype \
           --build-sqlite \
-          --build-opus-vorbis 
+          --build-opus-vorbis
 
     - name: Make
       run: |

@@ -22,11 +22,11 @@
 #include <mutex>
 #include <functional>
 
-constexpr int DEFAULT_DUEL_RULE = 5;
+namespace ygo {
+
+constexpr int DEFAULT_DUEL_RULE = CURRENT_RULE;
 constexpr int CONFIG_LINE_SIZE = 1024;
 constexpr int TEXT_LINE_SIZE = 256;
-
-namespace ygo {
 
 template<size_t N>
 bool IsExtension(const wchar_t* filename, const wchar_t(&extension)[N]) {

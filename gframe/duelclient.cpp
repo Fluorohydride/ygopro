@@ -739,7 +739,6 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 			starttime = new_replay.pheader.base.start_time;
 		else
 			starttime = new_replay.pheader.base.seed;
-		
 		wchar_t timetext[40];
 		std::wcsftime(timetext, sizeof timetext / sizeof timetext[0], L"%Y-%m-%d %H-%M-%S", std::localtime(&starttime));
 		mainGame->ebRSName->setText(timetext);
@@ -763,8 +762,11 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 			prep += sizeof new_replay.pheader;
 			std::memcpy(new_replay.comp_data, prep, len - sizeof new_replay.pheader - 1);
 			new_replay.comp_size = len - sizeof new_replay.pheader - 1;
-			if(mainGame->actionParam)
-				new_replay.SaveReplay(mainGame->ebRSName->getText());
+			if (mainGame->actionParam) {
+				bool save_result = new_replay.SaveReplay(mainGame->ebRSName->getText());
+				if (!save_result)
+					new_replay.SaveReplay(L"_LastReplay");
+			}
 			else
 				new_replay.SaveReplay(L"_LastReplay");
 		}
@@ -1114,7 +1116,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			break;
 		}
 		case HINT_RACE: {
-			myswprintf(textBuffer, dataManager.GetSysString(1511), dataManager.FormatRace(data).c_str());
+			const auto& race = dataManager.FormatRace(data);
+			myswprintf(textBuffer, dataManager.GetSysString(1511), race.c_str());
 			mainGame->AddLog(textBuffer);
 			mainGame->gMutex.lock();
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->guiFont, textBuffer);
@@ -1124,7 +1127,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			break;
 		}
 		case HINT_ATTRIB: {
-			myswprintf(textBuffer, dataManager.GetSysString(1511), dataManager.FormatAttribute(data).c_str());
+			const auto& attribute = dataManager.FormatAttribute(data);
+			myswprintf(textBuffer, dataManager.GetSysString(1511), attribute.c_str());
 			mainGame->AddLog(textBuffer);
 			mainGame->gMutex.lock();
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->guiFont, textBuffer);
@@ -2913,12 +2917,14 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			else
 				soundManager.PlaySoundEffect(SOUND_SPECIAL_SUMMON);
 			myswprintf(event_string, dataManager.GetSysString(1605), dataManager.GetName(code));
-			mainGame->showcardcode = code;
-			mainGame->showcarddif = 1;
-			mainGame->showcard = 5;
-			mainGame->WaitFrameSignal(30);
-			mainGame->showcard = 0;
-			mainGame->WaitFrameSignal(11);
+			if(code) {
+				mainGame->showcardcode = code;
+				mainGame->showcarddif = 1;
+				mainGame->showcard = 5;
+				mainGame->WaitFrameSignal(30);
+				mainGame->showcard = 0;
+				mainGame->WaitFrameSignal(11);
+			}
 		}
 		return true;
 	}

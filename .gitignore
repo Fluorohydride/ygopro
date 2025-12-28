@@ -23,9 +23,10 @@
 /ikpMP3.dll
 /irrKlang.dll
 
-/bin
+/.vscode/
+/bin/
 /build
-/obj
+/obj/
 /event
 /freetype
 /irrlicht

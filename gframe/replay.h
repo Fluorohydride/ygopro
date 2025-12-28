@@ -1,7 +1,10 @@
 #ifndef REPLAY_H
 #define REPLAY_H
 
-#include "config.h"
+#include <cstdio>
+#include <vector>
+#include <string>
+#include "../ocgcore/ocgapi.h"
 #include "deck_manager.h"
 
 namespace ygo {
@@ -62,7 +65,7 @@ public:
 	void WriteInt32(int32_t data, bool flush = true);
 	void Flush();
 	void EndRecord();
-	void SaveReplay(const wchar_t* name);
+	bool SaveReplay(const wchar_t* base_name);
 
 	// play
 	static bool DeleteReplay(const wchar_t* name);
@@ -95,10 +98,6 @@ public:
 	bool IsReplaying() const;
 
 	FILE* fp{ nullptr };
-#ifdef _WIN32
-	HANDLE recording_fp{ nullptr };
-#endif
-
 	ExtendedReplayHeader pheader;
 	unsigned char* comp_data;
 	size_t comp_size{};

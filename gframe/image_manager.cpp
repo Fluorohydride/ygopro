@@ -219,10 +219,10 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	auto tit = tMap[fit ? 1 : 0].find(code);
 	if(tit == tMap[fit ? 1 : 0].end()) {
 		char file[256];
-		std::snprintf(file, sizeof file, "expansions/pics/%d.jpg", code);
+		mysnprintf(file, "expansions/pics/%d.jpg", code);
 		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
 		if(img == nullptr) {
-			std::snprintf(file, sizeof file, "pics/%d.jpg", code);
+			mysnprintf(file, "pics/%d.jpg", code);
 			img = GetTextureFromFile(file, width, height);
 		}
 		tMap[fit ? 1 : 0][code] = img;
@@ -242,10 +242,10 @@ irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 	}
 	irr::video::ITexture* texture;
 	char file[256];
-	std::snprintf(file, sizeof file, "expansions/pics/%d.jpg", code);
+	mysnprintf(file, "expansions/pics/%d.jpg", code);
 	irr::video::IImage* srcimg = driver->createImageFromFile(file);
 	if(srcimg == nullptr) {
-		std::snprintf(file, sizeof file, "pics/%d.jpg", code);
+		mysnprintf(file, "pics/%d.jpg", code);
 		srcimg = driver->createImageFromFile(file);
 	}
 	if(srcimg == nullptr) {
@@ -368,18 +368,18 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
 		char file[256];
-		std::snprintf(file, sizeof file, "expansions/pics/field/%d.png", code);
+		mysnprintf(file, "expansions/pics/field/%d.png", code);
 		irr::video::ITexture* img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 		if(img == nullptr) {
-			std::snprintf(file, sizeof file, "expansions/pics/field/%d.jpg", code);
+			mysnprintf(file, "expansions/pics/field/%d.jpg", code);
 			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 		}
 		if(img == nullptr) {
-			std::snprintf(file, sizeof file, "pics/field/%d.png", code);
+			mysnprintf(file, "pics/field/%d.png", code);
 			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 		}
 		if(img == nullptr) {
-			std::snprintf(file, sizeof file, "pics/field/%d.jpg", code);
+			mysnprintf(file, "pics/field/%d.jpg", code);
 			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 			if(img == nullptr) {
 				tFields[code] = nullptr;

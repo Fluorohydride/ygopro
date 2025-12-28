@@ -348,6 +348,7 @@ void Game::DrawCard(ClientCard* pcard) {
 		if(pcard->aniFrame == 0) {
 			pcard->is_moving = false;
 			pcard->is_fading = false;
+			pcard->chain_code = 0;
 		}
 	}
 	matManager.mCard.AmbientColor = 0xffffffff;
@@ -355,7 +356,10 @@ void Game::DrawCard(ClientCard* pcard) {
 	driver->setTransform(irr::video::ETS_WORLD, pcard->mTransform);
 	auto m22 = pcard->mTransform(2, 2);
 	if(m22 > -0.99 || pcard->is_moving) {
-		matManager.mCard.setTexture(0, imageManager.GetTexture(pcard->code));
+		auto code = pcard->code;
+		if (code == 0 && pcard->is_moving)
+			code = pcard->chain_code;
+		matManager.mCard.setTexture(0, imageManager.GetTexture(code));
 		driver->setMaterial(matManager.mCard);
 		driver->drawVertexPrimitiveList(matManager.vCardFront, 4, matManager.iRectangle, 2);
 	}
@@ -1091,7 +1095,6 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 	if(win == wCardSelect) {
 		for(int i = 0; i < 5; ++i)
 			btnCardSelect[i]->setDrawImage(false);
-		dField.conti_selecting = false;
 		stCardListTip->setVisible(false);
 		for(auto& pcard : dField.selectable_cards)
 			dField.SetShowMark(pcard, false);
@@ -1303,8 +1306,9 @@ void Game::DrawDeckBd() {
 				else
 					myswprintf(adBuffer, L"%d/-", ptr->second.attack);
 			}
-			myswprintf(textBuffer, L"%ls/%ls %ls%d", dataManager.FormatAttribute(ptr->second.attribute).c_str(), dataManager.FormatRace(ptr->second.race).c_str(),
-				form, ptr->second.level);
+			const auto& attribute = dataManager.FormatAttribute(ptr->second.attribute);
+			const auto& race = dataManager.FormatRace(ptr->second.race);
+			myswprintf(textBuffer, L"%ls/%ls %ls%d", attribute.c_str(), race.c_str(), form, ptr->second.level);
 			DrawShadowText(textFont, textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
 			if(ptr->second.type & TYPE_PENDULUM) {
 				myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
@@ -1314,7 +1318,8 @@ void Game::DrawDeckBd() {
 		} else {
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
 			DrawShadowText(textFont, textBuffer, Resize(860, 165 + i * 66, 955, 185 + i * 66), Resize(1, 1, 0, 0));
-			myswprintf(textBuffer, L"%ls", dataManager.FormatType(ptr->second.type).c_str());
+			const auto& type = dataManager.FormatType(ptr->second.type);
+			myswprintf(textBuffer, L"%ls", type.c_str());
 			DrawShadowText(textFont, textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
 			myswprintf(textBuffer, L"%ls", availBuffer);
 			DrawShadowText(textFont, textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), Resize(1, 1, 0, 0));

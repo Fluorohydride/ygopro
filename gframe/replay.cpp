@@ -1,3 +1,4 @@
+#include "config.h"
 #include "replay.h"
 #include "myfilesystem.h"
 #include "lzma/LzmaLib.h"
@@ -15,31 +16,18 @@ Replay::~Replay() {
 void Replay::BeginRecord() {
 	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
 		return;
-#ifdef _WIN32
-	if(is_recording)
-		CloseHandle(recording_fp);
-	recording_fp = CreateFileW(L"./replay/_LastReplay.yrp", GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, nullptr);
-	if(recording_fp == INVALID_HANDLE_VALUE)
-		return;
-#else
 	if(is_recording)
 		std::fclose(fp);
 	fp = myfopen("./replay/_LastReplay.yrp", "wb");
 	if(!fp)
 		return;
-#endif
 	Reset();
 	is_recording = true;
 }
 void Replay::WriteHeader(ExtendedReplayHeader& header) {
 	pheader = header;
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &header, sizeof(header), &size, nullptr);
-#else
-	std::fwrite(&header, sizeof(header), 1, fp);
+	std::fwrite(&header, sizeof header, 1, fp);
 	std::fflush(fp);
-#endif
 }
 void Replay::WriteData(const void* data, size_t length, bool flush) {
 	if(!is_recording)
@@ -48,14 +36,9 @@ void Replay::WriteData(const void* data, size_t length, bool flush) {
 		return;
 	std::memcpy(replay_data + replay_size, data, length);
 	replay_size += length;
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, data, length, &size, nullptr);
-#else
 	std::fwrite(data, length, 1, fp);
 	if(flush)
 		std::fflush(fp);
-#endif
 }
 void Replay::WriteInt32(int32_t data, bool flush) {
 	Write<int32_t>(data, flush);
@@ -63,19 +46,12 @@ void Replay::WriteInt32(int32_t data, bool flush) {
 void Replay::Flush() {
 	if(!is_recording)
 		return;
-#ifdef _WIN32
-#else
 	std::fflush(fp);
-#endif
 }
 void Replay::EndRecord() {
 	if(!is_recording)
 		return;
-#ifdef _WIN32
-	CloseHandle(recording_fp);
-#else
 	std::fclose(fp);
-#endif
 	pheader.base.datasize = replay_size;
 	pheader.base.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
@@ -87,23 +63,29 @@ void Replay::EndRecord() {
 	}
 	is_recording = false;
 }
-void Replay::SaveReplay(const wchar_t* name) {
+bool Replay::SaveReplay(const wchar_t* base_name) {
 	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
-		return;
-	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls.yrp", name);
-	FILE* rfp = mywfopen(fname, "wb");
+		return false;
+	wchar_t filename[256]{};
+	wchar_t path[256]{};
+	BufferIO::CopyWideString(base_name, filename);
+	FileSystem::SafeFileName(filename);
+	if (myswprintf(path, L"./replay/%ls.yrp", filename) <= 0)
+		return false;
+	FILE* rfp = mywfopen(path, "wb");
 	if(!rfp)
-		return;
+		return false;
 	std::fwrite(&pheader, sizeof pheader, 1, rfp);
 	std::fwrite(comp_data, comp_size, 1, rfp);
 	std::fclose(rfp);
+	return true;
 }
 bool Replay::OpenReplay(const wchar_t* name) {
 	FILE* rfp = mywfopen(name, "rb");
 	if(!rfp) {
 		wchar_t fname[256];
-		myswprintf(fname, L"./replay/%ls", name);
+		if (myswprintf(fname, L"./replay/%ls", name) <= 0)
+			return false;
 		rfp = mywfopen(fname, "rb");
 	}
 	if(!rfp)
@@ -155,26 +137,30 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	return true;
 }
 bool Replay::DeleteReplay(const wchar_t* name) {
+	if (std::wcschr(name, L'/') || std::wcschr(name, L'\\'))
+		return false;
 	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls", name);
+	if(myswprintf(fname, L"./replay/%ls", name) <= 0)
+		return false;
 	return FileSystem::RemoveFile(fname);
 }
 bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
-	wchar_t oldfname[256];
-	wchar_t newfname[256];
-	myswprintf(oldfname, L"./replay/%ls", oldname);
-	myswprintf(newfname, L"./replay/%ls", newname);
-#ifdef _WIN32
-	BOOL result = MoveFileW(oldfname, newfname);
-	return !!result;
-#else
-	char oldfilefn[256];
-	char newfilefn[256];
-	BufferIO::EncodeUTF8(oldfname, oldfilefn);
-	BufferIO::EncodeUTF8(newfname, newfilefn);
-	int result = rename(oldfilefn, newfilefn);
+	wchar_t old_path[256];
+	wchar_t new_path[256];
+	if (std::wcschr(oldname, L'/') || std::wcschr(oldname, L'\\'))
+		return false;
+	if (std::wcschr(newname, L'/') || std::wcschr(newname, L'\\'))
+		return false;
+	if (myswprintf(old_path, L"./replay/%ls", oldname) <= 0)
+		return false;
+	if (myswprintf(new_path, L"./replay/%ls", newname) <= 0)
+		return false;
+	char oldfilefn[1024];
+	char newfilefn[1024];
+	BufferIO::EncodeUTF8(old_path, oldfilefn);
+	BufferIO::EncodeUTF8(new_path, newfilefn);
+	int result = std::rename(oldfilefn, newfilefn);
 	return result == 0;
-#endif
 }
 bool Replay::ReadNextResponse(unsigned char resp[]) {
 	unsigned char len{};

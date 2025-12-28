@@ -382,9 +382,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					int flag = 0;
 					flag += (mainGame->chkBotHand->isChecked() ? 0x1 : 0);
 					char arg2[8];
-					std::snprintf(arg2, sizeof arg2, "%d", flag);
+					mysnprintf(arg2, "%d", flag);
 					char arg3[8];
-					std::snprintf(arg3, sizeof arg3, "%d", mainGame->gameConf.serverport);
+					mysnprintf(arg3, "%d", mainGame->gameConf.serverport);
 					execl("./bot", "bot", arg1, arg2, arg3, nullptr);
 					std::exit(0);
 				} else {
@@ -428,8 +428,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					wchar_t *dot = std::wcsrchr(open_file_name, L'.');
 					if(dash && dot && !mywcsncasecmp(dot, L".ydk", 4)) { // full path
 						wchar_t deck_name[256];
-						std::wcsncpy(deck_name, dash + 1, dot - dash - 1);
-						deck_name[dot - dash - 1] = L'\0';
+						BufferIO::CopyWideString(dash + 1, deck_name, dot - dash - 1);
 						mainGame->ebDeckname->setText(deck_name);
 						mainGame->cbDBCategory->setSelected(-1);
 						mainGame->cbDBDecks->setSelected(-1);
@@ -438,7 +437,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDBDecks->setEnabled(false);
 					} else if(dash) { // has category
 						wchar_t deck_name[256];
-						std::wcsncpy(deck_name, dash + 1, 256);
+						BufferIO::CopyWideString(dash + 1, deck_name);
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 							if(!std::wcscmp(mainGame->cbDBDecks->getItem(i), deck_name)) {
 								BufferIO::CopyWideString(deck_name, mainGame->gameConf.lastdeck);
@@ -488,7 +487,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
 					wchar_t newname[256];
 					BufferIO::CopyWideString(mainGame->ebRSName->getText(), newname);
-					if(mywcsncasecmp(newname + std::wcslen(newname) - 4, L".yrp", 4)) {
+					if (!IsExtension(newname, L".yrp")) {
 						myswprintf(newname, L"%ls.yrp", mainGame->ebRSName->getText());
 					}
 					if(Replay::RenameReplay(mainGame->lstReplayList->getListItem(prev_sel), newname)) {
