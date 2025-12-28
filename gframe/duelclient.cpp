@@ -4067,6 +4067,19 @@ void DuelClient::SendResponse() {
 		SendBufferToServer(CTOS_RESPONSE, response_buf, response_len);
 	}
 }
+void DuelClient::SendUpdateDeck(const Deck& deck) {
+	std::vector<unsigned char> deckbuf;
+	deckbuf.reserve(1024);
+	BufferIO::VectorWrite<int32_t>(deckbuf, static_cast<int32_t>(deck.main.size() + deck.extra.size()));
+	BufferIO::VectorWrite<int32_t>(deckbuf, static_cast<int32_t>(deck.side.size()));
+	for (const auto& card: deck.main)
+		BufferIO::VectorWrite<uint32_t>(deckbuf, card->first);
+	for (const auto& card: deck.extra)
+		BufferIO::VectorWrite<uint32_t>(deckbuf, card->first);
+	for (const auto& card: deck.side)
+		BufferIO::VectorWrite<uint32_t>(deckbuf, card->first);
+	SendBufferToServer(CTOS_UPDATE_DECK, deckbuf.data(), deckbuf.size());
+}
 void DuelClient::BeginRefreshHost() {
 	if(is_refreshing)
 		return;

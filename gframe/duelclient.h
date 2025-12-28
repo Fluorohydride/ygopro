@@ -5,6 +5,7 @@
 #include <set>
 #include <random>
 #include "config.h"
+#include "deck_manager.h"
 #include "network.h"
 
 namespace ygo {
@@ -48,6 +49,7 @@ public:
 	static void SetResponseI(int32_t respI);
 	static void SetResponseB(void* respB, size_t len);
 	static void SendResponse();
+	static void SendUpdateDeck(const Deck& deck);
 	static void SendPacketToServer(unsigned char proto) {
 		auto p = duel_client_write;
 		BufferIO::Write<uint16_t>(p, 1);
