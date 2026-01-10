@@ -829,11 +829,11 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		break;
 	}
 	case STOC_HS_PLAYER_ENTER: {
-		if (len < 1 + STOC_HS_PlayerEnter_size)
+		if (len < 1 + sizeof(STOC_HS_PlayerEnter))
 			return;
 		soundManager.PlaySoundEffect(SOUND_PLAYER_ENTER);
 		STOC_HS_PlayerEnter packet;
-		std::memcpy(&packet, pdata, STOC_HS_PlayerEnter_size);
+		std::memcpy(&packet, pdata, sizeof(STOC_HS_PlayerEnter));
 		auto pkt = &packet;
 		if(pkt->pos > 3)
 			break;
