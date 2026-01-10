@@ -106,7 +106,7 @@ void SoundManager::PlaySoundEffect(int sound) {
 		strcpy(soundName, "set");
 		break;
 	}
-	case SOUND_FILP: {
+	case SOUND_FLIP: {
 		strcpy(soundName, "flip");
 		break;
 	}

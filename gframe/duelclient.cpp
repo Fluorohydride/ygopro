@@ -2942,7 +2942,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		pcard->SetCode(code);
 		pcard->position = cp;
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-			soundManager.PlaySoundEffect(SOUND_FILP);
+			soundManager.PlaySoundEffect(SOUND_FLIP);
 			myswprintf(event_string, dataManager.GetSysString(1607), dataManager.GetName(code));
 			mainGame->dField.MoveCard(pcard, 10);
 			mainGame->WaitFrameSignal(11);

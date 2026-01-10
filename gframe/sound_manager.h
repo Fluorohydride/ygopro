@@ -54,7 +54,7 @@ extern SoundManager soundManager;
 #define SOUND_SPECIAL_SUMMON		102
 #define SOUND_ACTIVATE				103
 #define SOUND_SET					104
-#define SOUND_FILP					105
+#define SOUND_FLIP					105
 #define SOUND_REVEAL				106
 #define SOUND_EQUIP					107
 #define SOUND_DESTROYED				108
