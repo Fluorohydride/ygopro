@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstring>
 #include <cwchar>
+#include <vector>
 
 class BufferIO {
 public:
@@ -15,9 +16,19 @@ public:
 		return ret;
 	}
 	template<typename T>
-	static void Write(unsigned char*& p, T value) {
+	static void Write(unsigned char*& p, const T& value) {
 		std::memcpy(p, &value, sizeof(T));
 		p += sizeof(T);
+	}
+
+	static void VectorWriteBlock(std::vector<unsigned char>& buffer, const void* src, size_t size) {
+		const auto len = buffer.size();
+		buffer.resize(len + size);
+		std::memcpy(buffer.data() + len, src, size);
+	}
+	template<typename T>
+	static void VectorWrite(std::vector<unsigned char>& buffer, const T& value) {
+		VectorWriteBlock(buffer, &value, sizeof(T));
 	}
 
 	// for compatibility
