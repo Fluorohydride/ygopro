@@ -55,13 +55,13 @@ struct Config {
 #else
 	bool use_image_load_background_thread{ true };
 #endif
-	unsigned short antialias{ 0 };
+	unsigned short antialias{ 2 };
 	unsigned short serverport{ 7911 };
 	unsigned char textfontsize{ 14 };
 	wchar_t lasthost[100]{};
 	wchar_t lastport[10]{};
-	wchar_t nickname[20]{};
-	wchar_t gamename[20]{};
+	wchar_t nickname[20]{ L"Player"};
+	wchar_t gamename[20]{ L"Game" };
 	wchar_t roompass[20]{};
 	//path
 	wchar_t lastcategory[256]{};
@@ -71,7 +71,7 @@ struct Config {
 	wchar_t bot_deck_path[256]{};
 	//settings
 	int chkMAutoPos{ 0 };
-	int chkSTAutoPos{ 1 };
+	int chkSTAutoPos{ 0 };
 	int chkRandomPos{ 0 };
 	int chkAutoChain{ 0 };
 	int chkWaitChain{ 0 };
@@ -102,8 +102,8 @@ struct Config {
 	double music_volume{ 0.5 };
 	int music_mode{ 1 };
 	bool window_maximized{ false };
-	int window_width{ 1024 };
-	int window_height{ 640 };
+	int window_width{ 1280 };
+	int window_height{ 800 };
 	bool resize_popup_menu{ false };
 };
 
@@ -193,7 +193,7 @@ public:
 	void WaitFrameSignal(int frame);
 	void DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lflist, bool drag = false);
 	void DrawDeckBd();
-	void LoadConfig();
+	void LoadConfig(const char* file);
 	void SaveConfig();
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
