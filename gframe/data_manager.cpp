@@ -1,5 +1,6 @@
 #include "data_manager.h"
 #include "game.h"
+#include "client_card.h"
 #include "spmemvfs/spmemvfs.h"
 
 namespace ygo {
@@ -289,6 +290,11 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) const {
 		return GetSysString(string_id);
 	else
 		return unknown_string;
+}
+const wchar_t* DataManager::FormatLocation(ClientCard* card) const {
+	if (!card)
+		return unknown_string;
+	return FormatLocation(card->location, card->sequence);
 }
 std::wstring DataManager::FormatAttribute(unsigned int attribute) const {
 	std::wstring buffer;
