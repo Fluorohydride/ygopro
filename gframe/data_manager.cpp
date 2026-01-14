@@ -280,11 +280,10 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) const {
 		else
 			return GetSysString(1009);
 	}
-	int i = 1000;
 	int string_id = 0;
-	for (unsigned filter = LOCATION_DECK; filter <= LOCATION_PZONE; filter <<= 1, ++i) {
-		if (filter == location) {
-			string_id = i;
+	for (int i = 0; i < 10; ++i) {
+		if ((0x1U << i) == location) {
+			string_id = STRING_ID_LOCATION + i;
 			break;
 		}
 	}

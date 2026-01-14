@@ -102,6 +102,7 @@ public:
 	const wchar_t* unknown_string{ L"???" };
 	irr::io::IFileSystem* FileSystem{};
 
+	static constexpr int STRING_ID_LOCATION = 1000;
 	static constexpr int STRING_ID_ATTRIBUTE = 1010;
 	static constexpr int STRING_ID_RACE = 1020;
 	static constexpr int STRING_ID_TYPE = 1050;
