@@ -221,8 +221,6 @@ const wchar_t* DataManager::GetDesc(uint32_t strCode) const {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetSysString(int code) const {
-	if (code < 0 || code > MAX_STRING_ID)
-		return unknown_string;
 	auto csit = _sysStrings.find(code);
 	if(csit == _sysStrings.end())
 		return unknown_string;
