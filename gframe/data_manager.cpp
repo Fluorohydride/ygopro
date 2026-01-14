@@ -303,7 +303,7 @@ std::wstring DataManager::FormatAttribute(unsigned int attribute) const {
 		}
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatRace(unsigned int race) const {
@@ -316,7 +316,7 @@ std::wstring DataManager::FormatRace(unsigned int race) const {
 		}
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatType(unsigned int type) const {
@@ -329,7 +329,7 @@ std::wstring DataManager::FormatType(unsigned int type) const {
 		}
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatSetName(const uint16_t setcode[]) const {
@@ -343,7 +343,7 @@ std::wstring DataManager::FormatSetName(const uint16_t setcode[]) const {
 		buffer.append(setname);
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatLinkMarker(unsigned int link_marker) const {
