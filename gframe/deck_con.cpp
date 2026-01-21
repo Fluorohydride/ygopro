@@ -1237,6 +1237,190 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				ZoomBigCard(mouse_pos.X, mouse_pos.Y);
 				break;
 			}
+			if(hovered_pos >= 1 && hovered_pos <= 3 && hovered_seq != -1) {
+				mainGame->env->setFocus(0);
+				irr::core::position2di dest;
+				int pos = hovered_pos;
+				int seq = hovered_seq;
+				switch(pos) {
+				case 1: {
+					if(event.MouseInput.Wheel > 0) {
+						if(seq <= 0) {
+							if(deckManager.current_deck.side.size() > 0) {
+								pos = 3;
+								seq = deckManager.current_deck.side.size() - 1;
+							} else if(deckManager.current_deck.extra.size() > 0) {
+								pos = 2;
+								seq = deckManager.current_deck.extra.size() - 1;
+							} else if(deckManager.current_deck.main.size() > 0) {
+								pos = 1;
+								seq = deckManager.current_deck.main.size() - 1;
+							} else
+								pos = -1;
+						} else
+							seq--;
+					} else {
+						if(seq + 1 >= deckManager.current_deck.main.size()) {
+							if(deckManager.current_deck.extra.size() > 0) {
+								pos = 2;
+								seq = 0;
+							} else if(deckManager.current_deck.side.size() > 0) {
+								pos = 3;
+								seq = 0;
+							} else if(deckManager.current_deck.main.size() > 0) {
+								pos = 1;
+								seq = 0;
+							} else
+								pos = -1;
+						} else
+							seq++;
+					}
+					break;
+				}
+				case 2: {
+					if(event.MouseInput.Wheel > 0) {
+						if(seq <= 0) {
+							if(deckManager.current_deck.main.size() > 0) {
+								pos = 1;
+								seq = deckManager.current_deck.main.size() - 1;
+							} else if(deckManager.current_deck.side.size() > 0) {
+								pos = 2;
+								seq = deckManager.current_deck.side.size() - 1;
+							} else if(deckManager.current_deck.extra.size() > 0) {
+								pos = 1;
+								seq = deckManager.current_deck.extra.size() - 1;
+							} else
+								pos = -1;
+						} else
+							seq--;
+					} else {
+						if(seq + 1 >= deckManager.current_deck.extra.size()) {
+							if(deckManager.current_deck.side.size() > 0) {
+								pos = 3;
+								seq = 0;
+							} else if(deckManager.current_deck.main.size() > 0) {
+								pos = 1;
+								seq = 0;
+							} else if(deckManager.current_deck.extra.size() > 0) {
+								pos = 2;
+								seq = 0;
+							} else
+								pos = -1;
+						} else
+							seq++;
+					}
+					break;
+				}
+				case 3: {
+					if(event.MouseInput.Wheel > 0) {
+						if(seq <= 0) {
+							if(deckManager.current_deck.extra.size() > 0) {
+								pos = 2;
+								seq = deckManager.current_deck.extra.size() - 1;
+							} else if(deckManager.current_deck.main.size() > 0) {
+								pos = 1;
+								seq = deckManager.current_deck.main.size() - 1;
+							} else if(deckManager.current_deck.side.size() > 0) {
+								pos = 3;
+								seq = deckManager.current_deck.side.size() - 1;
+							} else
+								pos = -1;
+						} else
+							seq--;
+					} else {
+						if(seq + 1 >= deckManager.current_deck.side.size()) {
+							if(deckManager.current_deck.main.size() > 0) {
+								pos = 1;
+								seq = 0;
+							} else if(deckManager.current_deck.extra.size() > 0) {
+								pos = 2;
+								seq = 0;
+							} else if(deckManager.current_deck.side.size() > 0) {
+								pos = 3;
+								seq = 0;
+							} else
+								pos = -1;
+						} else
+							seq++;
+					}
+					break;
+				}
+				}
+				if(pos < 0)
+					break;
+				int lx;
+				float dx;
+				switch(pos) {
+				case 1: {
+					float dy = 68;
+					if(showing_pack) {
+						if(mainGame->scrPackCards->isVisible() && seq > 0) {
+							seq = seq - 12 * mainGame->scrPackCards->getPos();
+						}
+						int mainsize = deckManager.current_deck.main.size();
+						lx = 10;
+						if(mainsize > 10 * 7)
+							lx = 11;
+						if(mainsize > 11 * 7)
+							lx = 12;
+						if(mainsize > 60)
+							dy = 66;
+						dx = (mainGame->scrPackCards->isVisible() ? 414.0f : 436.0f) / (lx - 1);
+						if(mainGame->scrPackCards->isVisible() && seq >= 12 * 7) {
+							int l = (seq - 12 * 6) / 12;
+							mainGame->scrPackCards->setPos(mainGame->scrPackCards->getPos() + l);
+							seq = seq - 12 * l;
+						}
+						if(seq < 0) {
+							mainGame->scrPackCards->setPos(mainGame->scrPackCards->getPos() - 1);
+							seq = seq + 12;
+						}
+						if(seq == 0) {
+							mainGame->scrPackCards->setPos(0);
+						}
+					} else {
+						if(deckManager.current_deck.main.size() <= 40) {
+							dx = 436.0f / 9;
+							lx = 10;
+						} else {
+							lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
+							dx = 436.0f / (lx - 1);
+						}
+					}
+					dest.X = 314 + CARD_THUMB_WIDTH / 2 + (seq % lx) * dx;
+					dest.Y = 164 + CARD_THUMB_HEIGHT / 2 + (seq / lx) * dy;
+					break;
+				}
+				case 2: {
+					if(deckManager.current_deck.extra.size() <= 10)
+						dx = 436.0f / 9;
+					else
+						dx = 436.0f / (deckManager.current_deck.extra.size() - 1);
+					dest.X = 314 + CARD_THUMB_WIDTH / 2 + seq * dx;
+					dest.Y = 466 + CARD_THUMB_HEIGHT / 2;
+					break;
+				}
+				case 3: {
+					if(deckManager.current_deck.side.size() <= 10)
+						dx = 436.0f / 9;
+					else
+						dx = 436.0f / (deckManager.current_deck.side.size() - 1);
+					dest.X = 314 + CARD_THUMB_WIDTH / 2 + seq * dx;
+					dest.Y = 564 + CARD_THUMB_HEIGHT / 2;
+					break;
+				}
+				}
+				dest = mainGame->Resize(dest.X, dest.Y);
+#ifdef _WIN32
+				POINT pt;
+				pt.x = dest.X;
+				pt.y = dest.Y;
+				ClientToScreen(mainGame->hWnd, &pt);
+				SetCursorPos(pt.x, pt.y);
+#endif
+				soundManager.PlaySoundEffect(SOUND_CARD_DROP);
+				break;
+			}
 			if(!mainGame->scrFilter->isVisible())
 				break;
 			if(mainGame->env->hasFocus(mainGame->scrFilter))
