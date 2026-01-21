@@ -2075,6 +2075,46 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		}
 		break;
 	}
+	case irr::EET_MOUSE_INPUT_EVENT: {
+		switch(event.MouseInput.Event) {
+		case irr::EMIE_LMOUSE_PRESSED_DOWN: {
+			auto* guiRoot = mainGame->env->getRootGUIElement();
+			auto mousepos = irr::core::position2di(event.MouseInput.X, event.MouseInput.Y);
+			if(guiRoot->getElementFromPoint(mousepos) == mainGame->stText) {
+				if(!mainGame->scrCardText->isVisible()) {
+					break;
+				}
+				is_dragging_cardtext = true;
+				dragging_cardtext_start_pos = mainGame->scrCardText->getPos();
+				dragging_cardtext_start_y = event.MouseInput.Y;
+				return true;
+			}
+			break;
+		}
+		case irr::EMIE_LMOUSE_LEFT_UP: {
+			is_dragging_cardtext = false;
+			break;
+		}
+		case irr::EMIE_MOUSE_MOVED: {
+			if(is_dragging_cardtext) {
+				if(!mainGame->scrCardText->isVisible()) {
+					is_dragging_cardtext = false;
+					break;
+				}
+				int step = mainGame->guiFont->getDimension(L"A").Height + mainGame->guiFont->getKerningHeight();
+				int pos = dragging_cardtext_start_pos + (dragging_cardtext_start_y - event.MouseInput.Y) / step;
+				int max = mainGame->scrCardText->getMax();
+				if(pos < 0) pos = 0;
+				if(pos > max) pos = max;
+				mainGame->scrCardText->setPos(pos);
+				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth() - 25, mainGame->guiFont, mainGame->showingtext, pos);
+			}
+			break;
+		}
+		default: break;
+		}
+		break;
+	}
 	default: break;
 	}
 	return false;
