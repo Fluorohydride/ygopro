@@ -2745,8 +2745,15 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 					}
 				}
 			} else if (!(cl & LOCATION_OVERLAY)) {
-				ClientCard* olcard = mainGame->dField.GetCard(pc, pl & 0x7f, ps);
-				ClientCard* pcard = olcard->overlayed[pp];
+				ClientCard* olcard;
+				ClientCard* pcard;
+				if(pc & 0x10) {
+					olcard = mainGame->dField.GetCard(pc & 0xf, pl, ps, pp); // the overlay card is under another card already
+					pcard = olcard->overlayed[0]; // the actual sequence is not passed by the msg, but all cards will alway be deattached
+				} else {
+					olcard = mainGame->dField.GetCard(pc, pl & 0x7f, ps);
+					pcard = olcard->overlayed[pp];
+				}
 				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 					olcard->overlayed.erase(olcard->overlayed.begin() + pcard->sequence);
 					pcard->overlayTarget = 0;
