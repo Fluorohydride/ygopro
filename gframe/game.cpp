@@ -1454,6 +1454,8 @@ void Game::LoadConfig() {
 				BufferIO::DecodeUTF8(valbuf, gameConf.lastcategory);
 			} else if (!std::strcmp(strbuf, "lastdeck")) {
 				BufferIO::DecodeUTF8(valbuf, gameConf.lastdeck);
+			} else if (!std::strcmp(strbuf, "startupcmd")) {
+				BufferIO::DecodeUTF8(valbuf, gameConf.startupcmd);
 			} else if(!std::strcmp(strbuf, "bot_deck_path")) {
 				BufferIO::DecodeUTF8(valbuf, gameConf.bot_deck_path);
 			}
@@ -1516,6 +1518,8 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
 	BufferIO::EncodeUTF8(gameConf.bot_deck_path, linebuf);
 	std::fprintf(fp, "bot_deck_path = %s\n", linebuf);
+	BufferIO::EncodeUTF8(gameConf.startupcmd, linebuf);
+	fprintf(fp, "startupcmd = %s\n", linebuf);
 	std::fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	std::fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
 	std::fprintf(fp, "draw_single_chain = %d\n", gameConf.draw_single_chain);
@@ -1535,6 +1539,7 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "music_volume = %d\n", vol);
 	std::fprintf(fp, "music_mode = %d\n", (chkMusicMode->isChecked() ? 1 : 0));
 #endif
+
 	std::fclose(fp);
 }
 void Game::ShowCardInfo(int code, bool resize) {
@@ -2181,6 +2186,25 @@ void Game::SetCursor(irr::gui::ECURSOR_ICON icon) {
 	if(cursor->getActiveIcon() != icon) {
 		cursor->setActiveIcon(icon);
 	}
+}
+bool Game::StartProcess(const wchar_t* cmd, const wchar_t* param1, const wchar_t* param2) {
+	if(cmd[0] == 0)
+		return false;
+#ifdef _WIN32
+	STARTUPINFOW si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+	wchar_t command[MAX_PATH];
+	myswprintf(command, L"%ls \"%ls\" \"%ls\"", cmd, param1, param2);
+	return CreateProcessW(NULL, command, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+#else
+	return true;
+//	if(fork() == 0) {
+//		exit(0);
+//	}
+#endif
 }
 
 }

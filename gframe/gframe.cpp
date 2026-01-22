@@ -205,6 +205,7 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 	}
+	ygo::mainGame->StartProcess(ygo::mainGame->gameConf.startupcmd);
 	ygo::mainGame->MainLoop();
 #ifdef _WIN32
 	WSACleanup();

@@ -68,6 +68,7 @@ struct Config {
 	wchar_t lastdeck[256]{};
 	wchar_t textfont[256]{};
 	wchar_t numfont[256]{};
+	wchar_t startupcmd[256]{};
 	wchar_t bot_deck_path[256]{};
 	//settings
 	int chkMAutoPos{ 0 };
@@ -242,6 +243,7 @@ public:
 	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(irr::gui::ECURSOR_ICON icon);
+	bool StartProcess(const wchar_t* cmd, const wchar_t* param1 = L"", const wchar_t* param2 = L"");
 	template<typename T>
 	static void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const irr::core::rect<irr::s32>& position, const irr::core::rect<irr::s32>& padding,
 		irr::video::SColor color = 0xffffffff, irr::video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const irr::core::rect<irr::s32>* clip = nullptr);
