@@ -1,5 +1,6 @@
 #include "data_manager.h"
 #include "game.h"
+#include "client_card.h"
 #include "spmemvfs/spmemvfs.h"
 
 namespace ygo {
@@ -221,8 +222,6 @@ const wchar_t* DataManager::GetDesc(uint32_t strCode) const {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetSysString(int code) const {
-	if (code < 0 || code > MAX_STRING_ID)
-		return unknown_string;
 	auto csit = _sysStrings.find(code);
 	if(csit == _sysStrings.end())
 		return unknown_string;
@@ -280,11 +279,10 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) const {
 		else
 			return GetSysString(1009);
 	}
-	int i = 1000;
 	int string_id = 0;
-	for (unsigned filter = LOCATION_DECK; filter <= LOCATION_PZONE; filter <<= 1, ++i) {
-		if (filter == location) {
-			string_id = i;
+	for (int i = 0; i < 10; ++i) {
+		if ((0x1U << i) == location) {
+			string_id = STRING_ID_LOCATION + i;
 			break;
 		}
 	}
@@ -292,6 +290,11 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) const {
 		return GetSysString(string_id);
 	else
 		return unknown_string;
+}
+const wchar_t* DataManager::FormatLocation(ClientCard* card) const {
+	if (!card)
+		return unknown_string;
+	return FormatLocation(card->location, card->sequence);
 }
 std::wstring DataManager::FormatAttribute(unsigned int attribute) const {
 	std::wstring buffer;
@@ -303,7 +306,7 @@ std::wstring DataManager::FormatAttribute(unsigned int attribute) const {
 		}
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatRace(unsigned int race) const {
@@ -316,7 +319,7 @@ std::wstring DataManager::FormatRace(unsigned int race) const {
 		}
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatType(unsigned int type) const {
@@ -329,7 +332,7 @@ std::wstring DataManager::FormatType(unsigned int type) const {
 		}
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatSetName(const uint16_t setcode[]) const {
@@ -343,7 +346,7 @@ std::wstring DataManager::FormatSetName(const uint16_t setcode[]) const {
 		buffer.append(setname);
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatLinkMarker(unsigned int link_marker) const {
