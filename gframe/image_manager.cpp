@@ -228,7 +228,7 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 		tMap[fit ? 1 : 0][code] = img;
 		return (img == nullptr) ? (fit ? tUnknownFit : tUnknown) : img;
 	}
-	if (tit->second)
+	if(tit->second)
 		return tit->second;
 	else
 		return fit ? tUnknownFit : tUnknown;
