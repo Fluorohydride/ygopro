@@ -320,10 +320,10 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		return tUnknownThumb;
 	auto tit = tThumb.find(code);
 	if(tit == tThumb.end() && !mainGame->gameConf.use_image_load_background_thread) {
-		char file[256];
-		mysnprintf(file, "expansions/pics/%d.jpg", code);
 		int width = CARD_THUMB_WIDTH * mainGame->xScale;
 		int height = CARD_THUMB_HEIGHT * mainGame->yScale;
+		char file[256];
+		mysnprintf(file, "expansions/pics/%d.jpg", code);
 		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
 		if(img == NULL) {
 			mysnprintf(file, "pics/%d.jpg", code);
@@ -337,9 +337,9 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		auto lit = tThumbLoading.find(code);
 		if(lit != tThumbLoading.end()) {
 			if(lit->second != nullptr) {
-				char file[256];
-				mysnprintf(file, "pics/%d.jpg", code);
-				irr::video::ITexture* texture = driver->addTexture(file, lit->second); // textures must be added in the main thread due to OpenGL
+				char textureName[256];
+				mysnprintf(textureName, "pics/%d.jpg_thumbnail", code); // not an actual file
+				irr::video::ITexture* texture = driver->addTexture(textureName, lit->second); // textures must be added in the main thread due to OpenGL
 				lit->second->drop();
 				tThumb[code] = texture;
 			} else {
