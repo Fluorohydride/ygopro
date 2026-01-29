@@ -57,7 +57,6 @@ Xyz materials:
 
 ### Directories:
 * pics: .jpg card images(177*254).
-* pics\thumbnail: .jpg thumbnail images(44*64).
 * script: .lua script files.
 * textures: Other image files.
 * deck: .ydk deck files.
