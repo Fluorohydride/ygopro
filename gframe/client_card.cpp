@@ -32,14 +32,15 @@ ClientCard::~ClientCard() {
 	overlayed.clear();
 }
 void ClientCard::SetCode(unsigned int x) {
-	if((location == LOCATION_HAND) && (code != x)) {
-		code = x;
+	if (code == x) {
+		return;
+	}
+	if (x == 0) {
+		chain_code = code;
+	}
+	code = x;
+	if (location == LOCATION_HAND) {
 		mainGame->dField.MoveCard(this, 5);
-	} else {
-		if (x == 0 && code != 0) {
-			chain_code = code;
-		}
-		code = x;
 	}
 }
 void ClientCard::UpdateInfo(unsigned char* buf) {
