@@ -14,7 +14,6 @@ public:
 	bool Initial();
 	void SetDevice(irr::IrrlichtDevice* dev);
 	void ClearTexture();
-	void RemoveTexture(int code);
 	void ResizeTexture();
 	irr::video::ITexture* GetTextureFromFile(const char* file, irr::s32 width, irr::s32 height);
 	irr::video::ITexture* GetTexture(int code, bool fit = false);
