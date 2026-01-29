@@ -65,6 +65,10 @@ void ImageManager::ClearTexture() {
 		if(tit->second && tit->second != tLoading)
 			driver->removeTexture(tit->second);
 	}
+	for(auto tit = tFields.begin(); tit != tFields.end(); ++tit) {
+		if(tit->second)
+			driver->removeTexture(tit->second);
+	}
 	if(tBigPicture != nullptr) {
 		driver->removeTexture(tBigPicture);
 		tBigPicture = nullptr;
@@ -72,13 +76,13 @@ void ImageManager::ClearTexture() {
 	tMap[0].clear();
 	tMap[1].clear();
 	tThumb.clear();
+	tFields.clear();
 	tThumbLoadingMutex.lock();
 	tThumbLoading.clear();
 	while(!tThumbLoadingCodes.empty())
 		tThumbLoadingCodes.pop();
 	tThumbLoadingThreadRunning = false;
 	tThumbLoadingMutex.unlock();
-	tFields.clear();
 }
 void ImageManager::ResizeTexture() {
 	irr::s32 imgWidth = CARD_IMG_WIDTH * mainGame->xScale;
