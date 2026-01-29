@@ -371,20 +371,22 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		return nullptr;
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
+		irr::s32 width = 512 * mainGame->xScale;
+		irr::s32 height = 512 * mainGame->yScale;
 		char file[256];
 		mysnprintf(file, "expansions/pics/field/%d.png", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
 		if(img == nullptr) {
 			mysnprintf(file, "expansions/pics/field/%d.jpg", code);
-			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+			img = GetTextureFromFile(file, width, height);
 		}
 		if(img == nullptr) {
 			mysnprintf(file, "pics/field/%d.png", code);
-			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+			img = GetTextureFromFile(file, width, height);
 		}
 		if(img == nullptr) {
 			mysnprintf(file, "pics/field/%d.jpg", code);
-			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+			img = GetTextureFromFile(file, width, height);
 			if(img == nullptr) {
 				tFields[code] = nullptr;
 				return nullptr;
