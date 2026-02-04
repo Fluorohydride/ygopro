@@ -124,6 +124,8 @@ void ImageManager::ResizeTexture() {
 void imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading) {
 	const auto& srcDim = src->getDimension();
 	const auto& destDim = dest->getDimension();
+	if (destDim.Width == 0 || destDim.Height == 0)
+		return;
 
 	// Cache scale ratios.
 	const double rx = (double)srcDim.Width / destDim.Width;
