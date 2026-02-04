@@ -57,6 +57,7 @@ struct CardString {
 };
 using code_pointer = std::unordered_map<uint32_t, CardDataC>::const_iterator;
 using string_pointer = std::unordered_map<uint32_t, CardString>::const_iterator;
+using wstring_map = std::unordered_map<uint32_t, std::wstring>;
 
 class ClientCard;
 
@@ -97,10 +98,10 @@ public:
 	std::wstring FormatSetName(const uint16_t setcode[]) const;
 	std::wstring FormatLinkMarker(unsigned int link_marker) const;
 
-	std::unordered_map<uint32_t, std::wstring> _counterStrings;
-	std::unordered_map<uint32_t, std::wstring> _victoryStrings;
-	std::unordered_map<uint32_t, std::wstring> _setnameStrings;
-	std::unordered_map<uint32_t, std::wstring> _sysStrings;
+	wstring_map _counterStrings;
+	wstring_map _victoryStrings;
+	wstring_map _setnameStrings;
+	wstring_map _sysStrings;
 	char errmsg[512]{};
 	const wchar_t* unknown_string{ L"???" };
 	irr::io::IFileSystem* FileSystem{};
@@ -126,6 +127,7 @@ public:
 	static bool deck_sort_name(code_pointer l1, code_pointer l2);
 
 private:
+	const wchar_t* GetMapString(const wstring_map& table, uint32_t code) const;
 	std::unordered_map<uint32_t, CardDataC> _datas;
 	std::unordered_map<uint32_t, CardString> _strings;
 	std::unordered_map<uint32_t, std::vector<uint16_t>> extra_setcode;
