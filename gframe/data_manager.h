@@ -88,7 +88,7 @@ public:
 	const wchar_t* GetVictoryString(uint32_t code) const;
 	const wchar_t* GetCounterName(uint32_t code) const;
 	const wchar_t* GetSetName(uint32_t code) const;
-	std::vector<unsigned int> GetSetCodes(std::wstring setname) const;
+	std::vector<uint32_t> GetSetCodes(std::wstring setname) const;
 	std::wstring GetNumString(int num, bool bracket = false) const;
 	const wchar_t* FormatLocation(int location, int sequence) const;
 	const wchar_t* FormatLocation(ClientCard* card) const;
