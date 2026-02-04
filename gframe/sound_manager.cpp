@@ -217,14 +217,16 @@ void SoundManager::PlaySoundEffect(int sound) {
 	default:
 		break;
 	}
-	char soundPath[256];
-	mysnprintf(soundPath, "./sound/%s.wav", soundName.c_str());
+	std::string soundPath{ "./sound/" };
+	soundPath.reserve(256);
+	soundPath.append(soundName);
+	soundPath.append(".wav");
 	SetSoundVolume(mainGame->gameConf.sound_volume);
 #ifdef YGOPRO_USE_MINIAUDIO
-	ma_engine_play_sound(&engineSound, soundPath, nullptr);
+	ma_engine_play_sound(&engineSound, soundPath.c_str(), nullptr);
 #endif
 #ifdef YGOPRO_USE_IRRKLANG
-	engineSound->play2D(soundPath);
+	engineSound->play2D(soundPath.c_str());
 #endif
 #endif // YGOPRO_USE_AUDIO
 }
