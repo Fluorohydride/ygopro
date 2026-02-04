@@ -65,6 +65,10 @@ void ImageManager::ClearTexture() {
 		if(tit->second && tit->second != tLoading)
 			driver->removeTexture(tit->second);
 	}
+	for(auto tit = tFields.begin(); tit != tFields.end(); ++tit) {
+		if(tit->second)
+			driver->removeTexture(tit->second);
+	}
 	if(tBigPicture != nullptr) {
 		driver->removeTexture(tBigPicture);
 		tBigPicture = nullptr;
@@ -72,13 +76,13 @@ void ImageManager::ClearTexture() {
 	tMap[0].clear();
 	tMap[1].clear();
 	tThumb.clear();
+	tFields.clear();
 	tThumbLoadingMutex.lock();
 	tThumbLoading.clear();
 	while(!tThumbLoadingCodes.empty())
 		tThumbLoadingCodes.pop();
 	tThumbLoadingThreadRunning = false;
 	tThumbLoadingMutex.unlock();
-	tFields.clear();
 }
 void ImageManager::ResizeTexture() {
 	irr::s32 imgWidth = CARD_IMG_WIDTH * mainGame->xScale;
@@ -316,10 +320,10 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		return tUnknownThumb;
 	auto tit = tThumb.find(code);
 	if(tit == tThumb.end() && !mainGame->gameConf.use_image_load_background_thread) {
-		char file[256];
-		mysnprintf(file, "expansions/pics/%d.jpg", code);
 		int width = CARD_THUMB_WIDTH * mainGame->xScale;
 		int height = CARD_THUMB_HEIGHT * mainGame->yScale;
+		char file[256];
+		mysnprintf(file, "expansions/pics/%d.jpg", code);
 		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
 		if(img == NULL) {
 			mysnprintf(file, "pics/%d.jpg", code);
@@ -333,9 +337,9 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		auto lit = tThumbLoading.find(code);
 		if(lit != tThumbLoading.end()) {
 			if(lit->second != nullptr) {
-				char file[256];
-				mysnprintf(file, "pics/%d.jpg", code);
-				irr::video::ITexture* texture = driver->addTexture(file, lit->second); // textures must be added in the main thread due to OpenGL
+				char textureName[256];
+				mysnprintf(textureName, "pics/%d.jpg_thumbnail", code); // not an actual file
+				irr::video::ITexture* texture = driver->addTexture(textureName, lit->second); // textures must be added in the main thread due to OpenGL
 				lit->second->drop();
 				tThumb[code] = texture;
 			} else {
@@ -367,20 +371,22 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		return nullptr;
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
+		irr::s32 width = 512 * mainGame->xScale;
+		irr::s32 height = 512 * mainGame->yScale;
 		char file[256];
 		mysnprintf(file, "expansions/pics/field/%d.png", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
 		if(img == nullptr) {
 			mysnprintf(file, "expansions/pics/field/%d.jpg", code);
-			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+			img = GetTextureFromFile(file, width, height);
 		}
 		if(img == nullptr) {
 			mysnprintf(file, "pics/field/%d.png", code);
-			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+			img = GetTextureFromFile(file, width, height);
 		}
 		if(img == nullptr) {
 			mysnprintf(file, "pics/field/%d.jpg", code);
-			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+			img = GetTextureFromFile(file, width, height);
 			if(img == nullptr) {
 				tFields[code] = nullptr;
 				return nullptr;
