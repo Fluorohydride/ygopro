@@ -271,6 +271,11 @@ irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 int ImageManager::LoadThumbThread() {
 	while(true) {
 		imageManager.tThumbLoadingMutex.lock();
+		imageManager.tThumbLoadingThreadRunning = !imageManager.tThumbLoadingCodes.empty();
+		if(!imageManager.tThumbLoadingThreadRunning) {
+			imageManager.tThumbLoadingMutex.unlock();
+			break;
+		}
 		int code = imageManager.tThumbLoadingCodes.front();
 		imageManager.tThumbLoadingCodes.pop();
 		imageManager.tThumbLoadingMutex.unlock();
@@ -285,19 +290,21 @@ int ImageManager::LoadThumbThread() {
 			int width = CARD_THUMB_WIDTH * mainGame->xScale;
 			int height = CARD_THUMB_HEIGHT * mainGame->yScale;
 			if(img->getDimension() == irr::core::dimension2d<irr::u32>(width, height)) {
-				img->grab();
 				imageManager.tThumbLoadingMutex.lock();
 				if(imageManager.tThumbLoadingThreadRunning)
 					imageManager.tThumbLoading[code] = img;
+				else
+					img->drop();
 				imageManager.tThumbLoadingMutex.unlock();
 			} else {
 				irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
 				imageScaleNNAA(img, destimg);
 				img->drop();
-				destimg->grab();
 				imageManager.tThumbLoadingMutex.lock();
 				if(imageManager.tThumbLoadingThreadRunning)
 					imageManager.tThumbLoading[code] = destimg;
+				else
+					destimg->drop();
 				imageManager.tThumbLoadingMutex.unlock();
 			}
 		} else {
@@ -306,13 +313,7 @@ int ImageManager::LoadThumbThread() {
 				imageManager.tThumbLoading[code] = nullptr;
 			imageManager.tThumbLoadingMutex.unlock();
 		}
-		imageManager.tThumbLoadingMutex.lock();
-		imageManager.tThumbLoadingThreadRunning = !imageManager.tThumbLoadingCodes.empty();
-		if(!imageManager.tThumbLoadingThreadRunning)
-			break;
-		imageManager.tThumbLoadingMutex.unlock();
 	}
-	imageManager.tThumbLoadingMutex.unlock();
 	return 0;
 }
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
