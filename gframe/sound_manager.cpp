@@ -88,7 +88,7 @@ void SoundManager::PlaySoundEffect(int sound) {
 #ifdef YGOPRO_USE_AUDIO
 	if(!mainGame->chkEnableSound->isChecked())
 		return;
-	char soundName[32];
+	char soundName[32]{};
 	switch(sound) {
 	case SOUND_SUMMON: {
 		strcpy(soundName, "summon");
@@ -215,9 +215,9 @@ void SoundManager::PlaySoundEffect(int sound) {
 		break;
 	}
 	default:
-		break;
+		return;
 	}
-	char soundPath[40];
+	char soundPath[64];
 	mysnprintf(soundPath, "./sound/%s.wav", soundName);
 	SetSoundVolume(mainGame->gameConf.sound_volume);
 #ifdef YGOPRO_USE_MINIAUDIO
