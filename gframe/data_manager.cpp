@@ -221,32 +221,32 @@ const wchar_t* DataManager::GetDesc(uint32_t strCode) const {
 		return csit->second.desc[offset].c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetSysString(int code) const {
+const wchar_t* DataManager::GetSysString(uint32_t code) const {
 	auto csit = _sysStrings.find(code);
 	if(csit == _sysStrings.end())
 		return unknown_string;
 	return csit->second.c_str();
 }
-const wchar_t* DataManager::GetVictoryString(int code) const {
+const wchar_t* DataManager::GetVictoryString(uint32_t code) const {
 	auto csit = _victoryStrings.find(code);
 	if(csit == _victoryStrings.end())
 		return unknown_string;
 	return csit->second.c_str();
 }
-const wchar_t* DataManager::GetCounterName(int code) const {
+const wchar_t* DataManager::GetCounterName(uint32_t code) const {
 	auto csit = _counterStrings.find(code);
 	if(csit == _counterStrings.end())
 		return unknown_string;
 	return csit->second.c_str();
 }
-const wchar_t* DataManager::GetSetName(int code) const {
+const wchar_t* DataManager::GetSetName(uint32_t code) const {
 	auto csit = _setnameStrings.find(code);
 	if(csit == _setnameStrings.end())
 		return unknown_string;
 	return csit->second.c_str();
 }
-std::vector<unsigned int> DataManager::GetSetCodes(std::wstring setname) const {
-	std::vector<unsigned int> matchingCodes;
+std::vector<uint32_t> DataManager::GetSetCodes(std::wstring setname) const {
+	std::vector<uint32_t> matchingCodes;
 	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
 		auto xpos = csit->second.find_first_of(L'|');//setname|another setname or extra info
 		if(setname.size() < 2) {

@@ -83,10 +83,10 @@ public:
 	const wchar_t* GetName(uint32_t code) const;
 	const wchar_t* GetText(uint32_t code) const;
 	const wchar_t* GetDesc(uint32_t strCode) const;
-	const wchar_t* GetSysString(int code) const;
-	const wchar_t* GetVictoryString(int code) const;
-	const wchar_t* GetCounterName(int code) const;
-	const wchar_t* GetSetName(int code) const;
+	const wchar_t* GetSysString(uint32_t code) const;
+	const wchar_t* GetVictoryString(uint32_t code) const;
+	const wchar_t* GetCounterName(uint32_t code) const;
+	const wchar_t* GetSetName(uint32_t code) const;
 	std::vector<unsigned int> GetSetCodes(std::wstring setname) const;
 	std::wstring GetNumString(int num, bool bracket = false) const;
 	const wchar_t* FormatLocation(int location, int sequence) const;
@@ -97,18 +97,18 @@ public:
 	std::wstring FormatSetName(const uint16_t setcode[]) const;
 	std::wstring FormatLinkMarker(unsigned int link_marker) const;
 
-	std::unordered_map<unsigned int, std::wstring> _counterStrings;
-	std::unordered_map<unsigned int, std::wstring> _victoryStrings;
-	std::unordered_map<unsigned int, std::wstring> _setnameStrings;
-	std::unordered_map<unsigned int, std::wstring> _sysStrings;
+	std::unordered_map<uint32_t, std::wstring> _counterStrings;
+	std::unordered_map<uint32_t, std::wstring> _victoryStrings;
+	std::unordered_map<uint32_t, std::wstring> _setnameStrings;
+	std::unordered_map<uint32_t, std::wstring> _sysStrings;
 	char errmsg[512]{};
 	const wchar_t* unknown_string{ L"???" };
 	irr::io::IFileSystem* FileSystem{};
 
-	static constexpr int STRING_ID_LOCATION = 1000;
-	static constexpr int STRING_ID_ATTRIBUTE = 1010;
-	static constexpr int STRING_ID_RACE = 1020;
-	static constexpr int STRING_ID_TYPE = 1050;
+	static constexpr uint32_t STRING_ID_LOCATION = 1000;
+	static constexpr uint32_t STRING_ID_ATTRIBUTE = 1010;
+	static constexpr uint32_t STRING_ID_RACE = 1020;
+	static constexpr uint32_t STRING_ID_TYPE = 1050;
 	static constexpr int TYPES_COUNT = 27;
 
 	static unsigned char scriptBuffer[0x100000];
