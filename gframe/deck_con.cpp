@@ -179,10 +179,12 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				std::sort(deckManager.current_deck.main.begin(), deckManager.current_deck.main.end(), DataManager::deck_sort_lv);
 				std::sort(deckManager.current_deck.extra.begin(), deckManager.current_deck.extra.end(), DataManager::deck_sort_lv);
 				std::sort(deckManager.current_deck.side.begin(), deckManager.current_deck.side.end(), DataManager::deck_sort_lv);
+				is_modified = true;
 				break;
 			}
 			case BUTTON_SHUFFLE_DECK: {
 				std::shuffle(deckManager.current_deck.main.begin(), deckManager.current_deck.main.end(), rnd);
+				is_modified = true;
 				break;
 			}
 			case BUTTON_SAVE_DECK: {
@@ -740,6 +742,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					deckManager.current_deck.main.clear();
 					deckManager.current_deck.extra.clear();
 					deckManager.current_deck.side.clear();
+					is_modified = true;
 				} else if(prev_operation == BUTTON_DELETE_DECK) {
 					int sel = prev_sel;
 					mainGame->cbDBDecks->setSelected(sel);
