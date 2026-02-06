@@ -215,12 +215,9 @@ void SoundManager::PlaySoundEffect(int sound) {
 		break;
 	}
 	default:
-		break;
+		return;
 	}
-	std::string soundPath{ "./sound/" };
-	soundPath.reserve(256);
-	soundPath.append(soundName);
-	soundPath.append(".wav");
+	std::string soundPath = "./sound/" + soundName + ".wav";
 	SetSoundVolume(mainGame->gameConf.sound_volume);
 #ifdef YGOPRO_USE_MINIAUDIO
 	ma_engine_play_sound(&engineSound, soundPath.c_str(), nullptr);
