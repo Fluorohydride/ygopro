@@ -88,143 +88,142 @@ void SoundManager::PlaySoundEffect(int sound) {
 #ifdef YGOPRO_USE_AUDIO
 	if(!mainGame->chkEnableSound->isChecked())
 		return;
-	char soundName[32];
+	std::string soundName;
 	switch(sound) {
 	case SOUND_SUMMON: {
-		strcpy(soundName, "summon");
+		soundName = "summon";
 		break;
 	}
 	case SOUND_SPECIAL_SUMMON: {
-		strcpy(soundName, "specialsummon");
+		soundName = "specialsummon";
 		break;
 	}
 	case SOUND_ACTIVATE: {
-		strcpy(soundName, "activate");
+		soundName = "activate";
 		break;
 	}
 	case SOUND_SET: {
-		strcpy(soundName, "set");
+		soundName = "set";
 		break;
 	}
 	case SOUND_FLIP: {
-		strcpy(soundName, "flip");
+		soundName = "flip";
 		break;
 	}
 	case SOUND_REVEAL: {
-		strcpy(soundName, "reveal");
+		soundName = "reveal";
 		break;
 	}
 	case SOUND_EQUIP: {
-		strcpy(soundName, "equip");
+		soundName = "equip";
 		break;
 	}
 	case SOUND_DESTROYED: {
-		strcpy(soundName, "destroyed");
+		soundName = "destroyed";
 		break;
 	}
 	case SOUND_BANISHED: {
-		strcpy(soundName, "banished");
+		soundName = "banished";
 		break;
 	}
 	case SOUND_TOKEN: {
-		strcpy(soundName, "token");
+		soundName = "token";
 		break;
 	}
 	case SOUND_NEGATE: {
-		strcpy(soundName, "negate");
+		soundName = "negate";
 		break;
 	}
 	case SOUND_ATTACK: {
-		strcpy(soundName, "attack");
+		soundName = "attack";
 		break;
 	}
 	case SOUND_DIRECT_ATTACK: {
-		strcpy(soundName, "directattack");
+		soundName = "directattack";
 		break;
 	}
 	case SOUND_DRAW: {
-		strcpy(soundName, "draw");
+		soundName = "draw";
 		break;
 	}
 	case SOUND_SHUFFLE: {
-		strcpy(soundName, "shuffle");
+		soundName = "shuffle";
 		break;
 	}
 	case SOUND_DAMAGE: {
-		strcpy(soundName, "damage");
+		soundName = "damage";
 		break;
 	}
 	case SOUND_RECOVER: {
-		strcpy(soundName, "gainlp");
+		soundName = "gainlp";
 		break;
 	}
 	case SOUND_COUNTER_ADD: {
-		strcpy(soundName, "addcounter");
+		soundName = "addcounter";
 		break;
 	}
 	case SOUND_COUNTER_REMOVE: {
-		strcpy(soundName, "removecounter");
+		soundName = "removecounter";
 		break;
 	}
 	case SOUND_COIN: {
-		strcpy(soundName, "coinflip");
+		soundName = "coinflip";
 		break;
 	}
 	case SOUND_DICE: {
-		strcpy(soundName, "diceroll");
+		soundName = "diceroll";
 		break;
 	}
 	case SOUND_NEXT_TURN: {
-		strcpy(soundName, "nextturn");
+		soundName = "nextturn";
 		break;
 	}
 	case SOUND_PHASE: {
-		strcpy(soundName, "phase");
+		soundName = "phase";
 		break;
 	}
 	case SOUND_MENU: {
-		strcpy(soundName, "menu");
+		soundName = "menu";
 		break;
 	}
 	case SOUND_BUTTON: {
-		strcpy(soundName, "button");
+		soundName = "button";
 		break;
 	}
 	case SOUND_INFO: {
-		strcpy(soundName, "info");
+		soundName = "info";
 		break;
 	}
 	case SOUND_QUESTION: {
-		strcpy(soundName, "question");
+		soundName = "question";
 		break;
 	}
 	case SOUND_CARD_PICK: {
-		strcpy(soundName, "cardpick");
+		soundName = "cardpick";
 		break;
 	}
 	case SOUND_CARD_DROP: {
-		strcpy(soundName, "carddrop");
+		soundName = "carddrop";
 		break;
 	}
 	case SOUND_PLAYER_ENTER: {
-		strcpy(soundName, "playerenter");
+		soundName = "playerenter";
 		break;
 	}
 	case SOUND_CHAT: {
-		strcpy(soundName, "chatmessage");
+		soundName = "chatmessage";
 		break;
 	}
 	default:
-		break;
+		return;
 	}
-	char soundPath[40];
-	mysnprintf(soundPath, "./sound/%s.wav", soundName);
+	std::string soundPath = "./sound/" + soundName + ".wav";
 	SetSoundVolume(mainGame->gameConf.sound_volume);
 #ifdef YGOPRO_USE_MINIAUDIO
-	ma_engine_play_sound(&engineSound, soundPath, nullptr);
+	ma_engine_play_sound(&engineSound, soundPath.c_str(), nullptr);
 #endif
 #ifdef YGOPRO_USE_IRRKLANG
-	engineSound->play2D(soundPath);
+	engineSound->play2D(soundPath.c_str());
 #endif
 #endif // YGOPRO_USE_AUDIO
 }

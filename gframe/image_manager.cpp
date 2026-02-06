@@ -122,7 +122,7 @@ void ImageManager::ResizeTexture() {
 }
 /** Scale image using nearest neighbor anti-aliasing.
  * Function by Warr1024, from https://github.com/minetest/minetest/issues/2419, modified. */
-void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest, bool use_threading) {
+void imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading) {
 	const auto& srcDim = src->getDimension();
 	const auto& destDim = dest->getDimension();
 	if (destDim.Width == 0 || destDim.Height == 0)
