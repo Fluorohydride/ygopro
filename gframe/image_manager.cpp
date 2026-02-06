@@ -1,5 +1,6 @@
 #include "image_manager.h"
 #include "game.h"
+#include <cmath>
 #include <thread>
 #ifdef _OPENMP
 #include <omp.h>
@@ -120,57 +121,61 @@ void ImageManager::ResizeTexture() {
 		tBackGround_deck = tBackGround;
 }
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
-void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
+void imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading) {
 	const auto& srcDim = src->getDimension();
 	const auto& destDim = dest->getDimension();
+	if (destDim.Width == 0 || destDim.Height == 0)
+		return;
 
 	// Cache scale ratios.
 	const double rx = (double)srcDim.Width / destDim.Width;
 	const double ry = (double)srcDim.Height / destDim.Height;
 
-#pragma omp parallel if(mainGame->gameConf.use_image_scale_multi_thread)
+#pragma omp parallel if(use_threading)
 {
-	double sx, sy, minsx, maxsx, minsy, maxsy, area, ra, ga, ba, aa, pw, ph, pa;
-	irr::video::SColor pxl, npxl;
-
 	// Walk each destination image pixel.
 #pragma omp for schedule(dynamic)
 	for(irr::s32 dy = 0; dy < (irr::s32)destDim.Height; dy++) {
 		for(irr::s32 dx = 0; dx < (irr::s32)destDim.Width; dx++) {
 			// Calculate floating-point source rectangle bounds.
-			minsx = dx * rx;
-			maxsx = minsx + rx;
-			minsy = dy * ry;
-			maxsy = minsy + ry;
+			double minsx = dx * rx;
+			double maxsx = minsx + rx;
+			double minsy = dy * ry;
+			double maxsy = minsy + ry;
+			irr::u32 sx_begin = (irr::u32)std::floor(minsx);
+			irr::u32 sx_end = (irr::u32)std::ceil(maxsx);
+			if (sx_end > srcDim.Width)
+				sx_end = srcDim.Width;
+			irr::u32 sy_begin = (irr::u32)std::floor(minsy);
+			irr::u32 sy_end = (irr::u32)std::ceil(maxsy);
+			if (sy_end > srcDim.Height)
+				sy_end = srcDim.Height;
 
 			// Total area, and integral of r, g, b values over that area,
 			// initialized to zero, to be summed up in next loops.
-			area = 0;
-			ra = 0;
-			ga = 0;
-			ba = 0;
-			aa = 0;
+			double area = 0, ra = 0, ga = 0, ba = 0, aa = 0;
+			irr::video::SColor pxl, npxl;
 
 			// Loop over the integral pixel positions described by those bounds.
-			for(sy = floor(minsy); sy < maxsy; sy++) {
-				for(sx = floor(minsx); sx < maxsx; sx++) {
+			for(irr::u32 sy = sy_begin; sy < sy_end; sy++) {
+				for(irr::u32 sx = sx_begin; sx < sx_end; sx++) {
 					// Calculate width, height, then area of dest pixel
 					// that's covered by this source pixel.
-					pw = 1;
+					double pw = 1;
 					if(minsx > sx)
 						pw += sx - minsx;
 					if(maxsx < (sx + 1))
 						pw += maxsx - sx - 1;
-					ph = 1;
+					double ph = 1;
 					if(minsy > sy)
 						ph += sy - minsy;
 					if(maxsy < (sy + 1))
 						ph += maxsy - sy - 1;
-					pa = pw * ph;
+					double pa = pw * ph;
 
 					// Get source pixel and add it to totals, weighted
 					// by covered area and alpha.
-					pxl = src->getPixel((irr::u32)sx, (irr::u32)sy);
+					pxl = src->getPixel(sx, sy);
 					area += pa;
 					ra += pa * pxl.getRed();
 					ga += pa * pxl.getGreen();
@@ -201,7 +206,7 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, irr::s3
 		texture = driver->addTexture(file, srcimg);
 	} else {
 		irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
-		imageScaleNNAA(srcimg, destimg);
+		imageScaleNNAA(srcimg, destimg, mainGame->gameConf.use_image_scale_multi_thread);
 		texture = driver->addTexture(file, destimg);
 		destimg->drop();
 	}
@@ -260,7 +265,7 @@ irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 	} else {
 		auto origsize = srcimg->getDimension();
 		irr::video::IImage* destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(origsize.Width * zoom, origsize.Height * zoom));
-		imageScaleNNAA(srcimg, destimg);
+		imageScaleNNAA(srcimg, destimg, mainGame->gameConf.use_image_scale_multi_thread);
 		texture = driver->addTexture(file, destimg);
 		destimg->drop();
 	}
@@ -298,7 +303,7 @@ int ImageManager::LoadThumbThread() {
 				imageManager.tThumbLoadingMutex.unlock();
 			} else {
 				irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
-				imageScaleNNAA(img, destimg);
+				imageScaleNNAA(img, destimg, mainGame->gameConf.use_image_scale_multi_thread);
 				img->drop();
 				imageManager.tThumbLoadingMutex.lock();
 				if(imageManager.tThumbLoadingThreadRunning)
