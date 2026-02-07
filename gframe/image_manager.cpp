@@ -1,11 +1,7 @@
 #include "image_manager.h"
 #include "image_resizer.h"
 #include "game.h"
-#include <cmath>
 #include <thread>
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 namespace ygo {
 
