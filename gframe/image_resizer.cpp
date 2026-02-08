@@ -43,8 +43,10 @@ struct StbSamplerCache {
 	}
 };
 
-/** Scale image using stb_image_resize2.
- * Returns true on success, false on failure or unsupported format. */
+/**
+ * Scale image using stb_image_resize2.
+ * Returns true on success, false on failure or unsupported format.
+ */
 bool ImageResizer::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* dest) {
 	if(!src || !dest)
 		return false;
@@ -111,8 +113,10 @@ bool ImageResizer::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* de
 	return ok != 0;
 }
 
-/** Scale image using nearest neighbor anti-aliasing.
- * Function by Warr1024, from https://github.com/minetest/minetest/issues/2419, modified. */
+/**
+ * Scale image using nearest neighbor anti-aliasing.
+ * Function by Warr1024, from https://github.com/minetest/minetest/issues/2419, modified.
+ */
 void ImageResizer::imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading) {
 	const auto& srcDim = src->getDimension();
 	const auto& destDim = dest->getDimension();

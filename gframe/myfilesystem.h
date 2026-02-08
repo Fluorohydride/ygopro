@@ -8,8 +8,10 @@
 #ifndef _WIN32
 #include <dirent.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <vector>
 #include <algorithm>
+#include <string>
 #endif
 
 #ifdef _WIN32
@@ -182,7 +184,7 @@ public:
 		bool success = true;
 		TraversalDir(dir, [dir, &success](const char *name, bool isdir) {
 			char full_path[1024];
-			int len = mysnprintf(full_path, "%s/%s", dir, name);
+			int len = std::snprintf(full_path, sizeof(full_path), "%s/%s", dir, name);
 			if (len < 0 || len >= (int)(sizeof full_path)) {
 				success = false;
 				return;
@@ -228,7 +230,7 @@ public:
 		while((dirp = readdir(dir)) != nullptr) {
 			file_unit funit;
 			char fname[1024];
-			int len = mysnprintf(fname, "%s/%s", path, dirp->d_name);
+			int len = std::snprintf(fname, sizeof(fname), "%s/%s", path, dirp->d_name);
 			if (len < 0 || len >= (int)(sizeof fname))
 				continue;
 			stat(fname, &fileStat);
