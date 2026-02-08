@@ -120,8 +120,10 @@ void ImageManager::ResizeTexture() {
 	if(!tBackGround_deck)
 		tBackGround_deck = tBackGround;
 }
-/** Scale image using nearest neighbor anti-aliasing.
- * Function by Warr1024, from https://github.com/minetest/minetest/issues/2419, modified. */
+/**
+ * Scale image using nearest neighbor anti-aliasing.
+ * Function by Warr1024, from https://github.com/minetest/minetest/issues/2419, modified.
+ */
 void imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading) {
 	const auto& srcDim = src->getDimension();
 	const auto& destDim = dest->getDimension();
@@ -198,10 +200,12 @@ void imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, bool use_
 	}
 } // end of parallel region
 }
-/** Convert image to texture, resizing if needed.
+/**
+ * Convert image to texture, resizing if needed.
  * @param name Texture name (Irrlicht texture key).
  * @param srcimg Source image; will be dropped by this function.
- * @return Texture pointer. Remove via `driver->removeTexture` (do not `drop`). */
+ * @return Texture pointer. Remove via `driver->removeTexture` (do not `drop`).
+ */
 irr::video::ITexture* ImageManager::addTexture(const char* name, irr::video::IImage* srcimg, irr::s32 width, irr::s32 height) {
 	if(srcimg == nullptr)
 		return nullptr;
@@ -217,8 +221,10 @@ irr::video::ITexture* ImageManager::addTexture(const char* name, irr::video::IIm
 	srcimg->drop();
 	return texture;
 }
-/** Load image from file and convert to texture.
- * @return Texture pointer. Remove via `driver->removeTexture` (do not `drop`). */
+/**
+ * Load image from file and convert to texture.
+ * @return Texture pointer. Remove via `driver->removeTexture` (do not `drop`).
+ */
 irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, irr::s32 width, irr::s32 height) {
 	irr::video::IImage* img = driver->createImageFromFile(file);
 	if(img == nullptr) {
@@ -228,9 +234,11 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, irr::s3
 	mysnprintf(name, "%s/%d_%d", file, width, height);
 	return addTexture(name, img, width, height);
 }
-/** Load card picture from `expansions` or `pics` folder.
+/**
+ * Load card picture from `expansions` or `pics` folder.
  * Files in the expansions directory have priority, allowing custom pictures to be loaded without modifying the original files.
- * @return Image pointer. Must be dropped after use. */
+ * @return Image pointer. Must be dropped after use.
+ */
 irr::video::IImage* ImageManager::GetImage(int code) {
 	char file[256];
 	mysnprintf(file, "expansions/pics/%d.jpg", code);
@@ -241,8 +249,10 @@ irr::video::IImage* ImageManager::GetImage(int code) {
 	}
 	return img;
 }
-/** Load card picture.
- * @return Texture pointer. Remove via `driver->removeTexture` (do not `drop`). */
+/**
+ * Load card picture.
+ * @return Texture pointer. Remove via `driver->removeTexture` (do not `drop`).
+ */
 irr::video::ITexture* ImageManager::GetTexture(int code, irr::s32 width, irr::s32 height) {
 	irr::video::IImage* img = GetImage(code);
 	if(img == nullptr) {
@@ -252,9 +262,11 @@ irr::video::ITexture* ImageManager::GetTexture(int code, irr::s32 width, irr::s3
 	mysnprintf(name, "pics/%d/%d_%d", code, width, height);
 	return addTexture(name, img, width, height);
 }
-/** Load managed card picture texture.
+/**
+ * Load managed card picture texture.
  * @param fit Resize to fit scale if true.
- * @return Texture pointer. Should NOT be removed nor dropped. */
+ * @return Texture pointer. Should NOT be removed nor dropped.
+ */
 irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	if(code == 0)
 		return fit ? tUnknownFit : tUnknown;
@@ -278,8 +290,10 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	else
 		return fit ? tUnknownFit : tUnknown;
 }
-/** Load managed card picture texture with zoom.
- * @return Texture pointer. Should NOT be removed nor dropped. */
+/**
+ * Load managed card picture texture with zoom.
+ * @return Texture pointer. Should NOT be removed nor dropped.
+ */
 irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 	if(code == 0)
 		return tUnknownFit;
@@ -339,8 +353,10 @@ int ImageManager::LoadThumbThread() {
 	}
 	return 0;
 }
-/** Load managed card thumbnail texture.
- * @return Texture pointer. Should NOT be removed nor dropped. */
+/**
+ * Load managed card thumbnail texture.
+ * @return Texture pointer. Should NOT be removed nor dropped.
+ */
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(code == 0)
 		return tUnknownThumb;
@@ -386,8 +402,10 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	else
 		return tUnknownThumb;
 }
-/** Load managed duel field texture.
- * @return Texture pointer. Should NOT be removed nor dropped. */
+/**
+ * Load managed duel field texture.
+ * @return Texture pointer. Should NOT be removed nor dropped.
+ */
 irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	if(code == 0)
 		return nullptr;
