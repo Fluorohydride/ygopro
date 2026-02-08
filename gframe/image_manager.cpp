@@ -198,10 +198,12 @@ void imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, bool use_
 	}
 } // end of parallel region
 }
-/** Convert image to texture, resizing if needed.
+/**
+ * Convert image to texture, resizing if needed.
  * @param name Texture name (Irrlicht texture key).
  * @param srcimg Source image; will be dropped by this function.
- * @return Texture pointer. Remove via `driver->removeTexture` (do not `drop`). */
+ * @return Texture pointer. Remove via `driver->removeTexture` (do not `drop`).
+ */
 irr::video::ITexture* ImageManager::addTexture(const char* name, irr::video::IImage* srcimg, irr::s32 width, irr::s32 height) {
 	if(srcimg == nullptr)
 		return nullptr;
@@ -252,9 +254,11 @@ irr::video::ITexture* ImageManager::GetTexture(int code, irr::s32 width, irr::s3
 	mysnprintf(name, "pics/%d/%d_%d", code, width, height);
 	return addTexture(name, img, width, height);
 }
-/** Load managed card picture texture.
+/**
+ * Load managed card picture texture.
  * @param fit Resize to fit scale if true.
- * @return Texture pointer. Should NOT be removed nor dropped. */
+ * @return Texture pointer. Should NOT be removed nor dropped.
+ */
 irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	if(code == 0)
 		return fit ? tUnknownFit : tUnknown;
@@ -278,8 +282,10 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	else
 		return fit ? tUnknownFit : tUnknown;
 }
-/** Load managed card picture texture with zoom.
- * @return Texture pointer. Should NOT be removed nor dropped. */
+/**
+ * Load managed card picture texture with zoom.
+ * @return Texture pointer. Should NOT be removed nor dropped.
+ */
 irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 	if(code == 0)
 		return tUnknown;
