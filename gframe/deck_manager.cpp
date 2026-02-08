@@ -12,6 +12,17 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	FILE* fp = myfopen(path, "r");
 	char linebuf[256]{};
 	wchar_t strBuffer[256]{};
+	auto credit_hash = [](const char* s) -> uint32_t {
+		uint32_t h = 2166136261u;
+		for(const unsigned char* p = reinterpret_cast<const unsigned char*>(s); *p; ++p) {
+			h ^= *p;
+			h *= 16777619u;
+		}
+		return h;
+	};
+	auto credit_update_hash = [](uint32_t& h, uint32_t a, uint32_t b, uint32_t c) {
+		h = h ^ ((a << 18) | (a >> 14)) ^ ((b << 9) | (b >> 23)) ^ ((c << 27) | (c >> 5));
+	};
 	if(fp) {
 		while(std::fgets(linebuf, sizeof linebuf, fp)) {
 			if(linebuf[0] == '#')
@@ -49,6 +60,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 					continue;
 				BufferIO::DecodeUTF8(keybuf, strBuffer);
 				cur->credit_limits[strBuffer] = static_cast<uint32_t>(limitValue);
+				credit_update_hash(cur->hash, credit_hash(keybuf), static_cast<uint32_t>(limitValue), 0x43524544u);
 				continue;
 			}
 			char* pos = linebuf;
@@ -81,6 +93,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 					continue;
 				BufferIO::DecodeUTF8(keybuf, strBuffer);
 				cur->credits[code][strBuffer] = static_cast<uint32_t>(creditValue);
+				credit_update_hash(cur->hash, code, credit_hash(keybuf), static_cast<uint32_t>(creditValue));
 				continue;
 			}
 			errno = 0;
