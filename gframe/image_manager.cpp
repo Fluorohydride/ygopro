@@ -282,14 +282,14 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
  * @return Texture pointer. Should NOT be removed nor dropped. */
 irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 	if(code == 0)
-		return tUnknown;
+		return tUnknownFit;
 	if(tBigPicture != nullptr) {
 		driver->removeTexture(tBigPicture);
 		tBigPicture = nullptr;
 	}
 	irr::video::IImage* img = GetImage(code);
 	if(img == nullptr) {
-		return tUnknown;
+		return tUnknownFit;
 	}
 	char name[256];
 	mysnprintf(name, "pics/%d/big", code);
