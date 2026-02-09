@@ -221,32 +221,26 @@ const wchar_t* DataManager::GetDesc(uint32_t strCode) const {
 		return csit->second.desc[offset].c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetSysString(int code) const {
-	auto csit = _sysStrings.find(code);
-	if(csit == _sysStrings.end())
+const wchar_t* DataManager::GetMapString(const wstring_map& table, uint32_t code) const {
+	auto csit = table.find(code);
+	if (csit == table.end())
 		return unknown_string;
 	return csit->second.c_str();
 }
-const wchar_t* DataManager::GetVictoryString(int code) const {
-	auto csit = _victoryStrings.find(code);
-	if(csit == _victoryStrings.end())
-		return unknown_string;
-	return csit->second.c_str();
+const wchar_t* DataManager::GetSysString(uint32_t code) const {
+	return GetMapString(_sysStrings, code);
 }
-const wchar_t* DataManager::GetCounterName(int code) const {
-	auto csit = _counterStrings.find(code);
-	if(csit == _counterStrings.end())
-		return unknown_string;
-	return csit->second.c_str();
+const wchar_t* DataManager::GetVictoryString(uint32_t code) const {
+	return GetMapString(_victoryStrings, code);
 }
-const wchar_t* DataManager::GetSetName(int code) const {
-	auto csit = _setnameStrings.find(code);
-	if(csit == _setnameStrings.end())
-		return unknown_string;
-	return csit->second.c_str();
+const wchar_t* DataManager::GetCounterName(uint32_t code) const {
+	return GetMapString(_counterStrings, code);
 }
-std::vector<unsigned int> DataManager::GetSetCodes(std::wstring setname) const {
-	std::vector<unsigned int> matchingCodes;
+const wchar_t* DataManager::GetSetName(uint32_t code) const {
+	return GetMapString(_setnameStrings, code);
+}
+std::vector<uint32_t> DataManager::GetSetCodes(std::wstring setname) const {
+	std::vector<uint32_t> matchingCodes;
 	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
 		auto xpos = csit->second.find_first_of(L'|');//setname|another setname or extra info
 		if(setname.size() < 2) {
