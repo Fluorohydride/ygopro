@@ -89,6 +89,7 @@ void DeckBuilder::Initialize() {
 		filterList = &deckManager._lfList.back();
 	}
 	ClearSearch();
+	StartFilter();
 	mouse_pos.set(0, 0);
 	hovered_code = 0;
 	hovered_pos = 0;
