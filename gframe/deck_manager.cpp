@@ -278,7 +278,7 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 	return fp;
 }
 irr::io::IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
-#ifdef _WIN32
+#ifdef _IRR_WCHAR_FILESYSTEM
 	auto reader = dataManager.FileSystem->createAndOpenFile(file);
 #else
 	char file2[256];
