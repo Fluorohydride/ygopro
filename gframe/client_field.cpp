@@ -1440,7 +1440,7 @@ static bool is_declarable(const T& cd, const std::vector<unsigned int>& opcode) 
 				stack.pop();
 				int lhs = stack.top();
 				stack.pop();
-				stack.push(lhs / rhs);
+				stack.push(rhs != 0 ? lhs / rhs : 0);
 			}
 			break;
 		}
