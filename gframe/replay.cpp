@@ -226,7 +226,7 @@ bool Replay::SaveDeck(size_t index, const wchar_t* filename) {
 	DeckArray deck = decks[index];
 	std::reverse(deck.main.begin(), deck.main.end());
 	std::reverse(deck.extra.begin(), deck.extra.end());
-	return deckManager.SaveDeckArray(deck, filename);
+	return DeckManager::SaveDeckArray(deck, filename);
 }
 bool Replay::ReadInfo() {
 	int player_count = (pheader.base.flag & REPLAY_TAG) ? 4 : 2;
