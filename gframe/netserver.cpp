@@ -13,6 +13,7 @@ event* NetServer::broadcast_ev = 0;
 evconnlistener* NetServer::listener = 0;
 DuelMode* NetServer::duel_mode = 0;
 unsigned char NetServer::net_server_write[SIZE_NETWORK_BUFFER];
+unsigned char NetServer::net_server_read[SIZE_NETWORK_BUFFER];
 size_t NetServer::last_sent = 0;
 
 bool NetServer::StartServer(unsigned short port) {
@@ -126,7 +127,6 @@ void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 	int len = evbuffer_get_length(input);
 	if (len < 2)
 		return;
-	unsigned char* net_server_read = new unsigned char[SIZE_NETWORK_BUFFER];
 	uint16_t packet_len = 0;
 	while (len >= 2) {
 		evbuffer_copyout(input, &packet_len, sizeof packet_len);
@@ -137,7 +137,6 @@ void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 			HandleCTOSPacket(&users[bev], &net_server_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}
-	delete[] net_server_read;
 }
 void NetServer::ServerEchoEvent(bufferevent* bev, short events, void* ctx) {
 	if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
