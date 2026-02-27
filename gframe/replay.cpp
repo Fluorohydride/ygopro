@@ -220,6 +220,14 @@ void Replay::SkipInfo(){
 bool Replay::IsReplaying() const {
 	return is_replaying;
 }
+bool Replay::SaveDeck(size_t index, const wchar_t* filename) {
+	if(index >= decks.size())
+		return false;
+	DeckArray deck = decks[index];
+	std::reverse(deck.main.begin(), deck.main.end());
+	std::reverse(deck.extra.begin(), deck.extra.end());
+	return deckManager.SaveDeckArray(deck, filename);
+}
 bool Replay::ReadInfo() {
 	int player_count = (pheader.base.flag & REPLAY_TAG) ? 4 : 2;
 	for (int i = 0; i < player_count; ++i) {
