@@ -1,7 +1,6 @@
 #include "data_manager.h"
 #include "game.h"
 #include "client_card.h"
-#include "spmemvfs/spmemvfs.h"
 
 namespace ygo {
 
@@ -85,22 +84,40 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 #else
 	auto reader = FileSystem->createAndOpenFile(file);
 #endif
-	if(reader == nullptr)
+	if (reader == nullptr)
 		return false;
-	spmemvfs_db_t db;
-	spmembuffer_t* mem = (spmembuffer_t*)std::calloc(sizeof(spmembuffer_t), 1);
-	spmemvfs_env_init();
-	mem->total = mem->used = reader->getSize();
-	mem->data = (char*)std::malloc(mem->total);
-	reader->read(mem->data, mem->total);
+
+	sqlite3* db_handle = nullptr;
+	if (sqlite3_open(":memory:", &db_handle) != SQLITE_OK) {
+		reader->drop();
+		return false;
+	}
+
+	sqlite3_int64 sz = reader->getSize();
+	unsigned char* buffer = (unsigned char*)sqlite3_malloc64(sz);
+	if (!buffer) {
+		sqlite3_close(db_handle);
+		reader->drop();
+		return false;
+	}
+
+	reader->read(buffer, sz);
 	reader->drop();
-	bool ret{};
-	if (spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
-		ret = Error(db.handle);
-	else
-		ret = ReadDB(db.handle);
-	spmemvfs_close_db(&db);
-	spmemvfs_env_fini();
+	int rc = sqlite3_deserialize(
+		db_handle,
+		nullptr,
+		buffer,
+		sz,
+		sz,
+		SQLITE_DESERIALIZE_FREEONCLOSE | SQLITE_DESERIALIZE_READONLY
+	);
+	if (rc != SQLITE_OK) {
+		Error(db_handle, nullptr);
+		sqlite3_close(db_handle);
+		return false;
+	}
+	bool ret = ReadDB(db_handle);
+	sqlite3_close(db_handle);
 	return ret;
 }
 bool DataManager::LoadStrings(const char* file) {
