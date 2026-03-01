@@ -89,6 +89,8 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 
 	sqlite3* db_handle = nullptr;
 	if (sqlite3_open(":memory:", &db_handle) != SQLITE_OK) {
+		Error(db_handle, nullptr);
+		sqlite3_close(db_handle);
 		reader->drop();
 		return false;
 	}
@@ -96,6 +98,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	sqlite3_int64 sz = reader->getSize();
 	unsigned char* buffer = (unsigned char*)sqlite3_malloc64(sz);
 	if (!buffer) {
+		Error(db_handle, nullptr);
 		sqlite3_close(db_handle);
 		reader->drop();
 		return false;
