@@ -8,9 +8,9 @@
 namespace ygo {
 
 struct Deck {
-	std::vector<code_pointer> main;
-	std::vector<code_pointer> extra;
-	std::vector<code_pointer> side;
+	std::vector<const CardDataC*> main;
+	std::vector<const CardDataC*> extra;
+	std::vector<const CardDataC*> side;
 	void clear() {
 		main.clear();
 		extra.clear();
