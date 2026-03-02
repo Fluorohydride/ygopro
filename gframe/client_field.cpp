@@ -1392,11 +1392,11 @@ bool ClientField::check_sum_trib(std::set<ClientCard*>::const_iterator index, st
 		return false;
 	int l1, l2;
 	get_sum_params((*index)->opParam, l1, l2);
-	if((acc + l1 >= select_min && acc + l1 <= select_max) || (acc + l2 >= select_min && acc + l2 <= select_max))
+	if((acc + l1 >= select_min && acc + l1 <= select_max) || (l2 > 0 && acc + l2 >= select_min && acc + l2 <= select_max))
 		return true;
 	++index;
 	return check_sum_trib(index, end, acc + l1)
-		|| check_sum_trib(index, end, acc + l2)
+		|| (l2 > 0 && check_sum_trib(index, end, acc + l2))
 		|| check_sum_trib(index, end, acc);
 }
 template <class T>

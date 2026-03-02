@@ -239,7 +239,8 @@ public:
 			int len = std::snprintf(fname, sizeof(fname), "%s/%s", path, dirp->d_name);
 			if (len < 0 || len >= (int)(sizeof fname))
 				continue;
-			stat(fname, &fileStat);
+			if (stat(fname, &fileStat) != 0)
+				continue;
 			funit.filename = std::string(dirp->d_name);
 			funit.is_dir = S_ISDIR(fileStat.st_mode);
 			if(funit.is_dir && (std::strcmp(dirp->d_name, ".") == 0 || std::strcmp(dirp->d_name, "..") == 0))

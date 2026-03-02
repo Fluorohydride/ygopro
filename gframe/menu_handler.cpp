@@ -356,6 +356,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					NetServer::StopServer();
 					break;
 				}
+				CloseHandle(pi.hThread);
+				CloseHandle(pi.hProcess);
 #else
 				if(fork() == 0) {
 					usleep(100000);
