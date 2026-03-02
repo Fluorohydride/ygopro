@@ -8,6 +8,8 @@ namespace ygo {
 ImageManager imageManager;
 
 bool ImageManager::Initial() {
+	// Directly initialize the textures that do not need to be scaled,
+	// and call ResizeTexture to initialize those that need to be scaled.
 	tCover[0] = nullptr;
 	tCover[1] = nullptr;
 	tCover[2] = GetTextureFromFile("textures/cover.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
@@ -104,6 +106,14 @@ void ImageManager::ResizeTexture() {
 	driver->removeTexture(tUnknownThumb);
 	driver->removeTexture(tLoading);
 	tLoading = GetTextureFromFile("textures/cover.jpg", imgWidthThumb, imgHeightThumb);
+	if(!tLoading && mainGame->gameConf.use_image_load_background_thread){
+		// If the cover image is missing, create a blank texture instead.
+		// tLoading is used as a sentinel value when loading thumbnails, so it must not be null.
+		irr::video::IImage* blankImg = driver->createImage(irr::video::ECF_A8R8G8B8, irr::core::dimension2d<irr::u32>(imgWidthThumb, imgHeightThumb));
+		blankImg->fill(0);
+		tLoading = driver->addTexture("textures/loading", blankImg);
+		blankImg->drop();
+	}
 	tUnknown = GetTextureFromFile("textures/unknown.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	tUnknownFit = GetTextureFromFile("textures/unknown.jpg", imgWidthFit, imgHeightFit);
 	tUnknownThumb = GetTextureFromFile("textures/unknown.jpg", imgWidthThumb, imgHeightThumb);
