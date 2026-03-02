@@ -39,8 +39,8 @@ extern "C" {
 
 typedef struct spmembuffer_t {
 	char * data;
-	int used;
-	int total;
+	sqlite3_int64 used;
+	sqlite3_int64 total;
 } spmembuffer_t;
 
 typedef struct spmemvfs_db_t {

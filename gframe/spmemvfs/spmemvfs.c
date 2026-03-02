@@ -29,6 +29,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#if defined(SPMEMVFS_DEBUG)
+#include <stdarg.h>
+#endif
 
 #include "spmemvfs.h"
 
@@ -102,13 +105,13 @@ int spmemfileClose( sqlite3_file * file )
 
 	spmemvfsDebug( "call %s( %p )", __func__, memfile );
 
-	if( SQLITE_OPEN_MAIN_DB & memfile->flags ) {
-		// noop
-	} else {
-		if( NULL != memfile->mem ) {
-			if( memfile->mem->data ) free( memfile->mem->data );
-			free( memfile->mem );
-		}
+	/* Memory was allocated in spmemvfsOpen(): either via memvfs->cb.load() for main DB
+	 * or via calloc() for temporary/journal files. This spmemfile_t object is the sole
+	 * owner of this memory and must free it here before the file is destroyed. */
+	if( NULL != memfile->mem ) {
+		if( memfile->mem->data ) free( memfile->mem->data );
+		free( memfile->mem );
+		memfile->mem = NULL;
 	}
 
 	free( memfile->path );
@@ -120,10 +123,20 @@ int spmemfileRead( sqlite3_file * file, void * buffer, int len, sqlite3_int64 of
 {
 	spmemfile_t * memfile = (spmemfile_t*)file;
 
-	spmemvfsDebug( "call %s( %p, ..., %d, %lld ), len %d",
-		__func__, memfile, len, offset, memfile->mem->used );
+	spmemvfsDebug( "call %s( %p, ..., %d, %lld ), len %lld",
+		__func__, memfile, len, (long long)offset, (long long)memfile->mem->used );
+
+	if( offset >= memfile->mem->used ) {
+		/* No data available at all: zero-fill the entire buffer per SQLite VFS spec */
+		memset( buffer, 0, len );
+		return SQLITE_IOERR_SHORT_READ;
+	}
 
 	if( ( offset + len ) > memfile->mem->used ) {
+		/* Partial read: copy available bytes, zero-fill the remainder */
+		sqlite3_int64 available = memfile->mem->used - offset;
+		memcpy( buffer, memfile->mem->data + offset, (size_t)available );
+		memset( (char*)buffer + available, 0, (size_t)(len - available) );
 		return SQLITE_IOERR_SHORT_READ;
 	}
 
@@ -137,12 +150,12 @@ int spmemfileWrite( sqlite3_file * file, const void * buffer, int len, sqlite3_i
 	spmemfile_t * memfile = (spmemfile_t*)file;
 	spmembuffer_t * mem = memfile->mem;
 
-	spmemvfsDebug( "call %s( %p, ..., %d, %lld ), len %d",
-		__func__, memfile, len, offset, mem->used );
+	spmemvfsDebug( "call %s( %p, ..., %d, %lld ), len %lld",
+		__func__, memfile, len, (long long)offset, (long long)mem->used );
 
 	if( ( offset + len ) > mem->total ) {
-		int newTotal = 2 * ( offset + len + mem->total );
-		char * newBuffer = (char*)realloc( mem->data, newTotal );
+		sqlite3_int64 newTotal = 2 * ( offset + len + mem->total );
+		char * newBuffer = (char*)realloc( mem->data, (size_t)newTotal );
 		if( NULL == newBuffer ) {
 			return SQLITE_NOMEM;
 		}
@@ -292,15 +305,22 @@ int spmemvfsOpen( sqlite3_vfs * vfs, const char * path, sqlite3_file * file, int
 	memfile->base.pMethods = &g_spmemfile_io_memthods;
 	memfile->flags = flags;
 
-	memfile->path = strdup( path );
+	/* SQLite may pass a NULL path for temporary/journal files */
+	memfile->path = ( path != NULL ) ? strdup( path ) : NULL;
 
 	if( SQLITE_OPEN_MAIN_DB & memfile->flags ) {
-		memfile->mem = memvfs->cb.load( memvfs->cb.arg, path );
+		memfile->mem = ( path != NULL ) ? memvfs->cb.load( memvfs->cb.arg, path ) : NULL;
 	} else {
 		memfile->mem = (spmembuffer_t*)calloc( sizeof( spmembuffer_t ), 1 );
 	}
 
-	return memfile->mem ? SQLITE_OK : SQLITE_ERROR;
+	if( memfile->mem == NULL ) {
+		free( memfile->path );
+		memfile->path = NULL;
+		return SQLITE_ERROR;
+	}
+
+	return SQLITE_OK;
 }
 
 int spmemvfsDelete( sqlite3_vfs * vfs, const char * path, int syncDir )
@@ -357,6 +377,7 @@ int spmemvfsSleep( sqlite3_vfs * vfs, int microseconds )
 
 int spmemvfsCurrentTime( sqlite3_vfs * vfs, double * result )
 {
+	*result = 0.0;
 	return SQLITE_OK;
 }
 
@@ -424,6 +445,7 @@ typedef struct spmemvfs_env_t {
 } spmemvfs_env_t;
 
 static spmemvfs_env_t * g_spmemvfs_env = NULL;
+static int g_spmemvfs_env_refcount = 0;
 
 static spmembuffer_t * load_cb( void * arg, const char * path )
 {
@@ -450,16 +472,35 @@ int spmemvfs_env_init()
 {
 	int ret = 0;
 
-	if( NULL == g_spmemvfs_env ) {
+	++g_spmemvfs_env_refcount;
+
+	if( 1 == g_spmemvfs_env_refcount ) {
 		spmemvfs_cb_t cb;
 
 		g_spmemvfs_env = (spmemvfs_env_t*)calloc( sizeof( spmemvfs_env_t ), 1 );
+		if( NULL == g_spmemvfs_env ) {
+			--g_spmemvfs_env_refcount;
+			return SQLITE_NOMEM;
+		}
+
 		g_spmemvfs_env->mutex = sqlite3_mutex_alloc( SQLITE_MUTEX_FAST );
+		if( NULL == g_spmemvfs_env->mutex ) {
+			free( g_spmemvfs_env );
+			g_spmemvfs_env = NULL;
+			--g_spmemvfs_env_refcount;
+			return SQLITE_NOMEM;
+		}
 
 		cb.arg = g_spmemvfs_env;
 		cb.load = load_cb;
 
 		ret = spmemvfs_init( &cb );
+		if( SQLITE_OK != ret ) {
+			sqlite3_mutex_free( g_spmemvfs_env->mutex );
+			free( g_spmemvfs_env );
+			g_spmemvfs_env = NULL;
+			--g_spmemvfs_env_refcount;
+		}
 	}
 
 	return ret;
@@ -467,7 +508,9 @@ int spmemvfs_env_init()
 
 void spmemvfs_env_fini()
 {
-	if( NULL != g_spmemvfs_env ) {
+	if( g_spmemvfs_env_refcount > 0 ) --g_spmemvfs_env_refcount;
+
+	if( 0 == g_spmemvfs_env_refcount && NULL != g_spmemvfs_env ) {
 		spmembuffer_link_t * iter = NULL;
 
 		sqlite3_vfs_unregister( (sqlite3_vfs*)&g_spmemvfs );
@@ -498,7 +541,13 @@ int spmemvfs_open_db( spmemvfs_db_t * db, const char * path, spmembuffer_t * mem
 	memset( db, 0, sizeof( spmemvfs_db_t ) );
 
 	iter = (spmembuffer_link_t*)calloc( sizeof( spmembuffer_link_t ), 1 );
+	if( NULL == iter ) return SQLITE_NOMEM;
+
 	iter->path = strdup( path );
+	if( NULL == iter->path ) {
+		free( iter );
+		return SQLITE_NOMEM;
+	}
 	iter->mem = mem;
 
 	sqlite3_mutex_enter( g_spmemvfs_env->mutex );
@@ -532,15 +581,13 @@ int spmemvfs_close_db( spmemvfs_db_t * db )
 
 	if( NULL == db ) return 0;
 
+	/* spmemfileClose owns and frees mem. Clear db->mem first to
+	 * prevent any accidental double-free from callers. */
+	db->mem = NULL;
+
 	if( NULL != db->handle ) {
 		ret = sqlite3_close( db->handle );
 		db->handle = NULL;
-	}
-
-	if( NULL != db->mem ) {
-		if( NULL != db->mem->data ) free( db->mem->data );
-		free( db->mem );
-		db->mem = NULL;
 	}
 
 	return ret;
