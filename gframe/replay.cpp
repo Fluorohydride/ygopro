@@ -1,6 +1,7 @@
 #include "config.h"
 #include "replay.h"
 #include "myfilesystem.h"
+#include "deck_manager.h"
 #include "lzma/LzmaLib.h"
 
 namespace ygo {

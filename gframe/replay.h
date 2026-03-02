@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include "../ocgcore/ocgapi.h"
-#include "deck_manager.h"
+#include "deck.h"
 
 namespace ygo {
 

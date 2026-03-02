@@ -3,7 +3,7 @@
 
 #include <set>
 #include "network.h"
-#include "deck_manager.h"
+#include "deck.h"
 #include "replay.h"
 
 namespace ygo {
