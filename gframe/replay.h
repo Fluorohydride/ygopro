@@ -96,6 +96,7 @@ public:
 	void Reset();
 	void SkipInfo();
 	bool IsReplaying() const;
+	bool SaveDeck(size_t index, const wchar_t* filename);
 
 	FILE* fp{ nullptr };
 	ExtendedReplayHeader pheader;
