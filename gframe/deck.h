@@ -16,6 +16,9 @@ struct Deck {
 		extra.clear();
 		side.clear();
 	}
+	size_t size() const noexcept {
+		return main.size() + extra.size() + side.size();
+	}
 };
 
 struct DeckArray {
