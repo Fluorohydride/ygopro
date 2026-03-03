@@ -1077,6 +1077,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			auto dit = _datas.find(hovered_code);
 			if (dit == _datas.end()) {
 				draging_pointer = nullptr;
+				is_starting_dragging = false;
+				is_draging = false;
 				break;
 			}
 			draging_pointer = &dit->second;
