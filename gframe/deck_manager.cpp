@@ -30,16 +30,18 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			if (cur == _lfList.rend())
 				continue;
 			char* pos = linebuf;
+			char* end = nullptr;
 			errno = 0;
-			auto result = std::strtoul(pos, &pos, 10);
+			auto result = std::strtoul(pos, &end, 10);
 			if (errno || result > UINT32_MAX)
 				continue;
-			if (pos == linebuf || *pos != ' ')
+			if (end == pos || *end != ' ')
 				continue;
 			uint32_t code = static_cast<uint32_t>(result);
+			pos = end;
 			errno = 0;
-			int count = std::strtol(pos, &pos, 10);
-			if (errno)
+			int count = std::strtol(pos, &end, 10);
+			if (errno || end == pos)
 				continue;
 			if (count < 0 || count > 2)
 				continue;
