@@ -257,7 +257,7 @@ bool SoundManager::IsPlayingMusic(wchar_t* music) {
 	if(music) {
 		return !mywcsncasecmp(currentPlayingMusic, music, 1024) && ma_sound_is_playing(&soundBGM);
 	} else {
-		return ma_sound_is_playing(&soundBGM);
+		return currentPlayingMusic[0] && ma_sound_is_playing(&soundBGM);
 	}
 #endif
 #ifdef YGOPRO_USE_IRRKLANG

@@ -3,7 +3,7 @@
 
 #include <set>
 #include "network.h"
-#include "deck_manager.h"
+#include "deck.h"
 #include "replay.h"
 
 namespace ygo {
@@ -17,7 +17,7 @@ public:
 	void LeaveGame(DuelPlayer* dp) override;
 	void ToDuelist(DuelPlayer* dp) override;
 	void ToObserver(DuelPlayer* dp) override;
-	void PlayerReady(DuelPlayer* dp, bool ready) override;
+	void PlayerReady(DuelPlayer* dp, bool is_ready) override;
 	void PlayerKick(DuelPlayer* dp, unsigned char pos) override;
 	void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) override;
 	void StartDuel(DuelPlayer* dp) override;

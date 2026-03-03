@@ -22,9 +22,8 @@ public:
 	}
 
 	static void VectorWriteBlock(std::vector<unsigned char>& buffer, const void* src, size_t size) {
-		const auto len = buffer.size();
-		buffer.resize(len + size);
-		std::memcpy(buffer.data() + len, src, size);
+		auto* bytes = static_cast<const unsigned char*>(src);
+		buffer.insert(buffer.end(), bytes, bytes + size);
 	}
 	template<typename T>
 	static void VectorWrite(std::vector<unsigned char>& buffer, const T& value) {

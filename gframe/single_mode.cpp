@@ -247,7 +247,6 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 		case MSG_SELECT_EFFECTYN: {
 			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 12;
-			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
 				mainGame->singleSignal.Wait();

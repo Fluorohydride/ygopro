@@ -309,7 +309,6 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	}
 	if(!reader)
 		return false;
-	std::memset(deckBuffer, 0, sizeof deckBuffer);
 	int size = reader->read(deckBuffer, sizeof deckBuffer);
 	reader->drop();
 	if (size >= (int)sizeof deckBuffer) {

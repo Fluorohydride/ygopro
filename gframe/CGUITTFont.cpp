@@ -322,7 +322,7 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 	tt_face = face->face;
 
 	// Store font metrics.
-	FT_Set_Pixel_Sizes(tt_face, size, 0);
+	FT_Set_Pixel_Sizes(tt_face, 0, size);
 	font_metrics = tt_face->size->metrics;
 
 	// Allocate our glyphs.
@@ -834,6 +834,7 @@ video::IImage* CGUITTFont::createTextureFromChar(const uchar32_t& ch) {
 	core::dimension2du glyph_size(glyph.source_rect.getSize());
 	video::IImage* image = Driver->createImage(format, glyph_size);
 	pageholder->copyTo(image, irr::core::vector2di(0, 0), glyph.source_rect);
+	pageholder->drop();
 
 	tex->unlock();
 	return image;

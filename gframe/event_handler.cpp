@@ -907,8 +907,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					} else {
 						if (select_continuous)
 							myswprintf(formatBuffer, L"%ls", dataManager.unknown_string);
-						else if (cant_check_grave && selectable_cards[i]->location == LOCATION_GRAVE)
-							myswprintf(formatBuffer, L"%ls", dataManager.FormatLocation(selectable_cards[i]->location, 0));
+						else if (cant_check_grave && selectable_cards[i + pos]->location == LOCATION_GRAVE)
+							myswprintf(formatBuffer, L"%ls", dataManager.FormatLocation(selectable_cards[i + pos]->location, 0));
 						else if (selectable_cards[i + pos]->location == LOCATION_OVERLAY)
 							myswprintf(formatBuffer, L"%ls[%d](%d)",
 								dataManager.FormatLocation(selectable_cards[i + pos]->overlayTarget), selectable_cards[i + pos]->overlayTarget->sequence + 1, selectable_cards[i + pos]->sequence + 1);
