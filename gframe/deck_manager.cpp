@@ -14,21 +14,21 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	wchar_t strBuffer[256]{};
 	auto credit_hash = [](const char* s) -> uint32_t {
 		uint32_t h = 2166136261u;
-		for(const unsigned char* p = reinterpret_cast<const unsigned char*>(s); *p; ++p) {
-			h ^= *p;
+		for(auto p = s; *p; ++p) {
+			h ^= static_cast<unsigned char>(*p);
 			h *= 16777619u;
 		}
 		return h;
 	};
-	auto credit_update_hash = [](uint32_t& h, uint32_t a, uint32_t b, uint32_t c) {
-		h = h ^ ((a << 18) | (a >> 14)) ^ ((b << 9) | (b >> 23)) ^ ((c << 27) | (c >> 5));
+	auto credit_update_hash = [](uint32_t h, uint32_t a, uint32_t b, uint32_t c) -> uint32_t {
+		return h ^ ((a << 18) | (a >> 14)) ^ ((b << 9) | (b >> 23)) ^ ((c << 27) | (c >> 5));
 	};
 	if(fp) {
 		while(std::fgets(linebuf, sizeof linebuf, fp)) {
 			if(linebuf[0] == '#')
 				continue;
 			if(linebuf[0] == '!') {
-				auto len = std::strcspn(linebuf, "\r\n");
+				auto len = std::strcspn(linebuf, "\n");
 				linebuf[len] = 0;
 				BufferIO::DecodeUTF8(&linebuf[1], strBuffer);
 				LFList newlist;
@@ -41,65 +41,35 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			if (cur == _lfList.rend())
 				continue;
 			if(linebuf[0] == '$') {
-				char* keyPos = linebuf + 1;
-				keyPos += std::strspn(keyPos, " \t");
-				auto keyLen = std::strcspn(keyPos, " \t\r\n");
-				if(!keyLen)
-					continue;
+				int limitValue = 0;
 				char keybuf[256];
-				if(keyLen >= sizeof keybuf)
-					keyLen = sizeof keybuf - 1;
-				std::memcpy(keybuf, keyPos, keyLen);
-				keybuf[keyLen] = 0;
-				keyPos += keyLen;
-				keyPos += std::strspn(keyPos, " \t");
-				errno = 0;
-				char* valuePos = keyPos;
-				auto limitValue = std::strtoul(keyPos, &keyPos, 10);
-				if(errno || valuePos == keyPos)
+				if (std::sscanf(linebuf, "$%255s %d", keybuf, &limitValue) < 2)
 					continue;
 				BufferIO::DecodeUTF8(keybuf, strBuffer);
-				cur->credit_limits[strBuffer] = static_cast<uint32_t>(limitValue);
-				credit_update_hash(cur->hash, credit_hash(keybuf), static_cast<uint32_t>(limitValue), 0x43524544u);
+				cur->credit_limits[strBuffer] = limitValue;
+				cur->hash = credit_update_hash(cur->hash, credit_hash(keybuf), static_cast<uint32_t>(limitValue), 0x43524544u);
 				continue;
 			}
 			char* pos = linebuf;
+			char* end = nullptr;
 			errno = 0;
-			char* codePos = pos;
-			auto result = std::strtoul(pos, &pos, 10);
-			if(errno || result > UINT32_MAX || codePos == pos)
+			auto result = std::strtoul(pos, &end, 10);
+			if (errno || result > UINT32_MAX || end == pos)
 				continue;
-			if(*pos != ' ' && *pos != '\t')
-				continue;
-			pos += std::strspn(pos, " \t");
 			uint32_t code = static_cast<uint32_t>(result);
-			if(*pos == '$') {
-				++pos;
-				pos += std::strspn(pos, " \t");
-				auto creditKeyLen = std::strcspn(pos, " \t\r\n");
-				if(!creditKeyLen)
-					continue;
-				char keybuf[256];
-				if(creditKeyLen >= sizeof keybuf)
-					creditKeyLen = sizeof keybuf - 1;
-				std::memcpy(keybuf, pos, creditKeyLen);
-				keybuf[creditKeyLen] = 0;
-				pos += creditKeyLen;
-				pos += std::strspn(pos, " \t");
-				errno = 0;
-				char* creditValuePos = pos;
-				auto creditValue = std::strtoul(pos, &pos, 10);
-				if(errno || creditValuePos == pos)
-					continue;
-				BufferIO::DecodeUTF8(keybuf, strBuffer);
+			char keyName[256];
+			int creditValue = 0;
+			if (std::sscanf(end, " $%255s %d", keyName, &creditValue) == 2) {
+				BufferIO::DecodeUTF8(keyName, strBuffer);
 				cur->credits[code][strBuffer] = static_cast<uint32_t>(creditValue);
-				credit_update_hash(cur->hash, code, credit_hash(keybuf), static_cast<uint32_t>(creditValue));
+				cur->hash = credit_update_hash(cur->hash, code, credit_hash(keyName), static_cast<uint32_t>(creditValue));
 				continue;
 			}
+			pos = end;
+			end = nullptr;
 			errno = 0;
-			char* countPos = pos;
-			int count = std::strtol(pos, &pos, 10);
-			if(errno || countPos == pos)
+			int count = std::strtol(pos, &end, 10);
+			if (errno || end == pos)
 				continue;
 			if(count < 0 || count > 2)
 				continue;
