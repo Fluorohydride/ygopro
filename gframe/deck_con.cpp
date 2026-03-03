@@ -1476,7 +1476,9 @@ void DeckBuilder::FilterCards() {
 	}
 	auto& _datas = dataManager.GetDataTable();
 	auto& _strings = dataManager.GetStringTable();
-	for (auto& [code, data] : _datas) {
+	for (auto& kv : _datas) {
+		auto code = kv.first;
+		auto& data = kv.second;
 		auto strpointer = _strings.find(code);
 		if (strpointer == _strings.end())
 			continue;
