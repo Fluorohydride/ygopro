@@ -1192,8 +1192,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				} else {
 					push_side(draging_pointer);
 				}
-				is_draging = false;
 			}
+			is_draging = false;
 			break;
 		}
 		case irr::EMIE_MMOUSE_LEFT_UP: {
