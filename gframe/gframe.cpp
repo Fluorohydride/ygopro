@@ -109,13 +109,17 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		if(wargv[i][0] == L'-' && wargv[i][1] == L'e' && wargv[i][2] != L'\0') {
-			ygo::dataManager.LoadDB(&wargv[i][2]);
+			char file[1024];
+			BufferIO::EncodeUTF8(wargv[i] + 2, file);
+			ygo::dataManager.LoadDB(file);
 			continue;
 		}
 		if(!std::wcscmp(wargv[i], L"-e")) { // extra database
 			++i;
 			if(i < wargc) {
-				ygo::dataManager.LoadDB(wargv[i]);
+				char file[1024];
+				BufferIO::EncodeUTF8(wargv[i], file);
+				ygo::dataManager.LoadDB(file);
 			}
 			continue;
 		} else if(!std::wcscmp(wargv[i], L"-n")) { // nickName

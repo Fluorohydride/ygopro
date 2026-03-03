@@ -154,7 +154,6 @@ project "irrlicht"
     }
 
     filter { "system:windows" }
-        defines { "_IRR_WCHAR_FILESYSTEM" }
         if USE_DXSDK then
             includedirs { "$(DXSDK_DIR)Include" }
         else
