@@ -12,6 +12,17 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	FILE* fp = myfopen(path, "r");
 	char linebuf[256]{};
 	wchar_t strBuffer[256]{};
+	auto credit_hash = [](const char* s) -> uint32_t {
+		uint32_t h = 2166136261u;
+		for(const unsigned char* p = reinterpret_cast<const unsigned char*>(s); *p; ++p) {
+			h ^= *p;
+			h *= 16777619u;
+		}
+		return h;
+	};
+	auto credit_update_hash = [](uint32_t& h, uint32_t a, uint32_t b, uint32_t c) {
+		h = h ^ ((a << 18) | (a >> 14)) ^ ((b << 9) | (b >> 23)) ^ ((c << 27) | (c >> 5));
+	};
 	if(fp) {
 		while(std::fgets(linebuf, sizeof linebuf, fp)) {
 			if(linebuf[0] == '#')
@@ -29,19 +40,68 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			}
 			if (cur == _lfList.rend())
 				continue;
+			if(linebuf[0] == '$') {
+				char* keyPos = linebuf + 1;
+				keyPos += std::strspn(keyPos, " \t");
+				auto keyLen = std::strcspn(keyPos, " \t\r\n");
+				if(!keyLen)
+					continue;
+				char keybuf[256];
+				if(keyLen >= sizeof keybuf)
+					keyLen = sizeof keybuf - 1;
+				std::memcpy(keybuf, keyPos, keyLen);
+				keybuf[keyLen] = 0;
+				keyPos += keyLen;
+				keyPos += std::strspn(keyPos, " \t");
+				errno = 0;
+				char* valuePos = keyPos;
+				auto limitValue = std::strtoul(keyPos, &keyPos, 10);
+				if(errno || valuePos == keyPos)
+					continue;
+				BufferIO::DecodeUTF8(keybuf, strBuffer);
+				cur->credit_limits[strBuffer] = static_cast<uint32_t>(limitValue);
+				credit_update_hash(cur->hash, credit_hash(keybuf), static_cast<uint32_t>(limitValue), 0x43524544u);
+				continue;
+			}
 			char* pos = linebuf;
 			errno = 0;
+			char* codePos = pos;
 			auto result = std::strtoul(pos, &pos, 10);
-			if (errno || result > UINT32_MAX)
+			if(errno || result > UINT32_MAX || codePos == pos)
 				continue;
-			if (pos == linebuf || *pos != ' ')
+			if(*pos != ' ' && *pos != '\t')
 				continue;
+			pos += std::strspn(pos, " \t");
 			uint32_t code = static_cast<uint32_t>(result);
-			errno = 0;
-			int count = std::strtol(pos, &pos, 10);
-			if (errno)
+			if(*pos == '$') {
+				++pos;
+				pos += std::strspn(pos, " \t");
+				auto creditKeyLen = std::strcspn(pos, " \t\r\n");
+				if(!creditKeyLen)
+					continue;
+				char keybuf[256];
+				if(creditKeyLen >= sizeof keybuf)
+					creditKeyLen = sizeof keybuf - 1;
+				std::memcpy(keybuf, pos, creditKeyLen);
+				keybuf[creditKeyLen] = 0;
+				pos += creditKeyLen;
+				pos += std::strspn(pos, " \t");
+				errno = 0;
+				char* creditValuePos = pos;
+				auto creditValue = std::strtoul(pos, &pos, 10);
+				if(errno || creditValuePos == pos)
+					continue;
+				BufferIO::DecodeUTF8(keybuf, strBuffer);
+				cur->credits[code][strBuffer] = static_cast<uint32_t>(creditValue);
+				credit_update_hash(cur->hash, code, credit_hash(keybuf), static_cast<uint32_t>(creditValue));
 				continue;
-			if (count < 0 || count > 2)
+			}
+			errno = 0;
+			char* countPos = pos;
+			int count = std::strtol(pos, &pos, 10);
+			if(errno || countPos == pos)
+				continue;
+			if(count < 0 || count > 2)
 				continue;
 			cur->content[code] = count;
 			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
@@ -95,6 +155,27 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 	if (!lflist)
 		return 0;
 	auto& list = lflist->content;
+	std::unordered_map<std::wstring, uint32_t> credit_used;
+	auto spend_credit = [&](uint32_t code) {
+		auto code_credit_it = lflist->credits.find(code);
+		if(code_credit_it == lflist->credits.end())
+			return static_cast<uint32_t>(0);
+		auto code_credit = code_credit_it->second;
+		for(auto& credit_it : code_credit) {
+			auto key = credit_it.first;
+			auto credit_limit_it = lflist->credit_limits.find(key);
+			if(credit_limit_it == lflist->credit_limits.end())
+				continue;
+			auto credit_limit = credit_limit_it->second;
+			if(credit_used.find(key) == credit_used.end())
+				credit_used[key] = 0;
+			auto credit_after = credit_used[key] + credit_it.second;
+			if(credit_after > credit_limit)
+				return (DECKERROR_LFLIST << 28) | code;
+			credit_used[key] = credit_after;
+		}
+		return (uint32_t)0;
+	};
 	const unsigned int rule_map[6] = { AVAIL_OCG, AVAIL_TCG, AVAIL_SC, AVAIL_CUSTOM, AVAIL_OCGTCG, 0 };
 	unsigned int avail = 0;
 	if (rule >= 0 && rule < (int)(sizeof rule_map / sizeof rule_map[0]))
@@ -113,6 +194,9 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 		auto it = list.find(code);
 		if(it != list.end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) | cit->first;
+		auto spend_credit_error = spend_credit(code);
+		if(spend_credit_error)
+			return spend_credit_error;
 	}
 	for (auto& cit : deck.extra) {
 		auto gameruleDeckError = checkAvail(cit->second.ot, avail);
@@ -128,6 +212,9 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 		auto it = list.find(code);
 		if(it != list.end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) | cit->first;
+		auto spend_credit_error = spend_credit(code);
+		if(spend_credit_error)
+			return spend_credit_error;
 	}
 	for (auto& cit : deck.side) {
 		auto gameruleDeckError = checkAvail(cit->second.ot, avail);
@@ -143,6 +230,9 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 		auto it = list.find(code);
 		if(it != list.end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) | cit->first;
+		auto spend_credit_error = spend_credit(code);
+		if(spend_credit_error)
+			return spend_credit_error;
 	}
 	return 0;
 }
