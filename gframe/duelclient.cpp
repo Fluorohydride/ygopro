@@ -4073,11 +4073,11 @@ void DuelClient::SendUpdateDeck(const Deck& deck) {
 	BufferIO::VectorWrite<int32_t>(deckbuf, static_cast<int32_t>(deck.main.size() + deck.extra.size()));
 	BufferIO::VectorWrite<int32_t>(deckbuf, static_cast<int32_t>(deck.side.size()));
 	for (const auto& card: deck.main)
-		BufferIO::VectorWrite<uint32_t>(deckbuf, card->first);
+		BufferIO::VectorWrite<uint32_t>(deckbuf, card->code);
 	for (const auto& card: deck.extra)
-		BufferIO::VectorWrite<uint32_t>(deckbuf, card->first);
+		BufferIO::VectorWrite<uint32_t>(deckbuf, card->code);
 	for (const auto& card: deck.side)
-		BufferIO::VectorWrite<uint32_t>(deckbuf, card->first);
+		BufferIO::VectorWrite<uint32_t>(deckbuf, card->code);
 	SendBufferToServer(CTOS_UPDATE_DECK, deckbuf.data(), deckbuf.size());
 }
 void DuelClient::BeginRefreshHost() {
