@@ -18,6 +18,7 @@
 
 #define NOMINMAX
 #include <Windows.h>
+#include <shellapi.h>
 
 class FileSystem {
 public:
@@ -71,13 +72,18 @@ public:
 	}
 
 	static bool DeleteDir(const wchar_t* wdir) {
-		wchar_t pdir[256];
+		size_t len = std::wcslen(wdir);
+		wchar_t pdir[1024 + 1]{};
+		if(len >= 1024)
+			return false;
 		BufferIO::CopyWideString(wdir, pdir);
+		// pFrom must be double-null terminated for SHFileOperationW
+		// pdir[len] is already '\0' and pdir[len+1] is '\0' due to zero-init
 		SHFILEOPSTRUCTW lpFileOp{};
 		lpFileOp.hwnd = nullptr;
 		lpFileOp.wFunc = FO_DELETE;
 		lpFileOp.pFrom = pdir;
-		lpFileOp.pTo = 0;
+		lpFileOp.pTo = nullptr;
 		lpFileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
 		return SHFileOperationW(&lpFileOp) == 0;
 	}
@@ -233,7 +239,8 @@ public:
 			int len = std::snprintf(fname, sizeof(fname), "%s/%s", path, dirp->d_name);
 			if (len < 0 || len >= (int)(sizeof fname))
 				continue;
-			stat(fname, &fileStat);
+			if (stat(fname, &fileStat) != 0)
+				continue;
 			funit.filename = std::string(dirp->d_name);
 			funit.is_dir = S_ISDIR(fileStat.st_mode);
 			if(funit.is_dir && (std::strcmp(dirp->d_name, ".") == 0 || std::strcmp(dirp->d_name, "..") == 0))

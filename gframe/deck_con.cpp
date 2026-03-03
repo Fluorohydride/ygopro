@@ -163,6 +163,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				return true;
 				break;
 			}
+			break;
 		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			soundManager.PlaySoundEffect(SOUND_BUTTON);
@@ -1011,6 +1012,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				InstantSearch();
 				break;
 			}
+			break;
 		}
 		case irr::gui::EGET_LISTBOX_CHANGED: {
 			switch(id) {

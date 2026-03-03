@@ -197,7 +197,7 @@ public:
 		//! \return Myself.
 		_Iter& operator-=(const difference_type v) {
 			if(v == 0) return *this;
-			if(v > 0) return operator+=(v * -1);
+			if(v < 0) return operator+=(-v);
 
 			if(pos == 0)
 				return *this;

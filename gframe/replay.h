@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include "../ocgcore/ocgapi.h"
-#include "deck_manager.h"
+#include "deck.h"
 
 namespace ygo {
 
@@ -96,6 +96,7 @@ public:
 	void Reset();
 	void SkipInfo();
 	bool IsReplaying() const;
+	bool SaveDeck(size_t index, const wchar_t* filename);
 
 	FILE* fp{ nullptr };
 	ExtendedReplayHeader pheader;
