@@ -125,26 +125,24 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 	if (!lflist)
 		return 0;
 	auto& list = lflist->content;
-	std::unordered_map<std::wstring, uint32_t> credit_used;
+	std::unordered_map<std::wstring, int> credit_used;
 	auto spend_credit = [&](uint32_t code) {
 		auto code_credit_it = lflist->credits.find(code);
 		if(code_credit_it == lflist->credits.end())
-			return static_cast<uint32_t>(0);
-		auto code_credit = code_credit_it->second;
-		for(auto& credit_it : code_credit) {
-			auto key = credit_it.first;
+			return 0U;
+		auto& credit_table = code_credit_it->second;
+		for(auto& credit_it : credit_table) {
+			auto& key = credit_it.first;
 			auto credit_limit_it = lflist->credit_limits.find(key);
 			if(credit_limit_it == lflist->credit_limits.end())
 				continue;
 			auto credit_limit = credit_limit_it->second;
-			if(credit_used.find(key) == credit_used.end())
-				credit_used[key] = 0;
 			auto credit_after = credit_used[key] + credit_it.second;
 			if(credit_after > credit_limit)
 				return (DECKERROR_LFLIST << 28) | code;
 			credit_used[key] = credit_after;
 		}
-		return (uint32_t)0;
+		return 0U;
 	};
 	const unsigned int rule_map[6] = { AVAIL_OCG, AVAIL_TCG, AVAIL_SC, AVAIL_CUSTOM, AVAIL_OCGTCG, 0 };
 	unsigned int avail = 0;
