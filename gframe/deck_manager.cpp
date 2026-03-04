@@ -28,7 +28,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			if(linebuf[0] == '#')
 				continue;
 			if(linebuf[0] == '!') {
-				auto len = std::strcspn(linebuf, "\n");
+				auto len = std::strcspn(linebuf, "\r\n");
 				linebuf[len] = 0;
 				BufferIO::DecodeUTF8(&linebuf[1], strBuffer);
 				LFList newlist;
@@ -43,10 +43,9 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			if(linebuf[0] == '$') {
 				int limitValue = 0;
 				char keybuf[256];
-				if (std::sscanf(linebuf, "$%255s %d", keybuf, &limitValue) < 2)
+				if (std::sscanf(linebuf, "$%255s %d", keybuf, &limitValue) != 2)
 					continue;
-				BufferIO::DecodeUTF8(keybuf, strBuffer);
-				cur->credit_limits[strBuffer] = limitValue;
+				cur->point_list.push_back({ keybuf, limitValue });
 				cur->hash = credit_update_hash(cur->hash, credit_hash(keybuf), static_cast<uint32_t>(limitValue), 0x43524544u);
 				continue;
 			}
@@ -57,12 +56,13 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			if (errno || result > UINT32_MAX || end == pos)
 				continue;
 			uint32_t code = static_cast<uint32_t>(result);
-			char keyName[256];
 			int creditValue = 0;
-			if (std::sscanf(end, " $%255s %d", keyName, &creditValue) == 2) {
-				BufferIO::DecodeUTF8(keyName, strBuffer);
-				cur->credits[code][strBuffer] = static_cast<uint32_t>(creditValue);
-				cur->hash = credit_update_hash(cur->hash, code, credit_hash(keyName), static_cast<uint32_t>(creditValue));
+			if (std::sscanf(end, " $%*s %d", &creditValue) == 1) {
+				if (cur->point_list.empty())
+					continue;
+				auto& point = cur->point_list.back();
+				point.table[code] = creditValue;
+				cur->hash = credit_update_hash(cur->hash, code, credit_hash(point.name.c_str()), static_cast<uint32_t>(creditValue));
 				continue;
 			}
 			pos = end;

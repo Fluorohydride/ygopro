@@ -23,12 +23,17 @@ constexpr int DECK_CATEGORY_NONE = 2;
 constexpr int DECK_CATEGORY_SEPARATOR = 3;
 constexpr int DECK_CATEGORY_CUSTOM = 4;
 
+struct GamePoint {
+	std::string name;
+	int limit;
+	std::unordered_map<uint32_t, int> table;
+};
+
 struct LFList {
 	unsigned int hash{};
 	std::wstring listName;
 	std::unordered_map<uint32_t, int> content;
-	std::unordered_map<std::wstring, int> credit_limits;
-	std::unordered_map<uint32_t, std::unordered_map<std::wstring, int>> credits;
+	std::vector<GamePoint> point_list;
 };
 
 class DeckManager {
