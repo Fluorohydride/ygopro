@@ -66,6 +66,7 @@ public:
 	static bool RenameCategory(const wchar_t* oldname, const wchar_t* newname);
 	static bool DeleteCategory(const wchar_t* name);
 	static bool SaveDeckArray(const DeckArray& deck, const wchar_t* name);
+	static uint32_t CheckDeckPoint(const Deck& deck, const LFList* lflist, std::vector<int>& sum);
 };
 
 extern DeckManager deckManager;
