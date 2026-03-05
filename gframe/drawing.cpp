@@ -1123,7 +1123,7 @@ void Game::WaitFrameSignal(int frame) {
 	signalFrame = (gameConf.quick_animation && frame >= 12) ? 12 : frame;
 	frameSignal.Wait();
 }
-void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lflist, bool drag) {
+void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, float mul, const LFList* lflist, bool drag) {
 	auto code = cp->first;
 	auto lcode = cp->second.alias;
 	if(lcode == 0)
@@ -1132,14 +1132,13 @@ void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lf
 	if(img == nullptr)
 		return; //nullptr->getSize() will cause a crash
 	irr::core::dimension2d<irr::u32> size = img->getOriginalSize();
-	irr::core::recti dragloc = mainGame->Resize(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH, pos.Y + CARD_THUMB_HEIGHT);
-	irr::core::recti limitloc = mainGame->Resize(pos.X, pos.Y, pos.X + 20, pos.Y + 20);
-	irr::core::recti otloc = Resize(pos.X + 7, pos.Y + 50, pos.X + 37, pos.Y + 65);
-	if(drag) {
-		dragloc = irr::core::recti(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH * mainGame->xScale, pos.Y + CARD_THUMB_HEIGHT * mainGame->yScale);
-		limitloc = irr::core::recti(pos.X, pos.Y, pos.X + 20 * mainGame->xScale, pos.Y + 20 * mainGame->yScale);
-		otloc = irr::core::recti(pos.X + 7, pos.Y + 50 * mainGame->yScale, pos.X + 37 * mainGame->xScale, pos.Y + 65 * mainGame->yScale);
-	}
+	int cw     = (int)(CARD_THUMB_WIDTH * mul);
+	int ch     = (int)(CARD_THUMB_HEIGHT * mul);
+	int lim_sz = (int)(20 * mul);
+	irr::core::recti dragloc(pos.X, pos.Y, pos.X + cw, pos.Y + ch);
+	irr::core::recti limitloc(pos.X, pos.Y, pos.X + lim_sz, pos.Y + lim_sz);
+	irr::core::recti otloc(pos.X + (int)(7 * mul), pos.Y + (int)(50 * mul),
+	                       pos.X + (int)(37 * mul), pos.Y + (int)(65 * mul));
 	driver->draw2DImage(img, dragloc, irr::core::rect<irr::s32>(0, 0, size.Width, size.Height));
 	auto lfit = lflist->content.find(lcode);
 	if (lfit != lflist->content.end()) {
@@ -1185,78 +1184,188 @@ void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lf
 }
 void Game::DrawDeckBd() {
 	wchar_t textBuffer[64];
-	//main deck
 	int mainsize = deckManager.current_deck.main.size();
+
+	// ====== Scale setup ======
+	float mul = xScale;
+	if(xScale > yScale) mul = yScale;
+	float cw     = CARD_THUMB_WIDTH  * mul;
+	float ch     = CARD_THUMB_HEIGHT * mul;
+	float dx_max = (436.0f / 9.0f) * mul;
+	float dy     = 68.0f * mul;
+	float panel_left  = 314.0f * xScale;
+	float panel_right = 797.0f * xScale;
+	float panel_w     = panel_right - panel_left;
+
+	// ====== Vertical layout (bottom-up, mul-scaled panels, yScale-scaled headers/gaps) ======
+	float hdr_h   = 20.0f * yScale;
+	float sec_gap = 4.0f * yScale;
+	float zone_h  = ch + 6.0f * mul;    // 1-row panel: 3*mul top pad + card + 3*mul bot pad
+	float total_bot  = 630.0f * yScale;
+
+	float sd_zone_bot = total_bot;
+	float sd_zone_top = sd_zone_bot - zone_h;
+	float sd_hdr_bot  = sd_zone_top - 3.0f * mul;
+	float sd_hdr_top  = sd_hdr_bot - hdr_h;
+	float ex_zone_bot = sd_hdr_top - sec_gap;
+	float ex_zone_top = ex_zone_bot - zone_h;
+	float ex_hdr_bot  = ex_zone_top - 3.0f * mul;
+	float ex_hdr_top  = ex_hdr_bot - hdr_h;
+	float main_panel_bot_np = ex_hdr_top - sec_gap;  // non-pack main deck panel bottom
+
+	float panel_top = 164.0f * yScale;  // card area top (matches original standard)
+
+	// ====== Layout computation ======
+	int   lx, rows;
+	float dx;
+
+	if(deckBuilder.showing_pack) {
+		// Pack mode: fill the full 160-630 panel with as many rows/cols as possible
+		float pack_h = total_bot - panel_top;
+		rows = (int)(pack_h / dy) + 1;
+		if(rows < 4) rows = 4;
+		// First pass: check if scrollbar is needed
+		int lx_w = (int)((panel_w - cw) / dx_max) + 1;
+		if(lx_w < 10) lx_w = 10;
+		int min_lx = (mainsize + rows - 1) / (rows > 0 ? rows : 1);
+		int lx_try = lx_w > min_lx ? lx_w : min_lx;
+		int total_rows = (mainsize + lx_try - 1) / (lx_try > 0 ? lx_try : 1);
+		bool need_scroll = (total_rows > rows);
+		// If scrollbar needed, reduce available width (scrollbar at x=775-795)
+		float avail_w = need_scroll ? (775.0f - 314.0f) * xScale : panel_w;
+		lx_w = (int)((avail_w - cw) / dx_max) + 1;
+		if(lx_w < 10) lx_w = 10;
+		lx = lx_w > min_lx ? lx_w : min_lx;
+		dx = (lx > 1) ? (avail_w - cw) / (lx - 1) : 0.0f;
+		deckBuilder.layout.pack_scroll     = scrPackCards->isVisible();
+		deckBuilder.layout.pack_scroll_pos = scrPackCards->getPos();
+	} else {
+		// Non-pack: main deck gets all space above extra/side sections
+		float main_h = main_panel_bot_np - panel_top;
+		rows = (int)((main_h - ch) / dy) + 1;
+		if(rows < 4) rows = 4;
+		int lx_w = (int)((panel_w - cw) / dx_max) + 1;
+		if(lx_w < 10) lx_w = 10;
+		int min_lx = (mainsize + rows - 1) / (rows > 0 ? rows : 1);
+		lx = lx_w > min_lx ? lx_w : min_lx;
+		dx = (lx > 1) ? (panel_w - cw) / (lx - 1) : 0.0f;
+		deckBuilder.layout.pack_scroll     = false;
+		deckBuilder.layout.pack_scroll_pos = 0;
+	}
+
+	float main_panel_bot = deckBuilder.showing_pack ? total_bot : main_panel_bot_np;
+
+	deckBuilder.layout.mul      = mul;
+	deckBuilder.layout.cw       = cw;
+	deckBuilder.layout.ch       = ch;
+	deckBuilder.layout.dy       = dy;
+	deckBuilder.layout.dx       = dx;
+	deckBuilder.layout.lx       = lx;
+	deckBuilder.layout.rows     = rows;
+	deckBuilder.layout.left     = panel_left;
+	deckBuilder.layout.top      = panel_top;
+	deckBuilder.layout.sr_row_h  = 66.0f * mul;
+	deckBuilder.layout.sr_top_px = 165.0f * yScale;
+
+	// ====== Main deck header (fixed position) ======
 	driver->draw2DRectangle(Resize(310, 137, 410, 157), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(Resize(309, 136, 410, 157));
 	DrawShadowText(textFont, dataManager.GetSysString(deckBuilder.showing_pack ? 1477 : 1330), Resize(315, 137, 410, 157), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
 	DrawShadowText(numFont, dataManager.GetNumString(mainsize), Resize(380, 138, 440, 158), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
-	driver->draw2DRectangle(Resize(310, 160, 797, deckBuilder.showing_pack ? 630 : 436), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
-	driver->draw2DRectangleOutline(Resize(309, 159, 797, deckBuilder.showing_pack ? 630 : 436));
-	int lx;
-	int dy = 68;
-	float dx;
-	if(mainsize <= 40) {
-		dx = 436.0f / 9;
-		lx = 10;
-	} else if(deckBuilder.showing_pack) {
-		lx = 10;
-		if(mainsize > 10 * 7)
-			lx = 11;
-		if(mainsize > 11 * 7)
-			lx = 12;
-		dx = (mainGame->scrPackCards->isVisible() ? 414.0f : 436.0f) / (lx - 1);
-		if(mainsize > 60)
-			dy = 66;
-	} else {
-		lx = (mainsize - 41) / 4 + 11;
-		dx = 436.0f / (lx - 1);
+
+	// ====== Main deck panel background (dynamic bottom) ======
+	driver->draw2DRectangle(
+		irr::core::recti((int)(310 * xScale), (int)(160 * yScale), (int)(797 * xScale), (int)main_panel_bot),
+		0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+	driver->draw2DRectangleOutline(irr::core::recti(
+		(int)(309 * xScale) - 1, (int)(159 * yScale) - 1,
+		(int)(797 * xScale) + 1, (int)main_panel_bot + 1));
+
+	// ====== Main deck / pack cards ======
+	{
+		int padding  = deckBuilder.layout.pack_scroll_pos * lx;
+		int max_draw = rows * lx;
+		for(int i = 0; i < mainsize - padding && i < max_draw; ++i) {
+			int j   = i + padding;
+			int col = i % lx;
+			int row = i / lx;
+			int sx  = (int)(panel_left + col * dx);
+			int sy  = (int)(panel_top  + row * dy);
+			DrawThumb(deckManager.current_deck.main[j], irr::core::vector2di(sx, sy), mul, deckBuilder.filterList);
+			if(deckBuilder.hovered_pos == 1 && deckBuilder.hovered_seq == j)
+				driver->draw2DRectangleOutline(irr::core::recti(sx - 1, sy - 1, sx + (int)cw + 1, sy + (int)ch + 1));
+		}
 	}
-	int padding = scrPackCards->getPos() * lx;
-	for(int i = 0; i < mainsize - padding && i < 7 * lx; ++i) {
-		int j = i + padding;
-		DrawThumb(deckManager.current_deck.main[j], irr::core::vector2di(314 + (i % lx) * dx, 164 + (i / lx) * dy), deckBuilder.filterList);
-		if(deckBuilder.hovered_pos == 1 && deckBuilder.hovered_seq == j)
-			driver->draw2DRectangleOutline(Resize(313 + (i % lx) * dx, 163 + (i / lx) * dy, 359 + (i % lx) * dx, 228 + (i / lx) * dy));
-	}
+
 	if(!deckBuilder.showing_pack) {
-		//extra deck
-		driver->draw2DRectangle(Resize(310, 440, 410, 460), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
-		driver->draw2DRectangleOutline(Resize(309, 439, 410, 460));
-		DrawShadowText(textFont, dataManager.GetSysString(1331), Resize(315, 440, 410, 460), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
-		DrawShadowText(numFont, dataManager.GetNumString(deckManager.current_deck.extra.size()), Resize(380, 441, 440, 461), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
-		driver->draw2DRectangle(Resize(310, 463, 797, 533), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
-		driver->draw2DRectangleOutline(Resize(309, 462, 797, 533));
-		if(deckManager.current_deck.extra.size() <= 10)
-			dx = 436.0f / 9;
-		else dx = 436.0f / (deckManager.current_deck.extra.size() - 1);
-		for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i) {
-			DrawThumb(deckManager.current_deck.extra[i], irr::core::vector2di(314 + i * dx, 466), deckBuilder.filterList);
-			if(deckBuilder.hovered_pos == 2 && deckBuilder.hovered_seq == (int)i)
-				driver->draw2DRectangleOutline(Resize(313 + i * dx, 465, 359 + i * dx, 531));
+		// ====== Dynamic layout helper (logical-X * xScale, Y already in screen pixels) ======
+		auto lrect = [&](float x1, float y1_px, float x2, float y2_px) {
+			return irr::core::recti((int)(x1 * xScale), (int)y1_px, (int)(x2 * xScale), (int)y2_px);
+		};
+
+		// ====== Extra deck header (dynamic position) ======
+		driver->draw2DRectangle(lrect(310, ex_hdr_top, 410, ex_hdr_bot), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+		driver->draw2DRectangleOutline(lrect(309, ex_hdr_top - 1, 410, ex_hdr_bot + 1));
+		DrawShadowText(textFont, dataManager.GetSysString(1331), lrect(315, ex_hdr_top, 410, ex_hdr_bot), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
+		DrawShadowText(numFont, dataManager.GetNumString(deckManager.current_deck.extra.size()), lrect(380, ex_hdr_top, 440, ex_hdr_bot), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
+
+		// ====== Extra deck panel + cards (left-aligned, max spacing) ======
+		driver->draw2DRectangle(lrect(310, ex_zone_top, 797, ex_zone_bot), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+		driver->draw2DRectangleOutline(lrect(309, ex_zone_top - 1, 797, ex_zone_bot + 1));
+		{
+			int   n_extra   = (int)deckManager.current_deck.extra.size();
+			int   max_at_dx = (int)((panel_w - cw) / dx_max) + 1;
+			float ex_dx     = (n_extra <= 1) ? 0.0f
+			                : (n_extra <= max_at_dx ? dx_max : (panel_w - cw) / (n_extra - 1));
+			float ex_card_y = ex_zone_top + 3.0f * mul;
+			deckBuilder.layout.ex_dx   = ex_dx;
+			deckBuilder.layout.ex_left = panel_left;
+			deckBuilder.layout.ex_top  = ex_zone_top;
+			deckBuilder.layout.ex_bot  = ex_zone_bot;
+			deckBuilder.layout.ex_lx   = n_extra;
+			for(int i = 0; i < n_extra; ++i) {
+				int sx = (int)(panel_left + i * ex_dx);
+				int sy = (int)ex_card_y;
+				DrawThumb(deckManager.current_deck.extra[i], irr::core::vector2di(sx, sy), mul, deckBuilder.filterList);
+				if(deckBuilder.hovered_pos == 2 && deckBuilder.hovered_seq == i)
+					driver->draw2DRectangleOutline(irr::core::recti(sx - 1, sy - 1, sx + (int)cw + 1, sy + (int)ch + 1));
+			}
 		}
-		//side deck
-		driver->draw2DRectangle(Resize(310, 537, 410, 557), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
-		driver->draw2DRectangleOutline(Resize(309, 536, 410, 557));
-		DrawShadowText(textFont, dataManager.GetSysString(1332), Resize(315, 537, 410, 557), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
-		DrawShadowText(numFont, dataManager.GetNumString(deckManager.current_deck.side.size()), Resize(380, 538, 440, 558), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
-		driver->draw2DRectangle(Resize(310, 560, 797, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
-		driver->draw2DRectangleOutline(Resize(309, 559, 797, 630));
-		if(deckManager.current_deck.side.size() <= 10)
-			dx = 436.0f / 9;
-		else dx = 436.0f / (deckManager.current_deck.side.size() - 1);
-		for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i) {
-			DrawThumb(deckManager.current_deck.side[i], irr::core::vector2di(314 + i * dx, 564), deckBuilder.filterList);
-			if(deckBuilder.hovered_pos == 3 && deckBuilder.hovered_seq == (int)i)
-				driver->draw2DRectangleOutline(Resize(313 + i * dx, 563, 359 + i * dx, 629));
+
+		// ====== Side deck header (dynamic position) ======
+		driver->draw2DRectangle(lrect(310, sd_hdr_top, 410, sd_hdr_bot), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+		driver->draw2DRectangleOutline(lrect(309, sd_hdr_top - 1, 410, sd_hdr_bot + 1));
+		DrawShadowText(textFont, dataManager.GetSysString(1332), lrect(315, sd_hdr_top, 410, sd_hdr_bot), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
+		DrawShadowText(numFont, dataManager.GetNumString(deckManager.current_deck.side.size()), lrect(380, sd_hdr_top, 440, sd_hdr_bot), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
+
+		// ====== Side deck panel + cards (left-aligned, max spacing) ======
+		driver->draw2DRectangle(lrect(310, sd_zone_top, 797, sd_zone_bot), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+		driver->draw2DRectangleOutline(lrect(309, sd_zone_top - 1, 797, sd_zone_bot + 1));
+		{
+			int   n_side    = (int)deckManager.current_deck.side.size();
+			int   max_at_dx = (int)((panel_w - cw) / dx_max) + 1;
+			float sd_dx     = (n_side <= 1) ? 0.0f
+			                : (n_side <= max_at_dx ? dx_max : (panel_w - cw) / (n_side - 1));
+			float sd_card_y = sd_zone_top + 3.0f * mul;
+			deckBuilder.layout.sd_dx   = sd_dx;
+			deckBuilder.layout.sd_left = panel_left;
+			deckBuilder.layout.sd_top  = sd_zone_top;
+			deckBuilder.layout.sd_bot  = sd_zone_bot;
+			deckBuilder.layout.sd_lx   = n_side;
+			for(int i = 0; i < n_side; ++i) {
+				int sx = (int)(panel_left + i * sd_dx);
+				int sy = (int)sd_card_y;
+				DrawThumb(deckManager.current_deck.side[i], irr::core::vector2di(sx, sy), mul, deckBuilder.filterList);
+				if(deckBuilder.hovered_pos == 3 && deckBuilder.hovered_seq == i)
+					driver->draw2DRectangleOutline(irr::core::recti(sx - 1, sy - 1, sx + (int)cw + 1, sy + (int)ch + 1));
+			}
 		}
 	}
+
 	if(is_siding) {
-		// side chat background
 		driver->draw2DRectangle(Resize(805, 10, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 		driver->draw2DRectangleOutline(Resize(804, 9, 1020, 630));
 	} else {
-		//search result
 		driver->draw2DRectangle(Resize(805, 137, 926, 157), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 		driver->draw2DRectangleOutline(Resize(804, 136, 926, 157));
 		DrawShadowText(textFont, dataManager.GetSysString(1333), Resize(810, 137, 915, 157), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
@@ -1264,17 +1373,34 @@ void Game::DrawDeckBd() {
 		driver->draw2DRectangle(Resize(805, 160, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 		driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
 	}
-	int max_result = mainGame->gameConf.use_image_load_background_thread ? 9 : 7;
+
+	// ====== Search results (mul-based row height, text right after card) ======
+	float sr_row_h   = deckBuilder.layout.sr_row_h;   // 66 * mul
+	float sr_top_px  = deckBuilder.layout.sr_top_px;  // 165 * yScale
+	float sr_panel_h = (626.0f - 165.0f) * yScale;
+	int   max_visible = (int)(sr_panel_h / sr_row_h);
+	if(max_visible < 7) max_visible = 7;
+	int   max_result  = mainGame->gameConf.use_image_load_background_thread ? max_visible + 2 : max_visible;
+	float tx_base  = 810.0f * xScale + cw + 6.0f * mul;  // text left: right after card + gap
+	float tx_right = 1019.0f * xScale;                    // text right: full search panel width
+
 	for(int i = 0; i < max_result && i + scrFilter->getPos() < (int)deckBuilder.results.size(); ++i) {
 		code_pointer ptr = deckBuilder.results[i + scrFilter->getPos()];
-		if(i >= 7)
-		{
+		if(i >= max_visible) {
 			imageManager.GetTextureThumb(ptr->second.code);
 			break;
 		}
+		float row_y = sr_top_px + i * sr_row_h;
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
-			driver->draw2DRectangle(0x80000000, Resize(806, 164 + i * 66, 1019, 230 + i * 66));
-		DrawThumb(ptr, irr::core::vector2di(810, 165 + i * 66), deckBuilder.filterList);
+			driver->draw2DRectangle(0x80000000, irr::core::recti(
+				(int)(806 * xScale), (int)row_y, (int)(1019 * xScale), (int)(row_y + sr_row_h)));
+		DrawThumb(ptr, irr::core::vector2di((int)(810 * xScale), (int)row_y), mul, deckBuilder.filterList);
+		// Helper: text line rect (3 lines per entry, 22*mul apart)
+		auto trow = [&](int line) {
+			return irr::core::recti(
+				(int)tx_base,  (int)(row_y + line * 22.0f * mul),
+				(int)tx_right, (int)(row_y + (line + 1) * 22.0f * mul));
+		};
 		const wchar_t* availBuffer = L"";
 		if ((ptr->second.ot & AVAIL_OCGTCG) == AVAIL_OCG)
 			availBuffer = L" [OCG]";
@@ -1284,7 +1410,7 @@ void Game::DrawDeckBd() {
 			availBuffer = L" [Custom]";
 		if(ptr->second.type & TYPE_MONSTER) {
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
-			DrawShadowText(textFont, textBuffer, Resize(860, 165 + i * 66, 955, 185 + i * 66), Resize(1, 1, 0, 0));
+			DrawShadowText(textFont, textBuffer, trow(0), Resize(1, 1, 0, 0));
 			const wchar_t* form = L"\u2605";
 			wchar_t adBuffer[32]{};
 			wchar_t scaleBuffer[16]{};
@@ -1309,24 +1435,27 @@ void Game::DrawDeckBd() {
 			const auto& attribute = dataManager.FormatAttribute(ptr->second.attribute);
 			const auto& race = dataManager.FormatRace(ptr->second.race);
 			myswprintf(textBuffer, L"%ls/%ls %ls%d", attribute.c_str(), race.c_str(), form, ptr->second.level);
-			DrawShadowText(textFont, textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
+			DrawShadowText(textFont, textBuffer, trow(1), Resize(1, 1, 0, 0));
 			if(ptr->second.type & TYPE_PENDULUM) {
 				myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
 			}
 			myswprintf(textBuffer, L"%ls%ls%ls", adBuffer, scaleBuffer, availBuffer);
-			DrawShadowText(textFont, textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), Resize(1, 1, 0, 0));
+			DrawShadowText(textFont, textBuffer, trow(2), Resize(1, 1, 0, 0));
 		} else {
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
-			DrawShadowText(textFont, textBuffer, Resize(860, 165 + i * 66, 955, 185 + i * 66), Resize(1, 1, 0, 0));
+			DrawShadowText(textFont, textBuffer, trow(0), Resize(1, 1, 0, 0));
 			const auto& type = dataManager.FormatType(ptr->second.type);
 			myswprintf(textBuffer, L"%ls", type.c_str());
-			DrawShadowText(textFont, textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), Resize(1, 1, 0, 0));
+			DrawShadowText(textFont, textBuffer, trow(1), Resize(1, 1, 0, 0));
 			myswprintf(textBuffer, L"%ls", availBuffer);
-			DrawShadowText(textFont, textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), Resize(1, 1, 0, 0));
+			DrawShadowText(textFont, textBuffer, trow(2), Resize(1, 1, 0, 0));
 		}
 	}
 	if(deckBuilder.is_draging) {
-		DrawThumb(deckBuilder.draging_pointer, irr::core::vector2di(deckBuilder.dragx - CARD_THUMB_WIDTH / 2 * mainGame->xScale, deckBuilder.dragy - CARD_THUMB_HEIGHT / 2 * mainGame->yScale), deckBuilder.filterList, true);
+		DrawThumb(deckBuilder.draging_pointer,
+		          irr::core::vector2di((int)(deckBuilder.dragx - CARD_THUMB_WIDTH / 2.0f * mul),
+		                               (int)(deckBuilder.dragy - CARD_THUMB_HEIGHT / 2.0f * mul)),
+		          mul, deckBuilder.filterList, true);
 	}
 }
 }
