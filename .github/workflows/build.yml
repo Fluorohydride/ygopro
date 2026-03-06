@@ -37,7 +37,7 @@ jobs:
         body = os.environ.get('PR_BODY', '')
         # Default URLs and branches for dependencies
         ocgcore_url = 'https://github.com/Fluorohydride/ygopro-core'
-        ocgcore_branch = 'master'
+        ocgcore_branch = ''
         irrlicht_url = 'https://github.com/mercury233/irrlicht'
         irrlicht_branch = ''
         # Regex patterns for parsing:
