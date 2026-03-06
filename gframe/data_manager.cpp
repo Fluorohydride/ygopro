@@ -11,6 +11,8 @@ static const char SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas
 " texts.name, texts.desc, texts.str1, texts.str2, texts.str3, texts.str4, texts.str5, texts.str6, texts.str7, texts.str8,"
 " texts.str9, texts.str10, texts.str11, texts.str12, texts.str13, texts.str14, texts.str15, texts.str16 FROM datas INNER JOIN texts ON datas.id = texts.id";
 
+constexpr int DATAS_COUNT = 11;
+
 DataManager::DataManager() : _datas(32768), _strings(32768) {
 	extra_setcode = { 
 		{8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}},
@@ -49,16 +51,16 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
 		cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
 		auto& cs = _strings[code];
-		if (const char* text = (const char*)sqlite3_column_text(pStmt, 11)) {
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, DATAS_COUNT + 0)) {
 			BufferIO::DecodeUTF8(text, strBuffer);
 			cs.name = strBuffer;
 		}
-		if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, DATAS_COUNT + 1)) {
 			BufferIO::DecodeUTF8(text, strBuffer);
 			cs.text = strBuffer;
 		}
 		for (int i = 0; i < DESC_COUNT; ++i) {
-			if (const char* text = (const char*)sqlite3_column_text(pStmt, 13 + i)) {
+			if (const char* text = (const char*)sqlite3_column_text(pStmt, (DATAS_COUNT + 2) + i)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.desc[i] = strBuffer;
 			}
