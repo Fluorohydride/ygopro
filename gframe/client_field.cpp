@@ -1401,6 +1401,8 @@ bool ClientField::check_sum_trib(std::set<ClientCard*>::const_iterator index, st
 }
 template <class T>
 static bool is_declarable(const T& cd, const std::vector<unsigned int>& opcode) {
+	if (cd.alias)
+		return false;
 	std::stack<int> stack;
 	for(auto it = opcode.begin(); it != opcode.end(); ++it) {
 		switch(*it) {
@@ -1535,9 +1537,9 @@ static bool is_declarable(const T& cd, const std::vector<unsigned int>& opcode) 
 	}
 	if(stack.size() != 1 || stack.top() == 0)
 		return false;
-	if (cd.type & TYPE_TOKEN)
+	if (!second_code.count(cd.code) && (cd.rule_code || (cd.type & TYPE_TOKEN)))
 		return false;
-	return !cd.alias || second_code.find(cd.code) != second_code.end();
+	return true;
 }
 void ClientField::UpdateDeclarableList() {
 	const wchar_t* pname = mainGame->ebANCard->getText();
@@ -1567,7 +1569,6 @@ void ClientField::UpdateDeclarableList() {
 			auto cp = _datas.find(code);
 			if (cp == _datas.end())
 				continue;
-			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, declare_opcodes)) {
 				if(pname == str.name || trycode == code) { //exact match or last used
 					mainGame->lstANCard->insertItem(0, str.name.c_str(), -1);
