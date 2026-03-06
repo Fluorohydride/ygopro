@@ -1162,22 +1162,22 @@ void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lf
 		}
 		driver->draw2DImage(imageManager.tLim, next_limitloc(), irr::core::recti(lim_texture_offset_x, lim_texture_offset_y, lim_texture_offset_x + 64, lim_texture_offset_y + 64), 0, 0, true);
 	}
-	auto lfcredit = lflist->credits.find(lcode);
-	if(lfcredit != lflist->credits.end()) {
-		for(auto& credit_entry : lfcredit->second) {
-			if(credit_max_display <= 0)
-				break;
-			auto value = credit_entry.second;
-			if(value > 0 && value <= 100) {
-				auto cvalue = value - 1; // 1-100 => 0-99
-				// pick the first and second digit
-				auto digit1 = cvalue / 10;
-				auto digit2 = cvalue % 10;
-				auto credit_texture_offset_x = digit2 * 64;
-				auto credit_texture_offset_y = digit1 * 64;
-				driver->draw2DImage(imageManager.tLimCredit, next_limitloc(), irr::core::recti(credit_texture_offset_x, credit_texture_offset_y, credit_texture_offset_x + 64, credit_texture_offset_y + 64), 0, 0, true);
-			}
+	for (auto& point : lflist->point_list) {
+		auto it = point.table.find(code);
+		if (it == point.table.end())
+			continue;
+		auto value = it->second;
+		if (value > 0 && value <= 100) {
+			auto cvalue = value - 1; // 1-100 => 0-99
+			// pick the first and second digit
+			auto digit1 = cvalue / 10;
+			auto digit2 = cvalue % 10;
+			auto credit_texture_offset_x = digit2 * 64;
+			auto credit_texture_offset_y = digit1 * 64;
+			driver->draw2DImage(imageManager.tLimCredit, next_limitloc(), irr::core::recti(credit_texture_offset_x, credit_texture_offset_y, credit_texture_offset_x + 64, credit_texture_offset_y + 64), 0, 0, true);
 		}
+		if (credit_max_display <= 0)
+			break;
 	}
 	bool showAvail = false;
 	bool showNotAvail = false;
