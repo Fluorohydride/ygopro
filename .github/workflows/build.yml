@@ -24,13 +24,15 @@ jobs:
         PR_BODY: ${{ github.event.pull_request.body }}
       shell: python
       run: |
-        # You can override the URLs and branches of submodules by adding lines in the pull request description.
-        # This is useful when you want to test changes which require modifications in the submodules.
+        # You can override the URLs and branches of dependencies by adding lines in the pull request description.
+        # This is useful when you want to test changes which require modifications in the submodules or dependencies.
         # Expected description format:
-        # > submodule: owner/repo@branch
-        # (leading >, dependency name, followed by Github repository, optional branch)
+        # > name: owner/repo@branch
+        # (leading >, dependency name, followed by GitHub repository, optional branch)
         # Example:
         # > ocgcore: mercury233/ygopro-core@patch-branch
+        # Supported dependencies:
+        # ocgcore, irrlicht
         import re, os
         body = os.environ.get('PR_BODY', '')
         # Default URLs and branches for dependencies
