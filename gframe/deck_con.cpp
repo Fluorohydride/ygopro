@@ -1875,21 +1875,21 @@ void DeckBuilder::pop_side(int seq) {
 	GetHoveredCard();
 }
 bool DeckBuilder::check_limit(code_pointer pointer) {
-	auto limitcode = pointer->second.alias ? pointer->second.alias : pointer->first;
+	auto limitcode = get_original_code_rule(pointer->first, pointer->second.alias, DataManager::CardReader);
 	int limit = 3;
 	auto flit = filterList->content.find(limitcode);
 	if(flit != filterList->content.end())
 		limit = flit->second;
 	for (auto& card : deckManager.current_deck.main) {
-		if (card->first == limitcode || card->second.alias == limitcode)
+		if (get_original_code_rule(card->first, card->second.alias, DataManager::CardReader) == limitcode)
 			limit--;
 	}
 	for (auto& card : deckManager.current_deck.extra) {
-		if (card->first == limitcode || card->second.alias == limitcode)
+		if (get_original_code_rule(card->first, card->second.alias, DataManager::CardReader) == limitcode)
 			limit--;
 	}
 	for (auto& card : deckManager.current_deck.side) {
-		if (card->first == limitcode || card->second.alias == limitcode)
+		if (get_original_code_rule(card->first, card->second.alias, DataManager::CardReader) == limitcode)
 			limit--;
 	}
 	return limit > 0;

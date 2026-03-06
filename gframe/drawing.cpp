@@ -1125,9 +1125,7 @@ void Game::WaitFrameSignal(int frame) {
 }
 void Game::DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lflist, bool drag) {
 	auto code = cp->first;
-	auto lcode = cp->second.alias;
-	if(lcode == 0)
-		lcode = code;
+	auto lcode = get_original_code_rule(cp->first, cp->second.alias, DataManager::CardReader);
 	irr::video::ITexture* img = imageManager.GetTextureThumb(code);
 	if(img == nullptr)
 		return; //nullptr->getSize() will cause a crash
