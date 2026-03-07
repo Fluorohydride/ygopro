@@ -256,6 +256,14 @@ jobs:
         update: true
         install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make
 
+    - name: Backport libevent fix for MinGW build
+      if: matrix.mingw == true
+      run: |
+        # https://github.com/libevent/libevent/pull/1498
+        cd event
+        sed -i 's/#define _WIN32_WINNT 0x0501/#define _WIN32_WINNT 0x0600/g' evutil.c
+        cd ..
+
     - name: Use premake to generate make files
       if: matrix.mingw == true
       shell: msys2 {0}
