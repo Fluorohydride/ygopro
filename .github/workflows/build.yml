@@ -258,8 +258,10 @@ jobs:
 
     - name: Backport libevent fix for MinGW build
       if: matrix.mingw == true
+      shell: msys2 {0}
       run: |
         # https://github.com/libevent/libevent/pull/1498
+        # https://github.com/mingw-w64/mingw-w64/commit/6cfc1fd2ca2fdbbb8d6570084970bea2ef100d2e
         cd event
         sed -i 's/#define _WIN32_WINNT 0x0501/#define _WIN32_WINNT 0x0600/g' evutil.c
         cd ..
