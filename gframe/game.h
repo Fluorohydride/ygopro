@@ -22,11 +22,11 @@
 #include <mutex>
 #include <functional>
 
-constexpr int DEFAULT_DUEL_RULE = 5;
+namespace ygo {
+
+constexpr int DEFAULT_DUEL_RULE = CURRENT_RULE;
 constexpr int CONFIG_LINE_SIZE = 1024;
 constexpr int TEXT_LINE_SIZE = 256;
-
-namespace ygo {
 
 template<size_t N>
 bool IsExtension(const wchar_t* filename, const wchar_t(&extension)[N]) {
@@ -48,7 +48,6 @@ bool IsExtension(const char* filename, const char(&extension)[N]) {
 
 struct Config {
 	bool use_d3d{ false };
-	bool use_image_scale{ true };
 	bool use_image_scale_multi_thread{ true };
 #ifdef _OPENMP
 	bool use_image_load_background_thread{ false };

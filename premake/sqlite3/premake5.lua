@@ -10,4 +10,5 @@ project "sqlite3"
         "SQLITE_OMIT_DEPRECATED",
         "SQLITE_OMIT_PROGRESS_CALLBACK",
         "SQLITE_OMIT_SHARED_CACHE",
+        "SQLITE_TRUSTED_SCHEMA=0",
     }

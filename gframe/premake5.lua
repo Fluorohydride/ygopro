@@ -30,7 +30,7 @@ project "YGOPro"
     end
 
     if BUILD_FREETYPE then
-        includedirs { "../freetype/include" }
+        includedirs { "../freetype/custom", "../freetype/include" }
     else
         includedirs { FREETYPE_INCLUDE_DIR }
         libdirs { FREETYPE_LIB_DIR }

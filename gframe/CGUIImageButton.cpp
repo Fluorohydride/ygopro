@@ -102,7 +102,7 @@ void Draw2DImageQuad(video::IVideoDriver* driver, video::ITexture* image, core::
 	driver->setTransform(irr::video::ETS_VIEW, oldViewMat);
 }
 CGUIImageButton* CGUIImageButton::addImageButton(IGUIEnvironment *env, const core::rect<s32>& rectangle, IGUIElement* parent, s32 id) {
-	CGUIImageButton* button = new CGUIImageButton(env, parent ? parent : 0, id, rectangle);
+	CGUIImageButton* button = new CGUIImageButton(env, parent, id, rectangle);
 	button->drop();
 	return button;
 }
