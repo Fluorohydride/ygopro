@@ -74,7 +74,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 			else if (cd.alias == 6218704) {
 				cd.rule_code = 13331639;
 			}
-			else if (cd.alias && (cd.alias >= cd.code + 20 || cd.alias + 20 <= cd.code)) {
+			else if (!(cd.type & TYPE_TOKEN) && cd.alias && (cd.alias >= cd.code + 20 || cd.alias + 20 <= cd.code)) {
 				cd.rule_code = cd.alias;
 				cd.alias = 0;
 			}
