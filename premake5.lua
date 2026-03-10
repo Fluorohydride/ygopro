@@ -86,6 +86,8 @@ newoption { trigger = 'build-ikpmp3', category = "YGOPro - irrklang - ikpmp3", d
 newoption { trigger = "mac-arm", category = "YGOPro", description = "Compile for Apple Silicon Mac" }
 newoption { trigger = "mac-intel", category = "YGOPro", description = "Compile for Intel Mac" }
 
+newoption { trigger = "use-openmp", category = "YGOPro", description = "Enable OpenMP support (edge case)" }
+
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
 end
@@ -242,6 +244,13 @@ if os.istarget("macosx") then
     if MAC_ARM or (not MAC_INTEL and os.hostarch() == "ARM64") then
         -- building on ARM CPU will target ARM automatically
         TARGET_MAC_ARM = true
+    end
+end
+
+if GetParam("use-openmp") then
+    USE_OPENMP = true
+    if os.istarget("macosx") then
+        print("Warning: OpenMP is not supported on Clang provided by Xcode.")
     end
 end
 
