@@ -241,6 +241,7 @@ jobs:
     - name: Update submodules
       # Here we use override URLs and branches from the prepare job, which can be set by pull request description,
       # to make sure we are testing the correct code. Only the ocgcore submodule is required for the build.
+      shell: bash
       run: |
         git submodule update --init --no-fetch ocgcore
         cd ocgcore
@@ -272,6 +273,7 @@ jobs:
         filename: premake5.zip
 
     - name: Extract premake
+      shell: bash
       run: |
         7z x ${{ steps.premake.outputs.filepath }}
 
@@ -284,9 +286,10 @@ jobs:
 
     - name: Extract irrKlang
       if: matrix.audiolib == 'irrklang'
+      shell: bash
       run: |
         7z x ${{ steps.irrKlang.outputs.filepath }}
-        move irrKlang-1.6.0 irrKlang
+        mv irrKlang-1.6.0 irrKlang
 
     - name: Check DirectX SDK
       if: matrix.nodxsdk != true
@@ -305,21 +308,25 @@ jobs:
 
     - name: Install DirectX SDK
       if: matrix.nodxsdk != true && steps.dxsdk.outputs.cache-hit != 'true'
+      shell: bash
       run: |
         7z x ${{ steps.dxsdk-download.outputs.filepath }} -aoa
 
     - name: Set DirectX SDK environment variable
       if: matrix.nodxsdk != true
+      shell: pwsh
       run: |
         $dxsdkPath = Resolve-Path 'DXSDK'
         "DXSDK_DIR=$($dxsdkPath.ProviderPath)\" | Out-File -FilePath $env:GITHUB_ENV -Append
 
     - name: Copy premake files
+      shell: bash
       run: |
-        xcopy /E premake\* .
-        xcopy /E resource\* .
+        cp -pr premake/* .
+        cp -pr resource/* .
 
     - name: Use premake to generate Visual Studio solution
+      shell: pwsh
       run: |
         .\premake5.exe ${{ matrix.vs }} --audio-lib=${{ matrix.audiolib }}
 
@@ -327,6 +334,7 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Build solution
+      shell: pwsh
       run: |
         MSBuild.exe build\YGOPro.sln /m /p:Configuration=Release /p:Platform=${{ matrix.x64 && 'x64' || 'Win32' }}
 
