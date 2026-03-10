@@ -51,6 +51,7 @@ struct CardDataC {
 		}
 		return false;
 	}
+
 	uint32_t get_duel_code() const {
 		if (rule_code)
 			return rule_code;
