@@ -371,7 +371,7 @@ jobs:
 
     - name: Update submodules
       run: |
-        git submodule update --init --no-fetch ocgcore
+        git submodule update --init --depth 1 ocgcore
         cd ocgcore
         git fetch --depth=1 ${{ needs.prepare.outputs.ocgcore-url }} ${{ needs.prepare.outputs.ocgcore-branch }}
         git checkout FETCH_HEAD
@@ -500,7 +500,7 @@ jobs:
 
     - name: Update submodules
       run: |
-        git submodule update --init --no-fetch ocgcore
+        git submodule update --init --depth 1 ocgcore
         cd ocgcore
         git fetch --depth=1 ${{ needs.prepare.outputs.ocgcore-url }} ${{ needs.prepare.outputs.ocgcore-branch }}
         git checkout FETCH_HEAD
