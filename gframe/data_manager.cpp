@@ -8,14 +8,15 @@ namespace ygo {
 unsigned char DataManager::scriptBuffer[0x100000] = {};
 DataManager dataManager;
 
-static const char SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas.setcode, datas.type, datas.atk, datas.def, datas.level, datas.race, datas.attribute, datas.category, datas.rule_code,"
+static const char NEW_SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas.setcode, datas.type, datas.atk, datas.def, datas.level, datas.race, datas.attribute, datas.category, datas.rule_code,"
 " texts.name, texts.desc, texts.str1, texts.str2, texts.str3, texts.str4, texts.str5, texts.str6, texts.str7, texts.str8,"
 " texts.str9, texts.str10, texts.str11, texts.str12, texts.str13, texts.str14, texts.str15, texts.str16 FROM datas INNER JOIN texts ON datas.id = texts.id";
-constexpr int DATAS_COUNT = 12;
+constexpr int NEW_DATAS_COUNT = 12;
 
-static const char OLD_SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas.setcode, datas.type, datas.atk, datas.def, datas.level, datas.race, datas.attribute, datas.category,"
+static const char SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas.setcode, datas.type, datas.atk, datas.def, datas.level, datas.race, datas.attribute, datas.category,"
 " texts.name, texts.desc, texts.str1, texts.str2, texts.str3, texts.str4, texts.str5, texts.str6, texts.str7, texts.str8,"
 " texts.str9, texts.str10, texts.str11, texts.str12, texts.str13, texts.str14, texts.str15, texts.str16 FROM datas INNER JOIN texts ON datas.id = texts.id";
+constexpr int DATAS_COUNT = 11;
 
 DataManager::DataManager() : _datas(32768), _strings(32768) {
 	extra_setcode = { 
@@ -25,15 +26,14 @@ DataManager::DataManager() : _datas(32768), _strings(32768) {
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt = nullptr;
-	int texts_offset = DATAS_COUNT;
-	// workaround: temporarily support old database without rule_code column
+	int texts_offset = NEW_DATAS_COUNT;
 	bool has_rule_code = true;
-	if (sqlite3_prepare_v2(pDB, SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK) {
-		if (sqlite3_prepare_v2(pDB, OLD_SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK) {
+	if (sqlite3_prepare_v2(pDB, NEW_SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK) {
+		if (sqlite3_prepare_v2(pDB, SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK) {
 			return Error(pDB, pStmt);
 		}
+		texts_offset = DATAS_COUNT;
 		has_rule_code = false;
-		texts_offset = DATAS_COUNT - 1;
 	}
 	wchar_t strBuffer[4096];
 	for (int step = sqlite3_step(pStmt); step != SQLITE_DONE; step = sqlite3_step(pStmt)) {
@@ -62,7 +62,6 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
 		cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
 		cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
-		// workaround: temporarily support old database without rule_code column
 		if (has_rule_code) {
 			cd.rule_code = static_cast<decltype(cd.rule_code)>(sqlite3_column_int64(pStmt, 11));
 		}
