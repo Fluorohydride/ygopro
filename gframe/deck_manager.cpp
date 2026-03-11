@@ -220,22 +220,22 @@ uint32_t DeckManager::LoadDeckFromStream(Deck& deck, std::istringstream& deckStr
 bool DeckManager::LoadSide(Deck& deck, uint32_t dbuf[], int mainc, int sidec) {
 	std::unordered_map<uint32_t, int> pcount;
 	std::unordered_map<uint32_t, int> ncount;
-	for(size_t i = 0; i < deck.main.size(); ++i)
-		pcount[deck.main[i]->code]++;
-	for(size_t i = 0; i < deck.extra.size(); ++i)
-		pcount[deck.extra[i]->code]++;
-	for(size_t i = 0; i < deck.side.size(); ++i)
-		pcount[deck.side[i]->code]++;
+	for(auto card : deck.main)
+		pcount[card->code]++;
+	for(auto card : deck.extra)
+		pcount[card->code]++;
+	for(auto card : deck.side)
+		pcount[card->code]++;
 	Deck ndeck;
 	LoadDeck(ndeck, dbuf, mainc, sidec);
 	if (ndeck.main.size() != deck.main.size() || ndeck.extra.size() != deck.extra.size() || ndeck.side.size() != deck.side.size())
 		return false;
-	for(size_t i = 0; i < ndeck.main.size(); ++i)
-		ncount[ndeck.main[i]->code]++;
-	for(size_t i = 0; i < ndeck.extra.size(); ++i)
-		ncount[ndeck.extra[i]->code]++;
-	for(size_t i = 0; i < ndeck.side.size(); ++i)
-		ncount[ndeck.side[i]->code]++;
+	for(auto card : ndeck.main)
+		ncount[card->code]++;
+	for(auto card : ndeck.extra)
+		ncount[card->code]++;
+	for(auto card : ndeck.side)
+		ncount[card->code]++;
 	for (auto& cdit : ncount)
 		if (cdit.second != pcount[cdit.first])
 			return false;
