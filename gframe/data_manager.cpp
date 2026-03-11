@@ -8,11 +8,6 @@ namespace ygo {
 unsigned char DataManager::scriptBuffer[0x100000] = {};
 DataManager dataManager;
 
-static const char NEW_SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas.setcode, datas.type, datas.atk, datas.def, datas.level, datas.race, datas.attribute, datas.category, datas.rule_code,"
-" texts.name, texts.desc, texts.str1, texts.str2, texts.str3, texts.str4, texts.str5, texts.str6, texts.str7, texts.str8,"
-" texts.str9, texts.str10, texts.str11, texts.str12, texts.str13, texts.str14, texts.str15, texts.str16 FROM datas INNER JOIN texts ON datas.id = texts.id";
-static constexpr int NEW_DATAS_COUNT = 12;
-
 static const char SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas.setcode, datas.type, datas.atk, datas.def, datas.level, datas.race, datas.attribute, datas.category,"
 " texts.name, texts.desc, texts.str1, texts.str2, texts.str3, texts.str4, texts.str5, texts.str6, texts.str7, texts.str8,"
 " texts.str9, texts.str10, texts.str11, texts.str12, texts.str13, texts.str14, texts.str15, texts.str16 FROM datas INNER JOIN texts ON datas.id = texts.id";
@@ -26,15 +21,9 @@ DataManager::DataManager() : _datas(32768), _strings(32768) {
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt = nullptr;
-	int texts_offset = NEW_DATAS_COUNT;
-	bool has_rule_code = true;
-	if (sqlite3_prepare_v2(pDB, NEW_SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK) {
-		if (sqlite3_prepare_v2(pDB, SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK) {
-			return Error(pDB, pStmt);
-		}
-		texts_offset = DATAS_COUNT;
-		has_rule_code = false;
-	}
+	int texts_offset = DATAS_COUNT;
+	if (sqlite3_prepare_v2(pDB, SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK)
+		return Error(pDB, pStmt);
 	wchar_t strBuffer[4096];
 	for (int step = sqlite3_step(pStmt); step != SQLITE_DONE; step = sqlite3_step(pStmt)) {
 		if (step != SQLITE_ROW)
@@ -62,21 +51,17 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
 		cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
 		cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
-		if (has_rule_code) {
-			cd.rule_code = static_cast<decltype(cd.rule_code)>(sqlite3_column_int64(pStmt, 11));
+		// rule_code
+		if (cd.code == 5405695) {
+			cd.rule_code = cd.alias;
+			cd.alias = 0;
 		}
-		else {
-			if (cd.code == 5405695) {
-				cd.rule_code = cd.alias;
-				cd.alias = 0;
-			}
-			else if (cd.alias == 6218704) {
-				cd.rule_code = 13331639;
-			}
-			else if (!(cd.type & TYPE_TOKEN) && cd.alias && (cd.alias >= cd.code + 20 || cd.alias + 20 <= cd.code)) {
-				cd.rule_code = cd.alias;
-				cd.alias = 0;
-			}
+		else if (cd.alias == 6218704) {
+			cd.rule_code = 13331639;
+		}
+		else if (!(cd.type & TYPE_TOKEN) && cd.alias && (cd.alias >= cd.code + 20 || cd.alias + 20 <= cd.code)) {
+			cd.rule_code = cd.alias;
+			cd.alias = 0;
 		}
 		auto& cs = _strings[code];
 		if (const char* text = (const char*)sqlite3_column_text(pStmt, texts_offset + 0)) {
