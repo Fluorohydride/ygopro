@@ -24,13 +24,14 @@ jobs:
         PR_BODY: ${{ github.event.pull_request.body }}
       shell: python
       run: |
-        # You can override the URLs and branches of dependencies by adding lines in the pull request description.
+        # You can override the branches of dependencies by adding lines in the pull request description.
         # This is useful when you want to test changes which require modifications in the submodules or dependencies.
         # Expected description format:
-        # > name: owner/repo@branch
-        # (leading >, dependency name, followed by GitHub repository, optional branch)
-        # Example:
-        # > ocgcore: mercury233/ygopro-core@patch-branch
+        # > name: NNN
+        # (leading >, dependency name, followed by a pull request number in that repository)
+        # Examples:
+        # > ocgcore: 123
+        # > irrlicht: 456
         # Supported dependencies:
         # ocgcore, irrlicht
         import re, os
@@ -40,21 +41,12 @@ jobs:
         ocgcore_branch = ''
         irrlicht_url = 'https://github.com/mercury233/irrlicht'
         irrlicht_branch = ''
-        # Regex patterns for parsing:
-        # REPO_RE: matches format "owner/repo" (e.g., "user/repo-name")
-        # BRANCH_RE: matches branch names with dots, slashes, and hyphens (e.g., "feature/my-branch", "v1.0")
-        REPO_RE = r'[\w][\w.-]*/[\w][\w.-]*'
-        BRANCH_RE = r'[\w][\w./-]*'
-        m = re.search(rf'(?m)^\s*>\s*ocgcore\s*:\s*({REPO_RE})(?:@({BRANCH_RE}))?\s*$', body)
+        m = re.search(r'(?m)^\s*>\s*ocgcore\s*:\s*(\d+)\s*$', body)
         if m:
-            ocgcore_url = f'https://github.com/{m.group(1)}'
-            if m.group(2):
-                ocgcore_branch = m.group(2)
-        m = re.search(rf'(?m)^\s*>\s*irrlicht\s*:\s*({REPO_RE})(?:@({BRANCH_RE}))?\s*$', body)
+            ocgcore_branch = f'refs/pull/{m.group(1)}/head'
+        m = re.search(r'(?m)^\s*>\s*irrlicht\s*:\s*(\d+)\s*$', body)
         if m:
-            irrlicht_url = f'https://github.com/{m.group(1)}'
-            if m.group(2):
-                irrlicht_branch = m.group(2)
+            irrlicht_branch = f'refs/pull/{m.group(1)}/head'
         # Output the parsed URLs and branches for downstream jobs
         with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
             f.write(f'ocgcore-url={ocgcore_url}\n')
@@ -243,7 +235,7 @@ jobs:
       # to make sure we are testing the correct code. Only the ocgcore submodule is required for the build.
       shell: bash
       run: |
-        git submodule update --init --no-fetch ocgcore
+        git submodule update --init --depth 1 ocgcore
         cd ocgcore
         git fetch --depth=1 ${{ needs.prepare.outputs.ocgcore-url }} ${{ needs.prepare.outputs.ocgcore-branch }}
         git checkout FETCH_HEAD
