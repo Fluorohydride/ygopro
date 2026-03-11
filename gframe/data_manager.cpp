@@ -13,6 +13,11 @@ static const char SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas
 " texts.str9, texts.str10, texts.str11, texts.str12, texts.str13, texts.str14, texts.str15, texts.str16 FROM datas INNER JOIN texts ON datas.id = texts.id";
 static constexpr int DATAS_COUNT = 11;
 
+static constexpr int CARD_ARTWORK_VERSIONS_OFFSET = 20;
+static inline bool is_alternative(uint32_t code, uint32_t alias) {
+	return alias && (alias < code + CARD_ARTWORK_VERSIONS_OFFSET) && (code < alias + CARD_ARTWORK_VERSIONS_OFFSET);
+}
+
 DataManager::DataManager() : _datas(32768), _strings(32768) {
 	extra_setcode = { 
 		{8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}},
@@ -59,7 +64,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		else if (cd.alias == 6218704) {
 			cd.rule_code = 13331639;
 		}
-		else if (!(cd.type & TYPE_TOKEN) && cd.alias && (cd.alias >= cd.code + 20 || cd.alias + 20 <= cd.code)) {
+		else if (cd.alias && !(cd.type & TYPE_TOKEN) && !is_alternative(cd.code, cd.alias)) {
 			cd.rule_code = cd.alias;
 			cd.alias = 0;
 		}
