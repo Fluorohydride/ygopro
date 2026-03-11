@@ -52,12 +52,12 @@ struct CardDataC {
 		return false;
 	}
 
+	uint32_t get_original_code() const {
+		return alias ? alias : code;
+	}
+
 	uint32_t get_duel_code() const {
-		if (rule_code)
-			return rule_code;
-		if (alias)
-			return alias;
-		return code;
+		return rule_code ? rule_code : get_original_code();
 	}
 };
 constexpr int DESC_COUNT = 16;
