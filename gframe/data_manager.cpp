@@ -13,11 +13,6 @@ static const char SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas
 " texts.str9, texts.str10, texts.str11, texts.str12, texts.str13, texts.str14, texts.str15, texts.str16 FROM datas INNER JOIN texts ON datas.id = texts.id";
 static constexpr int DATAS_COUNT = 11;
 
-static const char SELECT_STMT_V2[] = "SELECT datas.id, datas.ot, datas.alias, datas.setcode, datas.type, datas.atk, datas.def, datas.level, datas.race, datas.attribute, datas.category, datas.rule_code,"
-" texts.name, texts.desc, texts.str1, texts.str2, texts.str3, texts.str4, texts.str5, texts.str6, texts.str7, texts.str8,"
-" texts.str9, texts.str10, texts.str11, texts.str12, texts.str13, texts.str14, texts.str15, texts.str16 FROM datas INNER JOIN texts ON datas.id = texts.id";
-static constexpr int DATAS_COUNT_V2 = 12;
-
 static constexpr int CARD_ARTWORK_VERSIONS_OFFSET = 20;
 static inline bool is_alternative(uint32_t code, uint32_t alias) {
 	return alias && (alias < code + CARD_ARTWORK_VERSIONS_OFFSET) && (code < alias + CARD_ARTWORK_VERSIONS_OFFSET);
@@ -31,15 +26,9 @@ DataManager::DataManager() : _datas(32768), _strings(32768) {
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt = nullptr;
-	int texts_offset = DATAS_COUNT_V2;
-	bool is_schema_v2 = true;
-	if (sqlite3_prepare_v2(pDB, SELECT_STMT_V2, -1, &pStmt, nullptr) != SQLITE_OK) {
-		if (sqlite3_prepare_v2(pDB, SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK) {
-			return Error(pDB, pStmt);
-		}
-		texts_offset = DATAS_COUNT;
-		is_schema_v2 = false;
-	}
+	int texts_offset = DATAS_COUNT;
+	if (sqlite3_prepare_v2(pDB, SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK)
+		return Error(pDB, pStmt);
 	wchar_t strBuffer[4096];
 	for (int step = sqlite3_step(pStmt); step != SQLITE_DONE; step = sqlite3_step(pStmt)) {
 		if (step != SQLITE_ROW)
@@ -67,18 +56,14 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
 		cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
 		cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
-		if (is_schema_v2) {
-			cd.rule_code = static_cast<decltype(cd.rule_code)>(sqlite3_column_int64(pStmt, 11));
+		// rule_code
+		if (cd.code == 5405695) {
+			cd.rule_code = cd.alias;
+			cd.alias = 0;
 		}
-		else {
-			if (cd.code == 5405695) {
-				cd.rule_code = cd.alias;
-				cd.alias = 0;
-			}
-			else if (cd.alias && !(cd.type & TYPE_TOKEN) && !is_alternative(cd.code, cd.alias)) {
-				cd.rule_code = cd.alias;
-				cd.alias = 0;
-			}
+		else if (cd.alias && !(cd.type & TYPE_TOKEN) && !is_alternative(cd.code, cd.alias)) {
+			cd.rule_code = cd.alias;
+			cd.alias = 0;
 		}
 		auto& cs = _strings[code];
 		if (const char* text = (const char*)sqlite3_column_text(pStmt, texts_offset + 0)) {
@@ -97,20 +82,18 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		}
 	}
 	sqlite3_finalize(pStmt);
-	if (!is_schema_v2) {
-		for (auto& entry : _datas) {
-			auto& cd = entry.second;
-			if (cd.rule_code)
-				continue;
-			if (!cd.alias)
-				continue;
-			if (cd.type & TYPE_TOKEN)
-				continue;
-			auto it = _datas.find(cd.alias);
-			if (it == _datas.end())
-				continue;
-			cd.rule_code = it->second.rule_code;
-		}
+	for (auto& entry : _datas) {
+		auto& cd = entry.second;
+		if (cd.rule_code)
+			continue;
+		if (!cd.alias)
+			continue;
+		if (cd.type & TYPE_TOKEN)
+			continue;
+		auto it = _datas.find(cd.alias);
+		if (it == _datas.end())
+			continue;
+		cd.rule_code = it->second.rule_code;
 	}
 	for (const auto& entry : extra_setcode) {
 		const auto& code = entry.first;
