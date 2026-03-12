@@ -256,13 +256,19 @@ workspace "YGOPro"
         systemversion "latest"
         startproject "YGOPro"
         defines { "WINVER=0x0601" } -- WIN7
+
+    filter { "system:windows", "action:vs*" }
         platforms { "Win32", "x64" }
 
-    filter { "system:windows", "platforms:Win32" }
+    filter { "system:windows", "action:vs*", "platforms:Win32" }
         architecture "x86"
 
-    filter { "system:windows", "platforms:x64" }
+    filter { "system:windows", "action:vs*", "platforms:x64" }
         architecture "x86_64"
+
+    filter { "system:windows", "action:gmake" }
+        defines { "UNICODE", "_UNICODE" }
+        buildoptions { "-municode" }
 
     filter "system:macosx"
         libdirs { "/usr/local/lib" }
@@ -288,16 +294,16 @@ workspace "YGOPro"
         defines "_DEBUG"
         targetdir "bin/debug"
 
-    filter { "system:windows", "platforms:Win32", "configurations:Release" }
+    filter { "system:windows", "action:vs*", "platforms:Win32", "configurations:Release" }
         targetdir "bin/release/x86"
 
-    filter { "system:windows", "platforms:Win32", "configurations:Debug" }
+    filter { "system:windows", "action:vs*", "platforms:Win32", "configurations:Debug" }
         targetdir "bin/debug/x86"
 
-    filter { "system:windows", "platforms:x64", "configurations:Release" }
+    filter { "system:windows", "action:vs*", "platforms:x64", "configurations:Release" }
         targetdir "bin/release/x64"
 
-    filter { "system:windows", "platforms:x64", "configurations:Debug" }
+    filter { "system:windows", "action:vs*", "platforms:x64", "configurations:Debug" }
         targetdir "bin/debug/x64"
 
     filter { "configurations:Release", "action:vs*" }
