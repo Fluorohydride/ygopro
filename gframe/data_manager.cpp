@@ -100,6 +100,8 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 	if (!is_schema_v2) {
 		for (auto& entry : _datas) {
 			auto& cd = entry.second;
+			if (cd.rule_code)
+				continue;
 			if (!cd.alias)
 				continue;
 			if (cd.type & TYPE_TOKEN)
