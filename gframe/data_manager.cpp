@@ -84,11 +84,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_finalize(pStmt);
 	for (auto& entry : _datas) {
 		auto& cd = entry.second;
-		if (cd.rule_code)
-			continue;
-		if (!cd.alias)
-			continue;
-		if (cd.type & TYPE_TOKEN)
+		if (cd.rule_code || !cd.alias || (cd.type & TYPE_TOKEN))
 			continue;
 		auto it = _datas.find(cd.alias);
 		if (it == _datas.end())
