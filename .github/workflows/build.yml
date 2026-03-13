@@ -13,9 +13,6 @@ on:
 jobs:
   prepare:
     runs-on: ubuntu-latest
-    outputs:
-      ocgcore-url: ${{ steps.parse-pr-override.outputs.ocgcore-url }}
-      ocgcore-branch: ${{ steps.parse-pr-override.outputs.ocgcore-branch }}
 
     steps:
     - name: Parse pull request description for dependency overrides
