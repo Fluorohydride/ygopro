@@ -399,14 +399,10 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	pplayer[0] = players[0];
 	pplayer[1] = players[1];
 	if((tp && dp->type == 1) || (!tp && dp->type == 0)) {
-		DuelPlayer* p = players[0];
-		players[0] = players[1];
-		players[1] = p;
+		std::swap(players[0], players[1]);
 		players[0]->type = 0;
 		players[1]->type = 1;
-		Deck d = pdeck[0];
-		pdeck[0] = pdeck[1];
-		pdeck[1] = d;
+		std::swap(pdeck[0], pdeck[1]);
 		swapped = true;
 	}
 	dp->state = CTOS_RESPONSE;
