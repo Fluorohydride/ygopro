@@ -34,6 +34,9 @@ struct CardDataC {
 	uint32_t lscale{};
 	uint32_t rscale{};
 	uint32_t link_marker{};
+	uint32_t rule_code{};
+
+	// extra columns
 	uint32_t ot{};
 	uint32_t category{};
 
@@ -47,6 +50,14 @@ struct CardDataC {
 			}
 		}
 		return false;
+	}
+
+	uint32_t get_original_code() const {
+		return alias ? alias : code;
+	}
+
+	uint32_t get_duel_code() const {
+		return rule_code ? rule_code : get_original_code();
 	}
 };
 constexpr int DESC_COUNT = 16;
