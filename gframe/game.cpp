@@ -1162,10 +1162,8 @@ void Game::LoadExpansions() {
 				wchar_t fname[1024];
 				int len = BufferIO::DecodeUTF8(name, fname);
 				// TODO: zip file may contain non-UTF8 file name. DecodeUTF8 can't parse it and returns 0.
-				if (len > 9) {
-					// Require at least one character between "pack/" (5) and ".ydk" (4)
-					deckBuilder.expansionPacks.push_back(fname);
-				}
+				if (!len) continue;
+				deckBuilder.expansionPacks.push_back(fname);
 				continue;
 			}
 		}
