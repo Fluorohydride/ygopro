@@ -1160,8 +1160,11 @@ void Game::LoadExpansions() {
 			}
 			if (!mystrncasecmp(name, "pack/", 5) && IsExtension(name, ".ydk")) {
 				wchar_t fname[1024];
-				BufferIO::DecodeUTF8(name, fname);
-				deckBuilder.expansionPacks.push_back(fname);
+				int len = BufferIO::DecodeUTF8(name, fname);
+				if (len > 9) {
+					// TODO: zip file may contain non-UTF8 file name, DecodeUTF8 can't parse it
+					deckBuilder.expansionPacks.push_back(fname);
+				}
 				continue;
 			}
 		}
