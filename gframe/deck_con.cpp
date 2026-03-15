@@ -1275,102 +1275,110 @@ void DeckBuilder::GetHoveredCard() {
 	int pre_code = hovered_code;
 	hovered_pos = 0;
 	hovered_code = 0;
+	hovered_seq = -1;
 	irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 	if(root->getElementFromPoint(mouse_pos) != root)
 		return;
-	irr::core::vector2di pos = mainGame->ResizeReverse(mouse_pos.X, mouse_pos.Y);
-	int x = pos.X;
-	int y = pos.Y;
+	const DeckLayout& L = layout;
+	float mx = (float)mouse_pos.X;
+	float my = (float)mouse_pos.Y;
+	float xS = mainGame->xScale;
+	float yS = mainGame->yScale;
 	is_lastcard = 0;
-	if(x >= 314 && x <= 794) {
-		if(showing_pack) {
-			if((x <= 772 || !mainGame->scrPackCards->isVisible()) && y >= 164 && y <= 624) {
-				int mainsize = deckManager.current_deck.main.size();
-				int lx = 10;
-				int dy = 68;
-				if(mainsize > 10 * 7)
-					lx = 11;
-				if(mainsize > 11 * 7)
-					lx = 12;
-				if(mainsize > 60)
-					dy = 66;
-				int px;
-				int py = (y - 164) / dy;
-				hovered_pos = 1;
-				if(x >= 750)
-					px = lx - 1;
-				else
-					px = (x - 314) * (lx - 1) / (mainGame->scrPackCards->isVisible() ? 414.0f : 436.0f);
-				hovered_seq = py * lx + px + mainGame->scrPackCards->getPos() * lx;
-				if(hovered_seq >= mainsize) {
-					hovered_seq = -1;
-					hovered_code = 0;
-				} else {
-					hovered_code = deckManager.current_deck.main[hovered_seq]->first;
-				}
-			}
-		} else if(y >= 164 && y <= 435) {
-			int lx = 10, px, py = (y - 164) / 68;
+
+	if(showing_pack) {
+		// Actual right edge of the last card in the pack grid
+		float pack_right   = L.left + (float)(L.lx - 1) * L.dx + L.cw;
+		float bottom_bound = 624.0f * yS;
+		if(mx >= L.left && mx <= pack_right && my >= L.top && my <= bottom_bound) {
+			int mainsize = (int)deckManager.current_deck.main.size();
+			int col = (L.dx > 0.0f && mx < L.left + (float)(L.lx - 1) * L.dx)
+			          ? (int)((mx - L.left) / L.dx) : L.lx - 1;
+			if(col < 0) col = 0;
+			if(col > L.lx - 1) col = L.lx - 1;
+			int row = (L.dy > 0.0f) ? (int)((my - L.top) / L.dy) : 0;
 			hovered_pos = 1;
-			if(deckManager.current_deck.main.size() > DECK_MIN_SIZE)
-				lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
-			if(x >= 750)
-				px = lx - 1;
-			else
-				px = (x - 314) * (lx - 1) / 436;
-			hovered_seq = py * lx + px;
-			if(hovered_seq >= (int)deckManager.current_deck.main.size()) {
+			hovered_seq = row * L.lx + col + L.pack_scroll_pos * L.lx;
+			if(hovered_seq < 0 || hovered_seq >= mainsize) {
 				hovered_seq = -1;
 				hovered_code = 0;
 			} else {
 				hovered_code = deckManager.current_deck.main[hovered_seq]->first;
 			}
-		} else if(y >= 466 && y <= 530) {
-			int lx = deckManager.current_deck.extra.size();
-			hovered_pos = 2;
-			if(lx < 10)
-				lx = 10;
-			if(x >= 750)
-				hovered_seq = lx - 1;
-			else
-				hovered_seq = (x - 314) * (lx - 1) / 436;
-			if(hovered_seq >= (int)deckManager.current_deck.extra.size()) {
-				hovered_seq = -1;
-				hovered_code = 0;
-			} else {
-				hovered_code = deckManager.current_deck.extra[hovered_seq]->first;
-				if(x >= 772)
-					is_lastcard = 1;
-			}
-		} else if (y >= 564 && y <= 628) {
-			int lx = deckManager.current_deck.side.size();
-			hovered_pos = 3;
-			if(lx < 10)
-				lx = 10;
-			if(x >= 750)
-				hovered_seq = lx - 1;
-			else
-				hovered_seq = (x - 314) * (lx - 1) / 436;
-			if(hovered_seq >= (int)deckManager.current_deck.side.size()) {
-				hovered_seq = -1;
-				hovered_code = 0;
-			} else {
-				hovered_code = deckManager.current_deck.side[hovered_seq]->first;
-				if(x >= 772)
-					is_lastcard = 1;
-			}
 		}
-	} else if(x >= 810 && x <= 995 && y >= 165 && y <= 626) {
-		hovered_pos = 4;
-		hovered_seq = (y - 165) / 66;
-		int current_pos = mainGame->scrFilter->getPos() + hovered_seq;
-		if(current_pos >= (int)results.size()) {
-			hovered_seq = -1;
-			hovered_code = 0;
-		} else {
-			hovered_code = results[current_pos]->first;
+	} else {
+		float main_right  = L.left + (float)(L.lx - 1) * L.dx + L.cw;
+		float main_bottom = L.top  + (float)(L.rows - 1) * L.dy + L.ch;
+		if(mx >= L.left && mx <= main_right && my >= L.top && my <= main_bottom) {
+			int mainsize = (int)deckManager.current_deck.main.size();
+			int col = (L.dx > 0.0f) ? (int)((mx - L.left) / L.dx) : 0;
+			if(col < 0) col = 0;
+			if(col > L.lx - 1) col = L.lx - 1;
+			int row = (L.dy > 0.0f) ? (int)((my - L.top) / L.dy) : 0;
+			if(row < 0) row = 0;
+			if(row > L.rows - 1) row = L.rows - 1;
+			hovered_pos = 1;
+			hovered_seq = row * L.lx + col;
+			if(hovered_seq < 0 || hovered_seq >= mainsize) {
+				hovered_seq = -1;
+				hovered_code = 0;
+			} else {
+				hovered_code = deckManager.current_deck.main[hovered_seq]->first;
+			}
+		} else if(my >= L.ex_top && my <= L.ex_bot && mx >= L.ex_left && mx < 797.0f * xS) {
+			int n = (int)deckManager.current_deck.extra.size();
+			hovered_pos = 2;
+			if(n > 0) {
+				// Right limit: one full step past last card (cards are left-aligned)
+				float right_limit = L.ex_left + (float)n * L.ex_dx;
+				if(mx < right_limit) {
+					int seq = (L.ex_dx > 0.0f) ? (int)((mx - L.ex_left) / L.ex_dx) : 0;
+					if(seq < 0) seq = 0;
+					if(seq > n - 1) seq = n - 1;
+					hovered_seq = seq;
+					hovered_code = deckManager.current_deck.extra[hovered_seq]->first;
+					float last_card_cx = L.ex_left + (float)(n - 1) * L.ex_dx + L.cw * 0.5f;
+					if(mx >= last_card_cx)
+						is_lastcard = 1;
+				}
+			}
+		} else if(my >= L.sd_top && my <= L.sd_bot && mx >= L.sd_left && mx < 797.0f * xS) {
+			int n = (int)deckManager.current_deck.side.size();
+			hovered_pos = 3;
+			if(n > 0) {
+				float right_limit = L.sd_left + (float)n * L.sd_dx;
+				if(mx < right_limit) {
+					int seq = (L.sd_dx > 0.0f) ? (int)((mx - L.sd_left) / L.sd_dx) : 0;
+					if(seq < 0) seq = 0;
+					if(seq > n - 1) seq = n - 1;
+					hovered_seq = seq;
+					hovered_code = deckManager.current_deck.side[hovered_seq]->first;
+					float last_card_cx = L.sd_left + (float)(n - 1) * L.sd_dx + L.cw * 0.5f;
+					if(mx >= last_card_cx)
+						is_lastcard = 1;
+				}
+			}
 		}
 	}
+
+	if(hovered_pos == 0) {
+		float sr_left  = 810.0f * xS;
+		float sr_right = 995.0f * xS;
+		float sr_top   = L.sr_top_px;
+		float sr_bot   = 626.0f * yS;
+		if(mx >= sr_left && mx <= sr_right && my >= sr_top && my <= sr_bot) {
+			hovered_pos = 4;
+			hovered_seq = (int)((my - sr_top) / L.sr_row_h);
+			int current_pos = mainGame->scrFilter->getPos() + hovered_seq;
+			if(current_pos >= (int)results.size()) {
+				hovered_seq = -1;
+				hovered_code = 0;
+			} else {
+				hovered_code = results[current_pos]->first;
+			}
+		}
+	}
+
 	if(is_draging) {
 		dragx = mouse_pos.X;
 		dragy = mouse_pos.Y;
@@ -1575,13 +1583,18 @@ void DeckBuilder::FilterCards() {
 			continue;
 	}
 	myswprintf(result_string, L"%d", results.size());
-	if(results.size() > 7) {
-		mainGame->scrFilter->setVisible(true);
-		mainGame->scrFilter->setMax(results.size() - 7);
-		mainGame->scrFilter->setPos(0);
-	} else {
-		mainGame->scrFilter->setVisible(false);
-		mainGame->scrFilter->setPos(0);
+	{
+		float xS2 = mainGame->xScale, yS2 = mainGame->yScale;
+		float mul2 = (xS2 > yS2) ? yS2 : xS2;
+		int max_vis = std::max(7, (int)(((626.0f - 165.0f) * yS2) / (66.0f * mul2)));
+		if((int)results.size() > max_vis) {
+			mainGame->scrFilter->setVisible(true);
+			mainGame->scrFilter->setMax((int)results.size() - max_vis);
+			mainGame->scrFilter->setPos(0);
+		} else {
+			mainGame->scrFilter->setVisible(false);
+			mainGame->scrFilter->setPos(0);
+		}
 	}
 	SortList();
 }
@@ -1676,13 +1689,42 @@ void DeckBuilder::RefreshReadonly(int catesel) {
 }
 void DeckBuilder::RefreshPackListScroll() {
 	if(showing_pack) {
+		// Mirror the layout computation from DrawDeckBd for pack mode
+		float xS = mainGame->xScale, yS = mainGame->yScale;
+		float mul = (xS > yS) ? yS : xS;
+		float cw     = CARD_THUMB_WIDTH  * mul;
+		float dy     = 68.0f * mul;
+		float panel_w = (797.0f - 314.0f) * xS;
+		float dx_max  = (436.0f / 9.0f) * mul;
+		float panel_h = 630.0f * yS - 164.0f * yS;
+
+		int rows = (int)(panel_h / dy) + 1;
+		if(rows < 4) rows = 4;
+
+		int mainsize = (int)deckManager.current_deck.main.size();
+		// First pass without scrollbar
+		int lx_w = (int)((panel_w - cw) / dx_max) + 1;
+		if(lx_w < 10) lx_w = 10;
+		int min_lx = (mainsize + rows - 1) / (rows > 0 ? rows : 1);
+		int lx_try = lx_w > min_lx ? lx_w : min_lx;
+		int total_rows = (mainsize + lx_try - 1) / (lx_try > 0 ? lx_try : 1);
+		bool need_scroll = (total_rows > rows);
+		// Second pass with scrollbar width if needed
+		if(need_scroll) {
+			float avail_w = (775.0f - 314.0f) * xS;
+			lx_w = (int)((avail_w - cw) / dx_max) + 1;
+			if(lx_w < 10) lx_w = 10;
+		}
+		int lx = lx_w > min_lx ? lx_w : min_lx;
+		total_rows = (mainsize + lx - 1) / (lx > 0 ? lx : 1);
+		int scroll_range = total_rows - rows;
+
 		mainGame->scrPackCards->setPos(0);
-		int mainsize = deckManager.current_deck.main.size();
-		if(mainsize <= 7 * 12) {
+		if(scroll_range <= 0) {
 			mainGame->scrPackCards->setVisible(false);
 		} else {
 			mainGame->scrPackCards->setVisible(true);
-			mainGame->scrPackCards->setMax((int)ceil(((float)mainsize - 7 * 12) / 12.0f));
+			mainGame->scrPackCards->setMax(scroll_range);
 		}
 	} else {
 		mainGame->scrPackCards->setVisible(false);

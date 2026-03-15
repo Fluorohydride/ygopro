@@ -10,6 +10,29 @@
 
 namespace ygo {
 
+struct DeckLayout {
+	float mul{1.0f};
+	float cw{44.0f}, ch{64.0f};
+	// Main deck
+	float dy{68.0f};
+	float dx{0.0f};
+	int lx{10};
+	int rows{4};
+	float left{0.0f}, top{0.0f};
+	// Pack mode
+	bool pack_scroll{false};
+	int  pack_scroll_pos{0};
+	// Extra deck
+	float ex_dx{0.0f}, ex_left{0.0f}, ex_top{0.0f}, ex_bot{0.0f};
+	int   ex_lx{0};
+	// Side deck
+	float sd_dx{0.0f}, sd_left{0.0f}, sd_top{0.0f}, sd_bot{0.0f};
+	int   sd_lx{0};
+	// Search panel
+	float sr_row_h{66.0f};
+	float sr_top_px{165.0f};
+};
+
 class DeckBuilder: public irr::IEventReceiver {
 public:
 	DeckBuilder();
@@ -81,6 +104,7 @@ public:
 	bool is_modified{};
 	bool readonly{};
 	bool showing_pack{};
+	DeckLayout layout{};
 	std::mt19937 rnd;
 
 	const LFList* filterList{};
