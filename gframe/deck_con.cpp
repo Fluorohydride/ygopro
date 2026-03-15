@@ -415,9 +415,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case BUTTON_EXPORT_DECK_CODE: {
 				std::stringstream textStream;
 				deckManager.SaveDeck(deckManager.current_deck, textStream);
-				wchar_t text[0x10000];
-				BufferIO::DecodeUTF8(textStream.str().c_str(), text);
-				mainGame->env->getOSOperator()->copyToClipboard(text);
+				mainGame->env->getOSOperator()->copyToClipboard(textStream.str().c_str());
 				mainGame->stACMessage->setText(dataManager.GetSysString(1480));
 				mainGame->PopupElement(mainGame->wACMessage, 20);
 				break;
@@ -516,11 +514,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 							deckManager.current_deck.extra.clear();
 							deckManager.current_deck.side.clear();
 						} else {
-							const wchar_t* txt = mainGame->env->getOSOperator()->getTextFromClipboard();
+							const char* txt = mainGame->env->getOSOperator()->getTextFromClipboard();
 							if(txt) {
-								char text[0x10000];
-								BufferIO::EncodeUTF8(txt, text);
-								std::istringstream textStream(text);
+								std::istringstream textStream(txt);
 								deckManager.LoadCurrentDeck(textStream);
 							}
 						}
