@@ -174,6 +174,8 @@ public:
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void RefreshBot();
+	void Draw2DImageQuad(irr::video::IVideoDriver* driver, const irr::video::ITexture* texture, const irr::core::rect<irr::s32>& sourceRect,
+						 const irr::core::vector2d<irr::s32> corner[4], bool useAlphaChannel = true, irr::video::SColor color = 0xffffffff);
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();

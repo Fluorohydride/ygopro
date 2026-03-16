@@ -8,6 +8,56 @@
 
 namespace ygo {
 
+void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver,
+	const irr::video::ITexture* texture,
+	const irr::core::rect<irr::s32>& sourceRect,
+	const irr::core::position2d<irr::s32> corners[4],
+	bool useAlphaChannel, irr::video::SColor color)
+{
+	if (!texture)
+		return;
+
+	irr::video::SMaterial material;
+	irr::core::matrix4 oldProjMat = driver->getTransform(irr::video::ETS_PROJECTION);
+	driver->setTransform(irr::video::ETS_PROJECTION, irr::core::matrix4());
+	irr::core::matrix4 oldViewMat = driver->getTransform(irr::video::ETS_VIEW);
+	driver->setTransform(irr::video::ETS_VIEW, irr::core::matrix4());
+
+	irr::core::vector2df uvCorner[4];
+	uvCorner[0] = irr::core::vector2df((irr::f32)sourceRect.UpperLeftCorner.X, (irr::f32)sourceRect.UpperLeftCorner.Y);
+	uvCorner[1] = irr::core::vector2df((irr::f32)sourceRect.LowerRightCorner.X, (irr::f32)sourceRect.UpperLeftCorner.Y);
+	uvCorner[2] = irr::core::vector2df((irr::f32)sourceRect.UpperLeftCorner.X, (irr::f32)sourceRect.LowerRightCorner.Y);
+	uvCorner[3] = irr::core::vector2df((irr::f32)sourceRect.LowerRightCorner.X, (irr::f32)sourceRect.LowerRightCorner.Y);
+	const irr::f32 invW = 1.0f / (irr::f32)texture->getOriginalSize().Width;
+	const irr::f32 invH = 1.0f / (irr::f32)texture->getOriginalSize().Height;
+	for (int x = 0; x < 4; x++)
+		uvCorner[x] = irr::core::vector2df(uvCorner[x].X * invW, uvCorner[x].Y * invH);
+
+	irr::video::S3DVertex vertices[4];
+	irr::u16 indices[6] = { 0, 1, 2, 3, 2, 1 };
+	const irr::f32 screenWidth = (irr::f32)driver->getScreenSize().Width;
+	const irr::f32 screenHeight = (irr::f32)driver->getScreenSize().Height;
+	for (int x = 0; x < 4; x++)
+	{
+		vertices[x].Pos = irr::core::vector3df(
+			((corners[x].X / screenWidth) - 0.5f) * 2.0f,
+			((corners[x].Y / screenHeight) - 0.5f) * -2.0f, 1.0f);
+		vertices[x].TCoords = uvCorner[x];
+		vertices[x].Color = color;
+	}
+
+	material.Lighting = false;
+	material.ZWriteEnable = false;
+	material.TextureLayer[0].Texture = const_cast<irr::video::ITexture*>(texture);
+	material.MaterialType = useAlphaChannel ?
+		irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL : irr::video::EMT_SOLID;
+	driver->setMaterial(material);
+	driver->drawIndexedTriangleList(&vertices[0], 4, &indices[0], 2);
+
+	driver->setTransform(irr::video::ETS_PROJECTION, oldProjMat);
+	driver->setTransform(irr::video::ETS_VIEW, oldViewMat);
+}
+
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv) {
 	if(!gameConf.use_d3d) {
 		float origin[4] = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -881,7 +931,7 @@ void Game::DrawSpec() {
 			corner[1] = irr::core::vector2d<irr::s32>(winx2 + (CARD_IMG_HEIGHT * mul - y) * 0.3f, winy - y);
 			corner[2] = irr::core::vector2d<irr::s32>(winx, winy);
 			corner[3] = irr::core::vector2d<irr::s32>(winx2, winy);
-			irr::gui::Draw2DImageQuad(driver, imageManager.GetTexture(showcardcode, true), ResizeFit(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), corner);
+			Draw2DImageQuad(driver, imageManager.GetTexture(showcardcode, true), ResizeFit(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), corner);
 			showcardp++;
 			showcarddif += 9;
 			if(showcarddif >= 90)
