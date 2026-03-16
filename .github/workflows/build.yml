@@ -38,8 +38,8 @@ jobs:
         # Default URLs and branches for dependencies
         ocgcore_url = 'https://github.com/Fluorohydride/ygopro-core'
         ocgcore_branch = ''
-        irrlicht_url = 'https://github.com/mercury233/irrlicht'
-        irrlicht_branch = ''
+        irrlicht_url = 'https://github.com/mercury233/irrlicht-svn'
+        irrlicht_branch = 'mercury'
         # Regex patterns for parsing:
         # REPO_RE: matches format "owner/repo" (e.g., "user/repo-name")
         # BRANCH_RE: matches branch names with dots, slashes, and hyphens (e.g., "feature/my-branch", "v1.0")
