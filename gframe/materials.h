@@ -1,6 +1,7 @@
 #ifndef MATERIALS_H
 #define MATERIALS_H
 
+#define _IRR_STATIC_LIB_
 #include <irrlicht.h>
 
 namespace ygo {

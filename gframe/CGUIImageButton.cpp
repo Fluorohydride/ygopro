@@ -2,6 +2,7 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
+#define _IRR_STATIC_LIB_
 #include "CGUIImageButton.h"
 #ifdef _IRR_COMPILE_WITH_GUI_
 
@@ -10,6 +11,8 @@
 #include <IGUIEnvironment.h>
 #include <IVideoDriver.h>
 #include <IGUIFont.h>
+#include <EMaterialTypes.h>
+#include <SMaterial.h>
 
 namespace irr {
 namespace gui {
@@ -52,7 +55,7 @@ void Draw2DImageRotation(video::IVideoDriver* driver, video::ITexture* image, co
 		vertices[x].Color = color;
 	}
 	material.Lighting = false;
-	material.ZWriteEnable = false;
+	material.ZWriteEnable = irr::video::EZW_OFF;
 	material.TextureLayer[0].Texture = image;
 	if (useAlphaChannel)
 		material.MaterialType = irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL;
@@ -91,7 +94,7 @@ void Draw2DImageQuad(video::IVideoDriver* driver, video::ITexture* image, core::
 		vertices[x].Color = color;
 	}
 	material.Lighting = false;
-	material.ZWriteEnable = false;
+	material.ZWriteEnable = irr::video::EZW_OFF;
 	material.TextureLayer[0].Texture = image;
 	if (useAlphaChannel)
 		material.MaterialType = irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL;
@@ -158,7 +161,6 @@ void CGUIImageButton::setScaleImage(bool scaleImage)
 //! Returns whether the button scale the used images
 bool CGUIImageButton::isScalingImage() const
 {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return ScaleImage;
 }
 
@@ -182,7 +184,7 @@ void CGUIImageButton::setSpriteBank(IGUISpriteBank* sprites)
 }
 
 
-void CGUIImageButton::setSprite(EGUI_BUTTON_STATE state, s32 index, video::SColor color, bool loop)
+void CGUIImageButton::setSprite(EGUI_BUTTON_STATE state, s32 index, video::SColor color, bool loop, bool scale)
 {
 	if (SpriteBank)
 	{
@@ -437,7 +439,6 @@ void CGUIImageButton::setIsPushButton(bool isPushButton)
 //! Returns if the button is currently pressed
 bool CGUIImageButton::isPressed() const
 {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return Pressed;
 }
 
@@ -455,7 +456,6 @@ void CGUIImageButton::setPressed(bool pressed)
 //! Returns whether the button is a push button
 bool CGUIImageButton::isPushButton() const
 {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return IsPushButton;
 }
 
@@ -470,14 +470,12 @@ void CGUIImageButton::setUseAlphaChannel(bool useAlphaChannel)
 //! Returns if the alpha channel should be used for drawing images on the button
 bool CGUIImageButton::isAlphaChannelUsed() const
 {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return UseAlphaChannel;
 }
 
 
 bool CGUIImageButton::isDrawingBorder() const
 {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return DrawBorder;
 }
 

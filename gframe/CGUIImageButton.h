@@ -73,7 +73,7 @@ public:
 	\param color: The color of the sprite
 	*/
 	void setSprite(EGUI_BUTTON_STATE state, s32 index,
-		video::SColor color = video::SColor(255, 255, 255, 255), bool loop = false) override;
+		video::SColor color = video::SColor(255, 255, 255, 255), bool loop = false, bool scale = false) override;
 
 	//! Sets if the button should behave like a push button. Which means it
 	//! can be in two states: Normal or Pressed. With a click on the button,
@@ -106,6 +106,42 @@ public:
 
 	//! Checks whether the button scales the used images
 	bool isScalingImage() const override;
+
+	//! Sets another color for the button text.
+	void setOverrideColor(video::SColor color) override {}
+
+	//! Gets the override color
+	video::SColor getOverrideColor(void) const override { return video::SColor(255, 255, 255, 255); }
+
+	//! Gets the currently used text color
+	video::SColor getActiveColor() const override { return video::SColor(255, 255, 255, 255); }
+
+	//! Sets if the button text should use the override color or the color in the gui skin.
+	void enableOverrideColor(bool enable) override {}
+
+	//! Checks if an override color is enabled
+	bool isOverrideColorEnabled(void) const override { return false; }
+
+	//! Set image with state parameter
+	void setImage(EGUI_BUTTON_IMAGE_STATE state, video::ITexture* image=0, const core::rect<s32>& sourceRect=core::rect<s32>(0,0,0,0)) override {}
+
+	//! Get the sprite-index for the given state or -1 when no sprite is set
+	s32 getSpriteIndex(EGUI_BUTTON_STATE state) const override { return -1; }
+
+	//! Get the sprite color for the given state
+	video::SColor getSpriteColor(EGUI_BUTTON_STATE state) const override { return video::SColor(255, 255, 255, 255); }
+
+	//! Returns if the sprite in the given state does loop
+	bool getSpriteLoop(EGUI_BUTTON_STATE state) const override { return false; }
+
+	//! Returns if the sprite in the given state is scaled
+	bool getSpriteScale(EGUI_BUTTON_STATE state) const override { return false; }
+
+	//! Get if the shift key was pressed in last EGET_BUTTON_CLICKED event
+	bool getClickShiftState() const override { return false; }
+
+	//! Get if the control key was pressed in last EGET_BUTTON_CLICKED event
+	bool getClickControlState() const override { return false; }
 
 	//! Writes attributes of the element.
 	void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const override;

@@ -50,6 +50,8 @@ project "irrlicht"
         "NO_IRR_COMPILE_WITH_PCX_LOADER_",
         "NO_IRR_COMPILE_WITH_PPM_LOADER_",
         "NO_IRR_COMPILE_WITH_PSD_LOADER_",
+        "NO_IRR_COMPILE_WITH_PVR_LOADER_",
+        "NO_IRR_COMPILE_WITH_DDS_LOADER_",
         "NO_IRR_COMPILE_WITH_TGA_LOADER_",
         "NO_IRR_COMPILE_WITH_WAL_LOADER_",
         "NO_IRR_COMPILE_WITH_LMP_LOADER_",
@@ -165,9 +167,8 @@ project "irrlicht"
         defines { "GL_SILENCE_DEPRECATION" }
         undefines { "NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_" }
         files {
-            "source/Irrlicht/MacOSX/*.mm",
-            "source/Irrlicht/MacOSX/*.h",
+            "source/Irrlicht/*.mm",
         }
 
-    filter { "system:macosx", "files:source/Irrlicht/Irrlicht.cpp or source/Irrlicht/COpenGLDriver.cpp" }
+    filter { "system:macosx", "files:source/Irrlicht/Irrlicht.cpp or source/Irrlicht/COSOperator.cpp" }
         compileas "Objective-C++" 
