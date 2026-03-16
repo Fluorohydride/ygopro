@@ -479,6 +479,61 @@ bool CGUIImageButton::isDrawingBorder() const
 	return DrawBorder;
 }
 
+//! Start of region of methods which are not implemented in this class, but are required by the IGUIButton interface.
+//! These methods are not relevant for CGUIImageButton and thus have empty implementations or return default values.
+
+void CGUIImageButton::setOverrideColor(video::SColor color) {}
+
+video::SColor CGUIImageButton::getOverrideColor(void) const
+{
+	return video::SColor(255, 255, 255, 255);
+}
+
+video::SColor CGUIImageButton::getActiveColor() const
+{
+	return video::SColor(255, 255, 255, 255);
+}
+
+void CGUIImageButton::enableOverrideColor(bool enable) {}
+
+bool CGUIImageButton::isOverrideColorEnabled(void) const
+{
+	return false;
+}
+
+void CGUIImageButton::setImage(EGUI_BUTTON_IMAGE_STATE state, video::ITexture* image, const core::rect<s32>& sourceRect) {}
+
+s32 CGUIImageButton::getSpriteIndex(EGUI_BUTTON_STATE state) const
+{
+	return -1;
+}
+
+video::SColor CGUIImageButton::getSpriteColor(EGUI_BUTTON_STATE state) const
+{
+	return video::SColor(255, 255, 255, 255);
+}
+
+bool CGUIImageButton::getSpriteLoop(EGUI_BUTTON_STATE state) const
+{
+	return false;
+}
+
+bool CGUIImageButton::getSpriteScale(EGUI_BUTTON_STATE state) const
+{
+	return false;
+}
+
+bool CGUIImageButton::getClickShiftState() const
+{
+	return false;
+}
+
+bool CGUIImageButton::getClickControlState() const
+{
+	return false;
+}
+
+//! End of region of methods which are not implemented in this class
 
 //! Writes attributes of the element.
 void CGUIImageButton::serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options = 0) const

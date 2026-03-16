@@ -108,40 +108,40 @@ public:
 	bool isScalingImage() const override;
 
 	//! Sets another color for the button text.
-	void setOverrideColor(video::SColor color) override {}
+	void setOverrideColor(video::SColor color) override;
 
 	//! Gets the override color
-	video::SColor getOverrideColor(void) const override { return video::SColor(255, 255, 255, 255); }
+	video::SColor getOverrideColor(void) const override;
 
 	//! Gets the currently used text color
-	video::SColor getActiveColor() const override { return video::SColor(255, 255, 255, 255); }
+	video::SColor getActiveColor() const override;
 
 	//! Sets if the button text should use the override color or the color in the gui skin.
-	void enableOverrideColor(bool enable) override {}
+	void enableOverrideColor(bool enable) override;
 
 	//! Checks if an override color is enabled
-	bool isOverrideColorEnabled(void) const override { return false; }
+	bool isOverrideColorEnabled(void) const override;
 
 	//! Set image with state parameter
-	void setImage(EGUI_BUTTON_IMAGE_STATE state, video::ITexture* image=0, const core::rect<s32>& sourceRect=core::rect<s32>(0,0,0,0)) override {}
+	void setImage(EGUI_BUTTON_IMAGE_STATE state, video::ITexture* image=0, const core::rect<s32>& sourceRect=core::rect<s32>(0,0,0,0)) override;
 
 	//! Get the sprite-index for the given state or -1 when no sprite is set
-	s32 getSpriteIndex(EGUI_BUTTON_STATE state) const override { return -1; }
+	s32 getSpriteIndex(EGUI_BUTTON_STATE state) const override;
 
 	//! Get the sprite color for the given state
-	video::SColor getSpriteColor(EGUI_BUTTON_STATE state) const override { return video::SColor(255, 255, 255, 255); }
+	video::SColor getSpriteColor(EGUI_BUTTON_STATE state) const override;
 
 	//! Returns if the sprite in the given state does loop
-	bool getSpriteLoop(EGUI_BUTTON_STATE state) const override { return false; }
+	bool getSpriteLoop(EGUI_BUTTON_STATE state) const override;
 
 	//! Returns if the sprite in the given state is scaled
-	bool getSpriteScale(EGUI_BUTTON_STATE state) const override { return false; }
+	bool getSpriteScale(EGUI_BUTTON_STATE state) const override;
 
 	//! Get if the shift key was pressed in last EGET_BUTTON_CLICKED event
-	bool getClickShiftState() const override { return false; }
+	bool getClickShiftState() const override;
 
 	//! Get if the control key was pressed in last EGET_BUTTON_CLICKED event
-	bool getClickControlState() const override { return false; }
+	bool getClickControlState() const override;
 
 	//! Writes attributes of the element.
 	void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const override;
