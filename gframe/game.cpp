@@ -954,7 +954,7 @@ bool Game::Initialize() {
 		env->getSkin()->setColor((irr::gui::EGUI_DEFAULT_COLOR)i, col);
 	}
 	auto size = driver->getScreenSize();
-	if(window_size != size) { // in the first time, window_size is (0, 0), so it will always resize
+	if(window_size != size) { // On the first run, window_size is (0, 0), so this condition always triggers a resize
 		window_size = size;
 		xScale = window_size.Width / 1024.0;
 		yScale = window_size.Height / 640.0;
