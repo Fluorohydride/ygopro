@@ -9,7 +9,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif //__APPLE__
-#include "CGUIImageButton.h"
 #include "CGUITTFont.h"
 #include "mysignal.h"
 #include "client_field.h"
@@ -227,6 +226,9 @@ public:
 
 	void OnResize();
 	void ResizeChatInputWindow();
+	void ResizePosSelectButtons();
+	void ResizeCardSelectButtons(irr::gui::IGUIWindow* window, irr::gui::IGUIStaticText** labels, irr::gui::IGUIButton** images,
+		irr::gui::IGUIScrollBar* scrollbar, irr::gui::IGUIButton* buttonOK, const std::vector<ClientCard*>& cards);
 	irr::core::recti Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2);
 	irr::core::recti Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 dx, irr::s32 dy, irr::s32 dx2, irr::s32 dy2);
 	irr::core::vector2di Resize(irr::s32 x, irr::s32 y);
@@ -318,7 +320,12 @@ public:
 	irr::gui::CGUITTFont* numFont;
 	irr::gui::CGUITTFont* adFont;
 	irr::gui::CGUITTFont* lpcFont;
-	std::unordered_map<irr::gui::CGUIImageButton*, int> imageLoading;
+	std::unordered_map<irr::gui::IGUIButton*, std::pair<int, bool>> imageLoading;
+	// persistent tracking for image refresh on resize:
+	// {card_code, rotated} for buttons showing a card image from GetTextureButton
+	std::unordered_map<irr::gui::IGUIButton*, std::pair<int, bool>> btnCardImgInfo;
+	// {cover_idx, rotated} for buttons showing a facedown card (cover) image
+	std::unordered_map<irr::gui::IGUIButton*, std::pair<int, bool>> btnFacedownImgInfo;
 	//card image
 	irr::gui::IGUIStaticText* wCardImg;
 	irr::gui::IGUIImage* imgCard;
@@ -479,19 +486,19 @@ public:
 	irr::gui::IGUIScrollBar* scrOption;
 	//pos selection
 	irr::gui::IGUIWindow* wPosSelect;
-	irr::gui::CGUIImageButton* btnPSAU;
-	irr::gui::CGUIImageButton* btnPSAD;
-	irr::gui::CGUIImageButton* btnPSDU;
-	irr::gui::CGUIImageButton* btnPSDD;
+	irr::gui::IGUIButton* btnPSAU;
+	irr::gui::IGUIButton* btnPSAD;
+	irr::gui::IGUIButton* btnPSDU;
+	irr::gui::IGUIButton* btnPSDD;
 	//card selection
 	irr::gui::IGUIWindow* wCardSelect;
-	irr::gui::CGUIImageButton* btnCardSelect[5];
+	irr::gui::IGUIButton* btnCardSelect[5];
 	irr::gui::IGUIStaticText *stCardPos[5];
 	irr::gui::IGUIScrollBar *scrCardList;
 	irr::gui::IGUIButton* btnSelectOK;
 	//card display
 	irr::gui::IGUIWindow* wCardDisplay;
-	irr::gui::CGUIImageButton* btnCardDisplay[5];
+	irr::gui::IGUIButton* btnCardDisplay[5];
 	irr::gui::IGUIStaticText *stDisplayPos[5];
 	irr::gui::IGUIScrollBar *scrDisplayList;
 	irr::gui::IGUIButton* btnDisplayOK;

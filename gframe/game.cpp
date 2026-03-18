@@ -532,21 +532,18 @@ bool Game::Initialize() {
 	scrOption->setSmallStep(1);
 	scrOption->setMin(0);
 	//pos select
-	wPosSelect = env->addWindow(irr::core::rect<irr::s32>(340, 200, 935, 410), false, dataManager.GetSysString(561));
+	wPosSelect = env->addWindow(irr::core::rect<irr::s32>(425, 210, 900, 399), false, dataManager.GetSysString(561));
 	wPosSelect->getCloseButton()->setVisible(false);
 	wPosSelect->setVisible(false);
-	btnPSAU = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(10, 45, 150, 185), wPosSelect, BUTTON_POS_AU);
-	btnPSAU->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.5f, CARD_IMG_HEIGHT * 0.5f));
-	btnPSAD = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(155, 45, 295, 185), wPosSelect, BUTTON_POS_AD);
-	btnPSAD->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.5f, CARD_IMG_HEIGHT * 0.5f));
-	btnPSAD->setImage(imageManager.tCover[2]);
-	btnPSDU = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(300, 45, 440, 185), wPosSelect, BUTTON_POS_DU);
-	btnPSDU->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.5f, CARD_IMG_HEIGHT * 0.5f));
-	btnPSDU->setImageRotation(270);
-	btnPSDD = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(445, 45, 585, 185), wPosSelect, BUTTON_POS_DD);
-	btnPSDD->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.5f, CARD_IMG_HEIGHT * 0.5f));
-	btnPSDD->setImageRotation(270);
-	btnPSDD->setImage(imageManager.tCover[2]);
+	btnPSAU = env->addButton(irr::core::rect<irr::s32>(27, 35, 164, 172), wPosSelect, BUTTON_POS_AU);
+	btnPSAD = env->addButton(irr::core::rect<irr::s32>(27, 35, 164, 172), wPosSelect, BUTTON_POS_AD);
+	btnPSAD->setImage(imageManager.tButtonFacedown[0]);
+	btnFacedownImgInfo[btnPSAD] = {0, false};
+	btnPSAD->setVisible(false); // PSAD = PoSition Attack face-Down, is not allowed in the rules, so the width of wPosSelect only support 3 buttons
+	btnPSDU = env->addButton(irr::core::rect<irr::s32>(169, 35, 306, 172), wPosSelect, BUTTON_POS_DU);
+	btnPSDD = env->addButton(irr::core::rect<irr::s32>(311, 35, 448, 172), wPosSelect, BUTTON_POS_DD);
+	btnPSDD->setImage(imageManager.tButtonFacedownDefense[0]);
+	btnFacedownImgInfo[btnPSDD] = {0, true};
 	//card select
 	wCardSelect = env->addWindow(irr::core::rect<irr::s32>(320, 100, 1000, 400), false, L"");
 	wCardSelect->getCloseButton()->setVisible(false);
@@ -555,8 +552,7 @@ bool Game::Initialize() {
 		stCardPos[i] = env->addStaticText(L"", irr::core::rect<irr::s32>(30 + 125 * i, 30, 150 + 125 * i, 50), true, false, wCardSelect, -1, true);
 		stCardPos[i]->setBackgroundColor(0xffffffff);
 		stCardPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-		btnCardSelect[i] = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardSelect, BUTTON_CARD_0 + i);
-		btnCardSelect[i]->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.6f, CARD_IMG_HEIGHT * 0.6f));
+		btnCardSelect[i] = env->addButton(irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardSelect, BUTTON_CARD_0 + i);
 	}
 	scrCardList = env->addScrollBar(true, irr::core::rect<irr::s32>(30, 235, 650, 255), wCardSelect, SCROLL_CARD_SELECT);
 	btnSelectOK = env->addButton(irr::core::rect<irr::s32>(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_OK, dataManager.GetSysString(1211));
@@ -568,8 +564,7 @@ bool Game::Initialize() {
 		stDisplayPos[i] = env->addStaticText(L"", irr::core::rect<irr::s32>(30 + 125 * i, 30, 150 + 125 * i, 50), true, false, wCardDisplay, -1, true);
 		stDisplayPos[i]->setBackgroundColor(0xffffffff);
 		stDisplayPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-		btnCardDisplay[i] = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardDisplay, BUTTON_DISPLAY_0 + i);
-		btnCardDisplay[i]->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.6f, CARD_IMG_HEIGHT * 0.6f));
+		btnCardDisplay[i] = env->addButton(irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardDisplay, BUTTON_DISPLAY_0 + i);
 	}
 	scrDisplayList = env->addScrollBar(true, irr::core::rect<irr::s32>(30, 235, 650, 255), wCardDisplay, SCROLL_CARD_DISPLAY);
 	btnDisplayOK = env->addButton(irr::core::rect<irr::s32>(300, 265, 380, 290), wCardDisplay, BUTTON_CARD_DISP_OK, dataManager.GetSysString(1211));
@@ -1720,12 +1715,17 @@ void Game::ErrorLog(const char* msg) {
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
 	ClearCardInfo(0);
-	btnPSAU->setImage();
-	btnPSDU->setImage();
+	btnPSAU->setImage(nullptr);
+	btnPSDU->setImage(nullptr);
 	for(int i=0; i<=4; ++i) {
-		btnCardSelect[i]->setImage();
-		btnCardDisplay[i]->setImage();
+		btnCardSelect[i]->setImage(nullptr);
+		btnCardDisplay[i]->setImage(nullptr);
 	}
+	imageLoading.clear();
+	btnCardImgInfo.clear();
+	btnFacedownImgInfo.clear();
+	btnFacedownImgInfo[btnPSAD] = {0, false};
+	btnFacedownImgInfo[btnPSDD] = {0, true};
 	imageManager.ClearTexture();
 }
 void Game::CloseGameButtons() {
@@ -1851,6 +1851,20 @@ void Game::OnResize() {
 	imageManager.ClearTexture();
 	imageManager.ResizeTexture();
 
+	for(auto& it : btnCardImgInfo) {
+		auto button = it.first;
+		std::pair<int, bool>& imgInfo = it.second;
+		imageLoading[button] = imgInfo;
+	}
+	for(auto& it : btnFacedownImgInfo) {
+		auto button = it.first;
+		std::pair<int, bool>& imgInfo = it.second;
+		if(imgInfo.second)
+			button->setImage(imageManager.tButtonFacedownDefense[imgInfo.first]);
+		else
+			button->setImage(imageManager.tButtonFacedown[imgInfo.first]);
+	}
+
 	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 415));
 	wDeckEdit->setRelativePosition(Resize(309, 5, 605, 130));
 	cbDBDecks->setRelativePosition(Resize(80, 35, 220, 60));
@@ -1923,14 +1937,18 @@ void Game::OnResize() {
 	wQuery->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	wSurrender->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	wOptions->setRelativePosition(ResizeWin(490, 200, 840, 340));
-	wPosSelect->setRelativePosition(ResizeWin(340, 200, 935, 410));
-	wCardSelect->setRelativePosition(ResizeWin(320, 100, 1000, 400));
 	wANNumber->setRelativePosition(ResizeWin(550, 180, 780, 430));
 	wANCard->setRelativePosition(ResizeWin(510, 120, 820, 420));
 	wANAttribute->setRelativePosition(ResizeWin(500, 200, 830, 285));
 	wANRace->setRelativePosition(ResizeWin(480, 200, 850, 410));
 	wReplaySave->setRelativePosition(ResizeWin(510, 200, 820, 320));
 	wDMQuery->setRelativePosition(ResizeWin(400, 200, 710, 320));
+	if(wPosSelect->isVisible())
+		ResizePosSelectButtons();
+	if(wCardSelect->isVisible())
+		ResizeCardSelectButtons(wCardSelect, stCardPos, btnCardSelect, scrCardList, btnSelectOK, dField.selectable_cards);
+	if(wCardDisplay->isVisible())
+		ResizeCardSelectButtons(wCardDisplay, stDisplayPos, btnCardDisplay, scrDisplayList, btnDisplayOK, dField.display_cards);
 
 	stHintMsg->setRelativePosition(ResizeWin(660 - 160 * xScale, 60, 660 + 160 * xScale, 90));
 
@@ -2026,6 +2044,74 @@ void Game::ResizeChatInputWindow() {
 	if(is_building) x = 802 * xScale;
 	wChat->setRelativePosition(irr::core::recti(x, window_size.Height - 25, window_size.Width, window_size.Height));
 	ebChatInput->setRelativePosition(irr::core::recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
+}
+void Game::ResizePosSelectButtons() {
+	wPosSelect->setRelativePosition(Resize(425, 210, 900, 380, 0, 0, 0, 19)); // 19: Top border + Titlebar height
+	irr::s32 imgHeight = CARD_IMG_HEIGHT * 0.5f * mainGame->yScale + 0.5f;
+	irr::s32 gap = 5 * xScale + 0.5f;
+	irr::s32 btnPosWidth = imgHeight + gap * 2; // Square buttons, width = height
+	int totalWidth = 0, visCount = 0;
+	if(btnPSAU->isVisible()) { totalWidth += btnPosWidth; visCount++; }
+	if(btnPSAD->isVisible()) { totalWidth += btnPosWidth; visCount++; }
+	if(btnPSDU->isVisible()) { totalWidth += btnPosWidth; visCount++; }
+	if(btnPSDD->isVisible()) { totalWidth += btnPosWidth; visCount++; }
+	totalWidth += (visCount - 1) * gap;
+	irr::s32 posX = (wPosSelect->getRelativePosition().getWidth() - totalWidth) / 2;
+	irr::s32 posY = 19 + 16 * yScale;
+	if(btnPSAU->isVisible()) {
+		btnPSAU->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
+		posX += btnPosWidth + gap;
+	}
+	if(btnPSAD->isVisible()) {
+		btnPSAD->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
+		posX += btnPosWidth + gap;
+	}
+	if(btnPSDU->isVisible()) {
+		btnPSDU->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
+		posX += btnPosWidth + gap;
+	}
+	if(btnPSDD->isVisible()) {
+		btnPSDD->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
+		posX += btnPosWidth + gap;
+	}
+}
+void Game::ResizeCardSelectButtons(irr::gui::IGUIWindow* window,
+								   irr::gui::IGUIStaticText** labels,
+								   irr::gui::IGUIButton** images,
+								   irr::gui::IGUIScrollBar* scrollbar,
+								   irr::gui::IGUIButton* buttonOK,
+								   const std::vector<ClientCard*>& cards) {
+	irr::s32 gap = 5 * xScale + 0.5f;
+	irr::s32 btnWidth = CARD_IMG_WIDTH * 0.55f * mainGame->yScale + 0.5f;
+	irr::s32 btnHeight = CARD_IMG_HEIGHT * 0.55f * mainGame->yScale + 0.5f;
+	irr::s32 stride = btnWidth + gap;
+	int startpos = 30 * xScale;
+	int ct = 5;
+	if (cards.size() < 5) {
+		startpos = 30 * xScale + stride * (5 - (int)cards.size()) / 2;
+		ct = cards.size();
+	}
+	irr::s32 top = 19 + 11 * yScale;
+	irr::s32 labelHeight = 20 * yScale;
+	irr::s32 minTextHeight = gameConf.textfontsize * 1.4f + 0.5f;
+	if (labelHeight < minTextHeight) labelHeight = minTextHeight;
+	irr::s32 btnTop = top + labelHeight + gap;
+	for (int i = 0; i < ct; ++i) {
+		labels[i]->setRelativePosition(irr::core::recti(startpos + stride * i, top, startpos + stride * i + btnWidth, top + labelHeight));
+		images[i]->setRelativePosition(irr::core::recti(startpos + stride * i, btnTop, startpos + stride * i + btnWidth, btnTop + btnHeight));
+	}
+	irr::s32 barTop = btnTop + btnHeight + gap;
+	irr::s32 barWidth = stride * ct - gap;
+	irr::s32 barHeight = 20 * yScale;
+	if (barHeight > 25) barHeight = 25;
+	scrollbar->setRelativePosition(irr::core::recti(startpos, barTop, startpos + barWidth, barTop + barHeight));
+	irr::s32 btnOKWidth = 80 * xScale;
+	irr::s32 btnOKHeight = 25 * yScale;
+	if (btnOKHeight < minTextHeight) btnOKHeight = minTextHeight;
+	buttonOK->setRelativePosition(irr::core::recti(startpos + barWidth / 2 - btnOKWidth / 2, barTop + barHeight + gap * 2, startpos + barWidth / 2 + btnOKWidth / 2, barTop + barHeight + gap * 2 + btnOKHeight));
+	irr::s32 windowWidth = 30 * xScale * 2 + stride * 5 - gap;
+	irr::s32 windowHeight = top + labelHeight + btnHeight + barHeight + btnOKHeight + gap * 6;
+	window->setRelativePosition(irr::core::recti(380 * xScale, 130 * yScale, 380 * xScale + windowWidth, 130 * yScale + windowHeight));
 }
 irr::core::recti Game::Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2) {
 	x = x * xScale;
