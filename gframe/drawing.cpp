@@ -793,20 +793,7 @@ void Game::DrawGUI() {
 					fu.fadingFrame--;
 					if(!fu.fadingFrame) {
 						fu.guiFading->setRelativePosition(fu.fadingSize);
-						if(fu.guiFading == wPosSelect) {
-							btnPSAU->setDrawImage(true);
-							btnPSAD->setDrawImage(true);
-							btnPSDU->setDrawImage(true);
-							btnPSDD->setDrawImage(true);
-						}
-						if(fu.guiFading == wCardSelect) {
-							for(int i = 0; i < 5; ++i)
-								btnCardSelect[i]->setDrawImage(true);
-						}
-						if(fu.guiFading == wCardDisplay) {
-							for(int i = 0; i < 5; ++i)
-								btnCardDisplay[i]->setDrawImage(true);
-						}
+						SetImageButtonDrawing(fu.guiFading, true);
 						env->setFocus(fu.guiFading);
 					} else
 						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
@@ -824,20 +811,7 @@ void Game::DrawGUI() {
 					if(!fu.fadingFrame) {
 						fu.guiFading->setVisible(false);
 						fu.guiFading->setRelativePosition(fu.fadingSize);
-						if(fu.guiFading == wPosSelect) {
-							btnPSAU->setDrawImage(true);
-							btnPSAD->setDrawImage(true);
-							btnPSDU->setDrawImage(true);
-							btnPSDD->setDrawImage(true);
-						}
-						if(fu.guiFading == wCardSelect) {
-							for(int i = 0; i < 5; ++i)
-								btnCardSelect[i]->setDrawImage(true);
-						}
-						if(fu.guiFading == wCardDisplay) {
-							for(int i = 0; i < 5; ++i)
-								btnCardDisplay[i]->setDrawImage(true);
-						}
+						SetImageButtonDrawing(fu.guiFading, false);
 					} else
 						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
 				}
@@ -1101,20 +1075,7 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 	fu.fadingFrame = 10;
 	fu.autoFadeoutFrame = autoframe;
 	fu.signalAction = 0;
-	if(win == wPosSelect) {
-		btnPSAU->setDrawImage(false);
-		btnPSAD->setDrawImage(false);
-		btnPSDU->setDrawImage(false);
-		btnPSDD->setDrawImage(false);
-	}
-	if(win == wCardSelect) {
-		for(int i = 0; i < 5; ++i)
-			btnCardSelect[i]->setDrawImage(false);
-	}
-	if(win == wCardDisplay) {
-		for(int i = 0; i < 5; ++i)
-			btnCardDisplay[i]->setDrawImage(false);
-	}
+	SetImageButtonDrawing(win, false);
 	win->setRelativePosition(irr::core::recti(center.X, center.Y, 0, 0));
 	win->setVisible(true);
 	fadingList.push_back(fu);
@@ -1136,22 +1097,13 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 	fu.fadingFrame = 10;
 	fu.autoFadeoutFrame = 0;
 	fu.signalAction = set_action;
-	if(win == wPosSelect) {
-		btnPSAU->setDrawImage(false);
-		btnPSAD->setDrawImage(false);
-		btnPSDU->setDrawImage(false);
-		btnPSDD->setDrawImage(false);
-	}
+	SetImageButtonDrawing(win, false);
 	if(win == wCardSelect) {
-		for(int i = 0; i < 5; ++i)
-			btnCardSelect[i]->setDrawImage(false);
 		stCardListTip->setVisible(false);
 		for(auto& pcard : dField.selectable_cards)
 			dField.SetShowMark(pcard, false);
 	}
 	if(win == wCardDisplay) {
-		for(int i = 0; i < 5; ++i)
-			btnCardDisplay[i]->setDrawImage(false);
 		stCardListTip->setVisible(false);
 		for(auto& pcard : dField.display_cards)
 			dField.SetShowMark(pcard, false);
@@ -1167,6 +1119,25 @@ void Game::PopupElement(irr::gui::IGUIElement * element, int hideframe) {
 	if(!hideframe)
 		ShowElement(element);
 	else ShowElement(element, hideframe);
+}
+void Game::SetImageButtonDrawing(irr::gui::IGUIElement* element, bool draw) {
+// YGOPro was hiding the image of buttons during fading (animation), but this feature is not meaningful, and the official CGUIButton don't support to setDrawImage.
+#if false
+	if(element == wPosSelect) {
+		btnPSAU->setDrawImage(draw);
+		btnPSAD->setDrawImage(draw);
+		btnPSDU->setDrawImage(draw);
+		btnPSDD->setDrawImage(draw);
+	}
+	if(element == wCardSelect) {
+		for(int i = 0; i < 5; ++i)
+			btnCardSelect[i]->setDrawImage(draw);
+	}
+	if(element== wCardDisplay) {
+		for(int i = 0; i < 5; ++i)
+			btnCardDisplay[i]->setDrawImage(draw);
+	}
+#endif
 }
 void Game::WaitFrameSignal(int frame) {
 	frameSignal.Reset();
