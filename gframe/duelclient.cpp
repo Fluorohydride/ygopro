@@ -2049,7 +2049,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
 		mainGame->dField.select_hint = select_hint;
 		select_hint = 0;
-		return mainGame->dField.ShowSelectSum(mainGame->dField.select_panalmode);
+		mainGame->gMutex.lock();
+		bool result = mainGame->dField.ShowSelectSum(mainGame->dField.select_panalmode);
+		mainGame->gMutex.unlock();
+		return result;
 	}
 	case MSG_SORT_CARD: {
 		/*int player = */BufferIO::Read<uint8_t>(pbuf);
@@ -2071,10 +2074,12 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			mainGame->dField.selectable_cards.push_back(pcard);
 			mainGame->dField.sort_list.push_back(0);
 		}
+		mainGame->gMutex.lock();
 		mainGame->wCardSelect->setText(dataManager.GetSysString(205));
 		mainGame->dField.select_min = 0;
 		mainGame->dField.select_max = count;
 		mainGame->dField.ShowSelectCard();
+		mainGame->gMutex.unlock();
 		return false;
 	}
 	case MSG_CONFIRM_DECKTOP: {

@@ -184,12 +184,12 @@ public:
 	void DrawCard(ClientCard* pcard);
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
-	void DrawGUI();
+	void DrawGUI(); // called from MainLoop with gMutex held
 	void DrawSpec();
 	void DrawBackImage(irr::video::ITexture* texture);
-	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
-	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
-	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
+	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0); // caller must hold gMutex
+	void HideElement(irr::gui::IGUIElement* element, bool set_action = false); // caller must hold gMutex
+	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0); // caller must hold gMutex
 	void SetImageButtonDrawing(irr::gui::IGUIElement* element, bool draw = true);
 	void WaitFrameSignal(int frame);
 	void DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lflist, bool drag = false);
@@ -203,7 +203,7 @@ public:
 	void ClearChatMsg();
 	void AddDebugMsg(const char* msgbuf);
 	void ErrorLog(const char* msgbuf);
-	void ClearTextures();
+	void ClearTextures(); // caller must hold gMutex
 	void CloseGameButtons();
 	void CloseGameWindow();
 	void CloseDuelWindow();
@@ -224,7 +224,7 @@ public:
 		editbox->setText(text.c_str());
 	}
 
-	void OnResize();
+	void OnResize(); // caller must hold gMutex
 	void ResizeChatInputWindow();
 	void ResizePosSelectButtons();
 	void ResizeCardSelectButtons(irr::gui::IGUIWindow* window, irr::gui::IGUIStaticText** labels, irr::gui::IGUIButton** images,

@@ -978,7 +978,9 @@ void Game::MainLoop() {
 			window_size = size;
 			xScale = window_size.Width / 1024.0;
 			yScale = window_size.Height / 640.0;
+			gMutex.lock();
 			OnResize();
+			gMutex.unlock();
 		}
 		linePatternD3D = (linePatternD3D + 1) % 30;
 		linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
