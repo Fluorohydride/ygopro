@@ -74,11 +74,8 @@ bool ImageResizer::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* de
 	}
 
 	void* srcPtr = src->lock();
-	if(!srcPtr)
-		return false;
 	void* destPtr = dest->lock();
-	if(!destPtr) {
-		src->unlock();
+	if(!srcPtr || !destPtr) {
 		return false;
 	}
 
@@ -98,8 +95,6 @@ bool ImageResizer::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* de
 		stbir_set_filters(&cache.resize, STBIR_FILTER_BOX, STBIR_FILTER_BOX);
 		cache.samplers_built = (stbir_build_samplers(&cache.resize) != 0);
 		if(!cache.samplers_built) {
-			dest->unlock();
-			src->unlock();
 			return false;
 		}
 	} else {
@@ -107,10 +102,7 @@ bool ImageResizer::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* de
 		stbir_set_buffer_ptrs(&cache.resize, srcPtr, srcStride, destPtr, destStride);
 	}
 
-	const int ok = stbir_resize_extended(&cache.resize);
-	dest->unlock();
-	src->unlock();
-	return ok != 0;
+	return (stbir_resize_extended(&cache.resize) != 0);
 }
 
 /**
