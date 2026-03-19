@@ -100,10 +100,8 @@ bool DataManager::LoadDB(const char* file) {
 
 	reader->read(buffer, sz);
 	reader->drop();
-	// Workaround for sqlite3_deserialize() with possible WAL-mode databases:
 	// force rollback-journal mode by setting header bytes 18 and 19 to 0x01
-	// when the buffer is large enough, as recommended by SQLite documentation.
-	if (sz >= 20) {
+	if (sz >= 20 && buffer[18] == 0x02) {
 		buffer[18] = 0x01;
 		buffer[19] = 0x01;
 	}
