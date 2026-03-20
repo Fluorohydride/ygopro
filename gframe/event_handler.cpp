@@ -1761,60 +1761,34 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if (mainGame->wCardDisplay->isVisible())
 				break;
 			int loc_id = 0;
+			int p = (event.KeyInput.Key >= irr::KEY_F5) ? 1 : 0;
+			int key_offset = (p == 1) ? (event.KeyInput.Key - irr::KEY_F5) : (event.KeyInput.Key - irr::KEY_F1);
 			display_cards.clear();
-			switch (event.KeyInput.Key) {
-			case irr::KEY_F1:
+			if (key_offset == 0) { // Grave
 				if (cant_check_grave)
 					break;
 				loc_id = 1004;
-				for (auto it = grave[0].rbegin(); it != grave[0].rend(); ++it)
+				for (auto it = grave[p].rbegin(); it != grave[p].rend(); ++it)
 					display_cards.push_back(*it);
-				break;
-			case irr::KEY_F2:
+			}
+			else if (key_offset == 1) { // Remove
 				loc_id = 1005;
-				for (auto it = remove[0].rbegin(); it != remove[0].rend(); ++it)
+				for (auto it = remove[p].rbegin(); it != remove[p].rend(); ++it)
 					display_cards.push_back(*it);
-				break;
-			case irr::KEY_F3:
+			}
+			else if (key_offset == 2) { // Extra
 				loc_id = 1006;
-				for (auto it = extra[0].rbegin(); it != extra[0].rend(); ++it)
+				for (auto it = extra[p].rbegin(); it != extra[p].rend(); ++it)
 					display_cards.push_back(*it);
-				break;
-			case irr::KEY_F4:
+			}
+			else if (key_offset == 3) { // Overlay
 				loc_id = 1007;
-				for (auto it = mzone[0].begin(); it != mzone[0].end(); ++it) {
+				for (auto it = mzone[p].begin(); it != mzone[p].end(); ++it) {
 					if (*it) {
 						for (auto oit = (*it)->overlayed.begin(); oit != (*it)->overlayed.end(); ++oit)
 							display_cards.push_back(*oit);
 					}
 				}
-				break;
-			case irr::KEY_F5:
-				if (cant_check_grave)
-					break;
-				loc_id = 1004;
-				for (auto it = grave[1].rbegin(); it != grave[1].rend(); ++it)
-					display_cards.push_back(*it);
-				break;
-			case irr::KEY_F6:
-				loc_id = 1005;
-				for (auto it = remove[1].rbegin(); it != remove[1].rend(); ++it)
-					display_cards.push_back(*it);
-				break;
-			case irr::KEY_F7:
-				loc_id = 1006;
-				for (auto it = extra[1].rbegin(); it != extra[1].rend(); ++it)
-					display_cards.push_back(*it);
-				break;
-			case irr::KEY_F8:
-				loc_id = 1007;
-				for (auto it = mzone[1].begin(); it != mzone[1].end(); ++it) {
-					if (*it) {
-						for (auto oit = (*it)->overlayed.begin(); oit != (*it)->overlayed.end(); ++oit)
-							display_cards.push_back(*oit);
-					}
-				}
-				break;
 			}
 			if (loc_id && display_cards.size()) {
 				wchar_t formatBuffer[2048];
