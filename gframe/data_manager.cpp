@@ -104,8 +104,10 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 }
 bool DataManager::LoadDB(const char* file) {
 	auto reader = FileSystem->createAndOpenFile(file);
-	if (reader == nullptr)
+	if (reader == nullptr) {
+		mysnprintf(errmsg, "File does not exist, or fail to unzip: %s", file);
 		return false;
+	}
 
 	sqlite3* db_handle = nullptr;
 	if (sqlite3_open(":memory:", &db_handle) != SQLITE_OK) {
@@ -207,7 +209,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	if (const char* msg = sqlite3_errmsg(pDB))
-		mysnprintf(errmsg, "%s", msg);
+		mysnprintf(errmsg, "sqlite3_errmsg: %s", msg);
 	else
 		errmsg[0] = '\0';
 	sqlite3_finalize(pStmt);

@@ -76,7 +76,9 @@ bool Game::Initialize() {
 	}
 	dataManager.FileSystem = device->getFileSystem();
 	if(!dataManager.LoadDB("cards.cdb")) {
-		ErrorLog("Failed to load card database (cards.cdb)!");
+		std::string errmsg = "Failed to load card database (cards.cdb)! ";
+		errmsg.append(dataManager.errmsg);
+		ErrorLog(errmsg.c_str());
 		return false;
 	}
 	if(!dataManager.LoadStrings("strings.conf")) {
@@ -1133,7 +1135,13 @@ void Game::LoadExpansions() {
 		char fpath[1024];
 		mysnprintf(fpath, "./expansions/%s", name);
 		if (IsExtension(name, ".cdb")) {
-			dataManager.LoadDB(fpath);
+			if (!dataManager.LoadDB(fpath)) {
+				std::string errmsg = "Warning: Failed to load DB file on disk (";
+				errmsg.append(fpath);
+				errmsg.append(")! ");
+				errmsg.append(dataManager.errmsg);
+				mainGame->ErrorLog(errmsg.c_str());
+			}
 			return;
 		}
 		if (IsExtension(name, ".conf")) {
@@ -1150,7 +1158,15 @@ void Game::LoadExpansions() {
 		for(irr::u32 j = 0; j < archive->getFileCount(); ++j) {
 			const char* name = archive->getFullFileName(j).c_str();
 			if (IsExtension(name, ".cdb")) {
-				dataManager.LoadDB(name);
+				if (!dataManager.LoadDB(name)) {
+					std::string errmsg = "Warning: Failed to load DB file in expansion archive (";
+					errmsg.append(dataManager.FileSystem->getFileArchive(i)->getArchiveName().c_str());
+					errmsg.append(" : ");
+					errmsg.append(name);
+					errmsg.append(")! ");
+					errmsg.append(dataManager.errmsg);
+					mainGame->ErrorLog(errmsg.c_str());
+				}
 				continue;
 			}
 			if (IsExtension(name, ".conf")) {
@@ -1162,7 +1178,15 @@ void Game::LoadExpansions() {
 				wchar_t fname[1024];
 				int len = BufferIO::DecodeUTF8(name, fname);
 				// TODO: zip file may contain non-UTF8 file name. DecodeUTF8 can't parse it and returns 0.
-				if (!len) continue;
+				if (!len) {
+					std::string errmsg = "Warning: Failed to decode deck file name in expansion archive (";
+					errmsg.append(dataManager.FileSystem->getFileArchive(i)->getArchiveName().c_str());
+					errmsg.append(" : ");
+					errmsg.append(name);
+					errmsg.append(")! Please make sure the file name is UTF-8 encoded in the archive.");
+					mainGame->ErrorLog(errmsg.c_str());
+					continue;
+				}
 				deckBuilder.expansionPacks.push_back(fname);
 				continue;
 			}
