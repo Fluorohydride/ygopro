@@ -1716,9 +1716,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
+		if (mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+			break;
 		switch(event.KeyInput.Key) {
 		case irr::KEY_KEY_A: {
-			if(mainGame->gameConf.control_mode == 0 && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+			if(mainGame->gameConf.control_mode == 0) {
 				mainGame->always_chain = event.KeyInput.PressedDown;
 				mainGame->ignore_chain = false;
 				mainGame->chain_when_avail = false;
@@ -1727,7 +1729,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_S: {
-			if(mainGame->gameConf.control_mode == 0 && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+			if(mainGame->gameConf.control_mode == 0) {
 				mainGame->ignore_chain = event.KeyInput.PressedDown;
 				mainGame->always_chain = false;
 				mainGame->chain_when_avail = false;
@@ -1736,7 +1738,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_D: {
-			if(mainGame->gameConf.control_mode == 0 && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+			if(mainGame->gameConf.control_mode == 0) {
 				mainGame->chain_when_avail = event.KeyInput.PressedDown;
 				mainGame->always_chain = false;
 				mainGame->ignore_chain = false;
@@ -1753,7 +1755,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_F7:
 		case irr::KEY_F8: {
 			if(!event.KeyInput.PressedDown && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type != 7 && mainGame->dInfo.isStarted
-					&& !mainGame->wCardDisplay->isVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					&& !mainGame->wCardDisplay->isVisible()) {
 				int loc_id = 0;
 				display_cards.clear();
 				switch(event.KeyInput.Key) {
