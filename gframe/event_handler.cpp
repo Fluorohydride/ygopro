@@ -1809,6 +1809,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							}
 						}
 						break;
+					default: break;
 				}
 				if(display_cards.size()) {
 					wchar_t formatBuffer[2048];
