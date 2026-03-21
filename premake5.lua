@@ -57,6 +57,10 @@ newoption { trigger = "irrlicht-include-dir", category = "YGOPro - irrlicht", de
 newoption { trigger = "irrlicht-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
 newoption { trigger = "build-jpeg-png", category = "YGOPro - irrlicht", description = "" }
 newoption { trigger = "no-build-jpeg-png", category = "YGOPro - irrlicht", description = "" }
+newoption { trigger = "jpeg-include-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
+newoption { trigger = "jpeg-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
+newoption { trigger = "png-include-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
+newoption { trigger = "png-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
 newoption { trigger = "no-dxsdk", category = "YGOPro - irrlicht", description = "" }
 
 newoption { trigger = "no-audio", category = "YGOPro", description = "" }
