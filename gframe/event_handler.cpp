@@ -1761,6 +1761,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if (mainGame->wCardDisplay->isVisible())
 				break;
 			int loc_id = 0;
+			static_assert(irr::KEY_F8 - irr::KEY_F1 == 7, "keycode F1-F8 must be consecutive");
 			int p = (event.KeyInput.Key >= irr::KEY_F5) ? 1 : 0;
 			int key_offset = (p == 1) ? (event.KeyInput.Key - irr::KEY_F5) : (event.KeyInput.Key - irr::KEY_F1);
 			display_cards.clear();
