@@ -161,9 +161,8 @@ project "irrlicht"
         end
 
     filter { "system:macosx" }
-        cppdialect "gnu++14"
         defines { "GL_SILENCE_DEPRECATION" }
-        undefines { "NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_" }
+        undefines { "__STRICT_ANSI__", "NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_" }
         files {
             "source/Irrlicht/MacOSX/*.mm",
             "source/Irrlicht/MacOSX/*.h",
