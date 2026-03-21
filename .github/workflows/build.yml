@@ -490,8 +490,8 @@ jobs:
     - name: Install dependencies
       if: matrix.static-link != true
       run: |
-        brew install opus opusfile libvorbis libjpeg-turbo libpng
-#        brew install sqlite libx11 freetype libevent
+        brew install opus opusfile libvorbis
+#        brew install sqlite libx11 freetype libevent libjpeg-turbo libpng
 
     - name: Download premake
       id: premake
