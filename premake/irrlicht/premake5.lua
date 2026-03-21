@@ -1,13 +1,7 @@
 project "irrlicht"
     kind "StaticLib"
 
-    includedirs {
-        "include",
-        "source/Irrlicht",
-        "source/Irrlicht/jpeglib",
-        "source/Irrlicht/libpng",
-        "source/Irrlicht/zlib"
-    }
+    includedirs { "include" }
 
     exceptionhandling "Off"
     rtti "Off"
