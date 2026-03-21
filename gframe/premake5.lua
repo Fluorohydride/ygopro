@@ -27,6 +27,10 @@ project "YGOPro"
         includedirs { IRRLICHT_INCLUDE_DIR }
         libdirs { IRRLICHT_LIB_DIR }
     end
+    if not IRRLICHT_BUILD_JPEG_PNG then
+        links { "jpeg", "png" }
+        libdirs { JPEG_LIB_DIR, PNG_LIB_DIR }
+    end
 
     if BUILD_FREETYPE then
         includedirs { "../freetype/custom", "../freetype/include" }
