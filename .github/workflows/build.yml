@@ -4,6 +4,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 on:
   push:
     branches: [ "master" ]
@@ -13,9 +15,6 @@ on:
 jobs:
   prepare:
     runs-on: ubuntu-latest
-    outputs:
-      ocgcore-url: ${{ steps.parse-pr-override.outputs.ocgcore-url }}
-      ocgcore-branch: ${{ steps.parse-pr-override.outputs.ocgcore-branch }}
 
     steps:
     - name: Parse pull request description for dependency overrides
@@ -24,52 +23,44 @@ jobs:
         PR_BODY: ${{ github.event.pull_request.body }}
       shell: python
       run: |
-        # You can override the URLs and branches of dependencies by adding lines in the pull request description.
+        # You can override dependencies by specifying a pull request number in the pull request description.
         # This is useful when you want to test changes which require modifications in the submodules or dependencies.
         # Expected description format:
-        # > name: owner/repo@branch
-        # (leading >, dependency name, followed by GitHub repository, optional branch)
+        # > name: NNN
+        # (leading >, dependency name, followed by a PR number)
         # Example:
-        # > ocgcore: mercury233/ygopro-core@patch-branch
+        # > ocgcore: 123
         # Supported dependencies:
         # ocgcore, irrlicht
         import re, os
         body = os.environ.get('PR_BODY', '')
-        # Default URLs and branches for dependencies
-        ocgcore_url = 'https://github.com/Fluorohydride/ygopro-core'
-        ocgcore_branch = ''
-        irrlicht_url = 'https://github.com/mercury233/irrlicht'
-        irrlicht_branch = ''
-        # Regex patterns for parsing:
-        # REPO_RE: matches format "owner/repo" (e.g., "user/repo-name")
-        # BRANCH_RE: matches branch names with dots, slashes, and hyphens (e.g., "feature/my-branch", "v1.0")
-        REPO_RE = r'[\w][\w.-]*/[\w][\w.-]*'
-        BRANCH_RE = r'[\w][\w./-]*'
-        m = re.search(rf'(?m)^\s*>\s*ocgcore\s*:\s*({REPO_RE})(?:@({BRANCH_RE}))?\s*$', body)
+        # Default: empty means no override
+        ocgcore_ref = ''
+        irrlicht_ref = ''
+        m = re.search(r'(?m)^\s*>\s*ocgcore\s*:\s*(\d+)\s*$', body)
         if m:
-            ocgcore_url = f'https://github.com/{m.group(1)}'
-            if m.group(2):
-                ocgcore_branch = m.group(2)
-        m = re.search(rf'(?m)^\s*>\s*irrlicht\s*:\s*({REPO_RE})(?:@({BRANCH_RE}))?\s*$', body)
+            ocgcore_ref = f'refs/pull/{m.group(1)}/head'
+        m = re.search(r'(?m)^\s*>\s*irrlicht\s*:\s*(\d+)\s*$', body)
         if m:
-            irrlicht_url = f'https://github.com/{m.group(1)}'
-            if m.group(2):
-                irrlicht_branch = m.group(2)
-        # Output the parsed URLs and branches for downstream jobs
+            irrlicht_ref = f'refs/pull/{m.group(1)}/head'
+        # Output the parsed refs for downstream jobs
         with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-            f.write(f'ocgcore-url={ocgcore_url}\n')
-            f.write(f'ocgcore-branch={ocgcore_branch}\n')
-            f.write(f'irrlicht-url={irrlicht_url}\n')
-            f.write(f'irrlicht-branch={irrlicht_branch}\n')
+            f.write(f'ocgcore-ref={ocgcore_ref}\n')
+            f.write(f'irrlicht-ref={irrlicht_ref}\n')
 
-    - name: Download irrlicht
-      run: |
-        branch="${{ steps.parse-pr-override.outputs.irrlicht-branch }}"
-        if [ -n "$branch" ]; then
-          git clone --depth=1 -b "$branch" ${{ steps.parse-pr-override.outputs.irrlicht-url }} irrlicht
-        else
-          git clone --depth=1 ${{ steps.parse-pr-override.outputs.irrlicht-url }} irrlicht
-        fi
+    - name: Fetch ocgcore
+      uses: actions/checkout@v4
+      with:
+        repository: Fluorohydride/ygopro-core
+        path: ocgcore
+        ref: ${{ steps.parse-pr-override.outputs.ocgcore-ref }}
+
+    - name: Fetch Irrlicht
+      uses: actions/checkout@v4
+      with:
+        repository: mercury233/irrlicht
+        path: irrlicht
+        ref: ${{ steps.parse-pr-override.outputs.irrlicht-ref }}
 
     - name: Download lua
       id: lua
@@ -97,6 +88,7 @@ jobs:
           lua/
           miniaudio/
           irrlicht/
+          ocgcore/
 
   prepare-static-dependencies:
     runs-on: ubuntu-latest
@@ -237,21 +229,10 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: false
-
-    - name: Update submodules
-      # Here we use override URLs and branches from the prepare job, which can be set by pull request description,
-      # to make sure we are testing the correct code. Only the ocgcore submodule is required for the build.
-      shell: bash
-      run: |
-        git submodule update --init --no-fetch ocgcore
-        cd ocgcore
-        git fetch --depth=1 ${{ needs.prepare.outputs.ocgcore-url }} ${{ needs.prepare.outputs.ocgcore-branch }}
-        git checkout FETCH_HEAD
-        cd ..
-#        cd script
-#        git checkout master
-#        git pull origin master
-#        cd ..
+      # Git submodules are ignored in this CI script. The `prepare` job downloads them.
+      # For local development, use `git clone --recursive` when cloning the repository,
+      # and then check out the submodules to the `master` branch.
+      # (The submodule references recorded in this repository may be outdated).
 
     - name: Download prepare sources
       uses: actions/download-artifact@v4
@@ -375,18 +356,6 @@ jobs:
       with:
         submodules: false
 
-    - name: Update submodules
-      run: |
-        git submodule update --init --no-fetch ocgcore
-        cd ocgcore
-        git fetch --depth=1 ${{ needs.prepare.outputs.ocgcore-url }} ${{ needs.prepare.outputs.ocgcore-branch }}
-        git checkout FETCH_HEAD
-        cd ..
-#        cd script
-#        git checkout master
-#        git pull origin master
-#        cd ..
-
     - name: Download prepare sources
       uses: actions/download-artifact@v4
       with:
@@ -503,18 +472,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: false
-
-    - name: Update submodules
-      run: |
-        git submodule update --init --no-fetch ocgcore
-        cd ocgcore
-        git fetch --depth=1 ${{ needs.prepare.outputs.ocgcore-url }} ${{ needs.prepare.outputs.ocgcore-branch }}
-        git checkout FETCH_HEAD
-        cd ..
-#        cd script
-#        git checkout master
-#        git pull origin master
-#        cd ..
 
     - name: Download prepare sources
       uses: actions/download-artifact@v4

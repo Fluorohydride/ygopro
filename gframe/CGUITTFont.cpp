@@ -91,7 +91,6 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 			}
 			image_data += image_pitch;
 		}
-		image->unlock();
 		break;
 	}
 
@@ -114,7 +113,6 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 			}
 			glyph_data += bits.pitch;
 		}
-		image->unlock();
 		break;
 	}
 	default:
