@@ -312,7 +312,7 @@ jobs:
         .\premake5.exe ${{ matrix.vs }} --audio-lib=${{ matrix.audiolib }}
 
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
+      uses: microsoft/setup-msbuild@v3
 
     - name: Build solution
       shell: pwsh
