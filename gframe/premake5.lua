@@ -1,5 +1,4 @@
 include "lzma/."
-include "spmemvfs/."
 
 project "YGOPro"
     kind "WindowedApp"
@@ -8,7 +7,7 @@ project "YGOPro"
 
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore" }
-    links { "ocgcore", "clzma", "cspmemvfs", LUA_LIB_NAME, "sqlite3", "irrlicht", "freetype", "event" }
+    links { "ocgcore", "clzma", LUA_LIB_NAME, "sqlite3", "irrlicht", "freetype", "event" }
 
     if not BUILD_LUA then
         libdirs { LUA_LIB_DIR }
