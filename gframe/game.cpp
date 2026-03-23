@@ -317,7 +317,6 @@ bool Game::Initialize() {
 	wCardImg->setBackgroundColor(0xc0c0c0c0);
 	wCardImg->setVisible(false);
 	imgCard = env->addImage(irr::core::rect<irr::s32>(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT), wCardImg);
-	imgCard->setImage(imageManager.tCover[0]);
 	showingcode = 0;
 	imgCard->setScaleImage(true);
 	imgCard->setUseAlphaChannel(true);
@@ -538,12 +537,10 @@ bool Game::Initialize() {
 	wPosSelect->setVisible(false);
 	btnPSAU = env->addButton(irr::core::rect<irr::s32>(27, 35, 164, 172), wPosSelect, BUTTON_POS_AU);
 	btnPSAD = env->addButton(irr::core::rect<irr::s32>(27, 35, 164, 172), wPosSelect, BUTTON_POS_AD);
-	btnPSAD->setImage(imageManager.tButtonFacedown[0]);
 	btnFacedownImgInfo[btnPSAD] = {0, false};
 	btnPSAD->setVisible(false); // PSAD = PoSition Attack face-Down, is not allowed in the rules, so the width of wPosSelect only support 3 buttons
 	btnPSDU = env->addButton(irr::core::rect<irr::s32>(169, 35, 306, 172), wPosSelect, BUTTON_POS_DU);
 	btnPSDD = env->addButton(irr::core::rect<irr::s32>(311, 35, 448, 172), wPosSelect, BUTTON_POS_DD);
-	btnPSDD->setImage(imageManager.tButtonFacedownDefense[0]);
 	btnFacedownImgInfo[btnPSDD] = {0, true};
 	//card select
 	wCardSelect = env->addWindow(irr::core::rect<irr::s32>(320, 100, 1000, 400), false, L"");
@@ -949,13 +946,12 @@ bool Game::Initialize() {
 		col.setAlpha(224);
 		env->getSkin()->setColor((irr::gui::EGUI_DEFAULT_COLOR)i, col);
 	}
-	auto size = driver->getScreenSize();
-	if(window_size != size) { // On the first run, window_size is (0, 0), so this condition always triggers a resize
-		window_size = size;
-		xScale = window_size.Width / 1024.0;
-		yScale = window_size.Height / 640.0;
-		OnResize();
-	}
+	window_size = driver->getScreenSize();
+	xScale = window_size.Width / 1024.0;
+	yScale = window_size.Height / 640.0;
+	gMutex.lock();
+	OnResize();
+	gMutex.unlock();
 	return true;
 }
 void Game::MainLoop() {

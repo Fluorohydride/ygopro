@@ -42,7 +42,8 @@ bool ImageManager::Initial() {
 	tFieldTransparent[0] = driver->getTexture("textures/field-transparent2.png");
 	tField[1] = driver->getTexture("textures/field3.png");
 	tFieldTransparent[1] = driver->getTexture("textures/field-transparent3.png");
-	ResizeTexture();
+	// ResizeTexture will be called by Game::OnResize() during initialization,
+	// it will initialize the other textures with the correct size.
 	return true;
 }
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
