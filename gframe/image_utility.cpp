@@ -71,8 +71,8 @@ bool ImageUtility::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* de
 		return false;
 	}
 
-	void* srcPtr = src->lock();
-	void* destPtr = dest->lock();
+	void* srcPtr = src->getData();
+	void* destPtr = dest->getData();
 	if(!srcPtr || !destPtr) {
 		return false;
 	}
