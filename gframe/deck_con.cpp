@@ -1570,7 +1570,7 @@ void DeckBuilder::FilterCards() {
 		else
 			continue;
 	}
-	myswprintf(result_string, L"%d", results.size());
+	myswprintf(result_string, L"%zu", results.size());
 	if(results.size() > 7) {
 		mainGame->scrFilter->setVisible(true);
 		mainGame->scrFilter->setMax(results.size() - 7);

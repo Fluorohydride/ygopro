@@ -49,14 +49,14 @@ jobs:
             f.write(f'irrlicht-ref={irrlicht_ref}\n')
 
     - name: Fetch ocgcore
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: Fluorohydride/ygopro-core
         path: ocgcore
         ref: ${{ steps.parse-pr-override.outputs.ocgcore-ref }}
 
     - name: Fetch Irrlicht
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: mercury233/irrlicht
         path: irrlicht
@@ -64,7 +64,7 @@ jobs:
 
     - name: Download lua
       id: lua
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://www.lua.org/ftp/lua-5.4.8.tar.gz
 
@@ -81,7 +81,7 @@ jobs:
         cd ..
 
     - name: Upload sources
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: dependencies-sources
         path: |
@@ -96,7 +96,7 @@ jobs:
     steps:
     - name: Download libevent
       id: libevent
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
         filename: libevent.tar.gz
@@ -108,7 +108,7 @@ jobs:
 
     - name: Download freetype
       id: freetype
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://downloads.sourceforge.net/freetype/freetype-2.13.3.tar.gz
 
@@ -119,7 +119,7 @@ jobs:
 
     - name: Download sqlite
       id: sqlite
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://www.sqlite.org/2025/sqlite-amalgamation-3500100.zip
 
@@ -134,7 +134,7 @@ jobs:
 
     - name: Download ogg
       id: ogg
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://github.com/xiph/ogg/releases/download/v1.3.5/libogg-1.3.5.tar.gz
 
@@ -145,7 +145,7 @@ jobs:
 
     - name: Download opus
       id: opus
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
 
@@ -156,7 +156,7 @@ jobs:
 
     - name: Download opusfile
       id: opusfile
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://github.com/xiph/opusfile/releases/download/v0.12/opusfile-0.12.tar.gz
 
@@ -167,7 +167,7 @@ jobs:
 
     - name: Download vorbis
       id: vorbis
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://github.com/xiph/vorbis/releases/download/v1.3.7/libvorbis-1.3.7.tar.gz
 
@@ -177,7 +177,7 @@ jobs:
         mv libvorbis-1.3.7 miniaudio/external/vorbis
 
     - name: Upload static dependencies
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: dependencies-sources-static-link
         path: |
@@ -226,7 +226,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         submodules: false
       # Git submodules are ignored in this CI script. The `prepare` job downloads them.
@@ -235,20 +235,20 @@ jobs:
       # (The submodule references recorded in this repository may be outdated).
 
     - name: Download prepare sources
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: dependencies-sources
         path: .
 
     - name: Download static dependencies sources
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: dependencies-sources-static-link
         path: .
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta7/premake-5.0.0-beta7-windows.zip
         filename: premake5.zip
@@ -261,7 +261,7 @@ jobs:
     - name: Download irrKlang
       if: matrix.audiolib == 'irrklang'
       id: irrKlang
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://www.ambiera.at/downloads/irrKlang-32bit-1.6.0.zip
 
@@ -275,7 +275,7 @@ jobs:
     - name: Check DirectX SDK
       if: matrix.nodxsdk != true
       id: dxsdk
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         key: dxsdk
         path: DXSDK
@@ -283,7 +283,7 @@ jobs:
     - name: Download DirectX SDK
       if: matrix.nodxsdk != true && steps.dxsdk.outputs.cache-hit != 'true'
       id: dxsdk-download
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe
 
@@ -312,7 +312,7 @@ jobs:
         .\premake5.exe ${{ matrix.vs }} --audio-lib=${{ matrix.audiolib }}
 
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
+      uses: microsoft/setup-msbuild@v3
 
     - name: Build solution
       shell: pwsh
@@ -320,7 +320,7 @@ jobs:
         MSBuild.exe build\YGOPro.sln /m /p:Configuration=Release /p:Platform=${{ matrix.x64 && 'x64' || 'Win32' }}
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: YGOPro-${{ matrix.name }}
         path: |
@@ -352,19 +352,19 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         submodules: false
 
     - name: Download prepare sources
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: dependencies-sources
         path: .
 
     - name: Download static dependencies sources
       if: matrix.static-link == true
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: dependencies-sources-static-link
         path: .
@@ -377,11 +377,11 @@ jobs:
     - name: Install dependencies (dynamic link)
       if: matrix.static-link != true
       run: |
-        sudo apt-get install -y libevent-dev libfreetype6-dev libsqlite3-dev libopusfile-dev libvorbis-dev
+        sudo apt-get install -y libevent-dev libfreetype6-dev libsqlite3-dev libopusfile-dev libvorbis-dev libjpeg-dev libpng-dev
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://github.com/premake/premake-core/releases/download/v${{ matrix.premake-version }}/premake-${{ matrix.premake-version }}-linux.tar.gz
         filename: premake5.tar.gz
@@ -423,6 +423,7 @@ jobs:
       run: |
         ./premake5 gmake \
           --build-event \
+          --build-jpeg-png \
           --build-freetype \
           --build-sqlite \
           --build-opus-vorbis
@@ -434,7 +435,7 @@ jobs:
         cd ..
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: YGOPro-${{ matrix.name }}
         path: |
@@ -469,19 +470,19 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         submodules: false
 
     - name: Download prepare sources
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: dependencies-sources
         path: .
 
     - name: Download static dependencies sources
       if: matrix.static-link == true
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: dependencies-sources-static-link
         path: .
@@ -490,11 +491,11 @@ jobs:
       if: matrix.static-link != true
       run: |
         brew install opus opusfile libvorbis
-#        brew install sqlite libx11 freetype libevent
+#        brew install sqlite libx11 freetype libevent libjpeg-turbo libpng
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@v1.0.0
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
         url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta7/premake-5.0.0-beta7-macosx.tar.gz
         filename: premake5.tar.gz
@@ -528,6 +529,7 @@ jobs:
       run: |
         ./premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }} \
           --build-event \
+          --build-jpeg-png \
           --build-freetype \
           --build-sqlite \
           --build-opus-vorbis
@@ -539,7 +541,7 @@ jobs:
         cd ..
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: YGOPro-${{ matrix.name }}
         path: |

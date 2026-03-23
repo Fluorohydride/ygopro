@@ -1,5 +1,5 @@
 #include "image_manager.h"
-#include "image_resizer.h"
+#include "image_utility.h"
 #include "game.h"
 #include <thread>
 
@@ -142,7 +142,7 @@ void ImageManager::ResizeTexture() {
 		irr::video::IImage* coverImg = driver->createImageFromFile(coverFiles[i]);
 		if(coverImg) {
 			irr::video::IImage* coverResized = driver->createImage(coverImg->getColorFormat(), irr::core::dimension2d<irr::u32>(btnImgWidth, btnImgHeight));
-			resizeImage(coverImg, coverResized, mainGame->gameConf.use_image_scale_multi_thread);
+			ImageUtility::Resize(coverImg, coverResized, mainGame->gameConf.use_image_scale_multi_thread);
 			coverImg->drop();
 			char name[256];
 			mysnprintf(name, "btn_facedown/%d", i);
@@ -160,9 +160,6 @@ void ImageManager::ResizeTexture() {
 			tButtonFacedownDefense[i] = tButtonFacedownDefense[0];
 		}
 	}
-}
-void ImageManager::resizeImage(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading) {
-	imageResizer.resize(src, dest, use_threading);
 }
 /**
  * Rotate Image counter-clockwise by 90 degrees. (Defense position)
@@ -205,7 +202,7 @@ irr::video::ITexture* ImageManager::addTexture(const char* name, irr::video::IIm
 		texture = driver->addTexture(name, srcimg);
 	} else {
 		irr::video::IImage* destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
-		resizeImage(srcimg, destimg, mainGame->gameConf.use_image_scale_multi_thread);
+		ImageUtility::Resize(srcimg, destimg, mainGame->gameConf.use_image_scale_multi_thread);
 		texture = driver->addTexture(name, destimg);
 		destimg->drop();
 	}
@@ -326,7 +323,7 @@ int ImageManager::LoadThumbThread() {
 				imageManager.tThumbLoadingMutex.unlock();
 			} else {
 				irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
-				imageManager.resizeImage(img, destimg, mainGame->gameConf.use_image_scale_multi_thread);
+				ImageUtility::Resize(img, destimg, mainGame->gameConf.use_image_scale_multi_thread);
 				img->drop();
 				imageManager.tThumbLoadingMutex.lock();
 				if(imageManager.tThumbLoadingThreadRunning)
@@ -456,7 +453,7 @@ irr::video::ITexture* ImageManager::GetTextureButton(int code, bool defense) {
 		return nullptr;
 	}
 	irr::video::IImage* resized = driver->createImage(img->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
-	resizeImage(img, resized, mainGame->gameConf.use_image_scale_multi_thread);
+	ImageUtility::Resize(img, resized, mainGame->gameConf.use_image_scale_multi_thread);
 	img->drop();
 	irr::video::ITexture* texture = nullptr;
 	if(defense) {
