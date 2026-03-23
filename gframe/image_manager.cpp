@@ -147,7 +147,7 @@ void ImageManager::ResizeTexture() {
 			char name[256];
 			mysnprintf(name, "btn_facedown/%d", i);
 			tButtonFacedown[i] = driver->addTexture(name, coverResized);
-			irr::video::IImage* coverRotated = RotateImageCCW90(coverResized);
+			irr::video::IImage* coverRotated = ImageUtility::RotateImageCCW90(driver, coverResized);
 			coverResized->drop();
 			mysnprintf(name, "btn_facedown_defense/%d", i);
 			tButtonFacedownDefense[i] = driver->addTexture(name, coverRotated);
@@ -160,33 +160,6 @@ void ImageManager::ResizeTexture() {
 			tButtonFacedownDefense[i] = tButtonFacedownDefense[0];
 		}
 	}
-}
-/**
- * Rotate Image counter-clockwise by 90 degrees. (Defense position)
- * @return Image pointer. Must be dropped after use.
- */
-irr::video::IImage* ImageManager::RotateImageCCW90(irr::video::IImage* src) {
-	if(!src)
-		return nullptr;
-	irr::core::dimension2d<irr::u32> srcSize = src->getDimension();
-	irr::core::dimension2d<irr::u32> destSize(srcSize.Height, srcSize.Width);
-	irr::video::IImage* dest = driver->createImage(src->getColorFormat(), destSize);
-	void* srcData = src->lock();
-	void* destData = dest->lock();
-	if(srcData && destData) {
-		irr::u32 srcPitch = src->getPitch();
-		irr::u32 destPitch = dest->getPitch();
-		irr::u32 bytesPerPixel = src->getBytesPerPixel();
-		for(irr::u32 y = 0; y < srcSize.Height; ++y) {
-			for(irr::u32 x = 0; x < srcSize.Width; ++x) {
-				// counter-clockwise 90 degrees: dest(y, W-1-x) = src(x, y)
-				irr::u32 srcOffset = y * srcPitch + x * bytesPerPixel;
-				irr::u32 destOffset = (srcSize.Width - 1 - x) * destPitch + y * bytesPerPixel;
-				memcpy((irr::u8*)destData + destOffset, (irr::u8*)srcData + srcOffset, bytesPerPixel);
-			}
-		}
-	}
-	return dest;
 }
 /**
  * Convert image to texture, resizing if needed.
@@ -457,7 +430,7 @@ irr::video::ITexture* ImageManager::GetTextureButton(int code, bool defense) {
 	img->drop();
 	irr::video::ITexture* texture = nullptr;
 	if(defense) {
-		irr::video::IImage* rotated = RotateImageCCW90(resized);
+		irr::video::IImage* rotated = ImageUtility::RotateImageCCW90(driver, resized);
 		resized->drop();
 		if(rotated) {
 			char name[256];

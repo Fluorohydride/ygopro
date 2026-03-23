@@ -11,6 +11,7 @@ private:
 	static void imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading);
 public:
 	static void Resize(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading);
+	static irr::video::IImage* RotateImageCCW90(irr::video::IVideoDriver* driver, irr::video::IImage* src);
 };
 
 } // namespace ygo
