@@ -148,11 +148,11 @@ struct BotInfo {
 };
 
 struct FadingUnit {
-	bool signalAction;
-	bool isFadein;
-	int fadingFrame;
-	int autoFadeoutFrame;
-	irr::gui::IGUIElement* guiFading;
+	bool signalAction{};
+	bool isFadein{};
+	int fadingFrame{};
+	int autoFadeoutFrame{};
+	irr::gui::IGUIElement* guiFading{};
 	irr::core::recti fadingSize;
 	irr::core::vector2di fadingUL;
 	irr::core::vector2di fadingLR;
