@@ -1,5 +1,7 @@
 #include "image_utility.h"
 #include <cmath>
+#include <new>
+#include <setjmp.h>
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -7,7 +9,21 @@
 #define STB_IMAGE_RESIZE2_IMPLEMENTATION
 #include "stb_image_resize2.h"
 
+extern "C" {
+#include "jpeglib.h"
+}
+
 namespace ygo {
+
+struct JpegErrorMgr {
+	struct jpeg_error_mgr pub;
+	jmp_buf setjmp_buffer;
+};
+
+static void jpeg_error_exit_cb(j_common_ptr cinfo) {
+	JpegErrorMgr* err = reinterpret_cast<JpegErrorMgr*>(cinfo->err);
+	longjmp(err->setjmp_buffer, 1);
+}
 
 struct StbSamplerCache {
 	STBIR_RESIZE resize{};
@@ -188,6 +204,125 @@ void ImageUtility::Resize(irr::video::IImage* src, irr::video::IImage* dest, boo
 	if(imageScaleSTB(src, dest))
 		return;
 	imageScaleNNAA(src, dest, use_threading);
+}
+
+/**
+ * Decode a JPEG file using libjpeg with optional DCT-domain downscaling (1/2, 1/4, 1/8).
+ * When targetWidth / targetHeight are provided, the max scale denominator that keeps
+ * the decoded dimensions >= target is chosen, saving memory and CPU time.
+ * The reader is not dropped by this function.
+ * @return Image pointer. Must be dropped after use.
+ */
+irr::video::IImage* ImageUtility::LoadJpegImage(irr::video::IVideoDriver* driver, irr::io::IReadFile* reader, irr::s32 targetWidth, irr::s32 targetHeight) {
+	if(!reader) return nullptr;
+	long fileSize = reader->getSize();
+	if(fileSize <= 0) return nullptr;
+	unsigned char* input = new (std::nothrow) unsigned char[fileSize];
+	if(!input) return nullptr;
+
+	if(reader->read(input, (irr::u32)fileSize) != (irr::s32)fileSize) {
+		delete[] input;
+		return nullptr;
+	}
+
+	struct jpeg_decompress_struct cinfo;
+	JpegErrorMgr jerr;
+	cinfo.err = jpeg_std_error(&jerr.pub);
+	jerr.pub.error_exit = jpeg_error_exit_cb;
+
+	unsigned char* volatile outputData = nullptr;
+	unsigned char* volatile tempCmykRow = nullptr;
+
+	if(setjmp(jerr.setjmp_buffer)) {
+		jpeg_destroy_decompress(&cinfo);
+		delete[] input;
+		delete[] outputData;
+		delete[] tempCmykRow;
+		return nullptr;
+	}
+
+	jpeg_create_decompress(&cinfo);
+	jpeg_mem_src(&cinfo, input, (unsigned long)fileSize);
+
+	jpeg_read_header(&cinfo, TRUE);
+
+	// Choose the max scale_denom where decoded size is still >= target
+	cinfo.scale_num = 1;
+	cinfo.scale_denom = 1;
+	if(targetWidth > 0 && targetHeight > 0) {
+		const int denoms[] = {8, 4, 2};
+		for(int d : denoms) {
+			if((int)cinfo.image_width  / d >= targetWidth &&
+			   (int)cinfo.image_height / d >= targetHeight) {
+				cinfo.scale_denom = d;
+				break;
+			}
+		}
+	}
+
+	// CMYK/YCCK JPEGs cannot be converted to RGB directly by libjpeg;
+	// decode as CMYK (4 ch) and convert manually using the Adobe inverted convention.
+	const bool useCMYK = (cinfo.jpeg_color_space == JCS_CMYK ||
+	                      cinfo.jpeg_color_space == JCS_YCCK);
+	cinfo.out_color_space = useCMYK ? JCS_CMYK : JCS_RGB;
+
+	const bool fastDecoding = cinfo.scale_denom > 2;
+	cinfo.do_fancy_upsampling = fastDecoding ? FALSE : TRUE;
+	cinfo.do_block_smoothing = fastDecoding ? FALSE : TRUE;
+	cinfo.dct_method = fastDecoding ? JDCT_IFAST : JDCT_ISLOW;
+
+	jpeg_start_decompress(&cinfo);
+
+	const size_t width = cinfo.output_width;
+	const size_t height = cinfo.output_height;
+	const size_t rowspan = width * 3; // RGB bytes per pixel for output
+
+	// Ownership of outputData will be transferred to the IImage created by createImageFromData()
+	outputData = new (std::nothrow) unsigned char[rowspan * height];
+	if (!outputData) {
+		longjmp(jerr.setjmp_buffer, 1); 
+	}
+
+	if (useCMYK) {
+		tempCmykRow = new (std::nothrow) unsigned char[width * 4];
+		if (!tempCmykRow) longjmp(jerr.setjmp_buffer, 1);
+
+		unsigned char* rowArray[1];
+		rowArray[0] = tempCmykRow;
+
+		while (cinfo.output_scanline < cinfo.output_height) {
+			size_t currentLine = cinfo.output_scanline;
+			jpeg_read_scanlines(&cinfo, rowArray, 1);
+
+			// assume CMYK is in Adobe inverted convention, convert to RGB by multiplying by K
+			unsigned char* dstRow = &outputData[currentLine * rowspan];
+			for (size_t i = 0; i < width; i++) {
+				unsigned char k = tempCmykRow[i * 4 + 3];
+				dstRow[i * 3 + 0] = (tempCmykRow[i * 4 + 0] * k + 127) / 255;
+				dstRow[i * 3 + 1] = (tempCmykRow[i * 4 + 1] * k + 127) / 255;
+				dstRow[i * 3 + 2] = (tempCmykRow[i * 4 + 2] * k + 127) / 255;
+			}
+		}
+		
+		delete[] tempCmykRow;
+		tempCmykRow = nullptr;
+	} 
+	else {
+		unsigned char* rowArray[1];
+		while (cinfo.output_scanline < cinfo.output_height) {
+			rowArray[0] = &outputData[(size_t)cinfo.output_scanline * rowspan];
+			jpeg_read_scanlines(&cinfo, rowArray, 1);
+		}
+	}
+
+	jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
+	delete[] input;
+
+	return driver->createImageFromData(
+		irr::video::ECF_R8G8B8,
+		irr::core::dimension2d<irr::u32>(width, height),
+		outputData, true, true);
 }
 
 } // namespace ygo
