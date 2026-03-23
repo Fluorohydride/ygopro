@@ -65,8 +65,8 @@ struct Config {
 	//path
 	wchar_t lastcategory[256]{};
 	wchar_t lastdeck[256]{};
-	wchar_t textfont[256]{};
-	wchar_t numfont[256]{};
+	char textfont[256]{};
+	char numfont[256]{};
 	wchar_t bot_deck_path[256]{};
 	//settings
 	int chkMAutoPos{ 0 };
