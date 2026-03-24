@@ -124,7 +124,6 @@ public:
 	static constexpr uint32_t STRING_ID_TYPE = 1050;
 	static constexpr int TYPES_COUNT = 27;
 
-	static unsigned char scriptBuffer[0x100000];
 	static uint32_t CardReader(uint32_t, card_data*);
 	static unsigned char* ScriptReaderEx(const char* script_path, int* slen);
 	
