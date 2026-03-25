@@ -19,6 +19,7 @@ namespace ygo {
 constexpr int MAX_STRING_ID = 0x7ff;
 constexpr uint32_t MIN_CARD_ID = (uint32_t)(MAX_STRING_ID + 1) >> 4;
 constexpr uint32_t MAX_CARD_ID = 0x0fffffffU;
+constexpr int TEXT_LINE_SIZE = 256;
 
 using CardData = card_data;
 struct CardDataC {
