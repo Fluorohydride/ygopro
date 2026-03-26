@@ -1918,14 +1918,14 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		}
 		mainGame->gMutex.lock();
 		if(positions & 0x1) {
-			mainGame->imageLoading[mainGame->btnPSAU] = std::make_pair((int)code, false);
+			mainGame->btnImagePending[mainGame->btnPSAU] = std::make_pair((int)code, false);
 			mainGame->btnPSAU->setVisible(true);
 		} else mainGame->btnPSAU->setVisible(false);
 		if(positions & 0x2) {
 			mainGame->btnPSAD->setVisible(true);
 		} else mainGame->btnPSAD->setVisible(false);
 		if(positions & 0x4) {
-			mainGame->imageLoading[mainGame->btnPSDU] = std::make_pair((int)code, true);
+			mainGame->btnImagePending[mainGame->btnPSDU] = std::make_pair((int)code, true);
 			mainGame->btnPSDU->setVisible(true);
 		} else mainGame->btnPSDU->setVisible(false);
 		if(positions & 0x8) {

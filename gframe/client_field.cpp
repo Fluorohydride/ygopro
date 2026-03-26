@@ -440,9 +440,9 @@ void ClientField::ShowSelectCard(bool buttonok, bool is_continuous) {
 		mainGame->stCardPos[i]->enableOverrideColor(false);
 		// image
 		if(selectable_cards[i]->code)
-			mainGame->imageLoading[mainGame->btnCardSelect[i]] = std::make_pair(selectable_cards[i]->code, false);
+			mainGame->btnImagePending[mainGame->btnCardSelect[i]] = std::make_pair(selectable_cards[i]->code, false);
 		else if(select_continuous)
-			mainGame->imageLoading[mainGame->btnCardSelect[i]] = std::make_pair(selectable_cards[i]->chain_code, false);
+			mainGame->btnImagePending[mainGame->btnCardSelect[i]] = std::make_pair(selectable_cards[i]->chain_code, false);
 		else {
 			mainGame->btnCardSelect[i]->setImage(imageManager.tButtonFacedown[selectable_cards[i]->controler]);
 			mainGame->btnFacedownImgInfo[mainGame->btnCardSelect[i]] = {selectable_cards[i]->controler, false};
@@ -525,7 +525,7 @@ void ClientField::ShowChainCard() {
 	}
 	for(int i = 0; i < ct; ++i) {
 		if(selectable_cards[i]->code)
-			mainGame->imageLoading[mainGame->btnCardSelect[i]] = std::make_pair(selectable_cards[i]->code, false);
+			mainGame->btnImagePending[mainGame->btnCardSelect[i]] = std::make_pair(selectable_cards[i]->code, false);
 		else {
 			mainGame->btnCardSelect[i]->setImage(imageManager.tButtonFacedown[selectable_cards[i]->controler]);
 			mainGame->btnFacedownImgInfo[mainGame->btnCardSelect[i]] = {selectable_cards[i]->controler, false};
@@ -574,7 +574,7 @@ void ClientField::ShowLocationCard() {
 	for(int i = 0; i < ct; ++i) {
 		mainGame->stDisplayPos[i]->enableOverrideColor(false);
 		if(display_cards[i]->code)
-			mainGame->imageLoading[mainGame->btnCardDisplay[i]] = std::make_pair(display_cards[i]->code, false);
+			mainGame->btnImagePending[mainGame->btnCardDisplay[i]] = std::make_pair(display_cards[i]->code, false);
 		else {
 			mainGame->btnCardDisplay[i]->setImage(imageManager.tButtonFacedown[display_cards[i]->controler]);
 			mainGame->btnFacedownImgInfo[mainGame->btnCardDisplay[i]] = {display_cards[i]->controler, false};

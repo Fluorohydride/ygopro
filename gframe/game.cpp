@@ -1736,7 +1736,7 @@ void Game::ClearTextures() {
 		btnCardSelect[i]->setImage(nullptr);
 		btnCardDisplay[i]->setImage(nullptr);
 	}
-	imageLoading.clear();
+	btnImagePending.clear();
 	btnCardImgInfo.clear();
 	btnFacedownImgInfo.clear();
 	btnFacedownImgInfo[btnPSAD] = {0, false};
@@ -1869,7 +1869,7 @@ void Game::OnResize() {
 	for(auto& it : btnCardImgInfo) {
 		auto button = it.first;
 		std::pair<int, bool>& imgInfo = it.second;
-		imageLoading[button] = imgInfo;
+		btnImagePending[button] = imgInfo;
 	}
 	for(auto& it : btnFacedownImgInfo) {
 		auto button = it.first;

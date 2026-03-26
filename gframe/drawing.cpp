@@ -771,16 +771,15 @@ void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 	}
 }
 void Game::DrawGUI() {
-	while (imageLoading.size()) {
-		// textures must be added in the main thread which handle OpenGL context
-		auto mit = imageLoading.cbegin();
+	while(btnImagePending.size()) {
+		auto mit = btnImagePending.cbegin();
 		auto button = mit->first;
 		int code = mit->second.first;
 		bool rotated = mit->second.second;
 		button->setImage(imageManager.GetTextureButton(code, rotated));
 		btnCardImgInfo[button] = {code, rotated};
 		btnFacedownImgInfo.erase(button);
-		imageLoading.erase(mit);
+		btnImagePending.erase(mit);
 	}
 	for(auto fit = fadingList.begin(); fit != fadingList.end();) {
 		auto fthis = fit++;

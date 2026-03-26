@@ -319,7 +319,9 @@ public:
 	irr::gui::CGUITTFont* numFont{};
 	irr::gui::CGUITTFont* adFont{};
 	irr::gui::CGUITTFont* lpcFont{};
-	std::unordered_map<irr::gui::IGUIButton*, std::pair<int, bool>> imageLoading;
+	// textures must be added in the main thread which handle OpenGL context,
+	// {card_code, rotated} written in network thread, loaded in main thread's DrawGUI
+	std::unordered_map<irr::gui::IGUIButton*, std::pair<int, bool>> btnImagePending;
 	// persistent tracking for image refresh on resize:
 	// {card_code, rotated} for buttons showing a card image from GetTextureButton
 	std::unordered_map<irr::gui::IGUIButton*, std::pair<int, bool>> btnCardImgInfo;
