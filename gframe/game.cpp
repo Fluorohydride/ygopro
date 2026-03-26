@@ -2061,18 +2061,20 @@ void Game::ResizeChatInputWindow() {
 	ebChatInput->setRelativePosition(irr::core::recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 }
 void Game::ResizePosSelectButtons() {
-	wPosSelect->setRelativePosition(Resize(425, 210, 900, 380, 0, 0, 0, 19)); // 19: Top border + Titlebar height
 	irr::s32 imgHeight = CARD_IMG_HEIGHT * 0.5f * mainGame->yScale + 0.5f;
 	irr::s32 gap = 5 * xScale + 0.5f;
 	irr::s32 btnPosWidth = imgHeight + gap * 2; // Square buttons, width = height
+	irr::s32 stride = btnPosWidth + gap;
 	int totalWidth = 0, visCount = 0;
 	if(btnPSAU->isVisible()) { totalWidth += btnPosWidth; visCount++; }
 	if(btnPSAD->isVisible()) { totalWidth += btnPosWidth; visCount++; }
 	if(btnPSDU->isVisible()) { totalWidth += btnPosWidth; visCount++; }
 	if(btnPSDD->isVisible()) { totalWidth += btnPosWidth; visCount++; }
 	totalWidth += (visCount - 1) * gap;
-	irr::s32 posX = (wPosSelect->getRelativePosition().getWidth() - totalWidth) / 2;
 	irr::s32 posY = 19 + 16 * yScale;
+	irr::s32 windowWidth = 30 * xScale * 2 + stride * 3 - gap;
+	irr::s32 windowHeight = posY + 155 * yScale;
+	irr::s32 posX = (windowWidth - totalWidth) / 2;
 	if(btnPSAU->isVisible()) {
 		btnPSAU->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
 		posX += btnPosWidth + gap;
@@ -2089,6 +2091,7 @@ void Game::ResizePosSelectButtons() {
 		btnPSDD->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
 		posX += btnPosWidth + gap;
 	}
+	wPosSelect->setRelativePosition(irr::core::recti(663 * xScale - windowWidth / 2, 303 * yScale - windowHeight / 2, 663 * xScale + windowWidth / 2, 303 * yScale + windowHeight / 2));
 }
 void Game::ResizeCardSelectButtons(irr::gui::IGUIWindow* window,
 								   irr::gui::IGUIStaticText** labels,
@@ -2126,7 +2129,7 @@ void Game::ResizeCardSelectButtons(irr::gui::IGUIWindow* window,
 	buttonOK->setRelativePosition(irr::core::recti(startpos + barWidth / 2 - btnOKWidth / 2, barTop + barHeight + gap * 2, startpos + barWidth / 2 + btnOKWidth / 2, barTop + barHeight + gap * 2 + btnOKHeight));
 	irr::s32 windowWidth = 30 * xScale * 2 + stride * 5 - gap;
 	irr::s32 windowHeight = top + labelHeight + btnHeight + barHeight + btnOKHeight + gap * 6;
-	window->setRelativePosition(irr::core::recti(380 * xScale, 130 * yScale, 380 * xScale + windowWidth, 130 * yScale + windowHeight));
+	window->setRelativePosition(irr::core::recti(663 * xScale - windowWidth / 2, 263 * yScale - windowHeight / 2, 663 * xScale + windowWidth / 2, 263 * yScale + windowHeight / 2));
 }
 irr::core::recti Game::Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2) {
 	x = x * xScale;
