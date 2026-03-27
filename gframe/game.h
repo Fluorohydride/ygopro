@@ -266,8 +266,8 @@ public:
 	bool hideChat{};
 	int chatTiming[8]{};
 	int chatType[8]{};
-	unsigned short linePatternD3D{};
-	unsigned short linePatternGL{ 0x0f0f };
+	unsigned short linePattern{ 0 };
+	unsigned short stippleMask{ 0x0f0f };
 	int waitFrame{};
 	int signalFrame{};
 	int actionParam{};
