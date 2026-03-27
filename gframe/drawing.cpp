@@ -8,12 +8,9 @@
 
 namespace ygo {
 
-void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver,
-	irr::video::ITexture* texture,
-	const irr::core::rect<irr::s32>& sourceRect,
-	const irr::core::position2d<irr::s32> corners[4],
-	bool useAlphaChannel, irr::video::SColor color)
-{
+void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver, irr::video::ITexture* texture,
+						   const irr::core::rect<irr::s32>& sourceRect, const irr::core::position2d<irr::s32> corners[4],
+						   bool useAlphaChannel, irr::video::SColor color) {
 	if (!texture)
 		return;
 
