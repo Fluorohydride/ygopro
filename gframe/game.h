@@ -27,6 +27,13 @@ namespace ygo {
 constexpr int DEFAULT_DUEL_RULE = CURRENT_RULE;
 constexpr int CONFIG_LINE_SIZE = 1024;
 
+constexpr int GAME_WINDOW_WIDTH = 1024;
+constexpr int GAME_WINDOW_HEIGHT = 640;
+constexpr int CARD_IMG_WIDTH = 177;
+constexpr int CARD_IMG_HEIGHT = 254;
+constexpr int CARD_THUMB_WIDTH = 44;
+constexpr int CARD_THUMB_HEIGHT = 64;
+
 template<size_t N>
 bool IsExtension(const wchar_t* filename, const wchar_t(&extension)[N]) {
 	auto flen = std::wcslen(filename);
@@ -100,8 +107,8 @@ struct Config {
 	double music_volume{ 0.5 };
 	int music_mode{ 1 };
 	bool window_maximized{ false };
-	int window_width{ 1024 };
-	int window_height{ 640 };
+	int window_width{ GAME_WINDOW_WIDTH };
+	int window_height{ GAME_WINDOW_HEIGHT };
 	bool resize_popup_menu{ false };
 };
 
@@ -644,11 +651,6 @@ extern Game* mainGame;
 }
 
 #define SIZE_QUERY_BUFFER	0x4000
-
-#define CARD_IMG_WIDTH		177
-#define CARD_IMG_HEIGHT		254
-#define CARD_THUMB_WIDTH	44
-#define CARD_THUMB_HEIGHT	64
 
 #define UEVENT_EXIT			0x1
 #define UEVENT_TOWINDOW		0x2
