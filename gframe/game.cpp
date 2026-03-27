@@ -11,6 +11,10 @@
 #include "netserver.h"
 #include "single_mode.h"
 #include <thread>
+#include <chrono>
+#ifdef _WIN32
+#include <timeapi.h>
+#endif
 
 namespace ygo {
 
@@ -978,6 +982,14 @@ void Game::MainLoop() {
 	timer->setTime(0);
 	int fps = 0;
 	int cur_time = 0;
+#ifdef _WIN32
+	HANDLE hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+	bool useHighResTimer = (hWaitTimer != NULL);
+	if(!useHighResTimer)
+		timeBeginPeriod(1);
+#endif
+	auto lastFrameTime = std::chrono::steady_clock::now();
+	constexpr auto targetFrameDuration = std::chrono::microseconds(16667);
 	while(device->run()) {
 		auto size = driver->getScreenSize();
 		if(window_size != size) {
@@ -1037,12 +1049,10 @@ void Game::MainLoop() {
 			}
 		}
 		driver->endScene();
-		if(closeSignal.Wait(1))
+		if(closeSignal.TryWait())
 			CloseDuelWindow();
 		fps++;
 		cur_time = timer->getTime();
-		if(cur_time < fps * 17 - 20)
-			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		if(cur_time >= 1000) {
 			myswprintf(cap, L"YGOPro FPS: %d", fps);
 			device->setWindowCaption(cap);
@@ -1053,7 +1063,46 @@ void Game::MainLoop() {
 				if(dInfo.time_left[dInfo.time_player])
 					dInfo.time_left[dInfo.time_player]--;
 		}
+		auto targetTime = lastFrameTime + targetFrameDuration;
+		auto now = std::chrono::steady_clock::now();
+		if(now < targetTime) {
+#ifdef _WIN32
+			if(useHighResTimer)
+			{
+				auto remaining = std::chrono::duration_cast<std::chrono::microseconds>(targetTime - now);
+				if(remaining.count() > 1500) {
+					LARGE_INTEGER dueTime;
+					dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
+					if(SetWaitableTimer(hWaitTimer, &dueTime, 0, NULL, NULL, FALSE))
+						WaitForSingleObject(hWaitTimer, INFINITE);
+				}
+			}
+			else
+#endif
+			{
+				auto sleepTime = targetTime - now - std::chrono::milliseconds(2);
+				if(sleepTime > std::chrono::milliseconds(0)) {
+					std::this_thread::sleep_for(sleepTime);
+				}
+			}
+			// Spin-wait for sub-millisecond precision.
+			// If the window is inactive, sleep 1ms per iteration to avoid wasting CPU.
+			while(std::chrono::steady_clock::now() < targetTime) {
+				if(!device->isWindowActive())
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
+		}
+		lastFrameTime = targetTime;
+		now = std::chrono::steady_clock::now();
+		if(now - targetTime > targetFrameDuration)
+			lastFrameTime = now;
 	}
+#ifdef _WIN32
+	if(useHighResTimer)
+		CloseHandle(hWaitTimer);
+	else
+		timeEndPeriod(1);
+#endif
 	DuelClient::StopClient(true);
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);

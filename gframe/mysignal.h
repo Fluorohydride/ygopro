@@ -38,6 +38,14 @@ public:
 		_state = false;
 		return res;
 	}
+	bool TryWait() {
+		if(_nowait)
+			return false;
+		std::unique_lock<std::mutex> lock(_mutex);
+		bool res = _state;
+		_state = false;
+		return res;
+	}
 	void SetNoWait(bool nowait) {
 		_nowait = nowait;
 	}

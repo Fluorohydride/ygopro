@@ -76,7 +76,7 @@ project "YGOPro"
     filter "system:windows"
         entrypoint "mainCRTStartup"
         files "ygopro.rc"
-        links { "ws2_32", "iphlpapi" }
+        links { "ws2_32", "iphlpapi", "winmm" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrKlang" }
             if IRRKLANG_PRO then
