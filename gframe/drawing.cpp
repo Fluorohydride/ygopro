@@ -34,7 +34,7 @@ void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver,
 		uvCorner[x] = irr::core::vector2df(uvCorner[x].X * invW, uvCorner[x].Y * invH);
 
 	irr::video::S3DVertex vertices[4];
-	irr::u16 indices[6] = { 0, 1, 2, 3, 2, 1 };
+	static const irr::u16 indices[6] = { 0, 1, 2, 3, 2, 1 };
 	const irr::f32 screenWidth = (irr::f32)driver->getScreenSize().Width;
 	const irr::f32 screenHeight = (irr::f32)driver->getScreenSize().Height;
 	for (int x = 0; x < 4; x++)
@@ -81,15 +81,17 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 		driver->setMaterial(matManager.mOutLine);
 		if(stipple) {
 			if(linePattern < 15) {
-				driver->draw3DLine(vec[0].Pos, vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePattern + 1) / 15.0);
-				driver->draw3DLine(vec[1].Pos, vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePattern + 1) / 15.0);
-				driver->draw3DLine(vec[3].Pos, vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePattern + 1) / 15.0);
-				driver->draw3DLine(vec[2].Pos, vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePattern + 1) / 15.0);
+				float progress = (linePattern + 1) / 15.0f;
+				driver->draw3DLine(vec[0].Pos, vec[0].Pos + (vec[1].Pos - vec[0].Pos) * progress);
+				driver->draw3DLine(vec[1].Pos, vec[1].Pos + (vec[3].Pos - vec[1].Pos) * progress);
+				driver->draw3DLine(vec[3].Pos, vec[3].Pos + (vec[2].Pos - vec[3].Pos) * progress);
+				driver->draw3DLine(vec[2].Pos, vec[2].Pos + (vec[0].Pos - vec[2].Pos) * progress);
 			} else {
-				driver->draw3DLine(vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePattern - 14) / 15.0, vec[1].Pos);
-				driver->draw3DLine(vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePattern - 14) / 15.0, vec[3].Pos);
-				driver->draw3DLine(vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePattern - 14) / 15.0, vec[2].Pos);
-				driver->draw3DLine(vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePattern - 14) / 15.0, vec[0].Pos);
+				float progress = (linePattern - 14) / 15.0f;
+				driver->draw3DLine(vec[0].Pos + (vec[1].Pos - vec[0].Pos) * progress, vec[1].Pos);
+				driver->draw3DLine(vec[1].Pos + (vec[3].Pos - vec[1].Pos) * progress, vec[3].Pos);
+				driver->draw3DLine(vec[3].Pos + (vec[2].Pos - vec[3].Pos) * progress, vec[2].Pos);
+				driver->draw3DLine(vec[2].Pos + (vec[0].Pos - vec[2].Pos) * progress, vec[0].Pos);
 			}
 		} else {
 			driver->draw3DLine(vec[0].Pos, vec[1].Pos);
@@ -101,22 +103,28 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 }
 void Game::DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color) {
 	irr::core::recti pos = element->getAbsolutePosition();
-	float x1 = pos.UpperLeftCorner.X;
-	float x2 = pos.LowerRightCorner.X;
-	float y1 = pos.UpperLeftCorner.Y;
-	float y2 = pos.LowerRightCorner.Y;
-	float w = pos.getWidth();
-	float h = pos.getHeight();
+	irr::s32 x1 = pos.UpperLeftCorner.X;
+	irr::s32 x2 = pos.LowerRightCorner.X;
+	irr::s32 y1 = pos.UpperLeftCorner.Y;
+	irr::s32 y2 = pos.LowerRightCorner.Y;
+	irr::s32 w = pos.getWidth();
+	irr::s32 h = pos.getHeight();
 	if(linePattern < 15) {
-		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y1 - 1 - width, x1 + (w * (linePattern + 1) / 15.0) + 1 + width, y1 - 1));
-		driver->draw2DRectangle(color, irr::core::recti(x2 - (w * (linePattern + 1) / 15.0) - 1 - width, y2 + 1, x2 + 1 + width, y2 + 1 + width));
-		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y1 - 1 - width, x1 - 1, y2 - (h * (linePattern + 1) / 15.0) + 1 + width));
-		driver->draw2DRectangle(color, irr::core::recti(x2 + 1, y1 + (h * (linePattern + 1) / 15.0) - 1 - width, x2 + 1 + width, y2 + 1 + width));
+		float progress = (linePattern + 1) / 15.0f;
+		irr::s32 wp = w * progress;
+		irr::s32 hp = h * progress;
+		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y1 - 1 - width, x1 + wp + 1 + width, y1 - 1));
+		driver->draw2DRectangle(color, irr::core::recti(x2 - wp - 1 - width, y2 + 1, x2 + 1 + width, y2 + 1 + width));
+		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y1 - 1 - width, x1 - 1, y2 - hp + 1 + width));
+		driver->draw2DRectangle(color, irr::core::recti(x2 + 1, y1 + hp - 1 - width, x2 + 1 + width, y2 + 1 + width));
 	} else {
-		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width + (w * (linePattern - 14) / 15.0), y1 - 1 - width, x2 + 1 + width, y1 - 1));
-		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y2 + 1, x2 - (w * (linePattern - 14) / 15.0) + 1 + width, y2 + 1 + width));
-		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y2 - (h * (linePattern - 14) / 15.0) - 1 - width, x1 - 1, y2 + 1 + width));
-		driver->draw2DRectangle(color, irr::core::recti(x2 + 1, y1 - 1 - width, x2 + 1 + width, y1 + (h * (linePattern - 14) / 15.0) + 1 + width));
+		float progress = (linePattern - 14) / 15.0f;
+		irr::s32 wp = w * progress;
+		irr::s32 hp = h * progress;
+		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width + wp, y1 - 1 - width, x2 + 1 + width, y1 - 1));
+		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y2 + 1, x2 - wp + 1 + width, y2 + 1 + width));
+		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y2 - hp - 1 - width, x1 - 1, y2 + 1 + width));
+		driver->draw2DRectangle(color, irr::core::recti(x2 + 1, y1 - 1 - width, x2 + 1 + width, y1 + hp + 1 + width));
 	}
 }
 void Game::DrawBackGround() {
