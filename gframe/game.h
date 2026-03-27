@@ -190,6 +190,7 @@ public:
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
+	void SetImageButtonDrawing(irr::gui::IGUIElement* element, bool draw = true);
 	void WaitFrameSignal(int frame);
 	void DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList* lflist, bool drag = false);
 	void DrawDeckBd();
