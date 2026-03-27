@@ -9,7 +9,7 @@
 namespace ygo {
 
 void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver, irr::video::ITexture* texture,
-						   const irr::core::rect<irr::s32>& sourceRect, const irr::core::position2d<irr::s32> corners[4],
+						   const irr::core::recti& sourceRect, const irr::core::vector2di corners[4],
 						   bool useAlphaChannel, irr::video::SColor color) {
 	if (!texture)
 		return;
@@ -1121,7 +1121,7 @@ void Game::SetImageButtonDrawing(irr::gui::IGUIElement* element, bool draw) {
 		for(int i = 0; i < 5; ++i)
 			btnCardSelect[i]->setDrawImage(draw);
 	}
-	if(element== wCardDisplay) {
+	if(element == wCardDisplay) {
 		for(int i = 0; i < 5; ++i)
 			btnCardDisplay[i]->setDrawImage(draw);
 	}
