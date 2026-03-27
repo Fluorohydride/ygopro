@@ -19,6 +19,8 @@ void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver, irr::video::ITextur
 	driver->setTransform(irr::video::ETS_PROJECTION, irr::core::matrix4());
 	irr::core::matrix4 oldViewMat = driver->getTransform(irr::video::ETS_VIEW);
 	driver->setTransform(irr::video::ETS_VIEW, irr::core::matrix4());
+	irr::core::matrix4 oldWorldMat = driver->getTransform(irr::video::ETS_WORLD);
+	driver->setTransform(irr::video::ETS_WORLD, irr::core::matrix4());
 
 	irr::core::vector2df uvCorner[4];
 	uvCorner[0] = irr::core::vector2df((irr::f32)sourceRect.UpperLeftCorner.X, (irr::f32)sourceRect.UpperLeftCorner.Y);
@@ -53,6 +55,7 @@ void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver, irr::video::ITextur
 
 	driver->setTransform(irr::video::ETS_PROJECTION, oldProjMat);
 	driver->setTransform(irr::video::ETS_VIEW, oldViewMat);
+	driver->setTransform(irr::video::ETS_WORLD, oldWorldMat);
 }
 
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::video::SColor color) {
