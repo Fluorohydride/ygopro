@@ -983,7 +983,7 @@ void Game::MainLoop() {
 	int fps = 0;
 	int cur_time = 0;
 #ifdef _WIN32
-	HANDLE hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+	HANDLE hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
 	bool useHighResTimer = (hWaitTimer != NULL);
 	if(!useHighResTimer)
 		timeBeginPeriod(1);
