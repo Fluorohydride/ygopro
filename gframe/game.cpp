@@ -16,7 +16,8 @@
 #include <timeapi.h>
 #endif
 
-#if defined(__SSE2__) || defined( __x86_64__ ) || defined( _M_X64 ) || defined(__x86_64) || defined(_M_AMD64)
+#if defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || \
+	defined(__x86_64__) || defined(_M_X64) || defined(__x86_64) || defined(_M_AMD64)
 	#include <immintrin.h>
 	#define CPU_PAUSE() _mm_pause()
 #elif defined(_M_ARM) || defined(_M_ARM64) || defined(__arm__) || defined(__aarch64__)
