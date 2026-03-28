@@ -69,8 +69,8 @@ void Game::DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::vid
 	}
 }
 void Game::DrawBackGround() {
-	static irr::u32 selFieldAlpha = 255;
-	static irr::s32 selFieldDAlpha = -10;
+	static int selFieldAlpha = 255;
+	static int selFieldDAlpha = -10;
 //	matrix4 im = irr::core::IdentityMatrix;
 //	im.setTranslation(irr::core::vector3df(0, 0, -0.01f));
 //	driver->setTransform(irr::video::ETS_WORLD, im);
@@ -212,7 +212,7 @@ void Game::DrawBackGround() {
 			selFieldDAlpha = -10;
 		}
 		matManager.mSelField.AmbientColor = 0xffffffff;
-		matManager.mSelField.DiffuseColor = selFieldAlpha << 24;
+		matManager.mSelField.DiffuseColor = (irr::u32)selFieldAlpha << 24;
 		driver->setMaterial(matManager.mSelField);
 		driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
 	}
