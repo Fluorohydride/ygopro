@@ -839,10 +839,11 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 4: {
-			matManager.c2d[0] = ((irr::u32)showcarddif << 24) | 0xffffff;
-			matManager.c2d[1] = ((irr::u32)showcarddif << 24) | 0xffffff;
-			matManager.c2d[2] = ((irr::u32)showcarddif << 24) | 0xffffff;
-			matManager.c2d[3] = ((irr::u32)showcarddif << 24) | 0xffffff;
+			irr::u32 acolor = ((irr::u32)showcarddif << 24) | 0xffffff;
+			matManager.c2d[0] = acolor;
+			matManager.c2d[1] = acolor;
+			matManager.c2d[2] = acolor;
+			matManager.c2d[3] = acolor;
 			driver->draw2DImage(imageManager.GetTexture(showcardcode, true), ResizeCardHint(574, 150, 574 + CARD_IMG_WIDTH, 150 + CARD_IMG_HEIGHT),
 								ResizeFit(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 255)
@@ -850,10 +851,11 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 5: {
-			matManager.c2d[0] = ((irr::u32)showcarddif << 25) | 0xffffff;
-			matManager.c2d[1] = ((irr::u32)showcarddif << 25) | 0xffffff;
-			matManager.c2d[2] = ((irr::u32)showcarddif << 25) | 0xffffff;
-			matManager.c2d[3] = ((irr::u32)showcarddif << 25) | 0xffffff;
+			irr::u32 acolor = ((irr::u32)showcarddif << 25) | 0xffffff;
+			matManager.c2d[0] = acolor;
+			matManager.c2d[1] = acolor;
+			matManager.c2d[2] = acolor;
+			matManager.c2d[3] = acolor;
 			driver->draw2DImage(imageManager.GetTexture(showcardcode, true), ResizeCardMid(662 - showcarddif * 0.69685f, 277 - showcarddif, 662 + showcarddif * 0.69685f, 277 + showcarddif, midx, midy),
 								ResizeFit(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 127)
