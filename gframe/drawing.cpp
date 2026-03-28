@@ -538,28 +538,28 @@ void Game::DrawMisc() {
 			auto partialLP = dInfo.lp[0] % maxLP;
 			auto bgColorPos = (layerCount - 1) % 5;
 			auto fgColorPos = layerCount % 5; 
-			auto lpOffset0 = maxBarWidth * partialLP / maxLP + 0.5f;
-			driver->draw2DImage(imageManager.tLPBar, Resize(333 + lpOffset0, 12, 625, 28), irr::core::recti(0, bgColorPos * 16, 16, (bgColorPos + 1) * 16), 0, 0, true);
+			int barWidth = maxBarWidth * partialLP / maxLP;
+			driver->draw2DImage(imageManager.tLPBar, Resize(333 + barWidth, 12, 625, 28), irr::core::recti(0, bgColorPos * 16, 16, (bgColorPos + 1) * 16), 0, 0, true);
 			if(partialLP > 0) {
-				driver->draw2DImage(imageManager.tLPBar, Resize(333, 12, 333 + lpOffset0, 28), irr::core::recti(0, fgColorPos * 16, 16, (fgColorPos + 1) * 16), 0, 0, true);
+				driver->draw2DImage(imageManager.tLPBar, Resize(333, 12, 333 + barWidth, 28), irr::core::recti(0, fgColorPos * 16, 16, (fgColorPos + 1) * 16), 0, 0, true);
 			}
 		} else {
-			auto lpOffset0 = maxBarWidth * dInfo.lp[0] / maxLP + 0.5f;
-			driver->draw2DImage(imageManager.tLPBar, Resize(333, 12, 333 + lpOffset0, 28), irr::core::recti(0, 0, 16, 16), 0, 0, true);
+			int barWidth = maxBarWidth * dInfo.lp[0] / maxLP;
+			driver->draw2DImage(imageManager.tLPBar, Resize(333, 12, 333 + barWidth, 28), irr::core::recti(0, 0, 16, 16), 0, 0, true);
 		}
 		if(dInfo.lp[1] > maxLP) {
 			auto layerCount = dInfo.lp[1] / maxLP;
 			auto partialLP = dInfo.lp[1] % maxLP;
 			auto bgColorPos = (layerCount - 1) % 5;
 			auto fgColorPos = layerCount % 5;
-			auto lpOffset1 = maxBarWidth * partialLP / maxLP + 0.5f;
-			driver->draw2DImage(imageManager.tLPBar, Resize(695, 12, 987 - lpOffset1, 28), irr::core::recti(0, bgColorPos * 16, 16, (bgColorPos + 1) * 16), 0, 0, true);
+			int barWidth = maxBarWidth * partialLP / maxLP;
+			driver->draw2DImage(imageManager.tLPBar, Resize(695, 12, 987 - barWidth, 28), irr::core::recti(0, bgColorPos * 16, 16, (bgColorPos + 1) * 16), 0, 0, true);
 			if(partialLP > 0) {
-				driver->draw2DImage(imageManager.tLPBar, Resize(987 - lpOffset1, 12, 987, 28), irr::core::recti(0, fgColorPos * 16, 16, (fgColorPos + 1) * 16), 0, 0, true);
+				driver->draw2DImage(imageManager.tLPBar, Resize(987 - barWidth, 12, 987, 28), irr::core::recti(0, fgColorPos * 16, 16, (fgColorPos + 1) * 16), 0, 0, true);
 			}
 		} else {
-			auto lpOffset1 = maxBarWidth * dInfo.lp[1] / maxLP + 0.5f;
-			driver->draw2DImage(imageManager.tLPBar, Resize(987 - lpOffset1, 12, 987, 28), irr::core::recti(0, 0, 16, 16), 0, 0, true);
+			int barWidth = maxBarWidth * dInfo.lp[1] / maxLP;
+			driver->draw2DImage(imageManager.tLPBar, Resize(987 - barWidth, 12, 987, 28), irr::core::recti(0, 0, 16, 16), 0, 0, true);
 		}
 	}
 	auto tLPFrameRect = irr::core::recti(0, 0, imageManager.tLPFrame->getOriginalSize().Width, imageManager.tLPFrame->getOriginalSize().Height);
