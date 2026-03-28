@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "event_handler.h"
 #include "client_field.h"
 #include "network.h"
