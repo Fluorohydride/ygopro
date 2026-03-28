@@ -19,6 +19,7 @@ namespace ygo {
 constexpr int MAX_STRING_ID = 0x7ff;
 constexpr uint32_t MIN_CARD_ID = (uint32_t)(MAX_STRING_ID + 1) >> 4;
 constexpr uint32_t MAX_CARD_ID = 0x0fffffffU;
+constexpr int TEXT_LINE_SIZE = 256;
 
 using CardData = card_data;
 struct CardDataC {
@@ -34,6 +35,9 @@ struct CardDataC {
 	uint32_t lscale{};
 	uint32_t rscale{};
 	uint32_t link_marker{};
+	uint32_t rule_code{};
+
+	// extra columns
 	uint32_t ot{};
 	uint32_t category{};
 
@@ -47,6 +51,14 @@ struct CardDataC {
 			}
 		}
 		return false;
+	}
+
+	uint32_t get_original_code() const {
+		return alias ? alias : code;
+	}
+
+	uint32_t get_duel_code() const {
+		return rule_code ? rule_code : get_original_code();
 	}
 };
 constexpr int DESC_COUNT = 16;
@@ -112,7 +124,6 @@ public:
 	static constexpr uint32_t STRING_ID_TYPE = 1050;
 	static constexpr int TYPES_COUNT = 27;
 
-	static unsigned char scriptBuffer[0x100000];
 	static uint32_t CardReader(uint32_t, card_data*);
 	static unsigned char* ScriptReaderEx(const char* script_path, int* slen);
 	
@@ -121,10 +132,10 @@ public:
 	//read by fread
 	static unsigned char* ReadScriptFromFile(const char* script_name, int* slen);
 	
-	static bool deck_sort_lv(code_pointer l1, code_pointer l2);
-	static bool deck_sort_atk(code_pointer l1, code_pointer l2);
-	static bool deck_sort_def(code_pointer l1, code_pointer l2);
-	static bool deck_sort_name(code_pointer l1, code_pointer l2);
+	static bool deck_sort_lv(const CardDataC* l1, const CardDataC* l2);
+	static bool deck_sort_atk(const CardDataC* l1, const CardDataC* l2);
+	static bool deck_sort_def(const CardDataC* l1, const CardDataC* l2);
+	static bool deck_sort_name(const CardDataC* l1, const CardDataC* l2);
 
 private:
 	const wchar_t* GetMapString(const wstring_map& table, uint32_t code) const;
