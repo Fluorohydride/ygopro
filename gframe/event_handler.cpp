@@ -1536,7 +1536,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				} else {
 					if(mainGame->Resize(327, 8, 630, 51).isPointInside(mousepos))
 						mplayer = 0;
-					else if(mainGame->Resize(689, 8, 991, 51).isPointInside(mousepos))
+					else if(mainGame->Resize(689, 8, 992, 51).isPointInside(mousepos))
 						mplayer = 1;
 				}
 			}
