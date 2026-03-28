@@ -16,6 +16,20 @@
 #include <timeapi.h>
 #endif
 
+#if defined(__SSE2__) || defined( __x86_64__ ) || defined( _M_X64 ) || defined(__x86_64) || defined(_M_AMD64)
+	#include <immintrin.h>
+	#define CPU_PAUSE() _mm_pause()
+#elif defined(_M_ARM) || defined(_M_ARM64) || defined(__arm__) || defined(__aarch64__)
+    #if defined(_MSC_VER)
+        #include <intrin.h>
+        #define CPU_PAUSE() __yield()
+    #else
+        #define CPU_PAUSE() __asm__ __volatile__("yield" ::: "memory")
+    #endif
+#else
+	#define CPU_PAUSE() ((void)0)
+#endif
+
 namespace ygo {
 
 Game* mainGame;
@@ -1088,7 +1102,9 @@ void Game::MainLoop() {
 			// Spin-wait for sub-millisecond precision.
 			// If the window is inactive, sleep 1ms per iteration to avoid wasting CPU.
 			while(std::chrono::steady_clock::now() < targetTime) {
-				if(!device->isWindowActive())
+				if(device->isWindowActive())
+					CPU_PAUSE();
+				else
 					std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			}
 		}
