@@ -69,8 +69,8 @@ void Game::DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::vid
 	}
 }
 void Game::DrawBackGround() {
-	static int selFieldAlpha = 255;
-	static int selFieldDAlpha = -10;
+	static irr::u32 selFieldAlpha = 255;
+	static irr::s32 selFieldDAlpha = -10;
 //	matrix4 im = irr::core::IdentityMatrix;
 //	im.setTranslation(irr::core::vector3df(0, 0, -0.01f));
 //	driver->setTransform(irr::video::ETS_WORLD, im);
@@ -839,10 +839,10 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 4: {
-			matManager.c2d[0] = (showcarddif << 24) | 0xffffff;
-			matManager.c2d[1] = (showcarddif << 24) | 0xffffff;
-			matManager.c2d[2] = (showcarddif << 24) | 0xffffff;
-			matManager.c2d[3] = (showcarddif << 24) | 0xffffff;
+			matManager.c2d[0] = ((irr::u32)showcarddif << 24) | 0xffffff;
+			matManager.c2d[1] = ((irr::u32)showcarddif << 24) | 0xffffff;
+			matManager.c2d[2] = ((irr::u32)showcarddif << 24) | 0xffffff;
+			matManager.c2d[3] = ((irr::u32)showcarddif << 24) | 0xffffff;
 			driver->draw2DImage(imageManager.GetTexture(showcardcode, true), ResizeCardHint(574, 150, 574 + CARD_IMG_WIDTH, 150 + CARD_IMG_HEIGHT),
 								ResizeFit(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 255)
@@ -850,10 +850,10 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 5: {
-			matManager.c2d[0] = (showcarddif << 25) | 0xffffff;
-			matManager.c2d[1] = (showcarddif << 25) | 0xffffff;
-			matManager.c2d[2] = (showcarddif << 25) | 0xffffff;
-			matManager.c2d[3] = (showcarddif << 25) | 0xffffff;
+			matManager.c2d[0] = ((irr::u32)showcarddif << 25) | 0xffffff;
+			matManager.c2d[1] = ((irr::u32)showcarddif << 25) | 0xffffff;
+			matManager.c2d[2] = ((irr::u32)showcarddif << 25) | 0xffffff;
+			matManager.c2d[3] = ((irr::u32)showcarddif << 25) | 0xffffff;
 			driver->draw2DImage(imageManager.GetTexture(showcardcode, true), ResizeCardMid(662 - showcarddif * 0.69685f, 277 - showcarddif, 662 + showcarddif * 0.69685f, 277 + showcarddif, midx, midy),
 								ResizeFit(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 127)
@@ -952,7 +952,7 @@ void Game::DrawSpec() {
 			}
 			auto pos = lpcFont->getDimension(lstr);
 			if(showcardp < 10) {
-				int alpha = (showcardp * 25) << 24;
+				irr::u32 alpha = (irr::u32)(showcardp * 25) << 24;
 				DrawShadowText(lpcFont, lstr, ResizePhaseHint(660 - (9 - showcardp) * 40, 290, 960, 370, pos.Width), Resize(-1, -1, 0, 0), alpha | 0xffffff, alpha);
 			} else if(showcardp < showcarddif) {
 				DrawShadowText(lpcFont, lstr, ResizePhaseHint(660, 290, 960, 370, pos.Width), Resize(-1, -1, 0, 0), 0xffffffff);
@@ -964,7 +964,7 @@ void Game::DrawSpec() {
 					DrawShadowText(guiFont, dInfo.vic_string, ResizeWin(640 - w / 2, 320, 690 + w / 2, 340), Resize(-2, -1, 0, 0), 0xffffffff, 0xff000000, true, true, 0);
 				}
 			} else if(showcardp < showcarddif + 10) {
-				int alpha = ((showcarddif + 10 - showcardp) * 25) << 24;
+				irr::u32 alpha = (irr::u32)((showcarddif + 10 - showcardp) * 25) << 24;
 				DrawShadowText(lpcFont, lstr, ResizePhaseHint(660 + (showcardp - showcarddif) * 40, 290, 960, 370, pos.Width), Resize(-1, -1, 0, 0), alpha | 0xffffff, alpha);
 			}
 			showcardp++;
