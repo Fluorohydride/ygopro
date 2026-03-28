@@ -282,7 +282,7 @@ public:
 	int lpframe{};
 	int lpd{};
 	int lpplayer{};
-	int lpccolor{};
+	irr::u32 lpccolor{};
 	std::wstring lpcstring;
 	bool always_chain{};
 	bool ignore_chain{};
