@@ -1392,6 +1392,8 @@ void Game::LoadConfig() {
 			gameConf.auto_save_replay = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "draw_single_chain")) {
 			gameConf.draw_single_chain = std::strtol(valbuf, nullptr, 10);
+		} else if(!std::strcmp(strbuf, "solid_selection_line")) {
+			gameConf.solid_selection_line = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "hide_player_name")) {
 			gameConf.hide_player_name = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "prefer_expansion_script")) {
@@ -1513,6 +1515,7 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	std::fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
 	std::fprintf(fp, "draw_single_chain = %d\n", gameConf.draw_single_chain);
+	std::fprintf(fp, "solid_selection_line = %d\n", gameConf.solid_selection_line);
 	std::fprintf(fp, "hide_player_name = %d\n", gameConf.hide_player_name);
 	std::fprintf(fp, "prefer_expansion_script = %d\n", gameConf.prefer_expansion_script);
 	std::fprintf(fp, "window_maximized = %d\n", (gameConf.window_maximized ? 1 : 0));
