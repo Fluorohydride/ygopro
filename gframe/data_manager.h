@@ -109,6 +109,8 @@ public:
 	std::wstring FormatType(unsigned int type) const;
 	std::wstring FormatSetName(const uint16_t setcode[]) const;
 	std::wstring FormatLinkMarker(unsigned int link_marker) const;
+	static wchar_t NormalizeChar(wchar_t c);
+	static bool CardNameContains(const wchar_t* haystack, const wchar_t* needle);
 
 	wstring_map _counterStrings;
 	wstring_map _victoryStrings;

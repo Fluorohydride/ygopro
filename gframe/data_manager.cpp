@@ -427,6 +427,52 @@ std::wstring DataManager::FormatLinkMarker(unsigned int link_marker) const {
 		buffer.append(L"[\u2198]");
 	return buffer;
 }
+wchar_t DataManager::NormalizeChar(wchar_t c) {
+	/*
+	// Convert all symbols and punctuations to space.
+	if (c != 0 && c < 128 && !isalnum(c)) {
+		return ' ';
+	}
+	*/
+	// Convert latin characters to uppercase to ignore case.
+	if (c < 128 && isalpha(c)) {
+		return toupper(c);
+	}
+	// Normalize some accented characters.
+	if (c >= 232 && c <= 235) {
+		return 'E';
+	}
+	if (c >= 238 && c <= 239) {
+		return 'I';
+	}
+	return c;
+}
+bool DataManager::CardNameContains(const wchar_t* haystack, const wchar_t* needle) {
+	if(!needle[0]) {
+		return true;
+	}
+	if(!haystack) {
+		return false;
+	}
+	int i = 0;
+	int j = 0;
+	while(haystack[i]) {
+		wchar_t ca = NormalizeChar(haystack[i]);
+		wchar_t cb = NormalizeChar(needle[j]);
+		if(ca == cb) {
+			j++;
+			if(!needle[j]) {
+				return true;
+			}
+		} else {
+			i -= j;
+			j = 0;
+		}
+		i++;
+	}
+	return false;
+}
+
 uint32_t DataManager::CardReader(uint32_t code, card_data* pData) {
 	if (!dataManager.GetData(code, pData))
 		pData->clear();
