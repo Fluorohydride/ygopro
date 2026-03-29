@@ -459,6 +459,13 @@ wchar_t DataManager::NormalizeChar(wchar_t c) {
 	}
 	return c;
 }
+void DataManager::NormalizeString(const wchar_t* src, wchar_t* dst, size_t dst_size) {
+	size_t i = 0;
+	for(; src[i] && i < dst_size - 1; ++i) {
+		dst[i] = NormalizeChar(src[i]);
+	}
+	dst[i] = 0;
+}
 bool DataManager::CardNameContains(const wchar_t* haystack, const wchar_t* needle) {
 	if(!needle[0]) {
 		return true;
@@ -466,14 +473,18 @@ bool DataManager::CardNameContains(const wchar_t* haystack, const wchar_t* needl
 	if(!haystack) {
 		return false;
 	}
+	wchar_t normalized_haystack[TEXT_LINE_SIZE]{};
+	wchar_t normalized_needle[TEXT_LINE_SIZE]{};
+	NormalizeString(haystack, normalized_haystack, TEXT_LINE_SIZE);
+	NormalizeString(needle, normalized_needle, TEXT_LINE_SIZE);
 	int i = 0;
 	int j = 0;
-	while(haystack[i]) {
-		wchar_t ca = NormalizeChar(haystack[i]);
-		wchar_t cb = NormalizeChar(needle[j]);
+	while(normalized_haystack[i]) {
+		wchar_t ca = normalized_haystack[i];
+		wchar_t cb = normalized_needle[j];
 		if(ca == cb) {
 			j++;
-			if(!needle[j]) {
+			if(!normalized_needle[j]) {
 				return true;
 			}
 		} else {
