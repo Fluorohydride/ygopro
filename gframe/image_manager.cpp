@@ -100,8 +100,8 @@ void ImageManager::ResizeTexture() {
 	float mul = (mainGame->xScale > mainGame->yScale) ? mainGame->yScale : mainGame->xScale;
 	irr::s32 imgWidthFit = CARD_IMG_WIDTH * mul;
 	irr::s32 imgHeightFit = CARD_IMG_HEIGHT * mul;
-	irr::s32 bgWidth = 1024 * mainGame->xScale;
-	irr::s32 bgHeight = 640 * mainGame->yScale;
+	irr::s32 bgWidth = GAME_WINDOW_WIDTH * mainGame->xScale;
+	irr::s32 bgHeight = GAME_WINDOW_HEIGHT * mainGame->yScale;
 	float btnScale = 0.5f * mainGame->yScale;
 	irr::s32 btnImgWidth = CARD_IMG_WIDTH * btnScale;
 	irr::s32 btnImgHeight = CARD_IMG_HEIGHT * btnScale;
