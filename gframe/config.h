@@ -8,9 +8,7 @@
 
 #ifdef _WIN32
 
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
+#define NOMINMAX 1
 #include <WinSock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
