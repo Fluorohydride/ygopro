@@ -879,7 +879,7 @@ bool Game::Initialize() {
 	btnReplayUndo = env->addButton(irr::core::rect<irr::s32>(5, 80, 85, 100), wReplayControl, BUTTON_REPLAY_UNDO, dataManager.GetSysString(1360));
 	btnReplayExit = env->addButton(irr::core::rect<irr::s32>(5, 105, 85, 125), wReplayControl, BUTTON_REPLAY_EXIT, dataManager.GetSysString(1347));
 	//chat
-	wChat = env->addWindow(irr::core::rect<irr::s32>(307, 615, 1024, 640), false, L"");
+	wChat = env->addWindow(irr::core::rect<irr::s32>(307, 615, GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT), false, L"");
 	wChat->getCloseButton()->setVisible(false);
 	wChat->setDraggable(false);
 	wChat->setDrawTitlebar(false);
@@ -957,8 +957,8 @@ bool Game::Initialize() {
 	auto size = driver->getScreenSize();
 	if(window_size != size) { // On the first run, window_size is (0, 0), so this condition always triggers a resize
 		window_size = size;
-		xScale = window_size.Width / 1024.0;
-		yScale = window_size.Height / 640.0;
+		xScale = window_size.Width / static_cast<float>(GAME_WINDOW_WIDTH);
+		yScale = window_size.Height / static_cast<float>(GAME_WINDOW_HEIGHT);
 		OnResize();
 	}
 	return true;
@@ -982,12 +982,12 @@ void Game::MainLoop() {
 		auto size = driver->getScreenSize();
 		if(window_size != size) {
 			window_size = size;
-			xScale = window_size.Width / 1024.0;
-			yScale = window_size.Height / 640.0;
+			xScale = window_size.Width / static_cast<float>(GAME_WINDOW_WIDTH);
+			yScale = window_size.Height / static_cast<float>(GAME_WINDOW_HEIGHT);
 			OnResize();
 		}
-		linePatternD3D = (linePatternD3D + 1) % 30;
-		linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
+		linePattern = (linePattern + 1) % 30;
+		stippleMask = (stippleMask << 1) | (stippleMask >> 15);
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
@@ -1818,7 +1818,7 @@ int Game::ChatLocalPlayer(int player) {
 	if(dInfo.isStarted || is_siding) {
 		if(dInfo.isInDuel)
 			// when in duel
-			player = mainGame->dInfo.isFirst ? player : OppositePlayer(player);
+			player = dInfo.isFirst ? player : OppositePlayer(player);
 		else {
 			// when changing side or waiting tp result
 			auto selftype_boundary = dInfo.isTag ? 2 : 1;
@@ -2155,8 +2155,8 @@ void Game::SetWindowsScale(float scale) {
 	GetWindowRect(hWnd, &rcWindow);
 	GetClientRect(hWnd, &rcClient);
 	MoveWindow(hWnd, rcWindow.left, rcWindow.top,
-		(rcWindow.right - rcWindow.left) - rcClient.right + 1024 * scale,
-		(rcWindow.bottom - rcWindow.top) - rcClient.bottom + 640 * scale,
+		(rcWindow.right - rcWindow.left) - rcClient.right + GAME_WINDOW_WIDTH * scale,
+		(rcWindow.bottom - rcWindow.top) - rcClient.bottom + GAME_WINDOW_HEIGHT * scale,
 		true);
 #endif
 }

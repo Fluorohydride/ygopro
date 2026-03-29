@@ -83,7 +83,7 @@ static unsigned int checkAvail(unsigned int ot, unsigned int avail) {
 	return DECKERROR_NOTAVAIL;
 }
 unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int rule) {
-	std::unordered_map<int, int> ccount;
+	std::unordered_map<uint32_t, int> ccount;
 	// rule
 	if(deck.main.size() < DECK_MIN_SIZE || deck.main.size() > DECK_MAX_SIZE)
 		return (DECKERROR_MAINCOUNT << 28) | (unsigned)deck.main.size();
@@ -100,49 +100,49 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 	if (rule >= 0 && rule < (int)(sizeof rule_map / sizeof rule_map[0]))
 		avail = rule_map[rule];
 	for (auto& cit : deck.main) {
-		auto gameruleDeckError = checkAvail(cit->second.ot, avail);
+		auto gameruleDeckError = checkAvail(cit->ot, avail);
 		if(gameruleDeckError)
-			return (gameruleDeckError << 28) | cit->first;
-		if (cit->second.type & (TYPES_EXTRA_DECK | TYPE_TOKEN))
+			return (gameruleDeckError << 28) | cit->code;
+		if (cit->type & (TYPES_EXTRA_DECK | TYPE_TOKEN))
 			return (DECKERROR_MAINCOUNT << 28);
-		auto code = cit->second.get_duel_code();
+		auto code = cit->get_duel_code();
 		ccount[code]++;
 		int dc = ccount[code];
 		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) | cit->first;
+			return (DECKERROR_CARDCOUNT << 28) | cit->code;
 		auto it = list.find(code);
 		if(it != list.end() && dc > it->second)
-			return (DECKERROR_LFLIST << 28) | cit->first;
+			return (DECKERROR_LFLIST << 28) | cit->code;
 	}
 	for (auto& cit : deck.extra) {
-		auto gameruleDeckError = checkAvail(cit->second.ot, avail);
+		auto gameruleDeckError = checkAvail(cit->ot, avail);
 		if(gameruleDeckError)
-			return (gameruleDeckError << 28) | cit->first;
-		if (!(cit->second.type & TYPES_EXTRA_DECK) || cit->second.type & TYPE_TOKEN)
+			return (gameruleDeckError << 28) | cit->code;
+		if (!(cit->type & TYPES_EXTRA_DECK) || cit->type & TYPE_TOKEN)
 			return (DECKERROR_EXTRACOUNT << 28);
-		auto code = cit->second.get_duel_code();
+		auto code = cit->get_duel_code();
 		ccount[code]++;
 		int dc = ccount[code];
 		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) | cit->first;
+			return (DECKERROR_CARDCOUNT << 28) | cit->code;
 		auto it = list.find(code);
 		if(it != list.end() && dc > it->second)
-			return (DECKERROR_LFLIST << 28) | cit->first;
+			return (DECKERROR_LFLIST << 28) | cit->code;
 	}
 	for (auto& cit : deck.side) {
-		auto gameruleDeckError = checkAvail(cit->second.ot, avail);
+		auto gameruleDeckError = checkAvail(cit->ot, avail);
 		if(gameruleDeckError)
-			return (gameruleDeckError << 28) | cit->first;
-		if (cit->second.type & TYPE_TOKEN)
+			return (gameruleDeckError << 28) | cit->code;
+		if (cit->type & TYPE_TOKEN)
 			return (DECKERROR_SIDECOUNT << 28);
-		auto code = cit->second.get_duel_code();
+		auto code = cit->get_duel_code();
 		ccount[code]++;
 		int dc = ccount[code];
 		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) | cit->first;
+			return (DECKERROR_CARDCOUNT << 28) | cit->code;
 		auto it = list.find(code);
 		if(it != list.end() && dc > it->second)
-			return (DECKERROR_LFLIST << 28) | cit->first;
+			return (DECKERROR_LFLIST << 28) | cit->code;
 	}
 	return 0;
 }
@@ -163,16 +163,16 @@ uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec
 			continue;
 		}
 		if(is_packlist) {
-			deck.main.push_back(it);
+			deck.main.push_back(&cd);
 			continue;
 		}
 		if (cd.type & TYPES_EXTRA_DECK) {
 			if (deck.extra.size() < EXTRA_MAX_SIZE)
-				deck.extra.push_back(it);
+				deck.extra.push_back(&cd);
 		}
 		else {
 			if (deck.main.size() < DECK_MAX_SIZE)
-				deck.main.push_back(it);
+				deck.main.push_back(&cd);
 		}
 	}
 	for(int i = 0; i < sidec; ++i) {
@@ -188,7 +188,7 @@ uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec
 			continue;
 		}
 		if(deck.side.size() < SIDE_MAX_SIZE)
-			deck.side.push_back(it);
+			deck.side.push_back(&cd);
 	}
 	return errorcode;
 }
@@ -220,22 +220,22 @@ uint32_t DeckManager::LoadDeckFromStream(Deck& deck, std::istringstream& deckStr
 bool DeckManager::LoadSide(Deck& deck, uint32_t dbuf[], int mainc, int sidec) {
 	std::unordered_map<uint32_t, int> pcount;
 	std::unordered_map<uint32_t, int> ncount;
-	for(size_t i = 0; i < deck.main.size(); ++i)
-		pcount[deck.main[i]->first]++;
-	for(size_t i = 0; i < deck.extra.size(); ++i)
-		pcount[deck.extra[i]->first]++;
-	for(size_t i = 0; i < deck.side.size(); ++i)
-		pcount[deck.side[i]->first]++;
+	for(auto card : deck.main)
+		pcount[card->code]++;
+	for(auto card : deck.extra)
+		pcount[card->code]++;
+	for(auto card : deck.side)
+		pcount[card->code]++;
 	Deck ndeck;
 	LoadDeck(ndeck, dbuf, mainc, sidec);
 	if (ndeck.main.size() != deck.main.size() || ndeck.extra.size() != deck.extra.size() || ndeck.side.size() != deck.side.size())
 		return false;
-	for(size_t i = 0; i < ndeck.main.size(); ++i)
-		ncount[ndeck.main[i]->first]++;
-	for(size_t i = 0; i < ndeck.extra.size(); ++i)
-		ncount[ndeck.extra[i]->first]++;
-	for(size_t i = 0; i < ndeck.side.size(); ++i)
-		ncount[ndeck.side[i]->first]++;
+	for(auto card : ndeck.main)
+		ncount[card->code]++;
+	for(auto card : ndeck.extra)
+		ncount[card->code]++;
+	for(auto card : ndeck.side)
+		ncount[card->code]++;
 	for (auto& cdit : ncount)
 		if (cdit.second != pcount[cdit.first])
 			return false;
@@ -328,13 +328,13 @@ void DeckManager::SaveDeck(const Deck& deck, std::stringstream& deckStream) {
 	deckStream << "#created by ..." << std::endl;
 	deckStream << "#main" << std::endl;
 	for(size_t i = 0; i < deck.main.size(); ++i)
-		deckStream << deck.main[i]->first << std::endl;
+		deckStream << deck.main[i]->code << std::endl;
 	deckStream << "#extra" << std::endl;
 	for(size_t i = 0; i < deck.extra.size(); ++i)
-		deckStream << deck.extra[i]->first << std::endl;
+		deckStream << deck.extra[i]->code << std::endl;
 	deckStream << "!side" << std::endl;
 	for(size_t i = 0; i < deck.side.size(); ++i)
-		deckStream << deck.side[i]->first << std::endl;
+		deckStream << deck.side[i]->code << std::endl;
 }
 bool DeckManager::SaveDeck(const Deck& deck, const wchar_t* file) {
 	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))

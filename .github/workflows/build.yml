@@ -75,7 +75,7 @@ jobs:
 
     - name: Download miniaudio
       run: |
-        git clone --depth=1 -b 0.11.23 https://github.com/mackron/miniaudio
+        git clone --depth=1 -b 0.11.25 https://github.com/mackron/miniaudio
         cd miniaudio
         cp extras/miniaudio_split/miniaudio.* .
         cd ..
@@ -110,23 +110,23 @@ jobs:
       id: freetype
       uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
-        url: https://downloads.sourceforge.net/freetype/freetype-2.13.3.tar.gz
+        url: https://downloads.sourceforge.net/freetype/freetype-2.14.2.tar.gz
 
     - name: Extract freetype
       run: |
         tar xf ${{ steps.freetype.outputs.filepath }}
-        mv freetype-2.13.3 freetype
+        mv freetype-2.14.2 freetype
 
     - name: Download sqlite
       id: sqlite
       uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
-        url: https://www.sqlite.org/2025/sqlite-amalgamation-3500100.zip
+        url: https://www.sqlite.org/2026/sqlite-amalgamation-3510300.zip
 
     - name: Extract sqlite
       run: |
         7z x ${{ steps.sqlite.outputs.filepath }}
-        mv sqlite-amalgamation-3500100 sqlite3
+        mv sqlite-amalgamation-3510300 sqlite3
 
     - name: Create miniaudio external directory
       run: |
@@ -136,12 +136,12 @@ jobs:
       id: ogg
       uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
       with:
-        url: https://github.com/xiph/ogg/releases/download/v1.3.5/libogg-1.3.5.tar.gz
+        url: https://github.com/xiph/ogg/releases/download/v1.3.6/libogg-1.3.6.tar.gz
 
     - name: Extract ogg
       run: |
         tar xf ${{ steps.ogg.outputs.filepath }}
-        mv libogg-1.3.5 miniaudio/external/ogg
+        mv libogg-1.3.6 miniaudio/external/ogg
 
     - name: Download opus
       id: opus
