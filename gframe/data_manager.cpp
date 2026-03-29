@@ -428,22 +428,34 @@ std::wstring DataManager::FormatLinkMarker(unsigned int link_marker) const {
 	return buffer;
 }
 wchar_t DataManager::NormalizeChar(wchar_t c) {
-	/*
-	// Convert all symbols and punctuations to space.
-	if (c != 0 && c < 128 && !isalnum(c)) {
-		return ' ';
+	// Convert Alphabet characters to uppercase to ignore case.
+	if (c >= 0x0061 && c <= 0x007A) {
+		return c - 0x0020;
 	}
-	*/
-	// Convert latin characters to uppercase to ignore case.
-	if (c < 128 && isalpha(c)) {
-		return toupper(c);
+	// Normalize accented characters (Latin-1 Supplement).
+	if ((c >= 0x00C0 && c <= 0x00C5) || (c >= 0x00E0 && c <= 0x00E5)) {
+		return L'A';
 	}
-	// Normalize some accented characters.
-	if (c >= 232 && c <= 235) {
-		return 'E';
+	if (c == 0x00C7 || c == 0x00E7) {
+		return L'C';
 	}
-	if (c >= 238 && c <= 239) {
-		return 'I';
+	if ((c >= 0x00C8 && c <= 0x00CB) || (c >= 0x00E8 && c <= 0x00EB)) {
+		return L'E';
+	}
+	if ((c >= 0x00CC && c <= 0x00CF) || (c >= 0x00EC && c <= 0x00EF)) {
+		return L'I';
+	}
+	if (c == 0x00D1 || c == 0x00F1) {
+		return L'N';
+	}
+	if ((c >= 0x00D2 && c <= 0x00D6) || (c >= 0x00F2 && c <= 0x00F6)) {
+		return L'O';
+	}
+	if ((c >= 0x00D9 && c <= 0x00DC) || (c >= 0x00F9 && c <= 0x00FC)) {
+		return L'U';
+	}
+	if (c == 0x00DD || c == 0x00FD || c == 0x00FF) {
+		return L'Y';
 	}
 	return c;
 }
