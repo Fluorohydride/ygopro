@@ -993,10 +993,8 @@ void Game::MainLoop() {
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
-	irr::ITimer* timer = device->getTimer();
-	timer->setTime(0);
 	int fps = 0;
-	int cur_time = 0;
+	auto lastFpsTime = std::chrono::steady_clock::now();
 #ifdef _WIN32
 	HANDLE hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
 	bool useHighResTimer = (hWaitTimer != NULL);
@@ -1067,17 +1065,6 @@ void Game::MainLoop() {
 		if(closeSignal.TryWait())
 			CloseDuelWindow();
 		fps++;
-		cur_time = timer->getTime();
-		if(cur_time >= 1000) {
-			myswprintf(cap, L"YGOPro FPS: %d", fps);
-			device->setWindowCaption(cap);
-			fps = 0;
-			cur_time -= 1000;
-			timer->setTime(0);
-			if(dInfo.time_player == 0 || dInfo.time_player == 1)
-				if(dInfo.time_left[dInfo.time_player])
-					dInfo.time_left[dInfo.time_player]--;
-		}
 		auto targetTime = lastFrameTime + targetFrameDuration;
 		auto now = std::chrono::steady_clock::now();
 		if(now < targetTime) {
@@ -1113,6 +1100,17 @@ void Game::MainLoop() {
 		now = std::chrono::steady_clock::now();
 		if(now - targetTime > targetFrameDuration)
 			lastFrameTime = now;
+		if(now - lastFpsTime >= std::chrono::milliseconds(1000)) {
+			myswprintf(cap, L"YGOPro FPS: %d", fps);
+			device->setWindowCaption(cap);
+			fps = 0;
+			lastFpsTime += std::chrono::milliseconds(1000);
+			if(now - lastFpsTime > std::chrono::milliseconds(1000))
+				lastFpsTime = now;
+			if(dInfo.time_player == 0 || dInfo.time_player == 1)
+				if(dInfo.time_left[dInfo.time_player])
+					dInfo.time_left[dInfo.time_player]--;
+		}
 	}
 #ifdef _WIN32
 	if(useHighResTimer)
