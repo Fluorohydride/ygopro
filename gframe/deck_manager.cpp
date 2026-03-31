@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "deck_manager.h"
 #include "game.h"
 #include "myfilesystem.h"

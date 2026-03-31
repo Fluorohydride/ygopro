@@ -578,36 +578,44 @@ void Game::DrawMisc() {
 		driver->draw2DRectangle(0xa0000000, Resize(327, 8, 630, 51));
 		driver->draw2DRectangleOutline(Resize(327, 8, 630, 51), 0xffff8080);
 	} else {
-		driver->draw2DRectangle(0xa0000000, Resize(689, 8, 991, 51));
-		driver->draw2DRectangleOutline(Resize(689, 8, 991, 51), 0xffff8080);
+		driver->draw2DRectangle(0xa0000000, Resize(689, 8, 992, 51));
+		driver->draw2DRectangleOutline(Resize(689, 8, 992, 51), 0xffff8080);
 	}
-	driver->draw2DImage(imageManager.tLPFrame, Resize(330, 10, 629, 30), irr::core::recti(0, 0, 200, 20), 0, 0, true);
-	driver->draw2DImage(imageManager.tLPFrame, Resize(691, 10, 990, 30), irr::core::recti(0, 0, 200, 20), 0, 0, true);
 	if(dInfo.start_lp) {
+		constexpr float maxBarWidth = 292.0f;
 		auto maxLP = dInfo.isTag ? dInfo.start_lp / 2 : dInfo.start_lp;
-		if(dInfo.lp[0] >= maxLP) {
+		if(dInfo.lp[0] > maxLP) {
 			auto layerCount = dInfo.lp[0] / maxLP;
 			auto partialLP = dInfo.lp[0] % maxLP;
 			auto bgColorPos = (layerCount - 1) % 5;
 			auto fgColorPos = layerCount % 5; 
-			driver->draw2DImage(imageManager.tLPBar, Resize(335 + 290 * partialLP / maxLP, 12, 625, 28), irr::core::recti(0, bgColorPos * 16, 16, (bgColorPos + 1) * 16), 0, 0, true);
+			int barWidth = maxBarWidth * partialLP / maxLP;
+			driver->draw2DImage(imageManager.tLPBar, Resize(333 + barWidth, 12, 625, 28), irr::core::recti(0, bgColorPos * 16, 16, (bgColorPos + 1) * 16), 0, 0, true);
 			if(partialLP > 0) {
-				driver->draw2DImage(imageManager.tLPBar, Resize(335, 12, 335 + 290 * partialLP / maxLP, 28), irr::core::recti(0, fgColorPos * 16, 16, (fgColorPos + 1) * 16), 0, 0, true);
+				driver->draw2DImage(imageManager.tLPBar, Resize(333, 12, 333 + barWidth, 28), irr::core::recti(0, fgColorPos * 16, 16, (fgColorPos + 1) * 16), 0, 0, true);
 			}
+		} else {
+			int barWidth = maxBarWidth * dInfo.lp[0] / maxLP;
+			driver->draw2DImage(imageManager.tLPBar, Resize(333, 12, 333 + barWidth, 28), irr::core::recti(0, 0, 16, 16), 0, 0, true);
 		}
-		else driver->draw2DImage(imageManager.tLPBar, Resize(335, 12, 335 + 290 * dInfo.lp[0] / maxLP, 28), irr::core::recti(0, 0, 16, 16), 0, 0, true);
-		if(dInfo.lp[1] >= maxLP) {
+		if(dInfo.lp[1] > maxLP) {
 			auto layerCount = dInfo.lp[1] / maxLP;
 			auto partialLP = dInfo.lp[1] % maxLP;
 			auto bgColorPos = (layerCount - 1) % 5;
 			auto fgColorPos = layerCount % 5;
-			driver->draw2DImage(imageManager.tLPBar, Resize(696, 12, 986 - 290 * partialLP / maxLP, 28), irr::core::recti(0, bgColorPos * 16, 16, (bgColorPos + 1) * 16), 0, 0, true);
+			int barWidth = maxBarWidth * partialLP / maxLP;
+			driver->draw2DImage(imageManager.tLPBar, Resize(695, 12, 987 - barWidth, 28), irr::core::recti(0, bgColorPos * 16, 16, (bgColorPos + 1) * 16), 0, 0, true);
 			if(partialLP > 0) {
-				driver->draw2DImage(imageManager.tLPBar, Resize(986 - 290 * partialLP / maxLP, 12, 986, 28), irr::core::recti(0, fgColorPos * 16, 16, (fgColorPos + 1) * 16), 0, 0, true);
+				driver->draw2DImage(imageManager.tLPBar, Resize(987 - barWidth, 12, 987, 28), irr::core::recti(0, fgColorPos * 16, 16, (fgColorPos + 1) * 16), 0, 0, true);
 			}
+		} else {
+			int barWidth = maxBarWidth * dInfo.lp[1] / maxLP;
+			driver->draw2DImage(imageManager.tLPBar, Resize(987 - barWidth, 12, 987, 28), irr::core::recti(0, 0, 16, 16), 0, 0, true);
 		}
-		else driver->draw2DImage(imageManager.tLPBar, Resize(986 - 290 * dInfo.lp[1] / maxLP, 12, 986, 28), irr::core::recti(0, 0, 16, 16), 0, 0, true);
 	}
+	auto tLPFrameRect = irr::core::recti(0, 0, imageManager.tLPFrame->getOriginalSize().Width, imageManager.tLPFrame->getOriginalSize().Height);
+	driver->draw2DImage(imageManager.tLPFrame, Resize(329, 10, 629, 30), tLPFrameRect, 0, 0, true);
+	driver->draw2DImage(imageManager.tLPFrame, Resize(691, 10, 991, 30), tLPFrameRect, 0, 0, true);
 	if(lpframe) {
 		dInfo.lp[lpplayer] -= lpd;
 		myswprintf(dInfo.strLP[lpplayer], L"%d", dInfo.lp[lpplayer]);
@@ -631,7 +639,7 @@ void Game::DrawMisc() {
 	DrawShadowText(numFont, dInfo.strLP[1], Resize(691, 12, 992, 30), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true, false, 0);
 
 	if(!gameConf.hide_player_name) {
-		irr::core::recti p1size = Resize(335, 31, 629, 50);
+		irr::core::recti p1size = Resize(334, 31, 624, 50);
 		irr::core::recti p2size = Resize(986, 31, 986, 50);
 		if(!dInfo.isTag || !dInfo.tag_player[0])
 			textFont->drawUstring(dInfo.hostname, p1size, 0xffffffff, false, false, 0);
