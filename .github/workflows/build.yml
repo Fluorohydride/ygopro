@@ -55,12 +55,12 @@ jobs:
         path: ocgcore
         ref: ${{ steps.parse-pr-override.outputs.ocgcore-ref }}
 
-    - name: Fetch Irrlicht (temporary)
+    - name: Fetch Irrlicht
       uses: actions/checkout@v6
       with:
-        repository: mercury233/irrlicht-svn
+        repository: mercury233/irrlicht
         path: irrlicht
-        ref: mercury
+        ref: ${{ steps.parse-pr-override.outputs.irrlicht-ref }}
 
     - name: Download lua
       id: lua
