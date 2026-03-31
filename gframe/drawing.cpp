@@ -46,7 +46,7 @@ void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver, irr::video::ITextur
 	}
 
 	material.Lighting = false;
-	material.ZWriteEnable = irr::video::EZW_OFF;;
+	material.ZWriteEnable = irr::video::EZW_OFF;
 	material.TextureLayer[0].Texture = texture;
 	material.MaterialType = useAlphaChannel ?
 		irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL : irr::video::EMT_SOLID;
