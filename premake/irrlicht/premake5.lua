@@ -8,7 +8,7 @@ project "irrlicht"
 
     defines {
         "_IRR_STATIC_LIB_",
-        "NO_IRR_USE_NON_SYSTEM_BZLIB_",
+        "NO_IRR_LINUX_X11_VIDMODE_",
         "NO_IRR_COMPILE_WITH_BZIP2_",
         "NO_IRR_COMPILE_WITH_LZMA_",
         "NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_",
