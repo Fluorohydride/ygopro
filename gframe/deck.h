@@ -3,9 +3,10 @@
 
 #include <vector>
 #include <cstdint>
-#include "data_manager.h"
 
 namespace ygo {
+
+struct CardDataC;
 
 struct Deck {
 	std::vector<const CardDataC*> main;
