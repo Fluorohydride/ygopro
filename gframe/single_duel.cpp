@@ -1575,7 +1575,7 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 		NetServer::ReSendToPlayer(*pit);
 }
 uint32_t SingleDuel::MessageHandler(intptr_t fduel, uint32_t type) {
-	if(!mainGame->enable_log)
+	if(!mainGame->gameConf.enable_log)
 		return 0;
 	char msgbuf[1024];
 	get_log_message(fduel, msgbuf);

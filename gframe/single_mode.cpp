@@ -842,7 +842,7 @@ void SingleMode::SinglePlayReload() {
 	ReloadLocation(1, LOCATION_REMOVED, flag, queryBuffer);
 }
 uint32_t SingleMode::MessageHandler(intptr_t fduel, uint32_t type) {
-	if(!mainGame->enable_log)
+	if(!mainGame->gameConf.enable_log)
 		return 0;
 	char msgbuf[1024];
 	get_log_message(fduel, msgbuf);

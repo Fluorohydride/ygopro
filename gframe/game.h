@@ -54,6 +54,7 @@ struct Config {
 	bool use_image_load_background_thread{ true };
 #endif
 	unsigned short antialias{ 0 };
+	unsigned int enable_log{ 0x3 };
 	unsigned short serverport{ 7911 };
 	unsigned char textfontsize{ 14 };
 	wchar_t lasthost[100]{};
@@ -293,7 +294,6 @@ public:
 
 	bool is_building{};
 	bool is_siding{};
-	unsigned int enable_log{ 0x3 };
 	bool exit_on_return{ false };
 	bool open_file{ false };
 	wchar_t open_file_name[256]{};
