@@ -8,8 +8,6 @@ namespace ygo {
 ImageManager imageManager;
 
 bool ImageManager::Initial() {
-	// Directly initialize the textures that do not need to be scaled,
-	// and call ResizeTexture to initialize those that need to be scaled.
 	tCover[0] = nullptr;
 	tCover[1] = nullptr;
 	tCover[2] = GetTextureFromFile("textures/cover.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
