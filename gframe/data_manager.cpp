@@ -477,23 +477,7 @@ bool DataManager::CardNameContains(const wchar_t* haystack, const wchar_t* needl
 	wchar_t normalized_needle[TEXT_LINE_SIZE]{};
 	NormalizeString(haystack, normalized_haystack, TEXT_LINE_SIZE);
 	NormalizeString(needle, normalized_needle, TEXT_LINE_SIZE);
-	int i = 0;
-	int j = 0;
-	while(normalized_haystack[i]) {
-		wchar_t ca = normalized_haystack[i];
-		wchar_t cb = normalized_needle[j];
-		if(ca == cb) {
-			j++;
-			if(!normalized_needle[j]) {
-				return true;
-			}
-		} else {
-			i -= j;
-			j = 0;
-		}
-		i++;
-	}
-	return false;
+	return std::wcsstr(normalized_haystack, normalized_needle) != nullptr;
 }
 
 uint32_t DataManager::CardReader(uint32_t code, card_data* pData) {
