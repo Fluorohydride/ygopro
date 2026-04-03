@@ -2,13 +2,6 @@
 #define GAME_H
 
 #include "config.h"
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else //__APPLE__
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif //__APPLE__
 #include "CGUIImageButton.h"
 #include "CGUITTFont.h"
 #include "mysignal.h"
@@ -26,7 +19,13 @@ namespace ygo {
 
 constexpr int DEFAULT_DUEL_RULE = CURRENT_RULE;
 constexpr int CONFIG_LINE_SIZE = 1024;
-constexpr int TEXT_LINE_SIZE = 256;
+
+constexpr int GAME_WINDOW_WIDTH = 1024;
+constexpr int GAME_WINDOW_HEIGHT = 640;
+constexpr int CARD_IMG_WIDTH = 177;
+constexpr int CARD_IMG_HEIGHT = 254;
+constexpr int CARD_THUMB_WIDTH = 44;
+constexpr int CARD_THUMB_HEIGHT = 64;
 
 template<size_t N>
 bool IsExtension(const wchar_t* filename, const wchar_t(&extension)[N]) {
@@ -61,8 +60,8 @@ struct Config {
 	//path
 	wchar_t lastcategory[256]{};
 	wchar_t lastdeck[256]{};
-	wchar_t textfont[256]{};
-	wchar_t numfont[256]{};
+	char textfont[256]{};
+	char numfont[256]{};
 	wchar_t bot_deck_path[256]{};
 	//settings
 	int chkMAutoPos{ 0 };
@@ -97,8 +96,8 @@ struct Config {
 	double music_volume{ 0.5 };
 	int music_mode{ 1 };
 	bool window_maximized{ false };
-	int window_width{ 1024 };
-	int window_height{ 640 };
+	int window_width{ GAME_WINDOW_WIDTH };
+	int window_height{ GAME_WINDOW_HEIGHT };
 	bool resize_popup_menu{ false };
 };
 
@@ -144,11 +143,11 @@ struct BotInfo {
 };
 
 struct FadingUnit {
-	bool signalAction;
-	bool isFadein;
-	int fadingFrame;
-	int autoFadeoutFrame;
-	irr::gui::IGUIElement* guiFading;
+	bool signalAction{};
+	bool isFadein{};
+	int fadingFrame{};
+	int autoFadeoutFrame{};
+	irr::gui::IGUIElement* guiFading{};
 	irr::core::recti fadingSize;
 	irr::core::vector2di fadingUL;
 	irr::core::vector2di fadingLR;
@@ -170,7 +169,9 @@ public:
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void RefreshBot();
-	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
+	void Draw2DImageQuad(irr::video::IVideoDriver* driver, irr::video::ITexture* texture, const irr::core::recti& sourceRect,
+						 const irr::core::vector2di corner[4], bool useAlphaChannel = true, irr::video::SColor color = 0xffffffff);
+	void DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::video::SColor color);
 	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();
 	void DrawLinkedZones(ClientCard* pcard);
@@ -185,8 +186,9 @@ public:
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
+	void SetImageButtonDrawing(irr::gui::IGUIElement* element, bool draw = true);
 	void WaitFrameSignal(int frame);
-	void DrawThumb(code_pointer cp, irr::core::vector2di pos, const LFList* lflist, bool drag = false);
+	void DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList* lflist, bool drag = false);
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
@@ -260,8 +262,8 @@ public:
 	bool hideChat{};
 	int chatTiming[8]{};
 	int chatType[8]{};
-	unsigned short linePatternD3D{};
-	unsigned short linePatternGL{ 0x0f0f };
+	unsigned short linePattern{ 0 };
+	unsigned short stippleMask{ 0x0f0f };
 	int waitFrame{};
 	int signalFrame{};
 	int actionParam{};
@@ -279,7 +281,7 @@ public:
 	int lpframe{};
 	int lpd{};
 	int lpplayer{};
-	int lpccolor{};
+	irr::u32 lpccolor{};
 	std::wstring lpcstring;
 	bool always_chain{};
 	bool ignore_chain{};
@@ -295,345 +297,345 @@ public:
 	ClientField dField;
 	DeckBuilder deckBuilder;
 	MenuHandler menuHandler;
-	irr::IrrlichtDevice* device;
-	irr::video::IVideoDriver* driver;
-	irr::scene::ISceneManager* smgr;
-	irr::scene::ICameraSceneNode* camera;
+	irr::IrrlichtDevice* device{};
+	irr::video::IVideoDriver* driver{};
+	irr::scene::ISceneManager* smgr{};
+	irr::scene::ICameraSceneNode* camera{};
 
 #ifdef _WIN32
 	HWND hWnd;
 #endif
 
 	//GUI
-	irr::gui::IGUIEnvironment* env;
-	irr::gui::CGUITTFont* guiFont;
-	irr::gui::CGUITTFont* textFont;
-	irr::gui::CGUITTFont* numFont;
-	irr::gui::CGUITTFont* adFont;
-	irr::gui::CGUITTFont* lpcFont;
+	irr::gui::IGUIEnvironment* env{};
+	irr::gui::CGUITTFont* guiFont{};
+	irr::gui::CGUITTFont* textFont{};
+	irr::gui::CGUITTFont* numFont{};
+	irr::gui::CGUITTFont* adFont{};
+	irr::gui::CGUITTFont* lpcFont{};
 	std::unordered_map<irr::gui::CGUIImageButton*, int> imageLoading;
 	//card image
-	irr::gui::IGUIStaticText* wCardImg;
-	irr::gui::IGUIImage* imgCard;
+	irr::gui::IGUIStaticText* wCardImg{};
+	irr::gui::IGUIImage* imgCard{};
 	//hint text
-	irr::gui::IGUIStaticText* stHintMsg;
-	irr::gui::IGUIStaticText* stTip;
-	irr::gui::IGUIStaticText* stCardListTip;
+	irr::gui::IGUIStaticText* stHintMsg{};
+	irr::gui::IGUIStaticText* stTip{};
+	irr::gui::IGUIStaticText* stCardListTip{};
 	//infos
-	irr::gui::IGUITabControl* wInfos;
-	irr::gui::IGUIStaticText* stName;
-	irr::gui::IGUIStaticText* stInfo;
-	irr::gui::IGUIStaticText* stDataInfo;
-	irr::gui::IGUIStaticText* stSetName;
-	irr::gui::IGUIStaticText* stText;
-	irr::gui::IGUIScrollBar* scrCardText;
-	irr::gui::IGUIListBox* lstLog;
-	irr::gui::IGUIButton* btnClearLog;
-	irr::gui::IGUIButton* btnSaveLog;
-	irr::gui::IGUIWindow* tabHelper;
-	irr::gui::IGUIElement* elmTabHelperLast;
-	irr::gui::IGUIScrollBar* scrTabHelper;
-	irr::gui::IGUICheckBox* chkMAutoPos;
-	irr::gui::IGUICheckBox* chkSTAutoPos;
-	irr::gui::IGUICheckBox* chkRandomPos;
-	irr::gui::IGUICheckBox* chkAutoChain;
-	irr::gui::IGUICheckBox* chkWaitChain;
-	irr::gui::IGUICheckBox* chkDefaultShowChain;
-	irr::gui::IGUICheckBox* chkQuickAnimation;
-	irr::gui::IGUICheckBox* chkAutoSaveReplay;
-	irr::gui::IGUICheckBox* chkDrawSingleChain;
-	irr::gui::IGUICheckBox* chkHidePlayerName;
-	irr::gui::IGUIWindow* tabSystem;
-	irr::gui::IGUIElement* elmTabSystemLast;
-	irr::gui::IGUIScrollBar* scrTabSystem;
-	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
-	irr::gui::IGUICheckBox* chkAutoSearch;
-	irr::gui::IGUICheckBox* chkMultiKeywords;
-	irr::gui::IGUICheckBox* chkPreferExpansionScript;
-	irr::gui::IGUICheckBox* chkLFlist;
-	irr::gui::IGUIComboBox* cbLFlist;
-	irr::gui::IGUICheckBox* chkEnableSound;
-	irr::gui::IGUICheckBox* chkEnableMusic;
-	irr::gui::IGUIScrollBar* scrSoundVolume;
-	irr::gui::IGUIScrollBar* scrMusicVolume;
-	irr::gui::IGUICheckBox* chkMusicMode;
-	irr::gui::IGUIButton* btnWinResizeS;
-	irr::gui::IGUIButton* btnWinResizeM;
-	irr::gui::IGUIButton* btnWinResizeL;
-	irr::gui::IGUIButton* btnWinResizeXL;
+	irr::gui::IGUITabControl* wInfos{};
+	irr::gui::IGUIStaticText* stName{};
+	irr::gui::IGUIStaticText* stInfo{};
+	irr::gui::IGUIStaticText* stDataInfo{};
+	irr::gui::IGUIStaticText* stSetName{};
+	irr::gui::IGUIStaticText* stText{};
+	irr::gui::IGUIScrollBar* scrCardText{};
+	irr::gui::IGUIListBox* lstLog{};
+	irr::gui::IGUIButton* btnClearLog{};
+	irr::gui::IGUIButton* btnSaveLog{};
+	irr::gui::IGUIWindow* tabHelper{};
+	irr::gui::IGUIElement* elmTabHelperLast{};
+	irr::gui::IGUIScrollBar* scrTabHelper{};
+	irr::gui::IGUICheckBox* chkMAutoPos{};
+	irr::gui::IGUICheckBox* chkSTAutoPos{};
+	irr::gui::IGUICheckBox* chkRandomPos{};
+	irr::gui::IGUICheckBox* chkAutoChain{};
+	irr::gui::IGUICheckBox* chkWaitChain{};
+	irr::gui::IGUICheckBox* chkDefaultShowChain{};
+	irr::gui::IGUICheckBox* chkQuickAnimation{};
+	irr::gui::IGUICheckBox* chkAutoSaveReplay{};
+	irr::gui::IGUICheckBox* chkDrawSingleChain{};
+	irr::gui::IGUICheckBox* chkHidePlayerName{};
+	irr::gui::IGUIWindow* tabSystem{};
+	irr::gui::IGUIElement* elmTabSystemLast{};
+	irr::gui::IGUIScrollBar* scrTabSystem{};
+	irr::gui::IGUICheckBox* chkIgnoreDeckChanges{};
+	irr::gui::IGUICheckBox* chkAutoSearch{};
+	irr::gui::IGUICheckBox* chkMultiKeywords{};
+	irr::gui::IGUICheckBox* chkPreferExpansionScript{};
+	irr::gui::IGUICheckBox* chkLFlist{};
+	irr::gui::IGUIComboBox* cbLFlist{};
+	irr::gui::IGUICheckBox* chkEnableSound{};
+	irr::gui::IGUICheckBox* chkEnableMusic{};
+	irr::gui::IGUIScrollBar* scrSoundVolume{};
+	irr::gui::IGUIScrollBar* scrMusicVolume{};
+	irr::gui::IGUICheckBox* chkMusicMode{};
+	irr::gui::IGUIButton* btnWinResizeS{};
+	irr::gui::IGUIButton* btnWinResizeM{};
+	irr::gui::IGUIButton* btnWinResizeL{};
+	irr::gui::IGUIButton* btnWinResizeXL{};
 	//main menu
-	irr::gui::IGUIWindow* wMainMenu;
-	irr::gui::IGUIButton* btnLanMode;
-	irr::gui::IGUIButton* btnSingleMode;
-	irr::gui::IGUIButton* btnReplayMode;
-	irr::gui::IGUIButton* btnTestMode;
-	irr::gui::IGUIButton* btnDeckEdit;
-	irr::gui::IGUIButton* btnModeExit;
+	irr::gui::IGUIWindow* wMainMenu{};
+	irr::gui::IGUIButton* btnLanMode{};
+	irr::gui::IGUIButton* btnSingleMode{};
+	irr::gui::IGUIButton* btnReplayMode{};
+	irr::gui::IGUIButton* btnTestMode{};
+	irr::gui::IGUIButton* btnDeckEdit{};
+	irr::gui::IGUIButton* btnModeExit{};
 	//lan
-	irr::gui::IGUIWindow* wLanWindow;
-	irr::gui::IGUIEditBox* ebNickName;
-	irr::gui::IGUIListBox* lstHostList;
-	irr::gui::IGUIButton* btnLanRefresh;
-	irr::gui::IGUIEditBox* ebJoinHost;
-	irr::gui::IGUIEditBox* ebJoinPort;
-	irr::gui::IGUIEditBox* ebJoinPass;
-	irr::gui::IGUIButton* btnJoinHost;
-	irr::gui::IGUIButton* btnJoinCancel;
-	irr::gui::IGUIButton* btnCreateHost;
+	irr::gui::IGUIWindow* wLanWindow{};
+	irr::gui::IGUIEditBox* ebNickName{};
+	irr::gui::IGUIListBox* lstHostList{};
+	irr::gui::IGUIButton* btnLanRefresh{};
+	irr::gui::IGUIEditBox* ebJoinHost{};
+	irr::gui::IGUIEditBox* ebJoinPort{};
+	irr::gui::IGUIEditBox* ebJoinPass{};
+	irr::gui::IGUIButton* btnJoinHost{};
+	irr::gui::IGUIButton* btnJoinCancel{};
+	irr::gui::IGUIButton* btnCreateHost{};
 	//create host
-	irr::gui::IGUIWindow* wCreateHost;
-	irr::gui::IGUIComboBox* cbHostLFlist;
-	irr::gui::IGUIComboBox* cbMatchMode;
-	irr::gui::IGUIComboBox* cbRule;
-	irr::gui::IGUIEditBox* ebTimeLimit;
-	irr::gui::IGUIEditBox* ebStartLP;
-	irr::gui::IGUIEditBox* ebStartHand;
-	irr::gui::IGUIEditBox* ebDrawCount;
-	irr::gui::IGUIEditBox* ebServerName;
-	irr::gui::IGUIEditBox* ebServerPass;
-	irr::gui::IGUIComboBox* cbDuelRule;
-	irr::gui::IGUICheckBox* chkNoCheckDeck;
-	irr::gui::IGUICheckBox* chkNoShuffleDeck;
-	irr::gui::IGUIButton* btnHostConfirm;
-	irr::gui::IGUIButton* btnHostCancel;
+	irr::gui::IGUIWindow* wCreateHost{};
+	irr::gui::IGUIComboBox* cbHostLFlist{};
+	irr::gui::IGUIComboBox* cbMatchMode{};
+	irr::gui::IGUIComboBox* cbRule{};
+	irr::gui::IGUIEditBox* ebTimeLimit{};
+	irr::gui::IGUIEditBox* ebStartLP{};
+	irr::gui::IGUIEditBox* ebStartHand{};
+	irr::gui::IGUIEditBox* ebDrawCount{};
+	irr::gui::IGUIEditBox* ebServerName{};
+	irr::gui::IGUIEditBox* ebServerPass{};
+	irr::gui::IGUIComboBox* cbDuelRule{};
+	irr::gui::IGUICheckBox* chkNoCheckDeck{};
+	irr::gui::IGUICheckBox* chkNoShuffleDeck{};
+	irr::gui::IGUIButton* btnHostConfirm{};
+	irr::gui::IGUIButton* btnHostCancel{};
 	//host panel
-	irr::gui::IGUIWindow* wHostPrepare;
-	irr::gui::IGUIButton* btnHostPrepDuelist;
-	irr::gui::IGUIButton* btnHostPrepOB;
-	irr::gui::IGUIStaticText* stHostPrepDuelist[4];
-	irr::gui::IGUICheckBox* chkHostPrepReady[4];
-	irr::gui::IGUIButton* btnHostPrepKick[4];
-	irr::gui::IGUIComboBox* cbCategorySelect;
-	irr::gui::IGUIComboBox* cbDeckSelect;
-	irr::gui::IGUIStaticText* stHostPrepRule;
-	irr::gui::IGUIStaticText* stHostPrepOB;
-	irr::gui::IGUIButton* btnHostPrepReady;
-	irr::gui::IGUIButton* btnHostPrepNotReady;
-	irr::gui::IGUIButton* btnHostPrepStart;
-	irr::gui::IGUIButton* btnHostPrepCancel;
+	irr::gui::IGUIWindow* wHostPrepare{};
+	irr::gui::IGUIButton* btnHostPrepDuelist{};
+	irr::gui::IGUIButton* btnHostPrepOB{};
+	irr::gui::IGUIStaticText* stHostPrepDuelist[4]{};
+	irr::gui::IGUICheckBox* chkHostPrepReady[4]{};
+	irr::gui::IGUIButton* btnHostPrepKick[4]{};
+	irr::gui::IGUIComboBox* cbCategorySelect{};
+	irr::gui::IGUIComboBox* cbDeckSelect{};
+	irr::gui::IGUIStaticText* stHostPrepRule{};
+	irr::gui::IGUIStaticText* stHostPrepOB{};
+	irr::gui::IGUIButton* btnHostPrepReady{};
+	irr::gui::IGUIButton* btnHostPrepNotReady{};
+	irr::gui::IGUIButton* btnHostPrepStart{};
+	irr::gui::IGUIButton* btnHostPrepCancel{};
 	//replay
-	irr::gui::IGUIWindow* wReplay;
-	irr::gui::IGUIListBox* lstReplayList;
-	irr::gui::IGUIStaticText* stReplayInfo;
-	irr::gui::IGUIButton* btnLoadReplay;
-	irr::gui::IGUIButton* btnDeleteReplay;
-	irr::gui::IGUIButton* btnRenameReplay;
-	irr::gui::IGUIButton* btnReplayCancel;
-	irr::gui::IGUIButton* btnExportDeck;
-	irr::gui::IGUIEditBox* ebRepStartTurn;
+	irr::gui::IGUIWindow* wReplay{};
+	irr::gui::IGUIListBox* lstReplayList{};
+	irr::gui::IGUIStaticText* stReplayInfo{};
+	irr::gui::IGUIButton* btnLoadReplay{};
+	irr::gui::IGUIButton* btnDeleteReplay{};
+	irr::gui::IGUIButton* btnRenameReplay{};
+	irr::gui::IGUIButton* btnReplayCancel{};
+	irr::gui::IGUIButton* btnExportDeck{};
+	irr::gui::IGUIEditBox* ebRepStartTurn{};
 	//single play
-	irr::gui::IGUIWindow* wSinglePlay;
-	irr::gui::IGUIListBox* lstBotList;
-	irr::gui::IGUIStaticText* stBotInfo;
-	irr::gui::IGUIButton* btnStartBot;
-	irr::gui::IGUIButton* btnBotCancel;
-	irr::gui::IGUIComboBox* cbBotDeckCategory;
-	irr::gui::IGUIComboBox* cbBotDeck;
-	irr::gui::IGUIComboBox* cbBotRule;
-	irr::gui::IGUICheckBox* chkBotHand;
-	irr::gui::IGUICheckBox* chkBotNoCheckDeck;
-	irr::gui::IGUICheckBox* chkBotNoShuffleDeck;
-	irr::gui::IGUIListBox* lstSinglePlayList;
-	irr::gui::IGUIStaticText* stSinglePlayInfo;
-	irr::gui::IGUICheckBox* chkSinglePlayReturnDeckTop;
-	irr::gui::IGUIButton* btnLoadSinglePlay;
-	irr::gui::IGUIButton* btnSinglePlayCancel;
+	irr::gui::IGUIWindow* wSinglePlay{};
+	irr::gui::IGUIListBox* lstBotList{};
+	irr::gui::IGUIStaticText* stBotInfo{};
+	irr::gui::IGUIButton* btnStartBot{};
+	irr::gui::IGUIButton* btnBotCancel{};
+	irr::gui::IGUIComboBox* cbBotDeckCategory{};
+	irr::gui::IGUIComboBox* cbBotDeck{};
+	irr::gui::IGUIComboBox* cbBotRule{};
+	irr::gui::IGUICheckBox* chkBotHand{};
+	irr::gui::IGUICheckBox* chkBotNoCheckDeck{};
+	irr::gui::IGUICheckBox* chkBotNoShuffleDeck{};
+	irr::gui::IGUIListBox* lstSinglePlayList{};
+	irr::gui::IGUIStaticText* stSinglePlayInfo{};
+	irr::gui::IGUICheckBox* chkSinglePlayReturnDeckTop{};
+	irr::gui::IGUIButton* btnLoadSinglePlay{};
+	irr::gui::IGUIButton* btnSinglePlayCancel{};
 	//hand
-	irr::gui::IGUIWindow* wHand;
-	irr::gui::IGUIButton* btnHand[3];
+	irr::gui::IGUIWindow* wHand{};
+	irr::gui::IGUIButton* btnHand[3]{};
 	//
-	irr::gui::IGUIWindow* wFTSelect;
-	irr::gui::IGUIButton* btnFirst;
-	irr::gui::IGUIButton* btnSecond;
+	irr::gui::IGUIWindow* wFTSelect{};
+	irr::gui::IGUIButton* btnFirst{};
+	irr::gui::IGUIButton* btnSecond{};
 	//message
-	irr::gui::IGUIWindow* wMessage;
-	irr::gui::IGUIStaticText* stMessage;
-	irr::gui::IGUIButton* btnMsgOK;
+	irr::gui::IGUIWindow* wMessage{};
+	irr::gui::IGUIStaticText* stMessage{};
+	irr::gui::IGUIButton* btnMsgOK{};
 	//auto close message
-	irr::gui::IGUIWindow* wACMessage;
-	irr::gui::IGUIStaticText* stACMessage;
+	irr::gui::IGUIWindow* wACMessage{};
+	irr::gui::IGUIStaticText* stACMessage{};
 	//yes/no
-	irr::gui::IGUIWindow* wQuery;
-	irr::gui::IGUIStaticText* stQMessage;
-	irr::gui::IGUIButton* btnYes;
-	irr::gui::IGUIButton* btnNo;
+	irr::gui::IGUIWindow* wQuery{};
+	irr::gui::IGUIStaticText* stQMessage{};
+	irr::gui::IGUIButton* btnYes{};
+	irr::gui::IGUIButton* btnNo{};
 	//surrender yes/no
-	irr::gui::IGUIWindow* wSurrender;
-	irr::gui::IGUIStaticText* stSurrenderMessage;
-	irr::gui::IGUIButton* btnSurrenderYes;
-	irr::gui::IGUIButton* btnSurrenderNo;
+	irr::gui::IGUIWindow* wSurrender{};
+	irr::gui::IGUIStaticText* stSurrenderMessage{};
+	irr::gui::IGUIButton* btnSurrenderYes{};
+	irr::gui::IGUIButton* btnSurrenderNo{};
 	//options
-	irr::gui::IGUIWindow* wOptions;
-	irr::gui::IGUIStaticText* stOptions;
-	irr::gui::IGUIButton* btnOptionp;
-	irr::gui::IGUIButton* btnOptionn;
-	irr::gui::IGUIButton* btnOptionOK;
-	irr::gui::IGUIButton* btnOption[5];
-	irr::gui::IGUIScrollBar* scrOption;
+	irr::gui::IGUIWindow* wOptions{};
+	irr::gui::IGUIStaticText* stOptions{};
+	irr::gui::IGUIButton* btnOptionp{};
+	irr::gui::IGUIButton* btnOptionn{};
+	irr::gui::IGUIButton* btnOptionOK{};
+	irr::gui::IGUIButton* btnOption[5]{};
+	irr::gui::IGUIScrollBar* scrOption{};
 	//pos selection
-	irr::gui::IGUIWindow* wPosSelect;
-	irr::gui::CGUIImageButton* btnPSAU;
-	irr::gui::CGUIImageButton* btnPSAD;
-	irr::gui::CGUIImageButton* btnPSDU;
-	irr::gui::CGUIImageButton* btnPSDD;
+	irr::gui::IGUIWindow* wPosSelect{};
+	irr::gui::CGUIImageButton* btnPSAU{};
+	irr::gui::CGUIImageButton* btnPSAD{};
+	irr::gui::CGUIImageButton* btnPSDU{};
+	irr::gui::CGUIImageButton* btnPSDD{};
 	//card selection
-	irr::gui::IGUIWindow* wCardSelect;
-	irr::gui::CGUIImageButton* btnCardSelect[5];
-	irr::gui::IGUIStaticText *stCardPos[5];
-	irr::gui::IGUIScrollBar *scrCardList;
-	irr::gui::IGUIButton* btnSelectOK;
+	irr::gui::IGUIWindow* wCardSelect{};
+	irr::gui::CGUIImageButton* btnCardSelect[5]{};
+	irr::gui::IGUIStaticText *stCardPos[5]{};
+	irr::gui::IGUIScrollBar *scrCardList{};
+	irr::gui::IGUIButton* btnSelectOK{};
 	//card display
-	irr::gui::IGUIWindow* wCardDisplay;
-	irr::gui::CGUIImageButton* btnCardDisplay[5];
-	irr::gui::IGUIStaticText *stDisplayPos[5];
-	irr::gui::IGUIScrollBar *scrDisplayList;
-	irr::gui::IGUIButton* btnDisplayOK;
+	irr::gui::IGUIWindow* wCardDisplay{};
+	irr::gui::CGUIImageButton* btnCardDisplay[5]{};
+	irr::gui::IGUIStaticText *stDisplayPos[5]{};
+	irr::gui::IGUIScrollBar *scrDisplayList{};
+	irr::gui::IGUIButton* btnDisplayOK{};
 	//announce number
-	irr::gui::IGUIWindow* wANNumber;
-	irr::gui::IGUIComboBox* cbANNumber;
-	irr::gui::IGUIButton* btnANNumber[12];
-	irr::gui::IGUIButton* btnANNumberOK;
+	irr::gui::IGUIWindow* wANNumber{};
+	irr::gui::IGUIComboBox* cbANNumber{};
+	irr::gui::IGUIButton* btnANNumber[12]{};
+	irr::gui::IGUIButton* btnANNumberOK{};
 	//announce card
-	irr::gui::IGUIWindow* wANCard;
-	irr::gui::IGUIEditBox* ebANCard;
-	irr::gui::IGUIListBox* lstANCard;
-	irr::gui::IGUIButton* btnANCardOK;
+	irr::gui::IGUIWindow* wANCard{};
+	irr::gui::IGUIEditBox* ebANCard{};
+	irr::gui::IGUIListBox* lstANCard{};
+	irr::gui::IGUIButton* btnANCardOK{};
 	//announce attribute
-	irr::gui::IGUIWindow* wANAttribute;
-	irr::gui::IGUICheckBox* chkAttribute[7];
+	irr::gui::IGUIWindow* wANAttribute{};
+	irr::gui::IGUICheckBox* chkAttribute[ATTRIBUTES_COUNT]{};
 	//announce race
-	irr::gui::IGUIWindow* wANRace;
-	irr::gui::IGUICheckBox* chkRace[RACES_COUNT];
+	irr::gui::IGUIWindow* wANRace{};
+	irr::gui::IGUICheckBox* chkRace[RACES_COUNT]{};
 	//cmd menu
-	irr::gui::IGUIWindow* wCmdMenu;
-	irr::gui::IGUIButton* btnActivate;
-	irr::gui::IGUIButton* btnSummon;
-	irr::gui::IGUIButton* btnSPSummon;
-	irr::gui::IGUIButton* btnMSet;
-	irr::gui::IGUIButton* btnSSet;
-	irr::gui::IGUIButton* btnRepos;
-	irr::gui::IGUIButton* btnAttack;
-	irr::gui::IGUIButton* btnShowList;
-	irr::gui::IGUIButton* btnOperation;
-	irr::gui::IGUIButton* btnReset;
-	irr::gui::IGUIButton* btnShuffle;
+	irr::gui::IGUIWindow* wCmdMenu{};
+	irr::gui::IGUIButton* btnActivate{};
+	irr::gui::IGUIButton* btnSummon{};
+	irr::gui::IGUIButton* btnSPSummon{};
+	irr::gui::IGUIButton* btnMSet{};
+	irr::gui::IGUIButton* btnSSet{};
+	irr::gui::IGUIButton* btnRepos{};
+	irr::gui::IGUIButton* btnAttack{};
+	irr::gui::IGUIButton* btnShowList{};
+	irr::gui::IGUIButton* btnOperation{};
+	irr::gui::IGUIButton* btnReset{};
+	irr::gui::IGUIButton* btnShuffle{};
 	//chat window
-	irr::gui::IGUIWindow* wChat;
-	irr::gui::IGUIListBox* lstChatLog;
-	irr::gui::IGUIEditBox* ebChatInput;
-	irr::gui::IGUICheckBox* chkIgnore1;
-	irr::gui::IGUICheckBox* chkIgnore2;
+	irr::gui::IGUIWindow* wChat{};
+	irr::gui::IGUIListBox* lstChatLog{};
+	irr::gui::IGUIEditBox* ebChatInput{};
+	irr::gui::IGUICheckBox* chkIgnore1{};
+	irr::gui::IGUICheckBox* chkIgnore2{};
 	//phase button
-	irr::gui::IGUIStaticText* wPhase;
-	irr::gui::IGUIButton* btnPhaseStatus;
-	irr::gui::IGUIButton* btnBP;
-	irr::gui::IGUIButton* btnM2;
-	irr::gui::IGUIButton* btnEP;
+	irr::gui::IGUIStaticText* wPhase{};
+	irr::gui::IGUIButton* btnPhaseStatus{};
+	irr::gui::IGUIButton* btnBP{};
+	irr::gui::IGUIButton* btnM2{};
+	irr::gui::IGUIButton* btnEP{};
 	//deck edit
-	irr::gui::IGUIStaticText* wDeckEdit;
-	irr::gui::IGUIComboBox* cbDBCategory;
-	irr::gui::IGUIComboBox* cbDBDecks;
-	irr::gui::IGUIButton* btnManageDeck;
-	irr::gui::IGUIButton* btnClearDeck;
-	irr::gui::IGUIButton* btnSortDeck;
-	irr::gui::IGUIButton* btnShuffleDeck;
-	irr::gui::IGUIButton* btnSaveDeck;
-	irr::gui::IGUIButton* btnDeleteDeck;
-	irr::gui::IGUIButton* btnSaveDeckAs;
-	irr::gui::IGUIButton* btnSideOK;
-	irr::gui::IGUIButton* btnSideShuffle;
-	irr::gui::IGUIButton* btnSideSort;
-	irr::gui::IGUIButton* btnSideReload;
-	irr::gui::IGUIEditBox* ebDeckname;
-	irr::gui::IGUIStaticText* stDBCategory;
-	irr::gui::IGUIStaticText* stDeck;
-	irr::gui::IGUIStaticText* stCategory;
-	irr::gui::IGUIStaticText* stLimit;
-	irr::gui::IGUIStaticText* stAttribute;
-	irr::gui::IGUIStaticText* stRace;
-	irr::gui::IGUIStaticText* stAttack;
-	irr::gui::IGUIStaticText* stDefense;
-	irr::gui::IGUIStaticText* stStar;
-	irr::gui::IGUIStaticText* stSearch;
-	irr::gui::IGUIStaticText* stScale;
+	irr::gui::IGUIStaticText* wDeckEdit{};
+	irr::gui::IGUIComboBox* cbDBCategory{};
+	irr::gui::IGUIComboBox* cbDBDecks{};
+	irr::gui::IGUIButton* btnManageDeck{};
+	irr::gui::IGUIButton* btnClearDeck{};
+	irr::gui::IGUIButton* btnSortDeck{};
+	irr::gui::IGUIButton* btnShuffleDeck{};
+	irr::gui::IGUIButton* btnSaveDeck{};
+	irr::gui::IGUIButton* btnDeleteDeck{};
+	irr::gui::IGUIButton* btnSaveDeckAs{};
+	irr::gui::IGUIButton* btnSideOK{};
+	irr::gui::IGUIButton* btnSideShuffle{};
+	irr::gui::IGUIButton* btnSideSort{};
+	irr::gui::IGUIButton* btnSideReload{};
+	irr::gui::IGUIEditBox* ebDeckname{};
+	irr::gui::IGUIStaticText* stDBCategory{};
+	irr::gui::IGUIStaticText* stDeck{};
+	irr::gui::IGUIStaticText* stCategory{};
+	irr::gui::IGUIStaticText* stLimit{};
+	irr::gui::IGUIStaticText* stAttribute{};
+	irr::gui::IGUIStaticText* stRace{};
+	irr::gui::IGUIStaticText* stAttack{};
+	irr::gui::IGUIStaticText* stDefense{};
+	irr::gui::IGUIStaticText* stStar{};
+	irr::gui::IGUIStaticText* stSearch{};
+	irr::gui::IGUIStaticText* stScale{};
 	//deck manage
-	irr::gui::IGUIWindow* wDeckManage;
-	irr::gui::IGUIListBox* lstCategories;
-	irr::gui::IGUIListBox* lstDecks;
-	irr::gui::IGUIButton* btnNewCategory;
-	irr::gui::IGUIButton* btnRenameCategory;
-	irr::gui::IGUIButton* btnDeleteCategory;
-	irr::gui::IGUIButton* btnNewDeck;
-	irr::gui::IGUIButton* btnRenameDeck;
-	irr::gui::IGUIButton* btnDMDeleteDeck;
-	irr::gui::IGUIButton* btnMoveDeck;
-	irr::gui::IGUIButton* btnCopyDeck;
-	irr::gui::IGUIButton* btnImportDeckCode;
-	irr::gui::IGUIButton* btnExportDeckCode;
-	irr::gui::IGUIWindow* wDMQuery;
-	irr::gui::IGUIStaticText* stDMMessage;
-	irr::gui::IGUIStaticText* stDMMessage2;
-	irr::gui::IGUIEditBox* ebDMName;
-	irr::gui::IGUIComboBox* cbDMCategory;
-	irr::gui::IGUIButton* btnDMOK;
-	irr::gui::IGUIButton* btnDMCancel;
-	irr::gui::IGUIScrollBar* scrPackCards;
+	irr::gui::IGUIWindow* wDeckManage{};
+	irr::gui::IGUIListBox* lstCategories{};
+	irr::gui::IGUIListBox* lstDecks{};
+	irr::gui::IGUIButton* btnNewCategory{};
+	irr::gui::IGUIButton* btnRenameCategory{};
+	irr::gui::IGUIButton* btnDeleteCategory{};
+	irr::gui::IGUIButton* btnNewDeck{};
+	irr::gui::IGUIButton* btnRenameDeck{};
+	irr::gui::IGUIButton* btnDMDeleteDeck{};
+	irr::gui::IGUIButton* btnMoveDeck{};
+	irr::gui::IGUIButton* btnCopyDeck{};
+	irr::gui::IGUIButton* btnImportDeckCode{};
+	irr::gui::IGUIButton* btnExportDeckCode{};
+	irr::gui::IGUIWindow* wDMQuery{};
+	irr::gui::IGUIStaticText* stDMMessage{};
+	irr::gui::IGUIStaticText* stDMMessage2{};
+	irr::gui::IGUIEditBox* ebDMName{};
+	irr::gui::IGUIComboBox* cbDMCategory{};
+	irr::gui::IGUIButton* btnDMOK{};
+	irr::gui::IGUIButton* btnDMCancel{};
+	irr::gui::IGUIScrollBar* scrPackCards{};
 	//filter
-	irr::gui::IGUIStaticText* wFilter;
-	irr::gui::IGUIScrollBar* scrFilter;
-	irr::gui::IGUIComboBox* cbCardType;
-	irr::gui::IGUIComboBox* cbCardType2;
-	irr::gui::IGUIComboBox* cbRace;
-	irr::gui::IGUIComboBox* cbAttribute;
-	irr::gui::IGUIComboBox* cbLimit;
-	irr::gui::IGUIEditBox* ebStar;
-	irr::gui::IGUIEditBox* ebScale;
-	irr::gui::IGUIEditBox* ebAttack;
-	irr::gui::IGUIEditBox* ebDefense;
-	irr::gui::IGUIEditBox* ebCardName;
-	irr::gui::IGUIButton* btnEffectFilter;
-	irr::gui::IGUIButton* btnStartFilter;
-	irr::gui::IGUIButton* btnClearFilter;
-	irr::gui::IGUIWindow* wCategories;
-	irr::gui::IGUICheckBox* chkCategory[32];
-	irr::gui::IGUIButton* btnCategoryOK;
-	irr::gui::IGUIButton* btnMarksFilter;
-	irr::gui::IGUIWindow* wLinkMarks;
-	irr::gui::IGUIButton* btnMark[8];
-	irr::gui::IGUIButton* btnMarksOK;
+	irr::gui::IGUIStaticText* wFilter{};
+	irr::gui::IGUIScrollBar* scrFilter{};
+	irr::gui::IGUIComboBox* cbCardType{};
+	irr::gui::IGUIComboBox* cbCardType2{};
+	irr::gui::IGUIComboBox* cbRace{};
+	irr::gui::IGUIComboBox* cbAttribute{};
+	irr::gui::IGUIComboBox* cbLimit{};
+	irr::gui::IGUIEditBox* ebStar{};
+	irr::gui::IGUIEditBox* ebScale{};
+	irr::gui::IGUIEditBox* ebAttack{};
+	irr::gui::IGUIEditBox* ebDefense{};
+	irr::gui::IGUIEditBox* ebCardName{};
+	irr::gui::IGUIButton* btnEffectFilter{};
+	irr::gui::IGUIButton* btnStartFilter{};
+	irr::gui::IGUIButton* btnClearFilter{};
+	irr::gui::IGUIWindow* wCategories{};
+	irr::gui::IGUICheckBox* chkCategory[32]{};
+	irr::gui::IGUIButton* btnCategoryOK{};
+	irr::gui::IGUIButton* btnMarksFilter{};
+	irr::gui::IGUIWindow* wLinkMarks{};
+	irr::gui::IGUIButton* btnMark[8]{};
+	irr::gui::IGUIButton* btnMarksOK{};
 	//sort type
-	irr::gui::IGUIStaticText* wSort;
-	irr::gui::IGUIComboBox* cbSortType;
+	irr::gui::IGUIStaticText* wSort{};
+	irr::gui::IGUIComboBox* cbSortType{};
 	//replay save
-	irr::gui::IGUIWindow* wReplaySave;
-	irr::gui::IGUIEditBox* ebRSName;
-	irr::gui::IGUIButton* btnRSYes;
-	irr::gui::IGUIButton* btnRSNo;
+	irr::gui::IGUIWindow* wReplaySave{};
+	irr::gui::IGUIEditBox* ebRSName{};
+	irr::gui::IGUIButton* btnRSYes{};
+	irr::gui::IGUIButton* btnRSNo{};
 	//replay control
-	irr::gui::IGUIStaticText* wReplayControl;
-	irr::gui::IGUIButton* btnReplayStart;
-	irr::gui::IGUIButton* btnReplayPause;
-	irr::gui::IGUIButton* btnReplayStep;
-	irr::gui::IGUIButton* btnReplayUndo;
-	irr::gui::IGUIButton* btnReplayExit;
-	irr::gui::IGUIButton* btnReplaySwap;
+	irr::gui::IGUIStaticText* wReplayControl{};
+	irr::gui::IGUIButton* btnReplayStart{};
+	irr::gui::IGUIButton* btnReplayPause{};
+	irr::gui::IGUIButton* btnReplayStep{};
+	irr::gui::IGUIButton* btnReplayUndo{};
+	irr::gui::IGUIButton* btnReplayExit{};
+	irr::gui::IGUIButton* btnReplaySwap{};
 	//surrender/leave
-	irr::gui::IGUIButton* btnLeaveGame;
+	irr::gui::IGUIButton* btnLeaveGame{};
 	//swap
-	irr::gui::IGUIButton* btnSpectatorSwap;
+	irr::gui::IGUIButton* btnSpectatorSwap{};
 	//chain control
-	irr::gui::IGUIButton* btnChainIgnore;
-	irr::gui::IGUIButton* btnChainAlways;
-	irr::gui::IGUIButton* btnChainWhenAvail;
+	irr::gui::IGUIButton* btnChainIgnore{};
+	irr::gui::IGUIButton* btnChainAlways{};
+	irr::gui::IGUIButton* btnChainWhenAvail{};
 	//cancel or finish
-	irr::gui::IGUIButton* btnCancelOrFinish;
+	irr::gui::IGUIButton* btnCancelOrFinish{};
 	//big picture
-	irr::gui::IGUIWindow* wBigCard;
-	irr::gui::IGUIImage* imgBigCard;
-	irr::gui::IGUIButton* btnBigCardOriginalSize;
-	irr::gui::IGUIButton* btnBigCardZoomIn;
-	irr::gui::IGUIButton* btnBigCardZoomOut;
-	irr::gui::IGUIButton* btnBigCardClose;
+	irr::gui::IGUIWindow* wBigCard{};
+	irr::gui::IGUIImage* imgBigCard{};
+	irr::gui::IGUIButton* btnBigCardOriginalSize{};
+	irr::gui::IGUIButton* btnBigCardZoomIn{};
+	irr::gui::IGUIButton* btnBigCardZoomOut{};
+	irr::gui::IGUIButton* btnBigCardClose{};
 };
 
 extern Game* mainGame;
@@ -641,11 +643,6 @@ extern Game* mainGame;
 }
 
 #define SIZE_QUERY_BUFFER	0x4000
-
-#define CARD_IMG_WIDTH		177
-#define CARD_IMG_HEIGHT		254
-#define CARD_THUMB_WIDTH	44
-#define CARD_THUMB_HEIGHT	64
 
 #define UEVENT_EXIT			0x1
 #define UEVENT_TOWINDOW		0x2

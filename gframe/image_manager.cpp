@@ -1,5 +1,5 @@
 #include "image_manager.h"
-#include "image_resizer.h"
+#include "image_utility.h"
 #include "game.h"
 #include <thread>
 
@@ -90,8 +90,8 @@ void ImageManager::ResizeTexture() {
 	float mul = (mainGame->xScale > mainGame->yScale) ? mainGame->yScale : mainGame->xScale;
 	irr::s32 imgWidthFit = CARD_IMG_WIDTH * mul;
 	irr::s32 imgHeightFit = CARD_IMG_HEIGHT * mul;
-	irr::s32 bgWidth = 1024 * mainGame->xScale;
-	irr::s32 bgHeight = 640 * mainGame->yScale;
+	irr::s32 bgWidth = GAME_WINDOW_WIDTH * mainGame->xScale;
+	irr::s32 bgHeight = GAME_WINDOW_HEIGHT * mainGame->yScale;
 	driver->removeTexture(tCover[0]);
 	if(tCover[1] != tCover[0])
 		driver->removeTexture(tCover[1]);
@@ -120,9 +120,6 @@ void ImageManager::ResizeTexture() {
 	if(!tBackGround_deck)
 		tBackGround_deck = tBackGround;
 }
-void ImageManager::resizeImage(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading) {
-	imageResizer.resize(src, dest, use_threading);
-}
 /**
  * Convert image to texture, resizing if needed.
  * @param name Texture name (Irrlicht texture key).
@@ -137,7 +134,7 @@ irr::video::ITexture* ImageManager::addTexture(const char* name, irr::video::IIm
 		texture = driver->addTexture(name, srcimg);
 	} else {
 		irr::video::IImage* destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
-		resizeImage(srcimg, destimg, mainGame->gameConf.use_image_scale_multi_thread);
+		ImageUtility::Resize(srcimg, destimg, mainGame->gameConf.use_image_scale_multi_thread);
 		texture = driver->addTexture(name, destimg);
 		destimg->drop();
 	}
@@ -258,7 +255,7 @@ int ImageManager::LoadThumbThread() {
 				imageManager.tThumbLoadingMutex.unlock();
 			} else {
 				irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
-				imageManager.resizeImage(img, destimg, mainGame->gameConf.use_image_scale_multi_thread);
+				ImageUtility::Resize(img, destimg, mainGame->gameConf.use_image_scale_multi_thread);
 				img->drop();
 				imageManager.tThumbLoadingMutex.lock();
 				if(imageManager.tThumbLoadingThreadRunning)
