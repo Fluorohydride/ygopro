@@ -1,9 +1,9 @@
+#include <random>
+#include <thread>
 #include "single_mode.h"
 #include "duelclient.h"
 #include "game.h"
 #include "data_manager.h"
-#include <random>
-#include <thread>
 
 namespace ygo {
 

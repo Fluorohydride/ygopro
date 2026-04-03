@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "event_handler.h"
 #include "client_field.h"
 #include "network.h"
@@ -1536,7 +1537,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				} else {
 					if(mainGame->Resize(327, 8, 630, 51).isPointInside(mousepos))
 						mplayer = 0;
-					else if(mainGame->Resize(689, 8, 991, 51).isPointInside(mousepos))
+					else if(mainGame->Resize(689, 8, 992, 51).isPointInside(mousepos))
 						mplayer = 1;
 				}
 			}
@@ -2115,8 +2116,8 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_sequence = hc - 1 - (x - ofRect.UpperLeftCorner.X) * (hc - 1) / ((cardSize + cardSpace) * 5);
 		}
 	} else {
-		double screenx = x / 1024.0 * 1.35 - 0.90;
-		double screeny = y / 640.0 * 0.84 - 0.42;
+		double screenx = x / static_cast<double>(GAME_WINDOW_WIDTH) * 1.35 - 0.90;
+		double screeny = y / static_cast<double>(GAME_WINDOW_HEIGHT) * 0.84 - 0.42;
 		double angle = 0.798056 - atan(screeny);	//0.798056 = arctan(8.0/7.8)
 		double vlen = sqrt(1.0 + screeny * screeny);
 		double boardx = 4.2 + 7.8 * screenx / vlen / cos(angle);

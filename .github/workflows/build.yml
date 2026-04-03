@@ -372,7 +372,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libgl1-mesa-dev libglu1-mesa-dev libxxf86vm-dev
+        sudo apt-get install -y libgl1-mesa-dev
 
     - name: Install dependencies (dynamic link)
       if: matrix.static-link != true

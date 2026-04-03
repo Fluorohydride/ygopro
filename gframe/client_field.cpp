@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <stack>
 #include "client_field.h"
 #include "client_card.h"
