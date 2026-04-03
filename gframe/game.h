@@ -293,6 +293,11 @@ public:
 
 	bool is_building{};
 	bool is_siding{};
+	unsigned int enable_log{ 0x3 };
+	bool exit_on_return{ false };
+	bool open_file{ false };
+	wchar_t open_file_name[256]{};
+	bool bot_mode{ false };
 
 	irr::core::dimension2d<irr::u32> window_size;
 	float xScale{ 1.0f };

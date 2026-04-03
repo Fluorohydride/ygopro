@@ -136,7 +136,7 @@ void DeckBuilder::Terminate() {
 	int decksel = mainGame->cbDBDecks->getSelected();
 	if (decksel >= 0)
 		BufferIO::CopyWideString(mainGame->cbDBDecks->getItem(decksel), mainGame->gameConf.lastdeck);
-	if(exit_on_return)
+	if(mainGame->exit_on_return)
 		mainGame->device->closeDevice();
 }
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
