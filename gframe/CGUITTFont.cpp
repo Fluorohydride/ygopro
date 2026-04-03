@@ -91,7 +91,6 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 			}
 			image_data += image_pitch;
 		}
-		image->unlock();
 		break;
 	}
 
@@ -114,7 +113,6 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 			}
 			glyph_data += bits.pitch;
 		}
-		image->unlock();
 		break;
 	}
 	default:
@@ -322,7 +320,7 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 	tt_face = face->face;
 
 	// Store font metrics.
-	FT_Set_Pixel_Sizes(tt_face, size, 0);
+	FT_Set_Pixel_Sizes(tt_face, 0, size);
 	font_metrics = tt_face->size->metrics;
 
 	// Allocate our glyphs.

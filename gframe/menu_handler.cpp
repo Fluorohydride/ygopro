@@ -311,7 +311,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				for (size_t i = 0; i < replay.decks.size(); ++i) {
 					myswprintf(filename, L"./deck/%ls-%d %ls.ydk", replay_filename, i + 1, namebuf[i]);
-					DeckManager::SaveDeckArray(replay.decks[i], filename);
+					replay.SaveDeck(i, filename);
 				}
 				mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 				mainGame->PopupElement(mainGame->wACMessage, 20);
@@ -356,6 +356,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					NetServer::StopServer();
 					break;
 				}
+				CloseHandle(pi.hThread);
+				CloseHandle(pi.hProcess);
 #else
 				if(fork() == 0) {
 					usleep(100000);

@@ -399,14 +399,10 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	pplayer[0] = players[0];
 	pplayer[1] = players[1];
 	if((tp && dp->type == 1) || (!tp && dp->type == 0)) {
-		DuelPlayer* p = players[0];
-		players[0] = players[1];
-		players[1] = p;
+		std::swap(players[0], players[1]);
 		players[0]->type = 0;
 		players[1]->type = 1;
-		Deck d = pdeck[0];
-		pdeck[0] = pdeck[1];
-		pdeck[1] = d;
+		std::swap(pdeck[0], pdeck[1]);
 		swapped = true;
 	}
 	dp->state = CTOS_RESPONSE;
@@ -443,11 +439,11 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteInt32(host_info.draw_count, false);
 	last_replay.WriteInt32(opt, false);
 	last_replay.Flush();
-	auto load = [&](const std::vector<code_pointer>& deck_container, uint8_t p, uint8_t location) {
+	auto load = [&](const std::vector<const CardDataC*>& deck_container, uint8_t p, uint8_t location) {
 		last_replay.WriteInt32(deck_container.size(), false);
 		for (auto cit = deck_container.rbegin(); cit != deck_container.rend(); ++cit) {
-			new_card(pduel, (*cit)->first, p, p, location, 0, POS_FACEDOWN_DEFENSE);
-			last_replay.WriteInt32((*cit)->first, false);
+			new_card(pduel, (*cit)->code, p, p, location, 0, POS_FACEDOWN_DEFENSE);
+			last_replay.WriteInt32((*cit)->code, false);
 		}
 	};
 	load(pdeck[0].main, 0, LOCATION_DECK);

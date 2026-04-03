@@ -46,9 +46,6 @@
 #endif
 
 #include <cstdio>
-#include <cstdlib>
-#include <iostream>
-#include <algorithm>
 #include <string>
 #include "bufferio.h"
 #include "../ocgcore/ocgapi.h"

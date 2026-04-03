@@ -1,15 +1,24 @@
 #include "data_manager.h"
 #include "game.h"
 #include "client_card.h"
-#include "spmemvfs/spmemvfs.h"
 
 namespace ygo {
 
-unsigned char DataManager::scriptBuffer[0x100000] = {};
+namespace{
+	unsigned char scriptBuffer[0x100000]{};
+}
+
 DataManager dataManager;
+
 static const char SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas.setcode, datas.type, datas.atk, datas.def, datas.level, datas.race, datas.attribute, datas.category,"
 " texts.name, texts.desc, texts.str1, texts.str2, texts.str3, texts.str4, texts.str5, texts.str6, texts.str7, texts.str8,"
 " texts.str9, texts.str10, texts.str11, texts.str12, texts.str13, texts.str14, texts.str15, texts.str16 FROM datas INNER JOIN texts ON datas.id = texts.id";
+static constexpr int DATAS_COUNT = 11;
+
+static constexpr int CARD_ARTWORK_VERSIONS_OFFSET = 20;
+static inline bool is_alternative(uint32_t code, uint32_t alias) {
+	return alias && (alias < code + CARD_ARTWORK_VERSIONS_OFFSET) && (code < alias + CARD_ARTWORK_VERSIONS_OFFSET);
+}
 
 DataManager::DataManager() : _datas(32768), _strings(32768) {
 	extra_setcode = { 
@@ -19,6 +28,7 @@ DataManager::DataManager() : _datas(32768), _strings(32768) {
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt = nullptr;
+	int texts_offset = DATAS_COUNT;
 	if (sqlite3_prepare_v2(pDB, SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK)
 		return Error(pDB, pStmt);
 	wchar_t strBuffer[4096];
@@ -48,23 +58,41 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
 		cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
 		cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
+		// rule_code
+		if (cd.code == 5405695) {
+			cd.rule_code = cd.alias;
+			cd.alias = 0;
+		}
+		else if (cd.alias && !(cd.type & TYPE_TOKEN) && !is_alternative(cd.code, cd.alias)) {
+			cd.rule_code = cd.alias;
+			cd.alias = 0;
+		}
 		auto& cs = _strings[code];
-		if (const char* text = (const char*)sqlite3_column_text(pStmt, 11)) {
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, texts_offset + 0)) {
 			BufferIO::DecodeUTF8(text, strBuffer);
 			cs.name = strBuffer;
 		}
-		if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, texts_offset + 1)) {
 			BufferIO::DecodeUTF8(text, strBuffer);
 			cs.text = strBuffer;
 		}
 		for (int i = 0; i < DESC_COUNT; ++i) {
-			if (const char* text = (const char*)sqlite3_column_text(pStmt, 13 + i)) {
+			if (const char* text = (const char*)sqlite3_column_text(pStmt, (texts_offset + 2) + i)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.desc[i] = strBuffer;
 			}
 		}
 	}
 	sqlite3_finalize(pStmt);
+	for (auto& entry : _datas) {
+		auto& cd = entry.second;
+		if (cd.rule_code || !cd.alias || (cd.type & TYPE_TOKEN))
+			continue;
+		auto it = _datas.find(cd.alias);
+		if (it == _datas.end())
+			continue;
+		cd.rule_code = it->second.rule_code;
+	}
 	for (const auto& entry : extra_setcode) {
 		const auto& code = entry.first;
 		const auto& list = entry.second;
@@ -77,30 +105,52 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 	}
 	return true;
 }
-bool DataManager::LoadDB(const wchar_t* wfile) {
-	char file[256];
-	BufferIO::EncodeUTF8(wfile, file);
-#ifdef _IRR_WCHAR_FILESYSTEM
-	auto reader = FileSystem->createAndOpenFile(wfile);
-#else
+bool DataManager::LoadDB(const char* file) {
 	auto reader = FileSystem->createAndOpenFile(file);
-#endif
-	if(reader == nullptr)
+	if (reader == nullptr) {
+		mysnprintf(errmsg, "File does not exist or failed to unzip: %s", file);
 		return false;
-	spmemvfs_db_t db;
-	spmembuffer_t* mem = (spmembuffer_t*)std::calloc(sizeof(spmembuffer_t), 1);
-	spmemvfs_env_init();
-	mem->total = mem->used = reader->getSize();
-	mem->data = (char*)std::malloc(mem->total);
-	reader->read(mem->data, mem->total);
+	}
+
+	sqlite3* db_handle = nullptr;
+	if (sqlite3_open(":memory:", &db_handle) != SQLITE_OK) {
+		Error(db_handle, nullptr);
+		sqlite3_close(db_handle);
+		reader->drop();
+		return false;
+	}
+
+	sqlite3_int64 sz = reader->getSize();
+	unsigned char* buffer = (unsigned char*)sqlite3_malloc64(sz);
+	if (!buffer) {
+		Error(db_handle, nullptr);
+		sqlite3_close(db_handle);
+		reader->drop();
+		return false;
+	}
+
+	reader->read(buffer, sz);
 	reader->drop();
-	bool ret{};
-	if (spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
-		ret = Error(db.handle);
-	else
-		ret = ReadDB(db.handle);
-	spmemvfs_close_db(&db);
-	spmemvfs_env_fini();
+	// force rollback-journal mode by setting header bytes 18 and 19 to 0x01
+	if (sz >= 20 && buffer[18] == 0x02) {
+		buffer[18] = 0x01;
+		buffer[19] = 0x01;
+	}
+	int rc = sqlite3_deserialize(
+		db_handle,
+		nullptr,
+		buffer,
+		sz,
+		sz,
+		SQLITE_DESERIALIZE_FREEONCLOSE | SQLITE_DESERIALIZE_READONLY
+	);
+	if (rc != SQLITE_OK) {
+		Error(db_handle, nullptr);
+		sqlite3_close(db_handle);
+		return false;
+	}
+	bool ret = ReadDB(db_handle);
+	sqlite3_close(db_handle);
 	return ret;
 }
 bool DataManager::LoadStrings(const char* file) {
@@ -162,7 +212,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	if (const char* msg = sqlite3_errmsg(pDB))
-		mysnprintf(errmsg, "%s", msg);
+		mysnprintf(errmsg, "sqlite3_errmsg: %s", msg);
 	else
 		errmsg[0] = '\0';
 	sqlite3_finalize(pStmt);
@@ -242,16 +292,30 @@ const wchar_t* DataManager::GetSetName(uint32_t code) const {
 std::vector<uint32_t> DataManager::GetSetCodes(std::wstring setname) const {
 	std::vector<uint32_t> matchingCodes;
 	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
-		auto xpos = csit->second.find_first_of(L'|');//setname|another setname or extra info
-		if(setname.size() < 2) {
-			if(csit->second.compare(0, xpos, setname) == 0
-				|| csit->second.compare(xpos + 1, csit->second.length(), setname) == 0)
-				matchingCodes.push_back(csit->first);
-		} else {
-			if(csit->second.substr(0, xpos).find(setname) != std::wstring::npos
-				|| csit->second.substr(xpos + 1).find(setname) != std::wstring::npos) {
-				matchingCodes.push_back(csit->first);
+		const std::wstring& setnameString = csit->second;
+		size_t start = 0;
+		while(start < setnameString.size()) { // handle "setname|another setname"
+			auto pos = setnameString.find(L'|', start);
+			std::wstring token;
+			if(pos == std::wstring::npos)
+				token = setnameString.substr(start);
+			else
+				token = setnameString.substr(start, pos - start);
+			if(setname.size() < 2) {
+				// exact match for short set names to avoid too many results
+				if(token == setname) {
+					matchingCodes.push_back(csit->first);
+					break;
+				}
+			} else {
+				if(token.find(setname) != std::wstring::npos) {
+					matchingCodes.push_back(csit->first);
+					break;
+				}
 			}
+			if(pos == std::wstring::npos)
+				break;
+			start = pos + 1;
 		}
 	}
 	return matchingCodes;
@@ -394,13 +458,7 @@ unsigned char* DataManager::ScriptReaderEx(const char* script_path, int* slen) {
 	return nullptr;
 }
 unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* slen) {
-#ifdef _IRR_WCHAR_FILESYSTEM
-	wchar_t fname[256]{};
-	BufferIO::DecodeUTF8(script_name, fname);
-	auto reader = dataManager.FileSystem->createAndOpenFile(fname);
-#else
 	auto reader = dataManager.FileSystem->createAndOpenFile(script_name);
-#endif
 	if (!reader)
 		return nullptr;
 	int size = reader->read(scriptBuffer, sizeof scriptBuffer);
@@ -421,73 +479,73 @@ unsigned char* DataManager::ReadScriptFromFile(const char* script_name, int* sle
 	*slen = (int)len;
 	return scriptBuffer;
 }
-bool DataManager::deck_sort_lv(code_pointer p1, code_pointer p2) {
-	if ((p1->second.type & 0x7) != (p2->second.type & 0x7))
-		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
-	if ((p1->second.type & 0x7) == 1) {
-		int type1 = (p1->second.type & 0x48020c0) ? (p1->second.type & 0x48020c1) : (p1->second.type & 0x31);
-		int type2 = (p2->second.type & 0x48020c0) ? (p2->second.type & 0x48020c1) : (p2->second.type & 0x31);
+bool DataManager::deck_sort_lv(const CardDataC* p1, const CardDataC* p2) {
+	if ((p1->type & 0x7) != (p2->type & 0x7))
+		return (p1->type & 0x7) < (p2->type & 0x7);
+	if ((p1->type & 0x7) == 1) {
+		auto type1 = (p1->type & 0x48020c0) ? (p1->type & 0x48020c1) : (p1->type & 0x31);
+		auto type2 = (p2->type & 0x48020c0) ? (p2->type & 0x48020c1) : (p2->type & 0x31);
 		if (type1 != type2)
 			return type1 < type2;
-		if (p1->second.level != p2->second.level)
-			return p1->second.level > p2->second.level;
-		if (p1->second.attack != p2->second.attack)
-			return p1->second.attack > p2->second.attack;
-		if (p1->second.defense != p2->second.defense)
-			return p1->second.defense > p2->second.defense;
-		return p1->first < p2->first;
+		if (p1->level != p2->level)
+			return p1->level > p2->level;
+		if (p1->attack != p2->attack)
+			return p1->attack > p2->attack;
+		if (p1->defense != p2->defense)
+			return p1->defense > p2->defense;
+		return p1->code < p2->code;
 	}
-	if ((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))
-		return (p1->second.type & 0xfffffff8) < (p2->second.type & 0xfffffff8);
-	return p1->first < p2->first;
+	if ((p1->type & 0xfffffff8) != (p2->type & 0xfffffff8))
+		return (p1->type & 0xfffffff8) < (p2->type & 0xfffffff8);
+	return p1->code < p2->code;
 }
-bool DataManager::deck_sort_atk(code_pointer p1, code_pointer p2) {
-	if ((p1->second.type & 0x7) != (p2->second.type & 0x7))
-		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
-	if ((p1->second.type & 0x7) == 1) {
-		if (p1->second.attack != p2->second.attack)
-			return p1->second.attack > p2->second.attack;
-		if (p1->second.defense != p2->second.defense)
-			return p1->second.defense > p2->second.defense;
-		if (p1->second.level != p2->second.level)
-			return p1->second.level > p2->second.level;
-		int type1 = (p1->second.type & 0x48020c0) ? (p1->second.type & 0x48020c1) : (p1->second.type & 0x31);
-		int type2 = (p2->second.type & 0x48020c0) ? (p2->second.type & 0x48020c1) : (p2->second.type & 0x31);
+bool DataManager::deck_sort_atk(const CardDataC* p1, const CardDataC* p2) {
+	if ((p1->type & 0x7) != (p2->type & 0x7))
+		return (p1->type & 0x7) < (p2->type & 0x7);
+	if ((p1->type & 0x7) == 1) {
+		if (p1->attack != p2->attack)
+			return p1->attack > p2->attack;
+		if (p1->defense != p2->defense)
+			return p1->defense > p2->defense;
+		if (p1->level != p2->level)
+			return p1->level > p2->level;
+		auto type1 = (p1->type & 0x48020c0) ? (p1->type & 0x48020c1) : (p1->type & 0x31);
+		auto type2 = (p2->type & 0x48020c0) ? (p2->type & 0x48020c1) : (p2->type & 0x31);
 		if (type1 != type2)
 			return type1 < type2;
-		return p1->first < p2->first;
+		return p1->code < p2->code;
 	}
-	if ((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))
-		return (p1->second.type & 0xfffffff8) < (p2->second.type & 0xfffffff8);
-	return p1->first < p2->first;
+	if ((p1->type & 0xfffffff8) != (p2->type & 0xfffffff8))
+		return (p1->type & 0xfffffff8) < (p2->type & 0xfffffff8);
+	return p1->code < p2->code;
 }
-bool DataManager::deck_sort_def(code_pointer p1, code_pointer p2) {
-	if ((p1->second.type & 0x7) != (p2->second.type & 0x7))
-		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
-	if ((p1->second.type & 0x7) == 1) {
-		if (p1->second.defense != p2->second.defense)
-			return p1->second.defense > p2->second.defense;
-		if (p1->second.attack != p2->second.attack)
-			return p1->second.attack > p2->second.attack;
-		if (p1->second.level != p2->second.level)
-			return p1->second.level > p2->second.level;
-		int type1 = (p1->second.type & 0x48020c0) ? (p1->second.type & 0x48020c1) : (p1->second.type & 0x31);
-		int type2 = (p2->second.type & 0x48020c0) ? (p2->second.type & 0x48020c1) : (p2->second.type & 0x31);
+bool DataManager::deck_sort_def(const CardDataC* p1, const CardDataC* p2) {
+	if ((p1->type & 0x7) != (p2->type & 0x7))
+		return (p1->type & 0x7) < (p2->type & 0x7);
+	if ((p1->type & 0x7) == 1) {
+		if (p1->defense != p2->defense)
+			return p1->defense > p2->defense;
+		if (p1->attack != p2->attack)
+			return p1->attack > p2->attack;
+		if (p1->level != p2->level)
+			return p1->level > p2->level;
+		auto type1 = (p1->type & 0x48020c0) ? (p1->type & 0x48020c1) : (p1->type & 0x31);
+		auto type2 = (p2->type & 0x48020c0) ? (p2->type & 0x48020c1) : (p2->type & 0x31);
 		if (type1 != type2)
 			return type1 < type2;
-		return p1->first < p2->first;
+		return p1->code < p2->code;
 	}
-	if ((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))
-		return (p1->second.type & 0xfffffff8) < (p2->second.type & 0xfffffff8);
-	return p1->first < p2->first;
+	if ((p1->type & 0xfffffff8) != (p2->type & 0xfffffff8))
+		return (p1->type & 0xfffffff8) < (p2->type & 0xfffffff8);
+	return p1->code < p2->code;
 }
-bool DataManager::deck_sort_name(code_pointer p1, code_pointer p2) {
-	const wchar_t* name1 = dataManager.GetName(p1->first);
-	const wchar_t* name2 = dataManager.GetName(p2->first);
+bool DataManager::deck_sort_name(const CardDataC* p1, const CardDataC* p2) {
+	const wchar_t* name1 = dataManager.GetName(p1->code);
+	const wchar_t* name2 = dataManager.GetName(p2->code);
 	int res = std::wcscmp(name1, name2);
 	if (res != 0)
 		return res < 0;
-	return p1->first < p2->first;
+	return p1->code < p2->code;
 }
 
 }

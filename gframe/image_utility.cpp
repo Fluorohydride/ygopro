@@ -1,4 +1,4 @@
-#include "image_resizer.h"
+#include "image_utility.h"
 #include <cmath>
 #ifdef _OPENMP
 #include <omp.h>
@@ -8,8 +8,6 @@
 #include "stb_image_resize2.h"
 
 namespace ygo {
-
-ImageResizer imageResizer;
 
 struct StbSamplerCache {
 	STBIR_RESIZE resize{};
@@ -47,7 +45,7 @@ struct StbSamplerCache {
  * Scale image using stb_image_resize2.
  * Returns true on success, false on failure or unsupported format.
  */
-bool ImageResizer::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* dest) {
+bool ImageUtility::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* dest) {
 	if(!src || !dest)
 		return false;
 
@@ -74,11 +72,8 @@ bool ImageResizer::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* de
 	}
 
 	void* srcPtr = src->lock();
-	if(!srcPtr)
-		return false;
 	void* destPtr = dest->lock();
-	if(!destPtr) {
-		src->unlock();
+	if(!srcPtr || !destPtr) {
 		return false;
 	}
 
@@ -98,8 +93,6 @@ bool ImageResizer::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* de
 		stbir_set_filters(&cache.resize, STBIR_FILTER_BOX, STBIR_FILTER_BOX);
 		cache.samplers_built = (stbir_build_samplers(&cache.resize) != 0);
 		if(!cache.samplers_built) {
-			dest->unlock();
-			src->unlock();
 			return false;
 		}
 	} else {
@@ -107,17 +100,14 @@ bool ImageResizer::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* de
 		stbir_set_buffer_ptrs(&cache.resize, srcPtr, srcStride, destPtr, destStride);
 	}
 
-	const int ok = stbir_resize_extended(&cache.resize);
-	dest->unlock();
-	src->unlock();
-	return ok != 0;
+	return (stbir_resize_extended(&cache.resize) != 0);
 }
 
 /**
  * Scale image using nearest neighbor anti-aliasing.
  * Function by Warr1024, from https://github.com/minetest/minetest/issues/2419, modified.
  */
-void ImageResizer::imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading) {
+void ImageUtility::imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading) {
 	const auto& srcDim = src->getDimension();
 	const auto& destDim = dest->getDimension();
 	if (destDim.Width == 0 || destDim.Height == 0)
@@ -194,7 +184,7 @@ void ImageResizer::imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* d
 } // end of parallel region
 }
 
-void ImageResizer::resize(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading) {
+void ImageUtility::Resize(irr::video::IImage* src, irr::video::IImage* dest, bool use_threading) {
 	if(imageScaleSTB(src, dest))
 		return;
 	imageScaleNNAA(src, dest, use_threading);

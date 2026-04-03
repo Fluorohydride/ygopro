@@ -1,5 +1,4 @@
 include "lzma/."
-include "spmemvfs/."
 
 project "YGOPro"
     kind "WindowedApp"
@@ -8,7 +7,7 @@ project "YGOPro"
 
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore" }
-    links { "ocgcore", "clzma", "cspmemvfs", LUA_LIB_NAME, "sqlite3", "irrlicht", "freetype", "event" }
+    links { "ocgcore", "clzma", LUA_LIB_NAME, "sqlite3", "irrlicht", "freetype", "event" }
 
     if not BUILD_LUA then
         libdirs { LUA_LIB_DIR }
@@ -27,6 +26,10 @@ project "YGOPro"
     else
         includedirs { IRRLICHT_INCLUDE_DIR }
         libdirs { IRRLICHT_LIB_DIR }
+    end
+    if not IRRLICHT_BUILD_JPEG_PNG then
+        links { "jpeg", "png" }
+        libdirs { JPEG_LIB_DIR, PNG_LIB_DIR }
     end
 
     if BUILD_FREETYPE then
@@ -72,7 +75,6 @@ project "YGOPro"
 
     filter "system:windows"
         entrypoint "mainCRTStartup"
-        defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
         links { "ws2_32", "iphlpapi" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
@@ -104,7 +106,7 @@ project "YGOPro"
         end
 
     filter "system:linux"
-        links { "GL", "X11", "Xxf86vm", "dl", "pthread" }
+        links { "GL", "X11", "dl", "pthread" }
         linkoptions { "-fopenmp" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "IrrKlang" }

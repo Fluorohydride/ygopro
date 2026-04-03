@@ -1,9 +1,9 @@
+#include <random>
+#include <thread>
 #include "single_mode.h"
 #include "duelclient.h"
 #include "game.h"
 #include "data_manager.h"
-#include <random>
-#include <thread>
 
 namespace ygo {
 
@@ -247,7 +247,6 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 		case MSG_SELECT_EFFECTYN: {
 			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 12;
-			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
 				mainGame->singleSignal.Wait();

@@ -5,7 +5,7 @@
 #include <set>
 #include <random>
 #include "config.h"
-#include "deck_manager.h"
+#include "deck.h"
 #include "network.h"
 
 namespace ygo {

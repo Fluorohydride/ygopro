@@ -16,6 +16,7 @@ private:
 	static evconnlistener* listener;
 	static DuelMode* duel_mode;
 	static unsigned char net_server_write[SIZE_NETWORK_BUFFER];
+	static unsigned char net_server_read[SIZE_NETWORK_BUFFER];
 	static size_t last_sent;
 
 public:
