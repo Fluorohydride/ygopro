@@ -281,7 +281,7 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 irr::io::IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
 	char file2[256];
 	BufferIO::EncodeUTF8(file, file2);
-	auto reader = dataManager.FileSystem->createAndOpenFile(file2);
+	auto reader = dataManager.IrrFileSystem->createAndOpenFile(file2);
 	return reader;
 }
 bool DeckManager::LoadCurrentDeck(std::istringstream& deckStream, bool is_packlist) {

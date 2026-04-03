@@ -74,7 +74,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load textures!");
 		return false;
 	}
-	dataManager.FileSystem = device->getFileSystem();
+	dataManager.IrrFileSystem = device->getFileSystem();
 	if(!dataManager.LoadDB("cards.cdb")) {
 		std::string errmsg = "Failed to load card database (cards.cdb)! ";
 		errmsg.append(dataManager.errmsg);
@@ -1148,12 +1148,12 @@ void Game::LoadExpansions() {
 			return;
 		}
 		if (IsExtension(name, ".zip") || IsExtension(name, ".ypk")) {
-			dataManager.FileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
+			dataManager.IrrFileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
 			return;
 		}
 	});
-	for(irr::u32 i = 0; i < dataManager.FileSystem->getFileArchiveCount(); ++i) {
-		auto archive = dataManager.FileSystem->getFileArchive(i)->getFileList();
+	for(irr::u32 i = 0; i < dataManager.IrrFileSystem->getFileArchiveCount(); ++i) {
+		auto archive = dataManager.IrrFileSystem->getFileArchive(i)->getFileList();
 		for(irr::u32 j = 0; j < archive->getFileCount(); ++j) {
 			const char* name = archive->getFullFileName(j).c_str();
 			if (IsExtension(name, ".cdb")) {
@@ -1167,7 +1167,7 @@ void Game::LoadExpansions() {
 				continue;
 			}
 			if (IsExtension(name, ".conf")) {
-				auto reader = dataManager.FileSystem->createAndOpenFile(name);
+				auto reader = dataManager.IrrFileSystem->createAndOpenFile(name);
 				dataManager.LoadStrings(reader);
 				continue;
 			}
