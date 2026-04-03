@@ -1,4 +1,9 @@
 #include "game.h"
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
