@@ -18,7 +18,7 @@ public:
 	void ClearTexture();
 	void ResizeTexture();
 	irr::video::ITexture* GetTextureFromFile(const char* file, irr::s32 width, irr::s32 height);
-	irr::video::IImage* GetImage(int code);
+	irr::video::IImage* GetImage(int code, irr::s32 targetWidth = 0, irr::s32 targetHeight = 0);
 	irr::video::ITexture* GetTexture(int code, irr::s32 width, irr::s32 height);
 	irr::video::ITexture* GetTexture(int code, bool fit = false);
 	irr::video::ITexture* GetBigPicture(int code, float zoom);
@@ -35,6 +35,7 @@ public:
 	bool tThumbLoadingThreadRunning;
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
+	irr::io::IFileSystem* irrFileSystem;
 	irr::video::ITexture* tCover[4];
 	irr::video::ITexture* tUnknown;
 	irr::video::ITexture* tUnknownFit;
