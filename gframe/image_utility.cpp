@@ -10,7 +10,7 @@
 #include "stb_image_resize2.h"
 
 extern "C" {
-#include "jpeglib.h"
+#include <jpeglib.h>
 }
 
 namespace ygo {
