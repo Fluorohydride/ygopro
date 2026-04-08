@@ -1934,6 +1934,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				return true;
 				break;
 			}
+			case CHECKBOX_RESIZE_SELECT_WINDOW: {
+				mainGame->gameConf.resize_select_window = mainGame->chkResizeSelectWindow->isChecked();
+				if(mainGame->dInfo.isInDuel)
+					mainGame->OnResize();
+				return true;
+				break;
+			}
 			case CHECKBOX_RESIZE_POPUP_MENU: {
 				bool checked = mainGame->chkResizePopupMenu->isChecked();
 				mainGame->gameConf.resize_popup_menu = checked ? mainGame->scrResizePopupMenu->getPos() : 0;

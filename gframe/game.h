@@ -102,6 +102,7 @@ struct Config {
 	int window_width{ GAME_WINDOW_WIDTH };
 	int window_height{ GAME_WINDOW_HEIGHT };
 	int resize_popup_menu{ 0 };
+	bool resize_select_window{ true };
 };
 
 struct DuelInfo {
@@ -390,6 +391,7 @@ public:
 	irr::gui::IGUIScrollBar* scrSoundVolume{};
 	irr::gui::IGUIScrollBar* scrMusicVolume{};
 	irr::gui::IGUICheckBox* chkMusicMode{};
+	irr::gui::IGUICheckBox* chkResizeSelectWindow{};
 	irr::gui::IGUICheckBox* chkResizePopupMenu{};
 	irr::gui::IGUIScrollBar* scrResizePopupMenu{};
 	irr::gui::IGUIButton* btnWinResizeS{};
@@ -883,6 +885,7 @@ extern Game* mainGame;
 #define BUTTON_BIG_CARD_ORIG_SIZE	383
 #define CHECKBOX_RESIZE_POPUP_MENU	384
 #define SCROLL_RESIZE_POPUP_MENU	385
+#define CHECKBOX_RESIZE_SELECT_WINDOW	386
 
 #define AVAIL_OCG					0x1
 #define AVAIL_TCG					0x2

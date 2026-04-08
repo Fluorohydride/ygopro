@@ -432,6 +432,8 @@ bool Game::Initialize() {
 	chkPreferExpansionScript = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_PREFER_EXPANSION, dataManager.GetSysString(1379));
 	chkPreferExpansionScript->setChecked(gameConf.prefer_expansion_script != 0);
 	posY += 30;
+	chkResizeSelectWindow = env->addCheckBox(gameConf.resize_select_window, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_RESIZE_SELECT_WINDOW, dataManager.GetSysString(1387));
+	posY += 30;
 	env->addStaticText(dataManager.GetSysString(1282), irr::core::rect<irr::s32>(posX + 23, posY + 3, posX + 110, posY + 28), false, false, tabSystem);
 	btnWinResizeS = env->addButton(irr::core::rect<irr::s32>(posX + 115, posY, posX + 145, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_S, dataManager.GetSysString(1283));
 	btnWinResizeM = env->addButton(irr::core::rect<irr::s32>(posX + 150, posY, posX + 180, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_M, dataManager.GetSysString(1284));
@@ -1403,6 +1405,8 @@ void Game::LoadConfig() {
 			gameConf.window_width = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "window_height")) {
 			gameConf.window_height = std::strtol(valbuf, nullptr, 10);
+		} else if(!std::strcmp(strbuf, "resize_select_window")) {
+			gameConf.resize_select_window = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "resize_popup_menu")) {
 			int val = std::strtol(valbuf, nullptr, 10);
 			gameConf.resize_popup_menu = myclamp(val, 0, 5);
@@ -1512,6 +1516,7 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "window_maximized = %d\n", (gameConf.window_maximized ? 1 : 0));
 	std::fprintf(fp, "window_width = %d\n", gameConf.window_width);
 	std::fprintf(fp, "window_height = %d\n", gameConf.window_height);
+	std::fprintf(fp, "resize_select_window = %d\n", (chkResizeSelectWindow->isChecked() ? 1 : 0));
 	std::fprintf(fp, "resize_popup_menu = %d\n", gameConf.resize_popup_menu);
 #ifdef YGOPRO_USE_AUDIO
 	std::fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
@@ -2061,8 +2066,10 @@ void Game::ResizeCmdMenu(){
 	btnReset->setRelativePosition(irr::core::recti(0, 0, width, height));
 }
 void Game::ResizePosSelectButtons() {
-	irr::s32 imgHeight = CARD_IMG_HEIGHT * 0.5f * yScale + 0.5f;
-	irr::s32 gap = 5 * xScale + 0.5f;
+	float _xScale = gameConf.resize_select_window ? xScale : 1.0f;
+	float _yScale = gameConf.resize_select_window ? yScale : 1.2f;
+	irr::s32 imgHeight = CARD_IMG_HEIGHT * 0.5f * _yScale + 0.5f;
+	irr::s32 gap = 5 * _xScale + 0.5f;
 	irr::s32 btnPosWidth = imgHeight + gap * 2; // Square buttons, width = height
 	irr::s32 stride = btnPosWidth + gap;
 	int totalWidth = 0, visCount = 0;
@@ -2071,9 +2078,9 @@ void Game::ResizePosSelectButtons() {
 	if(btnPSDU->isVisible()) { totalWidth += btnPosWidth; visCount++; }
 	if(btnPSDD->isVisible()) { totalWidth += btnPosWidth; visCount++; }
 	totalWidth += (visCount - 1) * gap;
-	irr::s32 posY = 19 + 16 * yScale;
-	irr::s32 windowWidth = 30 * xScale * 2 + stride * 3 - gap;
-	irr::s32 windowHeight = posY + 155 * yScale;
+	irr::s32 posY = 19 + 16 * _yScale;
+	irr::s32 windowWidth = 30 * _xScale * 2 + stride * 3 - gap;
+	irr::s32 windowHeight = posY + 155 * _yScale;
 	irr::s32 posX = (windowWidth - totalWidth) / 2;
 	if(btnPSAU->isVisible()) {
 		btnPSAU->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
@@ -2099,18 +2106,20 @@ void Game::ResizeCardSelectButtons(irr::gui::IGUIWindow* window,
 								   irr::gui::IGUIScrollBar* scrollbar,
 								   irr::gui::IGUIButton* buttonOK,
 								   const std::vector<ClientCard*>& cards) {
-	irr::s32 gap = 5 * xScale + 0.5f;
-	irr::s32 btnWidth = CARD_IMG_WIDTH * 0.55f * yScale + 0.5f;
-	irr::s32 btnHeight = CARD_IMG_HEIGHT * 0.55f * yScale + 0.5f;
+	float _xScale = gameConf.resize_select_window ? xScale : 1.0f;
+	float _yScale = gameConf.resize_select_window ? yScale : 1.2f;
+	irr::s32 gap = 5 * _xScale + 0.5f;
+	irr::s32 btnWidth = CARD_IMG_WIDTH * 0.55f * _yScale + 0.5f;
+	irr::s32 btnHeight = CARD_IMG_HEIGHT * 0.55f * _yScale + 0.5f;
 	irr::s32 stride = btnWidth + gap;
-	int startpos = 30 * xScale;
+	int startpos = 30 * _xScale;
 	int ct = 5;
 	if (cards.size() < 5) {
-		startpos = 30 * xScale + stride * (5 - (int)cards.size()) / 2;
+		startpos = 30 * _xScale + stride * (5 - (int)cards.size()) / 2;
 		ct = cards.size();
 	}
-	irr::s32 top = 19 + 11 * yScale;
-	irr::s32 labelHeight = 20 * yScale;
+	irr::s32 top = 19 + 11 * _yScale;
+	irr::s32 labelHeight = 20 * _yScale;
 	irr::s32 minTextHeight = gameConf.textfontsize * 1.4f + 0.5f;
 	if (labelHeight < minTextHeight) labelHeight = minTextHeight;
 	irr::s32 btnTop = top + labelHeight + gap;
@@ -2120,14 +2129,14 @@ void Game::ResizeCardSelectButtons(irr::gui::IGUIWindow* window,
 	}
 	irr::s32 barTop = btnTop + btnHeight + gap;
 	irr::s32 barWidth = stride * ct - gap;
-	irr::s32 barHeight = 20 * yScale;
+	irr::s32 barHeight = 20 * _yScale;
 	if (barHeight > 25) barHeight = 25;
 	scrollbar->setRelativePosition(irr::core::recti(startpos, barTop, startpos + barWidth, barTop + barHeight));
-	irr::s32 btnOKWidth = 80 * xScale;
-	irr::s32 btnOKHeight = 25 * yScale;
+	irr::s32 btnOKWidth = 80 * _xScale;
+	irr::s32 btnOKHeight = 25 * _yScale;
 	if (btnOKHeight < minTextHeight) btnOKHeight = minTextHeight;
 	buttonOK->setRelativePosition(irr::core::recti(startpos + barWidth / 2 - btnOKWidth / 2, barTop + barHeight + gap * 2, startpos + barWidth / 2 + btnOKWidth / 2, barTop + barHeight + gap * 2 + btnOKHeight));
-	irr::s32 windowWidth = 30 * xScale * 2 + stride * 5 - gap;
+	irr::s32 windowWidth = 30 * _xScale * 2 + stride * 5 - gap;
 	irr::s32 windowHeight = top + labelHeight + btnHeight + barHeight + btnOKHeight + gap * 6;
 	window->setRelativePosition(irr::core::recti(663 * xScale - windowWidth / 2, 263 * yScale - windowHeight / 2, 663 * xScale + windowWidth / 2, 263 * yScale + windowHeight / 2));
 }
