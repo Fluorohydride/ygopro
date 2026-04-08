@@ -116,7 +116,7 @@ public:
 	wstring_map _sysStrings;
 	char errmsg[512]{};
 	const wchar_t* unknown_string{ L"???" };
-	irr::io::IFileSystem* FileSystem{};
+	irr::io::IFileSystem* IrrFileSystem{};
 
 	static constexpr uint32_t STRING_ID_LOCATION = 1000;
 	static constexpr uint32_t STRING_ID_ATTRIBUTE = 1010;
