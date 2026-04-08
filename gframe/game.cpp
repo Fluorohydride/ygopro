@@ -438,6 +438,14 @@ bool Game::Initialize() {
 	btnWinResizeL = env->addButton(irr::core::rect<irr::s32>(posX + 185, posY, posX + 215, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_L, dataManager.GetSysString(1285));
 	btnWinResizeXL = env->addButton(irr::core::rect<irr::s32>(posX + 220, posY, posX + 250, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_XL, dataManager.GetSysString(1286));
 	posY += 30;
+	chkResizePopupMenu = env->addCheckBox(gameConf.resize_popup_menu > 0, irr::core::rect<irr::s32>(posX, posY, posX + 120, posY + 25), tabSystem, CHECKBOX_RESIZE_POPUP_MENU, dataManager.GetSysString(1386));
+	scrResizePopupMenu = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 116, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_RESIZE_POPUP_MENU);
+	scrResizePopupMenu->setMax(5);
+	scrResizePopupMenu->setMin(1);
+	scrResizePopupMenu->setPos(gameConf.resize_popup_menu > 0 ? gameConf.resize_popup_menu : 3);
+	scrResizePopupMenu->setLargeStep(1);
+	scrResizePopupMenu->setSmallStep(1);
+	posY += 30;
 	chkLFlist = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 110, posY + 25), tabSystem, CHECKBOX_LFLIST, dataManager.GetSysString(1288));
 	chkLFlist->setChecked(gameConf.use_lflist);
 	cbLFlist = env->addComboBox(irr::core::rect<irr::s32>(posX + 115, posY, posX + 250, posY + 25), tabSystem, COMBOBOX_LFLIST);
@@ -1396,7 +1404,8 @@ void Game::LoadConfig() {
 		} else if(!std::strcmp(strbuf, "window_height")) {
 			gameConf.window_height = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "resize_popup_menu")) {
-			gameConf.resize_popup_menu = std::strtol(valbuf, nullptr, 10) > 0;
+			int val = std::strtol(valbuf, nullptr, 10);
+			gameConf.resize_popup_menu = myclamp(val, 0, 5);
 #ifdef YGOPRO_USE_AUDIO
 		} else if(!std::strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = std::strtol(valbuf, nullptr, 10) > 0;
@@ -1503,7 +1512,7 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "window_maximized = %d\n", (gameConf.window_maximized ? 1 : 0));
 	std::fprintf(fp, "window_width = %d\n", gameConf.window_width);
 	std::fprintf(fp, "window_height = %d\n", gameConf.window_height);
-	std::fprintf(fp, "resize_popup_menu = %d\n", gameConf.resize_popup_menu ? 1 : 0);
+	std::fprintf(fp, "resize_popup_menu = %d\n", gameConf.resize_popup_menu);
 #ifdef YGOPRO_USE_AUDIO
 	std::fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	std::fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
@@ -1960,6 +1969,7 @@ void Game::OnResize() {
 	//sound / music volume bar
 	scrSoundVolume->setRelativePosition(irr::core::recti(scrSoundVolume->getRelativePosition().UpperLeftCorner.X, scrSoundVolume->getRelativePosition().UpperLeftCorner.Y, 20 + (300 * xScale) - 70, scrSoundVolume->getRelativePosition().LowerRightCorner.Y));
 	scrMusicVolume->setRelativePosition(irr::core::recti(scrMusicVolume->getRelativePosition().UpperLeftCorner.X, scrMusicVolume->getRelativePosition().UpperLeftCorner.Y, 20 + (300 * xScale) - 70, scrMusicVolume->getRelativePosition().LowerRightCorner.Y));
+	scrResizePopupMenu->setRelativePosition(irr::core::recti(scrResizePopupMenu->getRelativePosition().UpperLeftCorner.X, scrResizePopupMenu->getRelativePosition().UpperLeftCorner.Y, 20 + (300 * xScale) - 70, scrResizePopupMenu->getRelativePosition().LowerRightCorner.Y));
 
 	irr::core::recti tabHelperPos = irr::core::recti(0, 0, 300 * xScale - 50, 365 * yScale - 65);
 	tabHelper->setRelativePosition(tabHelperPos);
@@ -1984,23 +1994,6 @@ void Game::OnResize() {
 	} else
 		scrTabSystem->setVisible(false);
 
-	if(gameConf.resize_popup_menu) {
-		int width = 100 * xScale;
-		int height = (yScale >= 0.666) ? 21 * yScale : 14;
-		wCmdMenu->setRelativePosition(irr::core::recti(1, 1, width + 1, 1));
-		btnActivate->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnSummon->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnSPSummon->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnMSet->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnSSet->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnRepos->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnAttack->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnActivate->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnShowList->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnOperation->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnReset->setRelativePosition(irr::core::recti(1, 1, width, height));
-	}
-
 	wCardImg->setRelativePosition(ResizeCardImgWin(1, 1, 20, 18));
 	imgCard->setRelativePosition(ResizeCardImgWin(10, 9, 0, 0));
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
@@ -2019,6 +2012,7 @@ void Game::OnResize() {
 	btnEP->setRelativePosition(Resize(320, 0, 370, 20));
 
 	ResizeChatInputWindow();
+	ResizeCmdMenu();
 
 	btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
 	wReplayControl->setRelativePosition(Resize(205, 143, 295, 273));
@@ -2049,6 +2043,22 @@ void Game::ResizeChatInputWindow() {
 	if(is_building) x = 802 * xScale;
 	wChat->setRelativePosition(irr::core::recti(x, window_size.Height - 25, window_size.Width, window_size.Height));
 	ebChatInput->setRelativePosition(irr::core::recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
+}
+void Game::ResizeCmdMenu(){
+	irr::s32 width = GetPopupMenuButtonWidth();
+	irr::s32 height = GetPopupMenuButtonHeight();
+	wCmdMenu->setRelativePosition(irr::core::recti(0, 0, width, 0));
+	btnActivate->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnSummon->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnSPSummon->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnMSet->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnSSet->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnRepos->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnAttack->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnActivate->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnShowList->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnOperation->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnReset->setRelativePosition(irr::core::recti(0, 0, width, height));
 }
 void Game::ResizePosSelectButtons() {
 	irr::s32 imgHeight = CARD_IMG_HEIGHT * 0.5f * yScale + 0.5f;

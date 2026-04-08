@@ -101,7 +101,7 @@ struct Config {
 	bool window_maximized{ false };
 	int window_width{ GAME_WINDOW_WIDTH };
 	int window_height{ GAME_WINDOW_HEIGHT };
-	bool resize_popup_menu{ false };
+	int resize_popup_menu{ 0 };
 };
 
 struct DuelInfo {
@@ -212,6 +212,23 @@ public:
 	int ChatLocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
 
+	irr::s32 GetPopupMenuButtonWidth() const {
+		if(gameConf.resize_popup_menu > 0) {
+			return (xScale >= 0.7f) ? 100 * xScale : 70;
+		} else {
+			return 100;
+		}
+	}
+
+	irr::s32 GetPopupMenuButtonHeight() const {
+		if(gameConf.resize_popup_menu > 0) {
+			float yScaleForMenu = yScale * (1 + (gameConf.resize_popup_menu - 1) * 0.33f);
+			return (yScaleForMenu >= 0.7f) ? 24 * yScaleForMenu : 16;
+		} else {
+			return 24;
+		}
+	}
+
 	bool HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();
 		return focus && focus->hasType(type);
@@ -225,6 +242,7 @@ public:
 
 	void OnResize(); // caller must hold gMutex
 	void ResizeChatInputWindow();
+	void ResizeCmdMenu();
 	void ResizePosSelectButtons();
 	void ResizeCardSelectButtons(irr::gui::IGUIWindow* window, irr::gui::IGUIStaticText** labels, irr::gui::IGUIButton** images,
 		irr::gui::IGUIScrollBar* scrollbar, irr::gui::IGUIButton* buttonOK, const std::vector<ClientCard*>& cards);
@@ -372,6 +390,8 @@ public:
 	irr::gui::IGUIScrollBar* scrSoundVolume{};
 	irr::gui::IGUIScrollBar* scrMusicVolume{};
 	irr::gui::IGUICheckBox* chkMusicMode{};
+	irr::gui::IGUICheckBox* chkResizePopupMenu{};
+	irr::gui::IGUIScrollBar* scrResizePopupMenu{};
 	irr::gui::IGUIButton* btnWinResizeS{};
 	irr::gui::IGUIButton* btnWinResizeM{};
 	irr::gui::IGUIButton* btnWinResizeL{};
@@ -861,6 +881,8 @@ extern Game* mainGame;
 #define BUTTON_BIG_CARD_ZOOM_IN		381
 #define BUTTON_BIG_CARD_ZOOM_OUT	382
 #define BUTTON_BIG_CARD_ORIG_SIZE	383
+#define CHECKBOX_RESIZE_POPUP_MENU	384
+#define SCROLL_RESIZE_POPUP_MENU	385
 
 #define AVAIL_OCG					0x1
 #define AVAIL_TCG					0x2
