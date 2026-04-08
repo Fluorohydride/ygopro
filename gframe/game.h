@@ -95,8 +95,8 @@ struct Config {
 	int prefer_expansion_script{ 0 };
 	bool enable_sound{ true };
 	bool enable_music{ true };
-	double sound_volume{ 0.5 };
-	double music_volume{ 0.5 };
+	int sound_volume{ 50 };
+	int music_volume{ 50 };
 	int music_mode{ 1 };
 	bool window_maximized{ false };
 	int window_width{ GAME_WINDOW_WIDTH };

@@ -1,4 +1,4 @@
-#include <algorithm>
+﻿#include <algorithm>
 #include "event_handler.h"
 #include "client_field.h"
 #include "network.h"
@@ -1997,8 +1997,8 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				break;
 			}
 			case SCROLL_VOLUME: {
-				mainGame->gameConf.sound_volume = (double)mainGame->scrSoundVolume->getPos() / 100;
-				mainGame->gameConf.music_volume = (double)mainGame->scrMusicVolume->getPos() / 100;
+				mainGame->gameConf.sound_volume = mainGame->scrSoundVolume->getPos();
+				mainGame->gameConf.music_volume = mainGame->scrMusicVolume->getPos();
 				soundManager.SetSoundVolume(mainGame->gameConf.sound_volume);
 				soundManager.SetMusicVolume(mainGame->gameConf.music_volume);
 				return true;

@@ -44,8 +44,8 @@ public:
 	void PlayMusic(wchar_t* music, bool loop);
 	void PlayBGM(int scene);
 	void StopBGM();
-	void SetSoundVolume(double volume);
-	void SetMusicVolume(double volume);
+	void SetSoundVolume(int volume);
+	void SetMusicVolume(int volume);
 };
 
 extern SoundManager soundManager;

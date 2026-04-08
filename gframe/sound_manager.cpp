@@ -322,20 +322,20 @@ void SoundManager::StopBGM() {
 	engineMusic->stopAllSounds();
 #endif
 }
-void SoundManager::SetSoundVolume(double volume) {
+void SoundManager::SetSoundVolume(int volume) {
 #ifdef YGOPRO_USE_MINIAUDIO
-	ma_engine_set_volume(&engineSound, volume);
+	ma_engine_set_volume(&engineSound, volume / 100.0f);
 #endif
 #ifdef YGOPRO_USE_IRRKLANG
-	engineSound->setSoundVolume(volume);
+	engineSound->setSoundVolume(volume / 100.0f);
 #endif
 }
-void SoundManager::SetMusicVolume(double volume) {
+void SoundManager::SetMusicVolume(int volume) {
 #ifdef YGOPRO_USE_MINIAUDIO
-	ma_engine_set_volume(&engineMusic, volume);
+	ma_engine_set_volume(&engineMusic, volume / 100.0f);
 #endif
 #ifdef YGOPRO_USE_IRRKLANG
-	engineMusic->setSoundVolume(volume);
+	engineMusic->setSoundVolume(volume / 100.0f);
 #endif
 }
 }

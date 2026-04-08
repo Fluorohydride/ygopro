@@ -452,7 +452,7 @@ bool Game::Initialize() {
 	scrSoundVolume = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 116, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_VOLUME);
 	scrSoundVolume->setMax(100);
 	scrSoundVolume->setMin(0);
-	scrSoundVolume->setPos(gameConf.sound_volume * 100);
+	scrSoundVolume->setPos(gameConf.sound_volume);
 	scrSoundVolume->setLargeStep(1);
 	scrSoundVolume->setSmallStep(1);
 	posY += 30;
@@ -461,7 +461,7 @@ bool Game::Initialize() {
 	scrMusicVolume = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 116, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_VOLUME);
 	scrMusicVolume->setMax(100);
 	scrMusicVolume->setMin(0);
-	scrMusicVolume->setPos(gameConf.music_volume * 100);
+	scrMusicVolume->setPos(gameConf.music_volume);
 	scrMusicVolume->setLargeStep(1);
 	scrMusicVolume->setSmallStep(1);
 	posY += 30;
@@ -1402,14 +1402,12 @@ void Game::LoadConfig() {
 			gameConf.enable_sound = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "sound_volume")) {
 			int vol = std::strtol(valbuf, nullptr, 10);
-			vol = myclamp(vol, 0, 100);
-			gameConf.sound_volume = (double)vol / 100;
+			gameConf.sound_volume = myclamp(vol, 0, 100);
 		} else if(!std::strcmp(strbuf, "enable_music")) {
 			gameConf.enable_music = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "music_volume")) {
 			int vol = std::strtol(valbuf, nullptr, 10);
-			vol = myclamp(vol, 0, 100);
-			gameConf.music_volume = (double)vol / 100;
+			gameConf.music_volume = myclamp(vol, 0, 100);
 		} else if(!std::strcmp(strbuf, "music_mode")) {
 			gameConf.music_mode = std::strtol(valbuf, nullptr, 10);
 #endif
@@ -1510,10 +1508,8 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	std::fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
 	std::fprintf(fp, "#Volume of sound and music, between 0 and 100\n");
-	int vol = gameConf.sound_volume * 100;
-	std::fprintf(fp, "sound_volume = %d\n", vol);
-	vol = gameConf.music_volume * 100;
-	std::fprintf(fp, "music_volume = %d\n", vol);
+	std::fprintf(fp, "sound_volume = %d\n", gameConf.sound_volume);
+	std::fprintf(fp, "music_volume = %d\n", gameConf.music_volume);
 	std::fprintf(fp, "music_mode = %d\n", (chkMusicMode->isChecked() ? 1 : 0));
 #endif
 	std::fclose(fp);
