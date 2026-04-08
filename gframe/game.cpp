@@ -2061,7 +2061,7 @@ void Game::ResizeChatInputWindow() {
 	ebChatInput->setRelativePosition(irr::core::recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 }
 void Game::ResizePosSelectButtons() {
-	irr::s32 imgHeight = CARD_IMG_HEIGHT * 0.5f * mainGame->yScale + 0.5f;
+	irr::s32 imgHeight = CARD_IMG_HEIGHT * 0.5f * yScale + 0.5f;
 	irr::s32 gap = 5 * xScale + 0.5f;
 	irr::s32 btnPosWidth = imgHeight + gap * 2; // Square buttons, width = height
 	irr::s32 stride = btnPosWidth + gap;
@@ -2100,8 +2100,8 @@ void Game::ResizeCardSelectButtons(irr::gui::IGUIWindow* window,
 								   irr::gui::IGUIButton* buttonOK,
 								   const std::vector<ClientCard*>& cards) {
 	irr::s32 gap = 5 * xScale + 0.5f;
-	irr::s32 btnWidth = CARD_IMG_WIDTH * 0.55f * mainGame->yScale + 0.5f;
-	irr::s32 btnHeight = CARD_IMG_HEIGHT * 0.55f * mainGame->yScale + 0.5f;
+	irr::s32 btnWidth = CARD_IMG_WIDTH * 0.55f * yScale + 0.5f;
+	irr::s32 btnHeight = CARD_IMG_HEIGHT * 0.55f * yScale + 0.5f;
 	irr::s32 stride = btnWidth + gap;
 	int startpos = 30 * xScale;
 	int ct = 5;
