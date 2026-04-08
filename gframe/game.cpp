@@ -1402,19 +1402,13 @@ void Game::LoadConfig() {
 			gameConf.enable_sound = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "sound_volume")) {
 			int vol = std::strtol(valbuf, nullptr, 10);
-			if (vol < 0)
-				vol = 0;
-			else if (vol > 100)
-				vol = 100;
+			vol = myclamp(vol, 0, 100);
 			gameConf.sound_volume = (double)vol / 100;
 		} else if(!std::strcmp(strbuf, "enable_music")) {
 			gameConf.enable_music = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "music_volume")) {
 			int vol = std::strtol(valbuf, nullptr, 10);
-			if (vol < 0)
-				vol = 0;
-			else if (vol > 100)
-				vol = 100;
+			vol = myclamp(vol, 0, 100);
 			gameConf.music_volume = (double)vol / 100;
 		} else if(!std::strcmp(strbuf, "music_mode")) {
 			gameConf.music_mode = std::strtol(valbuf, nullptr, 10);
