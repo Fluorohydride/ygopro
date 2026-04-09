@@ -190,4 +190,32 @@ void ImageUtility::Resize(irr::video::IImage* src, irr::video::IImage* dest, boo
 	imageScaleNNAA(src, dest, use_threading);
 }
 
+/**
+ * Rotate image counter-clockwise by 90 degrees. (Defense position)
+ * @return Image pointer. Must be dropped after use.
+ */
+irr::video::IImage* ImageUtility::RotateImageCCW90(irr::video::IVideoDriver* driver, irr::video::IImage* src) {
+	if(!src || !driver)
+		return nullptr;
+	irr::core::dimension2d<irr::u32> srcSize = src->getDimension();
+	irr::core::dimension2d<irr::u32> destSize(srcSize.Height, srcSize.Width);
+	irr::video::IImage* dest = driver->createImage(src->getColorFormat(), destSize);
+	void* srcData = src->lock();
+	void* destData = dest->lock();
+	if(srcData && destData) {
+		irr::u32 srcPitch = src->getPitch();
+		irr::u32 destPitch = dest->getPitch();
+		irr::u32 bytesPerPixel = src->getBytesPerPixel();
+		for(irr::u32 y = 0; y < srcSize.Height; ++y) {
+			for(irr::u32 x = 0; x < srcSize.Width; ++x) {
+				// counter-clockwise 90 degrees: dest(y, W-1-x) = src(x, y)
+				irr::u32 srcOffset = y * srcPitch + x * bytesPerPixel;
+				irr::u32 destOffset = (srcSize.Width - 1 - x) * destPitch + y * bytesPerPixel;
+				memcpy((irr::u8*)destData + destOffset, (irr::u8*)srcData + srcOffset, bytesPerPixel);
+			}
+		}
+	}
+	return dest;
+}
+
 } // namespace ygo

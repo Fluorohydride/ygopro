@@ -887,17 +887,24 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case SCROLL_CARD_SELECT: {
 				int pos = mainGame->scrCardList->getPos() / 10;
+				mainGame->gMutex.lock();
 				for(int i = 0; i < 5; ++i) {
 					// draw selectable_cards[i + pos] in btnCardSelect[i]
 					mainGame->stCardPos[i]->enableOverrideColor(false);
 					// image
-					if(selectable_cards[i + pos]->code)
-						mainGame->btnCardSelect[i]->setImage(imageManager.GetTexture(selectable_cards[i + pos]->code));
-					else if(select_continuous)
-						mainGame->btnCardSelect[i]->setImage(imageManager.GetTexture(selectable_cards[i + pos]->chain_code));
-					else
-						mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i + pos]->controler + 2]);
-					mainGame->btnCardSelect[i]->setRelativePosition(irr::core::rect<irr::s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
+					if(selectable_cards[i + pos]->code) {
+						mainGame->btnCardSelect[i]->setImage(imageManager.GetTextureButton(selectable_cards[i + pos]->code));
+						mainGame->btnCardImgInfo[mainGame->btnCardSelect[i]] = {selectable_cards[i + pos]->code, false};
+						mainGame->btnFacedownImgInfo.erase(mainGame->btnCardSelect[i]);
+					} else if(select_continuous) {
+						mainGame->btnCardSelect[i]->setImage(imageManager.GetTextureButton(selectable_cards[i + pos]->chain_code));
+						mainGame->btnCardImgInfo[mainGame->btnCardSelect[i]] = {selectable_cards[i + pos]->chain_code, false};
+						mainGame->btnFacedownImgInfo.erase(mainGame->btnCardSelect[i]);
+					} else {
+						mainGame->btnCardSelect[i]->setImage(imageManager.tButtonFacedown[selectable_cards[i + pos]->controler]);
+						mainGame->btnFacedownImgInfo[mainGame->btnCardSelect[i]] = {selectable_cards[i + pos]->controler, false};
+						mainGame->btnCardImgInfo.erase(mainGame->btnCardSelect[i]);
+					}
 					// text
 					wchar_t formatBuffer[2048];
 					if(mainGame->dInfo.curMsg == MSG_SORT_CARD) {
@@ -947,18 +954,26 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 					}
 				}
+				mainGame->gMutex.unlock();
 				break;
 			}
 			case SCROLL_CARD_DISPLAY: {
 				int pos = mainGame->scrDisplayList->getPos() / 10;
+				mainGame->gMutex.lock();
 				for(int i = 0; i < 5; ++i) {
 					// draw display_cards[i + pos] in btnCardDisplay[i]
 					mainGame->stDisplayPos[i]->enableOverrideColor(false);
-					if(display_cards[i + pos]->code)
-						mainGame->btnCardDisplay[i]->setImage(imageManager.GetTexture(display_cards[i + pos]->code));
-					else
-						mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[display_cards[i + pos]->controler + 2]);
-					mainGame->btnCardDisplay[i]->setRelativePosition(irr::core::rect<irr::s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
+					// image
+					if(display_cards[i + pos]->code) {
+						mainGame->btnCardDisplay[i]->setImage(imageManager.GetTextureButton(display_cards[i + pos]->code));
+						mainGame->btnCardImgInfo[mainGame->btnCardDisplay[i]] = {display_cards[i + pos]->code, false};
+						mainGame->btnFacedownImgInfo.erase(mainGame->btnCardDisplay[i]);
+					} else {
+						mainGame->btnCardDisplay[i]->setImage(imageManager.tButtonFacedown[display_cards[i + pos]->controler]);
+						mainGame->btnFacedownImgInfo[mainGame->btnCardDisplay[i]] = {display_cards[i + pos]->controler, false};
+						mainGame->btnCardImgInfo.erase(mainGame->btnCardDisplay[i]);
+					}
+					// text
 					wchar_t formatBuffer[2048];
 					if(display_cards[i + pos]->location == LOCATION_OVERLAY)
 						myswprintf(formatBuffer, L"%ls[%d](%d)",
@@ -966,6 +981,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					else
 						myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(display_cards[i + pos]), display_cards[i + pos]->sequence + 1);
 					mainGame->stDisplayPos[i]->setText(formatBuffer);
+					// color
 					if(display_cards[i + pos]->location == LOCATION_OVERLAY) {
 						if(display_cards[i + pos]->owner != display_cards[i + pos]->overlayTarget->controler)
 							mainGame->stDisplayPos[i]->setOverrideColor(0xff0000ff);
@@ -988,6 +1004,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 					}
 				}
+				mainGame->gMutex.unlock();
 				break;
 			}
 			break;
@@ -1796,7 +1813,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				wchar_t formatBuffer[2048];
 				myswprintf(formatBuffer, L"%ls(%zu)", dataManager.GetSysString(loc_id), display_cards.size());
 				mainGame->wCardDisplay->setText(formatBuffer);
+				mainGame->gMutex.lock();
 				ShowLocationCard();
+				mainGame->gMutex.unlock();
 			}
 			break;
 		}
