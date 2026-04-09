@@ -1548,6 +1548,7 @@ void ClientField::UpdateDeclarableList() {
 		int sel = mainGame->lstANCard->getSelected();
 		trycode = (sel == -1) ? 0 : ancard[sel];
 	}
+	auto setcodes = dataManager.GetSetCodes(pname);
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	auto& _datas = dataManager.GetDataTable();
@@ -1555,11 +1556,12 @@ void ClientField::UpdateDeclarableList() {
 	for(auto& entry : _strings) {
 		auto& code = entry.first;
 		auto& str = entry.second;
-		if(str.name.find(pname) != std::wstring::npos) {
-			auto cp = _datas.find(code);
-			if (cp == _datas.end())
-				continue;
-			if(is_declarable(cp->second, declare_opcodes)) {
+		auto cp = _datas.find(code);
+		if (cp == _datas.end())
+			continue;
+		auto& data = cp->second;
+		if(DataManager::CardNameContains(str.name.c_str(), pname) || data.is_setcodes(setcodes)) {
+			if(is_declarable(data, declare_opcodes)) {
 				if(pname == str.name || trycode == code) { //exact match or last used
 					mainGame->lstANCard->insertItem(0, str.name.c_str(), -1);
 					ancard.insert(ancard.begin(), code);
