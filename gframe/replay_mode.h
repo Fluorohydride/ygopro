@@ -20,7 +20,8 @@ private:
 	static int skip_turn;
 	static int current_step;
 	static int skip_step;
-	static void ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer);
+	static void ReloadLocation(int player, int location, int flag);
+	static std::vector<unsigned char> queryBuffer;
 
 public:
 	static Replay cur_replay;

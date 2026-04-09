@@ -46,6 +46,7 @@ private:
 	int WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache);
 	
 protected:
+	std::vector<unsigned char> query_buffer;
 	DuelPlayer* players[2]{};
 	DuelPlayer* pplayer[2]{};
 	bool ready[2]{};
