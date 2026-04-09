@@ -432,6 +432,9 @@ bool Game::Initialize() {
 	chkPreferExpansionScript = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_PREFER_EXPANSION, dataManager.GetSysString(1379));
 	chkPreferExpansionScript->setChecked(gameConf.prefer_expansion_script != 0);
 	posY += 30;
+	chkSwapYesNoButton = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_SWAP_YES_NO_BUTTON, dataManager.GetSysString(1388));
+	chkSwapYesNoButton->setChecked(gameConf.swap_yes_no_button);
+	posY += 30;
 	chkResizeSelectWindow = env->addCheckBox(gameConf.resize_select_window, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_RESIZE_SELECT_WINDOW, dataManager.GetSysString(1387));
 	posY += 30;
 	env->addStaticText(dataManager.GetSysString(1282), irr::core::rect<irr::s32>(posX + 23, posY + 3, posX + 110, posY + 28), false, false, tabSystem);
@@ -949,6 +952,7 @@ bool Game::Initialize() {
 		chkMusicMode->setEnabled(false);
 		chkMusicMode->setVisible(false);
 	}
+	SwapYesNoButtons(gameConf.swap_yes_no_button);
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
 	for (int i = 0; i < irr::gui::EGDC_COUNT; ++i) {
@@ -1399,6 +1403,8 @@ void Game::LoadConfig() {
 			gameConf.hide_player_name = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "prefer_expansion_script")) {
 			gameConf.prefer_expansion_script = std::strtol(valbuf, nullptr, 10);
+		} else if(!std::strcmp(strbuf, "swap_yes_no_button")) {
+			gameConf.swap_yes_no_button = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "window_maximized")) {
 			gameConf.window_maximized = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "window_width")) {
@@ -1513,6 +1519,7 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "draw_single_chain = %d\n", gameConf.draw_single_chain);
 	std::fprintf(fp, "hide_player_name = %d\n", gameConf.hide_player_name);
 	std::fprintf(fp, "prefer_expansion_script = %d\n", gameConf.prefer_expansion_script);
+	std::fprintf(fp, "swap_yes_no_button = %d\n", (chkSwapYesNoButton->isChecked() ? 1 : 0));
 	std::fprintf(fp, "window_maximized = %d\n", (gameConf.window_maximized ? 1 : 0));
 	std::fprintf(fp, "window_width = %d\n", gameConf.window_width);
 	std::fprintf(fp, "window_height = %d\n", gameConf.window_height);
@@ -1841,6 +1848,27 @@ int Game::ChatLocalPlayer(int player) {
 }
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
+}
+void Game::SwapYesNoButtons(bool no_first) {
+	if(no_first) {
+		btnYes->setRelativePosition(irr::core::rect<irr::s32>(200, 105, 250, 130));
+		btnNo->setRelativePosition(irr::core::rect<irr::s32>(100, 105, 150, 130));
+		btnSurrenderYes->setRelativePosition(irr::core::rect<irr::s32>(200, 105, 250, 130));
+		btnSurrenderNo->setRelativePosition(irr::core::rect<irr::s32>(100, 105, 150, 130));
+		btnRSYes->setRelativePosition(irr::core::rect<irr::s32>(170, 80, 240, 105));
+		btnRSNo->setRelativePosition(irr::core::rect<irr::s32>(70, 80, 140, 105));
+		btnDMOK->setRelativePosition(irr::core::rect<irr::s32>(170, 80, 240, 105));
+		btnDMCancel->setRelativePosition(irr::core::rect<irr::s32>(70, 80, 140, 105));
+	} else {
+		btnYes->setRelativePosition(irr::core::rect<irr::s32>(100, 105, 150, 130));
+		btnNo->setRelativePosition(irr::core::rect<irr::s32>(200, 105, 250, 130));
+		btnSurrenderYes->setRelativePosition(irr::core::rect<irr::s32>(100, 105, 150, 130));
+		btnSurrenderNo->setRelativePosition(irr::core::rect<irr::s32>(200, 105, 250, 130));
+		btnRSYes->setRelativePosition(irr::core::rect<irr::s32>(70, 80, 140, 105));
+		btnRSNo->setRelativePosition(irr::core::rect<irr::s32>(170, 80, 240, 105));
+		btnDMOK->setRelativePosition(irr::core::rect<irr::s32>(70, 80, 140, 105));
+		btnDMCancel->setRelativePosition(irr::core::rect<irr::s32>(170, 80, 240, 105));
+	}
 }
 void Game::OnResize() {
 #ifdef _WIN32

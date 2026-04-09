@@ -1934,6 +1934,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				return true;
 				break;
 			}
+			case CHECKBOX_SWAP_YES_NO_BUTTON: {
+				bool checked = mainGame->chkSwapYesNoButton->isChecked();
+				mainGame->gameConf.swap_yes_no_button = checked;
+				mainGame->SwapYesNoButtons(checked);
+				return true;
+				break;
+			}
 			case CHECKBOX_RESIZE_SELECT_WINDOW: {
 				mainGame->gameConf.resize_select_window = mainGame->chkResizeSelectWindow->isChecked();
 				if(mainGame->dInfo.isInDuel)

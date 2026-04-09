@@ -103,6 +103,7 @@ struct Config {
 	int window_height{ GAME_WINDOW_HEIGHT };
 	int resize_popup_menu{ 0 };
 	bool resize_select_window{ true };
+	bool swap_yes_no_button{ false };
 };
 
 struct DuelInfo {
@@ -240,6 +241,8 @@ public:
 		text.trim();
 		editbox->setText(text.c_str());
 	}
+
+	void SwapYesNoButtons(bool no_first);
 
 	void OnResize(); // caller must hold gMutex
 	void ResizeChatInputWindow();
@@ -384,6 +387,7 @@ public:
 	irr::gui::IGUICheckBox* chkAutoSearch{};
 	irr::gui::IGUICheckBox* chkMultiKeywords{};
 	irr::gui::IGUICheckBox* chkPreferExpansionScript{};
+	irr::gui::IGUICheckBox* chkSwapYesNoButton{};
 	irr::gui::IGUICheckBox* chkLFlist{};
 	irr::gui::IGUIComboBox* cbLFlist{};
 	irr::gui::IGUICheckBox* chkEnableSound{};
@@ -886,6 +890,7 @@ extern Game* mainGame;
 #define CHECKBOX_RESIZE_POPUP_MENU	384
 #define SCROLL_RESIZE_POPUP_MENU	385
 #define CHECKBOX_RESIZE_SELECT_WINDOW	386
+#define CHECKBOX_SWAP_YES_NO_BUTTON	387
 
 #define AVAIL_OCG					0x1
 #define AVAIL_TCG					0x2
