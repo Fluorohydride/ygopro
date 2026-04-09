@@ -1,4 +1,4 @@
-﻿#include <algorithm>
+#include <algorithm>
 #include "event_handler.h"
 #include "client_field.h"
 #include "network.h"
@@ -1943,8 +1943,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			case CHECKBOX_RESIZE_SELECT_WINDOW: {
 				mainGame->gameConf.resize_select_window = mainGame->chkResizeSelectWindow->isChecked();
-				if(mainGame->dInfo.isInDuel)
-					mainGame->OnResize();
+				mainGame->OnResize();
 				return true;
 				break;
 			}

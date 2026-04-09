@@ -2088,7 +2088,6 @@ void Game::ResizeCmdMenu(){
 	btnSSet->setRelativePosition(irr::core::recti(0, 0, width, height));
 	btnRepos->setRelativePosition(irr::core::recti(0, 0, width, height));
 	btnAttack->setRelativePosition(irr::core::recti(0, 0, width, height));
-	btnActivate->setRelativePosition(irr::core::recti(0, 0, width, height));
 	btnShowList->setRelativePosition(irr::core::recti(0, 0, width, height));
 	btnOperation->setRelativePosition(irr::core::recti(0, 0, width, height));
 	btnReset->setRelativePosition(irr::core::recti(0, 0, width, height));
