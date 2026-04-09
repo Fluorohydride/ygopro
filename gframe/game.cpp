@@ -2077,7 +2077,7 @@ void Game::ResizeChatInputWindow() {
 	wChat->setRelativePosition(irr::core::recti(x, window_size.Height - 25, window_size.Width, window_size.Height));
 	ebChatInput->setRelativePosition(irr::core::recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 }
-void Game::ResizeCmdMenu(){
+void Game::ResizeCmdMenu() {
 	irr::s32 width = GetPopupMenuButtonWidth();
 	irr::s32 height = GetPopupMenuButtonHeight();
 	wCmdMenu->setRelativePosition(irr::core::recti(0, 0, width, 0));
