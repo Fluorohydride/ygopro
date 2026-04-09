@@ -916,8 +916,6 @@ void ReplayMode::ReplayReload() {
 	ReloadLocation(1, LOCATION_REMOVED, flag, queryBuffer);
 }
 uint32_t ReplayMode::MessageHandler(intptr_t fduel, uint32_t type) {
-	if(!mainGame->gameConf.enable_log)
-		return 0;
 	char msgbuf[1024];
 	get_log_message(fduel, msgbuf);
 	mainGame->AddDebugMsg(msgbuf);
