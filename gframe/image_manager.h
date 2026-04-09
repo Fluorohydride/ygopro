@@ -24,11 +24,14 @@ public:
 	irr::video::ITexture* GetBigPicture(int code, float zoom);
 	irr::video::ITexture* GetTextureThumb(int code);
 	irr::video::ITexture* GetTextureField(int code);
+	irr::video::ITexture* GetTextureButton(int code, bool defense = false);
 	static int LoadThumbThread();
 
 	std::unordered_map<int, irr::video::ITexture*> tMap[2];
 	std::unordered_map<int, irr::video::ITexture*> tThumb;
 	std::unordered_map<int, irr::video::ITexture*> tFields;
+	std::unordered_map<int, irr::video::ITexture*> tButton;
+	std::unordered_map<int, irr::video::ITexture*> tButtonDefense;
 	std::unordered_map<int, irr::video::IImage*> tThumbLoading;
 	std::queue<int> tThumbLoadingCodes;
 	std::mutex tThumbLoadingMutex;
@@ -36,7 +39,9 @@ public:
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
 	irr::io::IFileSystem* irrFileSystem;
-	irr::video::ITexture* tCover[4];
+	irr::video::ITexture* tCover[2];
+	irr::video::ITexture* tButtonFacedown[2];
+	irr::video::ITexture* tButtonFacedownDefense[2];
 	irr::video::ITexture* tUnknown;
 	irr::video::ITexture* tUnknownFit;
 	irr::video::ITexture* tUnknownThumb;

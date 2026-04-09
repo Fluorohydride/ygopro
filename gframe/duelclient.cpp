@@ -1917,37 +1917,22 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			SetResponseI(positions);
 			return true;
 		}
-		int count = 0, filter = 0x1, startpos;
-		while(filter != 0x10) {
-			if(positions & filter) count++;
-			filter <<= 1;
-		}
-		if(count == 4) startpos = 10;
-		else if(count == 3) startpos = 82;
-		else startpos = 155;
+		mainGame->gMutex.lock();
 		if(positions & 0x1) {
-			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSAU, code));
-			mainGame->btnPSAU->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnImagePending[mainGame->btnPSAU] = std::make_pair((int)code, false);
 			mainGame->btnPSAU->setVisible(true);
-			startpos += 145;
 		} else mainGame->btnPSAU->setVisible(false);
 		if(positions & 0x2) {
-			mainGame->btnPSAD->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSAD->setVisible(true);
-			startpos += 145;
 		} else mainGame->btnPSAD->setVisible(false);
 		if(positions & 0x4) {
-			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSDU, code));
-			mainGame->btnPSDU->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnImagePending[mainGame->btnPSDU] = std::make_pair((int)code, true);
 			mainGame->btnPSDU->setVisible(true);
-			startpos += 145;
 		} else mainGame->btnPSDU->setVisible(false);
 		if(positions & 0x8) {
-			mainGame->btnPSDD->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSDD->setVisible(true);
-			startpos += 145;
 		} else mainGame->btnPSDD->setVisible(false);
-		mainGame->gMutex.lock();
+		mainGame->ResizePosSelectButtons();
 		mainGame->PopupElement(mainGame->wPosSelect);
 		mainGame->gMutex.unlock();
 		return false;
@@ -2065,7 +2050,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
 		mainGame->dField.select_hint = select_hint;
 		select_hint = 0;
-		return mainGame->dField.ShowSelectSum(mainGame->dField.select_panalmode);
+		mainGame->gMutex.lock();
+		bool result = mainGame->dField.ShowSelectSum(mainGame->dField.select_panalmode);
+		mainGame->gMutex.unlock();
+		return result;
 	}
 	case MSG_SORT_CARD: {
 		/*int player = */BufferIO::Read<uint8_t>(pbuf);
@@ -2087,10 +2075,12 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			mainGame->dField.selectable_cards.push_back(pcard);
 			mainGame->dField.sort_list.push_back(0);
 		}
+		mainGame->gMutex.lock();
 		mainGame->wCardSelect->setText(dataManager.GetSysString(205));
 		mainGame->dField.select_min = 0;
 		mainGame->dField.select_max = count;
 		mainGame->dField.ShowSelectCard();
+		mainGame->gMutex.unlock();
 		return false;
 	}
 	case MSG_CONFIRM_DECKTOP: {

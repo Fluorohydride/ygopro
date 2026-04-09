@@ -785,10 +785,15 @@ void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 	}
 }
 void Game::DrawGUI() {
-	while (imageLoading.size()) {
-		auto mit = imageLoading.cbegin();
-		mit->first->setImage(imageManager.GetTexture(mit->second));
-		imageLoading.erase(mit);
+	while(btnImagePending.size()) {
+		auto mit = btnImagePending.cbegin();
+		auto button = mit->first;
+		int code = mit->second.first;
+		bool rotated = mit->second.second;
+		button->setImage(imageManager.GetTextureButton(code, rotated));
+		btnCardImgInfo[button] = {code, rotated};
+		btnFacedownImgInfo.erase(button);
+		btnImagePending.erase(mit);
 	}
 	for(auto fit = fadingList.begin(); fit != fadingList.end();) {
 		auto fthis = fit++;
@@ -1137,6 +1142,8 @@ void Game::PopupElement(irr::gui::IGUIElement * element, int hideframe) {
 	else ShowElement(element, hideframe);
 }
 void Game::SetImageButtonDrawing(irr::gui::IGUIElement* element, bool draw) {
+// YGOPro was hiding the image of buttons during fading (animation), but this feature is not meaningful, and the official CGUIButton don't support to setDrawImage.
+#if false
 	if(element == wPosSelect) {
 		btnPSAU->setDrawImage(draw);
 		btnPSAD->setDrawImage(draw);
@@ -1151,6 +1158,7 @@ void Game::SetImageButtonDrawing(irr::gui::IGUIElement* element, bool draw) {
 		for(int i = 0; i < 5; ++i)
 			btnCardDisplay[i]->setDrawImage(draw);
 	}
+#endif
 }
 void Game::WaitFrameSignal(int frame) {
 	frameSignal.Reset();
