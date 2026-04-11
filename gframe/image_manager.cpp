@@ -49,6 +49,7 @@ bool ImageManager::Initial() {
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 	device = dev;
 	driver = dev->getVideoDriver();
+	irrFileSystem = dev->getFileSystem();
 }
 void ImageManager::ClearTexture() {
 	for(auto tit = tMap[0].begin(); tit != tMap[0].end(); ++tit) {
@@ -199,16 +200,22 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, irr::s3
 /**
  * Load card picture from `expansions` or `pics` folder.
  * Files in the expansions directory have priority, allowing custom pictures to be loaded without modifying the original files.
+ * If targetWidth / targetHeight are provided, libjpeg DCT-domain scaling is used for faster decoding.
+ * Note that the actual dimensions of the returned image are near to but not same as the target dimensions.
  * @return Image pointer. Must be dropped after use.
  */
-irr::video::IImage* ImageManager::GetImage(int code) {
+irr::video::IImage* ImageManager::GetImage(int code, irr::s32 targetWidth, irr::s32 targetHeight) {
 	char file[256];
 	mysnprintf(file, "expansions/pics/%d.jpg", code);
-	irr::video::IImage* img = driver->createImageFromFile(file);
-	if(img == nullptr) {
+	auto reader = irrFileSystem->createAndOpenFile(file);
+	if(reader == nullptr) {
 		mysnprintf(file, "pics/%d.jpg", code);
-		img = driver->createImageFromFile(file);
+		reader = irrFileSystem->createAndOpenFile(file);
 	}
+	if(reader == nullptr)
+		return nullptr;
+	irr::video::IImage* img = ImageUtility::LoadJpegImage(driver, reader, targetWidth, targetHeight);
+	reader->drop();
 	return img;
 }
 /**
@@ -216,7 +223,7 @@ irr::video::IImage* ImageManager::GetImage(int code) {
  * @return Texture pointer. Remove via `driver->removeTexture` (do not `drop`).
  */
 irr::video::ITexture* ImageManager::GetTexture(int code, irr::s32 width, irr::s32 height) {
-	irr::video::IImage* img = GetImage(code);
+	irr::video::IImage* img = GetImage(code, width, height);
 	if(img == nullptr) {
 		return nullptr;
 	}
@@ -284,10 +291,10 @@ int ImageManager::LoadThumbThread() {
 		int code = imageManager.tThumbLoadingCodes.front();
 		imageManager.tThumbLoadingCodes.pop();
 		imageManager.tThumbLoadingMutex.unlock();
-		irr::video::IImage* img = imageManager.GetImage(code);
+		const int width = CARD_THUMB_WIDTH * mainGame->xScale;
+		const int height = CARD_THUMB_HEIGHT * mainGame->yScale;
+		irr::video::IImage* img = imageManager.GetImage(code, width, height);
 		if(img != nullptr) {
-			int width = CARD_THUMB_WIDTH * mainGame->xScale;
-			int height = CARD_THUMB_HEIGHT * mainGame->yScale;
 			if(img->getDimension() == irr::core::dimension2d<irr::u32>(width, height)) {
 				imageManager.tThumbLoadingMutex.lock();
 				if(imageManager.tThumbLoadingThreadRunning)

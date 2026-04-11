@@ -117,6 +117,18 @@ jobs:
         tar xf ${{ steps.freetype.outputs.filepath }}
         mv freetype-2.14.2 freetype
 
+    - name: Download libjpeg-turbo
+      id: libjpeg-turbo
+      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      with:
+        url: https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.4.1/libjpeg-turbo-3.1.4.1.tar.gz
+
+    - name: Extract libjpeg-turbo
+      run: |
+        tar xf ${{ steps.libjpeg-turbo.outputs.filepath }}
+        mv libjpeg-turbo-3.1.4.1 jpeg
+        cp jpeg/src/jversion.h.in jpeg/src/jversion.h
+
     - name: Download sqlite
       id: sqlite
       uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
@@ -183,6 +195,9 @@ jobs:
         path: |
           event/
           freetype/
+          jpeg/
+          !jpeg/java/
+          !jpeg/testimgs/
           sqlite3/
           miniaudio/
           !miniaudio/external/opus/dnn/
@@ -245,6 +260,12 @@ jobs:
       with:
         name: dependencies-sources-static-link
         path: .
+
+    - name: Install NASM
+      shell: pwsh
+      run: |
+        choco install nasm -y
+        echo "C:\Program Files\NASM" >> $env:GITHUB_PATH
 
     - name: Download premake
       id: premake
@@ -423,7 +444,8 @@ jobs:
       run: |
         ./premake5 gmake \
           --build-event \
-          --build-jpeg-png \
+          --build-jpeg \
+          --build-png-irrlicht \
           --build-freetype \
           --build-sqlite \
           --build-opus-vorbis
@@ -529,7 +551,8 @@ jobs:
       run: |
         ./premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }} \
           --build-event \
-          --build-jpeg-png \
+          --build-jpeg \
+          --build-png-irrlicht \
           --build-freetype \
           --build-sqlite \
           --build-opus-vorbis
