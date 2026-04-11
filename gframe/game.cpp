@@ -15,6 +15,9 @@
 #ifdef _WIN32
 #include <timeapi.h>
 #endif
+#ifdef __APPLE__
+#include <CoreGraphics/CoreGraphics.h>
+#endif
 
 #if defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || \
 	defined(__x86_64__) || defined(_M_X64) || defined(__x86_64) || defined(_M_AMD64)
@@ -71,6 +74,7 @@ bool Game::Initialize() {
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params{};
 	params.AntiAlias = gameConf.antialias;
+	params.Vsync = gameConf.vsync;
 	if(gameConf.use_d3d)
 		params.DriverType = irr::video::EDT_DIRECT3D9;
 	else
@@ -81,6 +85,27 @@ bool Game::Initialize() {
 		ErrorLog("Failed to create Irrlicht Engine device!");
 		return false;
 	}
+	effectiveFps = gameConf.target_fps;
+	if(gameConf.vsync && effectiveFps <= 0) {
+		int detectedFps = 0;
+#ifdef _WIN32
+		DEVMODE dm{};
+		dm.dmSize = sizeof(dm);
+		if(EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dm) && dm.dmDisplayFrequency > 0)
+			detectedFps = (int)dm.dmDisplayFrequency;
+#elif defined(__APPLE__)
+		CGDisplayModeRef mode = CGDisplayCopyDisplayMode(CGMainDisplayID());
+		if(mode) {
+			double rate = CGDisplayModeGetRefreshRate(mode);
+			if(rate > 0) detectedFps = (int)rate;
+			CGDisplayModeRelease(mode);
+		}
+#endif
+		if(detectedFps > 0) effectiveFps = detectedFps;
+	}
+	if(effectiveFps < 60) effectiveFps = 60;
+	if(effectiveFps > 1000) effectiveFps = 1000;
+	fpsScale = (float)effectiveFps / 60.0f;
 #ifndef _DEBUG
 	device->getLogger()->setLogLevel(irr::ELOG_LEVEL::ELL_ERROR);
 #endif
@@ -987,13 +1012,18 @@ void Game::MainLoop() {
 	int fps = 0;
 	auto lastFpsTime = std::chrono::steady_clock::now();
 #ifdef _WIN32
-	HANDLE hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
-	bool useHighResTimer = (hWaitTimer != NULL);
-	if(!useHighResTimer)
-		timeBeginPeriod(1);
+	HANDLE hWaitTimer = NULL;
+	bool useHighResTimer = false;
+	if(!gameConf.vsync) {
+		hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
+		useHighResTimer = (hWaitTimer != NULL);
+		if(!useHighResTimer)
+			timeBeginPeriod(1);
+	}
 #endif
 	auto lastFrameTime = std::chrono::steady_clock::now();
-	constexpr auto targetFrameDuration = std::chrono::microseconds(16667);
+	auto targetFrameDuration = std::chrono::microseconds(1000000 / effectiveFps);
+	float lineAccum = 0;
 	while(device->run()) {
 		auto size = driver->getScreenSize();
 		if(window_size != size) {
@@ -1004,97 +1034,122 @@ void Game::MainLoop() {
 			OnResize();
 			gMutex.unlock();
 		}
-		linePattern = (linePattern + 1) % 30;
-		stippleMask = (stippleMask << 1) | (stippleMask >> 15);
-		atkframe += 0.1f;
+		logicalFrameAccum += 1.0f;
+		logicalTick = false;
+		if(logicalFrameAccum >= fpsScale) {
+			logicalFrameAccum -= fpsScale;
+			logicalTick = true;
+		}
+		lineAccum += 1.0f;
+		while(lineAccum >= fpsScale) {
+			lineAccum -= fpsScale;
+			linePattern = (linePattern + 1) % 30;
+			stippleMask = (stippleMask << 1) | (stippleMask >> 15);
+		}
+		atkframe += 0.1f / fpsScale;
 		if(atkframe > 6.2832f)
 			atkframe -= 6.2832f;
 		atkdy = (float)sin(atkframe);
-		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
-		gMutex.lock();
-		if(dInfo.isStarted) {
-			if(dInfo.isFinished && showcardcode == 1)
-				soundManager.PlayBGM(BGM_WIN);
-			else if(dInfo.isFinished && (showcardcode == 2 || showcardcode == 3))
-				soundManager.PlayBGM(BGM_LOSE);
-			else if(dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
-				soundManager.PlayBGM(BGM_DISADVANTAGE);
-			else if(dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
-				soundManager.PlayBGM(BGM_ADVANTAGE);
-			else
-				soundManager.PlayBGM(BGM_DUEL);
-			DrawBackImage(imageManager.tBackGround);
-			DrawBackGround();
-			DrawCards();
-			DrawMisc();
-			smgr->drawAll();
-			driver->setMaterial(irr::video::IdentityMaterial);
-			driver->clearZBuffer();
-		} else if(is_building) {
-			soundManager.PlayBGM(BGM_DECK);
-			DrawBackImage(imageManager.tBackGround_deck);
-			DrawDeckBd();
+		bool isMinimized = device->isWindowMinimized();
+		if(!isMinimized) {
+			driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
+			gMutex.lock();
+			if(dInfo.isStarted) {
+				if(dInfo.isFinished && showcardcode == 1)
+					soundManager.PlayBGM(BGM_WIN);
+				else if(dInfo.isFinished && (showcardcode == 2 || showcardcode == 3))
+					soundManager.PlayBGM(BGM_LOSE);
+				else if(dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
+					soundManager.PlayBGM(BGM_DISADVANTAGE);
+				else if(dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
+					soundManager.PlayBGM(BGM_ADVANTAGE);
+				else
+					soundManager.PlayBGM(BGM_DUEL);
+				DrawBackImage(imageManager.tBackGround);
+				DrawBackGround();
+				DrawCards();
+				DrawMisc();
+				smgr->drawAll();
+				driver->setMaterial(irr::video::IdentityMaterial);
+				driver->clearZBuffer();
+			} else if(is_building) {
+				soundManager.PlayBGM(BGM_DECK);
+				DrawBackImage(imageManager.tBackGround_deck);
+				DrawDeckBd();
+			} else {
+				soundManager.PlayBGM(BGM_MENU);
+				DrawBackImage(imageManager.tBackGround_menu);
+			}
+			DrawGUI();
+			DrawSpec();
+			gMutex.unlock();
+			if(signalFrame > 0) {
+				signalFrame--;
+				if(!signalFrame)
+					frameSignal.Set();
+			}
+			if(waitFrame >= 0 && logicalTick) {
+				waitFrame++;
+				if(waitFrame % 90 == 0) {
+					stHintMsg->setText(dataManager.GetSysString(1390));
+				} else if(waitFrame % 90 == 30) {
+					stHintMsg->setText(dataManager.GetSysString(1391));
+				} else if(waitFrame % 90 == 60) {
+					stHintMsg->setText(dataManager.GetSysString(1392));
+				}
+			}
+			driver->endScene();
 		} else {
-			soundManager.PlayBGM(BGM_MENU);
-			DrawBackImage(imageManager.tBackGround_menu);
-		}
-		DrawGUI();
-		DrawSpec();
-		gMutex.unlock();
-		if(signalFrame > 0) {
-			signalFrame--;
-			if(!signalFrame)
-				frameSignal.Set();
-		}
-		if(waitFrame >= 0) {
-			waitFrame++;
-			if(waitFrame % 90 == 0) {
-				stHintMsg->setText(dataManager.GetSysString(1390));
-			} else if(waitFrame % 90 == 30) {
-				stHintMsg->setText(dataManager.GetSysString(1391));
-			} else if(waitFrame % 90 == 60) {
-				stHintMsg->setText(dataManager.GetSysString(1392));
+			if(signalFrame > 0) {
+				signalFrame--;
+				if(!signalFrame)
+					frameSignal.Set();
 			}
 		}
-		driver->endScene();
 		if(closeSignal.TryWait())
 			CloseDuelWindow();
 		fps++;
-		auto targetTime = lastFrameTime + targetFrameDuration;
-		auto now = std::chrono::steady_clock::now();
-		if(now < targetTime) {
+		if(gameConf.vsync && isMinimized) {
+			// downscale to 60fps, reduce CPU usage
+			std::this_thread::sleep_for(std::chrono::microseconds(16667));
+		} else if(!gameConf.vsync) {
+			auto targetTime = lastFrameTime + targetFrameDuration;
+			auto now = std::chrono::steady_clock::now();
+			if(now < targetTime) {
 #ifdef _WIN32
-			if(useHighResTimer)
-			{
-				auto remaining = std::chrono::duration_cast<std::chrono::microseconds>(targetTime - now);
-				if(remaining.count() > 1500) {
-					LARGE_INTEGER dueTime;
-					dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
-					if(SetWaitableTimer(hWaitTimer, &dueTime, 0, NULL, NULL, FALSE))
-						WaitForSingleObject(hWaitTimer, INFINITE);
+				if(useHighResTimer)
+				{
+					auto remaining = std::chrono::duration_cast<std::chrono::microseconds>(targetTime - now);
+					if(remaining.count() > 1500) {
+						LARGE_INTEGER dueTime;
+						dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
+						if(SetWaitableTimer(hWaitTimer, &dueTime, 0, NULL, NULL, FALSE))
+							WaitForSingleObject(hWaitTimer, INFINITE);
+					}
 				}
-			}
-			else
-#endif
-			{
-				auto sleepTime = targetTime - now - std::chrono::milliseconds(2);
-				if(sleepTime > std::chrono::milliseconds(0)) {
-					std::this_thread::sleep_for(sleepTime);
-				}
-			}
-			// Spin-wait for sub-millisecond precision.
-			// If the window is inactive, sleep 1ms per iteration to avoid wasting CPU.
-			while(std::chrono::steady_clock::now() < targetTime) {
-				if(device->isWindowActive())
-					CPU_PAUSE();
 				else
-					std::this_thread::sleep_for(std::chrono::milliseconds(1));
+#endif
+				{
+					auto sleepTime = targetTime - now - std::chrono::milliseconds(2);
+					if(sleepTime > std::chrono::milliseconds(0)) {
+						std::this_thread::sleep_for(sleepTime);
+					}
+				}
+				// Spin-wait for sub-millisecond precision.
+				// If the window is inactive, sleep 1ms per iteration to avoid wasting CPU.
+				while(std::chrono::steady_clock::now() < targetTime) {
+					if(device->isWindowActive())
+						CPU_PAUSE();
+					else
+						std::this_thread::sleep_for(std::chrono::milliseconds(1));
+				}
 			}
+			lastFrameTime = targetTime;
+			now = std::chrono::steady_clock::now();
+			if(now - targetTime > targetFrameDuration)
+				lastFrameTime = now;
 		}
-		lastFrameTime = targetTime;
-		now = std::chrono::steady_clock::now();
-		if(now - targetTime > targetFrameDuration)
-			lastFrameTime = now;
+		auto now = std::chrono::steady_clock::now();
 		if(now - lastFpsTime >= std::chrono::milliseconds(1000)) {
 			myswprintf(cap, L"YGOPro FPS: %d", fps);
 			device->setWindowCaption(cap);
@@ -1108,10 +1163,12 @@ void Game::MainLoop() {
 		}
 	}
 #ifdef _WIN32
-	if(useHighResTimer)
-		CloseHandle(hWaitTimer);
-	else
-		timeEndPeriod(1);
+	if(!gameConf.vsync) {
+		if(useHighResTimer)
+			CloseHandle(hWaitTimer);
+		else
+			timeEndPeriod(1);
+	}
 #endif
 	DuelClient::StopClient(true);
 	if(dInfo.isSingleMode)
@@ -1119,6 +1176,11 @@ void Game::MainLoop() {
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	SaveConfig();
 	device->drop();
+}
+int Game::ScaleFrame(int frame60) const {
+	if(device->isWindowMinimized()) return frame60;
+	int scaled = (int)(frame60 * fpsScale + 0.5f);
+	return scaled < 1 ? 1 : scaled;
 }
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f32 left, irr::f32 right, irr::f32 bottom, irr::f32 top, irr::f32 znear, irr::f32 zfar) {
 	for(int i = 0; i < 16; ++i)
@@ -1388,6 +1450,10 @@ void Game::LoadConfig() {
 			gameConf.antialias = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "use_d3d")) {
 			gameConf.use_d3d = std::strtol(valbuf, nullptr, 10) > 0;
+		} else if(!std::strcmp(strbuf, "vsync")) {
+			gameConf.vsync = std::strtol(valbuf, nullptr, 10) > 0;
+		} else if(!std::strcmp(strbuf, "target_fps")) {
+			gameConf.target_fps = std::strtol(valbuf, nullptr, 10);
 		} else if (!std::strcmp(strbuf, "use_image_scale_multi_thread")) {
 			gameConf.use_image_scale_multi_thread = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if (!std::strcmp(strbuf, "use_image_load_background_thread")) {
@@ -1522,7 +1588,11 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[CONFIG_LINE_SIZE];
 	std::fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
-	std::fprintf(fp, "use_image_scale_multi_thread = %d\n", gameConf.use_image_scale_multi_thread ? 1 : 0);
+	std::fprintf(fp, "vsync = %d\n", gameConf.vsync ? 1 : 0);
+	std::fprintf(fp, "#target_fps: Controls FPS and calculation of animation speed. Default: 0\n");
+	std::fprintf(fp, "# Vsync on:  0 = auto-detect monitor refresh rate. If auto-detect fails, animation speed may be too fast, please try setting this manually\n");
+	std::fprintf(fp, "# Vsync off: 0 = run at default 60 FPS. Can be manually set to any value from 60 to 1000\n");
+	std::fprintf(fp, "target_fps = %d\n", gameConf.target_fps);
 	std::fprintf(fp, "use_image_load_background_thread = %d\n", gameConf.use_image_load_background_thread ? 1 : 0);
 	std::fprintf(fp, "antialias = %d\n", gameConf.antialias);
 	std::fprintf(fp, "errorlog = %u\n", enable_log);

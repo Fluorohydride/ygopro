@@ -46,6 +46,12 @@ bool IsExtension(const char* filename, const char(&extension)[N]) {
 
 struct Config {
 	bool use_d3d{ false };
+#if defined(_WIN32)
+	bool vsync{ true };
+#else
+	bool vsync{ false };
+#endif
+	int target_fps{ 0 };
 	bool use_image_scale_multi_thread{ true };
 #ifdef _OPENMP
 	bool use_image_load_background_thread{ false };
@@ -149,6 +155,7 @@ struct FadingUnit {
 	bool signalAction{};
 	bool isFadein{};
 	int fadingFrame{};
+	int fadingHalf{};
 	int autoFadeoutFrame{};
 	irr::gui::IGUIElement* guiFading{};
 	irr::core::recti fadingSize;
@@ -162,6 +169,7 @@ class Game {
 public:
 	bool Initialize();
 	void MainLoop();
+	int ScaleFrame(int frame60) const;
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f32 left, irr::f32 right, irr::f32 bottom, irr::f32 top, irr::f32 znear, irr::f32 zfar);
 	void InitStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cWidth, irr::u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
 	std::wstring SetStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, irr::u32 pos = 0);
@@ -272,6 +280,10 @@ public:
 	unsigned short stippleMask{ 0x0f0f };
 	int waitFrame{};
 	int signalFrame{};
+	int effectiveFps{};
+	float fpsScale{ 1.0f };
+	bool logicalTick{};
+	float logicalFrameAccum{};
 	int actionParam{};
 	int showingcode{};
 	const wchar_t* showingtext{};
@@ -284,8 +296,10 @@ public:
 	irr::core::vector3df atk_r;
 	irr::core::vector3df atk_t;
 	float atkdy{};
-	int lpframe{};
-	int lpd{};
+	int lpFrameCount{};
+	int lpFrame{};
+	int lpInitial{};
+	int lpFinal{};
 	int lpplayer{};
 	irr::u32 lpccolor{};
 	std::wstring lpcstring;
