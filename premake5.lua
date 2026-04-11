@@ -31,6 +31,18 @@ MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
 IRRKLANG_PRO = false
 IRRKLANG_PRO_BUILD_IKPMP3 = false
 
+-- Default include dirs, those values are ONLY used in static builds, WILL BE IGNORED if set corresponding BUILD_* to false
+LUA_INCLUDE_DIR = path.getabsolute("./lua/src")
+EVENT_INCLUDE_DIR = path.getabsolute("./event/include")
+IRRLICHT_INCLUDE_DIR = path.getabsolute("./irrlicht/include")
+JPEG_INCLUDE_DIR = path.getabsolute("./jpeg/src")
+FREETYPE_CUSTOM_INCLUDE_DIR = path.getabsolute("./freetype/custom")
+FREETYPE_INCLUDE_DIR = path.getabsolute("./freetype/include")
+SQLITE_INCLUDE_DIR = path.getabsolute("./sqlite3")
+MINIAUDIO_INCLUDE_DIR = path.getabsolute("./miniaudio")
+MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libopus")
+MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libvorbis")
+
 -- Read settings from command line or environment variables
 
 newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
@@ -180,7 +192,6 @@ if GetParam("build-jpeg") then
 elseif GetParam("no-build-jpeg") then
     BUILD_JPEG = false
 end
-JPEG_INCLUDE_DIR = path.getabsolute("./jpeg/src") -- both gframe and Irrlicht need it
 if not BUILD_JPEG then
     JPEG_INCLUDE_DIR = GetParam("jpeg-include-dir") or os.findheader("jpeglib.h")
     JPEG_LIB_DIR = GetParam("jpeg-lib-dir") or os.findlib(JPEG_LIB_NAME)
