@@ -3805,58 +3805,57 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			}
 			mainGame->WaitFrameSignal(5);
 		}
-		//
-		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
-			mainGame->gMutex.lock();
-		if(mainGame->dField.deck[player].size() > mcount) {
-			while(mainGame->dField.deck[player].size() > mcount) {
-				ClientCard* ccard = *mainGame->dField.deck[player].rbegin();
-				mainGame->dField.deck[player].pop_back();
-				delete ccard;
+		{
+			std::unique_lock<std::mutex> field_lock(mainGame->gMutex, std::defer_lock);
+			if (!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
+				field_lock.lock();
+			if (mainGame->dField.deck[player].size() > mcount) {
+				while (mainGame->dField.deck[player].size() > mcount) {
+					ClientCard* ccard = *mainGame->dField.deck[player].rbegin();
+					mainGame->dField.deck[player].pop_back();
+					delete ccard;
+				}
+			} else {
+				while (mainGame->dField.deck[player].size() < mcount) {
+					ClientCard* ccard = new ClientCard;
+					ccard->controler = player;
+					ccard->location = LOCATION_DECK;
+					ccard->sequence = (unsigned char)mainGame->dField.deck[player].size();
+					mainGame->dField.deck[player].push_back(ccard);
+				}
 			}
-		} else {
-			while(mainGame->dField.deck[player].size() < mcount) {
-				ClientCard* ccard = new ClientCard;
-				ccard->controler = player;
-				ccard->location = LOCATION_DECK;
-				ccard->sequence = (unsigned char)mainGame->dField.deck[player].size();
-				mainGame->dField.deck[player].push_back(ccard);
+			if (mainGame->dField.hand[player].size() > hcount) {
+				while (mainGame->dField.hand[player].size() > hcount) {
+					ClientCard* ccard = *mainGame->dField.hand[player].rbegin();
+					mainGame->dField.hand[player].pop_back();
+					delete ccard;
+				}
+			} else {
+				while (mainGame->dField.hand[player].size() < hcount) {
+					ClientCard* ccard = new ClientCard;
+					ccard->controler = player;
+					ccard->location = LOCATION_HAND;
+					ccard->sequence = (unsigned char)mainGame->dField.hand[player].size();
+					mainGame->dField.hand[player].push_back(ccard);
+				}
 			}
+			if (mainGame->dField.extra[player].size() > ecount) {
+				while (mainGame->dField.extra[player].size() > ecount) {
+					ClientCard* ccard = *mainGame->dField.extra[player].rbegin();
+					mainGame->dField.extra[player].pop_back();
+					delete ccard;
+				}
+			} else {
+				while (mainGame->dField.extra[player].size() < ecount) {
+					ClientCard* ccard = new ClientCard;
+					ccard->controler = player;
+					ccard->location = LOCATION_EXTRA;
+					ccard->sequence = (unsigned char)mainGame->dField.extra[player].size();
+					mainGame->dField.extra[player].push_back(ccard);
+				}
+			}
+			mainGame->dField.extra_p_count[player] = pcount;
 		}
-		if(mainGame->dField.hand[player].size() > hcount) {
-			while(mainGame->dField.hand[player].size() > hcount) {
-				ClientCard* ccard = *mainGame->dField.hand[player].rbegin();
-				mainGame->dField.hand[player].pop_back();
-				delete ccard;
-			}
-		} else {
-			while(mainGame->dField.hand[player].size() < hcount) {
-				ClientCard* ccard = new ClientCard;
-				ccard->controler = player;
-				ccard->location = LOCATION_HAND;
-				ccard->sequence = (unsigned char)mainGame->dField.hand[player].size();
-				mainGame->dField.hand[player].push_back(ccard);
-			}
-		}
-		if(mainGame->dField.extra[player].size() > ecount) {
-			while(mainGame->dField.extra[player].size() > ecount) {
-				ClientCard* ccard = *mainGame->dField.extra[player].rbegin();
-				mainGame->dField.extra[player].pop_back();
-				delete ccard;
-			}
-		} else {
-			while(mainGame->dField.extra[player].size() < ecount) {
-				ClientCard* ccard = new ClientCard;
-				ccard->controler = player;
-				ccard->location = LOCATION_EXTRA;
-				ccard->sequence = (unsigned char)mainGame->dField.extra[player].size();
-				mainGame->dField.extra[player].push_back(ccard);
-			}
-		}
-		mainGame->dField.extra_p_count[player] = pcount;
-		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
-			mainGame->gMutex.unlock();
-		//
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
 				ClientCard* pcard = *cit;
@@ -3888,8 +3887,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		break;
 	}
 	case MSG_RELOAD_FIELD: {
-		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-			mainGame->gMutex.lock();
+		std::unique_lock<std::mutex> field_lock(mainGame->gMutex, std::defer_lock);
+		if (!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			field_lock.lock();
 		}
 		mainGame->dField.Clear();
 		mainGame->dInfo.duel_rule = BufferIO::Read<uint8_t>(pbuf);
@@ -3995,9 +3995,6 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		if(val) {
 			myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
 			mainGame->dField.last_chain = true;
-		}
-		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-			mainGame->gMutex.unlock();
 		}
 		break;
 	}
