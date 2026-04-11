@@ -968,9 +968,8 @@ bool Game::Initialize() {
 	window_size = driver->getScreenSize();
 	xScale = window_size.Width / static_cast<float>(GAME_WINDOW_WIDTH);
 	yScale = window_size.Height / static_cast<float>(GAME_WINDOW_HEIGHT);
-	gMutex.lock();
+	std::lock_guard<std::mutex> lock(gMutex);
 	OnResize();
-	gMutex.unlock();
 	return true;
 }
 void Game::MainLoop() {
@@ -1000,9 +999,8 @@ void Game::MainLoop() {
 			window_size = size;
 			xScale = window_size.Width / static_cast<float>(GAME_WINDOW_WIDTH);
 			yScale = window_size.Height / static_cast<float>(GAME_WINDOW_HEIGHT);
-			gMutex.lock();
+			std::lock_guard<std::mutex> lock(gMutex);
 			OnResize();
-			gMutex.unlock();
 		}
 		linePattern = (linePattern + 1) % 30;
 		stippleMask = (stippleMask << 1) | (stippleMask >> 15);
@@ -1011,36 +1009,37 @@ void Game::MainLoop() {
 			atkframe -= 6.2832f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
-		gMutex.lock();
-		if(dInfo.isStarted) {
-			if(dInfo.isFinished && showcardcode == 1)
-				soundManager.PlayBGM(BGM_WIN);
-			else if(dInfo.isFinished && (showcardcode == 2 || showcardcode == 3))
-				soundManager.PlayBGM(BGM_LOSE);
-			else if(dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
-				soundManager.PlayBGM(BGM_DISADVANTAGE);
-			else if(dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
-				soundManager.PlayBGM(BGM_ADVANTAGE);
-			else
-				soundManager.PlayBGM(BGM_DUEL);
-			DrawBackImage(imageManager.tBackGround);
-			DrawBackGround();
-			DrawCards();
-			DrawMisc();
-			smgr->drawAll();
-			driver->setMaterial(irr::video::IdentityMaterial);
-			driver->clearZBuffer();
-		} else if(is_building) {
-			soundManager.PlayBGM(BGM_DECK);
-			DrawBackImage(imageManager.tBackGround_deck);
-			DrawDeckBd();
-		} else {
-			soundManager.PlayBGM(BGM_MENU);
-			DrawBackImage(imageManager.tBackGround_menu);
+		{
+			std::lock_guard<std::mutex> lock(gMutex);
+			if(dInfo.isStarted) {
+				if(dInfo.isFinished && showcardcode == 1)
+					soundManager.PlayBGM(BGM_WIN);
+				else if(dInfo.isFinished && (showcardcode == 2 || showcardcode == 3))
+					soundManager.PlayBGM(BGM_LOSE);
+				else if(dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
+					soundManager.PlayBGM(BGM_DISADVANTAGE);
+				else if(dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
+					soundManager.PlayBGM(BGM_ADVANTAGE);
+				else
+					soundManager.PlayBGM(BGM_DUEL);
+				DrawBackImage(imageManager.tBackGround);
+				DrawBackGround();
+				DrawCards();
+				DrawMisc();
+				smgr->drawAll();
+				driver->setMaterial(irr::video::IdentityMaterial);
+				driver->clearZBuffer();
+			} else if(is_building) {
+				soundManager.PlayBGM(BGM_DECK);
+				DrawBackImage(imageManager.tBackGround_deck);
+				DrawDeckBd();
+			} else {
+				soundManager.PlayBGM(BGM_MENU);
+				DrawBackImage(imageManager.tBackGround_menu);
+			}
+			DrawGUI();
+			DrawSpec();
 		}
-		DrawGUI();
-		DrawSpec();
-		gMutex.unlock();
 		if(signalFrame > 0) {
 			signalFrame--;
 			if(!signalFrame)
