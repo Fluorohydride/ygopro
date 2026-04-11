@@ -139,7 +139,7 @@ int SingleMode::SinglePlayThread() {
 		}
 	}
 	last_replay.EndRecord();
-	mainGame->gMutex.lock();
+	std::unique_lock<std::mutex> replay_lock(mainGame->gMutex);
 	time_t nowtime = std::time(nullptr);
 	wchar_t timetext[40];
 	std::wcsftime(timetext, sizeof timetext / sizeof timetext[0], L"%Y-%m-%d %H-%M-%S", std::localtime(&nowtime));
@@ -147,7 +147,7 @@ int SingleMode::SinglePlayThread() {
 	if(!mainGame->chkAutoSaveReplay->isChecked()) {
 		mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
 		mainGame->PopupElement(mainGame->wReplaySave);
-		mainGame->gMutex.unlock();
+		replay_lock.unlock();
 		mainGame->replaySignal.Reset();
 		mainGame->replaySignal.Wait();
 	} else {
@@ -156,7 +156,7 @@ int SingleMode::SinglePlayThread() {
 		myswprintf(msgbuf, dataManager.GetSysString(1367), timetext);
 		mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->guiFont, msgbuf);
 		mainGame->PopupElement(mainGame->wACMessage, 20);
-		mainGame->gMutex.unlock();
+		replay_lock.unlock();
 		mainGame->WaitFrameSignal(30);
 	}
 	if(mainGame->actionParam)

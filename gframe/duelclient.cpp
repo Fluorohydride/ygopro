@@ -724,7 +724,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 	case STOC_REPLAY: {
 		if (len < 1 + (int)sizeof(ExtendedReplayHeader))
 			return;
-		mainGame->gMutex.lock();
+		std::unique_lock<std::mutex> replay_lock(mainGame->gMutex);
 		mainGame->wPhase->setVisible(false);
 		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
@@ -743,7 +743,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		if(!mainGame->chkAutoSaveReplay->isChecked()) {
 			mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
 			mainGame->PopupElement(mainGame->wReplaySave);
-			mainGame->gMutex.unlock();
+			replay_lock.unlock();
 			mainGame->replaySignal.Reset();
 			mainGame->replaySignal.Wait();
 		}
@@ -753,7 +753,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 			myswprintf(msgbuf, dataManager.GetSysString(1367), timetext);
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->guiFont, msgbuf);
 			mainGame->PopupElement(mainGame->wACMessage, 20);
-			mainGame->gMutex.unlock();
+			replay_lock.unlock();
 			mainGame->WaitFrameSignal(30);
 		}
 		if(mainGame->actionParam || !is_host) {
