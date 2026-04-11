@@ -1714,8 +1714,6 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	}
 }
 uint32_t TagDuel::MessageHandler(intptr_t fduel, uint32_t type) {
-	if(!enable_log)
-		return 0;
 	char msgbuf[1024];
 	get_log_message(fduel, msgbuf);
 	mainGame->AddDebugMsg(msgbuf);

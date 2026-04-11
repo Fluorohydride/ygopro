@@ -3,7 +3,9 @@ include "lzma/."
 project "YGOPro"
     kind "WindowedApp"
     rtti "Off"
-    openmp "On"
+    if USE_OPENMP then
+        openmp "On"
+    end
 
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore" }
@@ -76,7 +78,7 @@ project "YGOPro"
     filter "system:windows"
         entrypoint "mainCRTStartup"
         files "ygopro.rc"
-        links { "ws2_32", "iphlpapi" }
+        links { "ws2_32", "iphlpapi", "winmm" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrKlang" }
             if IRRKLANG_PRO then
@@ -92,7 +94,6 @@ project "YGOPro"
         cppdialect "C++14"
 
     filter "system:macosx"
-        openmp "Off"
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework", "Carbon.framework" }
         defines { "GL_SILENCE_DEPRECATION" }
         if MAC_ARM then
@@ -107,7 +108,9 @@ project "YGOPro"
 
     filter "system:linux"
         links { "GL", "X11", "dl", "pthread" }
-        linkoptions { "-fopenmp" }
+        if USE_OPENMP then
+            linkoptions { "-fopenmp" }
+        end
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "IrrKlang" }
             linkoptions{ IRRKLANG_LINK_RPATH }

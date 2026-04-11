@@ -46,13 +46,10 @@ bool IsExtension(const char* filename, const char(&extension)[N]) {
 
 struct Config {
 	bool use_d3d{ false };
-	bool use_image_scale_multi_thread{ true };
-#ifdef _OPENMP
+	bool use_image_scale_multi_thread{ false };
 	bool use_image_load_background_thread{ false };
-#else
-	bool use_image_load_background_thread{ true };
-#endif
 	unsigned short antialias{ 0 };
+	unsigned int enable_log{ 0x3 };
 	unsigned short serverport{ 7911 };
 	unsigned char textfontsize{ 14 };
 	wchar_t lasthost[100]{};
@@ -295,6 +292,10 @@ public:
 
 	bool is_building{};
 	bool is_siding{};
+	bool exit_on_return{ false };
+	bool open_file{ false };
+	wchar_t open_file_name[256]{};
+	bool bot_mode{ false };
 
 	irr::core::dimension2d<irr::u32> window_size;
 	float xScale{ 1.0f };
