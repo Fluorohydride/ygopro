@@ -7,7 +7,9 @@
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
+#include <chrono>
 #include <ctime>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 #include <list>
@@ -15,6 +17,13 @@
 #include <functional>
 
 namespace ygo {
+
+enum AnalyzeType {
+	ANALYZE_NONE = 0,
+	ANALYZE_CLIENT = 1,
+	ANALYZE_REPLAY = 2,
+	ANALYZE_SINGLE_PLAY = 3,
+};
 
 constexpr int DEFAULT_DUEL_RULE = CURRENT_RULE;
 constexpr int CONFIG_LINE_SIZE = 1024;
@@ -183,10 +192,13 @@ public:
 	void DrawGUI(); // called from MainLoop with gMutex held
 	void DrawSpec();
 	void DrawBackImage(irr::video::ITexture* texture);
-	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0); // caller must hold gMutex
-	void HideElement(irr::gui::IGUIElement* element, bool set_action = false); // caller must hold gMutex
-	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0); // caller must hold gMutex
+	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
+	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
+	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
 	void SetImageButtonDrawing(irr::gui::IGUIElement* element, bool draw = true);
+	bool RenderOneFrame(bool handleCloseSignal = true);
+	bool ProcessAnalyzeQueue();
+	bool WaitForAction(Signal& sig);
 	void WaitFrameSignal(int frame);
 	void DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList* lflist, bool drag = false);
 	void DrawDeckBd();
@@ -202,7 +214,7 @@ public:
 	void ClearTextures(); // caller must hold gMutex
 	void CloseGameButtons();
 	void CloseGameWindow();
-	void CloseDuelWindow();
+	void CloseDuelWindow(bool notifyCloseDone = false);
 
 	int LocalPlayer(int player) const;
 	int OppositePlayer(int player);
@@ -253,8 +265,17 @@ public:
 	Signal singleSignal;
 	Signal closeSignal;
 	Signal closeDoneSignal;
+	Signal analyzeSignal;
+	Signal analyzeDone;
+	struct {
+		int type{0};
+		unsigned char* data{};
+		unsigned int len{};
+		bool result{};
+	} analyzeMsg;
 	Config gameConf;
 	DuelInfo dInfo;
+	int fpsCounter{};
 
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
@@ -267,8 +288,13 @@ public:
 	int chatType[8]{};
 	unsigned short linePattern{ 0 };
 	unsigned short stippleMask{ 0x0f0f };
+	float atkframe{0.1f};
 	int waitFrame{};
 	int signalFrame{};
+	bool closePending{};
+	std::chrono::steady_clock::time_point lastFrameTime{};
+	std::chrono::steady_clock::time_point lastFpsTime{};
+	std::thread::id main_thread_id;
 	int actionParam{};
 	int showingcode{};
 	const wchar_t* showingtext{};
@@ -311,6 +337,8 @@ public:
 
 #ifdef _WIN32
 	HWND hWnd;
+	HANDLE hWaitTimer{};
+	bool useHighResTimer{};
 #endif
 
 	//GUI

@@ -634,7 +634,6 @@ void ClientField::ShowSelectOption(int select_hint) {
 	wchar_t textBuffer[256];
 	int count = select_options.size();
 	bool quickmode = true;
-	mainGame->gMutex.lock();
 	for(auto option : select_options) {
 		if(mainGame->guiFont->getDimension(dataManager.GetDesc(option)).Width > 310) {
 			quickmode = false;
@@ -681,7 +680,6 @@ void ClientField::ShowSelectOption(int select_hint) {
 		myswprintf(textBuffer, dataManager.GetSysString(555));
 	mainGame->wOptions->setText(textBuffer);
 	mainGame->PopupElement(mainGame->wOptions);
-	mainGame->gMutex.unlock();
 }
 void ClientField::ReplaySwap() {
 	std::swap(deck[0], deck[1]);
