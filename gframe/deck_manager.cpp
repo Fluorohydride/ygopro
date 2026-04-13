@@ -431,35 +431,29 @@ bool DeckManager::SaveDeckArray(const DeckArray& deck, const wchar_t* name) {
 	std::fclose(fp);
 	return true;
 }
-uint32_t DeckManager::CheckDeckPoint(const Deck& deck, const LFList* lflist, std::vector<int>& sum) {
+std::vector<int> DeckManager::GetDeckPoint(const Deck& deck, const LFList* lflist) {
+	std::vector<int> sum;
 	if (!lflist || lflist->point_list.empty())
-		return 0U;
-	sum.clear();
+		return sum;
 	sum.resize(lflist->point_list.size());
-	auto add_card = [&sum](uint32_t code, const LFList* lflist){
+	auto add_card = [&](uint32_t code){
 		for (size_t i = 0; i < lflist->point_list.size(); ++i) {
 			auto& point = lflist->point_list[i];
 			auto it = point.table.find(code);
 			if (it == point.table.end())
 				continue;
 			sum[i] = sum[i] + it->second;
-			if (sum[i] > point.limit)
-				return false;
 		}
-		return true;
 	};
 	for (auto& card: deck.main){
-		if (!add_card(card->second.code, lflist))
-			return card->second.code;
+		add_card(card->code);
 	}
 	for (auto& card: deck.extra){
-		if (!add_card(card->second.code, lflist))
-			return card->second.code;
+		add_card(card->code);
 	}
 	for (auto& card: deck.side){
-		if (!add_card(card->second.code, lflist))
-			return card->second.code;
+		add_card(card->code);
 	}
-	return 0U;
+	return sum;
 }
 }
