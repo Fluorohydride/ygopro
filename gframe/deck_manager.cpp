@@ -128,7 +128,7 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 	auto& list = lflist->content;
 	const unsigned int rule_map[6] = { AVAIL_OCG, AVAIL_TCG, AVAIL_SC, AVAIL_CUSTOM, AVAIL_OCGTCG, 0 };
 	unsigned int avail = 0;
-	if ((size_t)rule < sizeof rule_map / sizeof rule_map[0])
+	if (rule >= 0 && rule < (int)(sizeof rule_map / sizeof rule_map[0]))
 		avail = rule_map[rule];
 	for (auto& cit : deck.main) {
 		auto gameruleDeckError = checkAvail(cit->ot, avail);
