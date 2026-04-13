@@ -1864,9 +1864,7 @@ bool DeckBuilder::check_limit(const CardDataC* pointer) {
 	}
 	if (!has_point)
 		return true;
-	std::vector<int> sum;
-	if (DeckManager::CheckDeckPoint(deckManager.current_deck, filterList, sum) != 0U)
-		return false;
+	std::vector<int> sum = DeckManager::GetDeckPoint(deckManager.current_deck, filterList);
 	auto code = pointer->code;
 	for (size_t i = 0; i < filterList->point_list.size(); ++i) {
 		auto& point = filterList->point_list[i];
