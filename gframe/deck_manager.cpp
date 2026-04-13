@@ -175,10 +175,16 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 		if(it != list.end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) | cit->code;
 	}
-	std::vector<int> sum;
-	uint32_t result = CheckDeckPoint(deck, lflist, sum);
+	std::vector<int> sum = GetDeckPoint(deck, lflist);
+	int result = 0;
+	for (size_t i = 0; i < lflist->point_list.size(); ++i) {
+		if (sum[i] > lflist->point_list[i].limit) {
+			result = sum[i];
+			break;
+		}
+	}
 	if (result)
-		return (DECKERROR_LFLIST << 28) | result;
+		return (DECKERROR_POINT << 28) | result;
 	return 0;
 }
 uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec, bool is_packlist) {
