@@ -1,14 +1,15 @@
 include "lzma/."
-include "spmemvfs/."
 
 project "YGOPro"
     kind "WindowedApp"
     rtti "Off"
-    openmp "On"
+    if USE_OPENMP then
+        openmp "On"
+    end
 
     files { "*.cpp", "*.h" }
-    includedirs { "../ocgcore" }
-    links { "ocgcore", "clzma", "cspmemvfs", LUA_LIB_NAME, "sqlite3", "irrlicht", "freetype", "event" }
+    includedirs { "../ocgcore", JPEG_INCLUDE_DIR }
+    links { "ocgcore", "clzma", LUA_LIB_NAME, "sqlite3", "irrlicht", JPEG_LIB_NAME, "freetype", "event" }
 
     if not BUILD_LUA then
         libdirs { LUA_LIB_DIR }
@@ -27,6 +28,14 @@ project "YGOPro"
     else
         includedirs { IRRLICHT_INCLUDE_DIR }
         libdirs { IRRLICHT_LIB_DIR }
+    end
+    if not BUILD_PNG_IRRLICHT then
+        links { "png" }
+        libdirs { PNG_LIB_DIR }
+    end
+
+    if not BUILD_JPEG then
+        libdirs { JPEG_LIB_DIR }
     end
 
     if BUILD_FREETYPE then
@@ -72,9 +81,8 @@ project "YGOPro"
 
     filter "system:windows"
         entrypoint "mainCRTStartup"
-        defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
-        links { "ws2_32", "iphlpapi" }
+        links { "ws2_32", "iphlpapi", "winmm" }
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrKlang" }
             if IRRKLANG_PRO then
@@ -90,7 +98,6 @@ project "YGOPro"
         cppdialect "C++14"
 
     filter "system:macosx"
-        openmp "Off"
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
         defines { "GL_SILENCE_DEPRECATION" }
         if MAC_ARM then
@@ -104,8 +111,10 @@ project "YGOPro"
         end
 
     filter "system:linux"
-        links { "GL", "X11", "Xxf86vm", "dl", "pthread" }
-        linkoptions { "-fopenmp" }
+        links { "GL", "X11", "dl", "pthread" }
+        if USE_OPENMP then
+            linkoptions { "-fopenmp" }
+        end
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "IrrKlang" }
             linkoptions{ IRRKLANG_LINK_RPATH }

@@ -100,7 +100,7 @@ struct SGUITTGlyph {
 //! Holds a sheet of glyphs.
 class CGUITTGlyphPage {
 public:
-	CGUITTGlyphPage(video::IVideoDriver* Driver, const io::path& texture_name) : texture(0), available_slots(0), used_slots(0), dirty(false), driver(Driver), name(texture_name) {}
+	CGUITTGlyphPage(video::IVideoDriver* Driver, const io::path& texture_name) :  driver(Driver), name(texture_name) {}
 	~CGUITTGlyphPage() {
 		if (texture) {
 			if (driver)
@@ -174,16 +174,16 @@ public:
 		dirty = false;
 	}
 
-	video::ITexture* texture;
-	u32 available_slots;
-	u32 used_slots;
-	bool dirty;
+	video::ITexture* texture{};
+	u32 available_slots{};
+	u32 used_slots{};
+	bool dirty{};
 
 	core::array<core::vector2di> render_positions;
 	core::array<core::recti> render_source_rects;
 
 	core::dimension2du texture_size;
-	u8 pixel_mode;
+	u8 pixel_mode{};
 
 private:
 	core::array<const SGUITTGlyph*> glyph_to_be_paged;

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <stack>
 #include "client_field.h"
 #include "client_card.h"
@@ -432,25 +433,22 @@ void ClientField::ShowSelectCard(bool buttonok, bool is_continuous) {
 			std::shuffle(selectable_cards.begin(), selectable_cards.end(), rnd);
 		}
 	}
-	int startpos;
-	int ct;
+	int ct = 5;
 	if(selectable_cards.size() <= 5) {
-		startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
 		ct = selectable_cards.size();
-	} else {
-		startpos = 30;
-		ct = 5;
 	}
 	for(int i = 0; i < ct; ++i) {
 		mainGame->stCardPos[i]->enableOverrideColor(false);
 		// image
 		if(selectable_cards[i]->code)
-			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
+			mainGame->btnImagePending[mainGame->btnCardSelect[i]] = std::make_pair(selectable_cards[i]->code, false);
 		else if(select_continuous)
-			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->chain_code));
-		else
-			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i]->controler + 2]);
-		mainGame->btnCardSelect[i]->setRelativePosition(irr::core::rect<irr::s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+			mainGame->btnImagePending[mainGame->btnCardSelect[i]] = std::make_pair(selectable_cards[i]->chain_code, false);
+		else {
+			mainGame->btnCardSelect[i]->setImage(imageManager.tButtonFacedown[selectable_cards[i]->controler]);
+			mainGame->btnFacedownImgInfo[mainGame->btnCardSelect[i]] = {selectable_cards[i]->controler, false};
+			mainGame->btnCardImgInfo.erase(mainGame->btnCardSelect[i]);
+		}
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
 		if(mainGame->dInfo.curMsg != MSG_SORT_CARD) {
@@ -503,7 +501,6 @@ void ClientField::ShowSelectCard(bool buttonok, bool is_continuous) {
 			mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 		}
 		mainGame->stCardPos[i]->setVisible(true);
-		mainGame->stCardPos[i]->setRelativePosition(irr::core::rect<irr::s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 	}
 	if(selectable_cards.size() <= 5) {
 		for(int i = selectable_cards.size(); i < 5; ++i) {
@@ -519,24 +516,22 @@ void ClientField::ShowSelectCard(bool buttonok, bool is_continuous) {
 		mainGame->scrCardList->setPos(0);
 	}
 	mainGame->btnSelectOK->setVisible(buttonok);
+	mainGame->ResizeCardSelectButtons(mainGame->wCardSelect, mainGame->stCardPos, mainGame->btnCardSelect, mainGame->scrCardList, mainGame->btnSelectOK, selectable_cards);
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
 void ClientField::ShowChainCard() {
-	int startpos;
-	int ct;
+	int ct = 5;
 	if(selectable_cards.size() <= 5) {
-		startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
 		ct = selectable_cards.size();
-	} else {
-		startpos = 30;
-		ct = 5;
 	}
 	for(int i = 0; i < ct; ++i) {
 		if(selectable_cards[i]->code)
-			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
-		else
-			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i]->controler + 2]);
-		mainGame->btnCardSelect[i]->setRelativePosition(irr::core::rect<irr::s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+			mainGame->btnImagePending[mainGame->btnCardSelect[i]] = std::make_pair(selectable_cards[i]->code, false);
+		else {
+			mainGame->btnCardSelect[i]->setImage(imageManager.tButtonFacedown[selectable_cards[i]->controler]);
+			mainGame->btnFacedownImgInfo[mainGame->btnCardSelect[i]] = {selectable_cards[i]->controler, false};
+			mainGame->btnCardImgInfo.erase(mainGame->btnCardSelect[i]);
+		}
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
 		wchar_t formatBuffer[2048];
@@ -554,7 +549,6 @@ void ClientField::ShowChainCard() {
 			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 		}
 		mainGame->stCardPos[i]->setVisible(true);
-		mainGame->stCardPos[i]->setRelativePosition(irr::core::rect<irr::s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 	} 
 	if(selectable_cards.size() <= 5) {
 		for(int i = selectable_cards.size(); i < 5; ++i) {
@@ -569,28 +563,24 @@ void ClientField::ShowChainCard() {
 		mainGame->scrCardList->setMax((selectable_cards.size() - 5) * 10 + 9);
 		mainGame->scrCardList->setPos(0);
 	}
-	if(!chain_forced)
-		mainGame->btnSelectOK->setVisible(true);
-	else mainGame->btnSelectOK->setVisible(false);
+	mainGame->btnSelectOK->setVisible(!chain_forced);
+	mainGame->ResizeCardSelectButtons(mainGame->wCardSelect, mainGame->stCardPos, mainGame->btnCardSelect, mainGame->scrCardList, mainGame->btnSelectOK, selectable_cards);
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
 void ClientField::ShowLocationCard() {
-	int startpos;
-	int ct;
+	int ct = 5;
 	if(display_cards.size() <= 5) {
-		startpos = 30 + 125 * (5 - display_cards.size()) / 2;
 		ct = display_cards.size();
-	} else {
-		startpos = 30;
-		ct = 5;
 	}
 	for(int i = 0; i < ct; ++i) {
 		mainGame->stDisplayPos[i]->enableOverrideColor(false);
 		if(display_cards[i]->code)
-			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardDisplay[i], display_cards[i]->code));
-		else
-			mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[display_cards[i]->controler + 2]);
-		mainGame->btnCardDisplay[i]->setRelativePosition(irr::core::rect<irr::s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+			mainGame->btnImagePending[mainGame->btnCardDisplay[i]] = std::make_pair(display_cards[i]->code, false);
+		else {
+			mainGame->btnCardDisplay[i]->setImage(imageManager.tButtonFacedown[display_cards[i]->controler]);
+			mainGame->btnFacedownImgInfo[mainGame->btnCardDisplay[i]] = {display_cards[i]->controler, false};
+			mainGame->btnCardImgInfo.erase(mainGame->btnCardDisplay[i]);
+		}
 		mainGame->btnCardDisplay[i]->setPressed(false);
 		mainGame->btnCardDisplay[i]->setVisible(true);
 		wchar_t formatBuffer[2048];
@@ -621,7 +611,6 @@ void ClientField::ShowLocationCard() {
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 		}
 		mainGame->stDisplayPos[i]->setVisible(true);
-		mainGame->stDisplayPos[i]->setRelativePosition(irr::core::rect<irr::s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 	}
 	if(display_cards.size() <= 5) {
 		for(int i = display_cards.size(); i < 5; ++i) {
@@ -637,6 +626,7 @@ void ClientField::ShowLocationCard() {
 		mainGame->scrDisplayList->setPos(0);
 	}
 	mainGame->btnDisplayOK->setVisible(true);
+	mainGame->ResizeCardSelectButtons(mainGame->wCardDisplay, mainGame->stDisplayPos, mainGame->btnCardDisplay, mainGame->scrDisplayList, mainGame->btnDisplayOK, display_cards);
 	mainGame->PopupElement(mainGame->wCardDisplay);
 }
 void ClientField::ShowSelectOption(int select_hint) {
@@ -1401,6 +1391,8 @@ bool ClientField::check_sum_trib(std::set<ClientCard*>::const_iterator index, st
 }
 template <class T>
 static bool is_declarable(const T& cd, const std::vector<unsigned int>& opcode) {
+	if (cd.alias)
+		return false;
 	std::stack<int> stack;
 	for(auto it = opcode.begin(); it != opcode.end(); ++it) {
 		switch(*it) {
@@ -1535,9 +1527,9 @@ static bool is_declarable(const T& cd, const std::vector<unsigned int>& opcode) 
 	}
 	if(stack.size() != 1 || stack.top() == 0)
 		return false;
-	if (cd.type & TYPE_TOKEN)
+	if (!second_code.count(cd.code) && (cd.rule_code || (cd.type & TYPE_TOKEN)))
 		return false;
-	return !cd.alias || second_code.find(cd.code) != second_code.end();
+	return true;
 }
 void ClientField::UpdateDeclarableList() {
 	const wchar_t* pname = mainGame->ebANCard->getText();
@@ -1556,6 +1548,7 @@ void ClientField::UpdateDeclarableList() {
 		int sel = mainGame->lstANCard->getSelected();
 		trycode = (sel == -1) ? 0 : ancard[sel];
 	}
+	auto setcodes = dataManager.GetSetCodes(pname);
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	auto& _datas = dataManager.GetDataTable();
@@ -1563,12 +1556,12 @@ void ClientField::UpdateDeclarableList() {
 	for(auto& entry : _strings) {
 		auto& code = entry.first;
 		auto& str = entry.second;
-		if(str.name.find(pname) != std::wstring::npos) {
-			auto cp = _datas.find(code);
-			if (cp == _datas.end())
-				continue;
-			//datas.alias can be double card names or alias
-			if(is_declarable(cp->second, declare_opcodes)) {
+		auto cp = _datas.find(code);
+		if (cp == _datas.end())
+			continue;
+		auto& data = cp->second;
+		if(DataManager::CardNameContains(str.name.c_str(), pname) || data.is_setcodes(setcodes)) {
+			if(is_declarable(data, declare_opcodes)) {
 				if(pname == str.name || trycode == code) { //exact match or last used
 					mainGame->lstANCard->insertItem(0, str.name.c_str(), -1);
 					ancard.insert(ancard.begin(), code);

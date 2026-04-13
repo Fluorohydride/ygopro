@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "config.h"
 #include "replay.h"
 #include "myfilesystem.h"

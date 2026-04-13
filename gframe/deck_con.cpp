@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <array>
 #include "config.h"
 #include "deck_con.h"
@@ -135,7 +136,7 @@ void DeckBuilder::Terminate() {
 	int decksel = mainGame->cbDBDecks->getSelected();
 	if (decksel >= 0)
 		BufferIO::CopyWideString(mainGame->cbDBDecks->getItem(decksel), mainGame->gameConf.lastdeck);
-	if(exit_on_return)
+	if(mainGame->exit_on_return)
 		mainGame->device->closeDevice();
 }
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
@@ -415,9 +416,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case BUTTON_EXPORT_DECK_CODE: {
 				std::stringstream textStream;
 				deckManager.SaveDeck(deckManager.current_deck, textStream);
-				wchar_t text[0x10000];
-				BufferIO::DecodeUTF8(textStream.str().c_str(), text);
-				mainGame->env->getOSOperator()->copyToClipboard(text);
+				mainGame->env->getOSOperator()->copyToClipboard(textStream.str().c_str());
 				mainGame->stACMessage->setText(dataManager.GetSysString(1480));
 				mainGame->PopupElement(mainGame->wACMessage, 20);
 				break;
@@ -516,11 +515,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 							deckManager.current_deck.extra.clear();
 							deckManager.current_deck.side.clear();
 						} else {
-							const wchar_t* txt = mainGame->env->getOSOperator()->getTextFromClipboard();
+							const char* txt = mainGame->env->getOSOperator()->getTextFromClipboard();
 							if(txt) {
-								char text[0x10000];
-								BufferIO::EncodeUTF8(txt, text);
-								std::istringstream textStream(text);
+								std::istringstream textStream(txt);
 								deckManager.LoadCurrentDeck(textStream);
 							}
 						}
@@ -1074,9 +1071,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			dragx = event.MouseInput.X;
 			dragy = event.MouseInput.Y;
-			draging_pointer = _datas.find(hovered_code);
-			if (draging_pointer == _datas.end())
+			auto dit = _datas.find(hovered_code);
+			if (dit == _datas.end()) {
+				draging_pointer = nullptr;
+				is_starting_dragging = false;
+				is_draging = false;
 				break;
+			}
+			draging_pointer = &dit->second;
 			if(hovered_pos == 4) {
 				if(!check_limit(draging_pointer))
 					break;
@@ -1133,15 +1135,16 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				auto pointer = _datas.find(hovered_code);
 				if (pointer == _datas.end())
 					break;
+				auto cd = &pointer->second;
 				soundManager.PlaySoundEffect(SOUND_CARD_DROP);
 				if(hovered_pos == 1) {
-					if(push_side(pointer))
+					if(push_side(cd))
 						pop_main(hovered_seq);
 				} else if(hovered_pos == 2) {
-					if(push_side(pointer))
+					if(push_side(cd))
 						pop_extra(hovered_seq);
 				} else {
-					if(push_extra(pointer) || push_main(pointer))
+					if(push_extra(cd) || push_main(cd))
 						pop_side(hovered_seq);
 				}
 				break;
@@ -1168,10 +1171,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					auto pointer = _datas.find(hovered_code);
 					if (pointer == _datas.end())
 						break;
-					if(!check_limit(pointer))
+					auto cd = &pointer->second;
+					if(!check_limit(cd))
 						break;
-					if(!push_extra(pointer) && !push_main(pointer))
-						push_side(pointer);
+					if(!push_extra(cd) && !push_main(cd))
+						push_side(cd);
 				}
 			} else {
 				soundManager.PlaySoundEffect(SOUND_CARD_PICK);
@@ -1185,8 +1189,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				} else {
 					push_side(draging_pointer);
 				}
-				is_draging = false;
 			}
+			is_draging = false;
 			break;
 		}
 		case irr::EMIE_MMOUSE_LEFT_UP: {
@@ -1203,21 +1207,22 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			auto pointer = _datas.find(hovered_code);
 			if (pointer == _datas.end())
 				break;
-			if(!check_limit(pointer))
+			auto cd = &pointer->second;
+			if(!check_limit(cd))
 				break;
 			soundManager.PlaySoundEffect(SOUND_CARD_PICK);
 			if (hovered_pos == 1) {
-				if(!push_main(pointer))
-					push_side(pointer);
+				if(!push_main(cd))
+					push_side(cd);
 			} else if (hovered_pos == 2) {
-				if(!push_extra(pointer))
-					push_side(pointer);
+				if(!push_extra(cd))
+					push_side(cd);
 			} else if (hovered_pos == 3) {
-				if(!push_side(pointer) && !push_extra(pointer))
-					push_main(pointer);
+				if(!push_side(cd) && !push_extra(cd))
+					push_main(cd);
 			} else {
-				if(!push_extra(pointer) && !push_main(pointer))
-					push_side(pointer);
+				if(!push_extra(cd) && !push_main(cd))
+					push_side(cd);
 			}
 			break;
 		}
@@ -1306,7 +1311,7 @@ void DeckBuilder::GetHoveredCard() {
 					hovered_seq = -1;
 					hovered_code = 0;
 				} else {
-					hovered_code = deckManager.current_deck.main[hovered_seq]->first;
+					hovered_code = deckManager.current_deck.main[hovered_seq]->code;
 				}
 			}
 		} else if(y >= 164 && y <= 435) {
@@ -1323,7 +1328,7 @@ void DeckBuilder::GetHoveredCard() {
 				hovered_seq = -1;
 				hovered_code = 0;
 			} else {
-				hovered_code = deckManager.current_deck.main[hovered_seq]->first;
+				hovered_code = deckManager.current_deck.main[hovered_seq]->code;
 			}
 		} else if(y >= 466 && y <= 530) {
 			int lx = deckManager.current_deck.extra.size();
@@ -1338,7 +1343,7 @@ void DeckBuilder::GetHoveredCard() {
 				hovered_seq = -1;
 				hovered_code = 0;
 			} else {
-				hovered_code = deckManager.current_deck.extra[hovered_seq]->first;
+				hovered_code = deckManager.current_deck.extra[hovered_seq]->code;
 				if(x >= 772)
 					is_lastcard = 1;
 			}
@@ -1355,7 +1360,7 @@ void DeckBuilder::GetHoveredCard() {
 				hovered_seq = -1;
 				hovered_code = 0;
 			} else {
-				hovered_code = deckManager.current_deck.side[hovered_seq]->first;
+				hovered_code = deckManager.current_deck.side[hovered_seq]->code;
 				if(x >= 772)
 					is_lastcard = 1;
 			}
@@ -1368,7 +1373,7 @@ void DeckBuilder::GetHoveredCard() {
 			hovered_seq = -1;
 			hovered_code = 0;
 		} else {
-			hovered_code = results[current_pos]->first;
+			hovered_code = results[current_pos]->code;
 		}
 	}
 	if(is_draging) {
@@ -1470,9 +1475,9 @@ void DeckBuilder::FilterCards() {
 	}
 	auto& _datas = dataManager.GetDataTable();
 	auto& _strings = dataManager.GetStringTable();
-	for (code_pointer ptr = _datas.begin(); ptr != _datas.end(); ++ptr) {
-		auto& code = ptr->first;
-		auto& data = ptr->second;
+	for (auto& kv : _datas) {
+		auto code = kv.first;
+		auto& data = kv.second;
 		auto strpointer = _strings.find(code);
 		if (strpointer == _strings.end())
 			continue;
@@ -1535,7 +1540,7 @@ void DeckBuilder::FilterCards() {
 		if(filter_marks && (data.link_marker & filter_marks) != filter_marks)
 			continue;
 		if(filter_lm) {
-			if(filter_lm <= 3 && (!filterList->content.count(ptr->first) || filterList->content.at(ptr->first) != filter_lm - 1))
+			if(filter_lm <= 3 && (!filterList->content.count(code) || filterList->content.at(code) != filter_lm - 1))
 				continue;
 			if(filter_lm == 4 && !(data.ot & AVAIL_OCG))
 				continue;
@@ -1552,13 +1557,13 @@ void DeckBuilder::FilterCards() {
 		for (auto elements_iterator = query_elements.begin(); elements_iterator != query_elements.end(); ++elements_iterator) {
 			bool match = false;
 			if (elements_iterator->type == element_t::type_t::name) {
-				match = CardNameContains(strings.name.c_str(), elements_iterator->keyword.c_str());
+				match = DataManager::CardNameContains(strings.name.c_str(), elements_iterator->keyword.c_str());
 			} else if (elements_iterator->type == element_t::type_t::setcode) {
 				match = data.is_setcodes(elements_iterator->setcodes);
-			} else if (trycode && (data.code == trycode || data.alias == trycode && is_alternative(data.code, data.alias))){
+			} else if (trycode && data.get_original_code() == trycode) {
 				match = true;
 			} else {
-				match = CardNameContains(strings.name.c_str(), elements_iterator->keyword.c_str())
+				match = DataManager::CardNameContains(strings.name.c_str(), elements_iterator->keyword.c_str())
 					|| strings.text.find(elements_iterator->keyword) != std::wstring::npos
 					|| data.is_setcodes(elements_iterator->setcodes);
 			}
@@ -1570,11 +1575,11 @@ void DeckBuilder::FilterCards() {
 			}
 		}
 		if(is_target)
-			results.push_back(ptr);
+			results.push_back(&data);
 		else
 			continue;
 	}
-	myswprintf(result_string, L"%d", results.size());
+	myswprintf(result_string, L"%zu", results.size());
 	if(results.size() > 7) {
 		mainGame->scrFilter->setVisible(true);
 		mainGame->scrFilter->setMax(results.size() - 7);
@@ -1627,7 +1632,7 @@ void DeckBuilder::SortList() {
 	auto left = results.begin();
 	const wchar_t* pstr = mainGame->ebCardName->getText();
 	for(auto it = results.begin(); it != results.end(); ++it) {
-		if(std::wcscmp(pstr, dataManager.GetName((*it)->first)) == 0) {
+		if(std::wcscmp(pstr, dataManager.GetName((*it)->code)) == 0) {
 			std::iter_swap(left, it);
 			++left;
 		}
@@ -1768,53 +1773,8 @@ void DeckBuilder::CloseBigCard() {
 	mainGame->btnBigCardClose->setVisible(false);
 }
 
-static inline wchar_t NormalizeChar(wchar_t c) {
-	/*
-	// Convert all symbols and punctuations to space.
-	if (c != 0 && c < 128 && !isalnum(c)) {
-		return ' ';
-	}
-	*/
-	// Convert latin chararacters to uppercase to ignore case.
-	if (c < 128 && isalpha(c)) {
-		return toupper(c);
-	}
-	// Remove some accentued characters that are not supported by the editbox.
-	if (c >= 232 && c <= 235) {
-		return 'E';
-	}
-	if (c >= 238 && c <= 239) {
-		return 'I';
-	}
-	return c;
-}
-bool DeckBuilder::CardNameContains(const wchar_t* haystack, const wchar_t* needle) {
-	if(!needle[0]) {
-		return true;
-	}
-	if(!haystack) {
-		return false;
-	}
-	int i = 0;
-	int j = 0;
-	while(haystack[i]) {
-		wchar_t ca = NormalizeChar(haystack[i]);
-		wchar_t cb = NormalizeChar(needle[j]);
-		if(ca == cb) {
-			j++;
-			if(!needle[j]) {
-				return true;
-			}
-		} else {
-			i -= j;
-			j = 0;
-		}
-		i++;
-	}
-	return false;
-}
-bool DeckBuilder::push_main(code_pointer pointer, int seq) {
-	if(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK))
+bool DeckBuilder::push_main(const CardDataC* pointer, int seq) {
+	if(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK))
 		return false;
 	auto& container = deckManager.current_deck.main;
 	int maxc = mainGame->is_siding ? DECK_MAX_SIZE + 5 : DECK_MAX_SIZE;
@@ -1828,8 +1788,8 @@ bool DeckBuilder::push_main(code_pointer pointer, int seq) {
 	GetHoveredCard();
 	return true;
 }
-bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
-	if(!(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)))
+bool DeckBuilder::push_extra(const CardDataC* pointer, int seq) {
+	if(!(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)))
 		return false;
 	auto& container = deckManager.current_deck.extra;
 	int maxc = mainGame->is_siding ? EXTRA_MAX_SIZE + 5 : EXTRA_MAX_SIZE;
@@ -1843,7 +1803,7 @@ bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
 	GetHoveredCard();
 	return true;
 }
-bool DeckBuilder::push_side(code_pointer pointer, int seq) {
+bool DeckBuilder::push_side(const CardDataC* pointer, int seq) {
 	auto& container = deckManager.current_deck.side;
 	int maxc = mainGame->is_siding ? SIDE_MAX_SIZE + 5 : SIDE_MAX_SIZE;
 	if((int)container.size() >= maxc)

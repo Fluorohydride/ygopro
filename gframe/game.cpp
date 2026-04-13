@@ -11,6 +11,25 @@
 #include "netserver.h"
 #include "single_mode.h"
 #include <thread>
+#include <chrono>
+#ifdef _WIN32
+#include <timeapi.h>
+#endif
+
+#if defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || \
+	defined(__x86_64__) || defined(_M_X64) || defined(__x86_64) || defined(_M_AMD64)
+	#include <immintrin.h>
+	#define CPU_PAUSE() _mm_pause()
+#elif defined(_M_ARM) || defined(_M_ARM64) || defined(__arm__) || defined(__aarch64__)
+    #if defined(_MSC_VER)
+        #include <intrin.h>
+        #define CPU_PAUSE() __yield()
+    #else
+        #define CPU_PAUSE() __asm__ __volatile__("yield" ::: "memory")
+    #endif
+#else
+	#define CPU_PAUSE() ((void)0)
+#endif
 
 namespace ygo {
 
@@ -74,9 +93,11 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load textures!");
 		return false;
 	}
-	dataManager.FileSystem = device->getFileSystem();
-	if(!dataManager.LoadDB(L"cards.cdb")) {
-		ErrorLog("Failed to load card database (cards.cdb)!");
+	dataManager.IrrFileSystem = device->getFileSystem();
+	if(!dataManager.LoadDB("cards.cdb")) {
+		std::string errmsg = "Failed to load card database (cards.cdb)! ";
+		errmsg.append(dataManager.errmsg);
+		ErrorLog(errmsg.c_str());
 		return false;
 	}
 	if(!dataManager.LoadStrings("strings.conf")) {
@@ -87,20 +108,20 @@ bool Game::Initialize() {
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	if(!numFont) {
-		const wchar_t* numFontPaths[] = {
-			L"./fonts/numFont.ttf",
-			L"./fonts/numFont.ttc",
-			L"./fonts/numFont.otf",
-			L"C:/Windows/Fonts/arialbd.ttf",
-			L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
-			L"/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
-			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Bold.ttc",
-			L"/usr/share/fonts/noto-cjk/NotoSansCJK-Bold.ttc",
-			L"/System/Library/Fonts/SFNSTextCondensed-Bold.otf",
-			L"/System/Library/Fonts/SFNS.ttf",
+		const char* numFontPaths[] = {
+			"./fonts/numFont.ttf",
+			"./fonts/numFont.ttc",
+			"./fonts/numFont.otf",
+			"C:/Windows/Fonts/arialbd.ttf",
+			"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
+			"/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+			"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Bold.ttc",
+			"/usr/share/fonts/noto-cjk/NotoSansCJK-Bold.ttc",
+			"/System/Library/Fonts/SFNSTextCondensed-Bold.otf",
+			"/System/Library/Fonts/SFNS.ttf",
 		};
-		for(const wchar_t* path : numFontPaths) {
-			BufferIO::CopyWideString(path, gameConf.numfont);
+		for(auto path : numFontPaths) {
+			BufferIO::CopyString(path, gameConf.numfont);
 			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 			if(numFont)
 				break;
@@ -108,25 +129,25 @@ bool Game::Initialize() {
 	}
 	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	if(!textFont) {
-		const wchar_t* textFontPaths[] = {
-			L"./fonts/textFont.ttf",
-			L"./fonts/textFont.ttc",
-			L"./fonts/textFont.otf",
-			L"C:/Windows/Fonts/msyh.ttc",
-			L"C:/Windows/Fonts/msyh.ttf",
-			L"C:/Windows/Fonts/simsun.ttc",
-			L"C:/Windows/Fonts/YuGothM.ttc",
-			L"C:/Windows/Fonts/meiryo.ttc",
-			L"C:/Windows/Fonts/msgothic.ttc",
-			L"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
-			L"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
-			L"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc",
-			L"/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
-			L"/System/Library/Fonts/PingFang.ttc",
-			L"/System/Library/Fonts/STHeiti Medium.ttc",
+		const char* textFontPaths[] = {
+			"./fonts/textFont.ttf",
+			"./fonts/textFont.ttc",
+			"./fonts/textFont.otf",
+			"C:/Windows/Fonts/msyh.ttc",
+			"C:/Windows/Fonts/msyh.ttf",
+			"C:/Windows/Fonts/simsun.ttc",
+			"C:/Windows/Fonts/YuGothM.ttc",
+			"C:/Windows/Fonts/meiryo.ttc",
+			"C:/Windows/Fonts/msgothic.ttc",
+			"/usr/share/fonts/truetype/DroidSansFallbackFull.ttf",
+			"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+			"/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc",
+			"/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
+			"/System/Library/Fonts/PingFang.ttc",
+			"/System/Library/Fonts/STHeiti Medium.ttc",
 		};
-		for(const wchar_t* path : textFontPaths) {
-			BufferIO::CopyWideString(path, gameConf.textfont);
+		for(auto path : textFontPaths) {
+			BufferIO::CopyString(path, gameConf.textfont);
 			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 			if(textFont)
 				break;
@@ -134,7 +155,6 @@ bool Game::Initialize() {
 	}
 	if(!numFont || !textFont) {
 		wchar_t fpath[1024]{};
-		fpath[0] = 0;
 		FileSystem::TraversalDir(L"./fonts", [&fpath](const wchar_t* name, bool isdir) {
 			if(!isdir && (IsExtension(name, L".ttf") || IsExtension(name, L".ttc") || IsExtension(name, L".otf"))) {
 				myswprintf(fpath, L"./fonts/%ls", name);
@@ -145,11 +165,11 @@ bool Game::Initialize() {
 			return false;
 		}
 		if(!numFont) {
-			BufferIO::CopyWideString(fpath, gameConf.numfont);
+			BufferIO::EncodeUTF8(fpath, gameConf.numfont);
 			numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 		}
 		if(!textFont) {
-			BufferIO::CopyWideString(fpath, gameConf.textfont);
+			BufferIO::EncodeUTF8(fpath, gameConf.textfont);
 			textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 		}
 	}
@@ -316,7 +336,6 @@ bool Game::Initialize() {
 	wCardImg->setBackgroundColor(0xc0c0c0c0);
 	wCardImg->setVisible(false);
 	imgCard = env->addImage(irr::core::rect<irr::s32>(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT), wCardImg);
-	imgCard->setImage(imageManager.tCover[0]);
 	showingcode = 0;
 	imgCard->setScaleImage(true);
 	imgCard->setUseAlphaChannel(true);
@@ -532,21 +551,16 @@ bool Game::Initialize() {
 	scrOption->setSmallStep(1);
 	scrOption->setMin(0);
 	//pos select
-	wPosSelect = env->addWindow(irr::core::rect<irr::s32>(340, 200, 935, 410), false, dataManager.GetSysString(561));
+	wPosSelect = env->addWindow(irr::core::rect<irr::s32>(425, 210, 900, 399), false, dataManager.GetSysString(561));
 	wPosSelect->getCloseButton()->setVisible(false);
 	wPosSelect->setVisible(false);
-	btnPSAU = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(10, 45, 150, 185), wPosSelect, BUTTON_POS_AU);
-	btnPSAU->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.5f, CARD_IMG_HEIGHT * 0.5f));
-	btnPSAD = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(155, 45, 295, 185), wPosSelect, BUTTON_POS_AD);
-	btnPSAD->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.5f, CARD_IMG_HEIGHT * 0.5f));
-	btnPSAD->setImage(imageManager.tCover[2]);
-	btnPSDU = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(300, 45, 440, 185), wPosSelect, BUTTON_POS_DU);
-	btnPSDU->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.5f, CARD_IMG_HEIGHT * 0.5f));
-	btnPSDU->setImageRotation(270);
-	btnPSDD = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(445, 45, 585, 185), wPosSelect, BUTTON_POS_DD);
-	btnPSDD->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.5f, CARD_IMG_HEIGHT * 0.5f));
-	btnPSDD->setImageRotation(270);
-	btnPSDD->setImage(imageManager.tCover[2]);
+	btnPSAU = env->addButton(irr::core::rect<irr::s32>(27, 35, 164, 172), wPosSelect, BUTTON_POS_AU);
+	btnPSAD = env->addButton(irr::core::rect<irr::s32>(27, 35, 164, 172), wPosSelect, BUTTON_POS_AD);
+	btnFacedownImgInfo[btnPSAD] = {0, false};
+	btnPSAD->setVisible(false); // PSAD = PoSition Attack face-Down, is not allowed in the rules, so the width of wPosSelect only support 3 buttons
+	btnPSDU = env->addButton(irr::core::rect<irr::s32>(169, 35, 306, 172), wPosSelect, BUTTON_POS_DU);
+	btnPSDD = env->addButton(irr::core::rect<irr::s32>(311, 35, 448, 172), wPosSelect, BUTTON_POS_DD);
+	btnFacedownImgInfo[btnPSDD] = {0, true};
 	//card select
 	wCardSelect = env->addWindow(irr::core::rect<irr::s32>(320, 100, 1000, 400), false, L"");
 	wCardSelect->getCloseButton()->setVisible(false);
@@ -555,8 +569,7 @@ bool Game::Initialize() {
 		stCardPos[i] = env->addStaticText(L"", irr::core::rect<irr::s32>(30 + 125 * i, 30, 150 + 125 * i, 50), true, false, wCardSelect, -1, true);
 		stCardPos[i]->setBackgroundColor(0xffffffff);
 		stCardPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-		btnCardSelect[i] = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardSelect, BUTTON_CARD_0 + i);
-		btnCardSelect[i]->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.6f, CARD_IMG_HEIGHT * 0.6f));
+		btnCardSelect[i] = env->addButton(irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardSelect, BUTTON_CARD_0 + i);
 	}
 	scrCardList = env->addScrollBar(true, irr::core::rect<irr::s32>(30, 235, 650, 255), wCardSelect, SCROLL_CARD_SELECT);
 	btnSelectOK = env->addButton(irr::core::rect<irr::s32>(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_OK, dataManager.GetSysString(1211));
@@ -568,8 +581,7 @@ bool Game::Initialize() {
 		stDisplayPos[i] = env->addStaticText(L"", irr::core::rect<irr::s32>(30 + 125 * i, 30, 150 + 125 * i, 50), true, false, wCardDisplay, -1, true);
 		stDisplayPos[i]->setBackgroundColor(0xffffffff);
 		stDisplayPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-		btnCardDisplay[i] = irr::gui::CGUIImageButton::addImageButton(env, irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardDisplay, BUTTON_DISPLAY_0 + i);
-		btnCardDisplay[i]->setImageSize(irr::core::dimension2di(CARD_IMG_WIDTH * 0.6f, CARD_IMG_HEIGHT * 0.6f));
+		btnCardDisplay[i] = env->addButton(irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardDisplay, BUTTON_DISPLAY_0 + i);
 	}
 	scrDisplayList = env->addScrollBar(true, irr::core::rect<irr::s32>(30, 235, 650, 255), wCardDisplay, SCROLL_CARD_DISPLAY);
 	btnDisplayOK = env->addButton(irr::core::rect<irr::s32>(300, 265, 380, 290), wCardDisplay, BUTTON_CARD_DISP_OK, dataManager.GetSysString(1211));
@@ -753,11 +765,11 @@ bool Game::Initialize() {
 	stDefense = env->addStaticText(dataManager.GetSysString(1323), irr::core::rect<irr::s32>(205, 42 + 75 / 6, 280, 62 + 75 / 6), false, false, wFilter);
 	ebDefense = env->addEditBox(L"", irr::core::rect<irr::s32>(260, 40 + 75 / 6, 340, 60 + 75 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebDefense->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stStar = env->addStaticText(dataManager.GetSysString(1324), irr::core::rect<irr::s32>(10, 62 + 100 / 6, 80, 82 + 100 / 6), false, false, wFilter);
-	ebStar = env->addEditBox(L"", irr::core::rect<irr::s32>(60, 60 + 100 / 6, 100, 80 + 100 / 6), true, wFilter, EDITBOX_INPUTS);
+	stStar = env->addStaticText(dataManager.GetSysString(1324), irr::core::rect<irr::s32>(10, 62 + 100 / 6, 70, 82 + 100 / 6), false, false, wFilter);
+	ebStar = env->addEditBox(L"", irr::core::rect<irr::s32>(60, 60 + 100 / 6, 95, 80 + 100 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stScale = env->addStaticText(dataManager.GetSysString(1336), irr::core::rect<irr::s32>(101, 62 + 100 / 6, 150, 82 + 100 / 6), false, false, wFilter);
-	ebScale = env->addEditBox(L"", irr::core::rect<irr::s32>(150, 60 + 100 / 6, 195, 80 + 100 / 6), true, wFilter, EDITBOX_INPUTS);
+	stScale = env->addStaticText(dataManager.GetSysString(1336), irr::core::rect<irr::s32>(105, 62 + 100 / 6, 165, 82 + 100 / 6), false, false, wFilter);
+	ebScale = env->addEditBox(L"", irr::core::rect<irr::s32>(155, 60 + 100 / 6, 195, 80 + 100 / 6), true, wFilter, EDITBOX_INPUTS);
 	ebScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stSearch = env->addStaticText(dataManager.GetSysString(1325), irr::core::rect<irr::s32>(205, 62 + 100 / 6, 280, 82 + 100 / 6), false, false, wFilter);
 	ebCardName = env->addEditBox(L"", irr::core::rect<irr::s32>(260, 60 + 100 / 6, 390, 80 + 100 / 6), true, wFilter, EDITBOX_KEYWORD);
@@ -768,7 +780,7 @@ bool Game::Initialize() {
 		btnStartFilter->setRelativePosition(irr::core::rect<irr::s32>(260, 80 + 125 / 6, 390, 100 + 125 / 6));
 		btnClearFilter = env->addButton(irr::core::rect<irr::s32>(205, 80 + 125 / 6, 255, 100 + 125 / 6), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
 	}
-	wCategories = env->addWindow(irr::core::rect<irr::s32>(600, 60, 1000, 305), false, L"");
+	wCategories = env->addWindow(irr::core::rect<irr::s32>(600, 55, 1000, 300), false, L"");
 	wCategories->getCloseButton()->setVisible(false);
 	wCategories->setDrawTitlebar(false);
 	wCategories->setDraggable(false);
@@ -783,7 +795,7 @@ bool Game::Initialize() {
 	for(int i = 0; i < 32; ++i)
 		chkCategory[i] = env->addCheckBox(false, irr::core::recti(10 + (i % 4) * catewidth, 5 + (i / 4) * 25, 10 + (i % 4 + 1) * catewidth, 5 + (i / 4 + 1) * 25), wCategories, -1, dataManager.GetSysString(1100 + i));
 	int wcatewidth = catewidth * 4 + 16;
-	wCategories->setRelativePosition(irr::core::rect<irr::s32>(1000 - wcatewidth, 60, 1000, 305));
+	wCategories->setRelativePosition(irr::core::rect<irr::s32>(1000 - wcatewidth, 55, 1000, 300));
 	btnCategoryOK->setRelativePosition(irr::core::recti(wcatewidth / 2 - 50, 210, wcatewidth / 2 + 50, 235));
 	btnMarksFilter = env->addButton(irr::core::rect<irr::s32>(60, 80 + 125 / 6, 195, 100 + 125 / 6), wFilter, BUTTON_MARKS_FILTER, dataManager.GetSysString(1374));
 	wLinkMarks = env->addWindow(irr::core::rect<irr::s32>(700, 30, 820, 150), false, L"");
@@ -869,21 +881,21 @@ bool Game::Initialize() {
 	btnRSYes = env->addButton(irr::core::rect<irr::s32>(70, 80, 140, 105), wReplaySave, BUTTON_REPLAY_SAVE, dataManager.GetSysString(1341));
 	btnRSNo = env->addButton(irr::core::rect<irr::s32>(170, 80, 240, 105), wReplaySave, BUTTON_REPLAY_CANCEL, dataManager.GetSysString(1212));
 	//replay control
-	wReplayControl = env->addStaticText(L"", irr::core::rect<irr::s32>(205, 118, 295, 273), true, false, 0, -1, true);
+	wReplayControl = env->addStaticText(L"", irr::core::rect<irr::s32>(205, 143, 295, 273), true, false, 0, -1, true);
 	wReplayControl->setVisible(false);
 	btnReplayStart = env->addButton(irr::core::rect<irr::s32>(5, 5, 85, 25), wReplayControl, BUTTON_REPLAY_START, dataManager.GetSysString(1343));
-	btnReplayPause = env->addButton(irr::core::rect<irr::s32>(5, 30, 85, 50), wReplayControl, BUTTON_REPLAY_PAUSE, dataManager.GetSysString(1344));
+	btnReplayPause = env->addButton(irr::core::rect<irr::s32>(5, 5, 85, 25), wReplayControl, BUTTON_REPLAY_PAUSE, dataManager.GetSysString(1344));
+	btnReplaySwap = env->addButton(irr::core::rect<irr::s32>(5, 30, 85, 50), wReplayControl, BUTTON_REPLAY_SWAP, dataManager.GetSysString(1346));
 	btnReplayStep = env->addButton(irr::core::rect<irr::s32>(5, 55, 85, 75), wReplayControl, BUTTON_REPLAY_STEP, dataManager.GetSysString(1345));
 	btnReplayUndo = env->addButton(irr::core::rect<irr::s32>(5, 80, 85, 100), wReplayControl, BUTTON_REPLAY_UNDO, dataManager.GetSysString(1360));
-	btnReplaySwap = env->addButton(irr::core::rect<irr::s32>(5, 105, 85, 125), wReplayControl, BUTTON_REPLAY_SWAP, dataManager.GetSysString(1346));
-	btnReplayExit = env->addButton(irr::core::rect<irr::s32>(5, 130, 85, 150), wReplayControl, BUTTON_REPLAY_EXIT, dataManager.GetSysString(1347));
+	btnReplayExit = env->addButton(irr::core::rect<irr::s32>(5, 105, 85, 125), wReplayControl, BUTTON_REPLAY_EXIT, dataManager.GetSysString(1347));
 	//chat
-	wChat = env->addWindow(irr::core::rect<irr::s32>(305, 615, 1020, 640), false, L"");
+	wChat = env->addWindow(irr::core::rect<irr::s32>(307, 615, GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT), false, L"");
 	wChat->getCloseButton()->setVisible(false);
 	wChat->setDraggable(false);
 	wChat->setDrawTitlebar(false);
 	wChat->setVisible(false);
-	ebChatInput = env->addEditBox(L"", irr::core::rect<irr::s32>(3, 2, 710, 22), true, wChat, EDITBOX_CHAT);
+	ebChatInput = env->addEditBox(L"", irr::core::rect<irr::s32>(3, 2, 711, 22), true, wChat, EDITBOX_CHAT);
 	//swap
 	btnSpectatorSwap = env->addButton(irr::core::rect<irr::s32>(205, 100, 295, 135), 0, BUTTON_REPLAY_SWAP, dataManager.GetSysString(1346));
 	btnSpectatorSwap->setVisible(false);
@@ -953,13 +965,12 @@ bool Game::Initialize() {
 		col.setAlpha(224);
 		env->getSkin()->setColor((irr::gui::EGUI_DEFAULT_COLOR)i, col);
 	}
-	auto size = driver->getScreenSize();
-	if(window_size != size) {
-		window_size = size;
-		xScale = window_size.Width / 1024.0;
-		yScale = window_size.Height / 640.0;
-		OnResize();
-	}
+	window_size = driver->getScreenSize();
+	xScale = window_size.Width / static_cast<float>(GAME_WINDOW_WIDTH);
+	yScale = window_size.Height / static_cast<float>(GAME_WINDOW_HEIGHT);
+	gMutex.lock();
+	OnResize();
+	gMutex.unlock();
 	return true;
 }
 void Game::MainLoop() {
@@ -973,21 +984,31 @@ void Game::MainLoop() {
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
-	irr::ITimer* timer = device->getTimer();
-	timer->setTime(0);
 	int fps = 0;
-	int cur_time = 0;
+	auto lastFpsTime = std::chrono::steady_clock::now();
+#ifdef _WIN32
+	HANDLE hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
+	bool useHighResTimer = (hWaitTimer != NULL);
+	if(!useHighResTimer)
+		timeBeginPeriod(1);
+#endif
+	auto lastFrameTime = std::chrono::steady_clock::now();
+	constexpr auto targetFrameDuration = std::chrono::microseconds(16667);
 	while(device->run()) {
 		auto size = driver->getScreenSize();
 		if(window_size != size) {
 			window_size = size;
-			xScale = window_size.Width / 1024.0;
-			yScale = window_size.Height / 640.0;
+			xScale = window_size.Width / static_cast<float>(GAME_WINDOW_WIDTH);
+			yScale = window_size.Height / static_cast<float>(GAME_WINDOW_HEIGHT);
+			gMutex.lock();
 			OnResize();
+			gMutex.unlock();
 		}
-		linePatternD3D = (linePatternD3D + 1) % 30;
-		linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
+		linePattern = (linePattern + 1) % 30;
+		stippleMask = (stippleMask << 1) | (stippleMask >> 15);
 		atkframe += 0.1f;
+		if(atkframe > 6.2832f)
+			atkframe -= 6.2832f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
 		gMutex.lock();
@@ -1036,23 +1057,62 @@ void Game::MainLoop() {
 			}
 		}
 		driver->endScene();
-		if(closeSignal.Wait(1))
+		if(closeSignal.TryWait())
 			CloseDuelWindow();
 		fps++;
-		cur_time = timer->getTime();
-		if(cur_time < fps * 17 - 20)
-			std::this_thread::sleep_for(std::chrono::milliseconds(20));
-		if(cur_time >= 1000) {
+		auto targetTime = lastFrameTime + targetFrameDuration;
+		auto now = std::chrono::steady_clock::now();
+		if(now < targetTime) {
+#ifdef _WIN32
+			if(useHighResTimer)
+			{
+				auto remaining = std::chrono::duration_cast<std::chrono::microseconds>(targetTime - now);
+				if(remaining.count() > 1500) {
+					LARGE_INTEGER dueTime;
+					dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
+					if(SetWaitableTimer(hWaitTimer, &dueTime, 0, NULL, NULL, FALSE))
+						WaitForSingleObject(hWaitTimer, INFINITE);
+				}
+			}
+			else
+#endif
+			{
+				auto sleepTime = targetTime - now - std::chrono::milliseconds(2);
+				if(sleepTime > std::chrono::milliseconds(0)) {
+					std::this_thread::sleep_for(sleepTime);
+				}
+			}
+			// Spin-wait for sub-millisecond precision.
+			// If the window is inactive, sleep 1ms per iteration to avoid wasting CPU.
+			while(std::chrono::steady_clock::now() < targetTime) {
+				if(device->isWindowActive())
+					CPU_PAUSE();
+				else
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
+		}
+		lastFrameTime = targetTime;
+		now = std::chrono::steady_clock::now();
+		if(now - targetTime > targetFrameDuration)
+			lastFrameTime = now;
+		if(now - lastFpsTime >= std::chrono::milliseconds(1000)) {
 			myswprintf(cap, L"YGOPro FPS: %d", fps);
 			device->setWindowCaption(cap);
 			fps = 0;
-			cur_time -= 1000;
-			timer->setTime(0);
+			lastFpsTime += std::chrono::milliseconds(1000);
+			if(now - lastFpsTime > std::chrono::milliseconds(1000))
+				lastFpsTime = now;
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)
 				if(dInfo.time_left[dInfo.time_player])
 					dInfo.time_left[dInfo.time_player]--;
 		}
 	}
+#ifdef _WIN32
+	if(useHighResTimer)
+		CloseHandle(hWaitTimer);
+	else
+		timeEndPeriod(1);
+#endif
 	DuelClient::StopClient(true);
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
@@ -1127,56 +1187,60 @@ std::wstring Game::SetStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cW
 	return result;
 }
 void Game::LoadExpansions() {
-	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
+	FileSystem::TraversalDir("./expansions", [](const char* name, bool isdir) {
 		if (isdir)
 			return;
-		wchar_t fpath[1024];
-		myswprintf(fpath, L"./expansions/%ls", name);
-		if (IsExtension(name, L".cdb")) {
-			dataManager.LoadDB(fpath);
+		char fpath[1024];
+		mysnprintf(fpath, "./expansions/%s", name);
+		if (IsExtension(name, ".cdb")) {
+			if (!dataManager.LoadDB(fpath)) {
+				std::string errmsg = "Warning: Failed to load DB file on disk (";
+				errmsg.append(fpath);
+				errmsg.append(")! ");
+				errmsg.append(dataManager.errmsg);
+				mainGame->ErrorLog(errmsg.c_str());
+			}
 			return;
 		}
-		if (IsExtension(name, L".conf")) {
-			char upath[1024];
-			BufferIO::EncodeUTF8(fpath, upath);
-			dataManager.LoadStrings(upath);
+		if (IsExtension(name, ".conf")) {
+			dataManager.LoadStrings(fpath);
 			return;
 		}
-		if (IsExtension(name, L".zip") || IsExtension(name, L".ypk")) {
-#ifdef _IRR_WCHAR_FILESYSTEM
-			dataManager.FileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
-#else
-			char upath[1024];
-			BufferIO::EncodeUTF8(fpath, upath);
-			dataManager.FileSystem->addFileArchive(upath, true, false, irr::io::EFAT_ZIP);
-#endif
+		if (IsExtension(name, ".zip") || IsExtension(name, ".ypk")) {
+			dataManager.IrrFileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
 			return;
 		}
 	});
-	for(irr::u32 i = 0; i < dataManager.FileSystem->getFileArchiveCount(); ++i) {
-		auto archive = dataManager.FileSystem->getFileArchive(i)->getFileList();
+	for(irr::u32 i = 0; i < dataManager.IrrFileSystem->getFileArchiveCount(); ++i) {
+		auto archive = dataManager.IrrFileSystem->getFileArchive(i)->getFileList();
 		for(irr::u32 j = 0; j < archive->getFileCount(); ++j) {
-#ifdef _IRR_WCHAR_FILESYSTEM
-			const wchar_t* fname = archive->getFullFileName(j).c_str();
-#else
-			wchar_t fname[1024];
-			const char* uname = archive->getFullFileName(j).c_str();
-			BufferIO::DecodeUTF8(uname, fname);
-#endif
-			if (IsExtension(fname, L".cdb")) {
-				dataManager.LoadDB(fname);
+			const char* name = archive->getFullFileName(j).c_str();
+			if (IsExtension(name, ".cdb")) {
+				if (!dataManager.LoadDB(name)) {
+					std::string errmsg = "Warning: Failed to load DB file in expansion archive (";
+					errmsg.append(name);
+					errmsg.append(")! ");
+					errmsg.append(dataManager.errmsg);
+					mainGame->ErrorLog(errmsg.c_str());
+				}
 				continue;
 			}
-			if (IsExtension(fname, L".conf")) {
-#ifdef _IRR_WCHAR_FILESYSTEM
-				auto reader = dataManager.FileSystem->createAndOpenFile(fname);
-#else
-				auto reader = dataManager.FileSystem->createAndOpenFile(uname);
-#endif
+			if (IsExtension(name, ".conf")) {
+				auto reader = dataManager.IrrFileSystem->createAndOpenFile(name);
 				dataManager.LoadStrings(reader);
 				continue;
 			}
-			if (!mywcsncasecmp(fname, L"pack/", 5) && IsExtension(fname, L".ydk")) {
+			if (!mystrncasecmp(name, "pack/", 5) && IsExtension(name, ".ydk")) {
+				wchar_t fname[1024];
+				int len = BufferIO::DecodeUTF8(name, fname);
+				// TODO: zip file may contain non-UTF8 file name. DecodeUTF8 can't parse it and returns 0.
+				if (!len) {
+					std::string errmsg = "Warning: Failed to decode deck file name in expansion archive (";
+					errmsg.append(name);
+					errmsg.append(")! Please make sure the file name is UTF-8 encoded in the archive.");
+					mainGame->ErrorLog(errmsg.c_str());
+					continue;
+				}
 				deckBuilder.expansionPacks.push_back(fname);
 				continue;
 			}
@@ -1324,13 +1388,14 @@ void Game::LoadConfig() {
 			gameConf.antialias = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "use_d3d")) {
 			gameConf.use_d3d = std::strtol(valbuf, nullptr, 10) > 0;
+#ifdef _OPENMP
 		} else if (!std::strcmp(strbuf, "use_image_scale_multi_thread")) {
 			gameConf.use_image_scale_multi_thread = std::strtol(valbuf, nullptr, 10) > 0;
+#endif
 		} else if (!std::strcmp(strbuf, "use_image_load_background_thread")) {
 			gameConf.use_image_load_background_thread = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "errorlog")) {
-			unsigned int val = std::strtol(valbuf, nullptr, 10);
-			enable_log = val & 0xff;
+			gameConf.enable_log = std::strtol(valbuf, nullptr, 10) & 0xff;
 		} else if(!std::strcmp(strbuf, "serverport")) {
 			gameConf.serverport = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "lasthost")) {
@@ -1433,9 +1498,9 @@ void Game::LoadConfig() {
 				if (fontsize > 0)
 					gameConf.textfontsize = fontsize;
 				*last_space = 0;
-				BufferIO::DecodeUTF8(valbuf, gameConf.textfont);
+				BufferIO::CopyString(valbuf, gameConf.textfont);
 			} else if (!std::strcmp(strbuf, "numfont")) {
-				BufferIO::DecodeUTF8(valbuf, gameConf.numfont);
+				BufferIO::CopyString(valbuf, gameConf.numfont);
 			} else if (!std::strcmp(strbuf, "nickname")) {
 				BufferIO::DecodeUTF8(valbuf, gameConf.nickname);
 			} else if (!std::strcmp(strbuf, "gamename")) {
@@ -1458,10 +1523,12 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[CONFIG_LINE_SIZE];
 	std::fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
+#ifdef _OPENMP
 	std::fprintf(fp, "use_image_scale_multi_thread = %d\n", gameConf.use_image_scale_multi_thread ? 1 : 0);
+#endif
 	std::fprintf(fp, "use_image_load_background_thread = %d\n", gameConf.use_image_load_background_thread ? 1 : 0);
 	std::fprintf(fp, "antialias = %d\n", gameConf.antialias);
-	std::fprintf(fp, "errorlog = %u\n", enable_log);
+	std::fprintf(fp, "errorlog = %u\n", gameConf.enable_log);
 	BufferIO::CopyWideString(ebNickName->getText(), gameConf.nickname);
 	BufferIO::EncodeUTF8(gameConf.nickname, linebuf);
 	std::fprintf(fp, "nickname = %s\n", linebuf);
@@ -1471,10 +1538,8 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "lastcategory = %s\n", linebuf);
 	BufferIO::EncodeUTF8(gameConf.lastdeck, linebuf);
 	std::fprintf(fp, "lastdeck = %s\n", linebuf);
-	BufferIO::EncodeUTF8(gameConf.textfont, linebuf);
-	std::fprintf(fp, "textfont = %s %d\n", linebuf, gameConf.textfontsize);
-	BufferIO::EncodeUTF8(gameConf.numfont, linebuf);
-	std::fprintf(fp, "numfont = %s\n", linebuf);
+	std::fprintf(fp, "textfont = %s %d\n", gameConf.textfont, gameConf.textfontsize);
+	std::fprintf(fp, "numfont = %s\n", gameConf.numfont);
 	std::fprintf(fp, "serverport = %d\n", gameConf.serverport);
 	BufferIO::EncodeUTF8(gameConf.lasthost, linebuf);
 	std::fprintf(fp, "lasthost = %s\n", linebuf);
@@ -1538,10 +1603,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 	imgCard->setImage(imageManager.GetTexture(code, true));
 	if (is_valid) {
 		auto& cd = cit->second;
-		if (is_alternative(cd.code,cd.alias))
-			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
-		else
-			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
+		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.get_original_code()), cd.get_original_code());
 	}
 	else {
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
@@ -1555,8 +1617,8 @@ void Game::ShowCardInfo(int code, bool resize) {
 	if (is_valid && !gameConf.hide_setname) {
 		auto& cd = cit->second;
 		auto target = cit;
-		if (cd.alias && _datas.find(cd.alias) != _datas.end()) {
-			target = _datas.find(cd.alias);
+		if (cd.rule_code && _datas.count(cd.rule_code)) {
+			target = _datas.find(cd.rule_code);
 		}
 		if (target->second.setcode[0]) {
 			offset = 23;// *yScale;
@@ -1708,12 +1770,12 @@ void Game::ClearChatMsg() {
 	}
 }
 void Game::AddDebugMsg(const char* msg) {
-	if (enable_log & 0x1) {
+	if (gameConf.enable_log & 0x1) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msg, wbuf);
 		AddChatMsg(wbuf, 9);
 	}
-	if (enable_log & 0x2) {
+	if (gameConf.enable_log & 0x2) {
 		char msgbuf[1040];
 		mysnprintf(msgbuf, "[Script Error]: %s", msg);
 		ErrorLog(msgbuf);
@@ -1737,12 +1799,17 @@ void Game::ErrorLog(const char* msg) {
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
 	ClearCardInfo(0);
-	btnPSAU->setImage();
-	btnPSDU->setImage();
+	btnPSAU->setImage(nullptr);
+	btnPSDU->setImage(nullptr);
 	for(int i=0; i<=4; ++i) {
-		btnCardSelect[i]->setImage();
-		btnCardDisplay[i]->setImage();
+		btnCardSelect[i]->setImage(nullptr);
+		btnCardDisplay[i]->setImage(nullptr);
 	}
+	btnImagePending.clear();
+	btnCardImgInfo.clear();
+	btnFacedownImgInfo.clear();
+	btnFacedownImgInfo[btnPSAD] = {0, false};
+	btnFacedownImgInfo[btnPSDD] = {0, true};
 	imageManager.ClearTexture();
 }
 void Game::CloseGameButtons() {
@@ -1814,7 +1881,7 @@ int Game::ChatLocalPlayer(int player) {
 	if(dInfo.isStarted || is_siding) {
 		if(dInfo.isInDuel)
 			// when in duel
-			player = mainGame->dInfo.isFirst ? player : OppositePlayer(player);
+			player = dInfo.isFirst ? player : OppositePlayer(player);
 		else {
 			// when changing side or waiting tp result
 			auto selftype_boundary = dInfo.isTag ? 2 : 1;
@@ -1867,6 +1934,20 @@ void Game::OnResize() {
 
 	imageManager.ClearTexture();
 	imageManager.ResizeTexture();
+
+	for(auto& it : btnCardImgInfo) {
+		auto button = it.first;
+		std::pair<int, bool>& imgInfo = it.second;
+		btnImagePending[button] = imgInfo;
+	}
+	for(auto& it : btnFacedownImgInfo) {
+		auto button = it.first;
+		std::pair<int, bool>& imgInfo = it.second;
+		if(imgInfo.second)
+			button->setImage(imageManager.tButtonFacedownDefense[imgInfo.first]);
+		else
+			button->setImage(imageManager.tButtonFacedown[imgInfo.first]);
+	}
 
 	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 415));
 	wDeckEdit->setRelativePosition(Resize(309, 5, 605, 130));
@@ -1940,14 +2021,18 @@ void Game::OnResize() {
 	wQuery->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	wSurrender->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	wOptions->setRelativePosition(ResizeWin(490, 200, 840, 340));
-	wPosSelect->setRelativePosition(ResizeWin(340, 200, 935, 410));
-	wCardSelect->setRelativePosition(ResizeWin(320, 100, 1000, 400));
 	wANNumber->setRelativePosition(ResizeWin(550, 180, 780, 430));
 	wANCard->setRelativePosition(ResizeWin(510, 120, 820, 420));
 	wANAttribute->setRelativePosition(ResizeWin(500, 200, 830, 285));
 	wANRace->setRelativePosition(ResizeWin(480, 200, 850, 410));
 	wReplaySave->setRelativePosition(ResizeWin(510, 200, 820, 320));
 	wDMQuery->setRelativePosition(ResizeWin(400, 200, 710, 320));
+	if(wPosSelect->isVisible())
+		ResizePosSelectButtons();
+	if(wCardSelect->isVisible())
+		ResizeCardSelectButtons(wCardSelect, stCardPos, btnCardSelect, scrCardList, btnSelectOK, dField.selectable_cards);
+	if(wCardDisplay->isVisible())
+		ResizeCardSelectButtons(wCardDisplay, stDisplayPos, btnCardDisplay, scrDisplayList, btnDisplayOK, dField.display_cards);
 
 	stHintMsg->setRelativePosition(ResizeWin(660 - 160 * xScale, 60, 660 + 160 * xScale, 90));
 
@@ -2018,9 +2103,9 @@ void Game::OnResize() {
 	wReplayControl->setRelativePosition(Resize(205, 143, 295, 273));
 	btnReplayStart->setRelativePosition(Resize(5, 5, 85, 25));
 	btnReplayPause->setRelativePosition(Resize(5, 5, 85, 25));
+	btnReplaySwap->setRelativePosition(Resize(5, 30, 85, 50));
 	btnReplayStep->setRelativePosition(Resize(5, 55, 85, 75));
 	btnReplayUndo->setRelativePosition(Resize(5, 80, 85, 100));
-	btnReplaySwap->setRelativePosition(Resize(5, 30, 85, 50));
 	btnReplayExit->setRelativePosition(Resize(5, 105, 85, 125));
 
 	btnSpectatorSwap->setRelativePosition(Resize(205, 100, 295, 135));
@@ -2043,6 +2128,77 @@ void Game::ResizeChatInputWindow() {
 	if(is_building) x = 802 * xScale;
 	wChat->setRelativePosition(irr::core::recti(x, window_size.Height - 25, window_size.Width, window_size.Height));
 	ebChatInput->setRelativePosition(irr::core::recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
+}
+void Game::ResizePosSelectButtons() {
+	irr::s32 imgHeight = CARD_IMG_HEIGHT * 0.5f * yScale + 0.5f;
+	irr::s32 gap = 5 * xScale + 0.5f;
+	irr::s32 btnPosWidth = imgHeight + gap * 2; // Square buttons, width = height
+	irr::s32 stride = btnPosWidth + gap;
+	int totalWidth = 0, visCount = 0;
+	if(btnPSAU->isVisible()) { totalWidth += btnPosWidth; visCount++; }
+	if(btnPSAD->isVisible()) { totalWidth += btnPosWidth; visCount++; }
+	if(btnPSDU->isVisible()) { totalWidth += btnPosWidth; visCount++; }
+	if(btnPSDD->isVisible()) { totalWidth += btnPosWidth; visCount++; }
+	totalWidth += (visCount - 1) * gap;
+	irr::s32 posY = 19 + 16 * yScale;
+	irr::s32 windowWidth = 30 * xScale * 2 + stride * 3 - gap;
+	irr::s32 windowHeight = posY + 155 * yScale;
+	irr::s32 posX = (windowWidth - totalWidth) / 2;
+	if(btnPSAU->isVisible()) {
+		btnPSAU->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
+		posX += btnPosWidth + gap;
+	}
+	if(btnPSAD->isVisible()) {
+		btnPSAD->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
+		posX += btnPosWidth + gap;
+	}
+	if(btnPSDU->isVisible()) {
+		btnPSDU->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
+		posX += btnPosWidth + gap;
+	}
+	if(btnPSDD->isVisible()) {
+		btnPSDD->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
+		posX += btnPosWidth + gap;
+	}
+	wPosSelect->setRelativePosition(irr::core::recti(663 * xScale - windowWidth / 2, 303 * yScale - windowHeight / 2, 663 * xScale + windowWidth / 2, 303 * yScale + windowHeight / 2));
+}
+void Game::ResizeCardSelectButtons(irr::gui::IGUIWindow* window,
+								   irr::gui::IGUIStaticText** labels,
+								   irr::gui::IGUIButton** images,
+								   irr::gui::IGUIScrollBar* scrollbar,
+								   irr::gui::IGUIButton* buttonOK,
+								   const std::vector<ClientCard*>& cards) {
+	irr::s32 gap = 5 * xScale + 0.5f;
+	irr::s32 btnWidth = CARD_IMG_WIDTH * 0.55f * yScale + 0.5f;
+	irr::s32 btnHeight = CARD_IMG_HEIGHT * 0.55f * yScale + 0.5f;
+	irr::s32 stride = btnWidth + gap;
+	int startpos = 30 * xScale;
+	int ct = 5;
+	if (cards.size() < 5) {
+		startpos = 30 * xScale + stride * (5 - (int)cards.size()) / 2;
+		ct = cards.size();
+	}
+	irr::s32 top = 19 + 11 * yScale;
+	irr::s32 labelHeight = 20 * yScale;
+	irr::s32 minTextHeight = gameConf.textfontsize * 1.4f + 0.5f;
+	if (labelHeight < minTextHeight) labelHeight = minTextHeight;
+	irr::s32 btnTop = top + labelHeight + gap;
+	for (int i = 0; i < ct; ++i) {
+		labels[i]->setRelativePosition(irr::core::recti(startpos + stride * i, top, startpos + stride * i + btnWidth, top + labelHeight));
+		images[i]->setRelativePosition(irr::core::recti(startpos + stride * i, btnTop, startpos + stride * i + btnWidth, btnTop + btnHeight));
+	}
+	irr::s32 barTop = btnTop + btnHeight + gap;
+	irr::s32 barWidth = stride * ct - gap;
+	irr::s32 barHeight = 20 * yScale;
+	if (barHeight > 25) barHeight = 25;
+	scrollbar->setRelativePosition(irr::core::recti(startpos, barTop, startpos + barWidth, barTop + barHeight));
+	irr::s32 btnOKWidth = 80 * xScale;
+	irr::s32 btnOKHeight = 25 * yScale;
+	if (btnOKHeight < minTextHeight) btnOKHeight = minTextHeight;
+	buttonOK->setRelativePosition(irr::core::recti(startpos + barWidth / 2 - btnOKWidth / 2, barTop + barHeight + gap * 2, startpos + barWidth / 2 + btnOKWidth / 2, barTop + barHeight + gap * 2 + btnOKHeight));
+	irr::s32 windowWidth = 30 * xScale * 2 + stride * 5 - gap;
+	irr::s32 windowHeight = top + labelHeight + btnHeight + barHeight + btnOKHeight + gap * 6;
+	window->setRelativePosition(irr::core::recti(663 * xScale - windowWidth / 2, 263 * yScale - windowHeight / 2, 663 * xScale + windowWidth / 2, 263 * yScale + windowHeight / 2));
 }
 irr::core::recti Game::Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2) {
 	x = x * xScale;
@@ -2151,8 +2307,8 @@ void Game::SetWindowsScale(float scale) {
 	GetWindowRect(hWnd, &rcWindow);
 	GetClientRect(hWnd, &rcClient);
 	MoveWindow(hWnd, rcWindow.left, rcWindow.top,
-		(rcWindow.right - rcWindow.left) - rcClient.right + 1024 * scale,
-		(rcWindow.bottom - rcWindow.top) - rcClient.bottom + 640 * scale,
+		(rcWindow.right - rcWindow.left) - rcClient.right + GAME_WINDOW_WIDTH * scale,
+		(rcWindow.bottom - rcWindow.top) - rcClient.bottom + GAME_WINDOW_HEIGHT * scale,
 		true);
 #endif
 }
