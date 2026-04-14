@@ -324,7 +324,7 @@ jobs:
     - name: Configure libevent
       shell: bash
       run: |
-        cp premake/event/win32-event-config.h event/include/event2/event-config.h
+        cp premake/event/msvc-event-config.h event/include/event2/event-config.h
         cp event/WIN32-Code/nmake/evconfig-private.h event/include/evconfig-private.h
 
     - name: Copy premake files
