@@ -204,7 +204,8 @@
 /* #undef EVENT__HAVE_SYS_UN_H */
 
 /* Define to 1 if you have the <afunix.h> header file. */
-#define EVENT__HAVE_AFUNIX_H 1
+// Disable AF_UNIX support on Windows.
+// #define EVENT__HAVE_AFUNIX_H 1
 
 /* Define if the system has openssl */
 /* #undef EVENT__HAVE_OPENSSL */
@@ -315,7 +316,8 @@
 /* #undef EVENT__HAVE_STRUCT_SOCKADDR_IN_SIN_LEN */
 
 /* Define to 1 if the system has the type `struct sockaddr_un'. */
-#define EVENT__HAVE_STRUCT_SOCKADDR_UN 1
+// Disable AF_UNIX support on Windows.
+// #define EVENT__HAVE_STRUCT_SOCKADDR_UN 1
 
 /* Define to 1 if the system has the type `struct sockaddr_storage'. */
 #define EVENT__HAVE_STRUCT_SOCKADDR_STORAGE 1
@@ -446,9 +448,6 @@
 /* XXX: Hello, this isn't even used, nor is it defined anywhere... - Ellzey */
 #define EVENT__PTHREAD_CREATE_JOINABLE 
 #endif
-
-/* The size of `pthread_t', as computed by sizeof. */
-#define EVENT__SIZEOF_PTHREAD_T 
 
 /* The size of a `int', as computed by sizeof. */
 #define EVENT__SIZEOF_INT 4
