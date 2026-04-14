@@ -462,23 +462,42 @@
 /* The size of `off_t', as computed by sizeof. */
 #define EVENT__SIZEOF_OFF_T 4
 
+/* The size of `ssize_t', as computed by sizeof. */
+#ifdef _WIN64
 #define EVENT__SIZEOF_SSIZE_T 8
+#else
+#define EVENT__SIZEOF_SSIZE_T 4
+#endif
 
+/* The size of `size_t', as computed by sizeof. */
+#ifdef _WIN64
+#define EVENT__SIZEOF_SIZE_T 8
+#else
+#define EVENT__SIZEOF_SIZE_T 4
+#endif
+
+/* The size of `void *', as computed by sizeof. */
+#ifdef _WIN64
+#define EVENT__SIZEOF_VOID_P 8
+#else
+#define EVENT__SIZEOF_VOID_P 4
+#endif
+
+/* The size of `time_t`, as computed by sizeof. */
+#ifdef _USE_32BIT_TIME_T
+#define EVENT__SIZEOF_TIME_T 4
+#else
+#define EVENT__SIZEOF_TIME_T 8
+#endif
 
 /* The size of a `short', as computed by sizeof. */
 #define EVENT__SIZEOF_SHORT 2
 
-/* The size of `size_t', as computed by sizeof. */
-#define EVENT__SIZEOF_SIZE_T 8
-
-/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
-/* #undef EVENT__TIME_WITH_SYS_TIME */
-
 /* The size of `socklen_t', as computed by sizeof. */
 #define EVENT__SIZEOF_SOCKLEN_T 4
 
-/* The size of 'void *', as computer by sizeof */
-#define EVENT__SIZEOF_VOID_P 8
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+/* #undef EVENT__TIME_WITH_SYS_TIME */
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
