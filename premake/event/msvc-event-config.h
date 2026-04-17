@@ -429,7 +429,7 @@
 #define EVENT__HAVE_UINTPTR_T 1
 
 /* Define to 1 if you have the `umask' function. */
-#define EVENT__HAVE_UMASK 1
+/* #undef EVENT__HAVE_UMASK */
 
 /* Define to 1 if you have the <unistd.h> header file. */
 /* #undef EVENT__HAVE_UNISTD_H */
