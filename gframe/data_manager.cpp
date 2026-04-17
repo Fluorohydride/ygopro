@@ -106,7 +106,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 	return true;
 }
 bool DataManager::LoadDB(const char* file) {
-	auto reader = FileSystem->createAndOpenFile(file);
+	auto reader = IrrFileSystem->createAndOpenFile(file);
 	if (reader == nullptr) {
 		mysnprintf(errmsg, "File does not exist or failed to unzip: %s", file);
 		return false;
@@ -427,6 +427,59 @@ std::wstring DataManager::FormatLinkMarker(unsigned int link_marker) const {
 		buffer.append(L"[\u2198]");
 	return buffer;
 }
+wchar_t DataManager::NormalizeChar(wchar_t c) {
+	// Convert Alphabet characters to uppercase to ignore case.
+	if (c >= 0x0061 && c <= 0x007A) {
+		return c - 0x0020;
+	}
+	// Normalize accented characters (Latin-1 Supplement).
+	if ((c >= 0x00C0 && c <= 0x00C5) || (c >= 0x00E0 && c <= 0x00E5)) {
+		return L'A';
+	}
+	if (c == 0x00C7 || c == 0x00E7) {
+		return L'C';
+	}
+	if ((c >= 0x00C8 && c <= 0x00CB) || (c >= 0x00E8 && c <= 0x00EB)) {
+		return L'E';
+	}
+	if ((c >= 0x00CC && c <= 0x00CF) || (c >= 0x00EC && c <= 0x00EF)) {
+		return L'I';
+	}
+	if (c == 0x00D1 || c == 0x00F1) {
+		return L'N';
+	}
+	if ((c >= 0x00D2 && c <= 0x00D6) || (c >= 0x00F2 && c <= 0x00F6)) {
+		return L'O';
+	}
+	if ((c >= 0x00D9 && c <= 0x00DC) || (c >= 0x00F9 && c <= 0x00FC)) {
+		return L'U';
+	}
+	if (c == 0x00DD || c == 0x00FD || c == 0x00FF) {
+		return L'Y';
+	}
+	return c;
+}
+void DataManager::NormalizeString(const wchar_t* src, wchar_t* dst, size_t dst_size) {
+	size_t i = 0;
+	for(; src[i] && i < dst_size - 1; ++i) {
+		dst[i] = NormalizeChar(src[i]);
+	}
+	dst[i] = 0;
+}
+bool DataManager::CardNameContains(const wchar_t* haystack, const wchar_t* needle) {
+	if(!needle[0]) {
+		return true;
+	}
+	if(!haystack) {
+		return false;
+	}
+	wchar_t normalized_haystack[TEXT_LINE_SIZE]{};
+	wchar_t normalized_needle[TEXT_LINE_SIZE]{};
+	NormalizeString(haystack, normalized_haystack, TEXT_LINE_SIZE);
+	NormalizeString(needle, normalized_needle, TEXT_LINE_SIZE);
+	return std::wcsstr(normalized_haystack, normalized_needle) != nullptr;
+}
+
 uint32_t DataManager::CardReader(uint32_t code, card_data* pData) {
 	if (!dataManager.GetData(code, pData))
 		pData->clear();
@@ -458,7 +511,7 @@ unsigned char* DataManager::ScriptReaderEx(const char* script_path, int* slen) {
 	return nullptr;
 }
 unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* slen) {
-	auto reader = dataManager.FileSystem->createAndOpenFile(script_name);
+	auto reader = dataManager.IrrFileSystem->createAndOpenFile(script_name);
 	if (!reader)
 		return nullptr;
 	int size = reader->read(scriptBuffer, sizeof scriptBuffer);

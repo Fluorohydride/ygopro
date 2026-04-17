@@ -224,7 +224,7 @@ void TagDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	if(dp->type > 3 || ready[dp->type] == is_ready)
 		return;
 	if(is_ready) {
-		unsigned int deckerror = 0;
+		uint32_t deckerror = 0;
 		if(!host_info.no_check_deck) {
 			if(deck_error[dp->type]) {
 				deckerror = (DECKERROR_UNKNOWNCARD << 28) | deck_error[dp->type];
@@ -1714,8 +1714,6 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	}
 }
 uint32_t TagDuel::MessageHandler(intptr_t fduel, uint32_t type) {
-	if(!enable_log)
-		return 0;
 	char msgbuf[1024];
 	get_log_message(fduel, msgbuf);
 	mainGame->AddDebugMsg(msgbuf);

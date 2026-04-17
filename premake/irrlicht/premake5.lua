@@ -1,13 +1,14 @@
 project "irrlicht"
     kind "StaticLib"
 
-    includedirs { "include" }
+    includedirs { "include", JPEG_INCLUDE_DIR }
 
     exceptionhandling "Off"
     rtti "Off"
 
     defines {
         "_IRR_STATIC_LIB_",
+        "NO_IRR_USE_NON_SYSTEM_JPEG_LIB_",
         "NO_IRR_LINUX_X11_VIDMODE_",
         "NO_IRR_COMPILE_WITH_BZIP2_",
         "NO_IRR_COMPILE_WITH_LZMA_",
@@ -81,54 +82,8 @@ project "irrlicht"
         "source/Irrlicht/zlib/zutil.c",
     }
 
-    if IRRLICHT_BUILD_JPEG_PNG then
+    if BUILD_PNG_IRRLICHT then
         files {
-            "source/Irrlicht/jpeglib/jaricom.c",
-            "source/Irrlicht/jpeglib/jcapimin.c",
-            "source/Irrlicht/jpeglib/jcapistd.c",
-            "source/Irrlicht/jpeglib/jcarith.c",
-            "source/Irrlicht/jpeglib/jccoefct.c",
-            "source/Irrlicht/jpeglib/jccolor.c",
-            "source/Irrlicht/jpeglib/jcdctmgr.c",
-            "source/Irrlicht/jpeglib/jchuff.c",
-            "source/Irrlicht/jpeglib/jcinit.c",
-            "source/Irrlicht/jpeglib/jcmainct.c",
-            "source/Irrlicht/jpeglib/jcmarker.c",
-            "source/Irrlicht/jpeglib/jcmaster.c",
-            "source/Irrlicht/jpeglib/jcomapi.c",
-            "source/Irrlicht/jpeglib/jcparam.c",
-            "source/Irrlicht/jpeglib/jcprepct.c",
-            "source/Irrlicht/jpeglib/jcsample.c",
-            "source/Irrlicht/jpeglib/jctrans.c",
-            "source/Irrlicht/jpeglib/jdapimin.c",
-            "source/Irrlicht/jpeglib/jdapistd.c",
-            "source/Irrlicht/jpeglib/jdarith.c",
-            "source/Irrlicht/jpeglib/jdatadst.c",
-            "source/Irrlicht/jpeglib/jdatasrc.c",
-            "source/Irrlicht/jpeglib/jdcoefct.c",
-            "source/Irrlicht/jpeglib/jdcolor.c",
-            "source/Irrlicht/jpeglib/jddctmgr.c",
-            "source/Irrlicht/jpeglib/jdhuff.c",
-            "source/Irrlicht/jpeglib/jdinput.c",
-            "source/Irrlicht/jpeglib/jdmainct.c",
-            "source/Irrlicht/jpeglib/jdmarker.c",
-            "source/Irrlicht/jpeglib/jdmaster.c",
-            "source/Irrlicht/jpeglib/jdmerge.c",
-            "source/Irrlicht/jpeglib/jdpostct.c",
-            "source/Irrlicht/jpeglib/jdsample.c",
-            "source/Irrlicht/jpeglib/jdtrans.c",
-            "source/Irrlicht/jpeglib/jerror.c",
-            "source/Irrlicht/jpeglib/jfdctflt.c",
-            "source/Irrlicht/jpeglib/jfdctfst.c",
-            "source/Irrlicht/jpeglib/jfdctint.c",
-            "source/Irrlicht/jpeglib/jidctflt.c",
-            "source/Irrlicht/jpeglib/jidctfst.c",
-            "source/Irrlicht/jpeglib/jidctint.c",
-            "source/Irrlicht/jpeglib/jmemmgr.c",
-            "source/Irrlicht/jpeglib/jmemnobs.c",
-            "source/Irrlicht/jpeglib/jquant1.c",
-            "source/Irrlicht/jpeglib/jquant2.c",
-            "source/Irrlicht/jpeglib/jutils.c",
             "source/Irrlicht/libpng/png.c",
             "source/Irrlicht/libpng/pngerror.c",
             "source/Irrlicht/libpng/pngget.c",
@@ -153,9 +108,8 @@ project "irrlicht"
             "PNG_ARM_NEON_IMPLEMENTATION=0",
         }
     else
-        includedirs { JPEG_INCLUDE_DIR, PNG_INCLUDE_DIR }
+        includedirs { PNG_INCLUDE_DIR }
         defines {
-            "NO_IRR_USE_NON_SYSTEM_JPEG_LIB_",
             "NO_IRR_USE_NON_SYSTEM_LIB_PNG_",
         }
     end

@@ -245,7 +245,7 @@ void ReplayMode::EndDuel() {
 		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.unlock();
-		if(exit_on_return)
+		if(mainGame->exit_on_return)
 			mainGame->device->closeDevice();
 	}
 }
@@ -916,8 +916,6 @@ void ReplayMode::ReplayReload() {
 	ReloadLocation(1, LOCATION_REMOVED, flag, queryBuffer);
 }
 uint32_t ReplayMode::MessageHandler(intptr_t fduel, uint32_t type) {
-	if(!enable_log)
-		return 0;
 	char msgbuf[1024];
 	get_log_message(fduel, msgbuf);
 	mainGame->AddDebugMsg(msgbuf);

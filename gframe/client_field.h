@@ -105,10 +105,10 @@ public:
 	void ClearCommandFlag();
 	void ClearSelect();
 	void ClearChainSelect();
-	void ShowSelectCard(bool buttonok = false, bool is_continuous = false);
-	void ShowChainCard();
-	void ShowLocationCard();
-	void ShowSelectOption(int select_hint = 0);
+	void ShowSelectCard(bool buttonok = false, bool is_continuous = false); // caller must hold gMutex
+	void ShowChainCard(); // caller must hold gMutex
+	void ShowLocationCard(); // caller must hold gMutex
+	void ShowSelectOption(int select_hint = 0); // caller must NOT hold gMutex
 	void ReplaySwap();
 	void RefreshAllCards();
 
@@ -116,7 +116,7 @@ public:
 	void GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans = false);
 	void MoveCard(ClientCard* pcard, int frame);
 	void FadeCard(ClientCard* pcard, int alpha, int frame);
-	bool ShowSelectSum(bool panelmode);
+	bool ShowSelectSum(bool panelmode); // caller must hold gMutex
 	bool CheckSelectSum();
 	bool CheckSelectTribute();
 	void get_sum_params(unsigned int opParam, int& op1, int& op2);
