@@ -498,21 +498,7 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 /* #undef EVENT__TIME_WITH_SYS_TIME */
 
-/* Define to `__inline__' or `__inline' if that's what the C compiler
-   calls it, or to nothing if 'inline' is not supported under any name.  */
-#ifndef __cplusplus
-/* why not c++?
- *
- *  and are we really expected to use EVENT__inline everywhere,
- *  shouldn't we just do:
- *     ifdef EVENT__inline
- *     define inline EVENT__inline
- *
- * - Ellzey
- */
-
-#define EVENT__inline inline
-#endif
+// EVENT__inline no longer needs to be defined.
 
 #define EVENT__HAVE___func__ 1
 #define EVENT__HAVE___FUNCTION__ 1
