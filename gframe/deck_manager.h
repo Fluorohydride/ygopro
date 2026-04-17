@@ -40,7 +40,7 @@ public:
 	void LoadLFList();
 	const wchar_t* GetLFListName(unsigned int lfhash);
 	const LFList* GetLFList(unsigned int lfhash);
-	unsigned int CheckDeck(const Deck& deck, unsigned int lfhash, int rule);
+	uint32_t CheckDeck(const Deck& deck, unsigned int lfhash, size_t rule);
 	bool LoadCurrentDeck(const wchar_t* file, bool is_packlist = false);
 	bool LoadCurrentDeck(int category_index, const wchar_t* category_name, const wchar_t* deckname);
 	bool LoadCurrentDeck(std::istringstream& deckStream, bool is_packlist = false);
