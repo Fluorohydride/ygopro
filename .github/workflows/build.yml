@@ -97,10 +97,11 @@ jobs:
     steps:
     - name: Download libevent
       id: libevent
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
         filename: libevent.tar.gz
+        sha256: 92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb
 
     - name: Extract libevent
       run: |
@@ -109,9 +110,10 @@ jobs:
 
     - name: Download freetype
       id: freetype
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://downloads.sourceforge.net/freetype/freetype-2.14.2.tar.gz
+        sha256: 752c2671f85c54a84b7f0dd2b5cd26b6b741117033886ffbc5ac89a68464b848
 
     - name: Extract freetype
       run: |
@@ -120,9 +122,10 @@ jobs:
 
     - name: Download libjpeg-turbo
       id: libjpeg-turbo
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.4.1/libjpeg-turbo-3.1.4.1.tar.gz
+        sha256: ecae8008e2cc9ade2f2c1bb9d5e6d4fb73e7c433866a056bd82980741571a022
 
     - name: Extract libjpeg-turbo
       run: |
@@ -132,9 +135,10 @@ jobs:
 
     - name: Download sqlite
       id: sqlite
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://www.sqlite.org/2026/sqlite-amalgamation-3510300.zip
+        sha256: acb1e6f5d832484bf6d32b681e858c38add8b2acdfd42ac5df24b8afb46552b4
 
     - name: Extract sqlite
       run: |
@@ -147,9 +151,10 @@ jobs:
 
     - name: Download ogg
       id: ogg
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/ogg/releases/download/v1.3.6/libogg-1.3.6.tar.gz
+        sha256: 83e6704730683d004d20e21b8f7f55dcb3383cdf84c0daedf30bde175f774638
 
     - name: Extract ogg
       run: |
@@ -158,9 +163,10 @@ jobs:
 
     - name: Download opus
       id: opus
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
+        sha256: 65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1
 
     - name: Extract opus
       run: |
@@ -169,9 +175,10 @@ jobs:
 
     - name: Download opusfile
       id: opusfile
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/opusfile/releases/download/v0.12/opusfile-0.12.tar.gz
+        sha256: 118d8601c12dd6a44f52423e68ca9083cc9f2bfe72da7a8c1acb22a80ae3550b
 
     - name: Extract opusfile
       run: |
@@ -180,9 +187,10 @@ jobs:
 
     - name: Download vorbis
       id: vorbis
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/vorbis/releases/download/v1.3.7/libvorbis-1.3.7.tar.gz
+        sha256: 0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab
 
     - name: Extract vorbis
       run: |
@@ -270,10 +278,11 @@ jobs:
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta7/premake-5.0.0-beta7-windows.zip
         filename: premake5.zip
+        sha256: df900cffda613b919ff824f5c59c2e02ebbdbe3ef6d499ab9b9d1912b5ff63f6
 
     - name: Extract premake
       shell: bash
@@ -283,9 +292,10 @@ jobs:
     - name: Download irrKlang
       if: matrix.audiolib == 'irrklang'
       id: irrKlang
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://www.ambiera.at/downloads/irrKlang-32bit-1.6.0.zip
+        sha256: 49daa96c90ae96f3f49a17a2a325ce046ba12c2b722e3e922ce4472ad090360d
 
     - name: Extract irrKlang
       if: matrix.audiolib == 'irrklang'
@@ -404,7 +414,7 @@ jobs:
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/premake/premake-core/releases/download/v${{ matrix.premake-version }}/premake-${{ matrix.premake-version }}-linux.tar.gz
         filename: premake5.tar.gz
