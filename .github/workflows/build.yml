@@ -64,9 +64,10 @@ jobs:
 
     - name: Download lua
       id: lua
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://www.lua.org/ftp/lua-5.4.8.tar.gz
+        sha256: 4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae
 
     - name: Extract lua
       run: |
@@ -304,9 +305,10 @@ jobs:
     - name: Download DirectX SDK
       if: matrix.nodxsdk != true && steps.dxsdk.outputs.cache-hit != 'true'
       id: dxsdk-download
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe
+        sha256: 705271dc83bfee54d9b94e028426e288d5f070784b7446d164f48ecfbb2a02cb
 
     - name: Install DirectX SDK
       if: matrix.nodxsdk != true && steps.dxsdk.outputs.cache-hit != 'true'
@@ -517,10 +519,11 @@ jobs:
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@0e2b8bab566270adae95bd3cd298744402b667eb
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta7/premake-5.0.0-beta7-macosx.tar.gz
         filename: premake5.tar.gz
+        sha256: f7a6d4978960aefbc0b2c522f211eedf014e6a2783b04a096c3716213c1bff67
 
     - name: Extract premake
       run: |
