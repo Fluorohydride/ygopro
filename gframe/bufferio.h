@@ -95,15 +95,19 @@ public:
 	static void CopyString(const char* src, char(&dst)[N], size_t len = N - 1) {
 		if(len >= N)
 			len = N - 1;
-		std::strncpy(dst, src, len);
-		dst[len] = 0;
+		size_t src_len = std::strlen(src);
+		size_t copy_len = (src_len < len) ? src_len : len;
+		std::memcpy(dst, src, copy_len);
+		dst[copy_len] = 0;
 	}
 	template<size_t N>
 	static void CopyWideString(const wchar_t* src, wchar_t(&dst)[N], size_t len = N - 1) {
 		if(len >= N)
 			len = N - 1;
-		std::wcsncpy(dst, src, len);
-		dst[len] = 0;
+		size_t src_len = std::wcslen(src);
+		size_t copy_len = (src_len < len) ? src_len : len;
+		std::wmemcpy(dst, src, copy_len);
+		dst[copy_len] = 0;
 	}
 	static bool IsHighSurrogate(unsigned int c) {
 		return (c >= 0xd800U && c <= 0xdbffU);
