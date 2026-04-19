@@ -1690,22 +1690,6 @@ void TagDuel::RefreshExtra(int player, int flag, int use_cache) {
 	auto qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_EXTRA, flag, qbuf, use_cache);
 	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer.data(), len + 3);
-	int qlen = 0;
-	while(qlen < len) {
-		int clen = BufferIO::Read<int32_t>(qbuf);
-		qlen += clen;
-		if (clen <= LEN_HEADER)
-			continue;
-		auto position = GetPosition(qbuf, 8);
-		if(!(position & POS_FACEUP))
-			std::memset(qbuf, 0, clen - 4);
-		qbuf += clen - 4;
-	}
-	for(int i = 0; i < 4; ++i)
-		if(players[i] != cur_player[player])
-			NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, query_buffer.data(), len + 3);
-	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
-		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	flag |= (QUERY_CODE | QUERY_POSITION);
