@@ -224,27 +224,30 @@ void ReplayMode::EndDuel() {
 	end_duel(pduel);
 	if(!is_closing) {
 		mainGame->actionSignal.Reset();
-		mainGame->gMutex.lock();
-		mainGame->stMessage->setText(dataManager.GetSysString(1501));
-		mainGame->HideElement(mainGame->wCardSelect);
-		mainGame->PopupElement(mainGame->wMessage);
-		mainGame->gMutex.unlock();
+		{
+			std::lock_guard<std::mutex> lock(mainGame->gMutex);
+			mainGame->stMessage->setText(dataManager.GetSysString(1501));
+			mainGame->HideElement(mainGame->wCardSelect);
+			mainGame->PopupElement(mainGame->wMessage);
+		}
 		mainGame->actionSignal.Wait();
-		mainGame->gMutex.lock();
-		mainGame->dInfo.isStarted = false;
-		mainGame->dInfo.isInDuel = false;
-		mainGame->dInfo.isFinished = true;
-		mainGame->dInfo.isReplay = false;
-		mainGame->dInfo.isSingleMode = false;
-		mainGame->gMutex.unlock();
+		{
+			std::lock_guard<std::mutex> lock(mainGame->gMutex);
+			mainGame->dInfo.isStarted = false;
+			mainGame->dInfo.isInDuel = false;
+			mainGame->dInfo.isFinished = true;
+			mainGame->dInfo.isReplay = false;
+			mainGame->dInfo.isSingleMode = false;
+		}
 		mainGame->closeDoneSignal.Reset();
 		mainGame->closeSignal.Set();
 		mainGame->closeDoneSignal.Wait();
-		mainGame->gMutex.lock();
-		mainGame->ShowElement(mainGame->wReplay);
-		mainGame->stTip->setVisible(false);
-		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		mainGame->gMutex.unlock();
+		{
+			std::lock_guard<std::mutex> lock(mainGame->gMutex);
+			mainGame->ShowElement(mainGame->wReplay);
+			mainGame->stTip->setVisible(false);
+			mainGame->device->setEventReceiver(&mainGame->menuHandler);
+		}
 		if(mainGame->exit_on_return)
 			mainGame->device->closeDevice();
 	}
@@ -293,9 +296,8 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			return true;
 		}
 		if(is_swaping) {
-			mainGame->gMutex.lock();
+			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			mainGame->dField.ReplaySwap();
-			mainGame->gMutex.unlock();
 			is_swaping = false;
 		}
 		auto offset = pbuf;
@@ -308,10 +310,11 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 				mainGame->dField.RefreshAllCards();
 				mainGame->gMutex.unlock();
 			}
-			mainGame->gMutex.lock();
-			mainGame->stMessage->setText(L"Error occurs.");
-			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.unlock();
+			{
+				std::lock_guard<std::mutex> lock(mainGame->gMutex);
+				mainGame->stMessage->setText(L"Error occurs.");
+				mainGame->PopupElement(mainGame->wMessage);
+			}
 			mainGame->actionSignal.Reset();
 			mainGame->actionSignal.Wait();
 			return false;

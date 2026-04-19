@@ -89,21 +89,22 @@ int SingleMode::SinglePlayThread() {
 		end_duel(pduel);
 		return 0;
 	}
-	mainGame->gMutex.lock();
-	mainGame->HideElement(mainGame->wSinglePlay);
-	mainGame->ClearCardInfo();
-	mainGame->wCardImg->setVisible(true);
-	mainGame->wInfos->setVisible(true);
-	mainGame->btnLeaveGame->setVisible(true);
-	mainGame->btnLeaveGame->setText(dataManager.GetSysString(1210));
-	mainGame->wPhase->setVisible(true);
-	mainGame->dField.Clear();
-	mainGame->dInfo.isFirst = true;
-	mainGame->dInfo.isStarted = true;
-	mainGame->dInfo.isFinished = false;
-	mainGame->dInfo.isSingleMode = true;
-	mainGame->device->setEventReceiver(&mainGame->dField);
-	mainGame->gMutex.unlock();
+	{
+		std::lock_guard<std::mutex> lock(mainGame->gMutex);
+		mainGame->HideElement(mainGame->wSinglePlay);
+		mainGame->ClearCardInfo();
+		mainGame->wCardImg->setVisible(true);
+		mainGame->wInfos->setVisible(true);
+		mainGame->btnLeaveGame->setVisible(true);
+		mainGame->btnLeaveGame->setText(dataManager.GetSysString(1210));
+		mainGame->wPhase->setVisible(true);
+		mainGame->dField.Clear();
+		mainGame->dInfo.isFirst = true;
+		mainGame->dInfo.isStarted = true;
+		mainGame->dInfo.isFinished = false;
+		mainGame->dInfo.isSingleMode = true;
+		mainGame->device->setEventReceiver(&mainGame->dField);
+	}
 	std::vector<unsigned char> engineBuffer;
 	engineBuffer.resize(SIZE_MESSAGE_BUFFER);
 	is_closing = false;
@@ -138,7 +139,7 @@ int SingleMode::SinglePlayThread() {
 		}
 	}
 	last_replay.EndRecord();
-	mainGame->gMutex.lock();
+	std::unique_lock<std::mutex> replay_lock(mainGame->gMutex);
 	time_t nowtime = std::time(nullptr);
 	wchar_t timetext[40];
 	std::wcsftime(timetext, sizeof timetext / sizeof timetext[0], L"%Y-%m-%d %H-%M-%S", std::localtime(&nowtime));
@@ -146,7 +147,7 @@ int SingleMode::SinglePlayThread() {
 	if(!mainGame->chkAutoSaveReplay->isChecked()) {
 		mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
 		mainGame->PopupElement(mainGame->wReplaySave);
-		mainGame->gMutex.unlock();
+		replay_lock.unlock();
 		mainGame->replaySignal.Reset();
 		mainGame->replaySignal.Wait();
 	} else {
@@ -155,27 +156,29 @@ int SingleMode::SinglePlayThread() {
 		myswprintf(msgbuf, dataManager.GetSysString(1367), timetext);
 		mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->guiFont, msgbuf);
 		mainGame->PopupElement(mainGame->wACMessage, 20);
-		mainGame->gMutex.unlock();
+		replay_lock.unlock();
 		mainGame->WaitFrameSignal(30);
 	}
 	if(mainGame->actionParam)
 		last_replay.SaveReplay(mainGame->ebRSName->getText());
 	end_duel(pduel);
 	if(!is_closing) {
-		mainGame->gMutex.lock();
-		mainGame->dInfo.isStarted = false;
-		mainGame->dInfo.isInDuel = false;
-		mainGame->dInfo.isFinished = true;
-		mainGame->dInfo.isSingleMode = false;
-		mainGame->gMutex.unlock();
+		{
+			std::lock_guard<std::mutex> lock(mainGame->gMutex);
+			mainGame->dInfo.isStarted = false;
+			mainGame->dInfo.isInDuel = false;
+			mainGame->dInfo.isFinished = true;
+			mainGame->dInfo.isSingleMode = false;
+		}
 		mainGame->closeDoneSignal.Reset();
 		mainGame->closeSignal.Set();
 		mainGame->closeDoneSignal.Wait();
-		mainGame->gMutex.lock();
-		mainGame->ShowElement(mainGame->wSinglePlay);
-		mainGame->stTip->setVisible(false);
-		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		mainGame->gMutex.unlock();
+		{
+			std::lock_guard<std::mutex> lock(mainGame->gMutex);
+			mainGame->ShowElement(mainGame->wSinglePlay);
+			mainGame->stTip->setVisible(false);
+			mainGame->device->setEventReceiver(&mainGame->menuHandler);
+		}
 		if(mainGame->exit_on_return)
 			mainGame->device->closeDevice();
 	}
@@ -745,9 +748,8 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 			pbuf += count * 15;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			SinglePlayReload();
-			mainGame->gMutex.lock();
+			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			mainGame->dField.RefreshAllCards();
-			mainGame->gMutex.unlock();
 			break;
 		}
 		case MSG_AI_NAME: {
@@ -773,10 +775,11 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 			}
 			pbuf += msg_len + 1;
 			BufferIO::DecodeUTF8(msgbuf, msg);
-			mainGame->gMutex.lock();
-			mainGame->SetStaticText(mainGame->stMessage, 310, mainGame->guiFont, msg);
-			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.unlock();
+			{
+				std::lock_guard<std::mutex> lock(mainGame->gMutex);
+				mainGame->SetStaticText(mainGame->stMessage, 310, mainGame->guiFont, msg);
+				mainGame->PopupElement(mainGame->wMessage);
+			}
 			mainGame->actionSignal.Reset();
 			mainGame->actionSignal.Wait();
 			break;
