@@ -38,6 +38,7 @@ int DuelClient::match_kill = 0;
 std::vector<HostPacket> DuelClient::hosts;
 std::set<std::pair<unsigned int, unsigned short>> DuelClient::remotes;
 event* DuelClient::resp_event = 0;
+const std::set<int> DuelClient::select_effectyn_id{ 95, 96, 97, 218, 219, 220 };
 
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
 	if(connect_state)
@@ -955,7 +956,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 // Analyze STOC_GAME_MSG packet
 bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	unsigned char* pbuf = msg;
-	wchar_t textBuffer[256];
+	wchar_t textBuffer[256]{};
 	mainGame->dInfo.curMsg = BufferIO::Read<uint8_t>(pbuf);
 	if(mainGame->dInfo.curMsg != MSG_RETRY) {
 		std::memcpy(last_successful_msg, msg, len);
@@ -1526,10 +1527,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			wchar_t ynbuf[256];
 			myswprintf(ynbuf, dataManager.GetSysString(221), dataManager.FormatLocation(l, s), dataManager.GetName(code));
 			myswprintf(textBuffer, L"%ls\n%ls\n%ls", event_string, ynbuf, dataManager.GetSysString(223));
-		} else if(desc <= MAX_STRING_ID) {
+		} else if(select_effectyn_id.count(desc)) {
 			myswprintf(textBuffer, dataManager.GetSysString(desc), dataManager.GetName(code));
 		} else {
-			myswprintf(textBuffer, dataManager.GetDesc(desc), dataManager.GetName(code));
+			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(desc));
 		}
 		mainGame->gMutex.lock();
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, textBuffer);
@@ -1836,14 +1837,14 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		unsigned char respbuf[SIZE_RETURN_VALUE];
 		int pzone = 0;
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE) {
-			if (select_hint) {
+			if (select_hint)
 				myswprintf(textBuffer, dataManager.GetSysString(569), dataManager.GetName(select_hint));
-			} else
+			else
 				myswprintf(textBuffer, dataManager.GetSysString(560));
 		} else {
-			if (select_hint) {
-				myswprintf(textBuffer, dataManager.GetDesc(select_hint));
-			} else
+			if (select_hint)
+				myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
+			else
 				myswprintf(textBuffer, dataManager.GetSysString(570));
 		}
 		select_hint = 0;

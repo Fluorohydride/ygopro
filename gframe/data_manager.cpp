@@ -260,7 +260,7 @@ const wchar_t* DataManager::GetText(uint32_t code) const {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetDesc(uint32_t strCode) const {
-	if (strCode < (MIN_CARD_ID << 4))
+	if (strCode <= MAX_STRING_ID)
 		return GetSysString(strCode);
 	unsigned int code = (strCode >> 4) & 0x0fffffff;
 	unsigned int offset = strCode & 0xf;
