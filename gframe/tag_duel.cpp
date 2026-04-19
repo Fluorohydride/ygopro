@@ -7,19 +7,6 @@
 
 namespace ygo {
 
-namespace {
-
-bool ShouldHideFacedownCode(uint32_t position) {
-	return (position & POS_FACEDOWN) && !(position & POS_REVEAL);
-}
-
-bool ShouldHideMoveCode(uint32_t location, uint32_t position) {
-	return !(location & (LOCATION_GRAVE | LOCATION_OVERLAY))
-		&& ((location & (LOCATION_DECK | LOCATION_HAND)) || ShouldHideFacedownCode(position));
-}
-
-}
-
 TagDuel::TagDuel() {
 	for(int i = 0; i < 4; ++i) {
 		players[i] = 0;
@@ -960,10 +947,12 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			int cc = pbuf[8];
 			int cl = pbuf[9];
 			int cs = pbuf[10];
-			uint8_t cp = pbuf[11];
+			uint8_t& cp = pbufw[11];
+			const bool should_hide_facedown = NetServer::ShouldHideFacedownCode(cp);
 			pbuf += 16;
 			NetServer::SendBufferToPlayer(cur_player[cc], STOC_GAME_MSG, offset, pbuf - offset);
-			if (ShouldHideMoveCode(cl, cp))
+			if (!(cl & (LOCATION_GRAVE | LOCATION_OVERLAY))
+					&& ((cl & (LOCATION_DECK | LOCATION_HAND)) || should_hide_facedown))
 				BufferIO::Write<int32_t>(pbufw, 0);
 			for(int i = 0; i < 4; ++i)
 				if(players[i] != cur_player[cc])
@@ -1058,12 +1047,12 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			int cc = pbuf[4];
 			/*int cl = pbuf[5];*/
 			/*int cs = pbuf[6];*/
-			uint8_t cp = pbuf[7];
+			uint8_t& cp = pbufw[7];
 			pbuf += 8;
 			auto pid = (cc == 0) ? 0 : 2;
 			NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[pid + 1]);
-			if (ShouldHideFacedownCode(cp))
+			if (NetServer::ShouldHideFacedownCode(cp))
 				BufferIO::Write<int32_t>(pbufw, 0);
 			pid = 2 - pid;
 			NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, offset, pbuf - offset);
@@ -1603,22 +1592,28 @@ void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 	query_buffer.resize(SIZE_QUERY_BUFFER);
 	auto qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_MZONE, flag, qbuf, use_cache);
+	std::vector<unsigned char> filtered_buffer(query_buffer);
+	auto fbuf = filtered_buffer.data() + 3;
 	int pid = (player == 0) ? 0 : 2;
-	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer.data(), len + 3);
-	NetServer::ReSendToPlayer(players[pid + 1]);
 	int qlen = 0;
 	while(qlen < len) {
 		int clen = BufferIO::Read<int32_t>(qbuf);
+		fbuf += 4;
 		qlen += clen;
 		if (clen <= LEN_HEADER)
 			continue;
-		auto position = GetPosition(qbuf, 8);
-		if (ShouldHideFacedownCode(position))
-			std::memset(qbuf, 0, clen - 4);
+		uint8_t& position = qbuf[11];
+		const bool hide_code = NetServer::ShouldHideFacedownCode(position);
+		fbuf[11] = position;
+		if (hide_code)
+			std::memset(fbuf, 0, clen - 4);
 		qbuf += clen - 4;
+		fbuf += clen - 4;
 	}
-	pid = 2 - pid;
 	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer.data(), len + 3);
+	NetServer::ReSendToPlayer(players[pid + 1]);
+	pid = 2 - pid;
+	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, filtered_buffer.data(), len + 3);
 	NetServer::ReSendToPlayer(players[pid + 1]);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
@@ -1628,22 +1623,28 @@ void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
 	query_buffer.resize(SIZE_QUERY_BUFFER);
 	auto qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_SZONE, flag, qbuf, use_cache);
+	std::vector<unsigned char> filtered_buffer(query_buffer);
+	auto fbuf = filtered_buffer.data() + 3;
 	int pid = (player == 0) ? 0 : 2;
-	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer.data(), len + 3);
-	NetServer::ReSendToPlayer(players[pid + 1]);
 	int qlen = 0;
 	while(qlen < len) {
 		int clen = BufferIO::Read<int32_t>(qbuf);
+		fbuf += 4;
 		qlen += clen;
 		if (clen <= LEN_HEADER)
 			continue;
-		auto position = GetPosition(qbuf, 8);
-		if (ShouldHideFacedownCode(position))
-			std::memset(qbuf, 0, clen - 4);
+		uint8_t& position = qbuf[11];
+		const bool hide_code = NetServer::ShouldHideFacedownCode(position);
+		fbuf[11] = position;
+		if (hide_code)
+			std::memset(fbuf, 0, clen - 4);
 		qbuf += clen - 4;
+		fbuf += clen - 4;
 	}
-	pid = 2 - pid;
 	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer.data(), len + 3);
+	NetServer::ReSendToPlayer(players[pid + 1]);
+	pid = 2 - pid;
+	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, filtered_buffer.data(), len + 3);
 	NetServer::ReSendToPlayer(players[pid + 1]);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
@@ -1696,7 +1697,7 @@ void TagDuel::RefreshExtra(int player, int flag, int use_cache) {
 		if (clen <= LEN_HEADER)
 			continue;
 		auto position = GetPosition(qbuf, 8);
-		if (ShouldHideFacedownCode(position))
+		if(!(position & POS_FACEUP))
 			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
@@ -1715,12 +1716,23 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	BufferIO::Write<uint8_t>(qbuf, location);
 	BufferIO::Write<uint8_t>(qbuf, sequence);
 	int len = query_card(pduel, player, location, sequence, flag, qbuf, 0);
-	auto position = GetPosition(qbuf, 12);
+	bool hide_code = true;
+	uint8_t position = 0;
+	if(len > LEN_HEADER) {
+		if(location & LOCATION_ONFIELD) {
+			uint8_t& pos = qbuf[15];
+			hide_code = NetServer::ShouldHideFacedownCode(pos);
+			position = pos;
+		} else {
+			position = qbuf[15];
+			hide_code = position & POS_FACEDOWN;
+		}
+	}
 	if(location & LOCATION_ONFIELD) {
 		int pid = (player == 0) ? 0 : 2;
 		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 4);
 		NetServer::ReSendToPlayer(players[pid + 1]);
-		if((position & POS_FACEUP) || (position & POS_REVEAL)) {
+		if(len > LEN_HEADER && !hide_code) {
 			pid = 2 - pid;
 			NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 4);
 			NetServer::ReSendToPlayer(players[pid + 1]);
@@ -1731,9 +1743,9 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 		int pid = (player == 0) ? 0 : 2;
 		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 4);
 		NetServer::ReSendToPlayer(players[pid + 1]);
-		if(location == LOCATION_REMOVED && ShouldHideFacedownCode(position))
+		if(location == LOCATION_REMOVED && hide_code)
 			return;
-		if((location & 0x90) || (location == LOCATION_EXTRA && ((position & POS_FACEUP) || (position & POS_REVEAL)))) {
+		if((location & 0x90) || (location == LOCATION_EXTRA && (position & POS_FACEUP))) {
 			for(int i = 0; i < 4; ++i)
 				if(players[i] != cur_player[player])
 					NetServer::ReSendToPlayer(players[i]);
