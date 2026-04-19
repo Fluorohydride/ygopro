@@ -183,21 +183,20 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 	if(linebuf[0] != '!')
 		return;
 	char strbuf[TEXT_LINE_SIZE]{};
-	int value{};
+	unsigned int value{};
 	wchar_t strBuffer[4096]{};
 	if (std::sscanf(linebuf, "!%63s", strbuf) != 1)
 		return;
 	if(!std::strcmp(strbuf, "system")) {
-		if (std::sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf) != 2)
+		if (std::sscanf(&linebuf[7], "%u %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
-		if (!_sysStrings.count(value))
-			_sysStrings[value] = strBuffer;
+		_sysStrings.emplace(value, strBuffer);
 	} else if(!std::strcmp(strbuf, "victory")) {
 		if (std::sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
-		_victoryStrings[value] = strBuffer;
+		_victoryStrings.emplace(value, strBuffer);
 	} else if(!std::strcmp(strbuf, "counter")) {
 		if (std::sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
