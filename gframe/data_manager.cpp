@@ -191,7 +191,8 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 		if (std::sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
-		_sysStrings[value] = strBuffer;
+		if (!_sysStrings.count(value))
+			_sysStrings[value] = strBuffer;
 	} else if(!std::strcmp(strbuf, "victory")) {
 		if (std::sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
