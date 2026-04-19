@@ -9,35 +9,6 @@ namespace ygo {
 
 namespace {
 
-bool IsRevealableLocation(uint32_t location) {
-	return (location & (LOCATION_ONFIELD | LOCATION_EXTRA | LOCATION_REMOVED)) != 0;
-}
-
-uint8_t QueryPublicPosition(intptr_t pduel, uint8_t player, uint8_t location, uint8_t sequence) {
-	unsigned char query_buffer[0x1000];
-	int len = query_card(pduel, player, location, sequence, QUERY_POSITION, query_buffer, 0);
-	if(len <= LEN_HEADER)
-		return 0;
-	auto qbuf = query_buffer;
-	const int clen = BufferIO::Read<int32_t>(qbuf);
-	if(clen <= LEN_HEADER)
-		return 0;
-	const uint32_t query_flag = BufferIO::Read<uint32_t>(qbuf);
-	if(!(query_flag & QUERY_POSITION))
-		return 0;
-	const uint32_t info = BufferIO::Read<uint32_t>(qbuf);
-	return static_cast<uint8_t>(info >> 24);
-}
-
-uint8_t AddPublicRevealFlag(intptr_t pduel, uint8_t player, uint8_t location, uint8_t sequence, uint8_t position) {
-	if((position & POS_FACEDOWN) && IsRevealableLocation(location)) {
-		const auto queried_position = QueryPublicPosition(pduel, player, location, sequence);
-		if(queried_position & POS_REVEAL)
-			position |= POS_REVEAL;
-	}
-	return position;
-}
-
 bool ShouldHideFacedownCode(uint32_t position) {
 	return (position & POS_FACEDOWN) && !(position & POS_REVEAL);
 }
@@ -982,15 +953,14 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 		}
 		case MSG_MOVE: {
 			pbufw = pbuf;
-			uint8_t pc = pbuf[4];
-			uint8_t pl = pbuf[5];
+			int pc = pbuf[4];
+			int pl = pbuf[5];
 			/*int ps = pbuf[6];*/
 			/*int pp = pbuf[7];*/
-			uint8_t cc = pbuf[8];
-			uint8_t cl = pbuf[9];
-			uint8_t cs = pbuf[10];
-			uint8_t cp = AddPublicRevealFlag(pduel, cc, cl, cs, pbuf[11]);
-			pbufw[11] = cp;
+			int cc = pbuf[8];
+			int cl = pbuf[9];
+			int cs = pbuf[10];
+			uint8_t cp = pbuf[11];
 			pbuf += 16;
 			NetServer::SendBufferToPlayer(cur_player[cc], STOC_GAME_MSG, offset, pbuf - offset);
 			if (ShouldHideMoveCode(cl, cp))
@@ -1085,11 +1055,10 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 		}
 		case MSG_SPSUMMONING: {
 			pbufw = pbuf;
-			uint8_t cc = pbuf[4];
-			uint8_t cl = pbuf[5];
-			uint8_t cs = pbuf[6];
-			uint8_t cp = AddPublicRevealFlag(pduel, cc, cl, cs, pbuf[7]);
-			pbufw[7] = cp;
+			int cc = pbuf[4];
+			/*int cl = pbuf[5];*/
+			/*int cs = pbuf[6];*/
+			uint8_t cp = pbuf[7];
 			pbuf += 8;
 			auto pid = (cc == 0) ? 0 : 2;
 			NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, offset, pbuf - offset);
