@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "deck_manager.h"
 #include "game.h"
 #include "myfilesystem.h"
@@ -82,7 +83,7 @@ static unsigned int checkAvail(unsigned int ot, unsigned int avail) {
 		return DECKERROR_TCGONLY;
 	return DECKERROR_NOTAVAIL;
 }
-unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int rule) {
+uint32_t DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, size_t rule) {
 	std::unordered_map<uint32_t, int> ccount;
 	// rule
 	if(deck.main.size() < DECK_MIN_SIZE || deck.main.size() > DECK_MAX_SIZE)
@@ -97,7 +98,7 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 	auto& list = lflist->content;
 	const unsigned int rule_map[6] = { AVAIL_OCG, AVAIL_TCG, AVAIL_SC, AVAIL_CUSTOM, AVAIL_OCGTCG, 0 };
 	unsigned int avail = 0;
-	if (rule >= 0 && rule < (int)(sizeof rule_map / sizeof rule_map[0]))
+	if (rule < sizeof rule_map / sizeof rule_map[0])
 		avail = rule_map[rule];
 	for (auto& cit : deck.main) {
 		auto gameruleDeckError = checkAvail(cit->ot, avail);
@@ -280,7 +281,7 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 irr::io::IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
 	char file2[256];
 	BufferIO::EncodeUTF8(file, file2);
-	auto reader = dataManager.FileSystem->createAndOpenFile(file2);
+	auto reader = dataManager.IrrFileSystem->createAndOpenFile(file2);
 	return reader;
 }
 bool DeckManager::LoadCurrentDeck(std::istringstream& deckStream, bool is_packlist) {

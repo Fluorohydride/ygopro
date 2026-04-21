@@ -2,14 +2,6 @@
 #define GAME_H
 
 #include "config.h"
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else //__APPLE__
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif //__APPLE__
-#include "CGUIImageButton.h"
 #include "CGUITTFont.h"
 #include "mysignal.h"
 #include "client_field.h"
@@ -26,6 +18,13 @@ namespace ygo {
 
 constexpr int DEFAULT_DUEL_RULE = CURRENT_RULE;
 constexpr int CONFIG_LINE_SIZE = 1024;
+
+constexpr int GAME_WINDOW_WIDTH = 1024;
+constexpr int GAME_WINDOW_HEIGHT = 640;
+constexpr int CARD_IMG_WIDTH = 177;
+constexpr int CARD_IMG_HEIGHT = 254;
+constexpr int CARD_THUMB_WIDTH = 44;
+constexpr int CARD_THUMB_HEIGHT = 64;
 
 template<size_t N>
 bool IsExtension(const wchar_t* filename, const wchar_t(&extension)[N]) {
@@ -47,13 +46,10 @@ bool IsExtension(const char* filename, const char(&extension)[N]) {
 
 struct Config {
 	bool use_d3d{ false };
-	bool use_image_scale_multi_thread{ true };
-#ifdef _OPENMP
+	bool use_image_scale_multi_thread{ false };
 	bool use_image_load_background_thread{ false };
-#else
-	bool use_image_load_background_thread{ true };
-#endif
 	unsigned short antialias{ 0 };
+	unsigned int enable_log{ 0x3 };
 	unsigned short serverport{ 7911 };
 	unsigned char textfontsize{ 14 };
 	wchar_t lasthost[100]{};
@@ -100,8 +96,8 @@ struct Config {
 	double music_volume{ 0.5 };
 	int music_mode{ 1 };
 	bool window_maximized{ false };
-	int window_width{ 1024 };
-	int window_height{ 640 };
+	int window_width{ GAME_WINDOW_WIDTH };
+	int window_height{ GAME_WINDOW_HEIGHT };
 	bool resize_popup_menu{ false };
 };
 
@@ -173,7 +169,9 @@ public:
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void RefreshBot();
-	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
+	void Draw2DImageQuad(irr::video::IVideoDriver* driver, irr::video::ITexture* texture, const irr::core::recti& sourceRect,
+						 const irr::core::vector2di corner[4], bool useAlphaChannel = true, irr::video::SColor color = 0xffffffff);
+	void DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::video::SColor color);
 	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();
 	void DrawLinkedZones(ClientCard* pcard);
@@ -182,12 +180,13 @@ public:
 	void DrawCard(ClientCard* pcard);
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
-	void DrawGUI();
+	void DrawGUI(); // called from MainLoop with gMutex held
 	void DrawSpec();
 	void DrawBackImage(irr::video::ITexture* texture);
-	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
-	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
-	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
+	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0); // caller must hold gMutex
+	void HideElement(irr::gui::IGUIElement* element, bool set_action = false); // caller must hold gMutex
+	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0); // caller must hold gMutex
+	void SetImageButtonDrawing(irr::gui::IGUIElement* element, bool draw = true);
 	void WaitFrameSignal(int frame);
 	void DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList* lflist, bool drag = false);
 	void DrawDeckBd();
@@ -200,7 +199,7 @@ public:
 	void ClearChatMsg();
 	void AddDebugMsg(const char* msgbuf);
 	void ErrorLog(const char* msgbuf);
-	void ClearTextures();
+	void ClearTextures(); // caller must hold gMutex
 	void CloseGameButtons();
 	void CloseGameWindow();
 	void CloseDuelWindow();
@@ -221,8 +220,11 @@ public:
 		editbox->setText(text.c_str());
 	}
 
-	void OnResize();
+	void OnResize(); // caller must hold gMutex
 	void ResizeChatInputWindow();
+	void ResizePosSelectButtons();
+	void ResizeCardSelectButtons(irr::gui::IGUIWindow* window, irr::gui::IGUIStaticText** labels, irr::gui::IGUIButton** images,
+		irr::gui::IGUIScrollBar* scrollbar, irr::gui::IGUIButton* buttonOK, const std::vector<ClientCard*>& cards);
 	irr::core::recti Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2);
 	irr::core::recti Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 dx, irr::s32 dy, irr::s32 dx2, irr::s32 dy2);
 	irr::core::vector2di Resize(irr::s32 x, irr::s32 y);
@@ -263,8 +265,8 @@ public:
 	bool hideChat{};
 	int chatTiming[8]{};
 	int chatType[8]{};
-	unsigned short linePatternD3D{};
-	unsigned short linePatternGL{ 0x0f0f };
+	unsigned short linePattern{ 0 };
+	unsigned short stippleMask{ 0x0f0f };
 	int waitFrame{};
 	int signalFrame{};
 	int actionParam{};
@@ -282,7 +284,7 @@ public:
 	int lpframe{};
 	int lpd{};
 	int lpplayer{};
-	int lpccolor{};
+	irr::u32 lpccolor{};
 	std::wstring lpcstring;
 	bool always_chain{};
 	bool ignore_chain{};
@@ -290,6 +292,10 @@ public:
 
 	bool is_building{};
 	bool is_siding{};
+	bool exit_on_return{ false };
+	bool open_file{ false };
+	wchar_t open_file_name[256]{};
+	bool bot_mode{ false };
 
 	irr::core::dimension2d<irr::u32> window_size;
 	float xScale{ 1.0f };
@@ -314,7 +320,14 @@ public:
 	irr::gui::CGUITTFont* numFont{};
 	irr::gui::CGUITTFont* adFont{};
 	irr::gui::CGUITTFont* lpcFont{};
-	std::unordered_map<irr::gui::CGUIImageButton*, int> imageLoading;
+	// textures must be added in the main thread which handle OpenGL context,
+	// {card_code, rotated} written in network thread, loaded in main thread's DrawGUI
+	std::unordered_map<irr::gui::IGUIButton*, std::pair<int, bool>> btnImagePending;
+	// persistent tracking for image refresh on resize:
+	// {card_code, rotated} for buttons showing a card image from GetTextureButton
+	std::unordered_map<irr::gui::IGUIButton*, std::pair<int, bool>> btnCardImgInfo;
+	// {cover_idx, rotated} for buttons showing a facedown card (cover) image
+	std::unordered_map<irr::gui::IGUIButton*, std::pair<int, bool>> btnFacedownImgInfo;
 	//card image
 	irr::gui::IGUIStaticText* wCardImg{};
 	irr::gui::IGUIImage* imgCard{};
@@ -475,19 +488,19 @@ public:
 	irr::gui::IGUIScrollBar* scrOption{};
 	//pos selection
 	irr::gui::IGUIWindow* wPosSelect{};
-	irr::gui::CGUIImageButton* btnPSAU{};
-	irr::gui::CGUIImageButton* btnPSAD{};
-	irr::gui::CGUIImageButton* btnPSDU{};
-	irr::gui::CGUIImageButton* btnPSDD{};
+	irr::gui::IGUIButton* btnPSAU{};
+	irr::gui::IGUIButton* btnPSAD{};
+	irr::gui::IGUIButton* btnPSDU{};
+	irr::gui::IGUIButton* btnPSDD{};
 	//card selection
 	irr::gui::IGUIWindow* wCardSelect{};
-	irr::gui::CGUIImageButton* btnCardSelect[5]{};
+	irr::gui::IGUIButton* btnCardSelect[5]{};
 	irr::gui::IGUIStaticText *stCardPos[5]{};
 	irr::gui::IGUIScrollBar *scrCardList{};
 	irr::gui::IGUIButton* btnSelectOK{};
 	//card display
 	irr::gui::IGUIWindow* wCardDisplay{};
-	irr::gui::CGUIImageButton* btnCardDisplay[5]{};
+	irr::gui::IGUIButton* btnCardDisplay[5]{};
 	irr::gui::IGUIStaticText *stDisplayPos[5]{};
 	irr::gui::IGUIScrollBar *scrDisplayList{};
 	irr::gui::IGUIButton* btnDisplayOK{};
@@ -644,11 +657,6 @@ extern Game* mainGame;
 }
 
 #define SIZE_QUERY_BUFFER	0x4000
-
-#define CARD_IMG_WIDTH		177
-#define CARD_IMG_HEIGHT		254
-#define CARD_THUMB_WIDTH	44
-#define CARD_THUMB_HEIGHT	64
 
 #define UEVENT_EXIT			0x1
 #define UEVENT_TOWINDOW		0x2

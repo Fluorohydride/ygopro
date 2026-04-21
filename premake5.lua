@@ -2,8 +2,8 @@
 
 -- Global settings
 
--- Default: Build Lua, Irrlicht from source on all systems.
---          Don't build event, freetype, sqlite, opus, vorbis on Linux or MacOS, use apt or homebrew,
+-- Default: Build Lua, Irrlicht, miniaudio from source on all systems.
+--          Don't build event, freetype, sqlite, jpeg, png, opus, vorbis on Linux or MacOS, use package manager,
 --          but build them on Windows, due to the lack of package manager on Windows.
 
 BUILD_LUA = true
@@ -16,8 +16,11 @@ BUILD_FREETYPE = os.istarget("windows")
 BUILD_SQLITE = os.istarget("windows")
 
 BUILD_IRRLICHT = true -- modified Irrlicht is required, can't use the official one
-IRRLICHT_BUILD_JPEG_PNG = os.istarget("windows") -- build the bundled jpeglib and libpng from Irrlicht
+BUILD_PNG_IRRLICHT = os.istarget("windows") -- build the bundled libpng from Irrlicht
 USE_DXSDK = true
+
+BUILD_JPEG = os.istarget("windows") -- libjpeg-turbo is required, can't use the bundled IJG jpeglib from Irrlicht
+JPEG_LIB_NAME = "jpeg" -- use the libjpeg API of libjpeg-turbo, the lib name should always be "jpeg", just in case
 
 USE_AUDIO = true
 AUDIO_LIB = "miniaudio" -- can be "miniaudio" or "irrklang"
@@ -27,6 +30,18 @@ MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
 -- BUILD_IRRKLANG is impossible because irrKlang is not open source
 IRRKLANG_PRO = false
 IRRKLANG_PRO_BUILD_IKPMP3 = false
+
+-- Default include dirs, those values are ONLY used in static builds, WILL BE IGNORED if set corresponding BUILD_* to false
+LUA_INCLUDE_DIR = path.getabsolute("./lua/src")
+EVENT_INCLUDE_DIR = path.getabsolute("./event/include")
+IRRLICHT_INCLUDE_DIR = path.getabsolute("./irrlicht/include")
+JPEG_INCLUDE_DIR = path.getabsolute("./jpeg/src")
+FREETYPE_CUSTOM_INCLUDE_DIR = path.getabsolute("./freetype/custom")
+FREETYPE_INCLUDE_DIR = path.getabsolute("./freetype/include")
+SQLITE_INCLUDE_DIR = path.getabsolute("./sqlite3")
+MINIAUDIO_INCLUDE_DIR = path.getabsolute("./miniaudio")
+MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libopus")
+MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libvorbis")
 
 -- Read settings from command line or environment variables
 
@@ -55,13 +70,16 @@ newoption { trigger = "build-irrlicht", category = "YGOPro - irrlicht", descript
 newoption { trigger = "no-build-irrlicht", category = "YGOPro - irrlicht", description = "" }
 newoption { trigger = "irrlicht-include-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
 newoption { trigger = "irrlicht-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
-newoption { trigger = "build-jpeg-png", category = "YGOPro - irrlicht", description = "" }
-newoption { trigger = "no-build-jpeg-png", category = "YGOPro - irrlicht", description = "" }
-newoption { trigger = "jpeg-include-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
-newoption { trigger = "jpeg-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
+newoption { trigger = "build-png-irrlicht", category = "YGOPro - irrlicht", description = "" }
+newoption { trigger = "no-build-png-irrlicht", category = "YGOPro - irrlicht", description = "" }
 newoption { trigger = "png-include-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
 newoption { trigger = "png-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
 newoption { trigger = "no-dxsdk", category = "YGOPro - irrlicht", description = "" }
+
+newoption { trigger = "build-jpeg", category = "YGOPro - jpeg", description = "" }
+newoption { trigger = "no-build-jpeg", category = "YGOPro - jpeg", description = "" }
+newoption { trigger = "jpeg-include-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
+newoption { trigger = "jpeg-lib-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
 
 newoption { trigger = "no-audio", category = "YGOPro", description = "" }
 newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "miniaudio, irrklang", default = AUDIO_LIB }
@@ -92,6 +110,8 @@ newoption { trigger = 'build-ikpmp3', category = "YGOPro - irrklang - ikpmp3", d
 
 newoption { trigger = "mac-arm", category = "YGOPro", description = "Compile for Apple Silicon Mac" }
 newoption { trigger = "mac-intel", category = "YGOPro", description = "Compile for Intel Mac" }
+
+newoption { trigger = "use-openmp", category = "YGOPro", description = "Enable OpenMP support (edge case)" }
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
@@ -157,16 +177,24 @@ if not BUILD_IRRLICHT then
     IRRLICHT_INCLUDE_DIR = GetParam("irrlicht-include-dir") or os.findheader("irrlicht.h")
     IRRLICHT_LIB_DIR = GetParam("irrlicht-lib-dir") or os.findlib("irrlicht")
 end
-if GetParam("no-build-jpeg-png") then
-    IRRLICHT_BUILD_JPEG_PNG = false
-elseif GetParam("build-jpeg-png") then
-    IRRLICHT_BUILD_JPEG_PNG = true
+if GetParam("build-png-irrlicht") then
+    BUILD_PNG_IRRLICHT = true
+elseif GetParam("no-build-png-irrlicht") then
+    BUILD_PNG_IRRLICHT = false
 end
-if not IRRLICHT_BUILD_JPEG_PNG then
-    JPEG_INCLUDE_DIR = GetParam("jpeg-include-dir") or os.findheader("jpeglib.h")
-    JPEG_LIB_DIR = GetParam("jpeg-lib-dir") or os.findlib("jpeg")
+if not BUILD_PNG_IRRLICHT then
     PNG_INCLUDE_DIR = GetParam("png-include-dir") or os.findheader("png.h")
     PNG_LIB_DIR = GetParam("png-lib-dir") or os.findlib("png")
+end
+
+if GetParam("build-jpeg") then
+    BUILD_JPEG = true
+elseif GetParam("no-build-jpeg") then
+    BUILD_JPEG = false
+end
+if not BUILD_JPEG then
+    JPEG_INCLUDE_DIR = GetParam("jpeg-include-dir") or os.findheader("jpeglib.h")
+    JPEG_LIB_DIR = GetParam("jpeg-lib-dir") or os.findlib(JPEG_LIB_NAME)
 end
 
 if GetParam("no-dxsdk") then
@@ -263,6 +291,13 @@ if os.istarget("macosx") then
     end
 end
 
+if GetParam("use-openmp") then
+    USE_OPENMP = true
+    if os.istarget("macosx") then
+        print("Warning: OpenMP is not supported on Clang provided by Xcode.")
+    end
+end
+
 workspace "YGOPro"
     location "build"
     language "C++"
@@ -289,7 +324,6 @@ workspace "YGOPro"
         buildoptions { "-municode" }
 
     filter "system:macosx"
-        libdirs { "/usr/local/lib" }
         if MAC_ARM then
             buildoptions { "-arch arm64" }
         end
@@ -299,9 +333,6 @@ workspace "YGOPro"
         if MAC_ARM and MAC_INTEL then
             architecture "universal"
         end
-
-    filter "system:linux"
-        buildoptions { "-U_FORTIFY_SOURCE" }
 
     filter "configurations:Release"
         optimize "Speed"
@@ -343,7 +374,7 @@ workspace "YGOPro"
         defines { "_CRT_SECURE_NO_WARNINGS" }
 
     filter "not action:vs*"
-        buildoptions { "-fno-strict-aliasing", "-Wno-multichar", "-Wno-format-security" }
+        buildoptions { "-fno-strict-aliasing" }
         if not MAC_ARM and not MAC_INTEL then
             buildoptions "-march=native"
         end
@@ -363,6 +394,9 @@ workspace "YGOPro"
     end
     if BUILD_IRRLICHT then
         include "irrlicht"
+    end
+    if BUILD_JPEG then
+        include "jpeg"
     end
     if BUILD_SQLITE then
         include "sqlite3"
