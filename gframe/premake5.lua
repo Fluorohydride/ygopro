@@ -7,6 +7,7 @@ project "YGOPro"
         openmp "On"
     end
 
+    defines { "_IRR_STATIC_LIB_" }
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore", EVENT_INCLUDE_DIR, IRRLICHT_INCLUDE_DIR, JPEG_INCLUDE_DIR, SQLITE_INCLUDE_DIR }
     links { "ocgcore", "clzma", LUA_LIB_NAME, "sqlite3", "irrlicht", JPEG_LIB_NAME, "freetype", "event" }
