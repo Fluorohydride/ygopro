@@ -452,13 +452,13 @@ std::vector<int> DeckManager::GetDeckPoint(const Deck& deck, const LFList* lflis
 		}
 	};
 	for (auto& card: deck.main){
-		add_card(card->code);
+		add_card(card->get_original_code());
 	}
 	for (auto& card: deck.extra){
-		add_card(card->code);
+		add_card(card->get_original_code());
 	}
 	for (auto& card: deck.side){
-		add_card(card->code);
+		add_card(card->get_original_code());
 	}
 	return sum;
 }

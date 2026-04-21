@@ -1855,9 +1855,10 @@ bool DeckBuilder::check_limit(const CardDataC* pointer) {
 	if (limit <= 0)
 		return false;
 	
+	uint32_t original_code = pointer->get_original_code();
 	bool has_point = false;
 	for (auto& point : filterList->point_list) {
-		if (point.table.find(pointer->code) != point.table.end()) {
+		if (point.table.find(original_code) != point.table.end()) {
 			has_point = true;
 			break;
 		}
@@ -1865,10 +1866,9 @@ bool DeckBuilder::check_limit(const CardDataC* pointer) {
 	if (!has_point)
 		return true;
 	std::vector<int> sum = DeckManager::GetDeckPoint(deckManager.current_deck, filterList);
-	auto code = pointer->code;
 	for (size_t i = 0; i < filterList->point_list.size(); ++i) {
 		auto& point = filterList->point_list[i];
-		auto it = point.table.find(code);
+		auto it = point.table.find(original_code);
 		if (it == point.table.end())
 			continue;
 		sum[i] = sum[i] + it->second;
