@@ -2251,7 +2251,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			std::sort(panel_confirm.begin(), panel_confirm.end(), ClientCard::client_card_sort);
 			mainGame->gMutex.lock();
 			mainGame->dField.selectable_cards = panel_confirm;
-			myswprintf(textBuffer, dataManager.GetSysString(208), panel_confirm.size());
+			myswprintf(textBuffer, dataManager.GetSysString(208), static_cast<int>(panel_confirm.size()));
 			mainGame->wCardSelect->setText(textBuffer);
 			mainGame->dField.ShowSelectCard(true);
 			mainGame->gMutex.unlock();

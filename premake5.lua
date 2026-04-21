@@ -318,7 +318,6 @@ workspace "YGOPro"
         architecture "x86_64"
 
     filter "system:macosx"
-        libdirs { "/usr/local/lib" }
         if MAC_ARM then
             buildoptions { "-arch arm64" }
         end
@@ -328,9 +327,6 @@ workspace "YGOPro"
         if MAC_ARM and MAC_INTEL then
             architecture "universal"
         end
-
-    filter "system:linux"
-        buildoptions { "-U_FORTIFY_SOURCE" }
 
     filter "configurations:Release"
         optimize "Speed"
@@ -372,7 +368,7 @@ workspace "YGOPro"
         defines { "_CRT_SECURE_NO_WARNINGS" }
 
     filter "not action:vs*"
-        buildoptions { "-fno-strict-aliasing", "-Wno-multichar", "-Wno-format-security" }
+        buildoptions { "-fno-strict-aliasing" }
         if not MAC_ARM and not MAC_INTEL then
             buildoptions "-march=native"
         end
