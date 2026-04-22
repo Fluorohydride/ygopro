@@ -61,6 +61,8 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			if (std::sscanf(end, " $%*s %d", &creditValue) == 1) {
 				if (cur->point_list.empty())
 					continue;
+				if (creditValue <= 0)
+					continue;
 				auto& point = cur->point_list.back();
 				point.table[code] = creditValue;
 				cur->hash = credit_update_hash(cur->hash, code, credit_hash(point.name.c_str()), static_cast<uint32_t>(creditValue));
