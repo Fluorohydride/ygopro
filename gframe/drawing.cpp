@@ -1169,6 +1169,7 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList
 	if(!cp)
 		return;
 	auto code = cp->code;
+	auto original_code = cp->get_original_code();
 	auto lcode = cp->get_duel_code();
 	irr::video::ITexture* img = imageManager.GetTextureThumb(code);
 	if(img == nullptr)
@@ -1205,7 +1206,7 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList
 		driver->draw2DImage(imageManager.tLim, next_limitloc(), irr::core::recti(lim_texture_offset_x, lim_texture_offset_y, lim_texture_offset_x + 64, lim_texture_offset_y + 64), 0, 0, true);
 	}
 	for (auto& point : lflist->point_list) {
-		auto it = point.table.find(code);
+		auto it = point.table.find(original_code);
 		if (it == point.table.end())
 			continue;
 		auto value = it->second;
