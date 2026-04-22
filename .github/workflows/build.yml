@@ -282,8 +282,10 @@ jobs:
             $success = $true
             break
           }
-          Write-Warning "NASM installation attempt $i failed, retrying in 10s..."
-          Start-Sleep -Seconds 10
+          if ($i -lt $maxRetries) {
+            Write-Warning "NASM installation attempt $i failed, retrying in 10s..."
+            Start-Sleep -Seconds 10
+          }
         }
         if (-not $success) {
           Write-Error "NASM installation failed after $maxRetries attempts"
