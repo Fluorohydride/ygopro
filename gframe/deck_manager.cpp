@@ -186,7 +186,7 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 		}
 	}
 	if (result)
-		return (DECKERROR_POINT << 28) | result;
+		return (DECKERROR_POINT << 28) | (result & 0x0fffffffU);
 	return 0;
 }
 uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec, bool is_packlist) {
