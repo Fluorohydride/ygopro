@@ -58,7 +58,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 				continue;
 			uint32_t code = static_cast<uint32_t>(result);
 			int creditValue = 0;
-			if (std::sscanf(end, " $%*s %d", &creditValue) == 1) {
+			if (std::sscanf(end, " $ %d", &creditValue) == 1 || std::sscanf(end, " $%*s %d", &creditValue) == 1) {
 				if (cur->point_list.empty())
 					continue;
 				if (creditValue <= 0)
