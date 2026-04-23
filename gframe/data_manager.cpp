@@ -183,7 +183,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 	if(linebuf[0] != '!')
 		return;
 	char strbuf[TEXT_LINE_SIZE]{};
-	unsigned int value{};
+	uint32_t value{};
 	wchar_t strBuffer[4096]{};
 	if (std::sscanf(linebuf, "!%63s", strbuf) != 1)
 		return;
