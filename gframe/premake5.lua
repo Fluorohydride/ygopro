@@ -93,7 +93,7 @@ project "YGOPro"
         cppdialect "C++14"
 
     filter "system:macosx"
-        links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
+        links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework", "Carbon.framework" }
         defines { "GL_SILENCE_DEPRECATION" }
         if MAC_ARM then
             linkoptions { "-arch arm64" }
