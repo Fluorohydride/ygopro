@@ -674,7 +674,11 @@ jobs:
     - name: Use premake to generate make files (Homebrew packages)
       if: matrix.static-link != true
       run: |
-        DYLD_LIBRARY_PATH=$(brew --prefix)/lib ./premake5 gmake
+        DYLD_LIBRARY_PATH=$(brew --prefix)/lib ./premake5 gmake \
+          --sqlite-include-dir=$(brew --prefix sqlite)/include \
+          --sqlite-lib-dir=$(brew --prefix sqlite)/lib \
+          --zlib-include-dir=$(brew --prefix zlib)/include \
+          --zlib-lib-dir=$(brew --prefix zlib)/lib
 
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true
