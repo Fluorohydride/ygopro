@@ -57,10 +57,6 @@ project "YGOPro"
         libdirs { SQLITE_LIB_DIR }
     end
 
-    if not BUILD_LZMA then
-        libdirs { LZMA_LIB_DIR }
-    end
-
     if USE_SIMD == "none" then
         defines { "STBIR_NO_SIMD" }
     end

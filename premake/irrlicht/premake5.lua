@@ -10,6 +10,7 @@ project "irrlicht"
         "_IRR_STATIC_LIB_",
         "NO_IRR_USE_NON_SYSTEM_JPEG_LIB_",
         "NO_IRR_USE_NON_SYSTEM_LIB_PNG_",
+        "NO_IRR_USE_NON_SYSTEM_ZLIB_",
         "NO_IRR_LINUX_X11_VIDMODE_",
         "NO_IRR_COMPILE_WITH_BZIP2_",
         "NO_IRR_COMPILE_WITH_LZMA_",

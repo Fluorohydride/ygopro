@@ -390,11 +390,6 @@ workspace "YGOPro"
     filter { "system:windows", "action:vs*", "platforms:ARM64" }
         architecture "AARCH64"
 
-    filter { "system:windows", "action:gmake" }
-        architecture "x86_64"
-        defines { "UNICODE", "_UNICODE" }
-        buildoptions { "-municode" }
-
     filter "system:macosx"
         systemversion "11"
         if MAC_ARM and MAC_INTEL then
