@@ -31,6 +31,8 @@ MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
 IRRKLANG_PRO = false
 IRRKLANG_PRO_BUILD_IKPMP3 = false
 
+BUILD_LZMA = os.istarget("windows")
+
 -- Default include dirs, those values are ONLY used in static builds, WILL BE IGNORED if set corresponding BUILD_* to false
 LUA_INCLUDE_DIR = path.getabsolute("./lua/src")
 EVENT_INCLUDE_DIR = path.getabsolute("./event/include")
@@ -42,6 +44,7 @@ SQLITE_INCLUDE_DIR = path.getabsolute("./sqlite3")
 MINIAUDIO_INCLUDE_DIR = path.getabsolute("./miniaudio")
 MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libopus")
 MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libvorbis")
+LZMA_INCLUDE_DIR = path.getabsolute("./lzma/src/liblzma/api")
 
 -- Read settings from command line or environment variables
 
@@ -108,6 +111,11 @@ newoption { trigger = "irrklang-pro-release-lib-dir", category = "YGOPro - irrkl
 newoption { trigger = "irrklang-pro-debug-lib-dir", category = "YGOPro - irrklang - pro", description = "", value = "PATH" }
 newoption { trigger = 'build-ikpmp3', category = "YGOPro - irrklang - ikpmp3", description = "" }
 
+newoption { trigger = "build-lzma", category = "YGOPro - lzma", description = "" }
+newoption { trigger = "no-build-lzma", category = "YGOPro - lzma", description = "" }
+newoption { trigger = "lzma-include-dir", category = "YGOPro - lzma", description = "", value = "PATH" }
+newoption { trigger = "lzma-lib-dir", category = "YGOPro - lzma", description = "", value = "PATH" }
+
 newoption { trigger = "mac-arm", category = "YGOPro", description = "Compile for Apple Silicon Mac" }
 newoption { trigger = "mac-intel", category = "YGOPro", description = "Compile for Intel Mac" }
 
@@ -166,6 +174,16 @@ end
 if not BUILD_SQLITE then
     SQLITE_INCLUDE_DIR = GetParam("sqlite-include-dir") or os.findheader("sqlite3.h")
     SQLITE_LIB_DIR = GetParam("sqlite-lib-dir") or os.findlib("sqlite3")
+end
+
+if GetParam("build-lzma") then
+    BUILD_LZMA = true
+elseif GetParam("no-build-lzma") then
+    BUILD_LZMA = false
+end
+if not BUILD_LZMA then
+    LZMA_INCLUDE_DIR = GetParam("lzma-include-dir") or os.findheader("lzma.h")
+    LZMA_LIB_DIR = GetParam("lzma-lib-dir") or os.findlib("lzma")
 end
 
 if GetParam("build-irrlicht") then
@@ -394,6 +412,9 @@ workspace "YGOPro"
     end
     if BUILD_SQLITE then
         include "sqlite3"
+    end
+    if BUILD_LZMA then
+        include "lzma"
     end
     if USE_AUDIO then
         if AUDIO_LIB=="miniaudio" then

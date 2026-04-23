@@ -1,5 +1,3 @@
-include "lzma/."
-
 project "YGOPro"
     kind "WindowedApp"
     rtti "Off"
@@ -9,8 +7,8 @@ project "YGOPro"
 
     defines { "_IRR_STATIC_LIB_" }
     files { "*.cpp", "*.h" }
-    includedirs { "../ocgcore", EVENT_INCLUDE_DIR, IRRLICHT_INCLUDE_DIR, JPEG_INCLUDE_DIR, SQLITE_INCLUDE_DIR }
-    links { "ocgcore", "clzma", LUA_LIB_NAME, "sqlite3", "irrlicht", JPEG_LIB_NAME, "freetype", "event" }
+    includedirs { "../ocgcore", EVENT_INCLUDE_DIR, IRRLICHT_INCLUDE_DIR, JPEG_INCLUDE_DIR, LZMA_INCLUDE_DIR, SQLITE_INCLUDE_DIR }
+    links { "ocgcore", "lzma", LUA_LIB_NAME, "sqlite3", "irrlicht", JPEG_LIB_NAME, "freetype", "event" }
 
     if not BUILD_LUA then
         libdirs { LUA_LIB_DIR }
@@ -43,6 +41,10 @@ project "YGOPro"
 
     if not BUILD_SQLITE then
         libdirs { SQLITE_LIB_DIR }
+    end
+
+    if not BUILD_LZMA then
+        libdirs { LZMA_LIB_DIR }
     end
 
     if USE_AUDIO then

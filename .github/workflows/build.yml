@@ -145,6 +145,18 @@ jobs:
         7z x ${{ steps.sqlite.outputs.filepath }}
         mv sqlite-amalgamation-3510300 sqlite3
 
+    - name: Download lzma (xz)
+      id: lzma
+      uses: mercury233/action-cache-download-file@v1.2.0
+      with:
+        url: https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz
+        sha256: 3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0
+
+    - name: Extract lzma
+      run: |
+        tar xf ${{ steps.lzma.outputs.filepath }}
+        mv xz-5.8.3 lzma
+
     - name: Create miniaudio external directory
       run: |
         mkdir -p miniaudio/external
@@ -208,6 +220,7 @@ jobs:
           !jpeg/java/
           !jpeg/testimgs/
           sqlite3/
+          lzma/
           miniaudio/
           !miniaudio/external/opus/dnn/
 
@@ -483,6 +496,7 @@ jobs:
           --build-png-irrlicht \
           --build-freetype \
           --build-sqlite \
+          --build-lzma \
           --build-opus-vorbis
 
     - name: Make
@@ -548,7 +562,7 @@ jobs:
       if: matrix.static-link != true
       run: |
         brew install opus opusfile libvorbis
-#        brew install sqlite libx11 freetype libevent libjpeg-turbo libpng
+#        brew install sqlite libx11 freetype libevent libjpeg-turbo libpng xz
 
     - name: Download premake
       id: premake
@@ -591,6 +605,7 @@ jobs:
           --build-png-irrlicht \
           --build-freetype \
           --build-sqlite \
+          --build-lzma \
           --build-opus-vorbis
 
     - name: Make
