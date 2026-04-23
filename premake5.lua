@@ -7,7 +7,7 @@
 -- Global settings
 
 -- Default: Build Lua, Irrlicht, miniaudio from source on all systems.
---          Don't build event, freetype, sqlite, jpeg, png, opus, vorbis on Linux or MacOS, use package manager,
+--          Don't build event, freetype, sqlite, jpeg, png, zlib, opus, vorbis on Linux or MacOS, use package manager,
 --          but build them on Windows, due to the lack of package manager on Windows.
 
 BUILD_LUA = true
