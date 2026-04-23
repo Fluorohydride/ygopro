@@ -495,7 +495,6 @@ jobs:
         mkdir premake-test
         cp ./premake5 ./premake-test
         cd ./premake-test
-        set +e
         if ./premake5 --version; then
           echo "premake=ok" >> $GITHUB_OUTPUT
         else
@@ -639,7 +638,6 @@ jobs:
         mkdir premake-test
         cp ./premake5 ./premake-test
         cd ./premake-test
-        set +e
         if ./premake5 --version; then
           echo "premake=ok" >> $GITHUB_OUTPUT
         else
