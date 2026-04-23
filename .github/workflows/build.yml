@@ -446,7 +446,7 @@ jobs:
     - name: Install dependencies (dynamic link)
       if: matrix.static-link != true
       run: |
-        sudo apt-get install -y libevent-dev libfreetype6-dev libsqlite3-dev libopusfile-dev libvorbis-dev libjpeg-dev libpng-dev
+        sudo apt-get install -y libevent-dev libfreetype6-dev libsqlite3-dev libopusfile-dev libvorbis-dev libjpeg-dev libpng-dev liblzma-dev
 
     - name: Download premake
       id: premake
