@@ -1,7 +1,7 @@
 project "irrlicht"
     kind "StaticLib"
 
-    includedirs { "include", JPEG_INCLUDE_DIR }
+    includedirs { "include", JPEG_INCLUDE_DIR, PNG_INCLUDE_DIR, ZLIB_INCLUDE_DIR }
 
     exceptionhandling "Off"
     rtti "Off"
@@ -9,6 +9,7 @@ project "irrlicht"
     defines {
         "_IRR_STATIC_LIB_",
         "NO_IRR_USE_NON_SYSTEM_JPEG_LIB_",
+        "NO_IRR_USE_NON_SYSTEM_LIB_PNG_",
         "NO_IRR_LINUX_X11_VIDMODE_",
         "NO_IRR_COMPILE_WITH_BZIP2_",
         "NO_IRR_COMPILE_WITH_LZMA_",
@@ -64,57 +65,7 @@ project "irrlicht"
     files {
         "include/*.h",
         "source/Irrlicht/*.cpp",
-        "source/Irrlicht/zlib/zlib.h",
-        "source/Irrlicht/zlib/adler32.c",
-        "source/Irrlicht/zlib/compress.c",
-        "source/Irrlicht/zlib/crc32.h",
-        "source/Irrlicht/zlib/crc32.c",
-        "source/Irrlicht/zlib/deflate.h",
-        "source/Irrlicht/zlib/deflate.c",
-        "source/Irrlicht/zlib/inffast.h",
-        "source/Irrlicht/zlib/inffast.c",
-        "source/Irrlicht/zlib/inflate.h",
-        "source/Irrlicht/zlib/inflate.c",
-        "source/Irrlicht/zlib/inftrees.h",
-        "source/Irrlicht/zlib/inftrees.c",
-        "source/Irrlicht/zlib/trees.h",
-        "source/Irrlicht/zlib/trees.c",
-        "source/Irrlicht/zlib/uncompr.c",
-        "source/Irrlicht/zlib/zutil.h",
-        "source/Irrlicht/zlib/zutil.c",
     }
-
-    if BUILD_PNG_IRRLICHT then
-        files {
-            "source/Irrlicht/libpng/png.c",
-            "source/Irrlicht/libpng/pngerror.c",
-            "source/Irrlicht/libpng/pngget.c",
-            "source/Irrlicht/libpng/pngmem.c",
-            "source/Irrlicht/libpng/pngpread.c",
-            "source/Irrlicht/libpng/pngread.c",
-            "source/Irrlicht/libpng/pngrio.c",
-            "source/Irrlicht/libpng/pngrtran.c",
-            "source/Irrlicht/libpng/pngrutil.c",
-            "source/Irrlicht/libpng/pngset.c",
-            "source/Irrlicht/libpng/pngtrans.c",
-            "source/Irrlicht/libpng/pngwio.c",
-            "source/Irrlicht/libpng/pngwrite.c",
-            "source/Irrlicht/libpng/pngwtran.c",
-            "source/Irrlicht/libpng/pngwutil.c",
-            "source/Irrlicht/libpng/intel/intel_init.c",
-            "source/Irrlicht/libpng/intel/filter_sse2_intrinsics.c",
-        }
-        defines {
-            "PNG_INTEL_SSE",
-            "PNG_ARM_NEON_OPT=0",
-            "PNG_ARM_NEON_IMPLEMENTATION=0",
-        }
-    else
-        includedirs { PNG_INCLUDE_DIR }
-        defines {
-            "NO_IRR_USE_NON_SYSTEM_LIB_PNG_",
-        }
-    end
 
     filter { "system:windows" }
         if USE_DXSDK then
@@ -129,6 +80,7 @@ project "irrlicht"
         files {
             "source/Irrlicht/*.mm",
         }
+        buildoptions { "-Wno-deprecated-declarations" }
 
     filter { "system:macosx", "files:source/Irrlicht/Irrlicht.cpp or source/Irrlicht/COSOperator.cpp" }
         compileas "Objective-C++" 

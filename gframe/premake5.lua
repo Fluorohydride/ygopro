@@ -9,10 +9,13 @@ project "YGOPro"
 
     defines { "_IRR_STATIC_LIB_" }
     files { "*.cpp", "*.h" }
-    includedirs { "../ocgcore", EVENT_INCLUDE_DIR, IRRLICHT_INCLUDE_DIR, JPEG_INCLUDE_DIR, SQLITE_INCLUDE_DIR }
-    links { "ocgcore", "clzma", LUA_LIB_NAME, "sqlite3", "irrlicht", JPEG_LIB_NAME, "freetype", "event" }
+    includedirs { "../ocgcore", EVENT_INCLUDE_DIR, IRRLICHT_INCLUDE_DIR, JPEG_INCLUDE_DIR, ZLIB_INCLUDE_DIR, SQLITE_INCLUDE_DIR }
+    links { "ocgcore", "clzma", "sqlite3", "irrlicht", "png", "freetype", "event" }
 
-    if not BUILD_LUA then
+    if BUILD_LUA then
+        links { "lua" }
+    else
+        links { LUA_LIB_NAME }
         libdirs { LUA_LIB_DIR }
     end
 
@@ -25,13 +28,22 @@ project "YGOPro"
         libdirs { IRRLICHT_LIB_DIR }
     end
 
-    if not BUILD_PNG_IRRLICHT then
-        links { "png" }
+    if BUILD_JPEG then
+        links { "jpeg" }
+    else
+        links { JPEG_LIB_NAME }
+        libdirs { JPEG_LIB_DIR }
+    end
+
+    if not BUILD_PNG then
         libdirs { PNG_LIB_DIR }
     end
 
-    if not BUILD_JPEG then
-        libdirs { JPEG_LIB_DIR }
+    if BUILD_ZLIB then
+        links { "zlib" }
+    else
+        links { ZLIB_LIB_NAME }
+        libdirs { ZLIB_LIB_DIR }
     end
 
     if BUILD_FREETYPE then
@@ -43,6 +55,14 @@ project "YGOPro"
 
     if not BUILD_SQLITE then
         libdirs { SQLITE_LIB_DIR }
+    end
+
+    if not BUILD_LZMA then
+        libdirs { LZMA_LIB_DIR }
+    end
+
+    if USE_SIMD == "none" then
+        defines { "STBIR_NO_SIMD" }
     end
 
     if USE_AUDIO then
@@ -93,12 +113,6 @@ project "YGOPro"
     filter "system:macosx"
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework", "Carbon.framework" }
         defines { "GL_SILENCE_DEPRECATION" }
-        if MAC_ARM then
-            linkoptions { "-arch arm64" }
-        end
-        if MAC_INTEL then
-            linkoptions { "-arch x86_64" }
-        end
         if USE_AUDIO and AUDIO_LIB == "irrklang" then
             links { "irrklang" }
         end
