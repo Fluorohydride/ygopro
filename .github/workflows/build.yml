@@ -270,28 +270,22 @@ jobs:
         name: dependencies-sources-static-link
         path: .
 
+    - name: Download NASM
+      id: nasm
+      uses: mercury233/action-cache-download-file@v1.2.0
+      with:
+        url: https://www.nasm.us/pub/nasm/releasebuilds/3.01/win64/nasm-3.01-win64.zip
+        filename: nasm.zip
+        sha256: e0ba5157007abc7b1a65118a96657a961ddf55f7e3f632ee035366dfce039ca4
+
     - name: Install NASM
       shell: pwsh
       run: |
-        $maxRetries = 3
-        $success = $false
-        for ($i = 1; $i -le $maxRetries; $i++) {
-          $output = choco install nasm -y 2>&1
-          $output | Write-Host
-          if (Test-Path "C:\Program Files\NASM\nasm.exe") {
-            $success = $true
-            break
-          }
-          if ($i -lt $maxRetries) {
-            Write-Warning "NASM installation attempt $i failed, retrying in 10s..."
-            Start-Sleep -Seconds 10
-          }
-        }
-        if (-not $success) {
-          Write-Error "NASM installation failed after $maxRetries attempts"
-          exit 1
-        }
-        echo "C:\Program Files\NASM" >> $env:GITHUB_PATH
+        New-Item -ItemType Directory -Path nasm | Out-Null
+        Expand-Archive -Path ${{ steps.nasm.outputs.filepath }} -DestinationPath nasm
+        Move-Item .\nasm\nasm-3.01\nasm.exe .\nasm
+        $nasmPath = (Resolve-Path .\nasm).Path
+        $nasmPath | Out-File -FilePath $env:GITHUB_PATH -Append
 
     - name: Download premake
       id: premake
