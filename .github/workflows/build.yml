@@ -435,17 +435,13 @@ jobs:
         include:
           - name: ubuntu-22
             os: ubuntu-22.04
-            premake-version: 5.0.0-beta8
           - name: ubuntu-24
             os: ubuntu-24.04
-            premake-version: 5.0.0-beta8
           - name: ubuntu-static-link
             os: ubuntu-22.04
-            premake-version: 5.0.0-beta8
             static-link: true
           - name: ubuntu-arm-static-link
             os: ubuntu-24.04-arm
-            premake-version: 5.0.0-beta8
             static-link: true
 
     runs-on: ${{ matrix.os }}
@@ -488,7 +484,7 @@ jobs:
       id: premake
       uses: mercury233/action-cache-download-file@v1.2.0
       with:
-        url: https://github.com/premake/premake-core/releases/download/v${{ matrix.premake-version }}/premake-${{ matrix.premake-version }}-linux.tar.gz
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-linux.tar.gz
         filename: premake5.tar.gz
 
     - name: Extract & test premake
@@ -508,9 +504,9 @@ jobs:
       run: |
         sudo apt-get install -y uuid-dev
         cd /tmp
-        curl -L -o premake-core.tar.gz https://github.com/premake/premake-core/archive/refs/tags/v${{ matrix.premake-version }}.tar.gz
+        curl -L -o premake-core.tar.gz https://github.com/premake/premake-core/archive/refs/tags/v5.0.0-beta8.tar.gz
         tar xf premake-core.tar.gz
-        cd premake-core-${{ matrix.premake-version }}
+        cd premake-core-5.0.0-beta8
         chmod +x ./Bootstrap.sh
         ./Bootstrap.sh
         cp bin/release/premake5 "$GITHUB_WORKSPACE/premake5"
