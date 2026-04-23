@@ -489,18 +489,22 @@ jobs:
 
     - name: Extract & test premake
       id: extract-premake
-      continue-on-error: true
       run: |
         tar xf ${{ steps.premake.outputs.filepath }}
         chmod +x ./premake5
         mkdir premake-test
         cp ./premake5 ./premake-test
         cd ./premake-test
-        ./premake5 --version
+        set +e
+        if ./premake5 --version; then
+          echo "premake=ok" >> $GITHUB_OUTPUT
+        else
+          echo "premake=fail" >> $GITHUB_OUTPUT
+        fi
         cd ..
 
     - name: Build premake from source (fallback)
-      if: steps.extract-premake.outcome == 'failure'
+      if: steps.extract-premake.outputs.premake != 'ok'
       run: |
         sudo apt-get install -y uuid-dev
         cd /tmp
@@ -629,18 +633,22 @@ jobs:
 
     - name: Extract & test premake
       id: extract-premake
-      continue-on-error: true
       run: |
         tar xf ${{ steps.premake.outputs.filepath }}
         chmod +x ./premake5
         mkdir premake-test
         cp ./premake5 ./premake-test
         cd ./premake-test
-        ./premake5 --version
+        set +e
+        if ./premake5 --version; then
+          echo "premake=ok" >> $GITHUB_OUTPUT
+        else
+          echo "premake=fail" >> $GITHUB_OUTPUT
+        fi
         cd ..
 
     - name: Build premake from source (fallback)
-      if: steps.extract-premake.outcome == 'failure'
+      if: steps.extract-premake.outputs.premake != 'ok'
       run: |
         cd /tmp
         curl -L -o premake-core-master.zip https://github.com/premake/premake-core/archive/refs/heads/master.zip
