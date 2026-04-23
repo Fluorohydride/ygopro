@@ -11,6 +11,25 @@
 #include "netserver.h"
 #include "single_mode.h"
 #include <thread>
+#include <chrono>
+#ifdef _WIN32
+#include <timeapi.h>
+#endif
+
+#if defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || \
+	defined(__x86_64__) || defined(_M_X64) || defined(__x86_64) || defined(_M_AMD64)
+	#include <immintrin.h>
+	#define CPU_PAUSE() _mm_pause()
+#elif defined(_M_ARM) || defined(_M_ARM64) || defined(__arm__) || defined(__aarch64__)
+    #if defined(_MSC_VER)
+        #include <intrin.h>
+        #define CPU_PAUSE() __yield()
+    #else
+        #define CPU_PAUSE() __asm__ __volatile__("yield" ::: "memory")
+    #endif
+#else
+	#define CPU_PAUSE() ((void)0)
+#endif
 
 namespace ygo {
 
@@ -979,10 +998,16 @@ void Game::MainLoop() {
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
-	irr::ITimer* timer = device->getTimer();
-	timer->setTime(0);
 	int fps = 0;
-	int cur_time = 0;
+	auto lastFpsTime = std::chrono::steady_clock::now();
+#ifdef _WIN32
+	HANDLE hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
+	bool useHighResTimer = (hWaitTimer != NULL);
+	if(!useHighResTimer)
+		timeBeginPeriod(1);
+#endif
+	auto lastFrameTime = std::chrono::steady_clock::now();
+	constexpr auto targetFrameDuration = std::chrono::microseconds(16667);
 	while(device->run()) {
 		auto size = driver->getScreenSize();
 		if(window_size != size) {
@@ -996,6 +1021,8 @@ void Game::MainLoop() {
 		linePattern = (linePattern + 1) % 30;
 		stippleMask = (stippleMask << 1) | (stippleMask >> 15);
 		atkframe += 0.1f;
+		if(atkframe > 6.2832f)
+			atkframe -= 6.2832f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
 		gMutex.lock();
@@ -1044,23 +1071,62 @@ void Game::MainLoop() {
 			}
 		}
 		driver->endScene();
-		if(closeSignal.Wait(1))
+		if(closeSignal.TryWait())
 			CloseDuelWindow();
 		fps++;
-		cur_time = timer->getTime();
-		if(cur_time < fps * 17 - 20)
-			std::this_thread::sleep_for(std::chrono::milliseconds(20));
-		if(cur_time >= 1000) {
+		auto targetTime = lastFrameTime + targetFrameDuration;
+		auto now = std::chrono::steady_clock::now();
+		if(now < targetTime) {
+#ifdef _WIN32
+			if(useHighResTimer)
+			{
+				auto remaining = std::chrono::duration_cast<std::chrono::microseconds>(targetTime - now);
+				if(remaining.count() > 1500) {
+					LARGE_INTEGER dueTime;
+					dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
+					if(SetWaitableTimer(hWaitTimer, &dueTime, 0, NULL, NULL, FALSE))
+						WaitForSingleObject(hWaitTimer, INFINITE);
+				}
+			}
+			else
+#endif
+			{
+				auto sleepTime = targetTime - now - std::chrono::milliseconds(2);
+				if(sleepTime > std::chrono::milliseconds(0)) {
+					std::this_thread::sleep_for(sleepTime);
+				}
+			}
+			// Spin-wait for sub-millisecond precision.
+			// If the window is inactive, sleep 1ms per iteration to avoid wasting CPU.
+			while(std::chrono::steady_clock::now() < targetTime) {
+				if(device->isWindowActive())
+					CPU_PAUSE();
+				else
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
+		}
+		lastFrameTime = targetTime;
+		now = std::chrono::steady_clock::now();
+		if(now - targetTime > targetFrameDuration)
+			lastFrameTime = now;
+		if(now - lastFpsTime >= std::chrono::milliseconds(1000)) {
 			myswprintf(cap, L"YGOPro FPS: %d", fps);
 			device->setWindowCaption(cap);
 			fps = 0;
-			cur_time -= 1000;
-			timer->setTime(0);
+			lastFpsTime += std::chrono::milliseconds(1000);
+			if(now - lastFpsTime > std::chrono::milliseconds(1000))
+				lastFpsTime = now;
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)
 				if(dInfo.time_left[dInfo.time_player])
 					dInfo.time_left[dInfo.time_player]--;
 		}
 	}
+#ifdef _WIN32
+	if(useHighResTimer)
+		CloseHandle(hWaitTimer);
+	else
+		timeEndPeriod(1);
+#endif
 	DuelClient::StopClient(true);
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
@@ -1166,6 +1232,8 @@ void Game::LoadExpansions() {
 			if (IsExtension(name, ".cdb")) {
 				if (!dataManager.LoadDB(name)) {
 					std::string errmsg = "Warning: Failed to load DB file in expansion archive (";
+					errmsg.append(dataManager.IrrFileSystem->getFileArchive(i)->getArchiveName().c_str());
+					errmsg.append(" : ");
 					errmsg.append(name);
 					errmsg.append(")! ");
 					errmsg.append(dataManager.errmsg);
@@ -1184,6 +1252,8 @@ void Game::LoadExpansions() {
 				// TODO: zip file may contain non-UTF8 file name. DecodeUTF8 can't parse it and returns 0.
 				if (!len) {
 					std::string errmsg = "Warning: Failed to decode deck file name in expansion archive (";
+					errmsg.append(dataManager.IrrFileSystem->getFileArchive(i)->getArchiveName().c_str());
+					errmsg.append(" : ");
 					errmsg.append(name);
 					errmsg.append(")! Please make sure the file name is UTF-8 encoded in the archive.");
 					mainGame->ErrorLog(errmsg.c_str());
@@ -1336,13 +1406,14 @@ void Game::LoadConfig() {
 			gameConf.antialias = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "use_d3d")) {
 			gameConf.use_d3d = std::strtol(valbuf, nullptr, 10) > 0;
+#ifdef _OPENMP
 		} else if (!std::strcmp(strbuf, "use_image_scale_multi_thread")) {
 			gameConf.use_image_scale_multi_thread = std::strtol(valbuf, nullptr, 10) > 0;
+#endif
 		} else if (!std::strcmp(strbuf, "use_image_load_background_thread")) {
 			gameConf.use_image_load_background_thread = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "errorlog")) {
-			unsigned int val = std::strtol(valbuf, nullptr, 10);
-			enable_log = val & 0xff;
+			gameConf.enable_log = std::strtol(valbuf, nullptr, 10) & 0xff;
 		} else if(!std::strcmp(strbuf, "serverport")) {
 			gameConf.serverport = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "lasthost")) {
@@ -1467,10 +1538,12 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[CONFIG_LINE_SIZE];
 	std::fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
+#ifdef _OPENMP
 	std::fprintf(fp, "use_image_scale_multi_thread = %d\n", gameConf.use_image_scale_multi_thread ? 1 : 0);
+#endif
 	std::fprintf(fp, "use_image_load_background_thread = %d\n", gameConf.use_image_load_background_thread ? 1 : 0);
 	std::fprintf(fp, "antialias = %d\n", gameConf.antialias);
-	std::fprintf(fp, "errorlog = %u\n", enable_log);
+	std::fprintf(fp, "errorlog = %u\n", gameConf.enable_log);
 	BufferIO::CopyWideString(ebNickName->getText(), gameConf.nickname);
 	BufferIO::EncodeUTF8(gameConf.nickname, linebuf);
 	std::fprintf(fp, "nickname = %s\n", linebuf);
@@ -1712,12 +1785,12 @@ void Game::ClearChatMsg() {
 	}
 }
 void Game::AddDebugMsg(const char* msg) {
-	if (enable_log & 0x1) {
+	if (gameConf.enable_log & 0x1) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msg, wbuf);
 		AddChatMsg(wbuf, 9);
 	}
-	if (enable_log & 0x2) {
+	if (gameConf.enable_log & 0x2) {
 		char msgbuf[1040];
 		mysnprintf(msgbuf, "[Script Error]: %s", msg);
 		ErrorLog(msgbuf);

@@ -136,11 +136,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->btnStartBot->setEnabled(true);
 					mainGame->btnBotCancel->setEnabled(true);
-					if(bot_mode)
+					if(mainGame->bot_mode)
 						mainGame->ShowElement(mainGame->wSinglePlay);
 					else
 						mainGame->ShowElement(mainGame->wLanWindow);
-					if(exit_on_return)
+					if(mainGame->exit_on_return)
 						mainGame->device->closeDevice();
 				} else {
 					if(!(mainGame->dInfo.isTag && mainGame->dField.tag_surrender))

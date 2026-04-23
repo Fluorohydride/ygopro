@@ -1,7 +1,6 @@
 #ifndef YGOPRO_CONFIG_H
 #define YGOPRO_CONFIG_H
 
-#define _IRR_STATIC_LIB_
 #define IRR_COMPILE_WITH_DX9_DEV_PACK
 
 #include <cerrno>
@@ -82,10 +81,5 @@ inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
 #include <irrlicht.h>
 
 constexpr uint16_t PRO_VERSION = 0x1362;
-extern unsigned int enable_log;
-extern bool exit_on_return;
-extern bool open_file;
-extern wchar_t open_file_name[256];
-extern bool bot_mode;
 
 #endif
