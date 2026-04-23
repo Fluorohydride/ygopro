@@ -218,7 +218,6 @@ jobs:
       matrix:
         name:
           - windows
-#          - windows-irrklang
 #          - windows-no-dxsdk
           - windows-x64
 #          - windows-2025
@@ -226,25 +225,17 @@ jobs:
           - name: windows
             os: windows-2022
             vs: vs2022
-            audiolib: miniaudio
-#          - name: windows-irrklang
-#            os: windows-2022
-#            vs: vs2022
-#            audiolib: irrklang
 #          - name: windows-no-dxsdk
 #            os: windows-2022
 #            vs: vs2022
-#            audiolib: miniaudio
 #            nodxsdk: true
           - name: windows-x64
             os: windows-2022
             vs: vs2022
-            audiolib: miniaudio
             x64: true
 #          - name: windows-2025
 #            os: windows-2025
 #            vs: vs2025 # to be enabled after the release of Visual Studio 2025
-#            audiolib: miniaudio
 
     runs-on: ${{ matrix.os }}
 
@@ -306,21 +297,6 @@ jobs:
       run: |
         7z x ${{ steps.premake.outputs.filepath }}
 
-    - name: Download irrKlang
-      if: matrix.audiolib == 'irrklang'
-      id: irrKlang
-      uses: mercury233/action-cache-download-file@v1.2.0
-      with:
-        url: https://www.ambiera.at/downloads/irrKlang-32bit-1.6.0.zip
-        sha256: 49daa96c90ae96f3f49a17a2a325ce046ba12c2b722e3e922ce4472ad090360d
-
-    - name: Extract irrKlang
-      if: matrix.audiolib == 'irrklang'
-      shell: bash
-      run: |
-        7z x ${{ steps.irrKlang.outputs.filepath }}
-        mv irrKlang-1.6.0 irrKlang
-
     - name: Check DirectX SDK
       if: matrix.nodxsdk != true
       id: dxsdk
@@ -365,7 +341,7 @@ jobs:
     - name: Use premake to generate Visual Studio solution
       shell: pwsh
       run: |
-        .\premake5.exe ${{ matrix.vs }} --audio-lib=${{ matrix.audiolib }}
+        .\premake5.exe ${{ matrix.vs }}
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v3
