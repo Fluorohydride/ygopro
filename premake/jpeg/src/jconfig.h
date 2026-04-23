@@ -6,10 +6,10 @@
 */
 
 /* Version ID for the JPEG library.
- * Irrlicht 1.8 uses Version 8d of the IJG libjpeg, so we set the version to 8.0 to avoid confusion.
+ * Irrlicht 1.9 uses Version 9a of the IJG libjpeg, so we set the version to 9.0 to avoid confusion.
  * JPEG_LIB_VERSION_MAJOR and JPEG_LIB_VERSION_MINOR are not used by libjpeg-turbo.
  */
-#define JPEG_LIB_VERSION  80
+#define JPEG_LIB_VERSION  90
 
 /* Support arithmetic encoding/decoding when using 8-bit samples */
 #define C_ARITH_CODING_SUPPORTED  1
