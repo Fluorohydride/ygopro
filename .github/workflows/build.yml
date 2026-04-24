@@ -497,6 +497,7 @@ jobs:
       with:
         url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-linux.tar.gz
         filename: premake5.tar.gz
+        sha256: 63edd3e7461eebdd45b500a3c7e8ad4e7a67d68f230010f9a97cbb71b4ec59c8
 
     - name: Extract & test premake
       id: extract-premake
