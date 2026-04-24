@@ -187,8 +187,16 @@ uint32_t DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, size_t ru
 			break;
 		}
 	}
-	if (result)
-		return (DECKERROR_POINT << 28) | (result & 0x0fffffffU);
+	if (result) {
+		uint32_t code = 0;
+		if (deck.main.size())
+			code = deck.main[0]->code;
+		else if (deck.extra.size())
+			code = deck.extra[0]->code;
+		else if (deck.side.size())
+			code = deck.side[0]->code;
+		return (DECKERROR_LFLIST << 28) | (code & MAX_CARD_ID);
+	}
 	return 0;
 }
 uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec, bool is_packlist) {

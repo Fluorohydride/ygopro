@@ -329,10 +329,6 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 				myswprintf(msgbuf, dataManager.GetSysString(1432), dataManager.GetName(code));
 				break;
 			}
-			case DECKERROR_POINT: {
-				myswprintf(msgbuf, L"%ls%d", dataManager.GetSysString(1433), code);
-				break;
-			}
 			default: {
 				myswprintf(msgbuf, dataManager.GetSysString(1406));
 				break;
