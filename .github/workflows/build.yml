@@ -379,6 +379,7 @@ jobs:
           - name: ubuntu-22
             os: ubuntu-22.04
             premake-version: 5.0.0-beta4
+            apt-outdated: true
           - name: ubuntu-24
             os: ubuntu-24.04
             premake-version: 5.0.0-beta7
@@ -447,6 +448,20 @@ jobs:
         ./configure
         cd ../../..
 
+    - name: Download lzma (xz)
+      if: matrix.apt-outdated == true
+      id: lzma
+      uses: mercury233/action-cache-download-file@v1.2.0
+      with:
+        url: https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz
+        sha256: 3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0
+
+    - name: Extract lzma
+      if: matrix.apt-outdated == true
+      run: |
+        tar xf ${{ steps.lzma.outputs.filepath }}
+        mv xz-5.8.3 lzma
+
     - name: Copy premake files
       run: |
         cp -pr premake/* .
@@ -455,7 +470,7 @@ jobs:
     - name: Use premake to generate make files (apt packages)
       if: matrix.static-link != true
       run: |
-        ./premake5 gmake
+        ./premake5 gmake ${{ matrix.apt-outdated == true && '--build-lzma' || '' }}
 
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true
