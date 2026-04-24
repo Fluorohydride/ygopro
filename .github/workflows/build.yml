@@ -78,14 +78,14 @@ jobs:
       uses: actions/checkout@v6
       with:
         repository: mackron/miniaudio
-        path: miniaudio
+        path: miniaudio-source
         ref: 9634bedb5b5a2ca38c1ee7108a9358a4e233f14d # tag: 0.11.25
 
-    - name: Use miniaudio split
+    - name: Use miniaudio split & decoders only
       run: |
-        cd miniaudio
-        cp extras/miniaudio_split/miniaudio.* .
-        cd ..
+        mkdir -p miniaudio/extras
+        cp miniaudio-source/extras/miniaudio_split/miniaudio.* miniaudio/
+        cp -r miniaudio-source/extras/decoders miniaudio/extras/
 
     - name: Upload sources
       uses: actions/upload-artifact@v6
@@ -94,7 +94,11 @@ jobs:
         path: |
           lua/
           miniaudio/
-          irrlicht/
+          irrlicht/include/
+          irrlicht/source/
+          !irrlicht/source/Irrlicht/jpeglib/
+          !irrlicht/source/Irrlicht/libpng/
+          !irrlicht/source/Irrlicht/zlib/
           ocgcore/
 
   prepare-static-dependencies:
@@ -235,9 +239,10 @@ jobs:
         path: |
           event/
           freetype/
+          !freetype/docs/
           jpeg/
           !jpeg/java/
-          !jpeg/testimgs/
+          !jpeg/testimages/
           png/
           zlib/
           sqlite3/
