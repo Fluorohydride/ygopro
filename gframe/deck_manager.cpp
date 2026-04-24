@@ -46,6 +46,8 @@ void DeckManager::LoadLFListSingle(const char* path) {
 				char keybuf[256];
 				if (std::sscanf(linebuf, "$%255s %d", keybuf, &limitValue) != 2)
 					continue;
+				if (limitValue < 0)
+					limitValue = 0;
 				cur->point_list.push_back({ keybuf, limitValue });
 				cur->hash = credit_update_hash(cur->hash, credit_hash(keybuf), static_cast<uint32_t>(limitValue), 0x43524544u);
 				continue;
