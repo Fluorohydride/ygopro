@@ -1205,7 +1205,7 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList
 		}
 		driver->draw2DImage(imageManager.tLim, next_limitloc(), irr::core::recti(lim_texture_offset_x, lim_texture_offset_y, lim_texture_offset_x + 64, lim_texture_offset_y + 64), 0, 0, true);
 	}
-	for (auto& point : lflist->point_list) {
+	for (auto& point : lflist->pointList) {
 		auto it = point.table.find(original_code);
 		if (it == point.table.end())
 			continue;

@@ -33,7 +33,7 @@ struct LFList {
 	unsigned int hash{};
 	std::wstring listName;
 	std::unordered_map<uint32_t, int> content;
-	std::vector<GamePoint> point_list;
+	std::vector<GamePoint> pointList;
 };
 
 class DeckManager {

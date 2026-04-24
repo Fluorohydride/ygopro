@@ -48,7 +48,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 					continue;
 				if (limitValue < 0)
 					limitValue = 0;
-				cur->point_list.push_back({ keybuf, limitValue });
+				cur->pointList.push_back({ keybuf, limitValue });
 				cur->hash = credit_update_hash(cur->hash, credit_hash(keybuf), static_cast<uint32_t>(limitValue), 0x43524544u);
 				continue;
 			}
@@ -61,11 +61,11 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			uint32_t code = static_cast<uint32_t>(result);
 			int creditValue = 0;
 			if (std::sscanf(end, " $ %d", &creditValue) == 1 || std::sscanf(end, " $%*s %d", &creditValue) == 1) {
-				if (cur->point_list.empty())
+				if (cur->pointList.empty())
 					continue;
 				if (creditValue <= 0)
 					continue;
-				auto& point = cur->point_list.back();
+				auto& point = cur->pointList.back();
 				point.table[code] = creditValue;
 				cur->hash = credit_update_hash(cur->hash, code, credit_hash(point.name.c_str()), static_cast<uint32_t>(creditValue));
 				continue;
@@ -181,8 +181,8 @@ uint32_t DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, size_t ru
 	}
 	std::vector<int> sum = GetDeckPoint(deck, lflist);
 	int result = 0;
-	for (size_t i = 0; i < lflist->point_list.size(); ++i) {
-		if (sum[i] > lflist->point_list[i].limit) {
+	for (size_t i = 0; i < lflist->pointList.size(); ++i) {
+		if (sum[i] > lflist->pointList[i].limit) {
 			result = sum[i];
 			break;
 		}
@@ -443,12 +443,12 @@ bool DeckManager::SaveDeckArray(const DeckArray& deck, const wchar_t* name) {
 }
 std::vector<int> DeckManager::GetDeckPoint(const Deck& deck, const LFList* lflist) {
 	std::vector<int> sum;
-	if (!lflist || lflist->point_list.empty())
+	if (!lflist || lflist->pointList.empty())
 		return sum;
-	sum.resize(lflist->point_list.size());
+	sum.resize(lflist->pointList.size());
 	auto add_card = [&](uint32_t code){
-		for (size_t i = 0; i < lflist->point_list.size(); ++i) {
-			auto& point = lflist->point_list[i];
+		for (size_t i = 0; i < lflist->pointList.size(); ++i) {
+			auto& point = lflist->pointList[i];
 			auto it = point.table.find(code);
 			if (it == point.table.end())
 				continue;
