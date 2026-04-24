@@ -286,14 +286,14 @@ void SoundManager::StopBGM() {
 	ma_sound_uninit(&soundBGM);
 #endif
 }
-void SoundManager::SetSoundVolume(double volume) {
+void SoundManager::SetSoundVolume(int volume) {
 #ifdef YGOPRO_USE_MINIAUDIO
-	ma_engine_set_volume(&engineSound, volume);
+	ma_engine_set_volume(&engineSound, volume / 100.0f);
 #endif
 }
-void SoundManager::SetMusicVolume(double volume) {
+void SoundManager::SetMusicVolume(int volume) {
 #ifdef YGOPRO_USE_MINIAUDIO
-	ma_engine_set_volume(&engineMusic, volume);
+	ma_engine_set_volume(&engineMusic, volume / 100.0f);
 #endif
 }
 }
