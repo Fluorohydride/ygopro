@@ -502,18 +502,23 @@ jobs:
         fi
         cd ..
 
-    - name: Build premake from source (fallback)
+    - name: Fetch premake source (fallback)
+      if: steps.extract-premake.outputs.premake != 'ok'
+      uses: actions/checkout@v6
+      with:
+        repository: premake/premake-core
+        path: premake-source
+        ref: 2ca338a25ed5f6e62d36c9cd70e5f313953c630d # tag: v5.0.0-beta8
+
+    - name: Build premake (fallback)
       if: steps.extract-premake.outputs.premake != 'ok'
       run: |
         sudo apt-get install -y uuid-dev
-        cd /tmp
-        curl -L -o premake-core.tar.gz https://github.com/premake/premake-core/archive/refs/tags/v5.0.0-beta8.tar.gz
-        tar xf premake-core.tar.gz
-        cd premake-core-5.0.0-beta8
+        cd premake-source
         chmod +x ./Bootstrap.sh
         ./Bootstrap.sh
-        cp bin/release/premake5 "$GITHUB_WORKSPACE/premake5"
-        cd "$GITHUB_WORKSPACE"
+        cp bin/release/premake5 ../premake5
+        cd ..
 
     - name: Configure libevent
       if: matrix.static-link == true
@@ -645,17 +650,22 @@ jobs:
         fi
         cd ..
 
-    - name: Build premake from source (fallback)
+    - name: Fetch premake source (fallback)
+      if: steps.extract-premake.outputs.premake != 'ok'
+      uses: actions/checkout@v6
+      with:
+        repository: premake/premake-core
+        path: premake-source
+        ref: 9ca696c86d5df6a1f6e674a931eef18e2b1c3b31 # fix: x86_64 architecture detection for macOS in Bootstrap.sh (#2640)
+
+    - name: Build premake (fallback)
       if: steps.extract-premake.outputs.premake != 'ok'
       run: |
-        cd /tmp
-        curl -L -o premake-core-master.zip https://github.com/premake/premake-core/archive/refs/heads/master.zip
-        unzip premake-core-master.zip
-        cd premake-core-master
+        cd premake-source
         chmod +x ./Bootstrap.sh
         ./Bootstrap.sh
-        cp bin/release/premake5 "$GITHUB_WORKSPACE/premake5"
-        cd "$GITHUB_WORKSPACE"
+        cp bin/release/premake5 ../premake5
+        cd ..
 
     - name: Configure libevent
       if: matrix.static-link == true
