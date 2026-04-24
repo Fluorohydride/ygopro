@@ -74,9 +74,15 @@ jobs:
         tar xf ${{ steps.lua.outputs.filepath }}
         mv lua-5.4.8 lua
 
-    - name: Download miniaudio
+    - name: Fetch miniaudio
+      uses: actions/checkout@v6
+      with:
+        repository: mackron/miniaudio
+        path: miniaudio
+        ref: 9634bedb5b5a2ca38c1ee7108a9358a4e233f14d # tag: 0.11.25
+
+    - name: Use miniaudio split
       run: |
-        git clone --depth=1 -b 0.11.25 https://github.com/mackron/miniaudio
         cd miniaudio
         cp extras/miniaudio_split/miniaudio.* .
         cd ..
