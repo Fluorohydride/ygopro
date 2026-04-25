@@ -71,6 +71,7 @@ void Replay::EndRecord() {
 	filters[0].id = LZMA_FILTER_LZMA1EXT;
 	filters[0].options = &opt;
 	filters[1].id = LZMA_VLI_UNKNOWN;
+	filters[1].options = nullptr;
 	lzma_properties_encode(&filters[0], pheader.base.props);
 	size_t out_pos = 0;
 	lzma_ret lret = lzma_raw_buffer_encode(filters, nullptr, replay_data, replay_size, comp_data, &out_pos, MAX_COMP_SIZE);
