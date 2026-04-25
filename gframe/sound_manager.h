@@ -6,9 +6,6 @@
 #ifdef YGOPRO_USE_MINIAUDIO
 #include <miniaudio.h>
 #endif
-#ifdef YGOPRO_USE_IRRKLANG
-#include <irrKlang.h>
-#endif
 
 namespace ygo {
 
@@ -27,11 +24,6 @@ private:
 	ma_engine engineMusic;
 	ma_sound soundBGM;
 	wchar_t currentPlayingMusic[1024]{};
-#endif
-#ifdef YGOPRO_USE_IRRKLANG
-	irrklang::ISoundEngine* engineSound;
-	irrklang::ISoundEngine* engineMusic;
-	irrklang::ISound* soundBGM;
 #endif
 	void RefershBGMDir(std::wstring path, int scene);
 
