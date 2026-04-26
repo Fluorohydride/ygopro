@@ -38,6 +38,7 @@ int DuelClient::match_kill = 0;
 std::vector<HostPacket> DuelClient::hosts;
 std::set<std::pair<unsigned int, unsigned short>> DuelClient::remotes;
 event* DuelClient::resp_event = 0;
+const std::set<int> DuelClient::select_effectyn_id{ 95, 96, 97, 218, 219, 220 };
 
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
 	if(connect_state)
@@ -79,9 +80,9 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 		mainGame->btnStartBot->setEnabled(true);
 		mainGame->btnBotCancel->setEnabled(true);
 		mainGame->gMutex.lock();
-		if(bot_mode && !mainGame->wSinglePlay->isVisible())
+		if(mainGame->bot_mode && !mainGame->wSinglePlay->isVisible())
 			mainGame->ShowElement(mainGame->wSinglePlay);
-		else if(!bot_mode && !mainGame->wLanWindow->isVisible())
+		else if(!mainGame->bot_mode && !mainGame->wLanWindow->isVisible())
 			mainGame->ShowElement(mainGame->wLanWindow);
 		soundManager.PlaySoundEffect(SOUND_INFO);
 		mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400));
@@ -133,7 +134,7 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
 		if(create_game) {
 			CTOS_CreateGame cscg;
-			if(bot_mode) {
+			if(mainGame->bot_mode) {
 				BufferIO::CopyCharArray(L"Bot Game", cscg.name);
 				BufferIO::CopyCharArray(L"", cscg.pass);
 				cscg.info.rule = 5;
@@ -181,9 +182,9 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 				mainGame->btnStartBot->setEnabled(true);
 				mainGame->btnBotCancel->setEnabled(true);
 				mainGame->gMutex.lock();
-				if(bot_mode && !mainGame->wSinglePlay->isVisible())
+				if(mainGame->bot_mode && !mainGame->wSinglePlay->isVisible())
 					mainGame->ShowElement(mainGame->wSinglePlay);
-				else if(!bot_mode && !mainGame->wLanWindow->isVisible())
+				else if(!mainGame->bot_mode && !mainGame->wLanWindow->isVisible())
 					mainGame->ShowElement(mainGame->wLanWindow);
 				soundManager.PlaySoundEffect(SOUND_INFO);
 				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400));
@@ -197,7 +198,7 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 					mainGame->btnBotCancel->setEnabled(true);
 					mainGame->gMutex.lock();
 					mainGame->HideElement(mainGame->wHostPrepare);
-					if(bot_mode)
+					if(mainGame->bot_mode)
 						mainGame->ShowElement(mainGame->wSinglePlay);
 					else
 						mainGame->ShowElement(mainGame->wLanWindow);
@@ -228,7 +229,7 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 					mainGame->is_building = false;
 					mainGame->ResizeChatInputWindow();
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
-					if(bot_mode)
+					if(mainGame->bot_mode)
 						mainGame->ShowElement(mainGame->wSinglePlay);
 					else
 						mainGame->ShowElement(mainGame->wLanWindow);
@@ -714,13 +715,13 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		mainGame->stTip->setVisible(false);
 		mainGame->ResizeChatInputWindow();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		if(bot_mode)
+		if(mainGame->bot_mode)
 			mainGame->ShowElement(mainGame->wSinglePlay);
 		else
 			mainGame->ShowElement(mainGame->wLanWindow);
 		mainGame->gMutex.unlock();
 		event_base_loopbreak(client_base);
-		if(exit_on_return)
+		if(mainGame->exit_on_return)
 			mainGame->device->closeDevice();
 		break;
 	}
@@ -955,7 +956,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 // Analyze STOC_GAME_MSG packet
 bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	unsigned char* pbuf = msg;
-	wchar_t textBuffer[256];
+	wchar_t textBuffer[256]{};
 	mainGame->dInfo.curMsg = BufferIO::Read<uint8_t>(pbuf);
 	if(mainGame->dInfo.curMsg != MSG_RETRY) {
 		std::memcpy(last_successful_msg, msg, len);
@@ -1063,13 +1064,13 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			mainGame->btnBotCancel->setEnabled(true);
 			mainGame->stTip->setVisible(false);
 			mainGame->device->setEventReceiver(&mainGame->menuHandler);
-			if(bot_mode)
+			if(mainGame->bot_mode)
 				mainGame->ShowElement(mainGame->wSinglePlay);
 			else
 				mainGame->ShowElement(mainGame->wLanWindow);
 			mainGame->gMutex.unlock();
 			event_base_loopbreak(client_base);
-			if(exit_on_return)
+			if(mainGame->exit_on_return)
 				mainGame->device->closeDevice();
 		}
 		return false;
@@ -1526,10 +1527,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			wchar_t ynbuf[256];
 			myswprintf(ynbuf, dataManager.GetSysString(221), dataManager.FormatLocation(l, s), dataManager.GetName(code));
 			myswprintf(textBuffer, L"%ls\n%ls\n%ls", event_string, ynbuf, dataManager.GetSysString(223));
-		} else if(desc <= MAX_STRING_ID) {
+		} else if(select_effectyn_id.count(desc)) {
 			myswprintf(textBuffer, dataManager.GetSysString(desc), dataManager.GetName(code));
 		} else {
-			myswprintf(textBuffer, dataManager.GetDesc(desc), dataManager.GetName(code));
+			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(desc));
 		}
 		mainGame->gMutex.lock();
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, textBuffer);
@@ -1836,14 +1837,14 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		unsigned char respbuf[SIZE_RETURN_VALUE];
 		int pzone = 0;
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE) {
-			if (select_hint) {
+			if (select_hint)
 				myswprintf(textBuffer, dataManager.GetSysString(569), dataManager.GetName(select_hint));
-			} else
+			else
 				myswprintf(textBuffer, dataManager.GetSysString(560));
 		} else {
-			if (select_hint) {
-				myswprintf(textBuffer, dataManager.GetDesc(select_hint));
-			} else
+			if (select_hint)
+				myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
+			else
 				myswprintf(textBuffer, dataManager.GetSysString(570));
 		}
 		select_hint = 0;
@@ -1917,37 +1918,22 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			SetResponseI(positions);
 			return true;
 		}
-		int count = 0, filter = 0x1, startpos;
-		while(filter != 0x10) {
-			if(positions & filter) count++;
-			filter <<= 1;
-		}
-		if(count == 4) startpos = 10;
-		else if(count == 3) startpos = 82;
-		else startpos = 155;
+		mainGame->gMutex.lock();
 		if(positions & 0x1) {
-			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSAU, code));
-			mainGame->btnPSAU->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnImagePending[mainGame->btnPSAU] = std::make_pair((int)code, false);
 			mainGame->btnPSAU->setVisible(true);
-			startpos += 145;
 		} else mainGame->btnPSAU->setVisible(false);
 		if(positions & 0x2) {
-			mainGame->btnPSAD->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSAD->setVisible(true);
-			startpos += 145;
 		} else mainGame->btnPSAD->setVisible(false);
 		if(positions & 0x4) {
-			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSDU, code));
-			mainGame->btnPSDU->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnImagePending[mainGame->btnPSDU] = std::make_pair((int)code, true);
 			mainGame->btnPSDU->setVisible(true);
-			startpos += 145;
 		} else mainGame->btnPSDU->setVisible(false);
 		if(positions & 0x8) {
-			mainGame->btnPSDD->setRelativePosition(irr::core::rect<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSDD->setVisible(true);
-			startpos += 145;
 		} else mainGame->btnPSDD->setVisible(false);
-		mainGame->gMutex.lock();
+		mainGame->ResizePosSelectButtons();
 		mainGame->PopupElement(mainGame->wPosSelect);
 		mainGame->gMutex.unlock();
 		return false;
@@ -2065,7 +2051,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
 		mainGame->dField.select_hint = select_hint;
 		select_hint = 0;
-		return mainGame->dField.ShowSelectSum(mainGame->dField.select_panalmode);
+		mainGame->gMutex.lock();
+		bool result = mainGame->dField.ShowSelectSum(mainGame->dField.select_panalmode);
+		mainGame->gMutex.unlock();
+		return result;
 	}
 	case MSG_SORT_CARD: {
 		/*int player = */BufferIO::Read<uint8_t>(pbuf);
@@ -2087,10 +2076,12 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			mainGame->dField.selectable_cards.push_back(pcard);
 			mainGame->dField.sort_list.push_back(0);
 		}
+		mainGame->gMutex.lock();
 		mainGame->wCardSelect->setText(dataManager.GetSysString(205));
 		mainGame->dField.select_min = 0;
 		mainGame->dField.select_max = count;
 		mainGame->dField.ShowSelectCard();
+		mainGame->gMutex.unlock();
 		return false;
 	}
 	case MSG_CONFIRM_DECKTOP: {
@@ -2261,7 +2252,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			std::sort(panel_confirm.begin(), panel_confirm.end(), ClientCard::client_card_sort);
 			mainGame->gMutex.lock();
 			mainGame->dField.selectable_cards = panel_confirm;
-			myswprintf(textBuffer, dataManager.GetSysString(208), panel_confirm.size());
+			myswprintf(textBuffer, dataManager.GetSysString(208), static_cast<int>(panel_confirm.size()));
 			mainGame->wCardSelect->setText(textBuffer);
 			mainGame->dField.ShowSelectCard(true);
 			mainGame->gMutex.unlock();

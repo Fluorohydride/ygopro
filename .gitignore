@@ -20,8 +20,6 @@
 /ygopro
 /ygopro.exe
 /ygopro.app
-/ikpMP3.dll
-/irrKlang.dll
 
 /.vscode/
 /bin/
@@ -30,8 +28,7 @@
 /event
 /freetype
 /irrlicht
-/irrklang
-/ikpmp3
+/jpeg
 /lua
 /miniaudio
 /sqlite3
