@@ -2,21 +2,14 @@
 #define NETSERVER_H
 
 #include <unordered_map>
-#include "config.h"
+#include "bufferio.h"
 #include "network.h"
 
 namespace ygo {
 
 class NetServer {
 private:
-	static std::unordered_map<bufferevent*, DuelPlayer> users;
-	static unsigned short server_port;
-	static event_base* net_evbase;
-	static event* broadcast_ev;
-	static evconnlistener* listener;
-	static DuelMode* duel_mode;
 	static unsigned char net_server_write[SIZE_NETWORK_BUFFER];
-	static unsigned char net_server_read[SIZE_NETWORK_BUFFER];
 	static size_t last_sent;
 
 public:
