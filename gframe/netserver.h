@@ -1,7 +1,6 @@
 #ifndef NETSERVER_H
 #define NETSERVER_H
 
-#include <unordered_map>
 #include "bufferio.h"
 #include "network.h"
 
