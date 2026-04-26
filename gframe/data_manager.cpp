@@ -21,6 +21,8 @@ static const char SELECT_STMT_V2[] = "SELECT datas.id, datas.ot, datas.alias, da
 " texts.str9, texts.str10, texts.str11, texts.str12, texts.str13, texts.str14, texts.str15, texts.str16 FROM datas INNER JOIN texts ON datas.id = texts.id";
 static constexpr int DATAS_COUNT_V2 = 16;
 
+static const char SELECT_SCHEMA_VERSION[] = "SELECT version FROM schema_version LIMIT 1;";
+
 static constexpr int CARD_ARTWORK_VERSIONS_OFFSET = 20;
 static inline bool is_alternative(uint32_t code, uint32_t alias) {
 	return alias && (alias < code + CARD_ARTWORK_VERSIONS_OFFSET) && (code < alias + CARD_ARTWORK_VERSIONS_OFFSET);
@@ -34,11 +36,10 @@ DataManager::DataManager() : _datas(32768), _strings(32768) {
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt = nullptr;
-	int version = 2;
 	int texts_offset = DATAS_COUNT_V2;
 	const char* select = SELECT_STMT_V2;
-	if (sqlite3_table_column_metadata(pDB, nullptr, "datas", "rule_code", nullptr, nullptr, nullptr, nullptr, nullptr) != SQLITE_OK) {
-		version = 1;
+	int version = GetSchemaVersion(pDB);
+	if (version < 2) {
 		texts_offset = DATAS_COUNT;
 		select = SELECT_STMT;
 	}
@@ -245,6 +246,15 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 		errmsg[0] = '\0';
 	sqlite3_finalize(pStmt);
 	return false;
+}
+int DataManager::GetSchemaVersion(sqlite3* pDB) const {
+	sqlite3_stmt* pStmt = nullptr;
+	int version = 1;
+	if (sqlite3_prepare_v2(pDB, SELECT_SCHEMA_VERSION, -1, &pStmt, nullptr) == SQLITE_OK && sqlite3_step(pStmt) == SQLITE_ROW) {
+		version = sqlite3_column_int(pStmt, 0);
+	}
+	sqlite3_finalize(pStmt);
+	return version;
 }
 code_pointer DataManager::GetCodePointer(uint32_t code) const {
 	return _datas.find(code);
