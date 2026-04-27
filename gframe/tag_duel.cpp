@@ -267,10 +267,8 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, unsigned int len)
 		valid = false;
 	else if (sidec > SIDEC_MAX)
 		valid = false;
-	else if (len < (2 + mainc + sidec) * sizeof(int32_t))
+	else if (len < (2 + mainc + sidec) * sizeof(uint32_t))
 		valid = false;
-	uint32_t deckbuf[MAINC_MAX + SIDEC_MAX];
-	std::memcpy(deckbuf, pdata, (mainc + sidec) * sizeof(uint32_t));
 	if (!valid) {
 		STOC_ErrorMsg scem;
 		scem.msg = ERRMSG_DECKERROR;
@@ -278,6 +276,8 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, unsigned int len)
 		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 		return;
 	}
+	uint32_t deckbuf[MAINC_MAX + SIDEC_MAX];
+	std::memcpy(deckbuf, pdata, (mainc + sidec) * sizeof(uint32_t));
 	deck_error[dp->type] = DeckManager::LoadDeck(pdeck[dp->type], deckbuf, mainc, sidec);
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
