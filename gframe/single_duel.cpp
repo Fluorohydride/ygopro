@@ -278,6 +278,8 @@ void SingleDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 void SingleDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {
 	if(dp->type > 1 || ready[dp->type])
 		return;
+	if (len < sizeof(uint32_t) * 2)
+		return;
 	bool valid = true;
 	uint32_t mainc = BufferIO::Read<uint32_t>(pdata);
 	uint32_t sidec = BufferIO::Read<uint32_t>(pdata);
