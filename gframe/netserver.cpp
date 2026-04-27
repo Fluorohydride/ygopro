@@ -2,7 +2,6 @@
 #include "netserver.h"
 #include "single_duel.h"
 #include "tag_duel.h"
-#include "deck_manager.h"
 #include <thread>
 
 namespace ygo {
@@ -217,9 +216,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, size_t len
 	case CTOS_UPDATE_DECK: {
 		if(!dp->game)
 			return;
-		if (len < 1 + sizeof(int32_t) + sizeof(int32_t))
-			return;
-		if (len > 1 + sizeof(CTOS_DeckData))
+		if (len < 1 + sizeof(int32_t) * 2)
 			return;
 		duel_mode->UpdateDeck(dp, pdata, len - 1);
 		break;

@@ -257,20 +257,20 @@ void TagDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 		return;
 	LeaveGame(players[pos]);
 }
-void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
+void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {
 	if(dp->type > 3 || ready[dp->type])
 		return;
-	if (len < 8 || len > sizeof(CTOS_DeckData))
-		return;
 	bool valid = true;
-	CTOS_DeckData deckbuf;
-	std::memcpy(&deckbuf, pdata, len);
-	if (deckbuf.mainc < 0 || deckbuf.mainc > MAINC_MAX)
+	uint32_t mainc = BufferIO::Read<uint32_t>(pdata);
+	uint32_t sidec = BufferIO::Read<uint32_t>(pdata);
+	if (mainc > MAINC_MAX)
 		valid = false;
-	else if (deckbuf.sidec < 0 || deckbuf.sidec > SIDEC_MAX)
+	else if (sidec > SIDEC_MAX)
 		valid = false;
-	else if (len < (2 + deckbuf.mainc + deckbuf.sidec) * (int)sizeof(int32_t))
+	else if (len < (2 + mainc + sidec) * sizeof(int32_t))
 		valid = false;
+	uint32_t deckbuf[MAINC_MAX + SIDEC_MAX];
+	std::memcpy(deckbuf, pdata, (mainc + sidec) * sizeof(uint32_t));
 	if (!valid) {
 		STOC_ErrorMsg scem;
 		scem.msg = ERRMSG_DECKERROR;
@@ -278,7 +278,7 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 		return;
 	}
-	deck_error[dp->type] = DeckManager::LoadDeck(pdeck[dp->type], deckbuf.list, deckbuf.mainc, deckbuf.sidec);
+	deck_error[dp->type] = DeckManager::LoadDeck(pdeck[dp->type], deckbuf, mainc, sidec);
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)

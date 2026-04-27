@@ -19,7 +19,7 @@ public:
 	void ToObserver(DuelPlayer* dp) override;
 	void PlayerReady(DuelPlayer* dp, bool is_ready) override;
 	void PlayerKick(DuelPlayer* dp, unsigned char pos) override;
-	void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) override;
+	void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, unsigned int len) override;
 	void StartDuel(DuelPlayer* dp) override;
 	void HandResult(DuelPlayer* dp, unsigned char res) override;
 	void TPResult(DuelPlayer* dp, unsigned char tp) override;
