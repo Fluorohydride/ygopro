@@ -4,6 +4,7 @@
 #include "tag_duel.h"
 #include "deck_manager.h"
 #include <thread>
+#include <unordered_map>
 
 namespace ygo {
 
