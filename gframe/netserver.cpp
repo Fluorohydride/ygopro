@@ -124,7 +124,7 @@ void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {
 */
 void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
-	int len = evbuffer_get_length(input);
+	size_t len = evbuffer_get_length(input);
 	if (len < 2)
 		return;
 	uint16_t packet_len = 0;
@@ -134,7 +134,7 @@ void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 			break;
 		int read_len = evbuffer_remove(input, net_server_read, packet_len + 2);
 		if (read_len > 2)
-			HandleCTOSPacket(&users[bev], &net_server_read[2], read_len - 2);
+			HandleCTOSPacket(&users[bev], &net_server_read[2], packet_len);
 		len -= packet_len + 2;
 	}
 }
@@ -182,7 +182,7 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 		users.erase(bit);
 	}
 }
-void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
+void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, size_t len) {
 	auto pdata = data;
 	unsigned char pktType = BufferIO::Read<uint8_t>(pdata);
 	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
@@ -191,7 +191,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	case CTOS_RESPONSE: {
 		if(!dp->game || !duel_mode->pduel)
 			return;
-		if (len < 1 + (int)sizeof(unsigned char))
+		if (len < 1 + sizeof(unsigned char))
 			return;
 		duel_mode->GetResponse(dp, pdata, len - 1);
 		break;
@@ -217,9 +217,9 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	case CTOS_UPDATE_DECK: {
 		if(!dp->game)
 			return;
-		if (len < 1 + (int)sizeof(int32_t) + (int)sizeof(int32_t))
+		if (len < 1 + sizeof(int32_t) + sizeof(int32_t))
 			return;
-		if (len > 1 + (int)sizeof(CTOS_DeckData))
+		if (len > 1 + sizeof(CTOS_DeckData))
 			return;
 		duel_mode->UpdateDeck(dp, pdata, len - 1);
 		break;
@@ -227,7 +227,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	case CTOS_HAND_RESULT: {
 		if(!dp->game)
 			return;
-		if (len < 1 + (int)sizeof(CTOS_HandResult))
+		if (len < 1 + sizeof(CTOS_HandResult))
 			return;
 		CTOS_HandResult packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -238,7 +238,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	case CTOS_TP_RESULT: {
 		if(!dp->game)
 			return;
-		if (len < 1 + (int)sizeof(CTOS_TPResult))
+		if (len < 1 + sizeof(CTOS_TPResult))
 			return;
 		CTOS_TPResult packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -247,7 +247,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 		break;
 	}
 	case CTOS_PLAYER_INFO: {
-		if (len < 1 + (int)sizeof(CTOS_PlayerInfo))
+		if (len < 1 + sizeof(CTOS_PlayerInfo))
 			return;
 		CTOS_PlayerInfo packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -268,7 +268,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	case CTOS_CREATE_GAME: {
 		if(dp->game || duel_mode)
 			return;
-		if (len < 1 + (int)sizeof(CTOS_CreateGame))
+		if (len < 1 + sizeof(CTOS_CreateGame))
 			return;
 		CTOS_CreateGame packet;
 		std::memcpy(&packet, pdata, sizeof packet);
@@ -316,7 +316,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	case CTOS_JOIN_GAME: {
 		if (!duel_mode)
 			return;
-		if (len < 1 + (int)sizeof(CTOS_JoinGame))
+		if (len < 1 + sizeof(CTOS_JoinGame))
 			return;
 		duel_mode->JoinGame(dp, pdata, false);
 		break;
@@ -355,7 +355,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, int len) {
 	case CTOS_HS_KICK: {
 		if (!duel_mode || duel_mode->pduel)
 			return;
-		if (len < 1 + (int)sizeof(CTOS_Kick))
+		if (len < 1 + sizeof(CTOS_Kick))
 			return;
 		CTOS_Kick packet;
 		std::memcpy(&packet, pdata, sizeof packet);
