@@ -370,7 +370,7 @@ workspace "YGOPro"
         include "sqlite3"
     end
     if BUILD_LZMA then
-        include "lzma"
+        include "lzma/."
     end
     if USE_AUDIO then
         if AUDIO_LIB=="miniaudio" then
