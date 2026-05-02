@@ -412,7 +412,7 @@ jobs:
       with:
         msystem: UCRT64
         update: true
-        install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make
+        install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make nasm
 
     - name: Backport libevent fix for MinGW build
       if: matrix.mingw == true
@@ -428,24 +428,30 @@ jobs:
       if: matrix.mingw == true
       shell: msys2 {0}
       run: |
-        ./premake5.exe gmake --audio-lib=${{ matrix.audiolib }}
+        ./premake5.exe gmake
+
+    - name: Fix irrlicht.make for MinGW
+      if: matrix.mingw == true
+      shell: python
+      run: |
+        import sys
+        import re
+        from pathlib import Path
+        makefile = Path('build/irrlicht.make')
+        text = makefile.read_text()
+        pattern = r'^LINKCMD\s*=\s*\$\(AR\)\s+-rcs\s+"\$@"\s+\$\(OBJECTS\)'
+        replacement = (
+            'LINKCMD = $(file >objects.rsp,$(OBJECTS)) \\\n'
+            '\t$(AR) -rcs "$@" @objects.rsp'
+        )
+        new_text, n = re.subn(pattern, replacement, text, flags=re.MULTILINE)
+        makefile.write_text(new_text)
 
     - name: Make
       if: matrix.mingw == true
-      continue-on-error: true
       shell: msys2 {0}
       run: |
         cd build
-        mingw32-make -j 4 config=release
-        cd ..
-
-    - name: Workaround fix for MinGW build
-      if: matrix.mingw == true
-      shell: msys2 {0}
-      run: |
-        cd build
-        sed -i '/OBJECTS += $(OBJDIR)\/.*\.o/d' irrlicht.make
-        sed -i '/^# Rules/i\OBJECTS += $(OBJDIR)/*.o' irrlicht.make
         mingw32-make -j 4 config=release
         cd ..
 

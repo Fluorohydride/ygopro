@@ -347,6 +347,7 @@ workspace "YGOPro"
         architecture "AARCH64"
 
     filter { "system:windows", "action:gmake" }
+        architecture "x86_64"
         defines { "UNICODE", "_UNICODE" }
         buildoptions { "-municode" }
 
@@ -399,10 +400,10 @@ workspace "YGOPro"
     filter { "system:windows", "action:vs*", "platforms:x64", "configurations:Debug" }
         targetdir "bin/debug/x64"
 
-    filter { "system:windows", "platforms:ARM64", "configurations:Release" }
+    filter { "system:windows", "action:vs*", "platforms:ARM64", "configurations:Release" }
         targetdir "bin/release/arm64"
 
-    filter { "system:windows", "platforms:ARM64", "configurations:Debug" }
+    filter { "system:windows", "action:vs*", "platforms:ARM64", "configurations:Debug" }
         targetdir "bin/debug/arm64"
 
     filter { "configurations:Release", "action:vs*" }
