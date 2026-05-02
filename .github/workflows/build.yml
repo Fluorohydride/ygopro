@@ -320,6 +320,7 @@ jobs:
         path: .
 
     - name: Download NASM
+      if: matrix.mingw != true
       id: nasm
       uses: mercury233/action-cache-download-file@v1.2.0
       with:
@@ -328,6 +329,7 @@ jobs:
         sha256: e0ba5157007abc7b1a65118a96657a961ddf55f7e3f632ee035366dfce039ca4
 
     - name: Install NASM
+      if: matrix.mingw != true
       shell: pwsh
       run: |
         New-Item -ItemType Directory -Path nasm | Out-Null
@@ -430,7 +432,7 @@ jobs:
       run: |
         ./premake5.exe gmake
 
-    - name: Fix irrlicht.make for MinGW
+    - name: Fix irrlicht.make for MinGW build
       if: matrix.mingw == true
       shell: python
       run: |
