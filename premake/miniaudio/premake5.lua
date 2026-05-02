@@ -1,7 +1,11 @@
 project "miniaudio"
     kind "StaticLib"
     files { "miniaudio.c", "miniaudio.h" }
-    defines { "MA_NO_ENCODING", "MA_NO_GENERATION", "MA_NO_NEON" }
+    defines { "MA_NO_ENCODING", "MA_NO_GENERATION" }
+
+    if USE_SIMD == "none" then
+        defines { "MA_NO_SSE2", "MA_NO_AVX2", "MA_NO_NEON" }
+    end
 
     if MINIAUDIO_SUPPORT_OPUS_VORBIS then
         files { "extras/decoders/libopus/*", "extras/decoders/libvorbis/*" }
@@ -117,22 +121,45 @@ project "miniaudio"
                 "HAVE_LRINTF",
                 "OP_HAVE_LRINTF",
             }
-            if not TARGET_MAC_ARM then
-                files {
-                    "external/opus/celt/x86/pitch_avx.c",
-                    "external/opus/celt/x86/pitch_sse.c",
-                    "external/opus/celt/x86/vq_sse2.c",
-                    "external/opus/celt/x86/x86_celt_map.c",
-                    "external/opus/celt/x86/x86cpu.c",
-                }
-                defines {
-                    "OPUS_HAVE_RTCD", "CPU_INFO_BY_ASM",
-                    "OPUS_X86_PRESUME_SSE", "OPUS_X86_PRESUME_SSE2",
-                    "OPUS_X86_MAY_HAVE_SSE", "OPUS_X86_MAY_HAVE_SSE4_1", "OPUS_X86_MAY_HAVE_AVX2",
-                }
-                filter "system:linux"
-                    buildoptions { "-mavx", "-mfma" }
-                filter {}
+            if USE_SIMD ~= "none" then
+                filter "architecture:x86 or x86_64"
+                    files {
+                        "external/opus/celt/x86/x86cpu.c",
+                        "external/opus/celt/x86/x86cpu.h",
+                        "external/opus/celt/x86/pitch_avx.c",
+                        "external/opus/celt/x86/pitch_sse.c",
+                        "external/opus/celt/x86/vq_sse2.c",
+                        "external/opus/celt/x86/x86_celt_map.c",
+                    }
+                    defines {
+                        "OPUS_HAVE_RTCD", "CPU_INFO_BY_ASM",
+                        "OPUS_X86_PRESUME_SSE", "OPUS_X86_PRESUME_SSE2",
+                        "OPUS_X86_MAY_HAVE_SSE", "OPUS_X86_MAY_HAVE_SSE4_1",
+                        "OPUS_X86_MAY_HAVE_AVX2",
+                    }
+                    if USE_SIMD == "best" then
+                        defines {
+                            "OPUS_X86_PRESUME_SSE4_1", "OPUS_X86_PRESUME_AVX2"
+                        }
+                    end
+                filter "architecture:AARCH64"
+                    files {
+                        "external/opus/celt/arm/armcpu.c",
+                        "external/opus/celt/arm/armcpu.h",
+                        "external/opus/celt/arm/arm_celt_map.c",
+                        "external/opus/celt/arm/celt_neon_intr.c",
+                        "external/opus/celt/arm/pitch_neon_intr.c",
+                        "external/opus/silk/arm/LPC_inv_pred_gain_neon_intr.c",
+                    }
+                    defines {
+                        "OPUS_HAVE_RTCD",
+                        "OPUS_ARM_PRESUME_EDSP", "OPUS_ARM_PRESUME_MEDIA",
+                        "OPUS_ARM_PRESUME_DOTPROD", "OPUS_ARM_PRESUME_NEON",
+                        "OPUS_ARM_MAY_HAVE_NEON_INTR", "OPUS_ARM_PRESUME_NEON_INTR", "OPUS_ARM_PRESUME_AARCH64_NEON_INTR",
+                    }
+                    includedirs {
+                        "external/opus",
+                    }
             end
         else
             includedirs { OPUS_INCLUDE_DIR, OPUSFILE_INCLUDE_DIR, VORBIS_INCLUDE_DIR, OGG_INCLUDE_DIR }

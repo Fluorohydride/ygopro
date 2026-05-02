@@ -91,10 +91,8 @@
 #define C_ARITH_CODING_SUPPORTED  1
 #define D_ARITH_CODING_SUPPORTED  1
 
-/* Use accelerated SIMD routines when available.
-  We enable this only for Windows x86/x64, where the premake build also
-  assembles the NASM SIMD objects. */
-#if defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__))
+/* Use accelerated SIMD routines when available. */
+#ifndef YGOPRO_NO_SIMD
 #define WITH_SIMD  1
 #endif
 

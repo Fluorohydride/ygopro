@@ -1,9 +1,13 @@
 -- Supported systems: Windows, Linux, MacOS
 
+-- Windows (Visual Studio) build supports x86, x86_64, and ARM64.
+-- Linux build supports x86_64 and ARM64.
+-- MacOS build supports x86_64 and ARM64, and it supports cross-compilation.
+
 -- Global settings
 
 -- Default: Build Lua, Irrlicht, miniaudio from source on all systems.
---          Don't build event, freetype, sqlite, jpeg, png, opus, vorbis on Linux or MacOS, use package manager,
+--          Don't build event, freetype, sqlite, jpeg, png, zlib, opus, vorbis on Linux or MacOS, use package manager,
 --          but build them on Windows, due to the lack of package manager on Windows.
 
 BUILD_LUA = true
@@ -16,11 +20,15 @@ BUILD_FREETYPE = os.istarget("windows")
 BUILD_SQLITE = os.istarget("windows")
 
 BUILD_IRRLICHT = true -- modified Irrlicht is required, can't use the official one
-BUILD_PNG_IRRLICHT = os.istarget("windows") -- build the bundled libpng from Irrlicht
 USE_DXSDK = true
 
 BUILD_JPEG = os.istarget("windows") -- libjpeg-turbo is required, can't use the bundled IJG jpeglib from Irrlicht
 JPEG_LIB_NAME = "jpeg" -- use the libjpeg API of libjpeg-turbo, the lib name should always be "jpeg", just in case
+
+BUILD_PNG = os.istarget("windows")
+
+BUILD_ZLIB = os.istarget("windows")
+ZLIB_LIB_NAME = "z" -- the lib name should always be "z", just in case
 
 USE_AUDIO = true
 AUDIO_LIB = "miniaudio" -- only miniaudio is supported for now
@@ -28,11 +36,25 @@ AUDIO_LIB = "miniaudio" -- only miniaudio is supported for now
 MINIAUDIO_SUPPORT_OPUS_VORBIS = true
 MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
 
+-- Available: none, sse2, avx2, neon, best
+-- "best" means avx2 on x86 and neon on ARM
+USE_SIMD = "best"
+
+-- Variable indicating whether we are building for Apple Silicon, will be detected automatically if not specified.
+local MAC_ARM = false
+local MAC_INTEL = false
+
+-- os.hostarch() actually returns the architecture of Premake5, and the official Windows build of Premake5 is 32-bit,
+-- so we can only distinguish between AARCH64 and x86, and must use the ARM build of Premake5 on ARM platforms.
+PREMAKE_ARCH = os.hostarch()
+
 -- Default include dirs, those values are ONLY used in static builds, WILL BE IGNORED if set corresponding BUILD_* to false
 LUA_INCLUDE_DIR = path.getabsolute("./lua/src")
 EVENT_INCLUDE_DIR = path.getabsolute("./event/include")
 IRRLICHT_INCLUDE_DIR = path.getabsolute("./irrlicht/include")
 JPEG_INCLUDE_DIR = path.getabsolute("./jpeg/src")
+PNG_INCLUDE_DIR = path.getabsolute("./png")
+ZLIB_INCLUDE_DIR = path.getabsolute("./zlib")
 FREETYPE_CUSTOM_INCLUDE_DIR = path.getabsolute("./freetype/custom")
 FREETYPE_INCLUDE_DIR = path.getabsolute("./freetype/include")
 SQLITE_INCLUDE_DIR = path.getabsolute("./sqlite3")
@@ -67,16 +89,24 @@ newoption { trigger = "build-irrlicht", category = "YGOPro - irrlicht", descript
 newoption { trigger = "no-build-irrlicht", category = "YGOPro - irrlicht", description = "" }
 newoption { trigger = "irrlicht-include-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
 newoption { trigger = "irrlicht-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
-newoption { trigger = "build-png-irrlicht", category = "YGOPro - irrlicht", description = "" }
-newoption { trigger = "no-build-png-irrlicht", category = "YGOPro - irrlicht", description = "" }
-newoption { trigger = "png-include-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
-newoption { trigger = "png-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
 newoption { trigger = "no-dxsdk", category = "YGOPro - irrlicht", description = "" }
 
 newoption { trigger = "build-jpeg", category = "YGOPro - jpeg", description = "" }
 newoption { trigger = "no-build-jpeg", category = "YGOPro - jpeg", description = "" }
 newoption { trigger = "jpeg-include-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
 newoption { trigger = "jpeg-lib-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
+newoption { trigger = "jpeg-lib-name", category = "YGOPro - jpeg", description = "", value = "NAME", default = JPEG_LIB_NAME }
+
+newoption { trigger = "build-png", category = "YGOPro - png", description = "" }
+newoption { trigger = "no-build-png", category = "YGOPro - png", description = "" }
+newoption { trigger = "png-include-dir", category = "YGOPro - png", description = "", value = "PATH" }
+newoption { trigger = "png-lib-dir", category = "YGOPro - png", description = "", value = "PATH" }
+
+newoption { trigger = "build-zlib", category = "YGOPro - zlib", description = "" }
+newoption { trigger = "no-build-zlib", category = "YGOPro - zlib", description = "" }
+newoption { trigger = "zlib-include-dir", category = "YGOPro - zlib", description = "", value = "PATH" }
+newoption { trigger = "zlib-lib-dir", category = "YGOPro - zlib", description = "", value = "PATH" }
+newoption { trigger = "zlib-lib-name", category = "YGOPro - zlib", description = "", value = "NAME", default = ZLIB_LIB_NAME }
 
 newoption { trigger = "no-audio", category = "YGOPro", description = "" }
 newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "", default = AUDIO_LIB }
@@ -94,10 +124,12 @@ newoption { trigger = "vorbis-lib-dir", category = "YGOPro - miniaudio", descrip
 newoption { trigger = "ogg-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 newoption { trigger = "ogg-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
 
-newoption { trigger = "mac-arm", category = "YGOPro", description = "Compile for Apple Silicon Mac" }
-newoption { trigger = "mac-intel", category = "YGOPro", description = "Compile for Intel Mac" }
+newoption { trigger = "mac-arm", category = "YGOPro", description = "Cross Compile for Apple Silicon Mac" }
+newoption { trigger = "mac-intel", category = "YGOPro", description = "Cross Compile for Intel Mac" }
 
 newoption { trigger = "use-openmp", category = "YGOPro", description = "Enable OpenMP support (edge case)" }
+
+newoption { trigger = "use-simd", category = "YGOPro", description = "", value = "none, sse2, avx2, neon, best", default = "best" }
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
@@ -163,15 +195,6 @@ if not BUILD_IRRLICHT then
     IRRLICHT_INCLUDE_DIR = GetParam("irrlicht-include-dir") or os.findheader("irrlicht.h")
     IRRLICHT_LIB_DIR = GetParam("irrlicht-lib-dir") or os.findlib("irrlicht")
 end
-if GetParam("build-png-irrlicht") then
-    BUILD_PNG_IRRLICHT = true
-elseif GetParam("no-build-png-irrlicht") then
-    BUILD_PNG_IRRLICHT = false
-end
-if not BUILD_PNG_IRRLICHT then
-    PNG_INCLUDE_DIR = GetParam("png-include-dir") or os.findheader("png.h")
-    PNG_LIB_DIR = GetParam("png-lib-dir") or os.findlib("png")
-end
 
 if GetParam("build-jpeg") then
     BUILD_JPEG = true
@@ -179,8 +202,30 @@ elseif GetParam("no-build-jpeg") then
     BUILD_JPEG = false
 end
 if not BUILD_JPEG then
+    JPEG_LIB_NAME = GetParam("jpeg-lib-name") or JPEG_LIB_NAME
     JPEG_INCLUDE_DIR = GetParam("jpeg-include-dir") or os.findheader("jpeglib.h")
     JPEG_LIB_DIR = GetParam("jpeg-lib-dir") or os.findlib(JPEG_LIB_NAME)
+end
+
+if GetParam("build-png") then
+    BUILD_PNG = true
+elseif GetParam("no-build-png") then
+    BUILD_PNG = false
+end
+if not BUILD_PNG then
+    PNG_INCLUDE_DIR = GetParam("png-include-dir") or os.findheader("png.h")
+    PNG_LIB_DIR = GetParam("png-lib-dir") or os.findlib("png")
+end
+
+if GetParam("build-zlib") then
+    BUILD_ZLIB = true
+elseif GetParam("no-build-zlib") then
+    BUILD_ZLIB = false
+end
+if not BUILD_ZLIB then
+    ZLIB_LIB_NAME = GetParam("zlib-lib-name") or ZLIB_LIB_NAME
+    ZLIB_INCLUDE_DIR = GetParam("zlib-include-dir") or os.findheader("zlib.h")
+    ZLIB_LIB_DIR = GetParam("zlib-lib-dir") or os.findlib(ZLIB_LIB_NAME)
 end
 
 if GetParam("no-dxsdk") then
@@ -234,16 +279,25 @@ if USE_AUDIO then
     end
 end
 
+if GetParam("use-simd") then
+    USE_SIMD = GetParam("use-simd")
+end
+
+if not MAC_ARM and not MAC_INTEL and table.indexof({ "x86", "x86_64", "ARM64" }, PREMAKE_ARCH) == nil then
+    print("Warning: Detected architecture " .. PREMAKE_ARCH .. " seems not supported, trying to build anyway, SIMD will be disabled.")
+    USE_SIMD = "none"
+end
+
+if USE_SIMD == "avx2" or USE_SIMD == "neon" then
+    USE_SIMD = "best"
+end
+
 if os.istarget("macosx") then
     if GetParam("mac-arm") then
         MAC_ARM = true
     end
     if GetParam("mac-intel") then
         MAC_INTEL = true
-    end
-    if MAC_ARM or (not MAC_INTEL and os.hostarch() == "ARM64") then
-        -- building on ARM CPU will target ARM automatically
-        TARGET_MAC_ARM = true
     end
 end
 
@@ -265,23 +319,59 @@ workspace "YGOPro"
         systemversion "latest"
         startproject "YGOPro"
         defines { "WINVER=0x0601" } -- WIN7
-        platforms { "Win32", "x64" }
 
-    filter { "system:windows", "platforms:Win32" }
+    filter { "system:windows", "action:vs*" }
+        platforms { "Win32", "x64", "ARM64" }
+        defaultplatform "x64"
+
+    filter { "system:windows", "action:vs*", "platforms:Win32" }
         architecture "x86"
+        if USE_SIMD == "none" then
+            vectorextensions "IA32"
+        end
+        if USE_SIMD == "sse2" then
+            vectorextensions "SSE2"
+        end
+        if USE_SIMD == "best" then
+            vectorextensions "AVX2"
+        end
 
-    filter { "system:windows", "platforms:x64" }
+    filter { "system:windows", "action:vs*", "platforms:x64" }
         architecture "x86_64"
+        -- x86_64 must have SSE2, so we shouldn't check USE_SIMD for SSE2
+        if USE_SIMD == "best" then
+            vectorextensions "AVX2"
+        end
+
+    filter { "system:windows", "action:vs*", "platforms:ARM64" }
+        architecture "AARCH64"
 
     filter "system:macosx"
+        systemversion "11"
+        if MAC_ARM and MAC_INTEL then
+            print("Warning: Universal binary is no longer supported, please choose either --mac-arm or --mac-intel, and combine the binaries with lipo manually.")
+            MAC_ARM = false
+            MAC_INTEL = false
+        end
+        if not MAC_ARM and not MAC_INTEL then
+            if PREMAKE_ARCH == "ARM64" then
+                MAC_ARM = true
+            else
+                MAC_INTEL = true
+            end
+        end
         if MAC_ARM then
-            buildoptions { "-arch arm64" }
+            architecture "AARCH64"
         end
         if MAC_INTEL then
-            buildoptions { "-arch x86_64", "-mavx", "-mfma" }
+            architecture "x86_64"
         end
-        if MAC_ARM and MAC_INTEL then
-            architecture "universal"
+
+    filter "system:linux"
+        if PREMAKE_ARCH == "ARM64" then
+            architecture "AARCH64"
+        else
+            architecture "x86_64"
         end
 
     filter "configurations:Release"
@@ -305,6 +395,12 @@ workspace "YGOPro"
     filter { "system:windows", "platforms:x64", "configurations:Debug" }
         targetdir "bin/debug/x64"
 
+    filter { "system:windows", "platforms:ARM64", "configurations:Release" }
+        targetdir "bin/release/arm64"
+
+    filter { "system:windows", "platforms:ARM64", "configurations:Debug" }
+        targetdir "bin/debug/arm64"
+
     filter { "configurations:Release", "action:vs*" }
         linktimeoptimization "On"
         staticruntime "On"
@@ -319,14 +415,16 @@ workspace "YGOPro"
     filter "action:vs*"
         cdialect "C11"
         conformancemode "On" 
-        vectorextensions "SSE2"
         buildoptions { "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
 
-    filter "not action:vs*"
+    filter "action:gmake"
         buildoptions { "-fno-strict-aliasing" }
-        if not MAC_ARM and not MAC_INTEL then
-            buildoptions "-march=native"
+
+    filter { "action:gmake", "architecture:x86_64" }
+        if USE_SIMD == "best" then
+            vectorextensions "AVX2"
+            buildoptions { "-mfma" }
         end
 
     filter {}
@@ -347,6 +445,12 @@ workspace "YGOPro"
     end
     if BUILD_JPEG then
         include "jpeg"
+    end
+    if BUILD_PNG then
+        include "png"
+    end
+    if BUILD_ZLIB then
+        include "zlib"
     end
     if BUILD_SQLITE then
         include "sqlite3"
