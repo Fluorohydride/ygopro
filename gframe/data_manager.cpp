@@ -183,20 +183,20 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 	if(linebuf[0] != '!')
 		return;
 	char strbuf[TEXT_LINE_SIZE]{};
-	int value{};
+	uint32_t value{};
 	wchar_t strBuffer[4096]{};
 	if (std::sscanf(linebuf, "!%63s", strbuf) != 1)
 		return;
 	if(!std::strcmp(strbuf, "system")) {
-		if (std::sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf) != 2)
+		if (std::sscanf(&linebuf[7], "%u %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
-		_sysStrings[value] = strBuffer;
+		_sysStrings.emplace(value, strBuffer);
 	} else if(!std::strcmp(strbuf, "victory")) {
 		if (std::sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
-		_victoryStrings[value] = strBuffer;
+		_victoryStrings.emplace(value, strBuffer);
 	} else if(!std::strcmp(strbuf, "counter")) {
 		if (std::sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
@@ -260,7 +260,7 @@ const wchar_t* DataManager::GetText(uint32_t code) const {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetDesc(uint32_t strCode) const {
-	if (strCode < (MIN_CARD_ID << 4))
+	if (strCode <= MAX_STRING_ID)
 		return GetSysString(strCode);
 	unsigned int code = (strCode >> 4) & 0x0fffffff;
 	unsigned int offset = strCode & 0xf;

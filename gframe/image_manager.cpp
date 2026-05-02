@@ -103,7 +103,7 @@ void ImageManager::ResizeTexture() {
 	irr::s32 imgHeightFit = CARD_IMG_HEIGHT * mul;
 	irr::s32 bgWidth = GAME_WINDOW_WIDTH * mainGame->xScale;
 	irr::s32 bgHeight = GAME_WINDOW_HEIGHT * mainGame->yScale;
-	float btnScale = 0.5f * mainGame->yScale;
+	float btnScale = 0.5f * (mainGame->gameConf.resize_select_window ? mainGame->yScale : 1.2f);
 	irr::s32 btnImgWidth = CARD_IMG_WIDTH * btnScale;
 	irr::s32 btnImgHeight = CARD_IMG_HEIGHT * btnScale;
 	const char* coverFiles[2] = { "textures/cover.jpg", "textures/cover2.jpg" };
@@ -433,9 +433,9 @@ irr::video::ITexture* ImageManager::GetTextureButton(int code, bool defense) {
 	auto tit = cache.find(code);
 	if(tit != cache.end())
 		return tit->second;
-	float btnScale = 0.5f * mainGame->yScale;
-	irr::s32 width = (irr::s32)(CARD_IMG_WIDTH * btnScale);
-	irr::s32 height = (irr::s32)(CARD_IMG_HEIGHT * btnScale);
+	float btnScale = 0.5f * (mainGame->gameConf.resize_select_window ? mainGame->yScale : 1.2f);
+	irr::s32 width = CARD_IMG_WIDTH * btnScale;
+	irr::s32 height = CARD_IMG_HEIGHT * btnScale;
 	irr::video::IImage* img = GetImage(code);
 	if(!img) {
 		cache[code] = nullptr;

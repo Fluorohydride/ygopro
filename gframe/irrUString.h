@@ -250,7 +250,7 @@ public:
 		//! Accesses the full character at the iterator's position.
 		const_reference operator*() const {
 			auto size = ref->size_raw();
-			_IRR_DEBUG_BREAK_IF(pos >= size);
+			IRR_DEBUG_BREAK_IF(pos >= size);
 			if(is_utf32) {
 				const uchar32_t* data = reinterpret_cast<const uchar32_t*>(ref->data());
 				auto ch = data[pos];

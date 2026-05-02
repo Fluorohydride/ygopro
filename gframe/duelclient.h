@@ -34,6 +34,7 @@ private:
 	static int match_kill;
 	static event* resp_event;
 	static std::set<std::pair<unsigned int, unsigned short>> remotes;
+	static const std::set<int> select_effectyn_id;
 
 public:
 	static unsigned char selftype;
