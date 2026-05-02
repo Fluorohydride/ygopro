@@ -261,6 +261,7 @@ jobs:
           - windows-x64-no-simd
           - windows-arm64
           - windows-2025
+          - windows-mingw
         include:
           - name: windows-x86-sse2
             os: windows-2022
@@ -290,6 +291,9 @@ jobs:
             os: windows-2025-vs2026
             vs: vs2026
             platform: x64
+          - name: windows-mingw
+            os: windows-2022
+            mingw: true
 
     runs-on: ${{ matrix.os }}
 
@@ -316,6 +320,7 @@ jobs:
         path: .
 
     - name: Download NASM
+      if: matrix.mingw != true
       id: nasm
       uses: mercury233/action-cache-download-file@v1.2.0
       with:
@@ -324,6 +329,7 @@ jobs:
         sha256: e0ba5157007abc7b1a65118a96657a961ddf55f7e3f632ee035366dfce039ca4
 
     - name: Install NASM
+      if: matrix.mingw != true
       shell: pwsh
       run: |
         New-Item -ItemType Directory -Path nasm | Out-Null
@@ -387,23 +393,76 @@ jobs:
         cp -pr resource/* .
 
     - name: Use premake to generate Visual Studio solution
+      if: matrix.mingw != true
       shell: pwsh
       run: |
         .\premake5.exe ${{ matrix.vs }} ${{ matrix.simd && format('--use-simd={0}', matrix.simd) || '' }}
 
     - name: Add msbuild to PATH
+      if: matrix.mingw != true
       uses: microsoft/setup-msbuild@v3
 
     - name: Build solution
+      if: matrix.mingw != true
       shell: pwsh
       run: |
         MSBuild.exe build\YGOPro.${{ matrix.vs == 'vs2026' && 'slnx' || 'sln' }} /m /p:Configuration=Release /p:Platform=${{ matrix.platform }}
+
+    - name: Install MinGW
+      if: matrix.mingw == true
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: UCRT64
+        update: true
+        install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make nasm
+
+    - name: Backport libevent fix for MinGW build
+      if: matrix.mingw == true
+      shell: msys2 {0}
+      run: |
+        # https://github.com/libevent/libevent/pull/1498
+        # https://github.com/mingw-w64/mingw-w64/commit/6cfc1fd2ca2fdbbb8d6570084970bea2ef100d2e
+        cd event
+        sed -i 's/#define _WIN32_WINNT 0x0501/#define _WIN32_WINNT 0x0600/g' evutil.c
+        cd ..
+
+    - name: Use premake to generate make files
+      if: matrix.mingw == true
+      shell: msys2 {0}
+      run: |
+        ./premake5.exe gmake
+
+    - name: Fix irrlicht.make for MinGW build
+      if: matrix.mingw == true
+      shell: python
+      run: |
+        import sys
+        import re
+        from pathlib import Path
+        makefile = Path('build/irrlicht.make')
+        text = makefile.read_text()
+        pattern = r'^LINKCMD\s*=\s*\$\(AR\)\s+-rcs\s+"\$@"\s+\$\(OBJECTS\)'
+        replacement = (
+            'LINKCMD = $(file >objects.rsp,$(OBJECTS)) \\\n'
+            '\t$(AR) -rcs "$@" @objects.rsp'
+        )
+        new_text, n = re.subn(pattern, replacement, text, flags=re.MULTILINE)
+        makefile.write_text(new_text)
+
+    - name: Make
+      if: matrix.mingw == true
+      shell: msys2 {0}
+      run: |
+        cd build
+        mingw32-make -j 4 config=release
+        cd ..
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v6
       with:
         name: YGOPro-${{ matrix.name }}
         path: |
+          bin/release/YGOPro.exe
           bin/release/x86/YGOPro.exe
           bin/release/x64/YGOPro.exe
           bin/release/arm64/YGOPro.exe
