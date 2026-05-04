@@ -1428,11 +1428,13 @@ void SingleDuel::EndDuel() {
 	if(!pduel)
 		return;
 	last_replay.EndRecord();
-	char replaybuf[0x2000], *pbuf = replaybuf;
-	std::memcpy(pbuf, &last_replay.pheader, sizeof last_replay.pheader);
-	pbuf += sizeof last_replay.pheader;
-	std::memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
-	NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replaybuf, sizeof last_replay.pheader + last_replay.comp_size);
+	std::vector<unsigned char> replay_buffer;
+	replay_buffer.resize(sizeof last_replay.pheader + last_replay.comp_size);
+	size_t position = 0;
+	std::memcpy(replay_buffer.data(), &last_replay.pheader, sizeof last_replay.pheader);
+	position += sizeof last_replay.pheader;
+	std::memcpy(&replay_buffer[position], last_replay.comp_data, last_replay.comp_size);
+	NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replay_buffer.data(), replay_buffer.size());
 	NetServer::ReSendToPlayer(players[1]);
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::ReSendToPlayer(*oit);
