@@ -36,7 +36,7 @@ void Replay::WriteData(const void* data, size_t length, bool flush) {
 		return;
 	if (replay_size + length > MAX_REPLAY_SIZE)
 		return;
-	std::memcpy(&replay_data[replay_size], data, length);
+	std::memcpy(replay_data + replay_size, data, length);
 	replay_size += length;
 	std::fwrite(data, length, 1, fp);
 	if(flush)
