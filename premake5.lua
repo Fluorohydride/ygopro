@@ -424,7 +424,7 @@ workspace "YGOPro"
     filter { "action:gmake", "architecture:x86_64" }
         if USE_SIMD == "best" then
             vectorextensions "AVX2"
-            buildoptions { "-mfma" }
+            isaextensions { "FMA" }
         end
 
     filter {}
