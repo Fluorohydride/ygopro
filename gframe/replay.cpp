@@ -186,7 +186,7 @@ bool Replay::ReadData(void* data, size_t length) {
 		return false;
 	}
 	if (length)
-		std::memcpy(data, &replay_data[data_position], length);
+		std::memcpy(data, replay_data + data_position, length);
 	data_position += length;
 	return true;
 }
