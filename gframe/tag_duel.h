@@ -2,6 +2,7 @@
 #define TAG_DUEL_H
 
 #include <set>
+#include <vector>
 #include "network.h"
 #include "deck.h"
 #include "replay.h"
