@@ -4,17 +4,22 @@
 #include "tag_duel.h"
 #include "deck_manager.h"
 #include <thread>
+#include <unordered_map>
 
 namespace ygo {
-std::unordered_map<bufferevent*, DuelPlayer> NetServer::users;
-unsigned short NetServer::server_port = 0;
-event_base* NetServer::net_evbase = 0;
-event* NetServer::broadcast_ev = 0;
-evconnlistener* NetServer::listener = 0;
-DuelMode* NetServer::duel_mode = 0;
-unsigned char NetServer::net_server_write[SIZE_NETWORK_BUFFER];
-unsigned char NetServer::net_server_read[SIZE_NETWORK_BUFFER];
-size_t NetServer::last_sent = 0;
+
+namespace{
+	std::unordered_map<bufferevent*, DuelPlayer> users{};
+	unsigned short server_port{};
+	event_base* net_evbase{};
+	event* broadcast_ev {};
+	evconnlistener* listener{};
+	DuelMode* duel_mode{};
+	unsigned char net_server_read[SIZE_NETWORK_BUFFER]{};
+}
+
+unsigned char NetServer::net_server_write[SIZE_NETWORK_BUFFER]{};
+size_t NetServer::last_sent{};
 
 bool NetServer::StartServer(unsigned short port) {
 	if(net_evbase)
@@ -32,7 +37,7 @@ bool NetServer::StartServer(unsigned short port) {
 	                                   LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, (sockaddr*)&sin, sizeof(sin));
 	if(!listener) {
 		event_base_free(net_evbase);
-		net_evbase = 0;
+		net_evbase = nullptr;
 		return false;
 	}
 	evconnlistener_set_error_cb(listener, ServerAcceptError);
@@ -74,7 +79,7 @@ void NetServer::StopBroadcast() {
 	event_get_assignment(broadcast_ev, 0, &fd, 0, 0, 0);
 	evutil_closesocket(fd);
 	event_free(broadcast_ev);
-	broadcast_ev = 0;
+	broadcast_ev = nullptr;
 }
 void NetServer::StopListen() {
 	evconnlistener_disable(listener);
@@ -156,21 +161,21 @@ int NetServer::ServerThread() {
 	}
 	users.clear();
 	evconnlistener_free(listener);
-	listener = 0;
+	listener = nullptr;
 	if(broadcast_ev) {
 		evutil_socket_t fd;
 		event_get_assignment(broadcast_ev, 0, &fd, 0, 0, 0);
 		evutil_closesocket(fd);
 		event_free(broadcast_ev);
-		broadcast_ev = 0;
+		broadcast_ev = nullptr;
 	}
 	if(duel_mode) {
 		event_free(duel_mode->etimer);
 		delete duel_mode;
 	}
-	duel_mode = 0;
+	duel_mode = nullptr;
 	event_base_free(net_evbase);
-	net_evbase = 0;
+	net_evbase = nullptr;
 	return 0;
 }
 void NetServer::DisconnectPlayer(DuelPlayer* dp) {
