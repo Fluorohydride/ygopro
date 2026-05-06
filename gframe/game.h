@@ -48,24 +48,24 @@ struct Config {
 	bool use_d3d{ false };
 	bool use_image_scale_multi_thread{ false };
 	bool use_image_load_background_thread{ false };
-	unsigned short antialias{ 0 };
+	unsigned short antialias{ 2 };
 	unsigned int enable_log{ 0x3 };
 	unsigned short serverport{ 7911 };
 	unsigned char textfontsize{ 14 };
 	wchar_t lasthost[100]{};
 	wchar_t lastport[10]{};
-	wchar_t nickname[20]{};
-	wchar_t gamename[20]{};
+	wchar_t nickname[20]{ L"Player" };
+	wchar_t gamename[20]{ L"Game" };
 	wchar_t roompass[20]{};
 	//path
 	wchar_t lastcategory[256]{};
 	wchar_t lastdeck[256]{};
 	char textfont[256]{};
 	char numfont[256]{};
-	wchar_t bot_deck_path[256]{};
+	wchar_t bot_deck_path[256]{ L"./botdeck" };
 	//settings
 	int chkMAutoPos{ 0 };
-	int chkSTAutoPos{ 1 };
+	int chkSTAutoPos{ 0 };
 	int chkRandomPos{ 0 };
 	int chkAutoChain{ 0 };
 	int chkWaitChain{ 0 };
@@ -192,7 +192,7 @@ public:
 	void WaitFrameSignal(int frame);
 	void DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList* lflist, bool drag = false);
 	void DrawDeckBd();
-	void LoadConfig();
+	void LoadConfig(const char* file);
 	void SaveConfig();
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
