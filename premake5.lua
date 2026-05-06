@@ -68,7 +68,7 @@ newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
 newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "" }
 newoption { trigger = "lua-include-dir", category = "YGOPro - lua", description = "", value = "PATH" }
 newoption { trigger = "lua-lib-dir", category = "YGOPro - lua", description = "", value = "PATH" }
-newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME", default = LUA_LIB_NAME }
+newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME" }
 
 newoption { trigger = "build-event", category = "YGOPro - event", description = "" }
 newoption { trigger = "no-build-event", category = "YGOPro - event", description = "" }
@@ -95,7 +95,7 @@ newoption { trigger = "build-jpeg", category = "YGOPro - jpeg", description = ""
 newoption { trigger = "no-build-jpeg", category = "YGOPro - jpeg", description = "" }
 newoption { trigger = "jpeg-include-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
 newoption { trigger = "jpeg-lib-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
-newoption { trigger = "jpeg-lib-name", category = "YGOPro - jpeg", description = "", value = "NAME", default = JPEG_LIB_NAME }
+newoption { trigger = "jpeg-lib-name", category = "YGOPro - jpeg", description = "", value = "NAME" }
 
 newoption { trigger = "build-png", category = "YGOPro - png", description = "" }
 newoption { trigger = "no-build-png", category = "YGOPro - png", description = "" }
@@ -106,10 +106,10 @@ newoption { trigger = "build-zlib", category = "YGOPro - zlib", description = ""
 newoption { trigger = "no-build-zlib", category = "YGOPro - zlib", description = "" }
 newoption { trigger = "zlib-include-dir", category = "YGOPro - zlib", description = "", value = "PATH" }
 newoption { trigger = "zlib-lib-dir", category = "YGOPro - zlib", description = "", value = "PATH" }
-newoption { trigger = "zlib-lib-name", category = "YGOPro - zlib", description = "", value = "NAME", default = ZLIB_LIB_NAME }
+newoption { trigger = "zlib-lib-name", category = "YGOPro - zlib", description = "", value = "NAME" }
 
 newoption { trigger = "no-audio", category = "YGOPro", description = "" }
-newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "", default = AUDIO_LIB }
+newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "" }
 
 newoption { trigger = "miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
 newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
