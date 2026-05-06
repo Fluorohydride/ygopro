@@ -243,7 +243,7 @@ void SingleDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	if(ready[dp->type] == is_ready)
 		return;
 	if(is_ready) {
-		unsigned int deckerror = 0;
+		uint32_t deckerror = 0;
 		if(!host_info.no_check_deck) {
 			if(deck_error[dp->type]) {
 				deckerror = (DECKERROR_UNKNOWNCARD << 28) | deck_error[dp->type];
@@ -1429,11 +1429,11 @@ void SingleDuel::EndDuel() {
 	if(!pduel)
 		return;
 	last_replay.EndRecord();
-	char replaybuf[0x2000], *pbuf = replaybuf;
-	std::memcpy(pbuf, &last_replay.pheader, sizeof last_replay.pheader);
-	pbuf += sizeof last_replay.pheader;
-	std::memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
-	NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replaybuf, sizeof last_replay.pheader + last_replay.comp_size);
+	std::vector<unsigned char> replay_buffer;
+	replay_buffer.reserve(sizeof last_replay.pheader + last_replay.comp_size);
+	BufferIO::VectorWrite(replay_buffer, last_replay.pheader);
+	BufferIO::VectorWriteBlock(replay_buffer, last_replay.comp_data, last_replay.comp_size);
+	NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replay_buffer.data(), replay_buffer.size());
 	NetServer::ReSendToPlayer(players[1]);
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::ReSendToPlayer(*oit);
@@ -1565,8 +1565,6 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 		NetServer::ReSendToPlayer(*pit);
 }
 uint32_t SingleDuel::MessageHandler(intptr_t fduel, uint32_t type) {
-	if(!enable_log)
-		return 0;
 	char msgbuf[1024];
 	get_log_message(fduel, msgbuf);
 	mainGame->AddDebugMsg(msgbuf);

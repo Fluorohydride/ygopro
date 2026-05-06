@@ -11,6 +11,25 @@
 #include "netserver.h"
 #include "single_mode.h"
 #include <thread>
+#include <chrono>
+#ifdef _WIN32
+#include <timeapi.h>
+#endif
+
+#if defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || \
+	defined(__x86_64__) || defined(_M_X64) || defined(__x86_64) || defined(_M_AMD64)
+	#include <immintrin.h>
+	#define CPU_PAUSE() _mm_pause()
+#elif defined(_M_ARM) || defined(_M_ARM64) || defined(__arm__) || defined(__aarch64__)
+    #if defined(_MSC_VER)
+        #include <intrin.h>
+        #define CPU_PAUSE() __yield()
+    #else
+        #define CPU_PAUSE() __asm__ __volatile__("yield" ::: "memory")
+    #endif
+#else
+	#define CPU_PAUSE() ((void)0)
+#endif
 
 namespace ygo {
 
@@ -49,7 +68,8 @@ void DuelInfo::Clear() {
 }
 
 bool Game::Initialize() {
-	LoadConfig();
+	LoadConfig("system.conf");
+	LoadConfig("load-once.conf");
 	irr::SIrrlichtCreationParameters params{};
 	params.AntiAlias = gameConf.antialias;
 	if(gameConf.use_d3d)
@@ -432,11 +452,24 @@ bool Game::Initialize() {
 	chkPreferExpansionScript = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_PREFER_EXPANSION, dataManager.GetSysString(1379));
 	chkPreferExpansionScript->setChecked(gameConf.prefer_expansion_script != 0);
 	posY += 30;
+	chkSwapYesNoButton = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_SWAP_YES_NO_BUTTON, dataManager.GetSysString(1388));
+	chkSwapYesNoButton->setChecked(gameConf.swap_yes_no_button);
+	posY += 30;
+	chkResizeSelectWindow = env->addCheckBox(gameConf.resize_select_window, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_RESIZE_SELECT_WINDOW, dataManager.GetSysString(1387));
+	posY += 30;
 	env->addStaticText(dataManager.GetSysString(1282), irr::core::rect<irr::s32>(posX + 23, posY + 3, posX + 110, posY + 28), false, false, tabSystem);
 	btnWinResizeS = env->addButton(irr::core::rect<irr::s32>(posX + 115, posY, posX + 145, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_S, dataManager.GetSysString(1283));
 	btnWinResizeM = env->addButton(irr::core::rect<irr::s32>(posX + 150, posY, posX + 180, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_M, dataManager.GetSysString(1284));
 	btnWinResizeL = env->addButton(irr::core::rect<irr::s32>(posX + 185, posY, posX + 215, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_L, dataManager.GetSysString(1285));
 	btnWinResizeXL = env->addButton(irr::core::rect<irr::s32>(posX + 220, posY, posX + 250, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_XL, dataManager.GetSysString(1286));
+	posY += 30;
+	chkResizePopupMenu = env->addCheckBox(gameConf.resize_popup_menu > 0, irr::core::rect<irr::s32>(posX, posY, posX + 120, posY + 25), tabSystem, CHECKBOX_RESIZE_POPUP_MENU, dataManager.GetSysString(1386));
+	scrResizePopupMenu = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 116, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_RESIZE_POPUP_MENU);
+	scrResizePopupMenu->setMax(5);
+	scrResizePopupMenu->setMin(1);
+	scrResizePopupMenu->setPos(gameConf.resize_popup_menu > 0 ? gameConf.resize_popup_menu : 3);
+	scrResizePopupMenu->setLargeStep(1);
+	scrResizePopupMenu->setSmallStep(1);
 	posY += 30;
 	chkLFlist = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 110, posY + 25), tabSystem, CHECKBOX_LFLIST, dataManager.GetSysString(1288));
 	chkLFlist->setChecked(gameConf.use_lflist);
@@ -452,7 +485,7 @@ bool Game::Initialize() {
 	scrSoundVolume = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 116, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_VOLUME);
 	scrSoundVolume->setMax(100);
 	scrSoundVolume->setMin(0);
-	scrSoundVolume->setPos(gameConf.sound_volume * 100);
+	scrSoundVolume->setPos(gameConf.sound_volume);
 	scrSoundVolume->setLargeStep(1);
 	scrSoundVolume->setSmallStep(1);
 	posY += 30;
@@ -461,7 +494,7 @@ bool Game::Initialize() {
 	scrMusicVolume = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 116, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_VOLUME);
 	scrMusicVolume->setMax(100);
 	scrMusicVolume->setMin(0);
-	scrMusicVolume->setPos(gameConf.music_volume * 100);
+	scrMusicVolume->setPos(gameConf.music_volume);
 	scrMusicVolume->setLargeStep(1);
 	scrMusicVolume->setSmallStep(1);
 	posY += 30;
@@ -939,6 +972,7 @@ bool Game::Initialize() {
 		chkMusicMode->setEnabled(false);
 		chkMusicMode->setVisible(false);
 	}
+	SwapYesNoButtons(gameConf.swap_yes_no_button);
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
 	for (int i = 0; i < irr::gui::EGDC_COUNT; ++i) {
@@ -965,10 +999,16 @@ void Game::MainLoop() {
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
-	irr::ITimer* timer = device->getTimer();
-	timer->setTime(0);
 	int fps = 0;
-	int cur_time = 0;
+	auto lastFpsTime = std::chrono::steady_clock::now();
+#ifdef _WIN32
+	HANDLE hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
+	bool useHighResTimer = (hWaitTimer != NULL);
+	if(!useHighResTimer)
+		timeBeginPeriod(1);
+#endif
+	auto lastFrameTime = std::chrono::steady_clock::now();
+	constexpr auto targetFrameDuration = std::chrono::microseconds(16667);
 	while(device->run()) {
 		auto size = driver->getScreenSize();
 		if(window_size != size) {
@@ -982,6 +1022,8 @@ void Game::MainLoop() {
 		linePattern = (linePattern + 1) % 30;
 		stippleMask = (stippleMask << 1) | (stippleMask >> 15);
 		atkframe += 0.1f;
+		if(atkframe > 6.2832f)
+			atkframe -= 6.2832f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
 		gMutex.lock();
@@ -1030,23 +1072,62 @@ void Game::MainLoop() {
 			}
 		}
 		driver->endScene();
-		if(closeSignal.Wait(1))
+		if(closeSignal.TryWait())
 			CloseDuelWindow();
 		fps++;
-		cur_time = timer->getTime();
-		if(cur_time < fps * 17 - 20)
-			std::this_thread::sleep_for(std::chrono::milliseconds(20));
-		if(cur_time >= 1000) {
+		auto targetTime = lastFrameTime + targetFrameDuration;
+		auto now = std::chrono::steady_clock::now();
+		if(now < targetTime) {
+#ifdef _WIN32
+			if(useHighResTimer)
+			{
+				auto remaining = std::chrono::duration_cast<std::chrono::microseconds>(targetTime - now);
+				if(remaining.count() > 1500) {
+					LARGE_INTEGER dueTime;
+					dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
+					if(SetWaitableTimer(hWaitTimer, &dueTime, 0, NULL, NULL, FALSE))
+						WaitForSingleObject(hWaitTimer, INFINITE);
+				}
+			}
+			else
+#endif
+			{
+				auto sleepTime = targetTime - now - std::chrono::milliseconds(2);
+				if(sleepTime > std::chrono::milliseconds(0)) {
+					std::this_thread::sleep_for(sleepTime);
+				}
+			}
+			// Spin-wait for sub-millisecond precision.
+			// If the window is inactive, sleep 1ms per iteration to avoid wasting CPU.
+			while(std::chrono::steady_clock::now() < targetTime) {
+				if(device->isWindowActive())
+					CPU_PAUSE();
+				else
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
+		}
+		lastFrameTime = targetTime;
+		now = std::chrono::steady_clock::now();
+		if(now - targetTime > targetFrameDuration)
+			lastFrameTime = now;
+		if(now - lastFpsTime >= std::chrono::milliseconds(1000)) {
 			myswprintf(cap, L"YGOPro FPS: %d", fps);
 			device->setWindowCaption(cap);
 			fps = 0;
-			cur_time -= 1000;
-			timer->setTime(0);
+			lastFpsTime += std::chrono::milliseconds(1000);
+			if(now - lastFpsTime > std::chrono::milliseconds(1000))
+				lastFpsTime = now;
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)
 				if(dInfo.time_left[dInfo.time_player])
 					dInfo.time_left[dInfo.time_player]--;
 		}
 	}
+#ifdef _WIN32
+	if(useHighResTimer)
+		CloseHandle(hWaitTimer);
+	else
+		timeEndPeriod(1);
+#endif
 	DuelClient::StopClient(true);
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
@@ -1152,6 +1233,8 @@ void Game::LoadExpansions() {
 			if (IsExtension(name, ".cdb")) {
 				if (!dataManager.LoadDB(name)) {
 					std::string errmsg = "Warning: Failed to load DB file in expansion archive (";
+					errmsg.append(dataManager.IrrFileSystem->getFileArchive(i)->getArchiveName().c_str());
+					errmsg.append(" : ");
 					errmsg.append(name);
 					errmsg.append(")! ");
 					errmsg.append(dataManager.errmsg);
@@ -1170,6 +1253,8 @@ void Game::LoadExpansions() {
 				// TODO: zip file may contain non-UTF8 file name. DecodeUTF8 can't parse it and returns 0.
 				if (!len) {
 					std::string errmsg = "Warning: Failed to decode deck file name in expansion archive (";
+					errmsg.append(dataManager.IrrFileSystem->getFileArchive(i)->getArchiveName().c_str());
+					errmsg.append(" : ");
 					errmsg.append(name);
 					errmsg.append(")! Please make sure the file name is UTF-8 encoded in the archive.");
 					mainGame->ErrorLog(errmsg.c_str());
@@ -1308,8 +1393,8 @@ void Game::RefreshBot() {
 		RefreshCategoryDeck(cbBotDeckCategory, cbBotDeck);
 	}
 }
-void Game::LoadConfig() {
-	FILE* fp = myfopen("system.conf", "r");
+void Game::LoadConfig(const char* file) {
+	FILE* fp = myfopen(file, "r");
 	if(!fp)
 		return;
 	char linebuf[CONFIG_LINE_SIZE]{};
@@ -1322,13 +1407,14 @@ void Game::LoadConfig() {
 			gameConf.antialias = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "use_d3d")) {
 			gameConf.use_d3d = std::strtol(valbuf, nullptr, 10) > 0;
+#ifdef _OPENMP
 		} else if (!std::strcmp(strbuf, "use_image_scale_multi_thread")) {
 			gameConf.use_image_scale_multi_thread = std::strtol(valbuf, nullptr, 10) > 0;
+#endif
 		} else if (!std::strcmp(strbuf, "use_image_load_background_thread")) {
 			gameConf.use_image_load_background_thread = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "errorlog")) {
-			unsigned int val = std::strtol(valbuf, nullptr, 10);
-			enable_log = val & 0xff;
+			gameConf.enable_log = std::strtol(valbuf, nullptr, 10) & 0xff;
 		} else if(!std::strcmp(strbuf, "serverport")) {
 			gameConf.serverport = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "lasthost")) {
@@ -1389,33 +1475,30 @@ void Game::LoadConfig() {
 			gameConf.hide_player_name = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "prefer_expansion_script")) {
 			gameConf.prefer_expansion_script = std::strtol(valbuf, nullptr, 10);
+		} else if(!std::strcmp(strbuf, "swap_yes_no_button")) {
+			gameConf.swap_yes_no_button = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "window_maximized")) {
 			gameConf.window_maximized = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "window_width")) {
 			gameConf.window_width = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "window_height")) {
 			gameConf.window_height = std::strtol(valbuf, nullptr, 10);
+		} else if(!std::strcmp(strbuf, "resize_select_window")) {
+			gameConf.resize_select_window = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "resize_popup_menu")) {
-			gameConf.resize_popup_menu = std::strtol(valbuf, nullptr, 10) > 0;
+			int val = std::strtol(valbuf, nullptr, 10);
+			gameConf.resize_popup_menu = myclamp(val, 0, 5);
 #ifdef YGOPRO_USE_AUDIO
 		} else if(!std::strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "sound_volume")) {
 			int vol = std::strtol(valbuf, nullptr, 10);
-			if (vol < 0)
-				vol = 0;
-			else if (vol > 100)
-				vol = 100;
-			gameConf.sound_volume = (double)vol / 100;
+			gameConf.sound_volume = myclamp(vol, 0, 100);
 		} else if(!std::strcmp(strbuf, "enable_music")) {
 			gameConf.enable_music = std::strtol(valbuf, nullptr, 10) > 0;
 		} else if(!std::strcmp(strbuf, "music_volume")) {
 			int vol = std::strtol(valbuf, nullptr, 10);
-			if (vol < 0)
-				vol = 0;
-			else if (vol > 100)
-				vol = 100;
-			gameConf.music_volume = (double)vol / 100;
+			gameConf.music_volume = myclamp(vol, 0, 100);
 		} else if(!std::strcmp(strbuf, "music_mode")) {
 			gameConf.music_mode = std::strtol(valbuf, nullptr, 10);
 #endif
@@ -1452,14 +1535,17 @@ void Game::LoadConfig() {
 	std::fclose(fp);
 }
 void Game::SaveConfig() {
+	FileSystem::RemoveFile("load-once.conf");
 	FILE* fp = myfopen("system.conf", "w");
 	std::fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[CONFIG_LINE_SIZE];
 	std::fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
+#ifdef _OPENMP
 	std::fprintf(fp, "use_image_scale_multi_thread = %d\n", gameConf.use_image_scale_multi_thread ? 1 : 0);
+#endif
 	std::fprintf(fp, "use_image_load_background_thread = %d\n", gameConf.use_image_load_background_thread ? 1 : 0);
 	std::fprintf(fp, "antialias = %d\n", gameConf.antialias);
-	std::fprintf(fp, "errorlog = %u\n", enable_log);
+	std::fprintf(fp, "errorlog = %u\n", gameConf.enable_log);
 	BufferIO::CopyWideString(ebNickName->getText(), gameConf.nickname);
 	BufferIO::EncodeUTF8(gameConf.nickname, linebuf);
 	std::fprintf(fp, "nickname = %s\n", linebuf);
@@ -1508,18 +1594,18 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "draw_single_chain = %d\n", gameConf.draw_single_chain);
 	std::fprintf(fp, "hide_player_name = %d\n", gameConf.hide_player_name);
 	std::fprintf(fp, "prefer_expansion_script = %d\n", gameConf.prefer_expansion_script);
+	std::fprintf(fp, "swap_yes_no_button = %d\n", (chkSwapYesNoButton->isChecked() ? 1 : 0));
 	std::fprintf(fp, "window_maximized = %d\n", (gameConf.window_maximized ? 1 : 0));
 	std::fprintf(fp, "window_width = %d\n", gameConf.window_width);
 	std::fprintf(fp, "window_height = %d\n", gameConf.window_height);
-	std::fprintf(fp, "resize_popup_menu = %d\n", gameConf.resize_popup_menu ? 1 : 0);
+	std::fprintf(fp, "resize_select_window = %d\n", (chkResizeSelectWindow->isChecked() ? 1 : 0));
+	std::fprintf(fp, "resize_popup_menu = %d\n", gameConf.resize_popup_menu);
 #ifdef YGOPRO_USE_AUDIO
 	std::fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	std::fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
 	std::fprintf(fp, "#Volume of sound and music, between 0 and 100\n");
-	int vol = gameConf.sound_volume * 100;
-	std::fprintf(fp, "sound_volume = %d\n", vol);
-	vol = gameConf.music_volume * 100;
-	std::fprintf(fp, "music_volume = %d\n", vol);
+	std::fprintf(fp, "sound_volume = %d\n", gameConf.sound_volume);
+	std::fprintf(fp, "music_volume = %d\n", gameConf.music_volume);
 	std::fprintf(fp, "music_mode = %d\n", (chkMusicMode->isChecked() ? 1 : 0));
 #endif
 	std::fclose(fp);
@@ -1701,12 +1787,12 @@ void Game::ClearChatMsg() {
 	}
 }
 void Game::AddDebugMsg(const char* msg) {
-	if (enable_log & 0x1) {
+	if (gameConf.enable_log & 0x1) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msg, wbuf);
 		AddChatMsg(wbuf, 9);
 	}
-	if (enable_log & 0x2) {
+	if (gameConf.enable_log & 0x2) {
 		char msgbuf[1040];
 		mysnprintf(msgbuf, "[Script Error]: %s", msg);
 		ErrorLog(msgbuf);
@@ -1837,6 +1923,27 @@ int Game::ChatLocalPlayer(int player) {
 }
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
+}
+void Game::SwapYesNoButtons(bool no_first) {
+	if(no_first) {
+		btnYes->setRelativePosition(irr::core::rect<irr::s32>(200, 105, 250, 130));
+		btnNo->setRelativePosition(irr::core::rect<irr::s32>(100, 105, 150, 130));
+		btnSurrenderYes->setRelativePosition(irr::core::rect<irr::s32>(200, 105, 250, 130));
+		btnSurrenderNo->setRelativePosition(irr::core::rect<irr::s32>(100, 105, 150, 130));
+		btnRSYes->setRelativePosition(irr::core::rect<irr::s32>(170, 80, 240, 105));
+		btnRSNo->setRelativePosition(irr::core::rect<irr::s32>(70, 80, 140, 105));
+		btnDMOK->setRelativePosition(irr::core::rect<irr::s32>(170, 80, 240, 105));
+		btnDMCancel->setRelativePosition(irr::core::rect<irr::s32>(70, 80, 140, 105));
+	} else {
+		btnYes->setRelativePosition(irr::core::rect<irr::s32>(100, 105, 150, 130));
+		btnNo->setRelativePosition(irr::core::rect<irr::s32>(200, 105, 250, 130));
+		btnSurrenderYes->setRelativePosition(irr::core::rect<irr::s32>(100, 105, 150, 130));
+		btnSurrenderNo->setRelativePosition(irr::core::rect<irr::s32>(200, 105, 250, 130));
+		btnRSYes->setRelativePosition(irr::core::rect<irr::s32>(70, 80, 140, 105));
+		btnRSNo->setRelativePosition(irr::core::rect<irr::s32>(170, 80, 240, 105));
+		btnDMOK->setRelativePosition(irr::core::rect<irr::s32>(70, 80, 140, 105));
+		btnDMCancel->setRelativePosition(irr::core::rect<irr::s32>(170, 80, 240, 105));
+	}
 }
 void Game::OnResize() {
 #ifdef _WIN32
@@ -1970,6 +2077,7 @@ void Game::OnResize() {
 	//sound / music volume bar
 	scrSoundVolume->setRelativePosition(irr::core::recti(scrSoundVolume->getRelativePosition().UpperLeftCorner.X, scrSoundVolume->getRelativePosition().UpperLeftCorner.Y, 20 + (300 * xScale) - 70, scrSoundVolume->getRelativePosition().LowerRightCorner.Y));
 	scrMusicVolume->setRelativePosition(irr::core::recti(scrMusicVolume->getRelativePosition().UpperLeftCorner.X, scrMusicVolume->getRelativePosition().UpperLeftCorner.Y, 20 + (300 * xScale) - 70, scrMusicVolume->getRelativePosition().LowerRightCorner.Y));
+	scrResizePopupMenu->setRelativePosition(irr::core::recti(scrResizePopupMenu->getRelativePosition().UpperLeftCorner.X, scrResizePopupMenu->getRelativePosition().UpperLeftCorner.Y, 20 + (300 * xScale) - 70, scrResizePopupMenu->getRelativePosition().LowerRightCorner.Y));
 
 	irr::core::recti tabHelperPos = irr::core::recti(0, 0, 300 * xScale - 50, 365 * yScale - 65);
 	tabHelper->setRelativePosition(tabHelperPos);
@@ -1994,23 +2102,6 @@ void Game::OnResize() {
 	} else
 		scrTabSystem->setVisible(false);
 
-	if(gameConf.resize_popup_menu) {
-		int width = 100 * xScale;
-		int height = (yScale >= 0.666) ? 21 * yScale : 14;
-		wCmdMenu->setRelativePosition(irr::core::recti(1, 1, width + 1, 1));
-		btnActivate->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnSummon->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnSPSummon->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnMSet->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnSSet->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnRepos->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnAttack->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnActivate->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnShowList->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnOperation->setRelativePosition(irr::core::recti(1, 1, width, height));
-		btnReset->setRelativePosition(irr::core::recti(1, 1, width, height));
-	}
-
 	wCardImg->setRelativePosition(ResizeCardImgWin(1, 1, 20, 18));
 	imgCard->setRelativePosition(ResizeCardImgWin(10, 9, 0, 0));
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
@@ -2029,6 +2120,7 @@ void Game::OnResize() {
 	btnEP->setRelativePosition(Resize(320, 0, 370, 20));
 
 	ResizeChatInputWindow();
+	ResizeCmdMenu();
 
 	btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
 	wReplayControl->setRelativePosition(Resize(205, 143, 295, 273));
@@ -2060,9 +2152,26 @@ void Game::ResizeChatInputWindow() {
 	wChat->setRelativePosition(irr::core::recti(x, window_size.Height - 25, window_size.Width, window_size.Height));
 	ebChatInput->setRelativePosition(irr::core::recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 }
+void Game::ResizeCmdMenu() {
+	irr::s32 width = GetPopupMenuButtonWidth();
+	irr::s32 height = GetPopupMenuButtonHeight();
+	wCmdMenu->setRelativePosition(irr::core::recti(0, 0, width, 0));
+	btnActivate->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnSummon->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnSPSummon->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnMSet->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnSSet->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnRepos->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnAttack->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnShowList->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnOperation->setRelativePosition(irr::core::recti(0, 0, width, height));
+	btnReset->setRelativePosition(irr::core::recti(0, 0, width, height));
+}
 void Game::ResizePosSelectButtons() {
-	irr::s32 imgHeight = CARD_IMG_HEIGHT * 0.5f * yScale + 0.5f;
-	irr::s32 gap = 5 * xScale + 0.5f;
+	float _xScale = gameConf.resize_select_window ? xScale : 1.0f;
+	float _yScale = gameConf.resize_select_window ? yScale : 1.2f;
+	irr::s32 imgHeight = CARD_IMG_HEIGHT * 0.5f * _yScale + 0.5f;
+	irr::s32 gap = 5 * _xScale + 0.5f;
 	irr::s32 btnPosWidth = imgHeight + gap * 2; // Square buttons, width = height
 	irr::s32 stride = btnPosWidth + gap;
 	int totalWidth = 0, visCount = 0;
@@ -2071,9 +2180,9 @@ void Game::ResizePosSelectButtons() {
 	if(btnPSDU->isVisible()) { totalWidth += btnPosWidth; visCount++; }
 	if(btnPSDD->isVisible()) { totalWidth += btnPosWidth; visCount++; }
 	totalWidth += (visCount - 1) * gap;
-	irr::s32 posY = 19 + 16 * yScale;
-	irr::s32 windowWidth = 30 * xScale * 2 + stride * 3 - gap;
-	irr::s32 windowHeight = posY + 155 * yScale;
+	irr::s32 posY = 19 + 16 * _yScale;
+	irr::s32 windowWidth = 30 * _xScale * 2 + stride * 3 - gap;
+	irr::s32 windowHeight = posY + 155 * _yScale;
 	irr::s32 posX = (windowWidth - totalWidth) / 2;
 	if(btnPSAU->isVisible()) {
 		btnPSAU->setRelativePosition(irr::core::recti(posX, posY, posX + btnPosWidth, posY + btnPosWidth));
@@ -2099,18 +2208,20 @@ void Game::ResizeCardSelectButtons(irr::gui::IGUIWindow* window,
 								   irr::gui::IGUIScrollBar* scrollbar,
 								   irr::gui::IGUIButton* buttonOK,
 								   const std::vector<ClientCard*>& cards) {
-	irr::s32 gap = 5 * xScale + 0.5f;
-	irr::s32 btnWidth = CARD_IMG_WIDTH * 0.55f * yScale + 0.5f;
-	irr::s32 btnHeight = CARD_IMG_HEIGHT * 0.55f * yScale + 0.5f;
+	float _xScale = gameConf.resize_select_window ? xScale : 1.0f;
+	float _yScale = gameConf.resize_select_window ? yScale : 1.2f;
+	irr::s32 gap = 5 * _xScale + 0.5f;
+	irr::s32 btnWidth = CARD_IMG_WIDTH * 0.55f * _yScale + 0.5f;
+	irr::s32 btnHeight = CARD_IMG_HEIGHT * 0.55f * _yScale + 0.5f;
 	irr::s32 stride = btnWidth + gap;
-	int startpos = 30 * xScale;
+	int startpos = 30 * _xScale;
 	int ct = 5;
 	if (cards.size() < 5) {
-		startpos = 30 * xScale + stride * (5 - (int)cards.size()) / 2;
+		startpos = 30 * _xScale + stride * (5 - (int)cards.size()) / 2;
 		ct = cards.size();
 	}
-	irr::s32 top = 19 + 11 * yScale;
-	irr::s32 labelHeight = 20 * yScale;
+	irr::s32 top = 19 + 11 * _yScale;
+	irr::s32 labelHeight = 20 * _yScale;
 	irr::s32 minTextHeight = gameConf.textfontsize * 1.4f + 0.5f;
 	if (labelHeight < minTextHeight) labelHeight = minTextHeight;
 	irr::s32 btnTop = top + labelHeight + gap;
@@ -2120,14 +2231,14 @@ void Game::ResizeCardSelectButtons(irr::gui::IGUIWindow* window,
 	}
 	irr::s32 barTop = btnTop + btnHeight + gap;
 	irr::s32 barWidth = stride * ct - gap;
-	irr::s32 barHeight = 20 * yScale;
+	irr::s32 barHeight = 20 * _yScale;
 	if (barHeight > 25) barHeight = 25;
 	scrollbar->setRelativePosition(irr::core::recti(startpos, barTop, startpos + barWidth, barTop + barHeight));
-	irr::s32 btnOKWidth = 80 * xScale;
-	irr::s32 btnOKHeight = 25 * yScale;
+	irr::s32 btnOKWidth = 80 * _xScale;
+	irr::s32 btnOKHeight = 25 * _yScale;
 	if (btnOKHeight < minTextHeight) btnOKHeight = minTextHeight;
 	buttonOK->setRelativePosition(irr::core::recti(startpos + barWidth / 2 - btnOKWidth / 2, barTop + barHeight + gap * 2, startpos + barWidth / 2 + btnOKWidth / 2, barTop + barHeight + gap * 2 + btnOKHeight));
-	irr::s32 windowWidth = 30 * xScale * 2 + stride * 5 - gap;
+	irr::s32 windowWidth = 30 * _xScale * 2 + stride * 5 - gap;
 	irr::s32 windowHeight = top + labelHeight + btnHeight + barHeight + btnOKHeight + gap * 6;
 	window->setRelativePosition(irr::core::recti(663 * xScale - windowWidth / 2, 263 * yScale - windowHeight / 2, 663 * xScale + windowWidth / 2, 263 * yScale + windowHeight / 2));
 }
