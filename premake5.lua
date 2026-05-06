@@ -63,6 +63,8 @@ MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libop
 MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libvorbis")
 
 -- Read settings from command line or environment variables
+-- Default values should be defined at the top of the script. If any values are set in the premake options, GetParam will not
+-- read them from environment variables.
 
 newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
 newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "" }
@@ -279,10 +281,7 @@ if USE_AUDIO then
     end
 end
 
-local useSimd = GetParam("use-simd")
-if useSimd then
-    USE_SIMD = useSimd
-end
+USE_SIMD = GetParam("use-simd") or USE_SIMD
 
 if not MAC_ARM and not MAC_INTEL and table.indexof({ "x86", "x86_64", "ARM64" }, PREMAKE_ARCH) == nil then
     print("Warning: Detected architecture " .. PREMAKE_ARCH .. " seems not supported, trying to build anyway, SIMD will be disabled.")
