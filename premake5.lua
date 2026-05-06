@@ -129,7 +129,7 @@ newoption { trigger = "mac-intel", category = "YGOPro", description = "Cross Com
 
 newoption { trigger = "use-openmp", category = "YGOPro", description = "Enable OpenMP support (edge case)" }
 
-newoption { trigger = "use-simd", category = "YGOPro", description = "", value = "none, sse2, avx2, neon, best", default = "best" }
+newoption { trigger = "use-simd", category = "YGOPro", description = "", value = "none, sse2, avx2, neon, best" }
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
@@ -279,8 +279,9 @@ if USE_AUDIO then
     end
 end
 
-if GetParam("use-simd") then
-    USE_SIMD = GetParam("use-simd")
+local useSimd = GetParam("use-simd")
+if useSimd then
+    USE_SIMD = useSimd
 end
 
 if not MAC_ARM and not MAC_INTEL and table.indexof({ "x86", "x86_64", "ARM64" }, PREMAKE_ARCH) == nil then
