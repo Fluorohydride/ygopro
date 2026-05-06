@@ -4154,7 +4154,9 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 		sockaddr_in bc_addr;
 		socklen_t sz = sizeof(sockaddr_in);
 		char buf[256];
-		/*int ret = */recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
+		int ret = recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
+		if(ret < (int)sizeof(HostPacket))
+			return;
 		HostPacket packet;
 		std::memcpy(&packet, buf, sizeof packet);
 		HostPacket* pHP = &packet;
