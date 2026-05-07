@@ -63,12 +63,14 @@ MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libop
 MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libvorbis")
 
 -- Read settings from command line or environment variables
+-- Default values should be defined at the top of the script. If any values are set in the premake options, GetParam will not
+-- read them from environment variables.
 
 newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
 newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "" }
 newoption { trigger = "lua-include-dir", category = "YGOPro - lua", description = "", value = "PATH" }
 newoption { trigger = "lua-lib-dir", category = "YGOPro - lua", description = "", value = "PATH" }
-newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME", default = LUA_LIB_NAME }
+newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME" }
 
 newoption { trigger = "build-event", category = "YGOPro - event", description = "" }
 newoption { trigger = "no-build-event", category = "YGOPro - event", description = "" }
@@ -95,7 +97,7 @@ newoption { trigger = "build-jpeg", category = "YGOPro - jpeg", description = ""
 newoption { trigger = "no-build-jpeg", category = "YGOPro - jpeg", description = "" }
 newoption { trigger = "jpeg-include-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
 newoption { trigger = "jpeg-lib-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
-newoption { trigger = "jpeg-lib-name", category = "YGOPro - jpeg", description = "", value = "NAME", default = JPEG_LIB_NAME }
+newoption { trigger = "jpeg-lib-name", category = "YGOPro - jpeg", description = "", value = "NAME" }
 
 newoption { trigger = "build-png", category = "YGOPro - png", description = "" }
 newoption { trigger = "no-build-png", category = "YGOPro - png", description = "" }
@@ -106,10 +108,10 @@ newoption { trigger = "build-zlib", category = "YGOPro - zlib", description = ""
 newoption { trigger = "no-build-zlib", category = "YGOPro - zlib", description = "" }
 newoption { trigger = "zlib-include-dir", category = "YGOPro - zlib", description = "", value = "PATH" }
 newoption { trigger = "zlib-lib-dir", category = "YGOPro - zlib", description = "", value = "PATH" }
-newoption { trigger = "zlib-lib-name", category = "YGOPro - zlib", description = "", value = "NAME", default = ZLIB_LIB_NAME }
+newoption { trigger = "zlib-lib-name", category = "YGOPro - zlib", description = "", value = "NAME" }
 
 newoption { trigger = "no-audio", category = "YGOPro", description = "" }
-newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "", default = AUDIO_LIB }
+newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "" }
 
 newoption { trigger = "miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
 newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
@@ -129,7 +131,7 @@ newoption { trigger = "mac-intel", category = "YGOPro", description = "Cross Com
 
 newoption { trigger = "use-openmp", category = "YGOPro", description = "Enable OpenMP support (edge case)" }
 
-newoption { trigger = "use-simd", category = "YGOPro", description = "", value = "none, sse2, avx2, neon, best", default = "best" }
+newoption { trigger = "use-simd", category = "YGOPro", description = "", value = "none, sse2, avx2, neon, best" }
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
@@ -279,9 +281,7 @@ if USE_AUDIO then
     end
 end
 
-if GetParam("use-simd") then
-    USE_SIMD = GetParam("use-simd")
-end
+USE_SIMD = GetParam("use-simd") or USE_SIMD
 
 if not MAC_ARM and not MAC_INTEL and table.indexof({ "x86", "x86_64", "ARM64" }, PREMAKE_ARCH) == nil then
     print("Warning: Detected architecture " .. PREMAKE_ARCH .. " seems not supported, trying to build anyway, SIMD will be disabled.")
