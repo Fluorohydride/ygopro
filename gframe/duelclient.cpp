@@ -1,5 +1,7 @@
 #include <algorithm>
+#include <set>
 #include <thread>
+#include <random>
 #include "config.h"
 #include "duelclient.h"
 #include "client_card.h"
@@ -13,32 +15,35 @@
 
 namespace ygo {
 
-unsigned DuelClient::connect_state = 0;
-unsigned char DuelClient::response_buf[SIZE_RETURN_VALUE];
-size_t DuelClient::response_len = 0;
-unsigned int DuelClient::watching = 0;
-unsigned char DuelClient::selftype = 0;
-bool DuelClient::is_host = false;
-event_base* DuelClient::client_base = 0;
-bufferevent* DuelClient::client_bev = 0;
-unsigned char DuelClient::duel_client_write[SIZE_NETWORK_BUFFER];
-bool DuelClient::is_closing = false;
-bool DuelClient::is_swapping = false;
-int DuelClient::select_hint = 0;
-int DuelClient::select_unselect_hint = 0;
-int DuelClient::last_select_hint = 0;
-unsigned char DuelClient::last_successful_msg[SIZE_NETWORK_BUFFER];
-size_t DuelClient::last_successful_msg_length = 0;
-wchar_t DuelClient::event_string[256];
-std::mt19937 DuelClient::rnd;
-std::uniform_real_distribution<float> DuelClient::real_dist;
+namespace {
+	unsigned connect_state{};
+	unsigned char response_buf[SIZE_RETURN_VALUE]{};
+	size_t response_len{};
+	unsigned int watching{};
+	bool is_host{};
+	event_base* client_base{};
+	bool is_closing{};
+	bool is_swapping{};
+	int select_hint{};
+	int select_unselect_hint{};
+	int last_select_hint{};
+	unsigned char last_successful_msg[SIZE_NETWORK_BUFFER]{};
+	size_t last_successful_msg_length{};
+	wchar_t event_string[256]{};
+	std::mt19937 rnd{};
+	std::uniform_real_distribution<float> real_dist{};
 
-bool DuelClient::is_refreshing = false;
-int DuelClient::match_kill = 0;
+	bool is_refreshing{};
+	int match_kill{};
+	std::set<std::pair<unsigned int, unsigned short>> remotes{};
+	event* resp_event{};
+	const std::set<int> select_effectyn_id{ 95, 96, 97, 218, 219, 220 };
+}
+
+bufferevent* DuelClient::client_bev = 0;
+unsigned char DuelClient::duel_client_write[SIZE_NETWORK_BUFFER]{};
+unsigned char DuelClient::selftype = 0;
 std::vector<HostPacket> DuelClient::hosts;
-std::set<std::pair<unsigned int, unsigned short>> DuelClient::remotes;
-event* DuelClient::resp_event = 0;
-const std::set<int> DuelClient::select_effectyn_id{ 95, 96, 97, 218, 219, 220 };
 
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
 	if(connect_state)
@@ -4149,7 +4154,9 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 		sockaddr_in bc_addr;
 		socklen_t sz = sizeof(sockaddr_in);
 		char buf[256];
-		/*int ret = */recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
+		int ret = recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
+		if(ret < (int)sizeof(HostPacket))
+			return;
 		HostPacket packet;
 		std::memcpy(&packet, buf, sizeof packet);
 		HostPacket* pHP = &packet;

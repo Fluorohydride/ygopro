@@ -66,12 +66,14 @@ MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/lib
 LZMA_INCLUDE_DIR = path.getabsolute("./lzma/src/liblzma/api")
 
 -- Read settings from command line or environment variables
+-- Default values should be defined at the top of the script. If any values are set in the premake options, GetParam will not
+-- read them from environment variables.
 
 newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
 newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "" }
 newoption { trigger = "lua-include-dir", category = "YGOPro - lua", description = "", value = "PATH" }
 newoption { trigger = "lua-lib-dir", category = "YGOPro - lua", description = "", value = "PATH" }
-newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME", default = LUA_LIB_NAME }
+newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME" }
 
 newoption { trigger = "build-event", category = "YGOPro - event", description = "" }
 newoption { trigger = "no-build-event", category = "YGOPro - event", description = "" }
@@ -98,7 +100,7 @@ newoption { trigger = "build-jpeg", category = "YGOPro - jpeg", description = ""
 newoption { trigger = "no-build-jpeg", category = "YGOPro - jpeg", description = "" }
 newoption { trigger = "jpeg-include-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
 newoption { trigger = "jpeg-lib-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
-newoption { trigger = "jpeg-lib-name", category = "YGOPro - jpeg", description = "", value = "NAME", default = JPEG_LIB_NAME }
+newoption { trigger = "jpeg-lib-name", category = "YGOPro - jpeg", description = "", value = "NAME" }
 
 newoption { trigger = "build-png", category = "YGOPro - png", description = "" }
 newoption { trigger = "no-build-png", category = "YGOPro - png", description = "" }
@@ -109,10 +111,10 @@ newoption { trigger = "build-zlib", category = "YGOPro - zlib", description = ""
 newoption { trigger = "no-build-zlib", category = "YGOPro - zlib", description = "" }
 newoption { trigger = "zlib-include-dir", category = "YGOPro - zlib", description = "", value = "PATH" }
 newoption { trigger = "zlib-lib-dir", category = "YGOPro - zlib", description = "", value = "PATH" }
-newoption { trigger = "zlib-lib-name", category = "YGOPro - zlib", description = "", value = "NAME", default = ZLIB_LIB_NAME }
+newoption { trigger = "zlib-lib-name", category = "YGOPro - zlib", description = "", value = "NAME" }
 
 newoption { trigger = "no-audio", category = "YGOPro", description = "" }
-newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "", default = AUDIO_LIB }
+newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "" }
 
 newoption { trigger = "miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
 newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
@@ -132,12 +134,14 @@ newoption { trigger = "no-build-lzma", category = "YGOPro - lzma", description =
 newoption { trigger = "lzma-include-dir", category = "YGOPro - lzma", description = "", value = "PATH" }
 newoption { trigger = "lzma-lib-dir", category = "YGOPro - lzma", description = "", value = "PATH" }
 
+newoption { trigger = "vs2026-win7-support", category = "YGOPro", description = "Enable Windows 7 support (toolset v143) for Visual Studio 2026" }
+
 newoption { trigger = "mac-arm", category = "YGOPro", description = "Cross Compile for Apple Silicon Mac" }
 newoption { trigger = "mac-intel", category = "YGOPro", description = "Cross Compile for Intel Mac" }
 
 newoption { trigger = "use-openmp", category = "YGOPro", description = "Enable OpenMP support (edge case)" }
 
-newoption { trigger = "use-simd", category = "YGOPro", description = "", value = "none, sse2, avx2, neon, best", default = "best" }
+newoption { trigger = "use-simd", category = "YGOPro", description = "", value = "none, sse2, avx2, neon, best" }
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
@@ -297,9 +301,7 @@ if USE_AUDIO then
     end
 end
 
-if GetParam("use-simd") then
-    USE_SIMD = GetParam("use-simd")
-end
+USE_SIMD = GetParam("use-simd") or USE_SIMD
 
 if not MAC_ARM and not MAC_INTEL and table.indexof({ "x86", "x86_64", "ARM64" }, PREMAKE_ARCH) == nil then
     print("Warning: Detected architecture " .. PREMAKE_ARCH .. " seems not supported, trying to build anyway, SIMD will be disabled.")
@@ -308,6 +310,10 @@ end
 
 if USE_SIMD == "avx2" or USE_SIMD == "neon" then
     USE_SIMD = "best"
+end
+
+if os.istarget("windows") and GetParam("vs2026-win7-support") then
+    WIN7_SUPPORT = true
 end
 
 if os.istarget("macosx") then
@@ -337,6 +343,11 @@ workspace "YGOPro"
         systemversion "latest"
         startproject "YGOPro"
         defines { "WINVER=0x0601" } -- WIN7
+
+    if WIN7_SUPPORT then
+        filter { "system:windows", "action:vs2026" }
+            toolset "v143"
+    end
 
     filter { "system:windows", "action:vs*" }
         platforms { "Win32", "x64", "ARM64" }
@@ -442,7 +453,7 @@ workspace "YGOPro"
     filter { "action:gmake", "architecture:x86_64" }
         if USE_SIMD == "best" then
             vectorextensions "AVX2"
-            buildoptions { "-mfma" }
+            isaextensions { "FMA" }
         end
 
     filter {}
