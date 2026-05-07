@@ -96,8 +96,7 @@ public:
 	static void CopyString(const char* src, char(&dst)[N], size_t len = N - 1) {
 		if(len >= N)
 			len = N - 1;
-		size_t src_len = std::strlen(src);
-		size_t copy_len = std::min(src_len, len);
+		size_t copy_len = std::min(std::strlen(src), len);
 		std::memcpy(dst, src, copy_len);
 		dst[copy_len] = 0;
 	}
@@ -105,8 +104,7 @@ public:
 	static void CopyWideString(const wchar_t* src, wchar_t(&dst)[N], size_t len = N - 1) {
 		if(len >= N)
 			len = N - 1;
-		size_t src_len = std::wcslen(src);
-		size_t copy_len = std::min(src_len, len);
+		size_t copy_len = std::min(std::wcslen(src), len);
 		std::wmemcpy(dst, src, copy_len);
 		dst[copy_len] = 0;
 	}
