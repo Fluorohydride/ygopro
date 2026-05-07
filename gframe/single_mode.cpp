@@ -67,12 +67,12 @@ int SingleMode::SinglePlayThread() {
 		opt |= DUEL_RETURN_DECK_TOP;
 	char filename[256]{};
 	int slen = 0;
-	if(open_file) {
-		open_file = false;
-		slen = BufferIO::EncodeUTF8(open_file_name, filename);
+	if(mainGame->open_file) {
+		mainGame->open_file = false;
+		slen = BufferIO::EncodeUTF8(mainGame->open_file_name, filename);
 		if(!preload_script(pduel, filename)) {
 			wchar_t fname[256]{};
-			myswprintf(fname, L"./single/%ls", open_file_name);
+			myswprintf(fname, L"./single/%ls", mainGame->open_file_name);
 			slen = BufferIO::EncodeUTF8(fname, filename);
 			if(!preload_script(pduel, filename))
 				slen = 0;
@@ -176,7 +176,7 @@ int SingleMode::SinglePlayThread() {
 		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.unlock();
-		if(exit_on_return)
+		if(mainGame->exit_on_return)
 			mainGame->device->closeDevice();
 	}
 	return 0;
@@ -842,8 +842,6 @@ void SingleMode::SinglePlayReload() {
 	ReloadLocation(1, LOCATION_REMOVED, flag, queryBuffer);
 }
 uint32_t SingleMode::MessageHandler(intptr_t fduel, uint32_t type) {
-	if(!enable_log)
-		return 0;
 	char msgbuf[1024];
 	get_log_message(fduel, msgbuf);
 	mainGame->AddDebugMsg(msgbuf);

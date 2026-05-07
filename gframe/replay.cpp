@@ -157,12 +157,7 @@ bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 		return false;
 	if (myswprintf(new_path, L"./replay/%ls", newname) <= 0)
 		return false;
-	char oldfilefn[1024];
-	char newfilefn[1024];
-	BufferIO::EncodeUTF8(old_path, oldfilefn);
-	BufferIO::EncodeUTF8(new_path, newfilefn);
-	int result = std::rename(oldfilefn, newfilefn);
-	return result == 0;
+	return FileSystem::Rename(old_path, new_path);
 }
 bool Replay::ReadNextResponse(unsigned char resp[]) {
 	unsigned char len{};
@@ -191,7 +186,7 @@ bool Replay::ReadData(void* data, size_t length) {
 		return false;
 	}
 	if (length)
-		std::memcpy(data, &replay_data[data_position], length);
+		std::memcpy(data, replay_data + data_position, length);
 	data_position += length;
 	return true;
 }
