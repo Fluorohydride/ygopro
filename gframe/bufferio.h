@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstring>
 #include <cwchar>
+#include <algorithm>
 #include <vector>
 
 class BufferIO {
@@ -96,7 +97,7 @@ public:
 		if(len >= N)
 			len = N - 1;
 		size_t src_len = std::strlen(src);
-		size_t copy_len = (src_len < len) ? src_len : len;
+		size_t copy_len = std::min(src_len, len);
 		std::memcpy(dst, src, copy_len);
 		dst[copy_len] = 0;
 	}
@@ -105,7 +106,7 @@ public:
 		if(len >= N)
 			len = N - 1;
 		size_t src_len = std::wcslen(src);
-		size_t copy_len = (src_len < len) ? src_len : len;
+		size_t copy_len = std::min(src_len, len);
 		std::wmemcpy(dst, src, copy_len);
 		dst[copy_len] = 0;
 	}
