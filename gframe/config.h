@@ -1,7 +1,6 @@
 #ifndef YGOPRO_CONFIG_H
 #define YGOPRO_CONFIG_H
 
-#define _IRR_STATIC_LIB_
 #define IRR_COMPILE_WITH_DX9_DEV_PACK
 
 #include <cerrno>
@@ -57,6 +56,10 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 template<size_t N, typename... TR>
 inline int mysnprintf(char(&buf)[N], const char* fmt, TR... args) {
 	return std::snprintf(buf, N, fmt, args...);
+}
+template<typename T>
+inline T myclamp(T v, T lo, T hi) {
+	return (v < lo) ? lo : (hi < v) ? hi : v;
 }
 
 inline FILE* mywfopen(const wchar_t* filename, const char* mode) {

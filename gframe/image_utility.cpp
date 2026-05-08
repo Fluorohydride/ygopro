@@ -87,8 +87,8 @@ bool ImageUtility::imageScaleSTB(irr::video::IImage* src, irr::video::IImage* de
 		return false;
 	}
 
-	void* srcPtr = src->lock();
-	void* destPtr = dest->lock();
+	void* srcPtr = src->getData();
+	void* destPtr = dest->getData();
 	if(!srcPtr || !destPtr) {
 		return false;
 	}
@@ -216,8 +216,8 @@ irr::video::IImage* ImageUtility::RotateImageCCW90(irr::video::IVideoDriver* dri
 	irr::core::dimension2d<irr::u32> srcSize = src->getDimension();
 	irr::core::dimension2d<irr::u32> destSize(srcSize.Height, srcSize.Width);
 	irr::video::IImage* dest = driver->createImage(src->getColorFormat(), destSize);
-	void* srcData = src->lock();
-	void* destData = dest->lock();
+	void* srcData = src->getData();
+	void* destData = dest->getData();
 	if(srcData && destData) {
 		irr::u32 srcPitch = src->getPitch();
 		irr::u32 destPitch = dest->getPitch();

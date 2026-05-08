@@ -1,12 +1,9 @@
 project "jpeg"
     kind "StaticLib"
 
-    local nasm = os.getenv("ASM_NASM") or "nasm"
-    local turboSimdNasmDir = path.getabsolute("simd/nasm")
-    local turboSimdX64Dir  = path.getabsolute("simd/x86_64")
-    local turboSimdX86Dir  = path.getabsolute("simd/i386")
-
     files {
+        "src/jconfig.h",
+        "src/jconfigint.h",
         "src/jcapimin.c",
         "src/jchuff.c",
         "src/jcicc.c",
@@ -40,7 +37,15 @@ project "jpeg"
         "src/wrapper/j*.c",
     }
 
-    filter { "system:windows", "architecture:x86_64" }
+if USE_SIMD == "none" then
+    defines { "YGOPRO_NO_SIMD" }
+else
+    local nasm = os.getenv("ASM_NASM") or "nasm"
+    local turboSimdNasmDir = path.getabsolute("simd/nasm")
+    local turboSimdX64Dir  = path.getabsolute("simd/x86_64")
+    local turboSimdX86Dir  = path.getabsolute("simd/i386")
+
+    filter { "architecture:x86_64" }
         includedirs {
             "simd",
             "simd/nasm",
@@ -57,7 +62,7 @@ project "jpeg"
             "simd/x86_64/jdmrgext-*.asm",
         }
 
-    filter { "system:windows", "architecture:x86" }
+    filter { "architecture:x86" }
         includedirs {
             "simd",
             "simd/nasm",
@@ -74,7 +79,7 @@ project "jpeg"
             "simd/i386/jdmrgext-*.asm",
         }
 
-    filter { "system:windows", "architecture:x86_64", "files:simd/**.asm" }
+    filter { "action:vs*", "architecture:x86_64", "files:simd/**.asm" }
         buildmessage "NASM Compiling %{file.relpath}"
         buildcommands {
             '"' .. nasm .. '" -f win64 -DWIN64 -D__x86_64__ '
@@ -84,7 +89,7 @@ project "jpeg"
         }
         buildoutputs { "%{cfg.objdir}/%{file.basename}.obj" }
 
-    filter { "system:windows", "architecture:x86", "files:simd/**.asm" }
+    filter { "action:vs*", "architecture:x86", "files:simd/**.asm" }
         buildmessage "NASM Compiling %{file.relpath}"
         buildcommands {
             '"' .. nasm .. '" -f win32 -DWIN32 '
@@ -93,3 +98,48 @@ project "jpeg"
             .. '"%{file.relpath}" -o "%{cfg.objdir}/%{file.basename}.obj"'
         }
         buildoutputs { "%{cfg.objdir}/%{file.basename}.obj" }
+
+    filter { "action:gmake", "system:linux", "architecture:x86_64", "files:simd/**.asm" }
+        buildmessage "NASM Compiling %{file.relpath}"
+        buildcommands {
+            '"' .. nasm .. '" -f elf64 -DELF -D__x86_64__ -DPIC '
+            .. '-I"' .. turboSimdNasmDir .. '" '
+            .. '-I"' .. turboSimdX64Dir .. '" '
+            .. '"%{file.relpath}" -o "%{cfg.objdir}/%{file.basename}.o"'
+        }
+        buildoutputs { "%{cfg.objdir}/%{file.basename}.o" }
+
+    filter { "action:gmake", "system:macosx", "architecture:x86_64", "files:simd/**.asm" }
+        buildmessage "NASM Compiling %{file.relpath}"
+        buildcommands {
+            '"' .. nasm .. '" -f macho64 -DMACHO -D__x86_64__ -DPIC '
+            .. '-I"' .. turboSimdNasmDir .. '" '
+            .. '-I"' .. turboSimdX64Dir .. '" '
+            .. '"%{file.relpath}" -o "%{cfg.objdir}/%{file.basename}.o"'
+        }
+        buildoutputs { "%{cfg.objdir}/%{file.basename}.o" }
+
+    filter { "architecture:AARCH64" }
+        defines { "NEON_INTRINSICS" }
+        includedirs {
+            "simd",
+            "simd/arm",
+        }
+        files {
+            "simd/arm/jccolor-neon.c",
+            "simd/arm/jcgray-neon.c",
+            "simd/arm/jcphuff-neon.c",
+            "simd/arm/jcsample-neon.c",
+            "simd/arm/jdcolor-neon.c",
+            "simd/arm/jdmerge-neon.c",
+            "simd/arm/jdsample-neon.c",
+            "simd/arm/jfdctfst-neon.c",
+            "simd/arm/jfdctint-neon.c",
+            "simd/arm/jidctfst-neon.c",
+            "simd/arm/jidctint-neon.c",
+            "simd/arm/jidctred-neon.c",
+            "simd/arm/jquanti-neon.c",
+            "simd/arm/aarch64/jchuff-neon.c",
+            "simd/arm/aarch64/jsimd.c",
+        }
+end
