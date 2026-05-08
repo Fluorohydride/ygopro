@@ -22,7 +22,7 @@ public:
 	static void ClientEvent(bufferevent* bev, short events, void* ctx);
 	static int ClientThread();
 	static void HandleSTOCPacketLan(unsigned char* data, size_t len);
-	static bool ClientAnalyze(unsigned char* msg, int len);
+	static bool ClientAnalyze(unsigned char* msg, size_t len);
 	static void SwapField();
 	static void SetResponseI(int32_t respI);
 	static void SetResponseB(void* respB, size_t len);

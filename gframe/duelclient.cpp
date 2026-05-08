@@ -962,7 +962,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, size_t len) {
 	}
 }
 // Analyze STOC_GAME_MSG packet
-bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
+bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 	unsigned char* pbuf = msg;
 	wchar_t textBuffer[256]{};
 	mainGame->dInfo.curMsg = BufferIO::Read<uint8_t>(pbuf);
