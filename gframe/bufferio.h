@@ -92,21 +92,27 @@ public:
 	static int CopyCharArray(const T1* src, T2(&dst)[N]) {
 		return CopyWStr(src, dst, N);
 	}
+	static void CopyString(const char* src, char* dst, size_t len) {
+		size_t copy_len = std::min(std::strlen(src), len);
+		std::memcpy(dst, src, copy_len);
+		dst[copy_len] = 0;
+	}
 	template<size_t N>
 	static void CopyString(const char* src, char(&dst)[N], size_t len = N - 1) {
 		if(len >= N)
 			len = N - 1;
-		size_t copy_len = std::min(std::strlen(src), len);
-		std::memcpy(dst, src, copy_len);
+		CopyString(src, dst + 0, len);
+	}
+	static void CopyWideString(const wchar_t* src, wchar_t* dst, size_t len) {
+		size_t copy_len = std::min(std::wcslen(src), len);
+		std::wmemcpy(dst, src, copy_len);
 		dst[copy_len] = 0;
 	}
 	template<size_t N>
 	static void CopyWideString(const wchar_t* src, wchar_t(&dst)[N], size_t len = N - 1) {
 		if(len >= N)
 			len = N - 1;
-		size_t copy_len = std::min(std::wcslen(src), len);
-		std::wmemcpy(dst, src, copy_len);
-		dst[copy_len] = 0;
+		CopyWideString(src, dst + 0, len);
 	}
 	static bool IsHighSurrogate(unsigned int c) {
 		return (c >= 0xd800U && c <= 0xdbffU);
