@@ -277,9 +277,9 @@ void SoundManager::PlayMusic(wchar_t* music, bool loop) {
 		return;
 	if(!IsPlayingMusic(music)) {
 		StopBGM();
-	SetMusicVolume(mainGame->gameConf.music_volume);
+		SetMusicVolume(mainGame->gameConf.music_volume);
 #ifdef YGOPRO_USE_MINIAUDIO
-		BufferIO::CopyWStr(music, currentPlayingMusic, 1024);
+		BufferIO::CopyWideString(music, currentPlayingMusic);
 		ma_sound_init_from_file_w(&engineMusic, music, MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_STREAM, nullptr, nullptr, &soundBGM);
 		ma_sound_set_looping(&soundBGM, loop);
 		ma_sound_start(&soundBGM);
