@@ -740,7 +740,11 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 		mainGame->CloseGameButtons();
 		auto prep = pdata;
 		Replay new_replay;
-		std::memcpy(&new_replay.pheader, prep, sizeof(new_replay.pheader));
+		std::memcpy(&new_replay.pheader, prep, sizeof new_replay.pheader);
+		prep += sizeof new_replay.pheader;
+		size_t data_size = len - (1 + sizeof new_replay.pheader);
+		if (data_size > MAX_COMP_SIZE)
+			data_size = MAX_COMP_SIZE;
 		time_t starttime;
 		if (new_replay.pheader.base.flag & REPLAY_UNIFORM)
 			starttime = new_replay.pheader.base.start_time;
@@ -766,9 +770,8 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, int len) {
 			mainGame->WaitFrameSignal(30);
 		}
 		if(mainGame->actionParam || !is_host) {
-			prep += sizeof new_replay.pheader;
-			std::memcpy(new_replay.comp_data, prep, len - sizeof new_replay.pheader - 1);
-			new_replay.comp_size = len - sizeof new_replay.pheader - 1;
+			std::memcpy(new_replay.comp_data, prep, data_size);
+			new_replay.comp_size = data_size;
 			if (mainGame->actionParam) {
 				bool save_result = new_replay.SaveReplay(mainGame->ebRSName->getText());
 				if (!save_result)
