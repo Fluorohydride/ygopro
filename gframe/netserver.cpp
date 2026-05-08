@@ -133,7 +133,7 @@ void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 			break;
 		int read_len = evbuffer_remove(input, net_server_read, packet_len + 2);
 		if (read_len > 2)
-			HandleCTOSPacket(&users[bev], &net_server_read[2], packet_len);
+			HandleCTOSPacket(&users[bev], &net_server_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}
 }
