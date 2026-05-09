@@ -1606,10 +1606,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			}
 		}
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
-		if(select_hint)
-			myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetDesc(select_hint),
-			           mainGame->dField.select_min, mainGame->dField.select_max);
-		else myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetSysString(560), mainGame->dField.select_min, mainGame->dField.select_max);
+		int hint = select_hint ? select_hint : 560;
+		myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetDesc(hint), mainGame->dField.select_min, mainGame->dField.select_max);
 		select_hint = 0;
 		if (panelmode) {
 			mainGame->gMutex.lock();
@@ -1699,10 +1697,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 		if(select_hint)
 			select_unselect_hint = select_hint;
-		if(select_unselect_hint)
-			myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetDesc(select_unselect_hint),
-			           mainGame->dField.select_min, mainGame->dField.select_max);
-		else myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetSysString(560), mainGame->dField.select_min, mainGame->dField.select_max);
+		int hint = select_unselect_hint ? select_unselect_hint : 560;
+		myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetDesc(hint), mainGame->dField.select_min, mainGame->dField.select_max);
 		select_hint = 0;
 		if (panelmode) {
 			mainGame->gMutex.lock();
@@ -1851,10 +1847,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			else
 				myswprintf(textBuffer, dataManager.GetSysString(560));
 		} else {
-			if (select_hint)
-				myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
-			else
-				myswprintf(textBuffer, dataManager.GetSysString(570));
+			int hint = select_hint ? select_hint : 570;
+			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(hint));
 		}
 		select_hint = 0;
 		mainGame->stHintMsg->setText(textBuffer);
@@ -1978,10 +1972,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			pcard->is_selectable = true;
 		}
 		mainGame->dField.CheckSelectTribute();
-		if(select_hint)
-			myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetDesc(select_hint),
-			           mainGame->dField.select_min, mainGame->dField.select_max);
-		else myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetSysString(531), mainGame->dField.select_min, mainGame->dField.select_max);
+		int hint = select_hint ? select_hint : 531;
+		myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetDesc(hint), mainGame->dField.select_min, mainGame->dField.select_max);
 		select_hint = 0;
 		mainGame->gMutex.lock();
 		mainGame->stHintMsg->setText(textBuffer);
@@ -3627,9 +3619,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				mainGame->chkRace[i]->setVisible(true);
 			else mainGame->chkRace[i]->setVisible(false);
 		}
-		if(select_hint)
-			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
-		else myswprintf(textBuffer, dataManager.GetSysString(563));
+		int hint = select_hint ? select_hint : 563;
+		myswprintf(textBuffer, L"%ls", dataManager.GetDesc(hint));
 		select_hint = 0;
 		mainGame->gMutex.lock();
 		mainGame->wANRace->setText(textBuffer);
@@ -3647,9 +3638,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 				mainGame->chkAttribute[i]->setVisible(true);
 			else mainGame->chkAttribute[i]->setVisible(false);
 		}
-		if(select_hint)
-			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
-		else myswprintf(textBuffer, dataManager.GetSysString(562));
+		int hint = select_hint ? select_hint : 562;
+		myswprintf(textBuffer, L"%ls", dataManager.GetDesc(hint));
 		select_hint = 0;
 		mainGame->gMutex.lock();
 		mainGame->wANAttribute->setText(textBuffer);
@@ -3663,9 +3653,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 		mainGame->dField.declare_opcodes.clear();
 		for (int i = 0; i < count; ++i)
 			mainGame->dField.declare_opcodes.push_back(BufferIO::Read<uint32_t>(pbuf));
-		if(select_hint)
-			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
-		else myswprintf(textBuffer, dataManager.GetSysString(564));
+		int hint = select_hint ? select_hint : 564;
+		myswprintf(textBuffer, L"%ls", dataManager.GetDesc(hint));
 		select_hint = 0;
 		mainGame->gMutex.lock();
 		mainGame->ebANCard->setText(L"");
@@ -3718,9 +3707,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + 95;
 			mainGame->wANNumber->setRelativePosition(pos);
 		}
-		if(select_hint)
-			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
-		else myswprintf(textBuffer, dataManager.GetSysString(565));
+		int hint = select_hint ? select_hint : 565;
+		myswprintf(textBuffer, L"%ls", dataManager.GetDesc(hint));
 		select_hint = 0;
 		mainGame->wANNumber->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wANNumber);
