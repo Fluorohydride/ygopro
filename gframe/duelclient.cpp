@@ -3540,21 +3540,20 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	case MSG_TOSS_COIN: {
 		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int count = BufferIO::Read<uint8_t>(pbuf);
-		wchar_t* pwbuf = textBuffer;
-		BufferIO::CopyWStrRef(dataManager.GetSysString(1623), pwbuf, 256);
+		std::wstring result;
+		result += dataManager.GetSysString(1623);
 		for (int i = 0; i < count; ++i) {
-			int res = BufferIO::Read<uint8_t>(pbuf);
-			*pwbuf++ = L'[';
-			BufferIO::CopyWStrRef(dataManager.GetSysString(res ? 60 : 61), pwbuf, 256);
-			*pwbuf++ = L']';
+			uint8_t res = BufferIO::Read<uint8_t>(pbuf);
+			result += L'[';
+			result += dataManager.GetSysString(res ? 60 : 61);
+			result += L']';
 		}
-		*pwbuf = 0;
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		soundManager.PlaySoundEffect(SOUND_COIN);
 		mainGame->gMutex.lock();
-		mainGame->AddLog(textBuffer);
-		mainGame->stACMessage->setText(textBuffer);
+		mainGame->AddLog(result.c_str());
+		mainGame->stACMessage->setText(result.c_str());
 		mainGame->PopupElement(mainGame->wACMessage, 20);
 		mainGame->gMutex.unlock();
 		mainGame->WaitFrameSignal(40);
@@ -3563,21 +3562,20 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 	case MSG_TOSS_DICE: {
 		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int count = BufferIO::Read<uint8_t>(pbuf);
-		wchar_t* pwbuf = textBuffer;
-		BufferIO::CopyWStrRef(dataManager.GetSysString(1624), pwbuf, 256);
+		std::wstring result;
+		result += dataManager.GetSysString(1624);
 		for (int i = 0; i < count; ++i) {
-			int res = BufferIO::Read<uint8_t>(pbuf);
-			*pwbuf++ = L'[';
-			*pwbuf++ = L'0' + res;
-			*pwbuf++ = L']';
+			uint8_t res = BufferIO::Read<uint8_t>(pbuf);
+			result += L'[';
+			result += (L'0' + res);
+			result += L']';
 		}
-		*pwbuf = 0;
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		soundManager.PlaySoundEffect(SOUND_DICE);
 		mainGame->gMutex.lock();
-		mainGame->AddLog(textBuffer);
-		mainGame->stACMessage->setText(textBuffer);
+		mainGame->AddLog(result.c_str());
+		mainGame->stACMessage->setText(result.c_str());
 		mainGame->PopupElement(mainGame->wACMessage, 20);
 		mainGame->gMutex.unlock();
 		mainGame->WaitFrameSignal(40);
