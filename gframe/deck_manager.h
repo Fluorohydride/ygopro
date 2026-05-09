@@ -6,6 +6,12 @@
 #include <sstream>
 #include "deck.h"
 
+namespace irr {
+	namespace io {
+		class IReadFile;
+	}
+}
+
 namespace ygo {
 
 constexpr int DECK_MAX_SIZE = 60;

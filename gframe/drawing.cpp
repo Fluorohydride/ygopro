@@ -7,6 +7,7 @@
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
+#include "data_manager.h"
 #include "deck_manager.h"
 #include "sound_manager.h"
 #include "duelclient.h"

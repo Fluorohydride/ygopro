@@ -4,6 +4,7 @@
 #include <random>
 #include "config.h"
 #include "duelclient.h"
+#include "data_manager.h"
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
