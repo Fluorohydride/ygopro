@@ -1599,8 +1599,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			pcard->is_selected = false;
 			if (l & 0xf1)
 				panelmode = true;
-			if((l & LOCATION_HAND) && hand_count[c] >= 10) {
-				if(++select_count_in_hand[c] > 1)
+			if ((l & LOCATION_HAND) && hand_count[c] >= 10) {
+				select_count_in_hand[c]++;
+				if (select_count_in_hand[c] > 1)
 					panelmode = true;
 			}
 		}
@@ -1665,7 +1666,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			if (l & 0xf1)
 				panelmode = true;
 			if((l & LOCATION_HAND) && hand_count[c] >= 10) {
-				if(++select_count_in_hand[c] > 1)
+				select_count_in_hand[c]++;
+				if(select_count_in_hand[c] > 1)
 					panelmode = true;
 			}
 		}
@@ -1689,7 +1691,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, int len) {
 			if (l & 0xf1)
 				panelmode = true;
 			if((l & LOCATION_HAND) && hand_count[c] >= 10) {
-				if(++select_count_in_hand[c] > 1)
+				select_count_in_hand[c]++;
+				if(select_count_in_hand[c] > 1)
 					panelmode = true;
 			}
 		}
