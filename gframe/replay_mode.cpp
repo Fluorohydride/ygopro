@@ -19,6 +19,7 @@ bool ReplayMode::exit_pending = false;
 int ReplayMode::skip_turn = 0;
 int ReplayMode::current_step = 0;
 int ReplayMode::skip_step = 0;
+std::vector<unsigned char> ReplayMode::queryBuffer(SIZE_QUERY_BUFFER);
 
 bool ReplayMode::StartReplay(int skipturn) {
 	skip_turn = skipturn;
@@ -859,24 +860,20 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 	}
 	return true;
 }
-inline void ReplayMode::ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer) {
+inline void ReplayMode::ReloadLocation(int player, int location, int flag) {
 	query_field_card(pduel, player, location, flag, queryBuffer.data(), 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, queryBuffer.data());
 }
 void ReplayMode::ReplayRefresh(int flag) {
-	std::vector<unsigned char> queryBuffer;
-	queryBuffer.resize(SIZE_QUERY_BUFFER);
-	ReloadLocation(0, LOCATION_MZONE, flag, queryBuffer);
-	ReloadLocation(1, LOCATION_MZONE, flag, queryBuffer);
-	ReloadLocation(0, LOCATION_SZONE, flag, queryBuffer);
-	ReloadLocation(1, LOCATION_SZONE, flag, queryBuffer);
-	ReloadLocation(0, LOCATION_HAND, flag, queryBuffer);
-	ReloadLocation(1, LOCATION_HAND, flag, queryBuffer);
+	ReloadLocation(0, LOCATION_MZONE, flag);
+	ReloadLocation(1, LOCATION_MZONE, flag);
+	ReloadLocation(0, LOCATION_SZONE, flag);
+	ReloadLocation(1, LOCATION_SZONE, flag);
+	ReloadLocation(0, LOCATION_HAND, flag);
+	ReloadLocation(1, LOCATION_HAND, flag);
 }
 void ReplayMode::ReplayRefreshLocation(int player, int location, int flag) {
-	std::vector<unsigned char> queryBuffer;
-	queryBuffer.resize(SIZE_QUERY_BUFFER);
-	ReloadLocation(player, location, flag, queryBuffer);
+	ReloadLocation(player, location, flag);
 }
 inline void ReplayMode::ReplayRefreshHand(int player, int flag) {
 	ReplayRefreshLocation(player, LOCATION_HAND, flag);
@@ -896,24 +893,22 @@ void ReplayMode::ReplayRefreshSingle(int player, int location, int sequence, int
 	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, queryBuffer);
 }
 void ReplayMode::ReplayReload() {
-	std::vector<unsigned char> queryBuffer;
-	queryBuffer.resize(SIZE_QUERY_BUFFER);
 	unsigned int flag = 0xffdfff;
-	ReloadLocation(0, LOCATION_MZONE, flag, queryBuffer);
-	ReloadLocation(1, LOCATION_MZONE, flag, queryBuffer);
-	ReloadLocation(0, LOCATION_SZONE, flag, queryBuffer);
-	ReloadLocation(1, LOCATION_SZONE, flag, queryBuffer);
-	ReloadLocation(0, LOCATION_HAND, flag, queryBuffer);
-	ReloadLocation(1, LOCATION_HAND, flag, queryBuffer);
+	ReloadLocation(0, LOCATION_MZONE, flag);
+	ReloadLocation(1, LOCATION_MZONE, flag);
+	ReloadLocation(0, LOCATION_SZONE, flag);
+	ReloadLocation(1, LOCATION_SZONE, flag);
+	ReloadLocation(0, LOCATION_HAND, flag);
+	ReloadLocation(1, LOCATION_HAND, flag);
 
-	ReloadLocation(0, LOCATION_DECK, flag, queryBuffer);
-	ReloadLocation(1, LOCATION_DECK, flag, queryBuffer);
-	ReloadLocation(0, LOCATION_EXTRA, flag, queryBuffer);
-	ReloadLocation(1, LOCATION_EXTRA, flag, queryBuffer);
-	ReloadLocation(0, LOCATION_GRAVE, flag, queryBuffer);
-	ReloadLocation(1, LOCATION_GRAVE, flag, queryBuffer);
-	ReloadLocation(0, LOCATION_REMOVED, flag, queryBuffer);
-	ReloadLocation(1, LOCATION_REMOVED, flag, queryBuffer);
+	ReloadLocation(0, LOCATION_DECK, flag);
+	ReloadLocation(1, LOCATION_DECK, flag);
+	ReloadLocation(0, LOCATION_EXTRA, flag);
+	ReloadLocation(1, LOCATION_EXTRA, flag);
+	ReloadLocation(0, LOCATION_GRAVE, flag);
+	ReloadLocation(1, LOCATION_GRAVE, flag);
+	ReloadLocation(0, LOCATION_REMOVED, flag);
+	ReloadLocation(1, LOCATION_REMOVED, flag);
 }
 uint32_t ReplayMode::MessageHandler(intptr_t fduel, uint32_t type) {
 	char msgbuf[1024];

@@ -2,6 +2,7 @@
 #define TAG_DUEL_H
 
 #include <set>
+#include <vector>
 #include "network.h"
 #include "deck.h"
 #include "replay.h"
@@ -46,6 +47,7 @@ private:
 	int WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache);
 	
 protected:
+	std::vector<unsigned char> query_buffer;
 	DuelPlayer* players[4];
 	DuelPlayer* pplayer[4];
 	DuelPlayer* cur_player[2];

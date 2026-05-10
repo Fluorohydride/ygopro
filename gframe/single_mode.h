@@ -12,7 +12,7 @@ private:
 	static intptr_t pduel;
 	static bool is_closing;
 	static bool is_continuing;
-	static void ReloadLocation(int player, int location, int flag, std::vector<unsigned char>& queryBuffer);
+	static void ReloadLocation(int player, int location, int flag);
 
 public:
 	static bool StartPlay();
@@ -34,6 +34,7 @@ public:
 
 protected:
 	static Replay last_replay;
+	static std::vector<unsigned char> queryBuffer;
 };
 
 }
