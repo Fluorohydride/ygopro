@@ -76,6 +76,7 @@ public:
 		pstr[l] = 0;
 		return l;
 	}
+	[[deprecated]]
 	template<typename T1, typename T2>
 	static int CopyWStrRef(const T1* src, T2*& pstr, int bufsize) {
 		int l = 0;
