@@ -34,7 +34,7 @@ void Replay::WriteHeader(ExtendedReplayHeader& header) {
 void Replay::WriteData(const void* data, size_t length, bool flush) {
 	if(!is_recording)
 		return;
-	if (replay_size + length > MAX_REPLAY_SIZE)
+	if (length > MAX_REPLAY_SIZE - replay_size)
 		return;
 	std::memcpy(replay_data + replay_size, data, length);
 	replay_size += length;
@@ -181,7 +181,7 @@ void Replay::ReadHeader(ExtendedReplayHeader& header) {
 bool Replay::ReadData(void* data, size_t length) {
 	if (!is_replaying || !can_read)
 		return false;
-	if (data_position + length > replay_size) {
+	if (length > replay_size - data_position) {
 		can_read = false;
 		return false;
 	}
