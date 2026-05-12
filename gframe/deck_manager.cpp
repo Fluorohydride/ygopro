@@ -148,11 +148,11 @@ uint32_t DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, size_t ru
 	}
 	return 0;
 }
-uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec, bool is_packlist) {
+uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], uint32_t mainc, uint32_t sidec, bool is_packlist) {
 	deck.clear();
 	uint32_t errorcode = 0;
 	auto& _datas = dataManager.GetDataTable();
-	for(int i = 0; i < mainc; ++i) {
+	for(uint32_t i = 0; i < mainc; ++i) {
 		auto code = dbuf[i];
 		auto it = _datas.find(code);
 		if(it == _datas.end()) {
@@ -177,7 +177,7 @@ uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec
 				deck.main.push_back(&cd);
 		}
 	}
-	for(int i = 0; i < sidec; ++i) {
+	for(uint32_t i = 0; i < sidec; ++i) {
 		auto code = dbuf[mainc + i];
 		auto it = _datas.find(code);
 		if(it == _datas.end()) {
@@ -219,7 +219,7 @@ uint32_t DeckManager::LoadDeckFromStream(Deck& deck, std::istringstream& deckStr
 	}
 	return LoadDeck(deck, cardlist, mainc, sidec, is_packlist);
 }
-bool DeckManager::LoadSide(Deck& deck, uint32_t dbuf[], int mainc, int sidec) {
+bool DeckManager::LoadSide(Deck& deck, uint32_t dbuf[], uint32_t mainc, uint32_t sidec) {
 	std::unordered_map<uint32_t, int> pcount;
 	std::unordered_map<uint32_t, int> ncount;
 	for(auto card : deck.main)
