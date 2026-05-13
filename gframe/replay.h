@@ -46,8 +46,8 @@ struct DuelParameters {
 };
 
 // max size
-constexpr int MAX_REPLAY_SIZE = 0x80000;
-constexpr int MAX_COMP_SIZE = UINT16_MAX - 1 - sizeof(ExtendedReplayHeader); // UINT16_MAX - 1 = MAX_DATA_SIZE;
+constexpr size_t MAX_REPLAY_SIZE = 0x80000;
+constexpr size_t MAX_COMP_SIZE = UINT16_MAX - 1 - sizeof(ExtendedReplayHeader); // UINT16_MAX - 1 : MAX_DATA_SIZE
 
 class Replay {
 public:
