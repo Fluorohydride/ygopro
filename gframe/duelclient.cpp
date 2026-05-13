@@ -4060,8 +4060,8 @@ void DuelClient::SendResponse() {
 void DuelClient::SendUpdateDeck(const Deck& deck) {
 	std::vector<unsigned char> deckbuf;
 	deckbuf.reserve(1024);
-	BufferIO::VectorWrite<int32_t>(deckbuf, static_cast<int32_t>(deck.main.size() + deck.extra.size()));
-	BufferIO::VectorWrite<int32_t>(deckbuf, static_cast<int32_t>(deck.side.size()));
+	BufferIO::VectorWrite<uint32_t>(deckbuf, static_cast<uint32_t>(deck.main.size() + deck.extra.size()));
+	BufferIO::VectorWrite<uint32_t>(deckbuf, static_cast<uint32_t>(deck.side.size()));
 	for (const auto& card: deck.main)
 		BufferIO::VectorWrite<uint32_t>(deckbuf, card->code);
 	for (const auto& card: deck.extra)
