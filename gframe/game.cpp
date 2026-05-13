@@ -2340,12 +2340,7 @@ void Game::SetWindowsIcon() {
 #endif
 }
 void Game::SetWindowsScale(float scale) {
-#ifdef _WIN32
-	WINDOWPLACEMENT plc;
-	plc.length = sizeof(WINDOWPLACEMENT);
-	if(GetWindowPlacement(hWnd, &plc) && (plc.showCmd == SW_SHOWMAXIMIZED))
-		ShowWindow(hWnd, SW_RESTORE);
-#endif
+	device->restoreWindow();
 	device->setWindowSize(irr::core::dimension2du(GAME_WINDOW_WIDTH * scale, GAME_WINDOW_HEIGHT * scale));
 }
 void Game::FlashWindow() {
