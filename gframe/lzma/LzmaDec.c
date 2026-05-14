@@ -175,7 +175,9 @@ static int MY_FAST_CALL LzmaDec_DecodeReal(CLzmaDec *p, SizeT limit, const Byte 
       }
       else
       {
-        unsigned matchByte = p->dic[(dicPos - rep0) + ((dicPos < rep0) ? dicBufSize : 0)];
+        SizeT matchPos = (dicPos - rep0) + ((dicPos < rep0) ? dicBufSize : 0);
+        if (matchPos >= dicBufSize) return SZ_ERROR_DATA;
+        unsigned matchByte = p->dic[matchPos];
         unsigned offs = 0x100;
         state -= (state < 10) ? 3 : 6;
         symbol = 1;
@@ -217,7 +219,9 @@ static int MY_FAST_CALL LzmaDec_DecodeReal(CLzmaDec *p, SizeT limit, const Byte 
           IF_BIT_0(prob)
           {
             UPDATE_0(prob);
-            dic[dicPos] = dic[(dicPos - rep0) + ((dicPos < rep0) ? dicBufSize : 0)];
+            SizeT sourcePos = (dicPos - rep0) + ((dicPos < rep0) ? dicBufSize : 0);
+            if (sourcePos >= dicBufSize) return SZ_ERROR_DATA;
+            dic[dicPos] = dic[sourcePos];
             dicPos++;
             processedPos++;
             state = state < kNumLitStates ? 9 : 11;
@@ -363,6 +367,7 @@ static int MY_FAST_CALL LzmaDec_DecodeReal(CLzmaDec *p, SizeT limit, const Byte 
         rep2 = rep1;
         rep1 = rep0;
         rep0 = distance + 1;
+        if (rep0 > dicBufSize) return SZ_ERROR_DATA;
         if (checkDicSize == 0)
         {
           if (distance >= processedPos)
@@ -381,6 +386,7 @@ static int MY_FAST_CALL LzmaDec_DecodeReal(CLzmaDec *p, SizeT limit, const Byte 
         SizeT rem = limit - dicPos;
         unsigned curLen = ((rem < len) ? (unsigned)rem : len);
         SizeT pos = (dicPos - rep0) + ((dicPos < rep0) ? dicBufSize : 0);
+        if (pos >= dicBufSize) return SZ_ERROR_DATA;
 
         processedPos += curLen;
 
@@ -434,6 +440,7 @@ static void MY_FAST_CALL LzmaDec_WriteRem(CLzmaDec *p, SizeT limit)
     SizeT dicBufSize = p->dicBufSize;
     unsigned len = p->remainLen;
     UInt32 rep0 = p->reps[0];
+    if (rep0 > dicBufSize) return;
     if (limit - dicPos < len)
       len = (unsigned)(limit - dicPos);
 
@@ -519,8 +526,9 @@ static ELzmaDummy LzmaDec_TryDummy(const CLzmaDec *p, const Byte *buf, SizeT inS
       }
       else
       {
-        unsigned matchByte = p->dic[p->dicPos - p->reps[0] +
-            ((p->dicPos < p->reps[0]) ? p->dicBufSize : 0)];
+        SizeT matchPos = p->dicPos - p->reps[0] + ((p->dicPos < p->reps[0]) ? p->dicBufSize : 0);
+        if (matchPos >= p->dicBufSize) return DUMMY_ERROR;
+        unsigned matchByte = p->dic[matchPos];
         unsigned offs = 0x100;
         unsigned symbol = 1;
         do
