@@ -12,7 +12,7 @@ DeckManager deckManager;
 void DeckManager::LoadLFListSingle(const char* path) {
 	auto cur = _lfList.rend();
 	FILE* fp = myfopen(path, "r");
-	char linebuf[256]{};
+	char linebuf[1024]{};
 	wchar_t strBuffer[256]{};
 	if(fp) {
 		while(std::fgets(linebuf, sizeof linebuf, fp)) {
