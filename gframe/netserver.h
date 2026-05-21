@@ -26,6 +26,11 @@ public:
 	static void DisconnectPlayer(DuelPlayer* dp);
 	static void HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, size_t len);
 	static size_t CreateChatPacket(unsigned char* src, int src_size, unsigned char* dst, uint16_t dst_player_type);
+	static inline bool ShouldHideFacedownCode(uint8_t& position) {
+		const bool public_reveal = (position & POS_REVEAL) != 0;
+		position &= static_cast<uint8_t>(~POS_REVEAL);
+		return (position & POS_FACEDOWN) && !public_reveal;
+	}
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto) {
 		auto p = net_server_write;
 		BufferIO::Write<uint16_t>(p, 1);
