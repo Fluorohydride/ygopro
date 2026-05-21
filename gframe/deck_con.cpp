@@ -2,6 +2,8 @@
 #include <array>
 #include "config.h"
 #include "deck_con.h"
+#include "data_manager.h"
+#include "deck_manager.h"
 #include "myfilesystem.h"
 #include "image_manager.h"
 #include "sound_manager.h"
@@ -1746,10 +1748,7 @@ void DeckBuilder::ShowBigCard(int code, float zoom) {
 	mainGame->gMutex.unlock();
 }
 void DeckBuilder::ZoomBigCard(irr::s32 centerx, irr::s32 centery) {
-	if(bigcard_zoom >= 4)
-		bigcard_zoom = 4;
-	if(bigcard_zoom <= 0.2f)
-		bigcard_zoom = 0.2f;
+	bigcard_zoom = myclamp(bigcard_zoom, 0.2f, 4.0f);
 	auto img = imageManager.GetBigPicture(bigcard_code, bigcard_zoom);
 	mainGame->imgBigCard->setImage(img);
 	auto size = img->getSize();

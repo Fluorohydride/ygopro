@@ -34,7 +34,7 @@ void Replay::WriteHeader(ExtendedReplayHeader& header) {
 void Replay::WriteData(const void* data, size_t length, bool flush) {
 	if(!is_recording)
 		return;
-	if (replay_size + length > MAX_REPLAY_SIZE)
+	if (length > MAX_REPLAY_SIZE - replay_size)
 		return;
 	std::memcpy(replay_data + replay_size, data, length);
 	replay_size += length;
@@ -157,12 +157,7 @@ bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 		return false;
 	if (myswprintf(new_path, L"./replay/%ls", newname) <= 0)
 		return false;
-	char oldfilefn[1024];
-	char newfilefn[1024];
-	BufferIO::EncodeUTF8(old_path, oldfilefn);
-	BufferIO::EncodeUTF8(new_path, newfilefn);
-	int result = std::rename(oldfilefn, newfilefn);
-	return result == 0;
+	return FileSystem::Rename(old_path, new_path);
 }
 bool Replay::ReadNextResponse(unsigned char resp[]) {
 	unsigned char len{};
@@ -186,12 +181,12 @@ void Replay::ReadHeader(ExtendedReplayHeader& header) {
 bool Replay::ReadData(void* data, size_t length) {
 	if (!is_replaying || !can_read)
 		return false;
-	if (data_position + length > replay_size) {
+	if (length > replay_size - data_position) {
 		can_read = false;
 		return false;
 	}
 	if (length)
-		std::memcpy(data, &replay_data[data_position], length);
+		std::memcpy(data, replay_data + data_position, length);
 	data_position += length;
 	return true;
 }
