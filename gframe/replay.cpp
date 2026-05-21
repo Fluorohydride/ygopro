@@ -3,7 +3,9 @@
 #include "replay.h"
 #include "myfilesystem.h"
 #include "deck_manager.h"
-#include "lzma/LzmaLib.h"
+
+#define LZMA_API_STATIC
+#include <lzma.h>
 
 namespace ygo {
 
@@ -56,12 +58,28 @@ void Replay::EndRecord() {
 	std::fclose(fp);
 	pheader.base.datasize = replay_size;
 	pheader.base.flag |= REPLAY_COMPRESSED;
-	size_t propsize = 5;
-	comp_size = MAX_COMP_SIZE;
-	int ret = LzmaCompress(comp_data, &comp_size, replay_data, replay_size, pheader.base.props, &propsize, 5, 0x1U << 24, 3, 0, 2, 32, 1);
-	if (ret != SZ_OK) {
-		std::memcpy(comp_data, &ret, sizeof ret);
-		comp_size = sizeof ret;
+	lzma_options_lzma opt;
+	lzma_lzma_preset(&opt, 5);
+	opt.dict_size = 0x1U << 24;
+	opt.lc = 3;
+	opt.lp = 0;
+	opt.pb = 2;
+	opt.nice_len = 32;
+	opt.mf = LZMA_MF_BT4;
+	opt.ext_flags = 0;
+	lzma_filter filters[2];
+	filters[0].id = LZMA_FILTER_LZMA1EXT;
+	filters[0].options = &opt;
+	filters[1].id = LZMA_VLI_UNKNOWN;
+	filters[1].options = nullptr;
+	lzma_properties_encode(&filters[0], pheader.base.props);
+	size_t out_pos = 0;
+	lzma_ret lret = lzma_raw_buffer_encode(filters, nullptr, replay_data, replay_size, comp_data, &out_pos, MAX_COMP_SIZE);
+	if (lret != LZMA_OK) {
+		std::memcpy(comp_data, &lret, sizeof lret);
+		comp_size = sizeof lret;
+	} else {
+		comp_size = out_pos;
 	}
 	is_recording = false;
 }
@@ -117,9 +135,20 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		if (pheader.base.datasize > MAX_REPLAY_SIZE)
 			return false;
 		replay_size = pheader.base.datasize;
-		if (LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.base.props, 5) != SZ_OK)
+		lzma_filter filter;
+		filter.id = LZMA_FILTER_LZMA1;
+		filter.options = nullptr;
+		if (lzma_properties_decode(&filter, nullptr, pheader.base.props, 5) != LZMA_OK)
 			return false;
-		if (replay_size != pheader.base.datasize) {
+		lzma_options_lzma *lzma_opt = static_cast<lzma_options_lzma *>(filter.options);
+		lzma_set_ext_size(*lzma_opt, replay_size);
+		lzma_opt->ext_flags = LZMA_LZMA1EXT_ALLOW_EOPM;
+		filter.id = LZMA_FILTER_LZMA1EXT;
+		lzma_filter filters[2] = { filter, { LZMA_VLI_UNKNOWN, nullptr } };
+		size_t in_pos = 0, out_pos = 0;
+		lzma_ret lret = lzma_raw_buffer_decode(filters, nullptr, comp_data, &in_pos, comp_size, replay_data, &out_pos, replay_size);
+		lzma_filters_free(filters, nullptr);
+		if (lret != LZMA_OK || out_pos != replay_size) {
 			replay_size = 0;
 			return false;
 		}
