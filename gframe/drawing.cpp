@@ -1,9 +1,4 @@
 #include "game.h"
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
@@ -11,6 +6,30 @@
 #include "deck_manager.h"
 #include "sound_manager.h"
 #include "duelclient.h"
+
+namespace {
+
+// Draws a camera-facing quad between two world-space points.
+void DrawThickLine3D(irr::video::IVideoDriver* driver,
+                     const irr::core::vector3df& start, const irr::core::vector3df& end,
+                     const irr::core::vector3df& camFwd, irr::f32 halfThick,
+                     irr::video::SColor color) {
+	irr::core::vector3df perp = (end - start).crossProduct(camFwd);
+	const irr::f32 len = perp.getLength();
+	if(len < 1e-6f) return;
+	perp *= halfThick / len;
+	irr::video::S3DVertex v[4];
+	static const irr::u16 idx[6] = {0, 2, 1, 1, 2, 3};
+	for(int i = 0; i < 4; ++i) { v[i].Color = color; v[i].Normal = {0, 0, -1}; }
+	v[0].Pos = start + perp;
+	v[1].Pos = start - perp;
+	v[2].Pos = end + perp;
+	v[3].Pos = end - perp;
+	driver->drawVertexPrimitiveList(v, 4, idx, 2,
+	    irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLES);
+}
+
+}
 
 namespace ygo {
 
@@ -65,55 +84,63 @@ void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver, irr::video::ITextur
 }
 
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::video::SColor color) {
-	if(!gameConf.use_d3d) {
-		GLfloat origin[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-		irr::u32 rawColor = color.color;
-		constexpr float k = 1.0f / 255.0f;
-		GLfloat cv[4] = {
-			(rawColor >> 16 & 0xff) * k, // red
-			(rawColor >>  8 & 0xff) * k, // green
-			(rawColor       & 0xff) * k, // blue
-			(rawColor >> 24 & 0xff) * k  // alpha
-		};
-		glLineWidth(matManager.mOutLine.Thickness);
-		if(stipple) {
-			glLineStipple(1, stippleMask);
-			glEnable(GL_LINE_STIPPLE);
+	static const int edgeStart[] = { 0, 1, 3, 2 };
+	static const int edgeEnd[]   = { 1, 3, 2, 0 };
+	driver->setMaterial(matManager.mOutLine);
+	// Transform vertices to world space and draw there
+	const irr::core::matrix4 oldWorld = driver->getTransform(irr::video::ETS_WORLD);
+	irr::core::vector3df wp[4];
+	for(int i = 0; i < 4; ++i)
+		oldWorld.transformVect(wp[i], vec[i].Pos);
+	const irr::core::matrix4& view = driver->getTransform(irr::video::ETS_VIEW);
+	const irr::core::vector3df camFwd(view(0,2), view(1,2), view(2,2));
+	const irr::f32 halfThick = matManager.mOutLine.Thickness * 0.005f;
+	driver->setTransform(irr::video::ETS_WORLD, irr::core::matrix4());
+	if(!stipple) {
+		for(int i = 0; i < 4; ++i)
+			DrawThickLine3D(driver, wp[edgeStart[i]], wp[edgeEnd[i]], camFwd, halfThick, color);
+	} else if(gameConf.solid_selection_line) {
+		const irr::f32 t0 = (linePattern < 15) ? 0.0f : (linePattern - 14) / 15.0f;
+		const irr::f32 t1 = (linePattern < 15) ? (linePattern + 1) / 15.0f : 1.0f;
+		for(int i = 0; i < 4; ++i) {
+			const auto& s = wp[edgeStart[i]];
+			const auto d = wp[edgeEnd[i]] - s;
+			DrawThickLine3D(driver, s + d * t0, s + d * t1, camFwd, halfThick, color);
 		}
-		glDisable(GL_TEXTURE_2D);
-		glMaterialfv(GL_FRONT, GL_AMBIENT, cv);
-		glBegin(GL_LINE_LOOP);
-		glVertex3fv(&vec[0].Pos.X);
-		glVertex3fv(&vec[1].Pos.X);
-		glVertex3fv(&vec[3].Pos.X);
-		glVertex3fv(&vec[2].Pos.X);
-		glEnd();
-		glMaterialfv(GL_FRONT, GL_AMBIENT, origin);
-		glDisable(GL_LINE_STIPPLE);
-		glEnable(GL_TEXTURE_2D);
 	} else {
-		driver->setMaterial(matManager.mOutLine);
-		if(stipple) {
-			if(linePattern < 15) {
-				float progress = (linePattern + 1) / 15.0f;
-				driver->draw3DLine(vec[0].Pos, vec[0].Pos + (vec[1].Pos - vec[0].Pos) * progress);
-				driver->draw3DLine(vec[1].Pos, vec[1].Pos + (vec[3].Pos - vec[1].Pos) * progress);
-				driver->draw3DLine(vec[3].Pos, vec[3].Pos + (vec[2].Pos - vec[3].Pos) * progress);
-				driver->draw3DLine(vec[2].Pos, vec[2].Pos + (vec[0].Pos - vec[2].Pos) * progress);
-			} else {
-				float progress = (linePattern - 14) / 15.0f;
-				driver->draw3DLine(vec[0].Pos + (vec[1].Pos - vec[0].Pos) * progress, vec[1].Pos);
-				driver->draw3DLine(vec[1].Pos + (vec[3].Pos - vec[1].Pos) * progress, vec[3].Pos);
-				driver->draw3DLine(vec[3].Pos + (vec[2].Pos - vec[3].Pos) * progress, vec[2].Pos);
-				driver->draw3DLine(vec[2].Pos + (vec[0].Pos - vec[2].Pos) * progress, vec[0].Pos);
+		// Project edge endpoints to screen space to get pixel length for pattern tiling.
+		// (1 pattern bit = 1 screen pixel, matching the original GL stipple behaviour.)
+		irr::core::matrix4 pv = driver->getTransform(irr::video::ETS_PROJECTION);
+		pv *= view;
+		const auto sz = driver->getCurrentRenderTargetSize();
+		const irr::f32 hw = sz.Width * 0.5f, hh = sz.Height * 0.5f;
+		irr::f32 patternCursor = 0.0f;
+		for(int i = 0; i < 4; ++i) {
+			const auto& s = wp[edgeStart[i]];
+			const auto d = wp[edgeEnd[i]] - s;
+			irr::f32 ps[4] = {s.X, s.Y, s.Z, 1.0f};
+			pv.multiplyWith1x4Matrix(ps);
+			irr::f32 pe[4] = {s.X+d.X, s.Y+d.Y, s.Z+d.Z, 1.0f};
+			pv.multiplyWith1x4Matrix(pe);
+			irr::f32 screenLen = 1.0f;
+			if(ps[3] > 0.0f && pe[3] > 0.0f) {
+				const irr::f32 dx = ps[0]/ps[3]*hw - pe[0]/pe[3]*hw;
+				const irr::f32 dy = ps[1]/ps[3]*hh - pe[1]/pe[3]*hh;
+				screenLen = std::sqrt(dx*dx + dy*dy);
 			}
-		} else {
-			driver->draw3DLine(vec[0].Pos, vec[1].Pos);
-			driver->draw3DLine(vec[1].Pos, vec[3].Pos);
-			driver->draw3DLine(vec[3].Pos, vec[2].Pos);
-			driver->draw3DLine(vec[2].Pos, vec[0].Pos);
+			for(irr::f32 cursor = 0.0f; cursor < screenLen; ) {
+				const int bit = static_cast<int>(patternCursor + cursor) & 0xf;
+				if(!((stippleMask >> bit) & 1)) { cursor += 1.0f; continue; }
+				irr::f32 runEnd = cursor + 1.0f;
+				while(runEnd < screenLen && ((stippleMask >> (static_cast<int>(patternCursor + runEnd) & 0xf)) & 1))
+					runEnd += 1.0f;
+				DrawThickLine3D(driver, s + d * (cursor / screenLen), s + d * (runEnd / screenLen), camFwd, halfThick, color);
+				cursor = runEnd;
+			}
+			patternCursor = std::fmod(patternCursor + screenLen, 16.0f);
 		}
 	}
+	driver->setTransform(irr::video::ETS_WORLD, oldWorld);
 }
 void Game::DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color) {
 	irr::core::recti pos = element->getAbsolutePosition();
