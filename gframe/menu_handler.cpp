@@ -1,5 +1,6 @@
 #include "config.h"
 #include "menu_handler.h"
+#include "data_manager.h"
 #include "myfilesystem.h"
 #include "netserver.h"
 #include "duelclient.h"

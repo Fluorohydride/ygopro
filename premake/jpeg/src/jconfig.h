@@ -6,10 +6,10 @@
 */
 
 /* Version ID for the JPEG library.
- * Irrlicht 1.8 uses Version 8d of the IJG libjpeg, so we set the version to 8.0 to avoid confusion.
+ * Irrlicht 1.9 uses Version 9a of the IJG libjpeg, so we set the version to 9.0 to avoid confusion.
  * JPEG_LIB_VERSION_MAJOR and JPEG_LIB_VERSION_MINOR are not used by libjpeg-turbo.
  */
-#define JPEG_LIB_VERSION  80
+#define JPEG_LIB_VERSION  90
 
 /* Support arithmetic encoding/decoding when using 8-bit samples */
 #define C_ARITH_CODING_SUPPORTED  1
@@ -18,10 +18,8 @@
 /* Support in-memory source/destination managers */
 #define MEM_SRCDST_SUPPORTED  1
 
-/* Use accelerated SIMD routines when available.
-  We enable this only for Windows x86/x64, where the premake build also
-  assembles the NASM SIMD objects. */
-#if defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__))
+/* Use accelerated SIMD routines when available. */
+#ifndef YGOPRO_NO_SIMD
 #define WITH_SIMD  1
 #endif
 

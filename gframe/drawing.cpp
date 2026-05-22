@@ -7,6 +7,7 @@
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
+#include "data_manager.h"
 #include "deck_manager.h"
 #include "sound_manager.h"
 #include "duelclient.h"
@@ -51,7 +52,7 @@ void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver, irr::video::ITextur
 	}
 
 	material.Lighting = false;
-	material.ZWriteEnable = false;
+	material.ZWriteEnable = irr::video::EZW_OFF;
 	material.TextureLayer[0].Texture = texture;
 	material.MaterialType = useAlphaChannel ?
 		irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL : irr::video::EMT_SOLID;

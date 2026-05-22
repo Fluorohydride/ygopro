@@ -103,7 +103,7 @@ void ImageManager::ResizeTexture() {
 	irr::s32 imgHeightFit = CARD_IMG_HEIGHT * mul;
 	irr::s32 bgWidth = GAME_WINDOW_WIDTH * mainGame->xScale;
 	irr::s32 bgHeight = GAME_WINDOW_HEIGHT * mainGame->yScale;
-	float btnScale = 0.5f * mainGame->yScale;
+	float btnScale = 0.5f * (mainGame->gameConf.resize_select_window ? mainGame->yScale : 1.2f);
 	irr::s32 btnImgWidth = CARD_IMG_WIDTH * btnScale;
 	irr::s32 btnImgHeight = CARD_IMG_HEIGHT * btnScale;
 	const char* coverFiles[2] = { "textures/cover.jpg", "textures/cover2.jpg" };
@@ -119,6 +119,14 @@ void ImageManager::ResizeTexture() {
 	driver->removeTexture(tUnknownThumb);
 	driver->removeTexture(tLoading);
 	tLoading = GetTextureFromFile(coverFiles[0], imgWidthThumb, imgHeightThumb);
+	if(!tLoading && mainGame->gameConf.use_image_load_background_thread) {
+		// If the cover image is missing, create a blank texture instead.
+		// tLoading is used as a sentinel value when loading thumbnails, so it must not be null.
+		irr::video::IImage* blankImg = driver->createImage(irr::video::ECF_A8R8G8B8, irr::core::dimension2d<irr::u32>(imgWidthThumb, imgHeightThumb));
+		blankImg->fill(0);
+		tLoading = driver->addTexture("textures/loading", blankImg);
+		blankImg->drop();
+	}
 	tUnknown = GetTextureFromFile("textures/unknown.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	tUnknownFit = GetTextureFromFile("textures/unknown.jpg", imgWidthFit, imgHeightFit);
 	tUnknownThumb = GetTextureFromFile("textures/unknown.jpg", imgWidthThumb, imgHeightThumb);
@@ -425,9 +433,9 @@ irr::video::ITexture* ImageManager::GetTextureButton(int code, bool defense) {
 	auto tit = cache.find(code);
 	if(tit != cache.end())
 		return tit->second;
-	float btnScale = 0.5f * mainGame->yScale;
-	irr::s32 width = (irr::s32)(CARD_IMG_WIDTH * btnScale);
-	irr::s32 height = (irr::s32)(CARD_IMG_HEIGHT * btnScale);
+	float btnScale = 0.5f * (mainGame->gameConf.resize_select_window ? mainGame->yScale : 1.2f);
+	irr::s32 width = CARD_IMG_WIDTH * btnScale;
+	irr::s32 height = CARD_IMG_HEIGHT * btnScale;
 	irr::video::IImage* img = GetImage(code);
 	if(!img) {
 		cache[code] = nullptr;
