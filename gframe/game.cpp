@@ -2339,8 +2339,19 @@ irr::core::recti Game::ResizeFit(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y
 
 void Game::FixMacOSBundleWorkingDirectory() {
 #ifdef __APPLE__
-	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+	CFBundleRef main_bundle = CFBundleGetMainBundle();
+	if(!main_bundle) {
+		return;
+	}
+	CFURLRef bundle_url = CFBundleCopyBundleURL(main_bundle);
+	if(!bundle_url) {
+		return;
+	}
 	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(nullptr, bundle_url);
+	if(!bundle_base_url) {
+		CFRelease(bundle_url);
+		return;
+	}
 	CFStringRef bundle_ext = CFURLCopyPathExtension(bundle_url);
 	if(bundle_ext) {
 		char path[PATH_MAX];
