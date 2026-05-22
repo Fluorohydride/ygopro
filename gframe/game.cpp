@@ -15,6 +15,9 @@
 #ifdef _WIN32
 #include <timeapi.h>
 #endif
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#endif
 
 #if defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || \
 	defined(__x86_64__) || defined(_M_X64) || defined(__x86_64) || defined(_M_AMD64)
@@ -78,6 +81,9 @@ bool Game::Initialize() {
 		params.DriverType = irr::video::EDT_OPENGL;
 	params.WindowSize = irr::core::dimension2d<irr::u32>(gameConf.window_width, gameConf.window_height);
 	device = irr::createDeviceEx(params);
+#ifdef __APPLE__
+	FixMacOSBundleWorkingDirectory();
+#endif
 	if(!device) {
 		ErrorLog("Failed to create Irrlicht Engine device!");
 		return false;
@@ -2329,6 +2335,24 @@ irr::core::recti Game::ResizeFit(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y
 	x2 = x2 * mul;
 	y2 = y2 * mul;
 	return irr::core::recti(x, y, x2, y2);
+}
+
+void Game::FixMacOSBundleWorkingDirectory() {
+#ifdef __APPLE__
+	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(nullptr, bundle_url);
+	CFStringRef bundle_ext = CFURLCopyPathExtension(bundle_url);
+	if(bundle_ext) {
+		char path[PATH_MAX];
+		if(CFStringCompare(bundle_ext, CFSTR("app"), kCFCompareCaseInsensitive) == kCFCompareEqualTo
+			&& CFURLGetFileSystemRepresentation(bundle_base_url, true, (UInt8*)path, PATH_MAX)) {
+			chdir(path);
+		}
+		CFRelease(bundle_ext);
+	}
+	CFRelease(bundle_url);
+	CFRelease(bundle_base_url);
+#endif //__APPLE__
 }
 void Game::SetWindowsIcon() {
 #ifdef _WIN32
