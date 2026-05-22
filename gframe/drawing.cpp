@@ -1170,6 +1170,7 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList
 	if(!cp)
 		return;
 	auto code = cp->code;
+	auto original_code = cp->get_original_code();
 	auto lcode = cp->get_duel_code();
 	irr::video::ITexture* img = imageManager.GetTextureThumb(code);
 	if(img == nullptr)
@@ -1184,19 +1185,43 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList
 		otloc = irr::core::recti(pos.X + 7, pos.Y + 50 * yScale, pos.X + 37 * xScale, pos.Y + 65 * yScale);
 	}
 	driver->draw2DImage(img, dragloc, irr::core::rect<irr::s32>(0, 0, size.Width, size.Height));
+	auto current_limitloc = limitloc;
+	auto credit_max_display = CARD_THUMB_WIDTH / 20;
+	auto next_limitloc = [&]() {
+		auto this_limitloc = current_limitloc;
+		auto width = current_limitloc.getWidth();
+		current_limitloc.UpperLeftCorner.X += width;
+		current_limitloc.LowerRightCorner.X += width;
+		--credit_max_display;
+		return this_limitloc;
+	};
 	auto lfit = lflist->content.find(lcode);
-	if (lfit != lflist->content.end()) {
-		switch(lfit->second) {
-		case 0:
-			driver->draw2DImage(imageManager.tLim, limitloc, irr::core::recti(0, 0, 64, 64), 0, 0, true);
-			break;
-		case 1:
-			driver->draw2DImage(imageManager.tLim, limitloc, irr::core::recti(64, 0, 128, 64), 0, 0, true);
-			break;
-		case 2:
-			driver->draw2DImage(imageManager.tLim, limitloc, irr::core::recti(0, 64, 64, 128), 0, 0, true);
-			break;
+	if (lfit != lflist->content.end() && lfit->second >= 0 && lfit->second <= 2) {
+		auto lim_texture_offset_x = 0;
+		auto lim_texture_offset_y = 0;
+		if(lfit->second == 1) {
+			lim_texture_offset_x = 64;
+		} else if(lfit->second == 2) {
+			lim_texture_offset_y = 64;
 		}
+		driver->draw2DImage(imageManager.tLim, next_limitloc(), irr::core::recti(lim_texture_offset_x, lim_texture_offset_y, lim_texture_offset_x + 64, lim_texture_offset_y + 64), 0, 0, true);
+	}
+	for (auto& point : lflist->pointList) {
+		auto it = point.table.find(original_code);
+		if (it == point.table.end())
+			continue;
+		auto value = it->second;
+		if (value > 0 && value <= 100) {
+			auto cvalue = value - 1; // 1-100 => 0-99
+			// pick the first and second digit
+			auto digit1 = cvalue / 10;
+			auto digit2 = cvalue % 10;
+			auto credit_texture_offset_x = digit2 * 64;
+			auto credit_texture_offset_y = digit1 * 64;
+			driver->draw2DImage(imageManager.tLimCredit, next_limitloc(), irr::core::recti(credit_texture_offset_x, credit_texture_offset_y, credit_texture_offset_x + 64, credit_texture_offset_y + 64), 0, 0, true);
+		}
+		if (credit_max_display <= 0)
+			break;
 	}
 	bool showAvail = false;
 	bool showNotAvail = false;

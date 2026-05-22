@@ -14,6 +14,17 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	FILE* fp = myfopen(path, "r");
 	char linebuf[1024]{};
 	wchar_t strBuffer[256]{};
+	auto credit_hash = [](const char* s) -> uint32_t {
+		uint32_t h = 2166136261u;
+		for(auto p = s; *p; ++p) {
+			h ^= static_cast<unsigned char>(*p);
+			h *= 16777619u;
+		}
+		return h;
+	};
+	auto credit_update_hash = [](uint32_t h, uint32_t a, uint32_t b, uint32_t c) -> uint32_t {
+		return h ^ ((a << 18) | (a >> 14)) ^ ((b << 9) | (b >> 23)) ^ ((c << 27) | (c >> 5));
+	};
 	if(fp) {
 		while(std::fgets(linebuf, sizeof linebuf, fp)) {
 			if(linebuf[0] == '#')
@@ -31,17 +42,40 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			}
 			if (cur == _lfList.rend())
 				continue;
-			char* pos = linebuf;
-			errno = 0;
-			auto result = std::strtoul(pos, &pos, 10);
-			if (errno || result > UINT32_MAX)
+			if(linebuf[0] == '$') {
+				int limitValue = 0;
+				char keybuf[256];
+				if (std::sscanf(linebuf, "$%255s %d", keybuf, &limitValue) != 2)
+					continue;
+				if (limitValue < 0)
+					limitValue = 0;
+				cur->pointList.push_back({ keybuf, limitValue });
+				cur->hash = credit_update_hash(cur->hash, credit_hash(keybuf), static_cast<uint32_t>(limitValue), 0x43524544u);
 				continue;
-			if (pos == linebuf || *pos != ' ')
+			}
+			char* pos = linebuf;
+			char* end = nullptr;
+			errno = 0;
+			auto result = std::strtoul(pos, &end, 10);
+			if (errno || result > UINT32_MAX || end == pos)
 				continue;
 			uint32_t code = static_cast<uint32_t>(result);
+			int creditValue = 0;
+			if (std::sscanf(end, " $ %d", &creditValue) == 1 || std::sscanf(end, " $%*s %d", &creditValue) == 1) {
+				if (cur->pointList.empty())
+					continue;
+				if (creditValue <= 0)
+					continue;
+				auto& point = cur->pointList.back();
+				point.table[code] = creditValue;
+				cur->hash = credit_update_hash(cur->hash, code, credit_hash(point.name.c_str()), static_cast<uint32_t>(creditValue));
+				continue;
+			}
+			pos = end;
+			end = nullptr;
 			errno = 0;
-			int count = std::strtol(pos, &pos, 10);
-			if (errno)
+			int count = std::strtol(pos, &end, 10);
+			if (errno || end == pos)
 				continue;
 			if (count < 0 || count > 2)
 				continue;
@@ -145,6 +179,24 @@ uint32_t DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, size_t ru
 		auto it = list.find(code);
 		if(it != list.end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) | cit->code;
+	}
+	std::vector<int> sum = GetDeckPoint(deck, lflist);
+	int result = 0;
+	for (size_t i = 0; i < lflist->pointList.size(); ++i) {
+		if (sum[i] > lflist->pointList[i].limit) {
+			result = sum[i];
+			break;
+		}
+	}
+	if (result) {
+		uint32_t code = 0;
+		if (deck.main.size())
+			code = deck.main[0]->code;
+		else if (deck.extra.size())
+			code = deck.extra[0]->code;
+		else if (deck.side.size())
+			code = deck.side[0]->code;
+		return (DECKERROR_LFLIST << 28) | (code & MAX_CARD_ID);
 	}
 	return 0;
 }
@@ -397,5 +449,30 @@ bool DeckManager::SaveDeckArray(const DeckArray& deck, const wchar_t* name) {
 		std::fprintf(fp, "%u\n", code);
 	std::fclose(fp);
 	return true;
+}
+std::vector<int> DeckManager::GetDeckPoint(const Deck& deck, const LFList* lflist) {
+	std::vector<int> sum;
+	if (!lflist || lflist->pointList.empty())
+		return sum;
+	sum.resize(lflist->pointList.size());
+	auto add_card = [&](uint32_t code){
+		for (size_t i = 0; i < lflist->pointList.size(); ++i) {
+			auto& point = lflist->pointList[i];
+			auto it = point.table.find(code);
+			if (it == point.table.end())
+				continue;
+			sum[i] = sum[i] + it->second;
+		}
+	};
+	for (auto& card: deck.main){
+		add_card(card->get_original_code());
+	}
+	for (auto& card: deck.extra){
+		add_card(card->get_original_code());
+	}
+	for (auto& card: deck.side){
+		add_card(card->get_original_code());
+	}
+	return sum;
 }
 }
