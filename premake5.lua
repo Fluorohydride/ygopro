@@ -11,7 +11,8 @@
 --          but build them on Windows, due to the lack of package manager on Windows.
 
 BUILD_LUA = true
-LUA_LIB_NAME = "lua" -- change this if you don't build Lua
+LUA_LIB_NAME = "lua" -- at most times you need to change those if you don't build Lua from source:
+                     -- most Lua distributions provide a C lib named "lua", but ocgcore requires lua built as C++.
 
 BUILD_EVENT = os.istarget("windows")
 
@@ -155,99 +156,48 @@ function FindHeaderWithSubDir(header, subdir)
     return result
 end
 
-if GetParam("build-lua") then
-    BUILD_LUA = true
-elseif GetParam("no-build-lua") then
-    BUILD_LUA = false
-end
-if not BUILD_LUA then
-    -- at most times you need to change those if you change BUILD_LUA to false
-    -- make sure your lua lib is built with C++ and version >= 5.3
-    LUA_LIB_NAME = GetParam("lua-lib-name") or LUA_LIB_NAME
-    LUA_INCLUDE_DIR = GetParam("lua-include-dir") or os.findheader("lua.h")
-    LUA_LIB_DIR = GetParam("lua-lib-dir") or os.findlib(LUA_LIB_NAME)
-end
-
-if GetParam("build-event") then
-    BUILD_EVENT = true
-elseif GetParam("no-build-event") then
-    BUILD_EVENT = false
-end
-if not BUILD_EVENT then
-    EVENT_INCLUDE_DIR = GetParam("event-include-dir") or os.findheader("event2/event.h")
-    EVENT_LIB_DIR = GetParam("event-lib-dir") or os.findlib("event")
-end
-
-if GetParam("build-freetype") then
-    BUILD_FREETYPE = true
-elseif GetParam("no-build-freetype") then
-    BUILD_FREETYPE = false
-end
-if not BUILD_FREETYPE then
-    FREETYPE_INCLUDE_DIR = GetParam("freetype-include-dir") or FindHeaderWithSubDir("freetype2/ft2build.h", "freetype2")
-    FREETYPE_LIB_DIR = GetParam("freetype-lib-dir") or os.findlib("freetype")
-end
-
-if GetParam("build-sqlite") then
-    BUILD_SQLITE = true
-elseif GetParam("no-build-sqlite") then
-    BUILD_SQLITE = false
-end
-if not BUILD_SQLITE then
-    SQLITE_INCLUDE_DIR = GetParam("sqlite-include-dir") or os.findheader("sqlite3.h")
-    SQLITE_LIB_DIR = GetParam("sqlite-lib-dir") or os.findlib("sqlite3")
-end
-
-if GetParam("build-lzma") then
-    BUILD_LZMA = true
-elseif GetParam("no-build-lzma") then
-    BUILD_LZMA = false
-end
-if not BUILD_LZMA then
-    LZMA_INCLUDE_DIR = GetParam("lzma-include-dir") or os.findheader("lzma.h")
-    LZMA_LIB_DIR = GetParam("lzma-lib-dir") or os.findlib("lzma")
-end
-
-if GetParam("build-irrlicht") then
-    BUILD_IRRLICHT = true
-elseif GetParam("no-build-irrlicht") then
-    BUILD_IRRLICHT = false
-end
-if not BUILD_IRRLICHT then
-    IRRLICHT_INCLUDE_DIR = GetParam("irrlicht-include-dir") or os.findheader("irrlicht.h")
-    IRRLICHT_LIB_DIR = GetParam("irrlicht-lib-dir") or os.findlib("irrlicht")
-end
-
-if GetParam("build-jpeg") then
-    BUILD_JPEG = true
-elseif GetParam("no-build-jpeg") then
-    BUILD_JPEG = false
-end
-if not BUILD_JPEG then
-    JPEG_LIB_NAME = GetParam("jpeg-lib-name") or JPEG_LIB_NAME
-    JPEG_INCLUDE_DIR = GetParam("jpeg-include-dir") or os.findheader("jpeglib.h")
-    JPEG_LIB_DIR = GetParam("jpeg-lib-dir") or os.findlib(JPEG_LIB_NAME)
-end
-
-if GetParam("build-png") then
-    BUILD_PNG = true
-elseif GetParam("no-build-png") then
-    BUILD_PNG = false
-end
-if not BUILD_PNG then
-    PNG_INCLUDE_DIR = GetParam("png-include-dir") or os.findheader("png.h")
-    PNG_LIB_DIR = GetParam("png-lib-dir") or os.findlib("png")
-end
-
-if GetParam("build-zlib") then
-    BUILD_ZLIB = true
-elseif GetParam("no-build-zlib") then
-    BUILD_ZLIB = false
-end
-if not BUILD_ZLIB then
-    ZLIB_LIB_NAME = GetParam("zlib-lib-name") or ZLIB_LIB_NAME
-    ZLIB_INCLUDE_DIR = GetParam("zlib-include-dir") or os.findheader("zlib.h")
-    ZLIB_LIB_DIR = GetParam("zlib-lib-dir") or os.findlib(ZLIB_LIB_NAME)
+-- Process build flags and external directory settings for all library dependencies.
+-- Fields: name, header, header_subdir (for FindHeaderWithSubDir), findlib (override lib name), libname_var (global holding the lib name)
+local buildDeps = {
+    { name = "lua",      header = "lua.h",                libname_var = "LUA_LIB_NAME"  },
+    { name = "event",    header = "event2/event.h"                                      },
+    { name = "freetype", header = "freetype2/ft2build.h", header_subdir = "freetype2"   },
+    { name = "sqlite",   header = "sqlite3.h",            findlib = "sqlite3"           },
+    { name = "lzma",     header = "lzma.h"                                              },
+    { name = "irrlicht", header = "irrlicht.h"                                          },
+    { name = "jpeg",     header = "jpeglib.h",            libname_var = "JPEG_LIB_NAME" },
+    { name = "png",      header = "png.h"                                               },
+    { name = "zlib",     header = "zlib.h",               libname_var = "ZLIB_LIB_NAME" },
+}
+for _, dep in ipairs(buildDeps) do
+    local name  = dep.name
+    local upper = string.upper(name)
+    local flag  = "BUILD_" .. upper
+    if GetParam("build-" .. name) then
+        _G[flag] = true
+    elseif GetParam("no-build-" .. name) then
+        _G[flag] = false
+    end
+    if not _G[flag] then
+        if dep.libname_var then
+            _G[dep.libname_var] = GetParam(name .. "-lib-name") or _G[dep.libname_var]
+        end
+        local findlib_name = dep.findlib or (dep.libname_var and _G[dep.libname_var]) or name
+        local include_dir_var = upper .. "_INCLUDE_DIR"
+        local lib_dir_var = upper .. "_LIB_DIR"
+        _G[include_dir_var] = GetParam(name .. "-include-dir") or FindHeaderWithSubDir(dep.header, dep.header_subdir)
+        _G[lib_dir_var] = GetParam(name .. "-lib-dir") or os.findlib(findlib_name)
+        if not _G[include_dir_var] then
+            print("::warning:: Include directory for " .. name .. " not found, you may need to specify it with --" .. name .. "-include-dir")
+        elseif not os.isdir(_G[include_dir_var]) then
+            print("::warning:: Include directory for " .. name .. " is not a valid directory: " .. _G[include_dir_var])
+        end
+        if not _G[lib_dir_var] then
+            print("::warning:: Library directory for " .. name .. " not found, you may need to specify it with --" .. name .. "-lib-dir")
+        elseif not os.isdir(_G[lib_dir_var]) then
+            print("::warning:: Library directory for " .. name .. " is not a valid directory: " .. _G[lib_dir_var])
+        end
+    end
 end
 
 if GetParam("no-dxsdk") then
