@@ -66,53 +66,47 @@ MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libop
 MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libvorbis")
 LZMA_INCLUDE_DIR = path.getabsolute("./lzma/src/liblzma/api")
 
+-- Fields: name, header, header_subdir (for FindHeaderWithSubDir), findlib (override lib name), libname_var (global holding the lib name)
+local buildDeps = {
+    { name = "lua",      header = "lua.h",                libname_var = "LUA_LIB_NAME"  },
+    { name = "event",    header = "event2/event.h"                                      },
+    { name = "freetype", header = "freetype2/ft2build.h", header_subdir = "freetype2"   },
+    { name = "sqlite",   header = "sqlite3.h",            findlib = "sqlite3"           },
+    { name = "lzma",     header = "lzma.h"                                              },
+    { name = "irrlicht", header = "irrlicht.h"                                          },
+    { name = "jpeg",     header = "jpeglib.h",            libname_var = "JPEG_LIB_NAME" },
+    { name = "png",      header = "png.h"                                               },
+    { name = "zlib",     header = "zlib.h",               libname_var = "ZLIB_LIB_NAME" },
+}
+-- Fields: name, header, header_subdir (for FindHeaderWithSubDir)
+local miniaudioDeps = {
+    { name = "opus",     header = "opus/opus.h",          header_subdir = "opus"        },
+    { name = "opusfile", header = "opus/opusfile.h",      header_subdir = "opus"        },
+    { name = "vorbis",   header = "vorbis/vorbisfile.h"                                 },
+    { name = "ogg",      header = "ogg/ogg.h"                                           },
+}
+
 -- Read settings from command line or environment variables
--- Default values should be defined at the top of the script. If any values are set in the premake options, GetParam will not
--- read them from environment variables.
+-- Default values should be defined at the top of the script.
+-- If any values are set in the premake options, GetParam will not read them from environment variables.
 
-newoption { trigger = "build-lua", category = "YGOPro - lua", description = "" }
-newoption { trigger = "no-build-lua", category = "YGOPro - lua", description = "" }
-newoption { trigger = "lua-include-dir", category = "YGOPro - lua", description = "", value = "PATH" }
-newoption { trigger = "lua-lib-dir", category = "YGOPro - lua", description = "", value = "PATH" }
-newoption { trigger = "lua-lib-name", category = "YGOPro - lua", description = "", value = "NAME" }
+for _, dep in ipairs(buildDeps) do
+    local name = dep.name
+    local cat  = "YGOPro - " .. name
+    newoption { trigger = "build-"    .. name,       category = cat, description = "" }
+    newoption { trigger = "no-build-" .. name,       category = cat, description = "" }
+    newoption { trigger = name .. "-include-dir",    category = cat, description = "", value = "PATH" }
+    newoption { trigger = name .. "-lib-dir",        category = cat, description = "", value = "PATH" }
+    if dep.libname_var then
+        newoption { trigger = name .. "-lib-name",   category = cat, description = "", value = "NAME" }
+    end
+end
+for _, dep in ipairs(miniaudioDeps) do
+    newoption { trigger = dep.name .. "-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
+    newoption { trigger = dep.name .. "-lib-dir",     category = "YGOPro - miniaudio", description = "", value = "PATH" }
+end
 
-newoption { trigger = "build-event", category = "YGOPro - event", description = "" }
-newoption { trigger = "no-build-event", category = "YGOPro - event", description = "" }
-newoption { trigger = "event-include-dir", category = "YGOPro - event", description = "", value = "PATH" }
-newoption { trigger = "event-lib-dir", category = "YGOPro - event", description = "", value = "PATH" }
-
-newoption { trigger = "build-freetype", category = "YGOPro - freetype", description = "" }
-newoption { trigger = "no-build-freetype", category = "YGOPro - freetype", description = "" }
-newoption { trigger = "freetype-include-dir", category = "YGOPro - freetype", description = "", value = "PATH" }
-newoption { trigger = "freetype-lib-dir", category = "YGOPro - freetype", description = "", value = "PATH" }
-
-newoption { trigger = "build-sqlite", category = "YGOPro - sqlite", description = "" }
-newoption { trigger = "no-build-sqlite", category = "YGOPro - sqlite", description = "" }
-newoption { trigger = "sqlite-include-dir", category = "YGOPro - sqlite", description = "", value = "PATH" }
-newoption { trigger = "sqlite-lib-dir", category = "YGOPro - sqlite", description = "", value = "PATH" }
-
-newoption { trigger = "build-irrlicht", category = "YGOPro - irrlicht", description = "" }
-newoption { trigger = "no-build-irrlicht", category = "YGOPro - irrlicht", description = "" }
-newoption { trigger = "irrlicht-include-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
-newoption { trigger = "irrlicht-lib-dir", category = "YGOPro - irrlicht", description = "", value = "PATH" }
 newoption { trigger = "no-dxsdk", category = "YGOPro - irrlicht", description = "" }
-
-newoption { trigger = "build-jpeg", category = "YGOPro - jpeg", description = "" }
-newoption { trigger = "no-build-jpeg", category = "YGOPro - jpeg", description = "" }
-newoption { trigger = "jpeg-include-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
-newoption { trigger = "jpeg-lib-dir", category = "YGOPro - jpeg", description = "", value = "PATH" }
-newoption { trigger = "jpeg-lib-name", category = "YGOPro - jpeg", description = "", value = "NAME" }
-
-newoption { trigger = "build-png", category = "YGOPro - png", description = "" }
-newoption { trigger = "no-build-png", category = "YGOPro - png", description = "" }
-newoption { trigger = "png-include-dir", category = "YGOPro - png", description = "", value = "PATH" }
-newoption { trigger = "png-lib-dir", category = "YGOPro - png", description = "", value = "PATH" }
-
-newoption { trigger = "build-zlib", category = "YGOPro - zlib", description = "" }
-newoption { trigger = "no-build-zlib", category = "YGOPro - zlib", description = "" }
-newoption { trigger = "zlib-include-dir", category = "YGOPro - zlib", description = "", value = "PATH" }
-newoption { trigger = "zlib-lib-dir", category = "YGOPro - zlib", description = "", value = "PATH" }
-newoption { trigger = "zlib-lib-name", category = "YGOPro - zlib", description = "", value = "NAME" }
 
 newoption { trigger = "no-audio", category = "YGOPro", description = "" }
 newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "" }
@@ -121,19 +115,6 @@ newoption { trigger = "miniaudio-support-opus-vorbis", category = "YGOPro - mini
 newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
 newoption { trigger = "build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
 newoption { trigger = "no-build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
-newoption { trigger = "opus-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
-newoption { trigger = "opus-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
-newoption { trigger = "opusfile-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
-newoption { trigger = "opusfile-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
-newoption { trigger = "vorbis-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
-newoption { trigger = "vorbis-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
-newoption { trigger = "ogg-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
-newoption { trigger = "ogg-lib-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
-
-newoption { trigger = "build-lzma", category = "YGOPro - lzma", description = "" }
-newoption { trigger = "no-build-lzma", category = "YGOPro - lzma", description = "" }
-newoption { trigger = "lzma-include-dir", category = "YGOPro - lzma", description = "", value = "PATH" }
-newoption { trigger = "lzma-lib-dir", category = "YGOPro - lzma", description = "", value = "PATH" }
 
 newoption { trigger = "vs2026-win7-support", category = "YGOPro", description = "Enable Windows 7 support (toolset v143) for Visual Studio 2026" }
 
@@ -156,19 +137,27 @@ function FindHeaderWithSubDir(header, subdir)
     return result
 end
 
+function CheckDirectory(varname)
+    local dir = _G[varname]
+    if not dir or dir == "" then
+        print("::warning:: " .. varname .. " is not set")
+    elseif not os.isdir(dir) then
+        print("::warning:: " .. varname .. " is not a valid directory: " .. dir)
+    end
+end
+
+function GetDependencyDirectory(dep)
+    local upper = string.upper(dep.name)
+    local findlib_name = dep.findlib or (dep.libname_var and _G[dep.libname_var]) or dep.name
+    local include_dir_var = upper .. "_INCLUDE_DIR"
+    local lib_dir_var = upper .. "_LIB_DIR"
+    _G[include_dir_var] = GetParam(dep.name .. "-include-dir") or FindHeaderWithSubDir(dep.header, dep.header_subdir)
+    _G[lib_dir_var] = GetParam(dep.name .. "-lib-dir") or os.findlib(findlib_name)
+    CheckDirectory(include_dir_var)
+    CheckDirectory(lib_dir_var)
+end
+
 -- Process build flags and external directory settings for all library dependencies.
--- Fields: name, header, header_subdir (for FindHeaderWithSubDir), findlib (override lib name), libname_var (global holding the lib name)
-local buildDeps = {
-    { name = "lua",      header = "lua.h",                libname_var = "LUA_LIB_NAME"  },
-    { name = "event",    header = "event2/event.h"                                      },
-    { name = "freetype", header = "freetype2/ft2build.h", header_subdir = "freetype2"   },
-    { name = "sqlite",   header = "sqlite3.h",            findlib = "sqlite3"           },
-    { name = "lzma",     header = "lzma.h"                                              },
-    { name = "irrlicht", header = "irrlicht.h"                                          },
-    { name = "jpeg",     header = "jpeglib.h",            libname_var = "JPEG_LIB_NAME" },
-    { name = "png",      header = "png.h"                                               },
-    { name = "zlib",     header = "zlib.h",               libname_var = "ZLIB_LIB_NAME" },
-}
 for _, dep in ipairs(buildDeps) do
     local name  = dep.name
     local upper = string.upper(name)
@@ -182,21 +171,7 @@ for _, dep in ipairs(buildDeps) do
         if dep.libname_var then
             _G[dep.libname_var] = GetParam(name .. "-lib-name") or _G[dep.libname_var]
         end
-        local findlib_name = dep.findlib or (dep.libname_var and _G[dep.libname_var]) or name
-        local include_dir_var = upper .. "_INCLUDE_DIR"
-        local lib_dir_var = upper .. "_LIB_DIR"
-        _G[include_dir_var] = GetParam(name .. "-include-dir") or FindHeaderWithSubDir(dep.header, dep.header_subdir)
-        _G[lib_dir_var] = GetParam(name .. "-lib-dir") or os.findlib(findlib_name)
-        if not _G[include_dir_var] then
-            print("::warning:: Include directory for " .. name .. " not found, you may need to specify it with --" .. name .. "-include-dir")
-        elseif not os.isdir(_G[include_dir_var]) then
-            print("::warning:: Include directory for " .. name .. " is not a valid directory: " .. _G[include_dir_var])
-        end
-        if not _G[lib_dir_var] then
-            print("::warning:: Library directory for " .. name .. " not found, you may need to specify it with --" .. name .. "-lib-dir")
-        elseif not os.isdir(_G[lib_dir_var]) then
-            print("::warning:: Library directory for " .. name .. " is not a valid directory: " .. _G[lib_dir_var])
-        end
+        GetDependencyDirectory(dep)
     end
 end
 
@@ -236,14 +211,9 @@ if USE_AUDIO then
                 MINIAUDIO_BUILD_OPUS_VORBIS = true
             end
             if not MINIAUDIO_BUILD_OPUS_VORBIS then
-                OPUS_INCLUDE_DIR = GetParam("opus-include-dir") or FindHeaderWithSubDir("opus/opus.h", "opus")
-                OPUS_LIB_DIR = GetParam("opus-lib-dir") or os.findlib("opus")
-                OPUSFILE_INCLUDE_DIR = GetParam("opusfile-include-dir") or FindHeaderWithSubDir("opus/opusfile.h", "opus")
-                OPUSFILE_LIB_DIR = GetParam("opusfile-lib-dir") or os.findlib("opusfile")
-                VORBIS_INCLUDE_DIR = GetParam("vorbis-include-dir") or os.findheader("vorbis/vorbisfile.h")
-                VORBIS_LIB_DIR = GetParam("vorbis-lib-dir") or os.findlib("vorbis")
-                OGG_INCLUDE_DIR = GetParam("ogg-include-dir") or os.findheader("ogg/ogg.h")
-                OGG_LIB_DIR = GetParam("ogg-lib-dir") or os.findlib("ogg")
+                for _, dep in ipairs(miniaudioDeps) do
+                    GetDependencyDirectory(dep)
+                end
             end
         end
     else
