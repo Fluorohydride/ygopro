@@ -8,7 +8,9 @@ project "YGOPro"
     defines { "_IRR_STATIC_LIB_" }
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore", EVENT_INCLUDE_DIR, IRRLICHT_INCLUDE_DIR, JPEG_INCLUDE_DIR, ZLIB_INCLUDE_DIR, LZMA_INCLUDE_DIR, SQLITE_INCLUDE_DIR }
-    links { "ocgcore", "lzma", "sqlite3", "irrlicht", "png", "freetype", "event" }
+    links { "ocgcore" }
+
+    -- When building from source, the dependencies will be linked with their project names, which can't be changed via options.
 
     if BUILD_LUA then
         links { "lua" }
@@ -17,12 +19,17 @@ project "YGOPro"
         libdirs { LUA_LIB_DIR }
     end
 
-    if not BUILD_EVENT then
+    if BUILD_EVENT then
+        links { "event" }
+    else
+        links { EVENT_LIB_NAME, EVENT_PTHREADS_LIB_NAME }
         libdirs { EVENT_LIB_DIR }
-        links { "event_pthreads" }
     end
 
-    if not BUILD_IRRLICHT then
+    if BUILD_IRRLICHT then
+        links { "irrlicht" }
+    else
+        links { IRRLICHT_LIB_NAME }
         libdirs { IRRLICHT_LIB_DIR }
     end
 
@@ -33,7 +40,10 @@ project "YGOPro"
         libdirs { JPEG_LIB_DIR }
     end
 
-    if not BUILD_PNG then
+    if BUILD_PNG then
+        links { "png" }
+    else
+        links { PNG_LIB_NAME }
         libdirs { PNG_LIB_DIR }
     end
 
@@ -46,16 +56,24 @@ project "YGOPro"
 
     if BUILD_FREETYPE then
         includedirs { FREETYPE_CUSTOM_INCLUDE_DIR, FREETYPE_INCLUDE_DIR }
+        links { "freetype" }
     else
         includedirs { FREETYPE_INCLUDE_DIR }
+        links { FREETYPE_LIB_NAME }
         libdirs { FREETYPE_LIB_DIR }
     end
 
-    if not BUILD_SQLITE then
+    if BUILD_SQLITE then
+        links { "sqlite3" }
+    else
+        links { SQLITE_LIB_NAME }
         libdirs { SQLITE_LIB_DIR }
     end
 
-    if not BUILD_LZMA then
+    if BUILD_LZMA then
+        links { "lzma" }
+    else
+        links { LZMA_LIB_NAME }
         libdirs { LZMA_LIB_DIR }
     end
 
@@ -73,7 +91,7 @@ project "YGOPro"
                 defines { "YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS" }
                 includedirs { MINIAUDIO_OPUS_INCLUDE_DIR, MINIAUDIO_VORBIS_INCLUDE_DIR }
                 if not MINIAUDIO_BUILD_OPUS_VORBIS then
-                    links { "opusfile", "vorbisfile", "opus", "vorbis", "ogg" }
+                    links { OPUS_LIB_NAME, OPUSFILE_LIB_NAME, VORBIS_LIB_NAME, VORBISFILE_LIB_NAME, OGG_LIB_NAME }
                     libdirs { OPUS_LIB_DIR, OPUSFILE_LIB_DIR, VORBIS_LIB_DIR, OGG_LIB_DIR }
                 end
             end

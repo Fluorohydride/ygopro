@@ -15,10 +15,12 @@ LUA_LIB_NAME = "lua" -- at most times you need to change those if you don't buil
                      -- most Lua distributions provide a C lib named "lua", but ocgcore requires lua built as C++.
 
 BUILD_EVENT = os.istarget("windows")
+EVENT_PTHREADS_LIB_NAME = "event_pthreads" -- need to link both event_pthreads and event when not building from source
 
 BUILD_FREETYPE = os.istarget("windows")
 
 BUILD_SQLITE = os.istarget("windows")
+SQLITE_LIB_NAME = "sqlite3" -- the lib name should always be "sqlite3" instead of "sqlite"
 
 BUILD_IRRLICHT = true -- modified Irrlicht is required, can't use the official one
 USE_DXSDK = true
@@ -36,6 +38,7 @@ AUDIO_LIB = "miniaudio" -- only miniaudio is supported for now
 -- BUILD_MINIAUDIO is always true
 MINIAUDIO_SUPPORT_OPUS_VORBIS = true
 MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
+VORBISFILE_LIB_NAME = "vorbisfile" -- need to link both vorbisfile and vorbis when not building from source
 
 BUILD_LZMA = os.istarget("windows")
 
@@ -52,58 +55,58 @@ local MAC_INTEL = false
 PREMAKE_ARCH = os.hostarch()
 
 -- Default include dirs, those values are ONLY used in static builds, WILL BE IGNORED if set corresponding BUILD_* to false
+MINIAUDIO_INCLUDE_DIR = path.getabsolute("./miniaudio")
+MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libopus")
+MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libvorbis")
+FREETYPE_CUSTOM_INCLUDE_DIR = path.getabsolute("./freetype/custom")
+
 LUA_INCLUDE_DIR = path.getabsolute("./lua/src")
 EVENT_INCLUDE_DIR = path.getabsolute("./event/include")
 IRRLICHT_INCLUDE_DIR = path.getabsolute("./irrlicht/include")
 JPEG_INCLUDE_DIR = path.getabsolute("./jpeg/src")
 PNG_INCLUDE_DIR = path.getabsolute("./png")
 ZLIB_INCLUDE_DIR = path.getabsolute("./zlib")
-FREETYPE_CUSTOM_INCLUDE_DIR = path.getabsolute("./freetype/custom")
 FREETYPE_INCLUDE_DIR = path.getabsolute("./freetype/include")
 SQLITE_INCLUDE_DIR = path.getabsolute("./sqlite3")
-MINIAUDIO_INCLUDE_DIR = path.getabsolute("./miniaudio")
-MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libopus")
-MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libvorbis")
 LZMA_INCLUDE_DIR = path.getabsolute("./lzma/src/liblzma/api")
 
--- Fields: name, header, header_subdir (for FindHeaderWithSubDir), findlib (override lib name), libname_var (global holding the lib name)
-local buildDeps = {
-    { name = "lua",      header = "lua.h",                libname_var = "LUA_LIB_NAME"  },
-    { name = "event",    header = "event2/event.h"                                      },
-    { name = "freetype", header = "freetype2/ft2build.h", header_subdir = "freetype2"   },
-    { name = "sqlite",   header = "sqlite3.h",            findlib = "sqlite3"           },
-    { name = "lzma",     header = "lzma.h"                                              },
-    { name = "irrlicht", header = "irrlicht.h"                                          },
-    { name = "jpeg",     header = "jpeglib.h",            libname_var = "JPEG_LIB_NAME" },
-    { name = "png",      header = "png.h"                                               },
-    { name = "zlib",     header = "zlib.h",               libname_var = "ZLIB_LIB_NAME" },
-}
 -- Fields: name, header, header_subdir (for FindHeaderWithSubDir)
+local buildDeps = {
+    { name = "lua",      header = "lua.h",                                            },
+    { name = "event",    header = "event2/event.h"                                    },
+    { name = "freetype", header = "freetype2/ft2build.h", header_subdir = "freetype2" },
+    { name = "sqlite",   header = "sqlite3.h",                                        },
+    { name = "lzma",     header = "lzma.h"                                            },
+    { name = "irrlicht", header = "irrlicht.h"                                        },
+    { name = "jpeg",     header = "jpeglib.h",                                        },
+    { name = "png",      header = "png.h"                                             },
+    { name = "zlib",     header = "zlib.h",                                           },
+}
+-- miniaudioDeps don't have separate [no-]build-* options, instead them use [no-]build-opus-vorbis as general build options
 local miniaudioDeps = {
-    { name = "opus",     header = "opus/opus.h",          header_subdir = "opus"        },
-    { name = "opusfile", header = "opus/opusfile.h",      header_subdir = "opus"        },
-    { name = "vorbis",   header = "vorbis/vorbisfile.h"                                 },
-    { name = "ogg",      header = "ogg/ogg.h"                                           },
+    { name = "opus",     header = "opus/opus.h",          header_subdir = "opus"      },
+    { name = "opusfile", header = "opus/opusfile.h",      header_subdir = "opus"      },
+    { name = "vorbis",   header = "vorbis/vorbisfile.h"                               },
+    { name = "ogg",      header = "ogg/ogg.h"                                         },
 }
 
--- Read settings from command line or environment variables
--- Default values should be defined at the top of the script.
--- If any values are set in the premake options, GetParam will not read them from environment variables.
+-- Default values should be defined at the top of the script instead of the premake options.
 
 for _, dep in ipairs(buildDeps) do
     local name = dep.name
     local cat  = "YGOPro - " .. name
-    newoption { trigger = "build-"    .. name,       category = cat, description = "" }
-    newoption { trigger = "no-build-" .. name,       category = cat, description = "" }
-    newoption { trigger = name .. "-include-dir",    category = cat, description = "", value = "PATH" }
-    newoption { trigger = name .. "-lib-dir",        category = cat, description = "", value = "PATH" }
-    if dep.libname_var then
-        newoption { trigger = name .. "-lib-name",   category = cat, description = "", value = "NAME" }
-    end
+    newoption { trigger = "build-"    .. name,    category = cat, description = "" }
+    newoption { trigger = "no-build-" .. name,    category = cat, description = "" }
+    newoption { trigger = name .. "-include-dir", category = cat, description = "", value = "PATH" }
+    newoption { trigger = name .. "-lib-dir",     category = cat, description = "", value = "PATH" }
+    newoption { trigger = name .. "-lib-name",    category = cat, description = "", value = "NAME" }
 end
 for _, dep in ipairs(miniaudioDeps) do
-    newoption { trigger = dep.name .. "-include-dir", category = "YGOPro - miniaudio", description = "", value = "PATH" }
-    newoption { trigger = dep.name .. "-lib-dir",     category = "YGOPro - miniaudio", description = "", value = "PATH" }
+    local name = dep.name
+    local cat  = "YGOPro - miniaudio"
+    newoption { trigger = name .. "-include-dir", category = cat, description = "", value = "PATH" }
+    newoption { trigger = name .. "-lib-dir",     category = cat, description = "", value = "PATH" }
+    newoption { trigger = name .. "-lib-name",    category = cat, description = "", value = "NAME" }
 end
 
 newoption { trigger = "no-dxsdk", category = "YGOPro - irrlicht", description = "" }
@@ -124,6 +127,9 @@ newoption { trigger = "mac-intel", category = "YGOPro", description = "Cross Com
 newoption { trigger = "use-openmp", category = "YGOPro", description = "Enable OpenMP support (edge case)" }
 
 newoption { trigger = "use-simd", category = "YGOPro", description = "", value = "none, sse2, avx2, neon, best" }
+
+-- Read settings from command line or environment variables
+-- If any values are set in the premake options, GetParam will not read them from environment variables.
 
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
@@ -148,11 +154,12 @@ end
 
 function GetDependencyDirectory(dep)
     local upper = string.upper(dep.name)
-    local findlib_name = dep.findlib or (dep.libname_var and _G[dep.libname_var]) or dep.name
     local include_dir_var = upper .. "_INCLUDE_DIR"
+    local lib_name_var = upper .. "_LIB_NAME"
     local lib_dir_var = upper .. "_LIB_DIR"
     _G[include_dir_var] = GetParam(dep.name .. "-include-dir") or FindHeaderWithSubDir(dep.header, dep.header_subdir)
-    _G[lib_dir_var] = GetParam(dep.name .. "-lib-dir") or os.findlib(findlib_name)
+    _G[lib_name_var] = GetParam(dep.name .. "-lib-name") or _G[lib_name_var] or dep.name
+    _G[lib_dir_var] = GetParam(dep.name .. "-lib-dir") or os.findlib(_G[lib_name_var])
     CheckDirectory(include_dir_var)
     CheckDirectory(lib_dir_var)
 end
@@ -168,9 +175,6 @@ for _, dep in ipairs(buildDeps) do
         _G[flag] = false
     end
     if not _G[flag] then
-        if dep.libname_var then
-            _G[dep.libname_var] = GetParam(name .. "-lib-name") or _G[dep.libname_var]
-        end
         GetDependencyDirectory(dep)
     end
 end
