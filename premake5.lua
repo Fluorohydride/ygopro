@@ -71,7 +71,7 @@ SQLITE_INCLUDE_DIR = path.getabsolute("./sqlite")
 LZMA_INCLUDE_DIR = path.getabsolute("./lzma/src/liblzma/api")
 
 -- Fields: name, header, header_subdir (for FindHeaderWithSubDir)
-local buildDeps = {
+DEPENDENCIES_METADATA = {
     { name = "lua",      header = "lua.h",                                            },
     { name = "event",    header = "event2/event.h"                                    },
     { name = "freetype", header = "freetype2/ft2build.h", header_subdir = "freetype2" },
@@ -82,8 +82,8 @@ local buildDeps = {
     { name = "png",      header = "png.h"                                             },
     { name = "zlib",     header = "zlib.h",                                           },
 }
--- miniaudioDeps don't have separate [no-]build-* options, instead them use [no-]build-opus-vorbis as general build options
-local miniaudioDeps = {
+-- Those dependencies don't have separate [no-]build-* options, instead them use [no-]build-opus-vorbis as general build options
+MINIAUDIO_DEPENDENCIES_METADATA = {
     { name = "opus",     header = "opus/opus.h",          header_subdir = "opus"      },
     { name = "opusfile", header = "opus/opusfile.h",      header_subdir = "opus"      },
     { name = "vorbis",   header = "vorbis/vorbisfile.h"                               },
@@ -92,7 +92,7 @@ local miniaudioDeps = {
 
 -- Default values should be defined at the top of the script instead of the premake options.
 
-for _, dep in ipairs(buildDeps) do
+for _, dep in ipairs(DEPENDENCIES_METADATA) do
     local name = dep.name
     local cat  = "YGOPro - " .. name
     newoption { trigger = "build-"    .. name,    category = cat, description = "" }
@@ -101,7 +101,7 @@ for _, dep in ipairs(buildDeps) do
     newoption { trigger = name .. "-lib-dir",     category = cat, description = "", value = "PATH" }
     newoption { trigger = name .. "-lib-name",    category = cat, description = "", value = "NAME" }
 end
-for _, dep in ipairs(miniaudioDeps) do
+for _, dep in ipairs(MINIAUDIO_DEPENDENCIES_METADATA) do
     local name = dep.name
     local cat  = "YGOPro - miniaudio"
     newoption { trigger = name .. "-include-dir", category = cat, description = "", value = "PATH" }
@@ -143,13 +143,16 @@ function FindHeaderWithSubDir(header, subdir)
     return result
 end
 
-function CheckDirectory(varname)
+function EnsureAbsoluteDirectory(varname)
     local dir = _G[varname]
     if not dir or dir == "" then
         print("::warning:: " .. varname .. " is not set")
+        return
     elseif not os.isdir(dir) then
         print("::warning:: " .. varname .. " is not a valid directory: " .. dir)
+        return
     end
+    _G[varname] = path.getabsolute(dir)
 end
 
 -- Get dependency directories from command line or environment variables, and check their validity.
@@ -162,12 +165,12 @@ function GetDependencyDirectory(dep)
     _G[include_dir_var] = GetParam(dep.name .. "-include-dir") or FindHeaderWithSubDir(dep.header, dep.header_subdir)
     _G[lib_name_var] = GetParam(dep.name .. "-lib-name") or _G[lib_name_var] or dep.name
     _G[lib_dir_var] = GetParam(dep.name .. "-lib-dir") or os.findlib(_G[lib_name_var])
-    CheckDirectory(include_dir_var)
-    CheckDirectory(lib_dir_var)
+    EnsureAbsoluteDirectory(include_dir_var)
+    EnsureAbsoluteDirectory(lib_dir_var)
 end
 
 -- Process build flags and external directory settings for all library dependencies.
-for _, dep in ipairs(buildDeps) do
+for _, dep in ipairs(DEPENDENCIES_METADATA) do
     local name  = dep.name
     local upper = string.upper(name)
     local flag  = "BUILD_" .. upper
@@ -210,7 +213,7 @@ if USE_AUDIO then
                 MINIAUDIO_BUILD_OPUS_VORBIS = true
             end
             if not MINIAUDIO_BUILD_OPUS_VORBIS then
-                for _, dep in ipairs(miniaudioDeps) do
+                for _, dep in ipairs(MINIAUDIO_DEPENDENCIES_METADATA) do
                     GetDependencyDirectory(dep)
                 end
             end
@@ -379,35 +382,13 @@ workspace "YGOPro"
 
     include "ocgcore"
     include "gframe"
-    if BUILD_LUA then
-        include "lua"
-    end
-    if BUILD_EVENT then
-        include "event"
-    end
-    if BUILD_FREETYPE then
-        include "freetype"
-    end
-    if BUILD_IRRLICHT then
-        include "irrlicht"
-    end
-    if BUILD_JPEG then
-        include "jpeg"
-    end
-    if BUILD_PNG then
-        include "png"
-    end
-    if BUILD_ZLIB then
-        include "zlib"
-    end
-    if BUILD_SQLITE then
-        include "sqlite"
-    end
-    if BUILD_LZMA then
-        include "lzma/."
+    for _, dep in ipairs(DEPENDENCIES_METADATA) do
+        if _G["BUILD_" .. string.upper(dep.name)] then
+            include(dep.name)
+        end
     end
     if USE_AUDIO then
         if AUDIO_LIB=="miniaudio" then
-            include "miniaudio"
+            include "miniaudio/."
         end
     end

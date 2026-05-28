@@ -11,18 +11,17 @@ project "YGOPro"
     includedirs { "../ocgcore" }
     links { "ocgcore" }
 
-    local dependencies = { "lua", "event", "irrlicht", "jpeg", "png", "zlib", "freetype", "sqlite", "lzma" }
 
     if BUILD_FREETYPE then
         includedirs { FREETYPE_CUSTOM_INCLUDE_DIR }
     end
 
-    for _, dep in ipairs(dependencies) do
-        local upper = string.upper(dep)
+    for _, dep in ipairs(DEPENDENCIES_METADATA) do
+        local upper = string.upper(dep.name)
         includedirs { _G[upper .. "_INCLUDE_DIR"] }
         if _G["BUILD_" .. upper] then
             -- When building from source, the dependencies will be linked with their project names, which can't be changed via options.
-            links { dep }
+            links { dep.name }
         else
             links { _G[upper .. "_LIB_NAME"] }
             libdirs { _G[upper .. "_LIB_DIR"] }
