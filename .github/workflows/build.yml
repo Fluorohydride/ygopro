@@ -155,6 +155,18 @@ jobs:
         tar xf ${{ steps.libpng.outputs.filepath }}
         mv libpng-1.6.58 png
         cp png/scripts/pnglibconf.h.prebuilt png/pnglibconf.h
+
+    - name: Download libwebp
+      id: libwebp
+      uses: mercury233/action-cache-download-file@v1.2.0
+      with:
+        url: https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.6.0.tar.gz
+        sha256: e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564
+
+    - name: Extract libwebp
+      run: |
+        tar xf ${{ steps.libwebp.outputs.filepath }}
+        mv libwebp-1.6.0 webp
     
     - name: Download zlib
       id: zlib
@@ -256,6 +268,8 @@ jobs:
           !jpeg/java/
           !jpeg/testimages/
           png/
+          webp/
+          !webp/webp_js/
           zlib/
           sqlite3/
           lzma/
@@ -473,7 +487,7 @@ jobs:
     - name: Install dependencies (dynamic link)
       if: matrix.static-link != true
       run: |
-        sudo apt-get install -y libevent-dev libfreetype6-dev libsqlite3-dev libopusfile-dev libvorbis-dev libjpeg-dev libpng-dev zlib1g-dev liblzma-dev
+        sudo apt-get install -y libevent-dev libfreetype6-dev libsqlite3-dev libopusfile-dev libvorbis-dev libjpeg-dev libpng-dev libwebp-dev zlib1g-dev liblzma-dev
 
     - name: Install NASM
       if: matrix.static-link == true
@@ -569,6 +583,7 @@ jobs:
           --build-event \
           --build-jpeg \
           --build-png \
+          --build-webp \
           --build-zlib \
           --build-freetype \
           --build-sqlite \
@@ -635,8 +650,8 @@ jobs:
     - name: Install dependencies
       if: matrix.static-link != true
       run: |
-        brew install opus opusfile libvorbis zlib
-#        brew install sqlite libx11 freetype libevent libjpeg-turbo libpng xz
+        brew reinstall sqlite libx11 freetype libevent libjpeg-turbo webp opus opusfile libvorbis zlib
+      # libpng is dependency of freetype, xz is dependency of webp, so they are installed as well.
 
     - name: Install NASM
       if: matrix.static-link == true
@@ -713,6 +728,7 @@ jobs:
           --build-event \
           --build-jpeg \
           --build-png \
+          --build-webp \
           --build-zlib \
           --build-freetype \
           --build-sqlite \

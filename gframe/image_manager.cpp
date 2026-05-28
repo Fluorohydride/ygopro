@@ -1,6 +1,7 @@
 #include "image_manager.h"
 #include "image_utility.h"
 #include "game.h"
+#include <functional>
 #include <thread>
 
 namespace ygo {
@@ -213,16 +214,29 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, irr::s3
  * @return Image pointer. Must be dropped after use.
  */
 irr::video::IImage* ImageManager::GetImage(int code, irr::s32 targetWidth, irr::s32 targetHeight) {
+	std::function<irr::video::IImage*(irr::video::IVideoDriver*, irr::io::IReadFile*, irr::s32, irr::s32)> loadFunc;
 	char file[256];
 	mysnprintf(file, "expansions/pics/%d.jpg", code);
 	auto reader = irrFileSystem->createAndOpenFile(file);
+	loadFunc = ImageUtility::LoadJpegImage;
+	if(reader == nullptr) {
+		mysnprintf(file, "expansions/pics/%d.webp", code);
+		reader = irrFileSystem->createAndOpenFile(file);
+		loadFunc = ImageUtility::LoadWebPImage;
+	}
 	if(reader == nullptr) {
 		mysnprintf(file, "pics/%d.jpg", code);
 		reader = irrFileSystem->createAndOpenFile(file);
+		loadFunc = ImageUtility::LoadJpegImage;
+	}
+	if(reader == nullptr) {
+		mysnprintf(file, "pics/%d.webp", code);
+		reader = irrFileSystem->createAndOpenFile(file);
+		loadFunc = ImageUtility::LoadWebPImage;
 	}
 	if(reader == nullptr)
 		return nullptr;
-	irr::video::IImage* img = ImageUtility::LoadJpegImage(driver, reader, targetWidth, targetHeight);
+	irr::video::IImage* img = loadFunc(driver, reader, targetWidth, targetHeight);
 	reader->drop();
 	return img;
 }
