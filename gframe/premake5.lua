@@ -7,74 +7,30 @@ project "YGOPro"
 
     defines { "_IRR_STATIC_LIB_" }
     files { "*.cpp", "*.h" }
-    includedirs { "../ocgcore", EVENT_INCLUDE_DIR, IRRLICHT_INCLUDE_DIR, JPEG_INCLUDE_DIR, ZLIB_INCLUDE_DIR, LZMA_INCLUDE_DIR, SQLITE_INCLUDE_DIR }
+
+    includedirs { "../ocgcore" }
     links { "ocgcore" }
 
-    -- When building from source, the dependencies will be linked with their project names, which can't be changed via options.
-
-    if BUILD_LUA then
-        links { "lua" }
-    else
-        links { LUA_LIB_NAME }
-        libdirs { LUA_LIB_DIR }
-    end
-
-    if BUILD_EVENT then
-        links { "event" }
-    else
-        links { EVENT_LIB_NAME, EVENT_PTHREADS_LIB_NAME }
-        libdirs { EVENT_LIB_DIR }
-    end
-
-    if BUILD_IRRLICHT then
-        links { "irrlicht" }
-    else
-        links { IRRLICHT_LIB_NAME }
-        libdirs { IRRLICHT_LIB_DIR }
-    end
-
-    if BUILD_JPEG then
-        links { "jpeg" }
-    else
-        links { JPEG_LIB_NAME }
-        libdirs { JPEG_LIB_DIR }
-    end
-
-    if BUILD_PNG then
-        links { "png" }
-    else
-        links { PNG_LIB_NAME }
-        libdirs { PNG_LIB_DIR }
-    end
-
-    if BUILD_ZLIB then
-        links { "zlib" }
-    else
-        links { ZLIB_LIB_NAME }
-        libdirs { ZLIB_LIB_DIR }
-    end
+    local dependencies = { "lua", "event", "irrlicht", "jpeg", "png", "zlib", "freetype", "sqlite", "lzma" }
 
     if BUILD_FREETYPE then
-        includedirs { FREETYPE_CUSTOM_INCLUDE_DIR, FREETYPE_INCLUDE_DIR }
-        links { "freetype" }
-    else
-        includedirs { FREETYPE_INCLUDE_DIR }
-        links { FREETYPE_LIB_NAME }
-        libdirs { FREETYPE_LIB_DIR }
+        includedirs { FREETYPE_CUSTOM_INCLUDE_DIR }
     end
 
-    if BUILD_SQLITE then
-        links { "sqlite" }
-    else
-        links { SQLITE_LIB_NAME }
-        libdirs { SQLITE_LIB_DIR }
+    for _, dep in ipairs(dependencies) do
+        local upper = string.upper(dep)
+        includedirs { _G[upper .. "_INCLUDE_DIR"] }
+        if _G["BUILD_" .. upper] then
+            -- When building from source, the dependencies will be linked with their project names, which can't be changed via options.
+            links { dep }
+        else
+            links { _G[upper .. "_LIB_NAME"] }
+            libdirs { _G[upper .. "_LIB_DIR"] }
+        end
     end
 
-    if BUILD_LZMA then
-        links { "lzma" }
-    else
-        links { LZMA_LIB_NAME }
-        libdirs { LZMA_LIB_DIR }
+    if not BUILD_EVENT then
+        links { EVENT_PTHREADS_LIB_NAME }
     end
 
     if USE_SIMD == "none" then

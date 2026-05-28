@@ -152,6 +152,8 @@ function CheckDirectory(varname)
     end
 end
 
+-- Get dependency directories from command line or environment variables, and check their validity.
+-- Only called if the dependency is not built from source.
 function GetDependencyDirectory(dep)
     local upper = string.upper(dep.name)
     local include_dir_var = upper .. "_INCLUDE_DIR"
@@ -169,10 +171,10 @@ for _, dep in ipairs(buildDeps) do
     local name  = dep.name
     local upper = string.upper(name)
     local flag  = "BUILD_" .. upper
-    if GetParam("build-" .. name) then
-        _G[flag] = true
-    elseif GetParam("no-build-" .. name) then
+    if GetParam("no-build-" .. name) then
         _G[flag] = false
+    elseif GetParam("build-" .. name) then
+        _G[flag] = true
     end
     if not _G[flag] then
         GetDependencyDirectory(dep)
@@ -191,22 +193,15 @@ end
 
 if GetParam("no-audio") then
     USE_AUDIO = false
-elseif GetParam("no-use-miniaudio") then
-    print("Warning: --no-use-miniaudio is deprecated, use --no-audio")
-    USE_AUDIO = false
-elseif GetParam("use-miniaudio") then
-    print("Warning: --use-miniaudio is deprecated, use --audio-lib=miniaudio")
-    USE_AUDIO = true
-    AUDIO_LIB = "miniaudio"
 end
 
 if USE_AUDIO then
     AUDIO_LIB = GetParam("audio-lib") or AUDIO_LIB
     if AUDIO_LIB == "miniaudio" then
-        if GetParam("miniaudio-support-opus-vorbis") then
-            MINIAUDIO_SUPPORT_OPUS_VORBIS = true
-        elseif GetParam("no-miniaudio-support-opus-vorbis") then
+        if GetParam("no-miniaudio-support-opus-vorbis") then
             MINIAUDIO_SUPPORT_OPUS_VORBIS = false
+        elseif GetParam("miniaudio-support-opus-vorbis") then
+            MINIAUDIO_SUPPORT_OPUS_VORBIS = true
         end
         if MINIAUDIO_SUPPORT_OPUS_VORBIS then
             if GetParam("no-build-opus-vorbis") then
