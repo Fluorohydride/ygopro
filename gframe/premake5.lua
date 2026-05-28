@@ -64,7 +64,7 @@ project "YGOPro"
     end
 
     if BUILD_SQLITE then
-        links { "sqlite3" }
+        links { "sqlite" }
     else
         links { SQLITE_LIB_NAME }
         libdirs { SQLITE_LIB_DIR }

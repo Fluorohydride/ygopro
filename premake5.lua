@@ -67,7 +67,7 @@ JPEG_INCLUDE_DIR = path.getabsolute("./jpeg/src")
 PNG_INCLUDE_DIR = path.getabsolute("./png")
 ZLIB_INCLUDE_DIR = path.getabsolute("./zlib")
 FREETYPE_INCLUDE_DIR = path.getabsolute("./freetype/include")
-SQLITE_INCLUDE_DIR = path.getabsolute("./sqlite3")
+SQLITE_INCLUDE_DIR = path.getabsolute("./sqlite")
 LZMA_INCLUDE_DIR = path.getabsolute("./lzma/src/liblzma/api")
 
 -- Fields: name, header, header_subdir (for FindHeaderWithSubDir)
@@ -406,7 +406,7 @@ workspace "YGOPro"
         include "zlib"
     end
     if BUILD_SQLITE then
-        include "sqlite3"
+        include "sqlite"
     end
     if BUILD_LZMA then
         include "lzma/."
