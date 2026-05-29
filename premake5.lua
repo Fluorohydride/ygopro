@@ -60,34 +60,76 @@ MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libop
 MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libvorbis")
 FREETYPE_CUSTOM_INCLUDE_DIR = path.getabsolute("./freetype/custom")
 
-LUA_INCLUDE_DIR = path.getabsolute("./lua/src")
-EVENT_INCLUDE_DIR = path.getabsolute("./event/include")
-IRRLICHT_INCLUDE_DIR = path.getabsolute("./irrlicht/include")
-JPEG_INCLUDE_DIR = path.getabsolute("./jpeg/src")
-PNG_INCLUDE_DIR = path.getabsolute("./png")
-ZLIB_INCLUDE_DIR = path.getabsolute("./zlib")
-FREETYPE_INCLUDE_DIR = path.getabsolute("./freetype/include")
-SQLITE_INCLUDE_DIR = path.getabsolute("./sqlite")
-LZMA_INCLUDE_DIR = path.getabsolute("./lzma/src/liblzma/api")
-
--- Fields: name, header, header_subdir (for FindHeaderWithSubDir)
+-- Fields: name, header, header_subdir (for FindHeaderWithSubDir), local_include_dir (for building from source)
 DEPENDENCIES_METADATA = {
-    { name = "lua",      header = "lua.h",                                            },
-    { name = "event",    header = "event2/event.h"                                    },
-    { name = "freetype", header = "freetype2/ft2build.h", header_subdir = "freetype2" },
-    { name = "sqlite",   header = "sqlite3.h",                                        },
-    { name = "lzma",     header = "lzma.h"                                            },
-    { name = "irrlicht", header = "irrlicht.h"                                        },
-    { name = "jpeg",     header = "jpeglib.h",                                        },
-    { name = "png",      header = "png.h"                                             },
-    { name = "zlib",     header = "zlib.h",                                           },
+    {
+        name = "lua",
+        header = "lua.h",
+        local_include_dir = "./lua/src",
+    },
+    {
+        name = "event",
+        header = "event2/event.h",
+        local_include_dir = "./event/include",
+    },
+    {
+        name = "freetype",
+        header = "freetype2/ft2build.h",
+        header_subdir = "freetype2",
+        local_include_dir = "./freetype/include",
+    },
+    {
+        name = "sqlite",
+        header = "sqlite3.h",
+        local_include_dir = "./sqlite",
+    },
+    {
+        name = "lzma",
+        header = "lzma.h",
+        local_include_dir = "./lzma/src/liblzma/api",
+    },
+    {
+        name = "irrlicht",
+        header = "irrlicht.h",
+        local_include_dir = "./irrlicht/include",
+    },
+    {
+        name = "jpeg",
+        header = "jpeglib.h",
+        local_include_dir = "./jpeg/src",
+    },
+    {
+        name = "png",
+        header = "png.h",
+        local_include_dir = "./png",
+    },
+    {
+        name = "zlib",
+        header = "zlib.h",
+        local_include_dir = "./zlib",
+    },
 }
+
 -- Those dependencies don't have separate [no-]build-* options, instead them use [no-]build-opus-vorbis as general build options
 MINIAUDIO_DEPENDENCIES_METADATA = {
-    { name = "opus",     header = "opus/opus.h",          header_subdir = "opus"      },
-    { name = "opusfile", header = "opus/opusfile.h",      header_subdir = "opus"      },
-    { name = "vorbis",   header = "vorbis/vorbisfile.h"                               },
-    { name = "ogg",      header = "ogg/ogg.h"                                         },
+    {
+        name = "opus",
+        header = "opus/opus.h",
+        header_subdir = "opus",
+    },
+    {
+        name = "opusfile",
+        header = "opus/opusfile.h",
+        header_subdir = "opus",
+    },
+    {
+        name = "vorbis",
+        header = "vorbis/vorbisfile.h",
+    },
+    {
+        name = "ogg",
+        header = "ogg/ogg.h",
+    },
 }
 
 -- Default values should be defined at the top of the script instead of the premake options.
@@ -156,8 +198,7 @@ function EnsureAbsoluteDirectory(varname)
 end
 
 -- Get dependency directories from command line or environment variables, and check their validity.
--- Only called if the dependency is not built from source.
-function GetDependencyDirectory(dep)
+function GetPreBuiltDependencyDirectory(dep)
     local upper = string.upper(dep.name)
     local include_dir_var = upper .. "_INCLUDE_DIR"
     local lib_name_var = upper .. "_LIB_NAME"
@@ -169,18 +210,30 @@ function GetDependencyDirectory(dep)
     EnsureAbsoluteDirectory(lib_dir_var)
 end
 
+-- Get dependency directories from command line or environment variables, and check their validity.
+function GetBuildFromSourceDependencyDirectory(dep)
+    local upper = string.upper(dep.name)
+    local include_dir_var = upper .. "_INCLUDE_DIR"
+    _G[include_dir_var] = dep.local_include_dir
+    EnsureAbsoluteDirectory(include_dir_var)
+end
+
 -- Process build flags and external directory settings for all library dependencies.
 for _, dep in ipairs(DEPENDENCIES_METADATA) do
     local name  = dep.name
     local upper = string.upper(name)
     local flag  = "BUILD_" .. upper
+    local build = _G[flag] or false
     if GetParam("no-build-" .. name) then
-        _G[flag] = false
+        build = false
     elseif GetParam("build-" .. name) then
-        _G[flag] = true
+        build = true
     end
-    if not _G[flag] then
-        GetDependencyDirectory(dep)
+    _G[flag] = build
+    if build then
+        GetBuildFromSourceDependencyDirectory(dep)
+    else
+        GetPreBuiltDependencyDirectory(dep)
     end
 end
 
@@ -214,7 +267,7 @@ if USE_AUDIO then
             end
             if not MINIAUDIO_BUILD_OPUS_VORBIS then
                 for _, dep in ipairs(MINIAUDIO_DEPENDENCIES_METADATA) do
-                    GetDependencyDirectory(dep)
+                    GetPreBuiltDependencyDirectory(dep)
                 end
             end
         end
@@ -384,7 +437,7 @@ workspace "YGOPro"
     include "gframe"
     for _, dep in ipairs(DEPENDENCIES_METADATA) do
         if _G["BUILD_" .. string.upper(dep.name)] then
-            include(dep.name)
+            include(dep.name .. "/.")
         end
     end
     if USE_AUDIO then
