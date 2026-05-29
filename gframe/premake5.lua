@@ -28,7 +28,7 @@ project "YGOPro"
         end
     end
 
-    if not BUILD_EVENT then
+    if not BUILD_EVENT and not os.istarget("windows") then
         links { EVENT_PTHREADS_LIB_NAME }
     end
 
