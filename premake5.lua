@@ -1,10 +1,10 @@
 ----- YGOPro build configuration script using Premake5
 
---- Supported systems: Windows, Linux, MacOS
+--- Supported systems: Windows, Linux, macOS
 
--- Windows (Visual Studio) build supports x86, x86_64, and ARM64.
+-- Windows (Visual Studio) build supports x86, x86_64, and ARM64, with cross-compilation support.
 -- Linux build supports x86_64 and ARM64.
--- MacOS build supports x86_64 and ARM64, and it supports cross-compilation.
+-- macOS build supports x86_64 and ARM64, with cross-compilation support.
 
 ---- Global settings
 
@@ -16,7 +16,7 @@ USE_AUDIO = true
 AUDIO_LIB = "miniaudio" -- only miniaudio is supported for now
 
 -- Available: none, sse2, avx2, neon, best
--- "best" means avx2 on x86 and neon on ARM
+-- "best" means avx2 on x86-* and neon on ARM
 USE_SIMD = "best"
 
 -- os.hostarch() actually returns the architecture of Premake5, and the official Windows build of Premake5 is 32-bit,
@@ -45,9 +45,9 @@ BUILD_LUA = true
 -- (clipboard and IME). Also, Irrlicht's bundled jpeglib/libpng/zlib/lzma are not used here.
 BUILD_IRRLICHT = true
 
--- miniaudio is always built from source (was a header-only library; now an independent subproject).
+-- miniaudio is always built from source (originally a header-only library, now an independent subproject).
 -- When building Opus/Vorbis from source, they are integrated directly into the miniaudio subproject.
--- In order to simplify the build process, support for Ogg format audio (Opus/Vorbis) is optional.
+-- To simplify the build process, support for Ogg format audio (Opus/Vorbis) is optional.
 MINIAUDIO_SUPPORT_OPUS_VORBIS = true
 MINIAUDIO_INCLUDE_DIR = path.getabsolute("./miniaudio")
 MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libopus")
@@ -68,7 +68,7 @@ VORBISFILE_LIB_NAME = "vorbisfile"
 SQLITE_LIB_NAME = "sqlite3"
 ZLIB_LIB_NAME = "z"
 
---- Dependency metadata will be expanded into global variables like LUA_INCLUDE_DIR, LUA_LIB_NAME, LUA_LIB_DIR, etc. when processed.
+--- Dependency metadata entries are used to generate global variables such as LUA_INCLUDE_DIR, LUA_LIB_NAME, LUA_LIB_DIR, etc. during processing.
 
 -- Fields: name, header (for finding directory), header_subdir (for FindHeaderWithSubDir), local_include_dir (for building from source)
 DEPENDENCIES_METADATA = {
@@ -94,11 +94,6 @@ DEPENDENCIES_METADATA = {
         local_include_dir = "./sqlite",
     },
     {
-        name = "lzma",
-        header = "lzma.h",
-        local_include_dir = "./lzma/src/liblzma/api",
-    },
-    {
         name = "irrlicht",
         header = "irrlicht.h",
         local_include_dir = "./irrlicht/include",
@@ -114,13 +109,18 @@ DEPENDENCIES_METADATA = {
         local_include_dir = "./png",
     },
     {
+        name = "lzma",
+        header = "lzma.h",
+        local_include_dir = "./lzma/src/liblzma/api",
+    },
+    {
         name = "zlib",
         header = "zlib.h",
         local_include_dir = "./zlib",
     },
 }
 
--- Those dependencies don't have separate [no-]build-* options, instead them use [no-]build-opus-vorbis as general build options
+-- These dependencies do not have separate [no-]build-* options; instead, they use [no-]build-opus-vorbis as general build option.
 MINIAUDIO_DEPENDENCIES_METADATA = {
     {
         name = "opus",
@@ -154,20 +154,20 @@ MINIAUDIO_DEPENDENCIES_METADATA = {
 ---
 --- Windows: Prebuilt support is incomplete (static lib, dynamic lib, debug-specific lib to be refined).
 ---
---- Linux: The script already tries hard to find include and lib paths for prebuilt dependencies.
---- In most cases you should not need to manually specify parameters.
+--- Linux: The script already attempts to automatically locate include and lib paths for prebuilt dependencies.
+--- In most cases, you should not need to manually specify parameters.
 --- If a package is not found, manually specify it. If you installed from a well-known package manager,
 --- please consider reporting the issue.
 ---
---- macOS: When using Homebrew, use `DYLD_LIBRARY_PATH=$(brew --prefix)/lib` to ensure finding Homebrew installation paths.
---- Note: macOS/Xcode already provides "system" versions of sqlite and zlib, Homebrew treat those packages as "keg-only",
---- won't install them to the common directories. You must manually specify paths to use Homebrew-installed versions.
+--- macOS: When using Homebrew, use `DYLD_LIBRARY_PATH=$(brew --prefix)/lib` to ensure Homebrew installation paths are found.
+--- Note: macOS/Xcode already provides "system" versions of sqlite and zlib; Homebrew treats those packages as "keg-only"
+--- and won't install them to common directories. You must manually specify paths to use Homebrew-installed versions.
 
 --- Parameters are read from premake options (priority) and environment variables.
 --- Environment variable names are uppercase versions with hyphens replaced by underscores.
 ---
---- Note on default values: Default values should be defined at the top of the script, not as premake option defaults,
---- otherwise the premake default will always have higher priority than environment variables.
+--- Note on default values: Default values should be defined at the top of the script, not as premake option defaults;
+--- otherwise, the premake option default will always take priority over environment variables.
 
 for _, dep in ipairs(DEPENDENCIES_METADATA) do
     local name = dep.name
@@ -215,8 +215,8 @@ newoption { trigger = "use-simd", category = "YGOPro", description = "Specify SI
 
 ---- Process options
 
--- Read settings from command line or environment variables
--- If any values are set in the premake options, GetParam will not read them from environment variables.
+-- Read settings from command line or environment variables.
+-- Command-line options take priority over environment variables.
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
 end
@@ -254,7 +254,7 @@ function GetPreBuiltDependencyDirectory(dep)
     EnsureAbsoluteDirectory(lib_dir_var)
 end
 
--- Get dependency directories from command line or environment variables, and check their validity.
+-- Set the include directory for a dependency being built from source, and validate its path.
 function GetBuildFromSourceDependencyDirectory(dep)
     local upper = string.upper(dep.name)
     local include_dir_var = upper .. "_INCLUDE_DIR"
@@ -290,7 +290,7 @@ if GetParam("no-dxsdk") then
 end
 if USE_DXSDK and os.istarget("windows") then
     if not os.getenv("DXSDK_DIR") then
-        print("Warning: DXSDK_DIR environment variable not set, it seems you don't have the DirectX SDK installed. DirectX mode will be disabled.")
+        print("::warning:: DXSDK_DIR environment variable not set, it seems you don't have the DirectX SDK installed. DirectX mode will be disabled.")
         USE_DXSDK = false
     end
 end
@@ -330,22 +330,10 @@ end
 
 USE_SIMD = GetParam("use-simd") or USE_SIMD
 
--- Variable indicating whether we are building for Apple Silicon (for cross-compilation on macOS), will be detected automatically if not specified.
+-- Variables indicating the target Mac architecture for cross-compilation; automatically detected based on Premake's
+-- host architecture if neither --mac-arm nor --mac-intel is specified.
 local mac_arm = false
 local mac_intel = false
-
-if not mac_arm and not mac_intel and table.indexof({ "x86", "x86_64", "ARM64" }, PREMAKE_ARCH) == nil then
-    print("Warning: Detected architecture " .. PREMAKE_ARCH .. " seems not supported, trying to build anyway, SIMD will be disabled.")
-    USE_SIMD = "none"
-end
-
-if USE_SIMD == "avx2" or USE_SIMD == "neon" then
-    USE_SIMD = "best"
-end
-
-if os.istarget("windows") and GetParam("vs2026-win7-support") then
-    WIN7_SUPPORT = true
-end
 
 if os.istarget("macosx") then
     if GetParam("mac-arm") then
@@ -356,10 +344,25 @@ if os.istarget("macosx") then
     end
 end
 
+if not mac_arm and not mac_intel and table.indexof({ "x86", "x86_64", "ARM64" }, PREMAKE_ARCH) == nil then
+    print("::warning:: Detected architecture '" .. PREMAKE_ARCH .. "' is not recognized. Proceeding with the build; SIMD will be disabled.")
+    USE_SIMD = "none"
+end
+
+-- Normalize "avx2" and "neon" to "best": downstream code only checks "best",
+-- which already maps to AVX2 on x86-* and NEON on ARM.
+if USE_SIMD == "avx2" or USE_SIMD == "neon" then
+    USE_SIMD = "best"
+end
+
+if os.istarget("windows") and GetParam("vs2026-win7-support") then
+    WIN7_SUPPORT = true
+end
+
 if GetParam("use-openmp") then
     USE_OPENMP = true
     if os.istarget("macosx") then
-        print("Warning: OpenMP is not supported on Clang provided by Xcode.")
+        print("::warning:: OpenMP is not supported on Clang provided by Xcode.")
     end
 end
 
@@ -411,7 +414,7 @@ workspace "YGOPro"
     filter "system:macosx"
         systemversion "11"
         if mac_arm and mac_intel then
-            print("Warning: Universal binary is no longer supported, please choose either --mac-arm or --mac-intel, and combine the binaries with lipo manually.")
+            print("::warning:: Universal binary is no longer supported. Please choose either --mac-arm or --mac-intel and combine the binaries with lipo manually.")
             mac_arm = false
             mac_intel = false
         end
@@ -478,7 +481,7 @@ workspace "YGOPro"
 
     filter "action:vs*"
         cdialect "C11"
-        conformancemode "On" 
+        conformancemode "On"
         buildoptions { "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
 
@@ -497,11 +500,12 @@ workspace "YGOPro"
     include "gframe"
     for _, dep in ipairs(DEPENDENCIES_METADATA) do
         if _G["BUILD_" .. string.upper(dep.name)] then
+            -- Build dependency as subproject, using our pre-provided premake script (copy from the premake directory of the project before running premake)
             include(dep.name .. "/.")
         end
     end
     if USE_AUDIO then
-        if AUDIO_LIB=="miniaudio" then
+        if AUDIO_LIB == "miniaudio" then
             include "miniaudio/."
         end
     end
