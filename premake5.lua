@@ -215,13 +215,22 @@ newoption { trigger = "use-simd", category = "YGOPro", description = "Specify SI
 
 ---- Process options
 
--- Read settings from command line or environment variables.
--- Command-line options take priority over environment variables.
-function GetParam(param)
-    return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
+-- Return val if it's not nil; otherwise, return default.
+local function ifnil(val, default)
+    if val ~= nil then
+        return val
+    else
+        return default
+    end
 end
 
-function FindHeaderWithSubDir(header, subdir)
+-- Read settings from command line or environment variables.
+-- Command-line options take priority over environment variables.
+local function GetParam(param)
+    return ifnil(_OPTIONS[param], os.getenv(string.upper(string.gsub(param,"-","_"))))
+end
+
+local function FindHeaderWithSubDir(header, subdir)
     local result = os.findheader(header)
     if result and subdir then
         result = path.join(result, subdir)
@@ -229,7 +238,7 @@ function FindHeaderWithSubDir(header, subdir)
     return result
 end
 
-function EnsureAbsoluteDirectory(varname)
+local function EnsureAbsoluteDirectory(varname)
     local dir = _G[varname]
     if not dir or dir == "" then
         print("::warning:: " .. varname .. " is not set")
@@ -242,7 +251,7 @@ function EnsureAbsoluteDirectory(varname)
 end
 
 -- Get dependency directories from command line or environment variables, and check their validity.
-function GetPreBuiltDependencyDirectory(dep)
+local function GetPreBuiltDependencyDirectory(dep)
     local upper = string.upper(dep.name)
     local include_dir_var = upper .. "_INCLUDE_DIR"
     local lib_name_var = upper .. "_LIB_NAME"
@@ -255,7 +264,7 @@ function GetPreBuiltDependencyDirectory(dep)
 end
 
 -- Set the include directory for a dependency being built from source, and validate its path.
-function GetBuildFromSourceDependencyDirectory(dep)
+local function GetBuildFromSourceDependencyDirectory(dep)
     local upper = string.upper(dep.name)
     local include_dir_var = upper .. "_INCLUDE_DIR"
     _G[include_dir_var] = dep.local_include_dir
@@ -271,7 +280,7 @@ for _, dep in ipairs(DEPENDENCIES_METADATA) do
     local name  = dep.name
     local upper = string.upper(name)
     local flag  = "BUILD_" .. upper
-    local build = _G[flag] or BUILD_ALL_FROM_SOURCE
+    local build = ifnil(_G[flag], BUILD_ALL_FROM_SOURCE)
     if GetParam("no-build-" .. name) then
         build = false
     elseif GetParam("build-" .. name) then
