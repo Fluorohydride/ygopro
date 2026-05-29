@@ -1,66 +1,76 @@
--- Supported systems: Windows, Linux, MacOS
+----- YGOPro build configuration script using Premake5
+
+--- Supported systems: Windows, Linux, MacOS
 
 -- Windows (Visual Studio) build supports x86, x86_64, and ARM64.
 -- Linux build supports x86_64 and ARM64.
 -- MacOS build supports x86_64 and ARM64, and it supports cross-compilation.
 
--- Global settings
+---- Global settings
 
--- Default: Build Lua, Irrlicht, miniaudio from source on all systems.
---          Don't build event, freetype, sqlite, jpeg, png, zlib, opus, vorbis on Linux or MacOS, use package manager,
---          but build them on Windows, due to the lack of package manager on Windows.
+--- Use global variables to share settings across different scripts.
 
-BUILD_LUA = true
-LUA_LIB_NAME = "lua" -- at most times you need to change those if you don't build Lua from source:
-                     -- most Lua distributions provide a C lib named "lua", but ocgcore requires lua built as C++.
-
-BUILD_EVENT = os.istarget("windows")
-EVENT_PTHREADS_LIB_NAME = "event_pthreads" -- need to link both event_pthreads and event when not building from source
-
-BUILD_FREETYPE = os.istarget("windows")
-
-BUILD_SQLITE = os.istarget("windows")
-SQLITE_LIB_NAME = "sqlite3" -- the lib name should always be "sqlite3" instead of "sqlite"
-
-BUILD_IRRLICHT = true -- modified Irrlicht is required, can't use the official one
 USE_DXSDK = true
-
-BUILD_JPEG = os.istarget("windows") -- libjpeg-turbo is required, can't use the bundled IJG jpeglib from Irrlicht
-JPEG_LIB_NAME = "jpeg" -- use the libjpeg API of libjpeg-turbo, the lib name should always be "jpeg", just in case
-
-BUILD_PNG = os.istarget("windows")
-
-BUILD_ZLIB = os.istarget("windows")
-ZLIB_LIB_NAME = "z" -- the lib name should always be "z", just in case
 
 USE_AUDIO = true
 AUDIO_LIB = "miniaudio" -- only miniaudio is supported for now
--- BUILD_MINIAUDIO is always true
-MINIAUDIO_SUPPORT_OPUS_VORBIS = true
-MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
-VORBISFILE_LIB_NAME = "vorbisfile" -- need to link both vorbisfile and vorbis when not building from source
-
-BUILD_LZMA = os.istarget("windows")
 
 -- Available: none, sse2, avx2, neon, best
 -- "best" means avx2 on x86 and neon on ARM
 USE_SIMD = "best"
 
--- Variable indicating whether we are building for Apple Silicon, will be detected automatically if not specified.
-local MAC_ARM = false
-local MAC_INTEL = false
-
 -- os.hostarch() actually returns the architecture of Premake5, and the official Windows build of Premake5 is 32-bit,
 -- so we can only distinguish between AARCH64 and x86, and must use the ARM build of Premake5 on ARM platforms.
 PREMAKE_ARCH = os.hostarch()
 
--- Default include dirs, those values are ONLY used in static builds, WILL BE IGNORED if set corresponding BUILD_* to false
+---- Dependency settings
+
+--- When building dependencies from source, the corresponding source code must be placed in the corresponding location
+--- in the project folder (local), with the folder name fixed as the dependency name and the folder structure fixed as
+--- the official source package extraction.
+---
+--- Some dependencies need extra configuration (run configure scripts, copy or rename files), see the documentation or
+--- the CI workflow script for details.
+
+-- On Windows, build all dependencies from source by default.
+-- On Linux/macOS, most dependencies should be installed via the package manager.
+BUILD_ALL_FROM_SOURCE = os.istarget("windows")
+
+-- Build Lua from source by default:
+-- Most package managers provide Lua compiled as C, but ocgcore requires Lua compiled as C++.
+-- Some package managers do provide lua-c++ variants (e.g. liblua5.4-c++.so), which can be specified manually.
+BUILD_LUA = true
+
+-- Modified Irrlicht is required; the official version from package managers lacks proper CJK support
+-- (clipboard and IME). Also, Irrlicht's bundled jpeglib/libwebp/zlib/lzma are not used here.
+BUILD_IRRLICHT = true
+
+-- miniaudio is always built from source (was a header-only library; now an independent subproject).
+-- When building Opus/Vorbis from source, they are integrated directly into the miniaudio subproject.
+-- In order to simplify the build process, support for Ogg format audio (Opus/Vorbis) is optional.
+MINIAUDIO_SUPPORT_OPUS_VORBIS = true
 MINIAUDIO_INCLUDE_DIR = path.getabsolute("./miniaudio")
 MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libopus")
 MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libvorbis")
+
+-- When building freetype, a custom include dir is prepended to prioritize custom header files.
 FREETYPE_CUSTOM_INCLUDE_DIR = path.getabsolute("./freetype/custom")
 
--- Fields: name, header, header_subdir (for FindHeaderWithSubDir), local_include_dir (for building from source)
+-- When building libevent from source, event_pthreads is integrated into the event subproject.
+-- When not building from source, both "event" and "event_pthreads" need to be linked.
+EVENT_PTHREADS_LIB_NAME = "event_pthreads"
+
+-- When building Vorbis from source, vorbisfile is integrated into the miniaudio subproject.
+-- When not building from source, both "vorbis" and "vorbisfile" need to be linked.
+VORBISFILE_LIB_NAME = "vorbisfile"
+
+-- The following prebuilt lib names differ from the dependency name:
+SQLITE_LIB_NAME = "sqlite3"
+ZLIB_LIB_NAME = "z"
+
+--- Dependency metadata will be expanded into global variables like LUA_INCLUDE_DIR, LUA_LIB_NAME, LUA_LIB_DIR, etc. when processed.
+
+-- Fields: name, header (for finding directory), header_subdir (for FindHeaderWithSubDir), local_include_dir (for building from source)
 DEPENDENCIES_METADATA = {
     {
         name = "lua",
@@ -132,7 +142,32 @@ MINIAUDIO_DEPENDENCIES_METADATA = {
     },
 }
 
--- Default values should be defined at the top of the script instead of the premake options.
+---- Register options
+
+--- The *-include-dir, *-lib-dir, and *-lib-name options are only used for prebuilt dependencies.
+--- These options are ignored when building from source.
+---
+--- For *-lib-name option: Most users don't need to set it, as the script already provides conventional values.
+--- The only known case where setting it is necessary is when using prebuilt lua-c++, where the lib name must be specified.
+
+--- Platform-specific notes:
+---
+--- Windows: Prebuilt support is incomplete (static lib, dynamic lib, debug-specific lib to be refined).
+---
+--- Linux: The script already tries hard to find include and lib paths for prebuilt dependencies.
+--- In most cases you should not need to manually specify parameters.
+--- If a package is not found, manually specify it. If you installed from a well-known package manager,
+--- please consider reporting the issue.
+---
+--- macOS: When using Homebrew, use `DYLD_LIBRARY_PATH=$(brew --prefix)/lib` to ensure finding Homebrew installation paths.
+--- Note: macOS/Xcode already provides "system" versions of sqlite and zlib, Homebrew treat those packages as "keg-only",
+--- won't install them to the common directories. You must manually specify paths to use Homebrew-installed versions.
+
+--- Parameters are read from premake options (priority) and environment variables.
+--- Environment variable names are uppercase versions with hyphens replaced by underscores.
+---
+--- Note on default values: Default values should be defined at the top of the script, not as premake option defaults,
+--- otherwise the premake default will always have higher priority than environment variables.
 
 for _, dep in ipairs(DEPENDENCIES_METADATA) do
     local name = dep.name
@@ -151,28 +186,37 @@ for _, dep in ipairs(MINIAUDIO_DEPENDENCIES_METADATA) do
     newoption { trigger = name .. "-lib-name",    category = cat, description = "", value = "NAME" }
 end
 
-newoption { trigger = "no-dxsdk", category = "YGOPro - irrlicht", description = "" }
+newoption { trigger = "build-all", category = "YGOPro", description = "Build all dependencies from source" }
 
-newoption { trigger = "no-audio", category = "YGOPro", description = "" }
-newoption { trigger = "audio-lib", category = "YGOPro", description = "", value = "" }
+newoption { trigger = "no-dxsdk", category = "YGOPro - irrlicht", description = "Do not use DirectX SDK, disable D3D9 support" }
 
-newoption { trigger = "miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
-newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
-newoption { trigger = "build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
-newoption { trigger = "no-build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
+newoption { trigger = "no-audio", category = "YGOPro", description = "Disable audio support" }
+newoption { trigger = "audio-lib", category = "YGOPro", description = "Specify audio library (only miniaudio is supported for now)", value = "NAME" }
+
+newoption { trigger = "miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "Enable support for OGG format (Opus and Vorbis) in miniaudio" }
+newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "Disable support for OGG format in miniaudio" }
+newoption { trigger = "build-opus-vorbis", category = "YGOPro - miniaudio", description = "Build Opus and Vorbis libraries from source" }
+newoption { trigger = "no-build-opus-vorbis", category = "YGOPro - miniaudio", description = "Do not build Opus and Vorbis libraries from source" }
 
 newoption { trigger = "vs2026-win7-support", category = "YGOPro", description = "Enable Windows 7 support (toolset v143) for Visual Studio 2026" }
 
 newoption { trigger = "mac-arm", category = "YGOPro", description = "Cross Compile for Apple Silicon Mac" }
 newoption { trigger = "mac-intel", category = "YGOPro", description = "Cross Compile for Intel Mac" }
 
-newoption { trigger = "use-openmp", category = "YGOPro", description = "Enable OpenMP support (edge case)" }
+newoption { trigger = "use-openmp", category = "YGOPro", description = "Enable OpenMP support for card picture resizing (only for benchmarking)" }
 
-newoption { trigger = "use-simd", category = "YGOPro", description = "", value = "none, sse2, avx2, neon, best" }
+newoption { trigger = "use-simd", category = "YGOPro", description = "Specify SIMD instruction set", allowed = {
+    { "none", "Turn off extra SIMD support" },
+    { "sse2", "Use SSE2 instructions" },
+    { "avx2", "Use AVX2 instructions" },
+    { "neon", "Use NEON instructions" },
+    { "best", "Default, use the best SIMD instructions (AVX2 on x86-*, NEON on ARM)" },
+}}
+
+---- Process options
 
 -- Read settings from command line or environment variables
 -- If any values are set in the premake options, GetParam will not read them from environment variables.
-
 function GetParam(param)
     return _OPTIONS[param] or os.getenv(string.upper(string.gsub(param,"-","_")))
 end
@@ -218,12 +262,16 @@ function GetBuildFromSourceDependencyDirectory(dep)
     EnsureAbsoluteDirectory(include_dir_var)
 end
 
+if GetParam("build-all") then
+    BUILD_ALL_FROM_SOURCE = true
+end
+
 -- Process build flags and external directory settings for all library dependencies.
 for _, dep in ipairs(DEPENDENCIES_METADATA) do
     local name  = dep.name
     local upper = string.upper(name)
     local flag  = "BUILD_" .. upper
-    local build = _G[flag] or false
+    local build = _G[flag] or BUILD_ALL_FROM_SOURCE
     if GetParam("no-build-" .. name) then
         build = false
     elseif GetParam("build-" .. name) then
@@ -260,12 +308,16 @@ if USE_AUDIO then
             MINIAUDIO_SUPPORT_OPUS_VORBIS = true
         end
         if MINIAUDIO_SUPPORT_OPUS_VORBIS then
+            MINIAUDIO_BUILD_OPUS_VORBIS = BUILD_ALL_FROM_SOURCE
             if GetParam("no-build-opus-vorbis") then
                 MINIAUDIO_BUILD_OPUS_VORBIS = false
             elseif GetParam("build-opus-vorbis") then
                 MINIAUDIO_BUILD_OPUS_VORBIS = true
             end
-            if not MINIAUDIO_BUILD_OPUS_VORBIS then
+            if MINIAUDIO_BUILD_OPUS_VORBIS then
+                -- Opus, Vorbis and Ogg dependencies are integrated into the miniaudio subproject instead of being maintained as separate subprojects.
+                -- Since their locations are predefined in the miniaudio subproject, nothing needs to be done here.
+            else
                 for _, dep in ipairs(MINIAUDIO_DEPENDENCIES_METADATA) do
                     GetPreBuiltDependencyDirectory(dep)
                 end
@@ -278,7 +330,11 @@ end
 
 USE_SIMD = GetParam("use-simd") or USE_SIMD
 
-if not MAC_ARM and not MAC_INTEL and table.indexof({ "x86", "x86_64", "ARM64" }, PREMAKE_ARCH) == nil then
+-- Variable indicating whether we are building for Apple Silicon (for cross-compilation on macOS), will be detected automatically if not specified.
+local mac_arm = false
+local mac_intel = false
+
+if not mac_arm and not mac_intel and table.indexof({ "x86", "x86_64", "ARM64" }, PREMAKE_ARCH) == nil then
     print("Warning: Detected architecture " .. PREMAKE_ARCH .. " seems not supported, trying to build anyway, SIMD will be disabled.")
     USE_SIMD = "none"
 end
@@ -293,10 +349,10 @@ end
 
 if os.istarget("macosx") then
     if GetParam("mac-arm") then
-        MAC_ARM = true
+        mac_arm = true
     end
     if GetParam("mac-intel") then
-        MAC_INTEL = true
+        mac_intel = true
     end
 end
 
@@ -306,6 +362,8 @@ if GetParam("use-openmp") then
         print("Warning: OpenMP is not supported on Clang provided by Xcode.")
     end
 end
+
+---- Premake workspace and project configuration
 
 workspace "YGOPro"
     location "build"
@@ -352,25 +410,27 @@ workspace "YGOPro"
 
     filter "system:macosx"
         systemversion "11"
-        if MAC_ARM and MAC_INTEL then
+        if mac_arm and mac_intel then
             print("Warning: Universal binary is no longer supported, please choose either --mac-arm or --mac-intel, and combine the binaries with lipo manually.")
-            MAC_ARM = false
-            MAC_INTEL = false
+            mac_arm = false
+            mac_intel = false
         end
-        if not MAC_ARM and not MAC_INTEL then
+        if not mac_arm and not mac_intel then
             if PREMAKE_ARCH == "ARM64" then
-                MAC_ARM = true
+                mac_arm = true
             else
-                MAC_INTEL = true
+                mac_intel = true
             end
         end
-        if MAC_ARM then
+        -- We need to specify architecture on macOS to make the premake filters work correctly.
+        if mac_arm then
             architecture "AARCH64"
         end
-        if MAC_INTEL then
+        if mac_intel then
             architecture "x86_64"
         end
 
+    -- We need to specify architecture on Linux to make the premake filters work correctly.
     filter "system:linux"
         if PREMAKE_ARCH == "ARM64" then
             architecture "AARCH64"
