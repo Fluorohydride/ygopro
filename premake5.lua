@@ -42,7 +42,7 @@ BUILD_ALL_FROM_SOURCE = os.istarget("windows")
 BUILD_LUA = true
 
 -- Modified Irrlicht is required; the official version from package managers lacks proper CJK support
--- (clipboard and IME). Also, Irrlicht's bundled jpeglib/libwebp/zlib/lzma are not used here.
+-- (clipboard and IME). Also, Irrlicht's bundled jpeglib/libpng/zlib/lzma are not used here.
 BUILD_IRRLICHT = true
 
 -- miniaudio is always built from source (was a header-only library; now an independent subproject).
