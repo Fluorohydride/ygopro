@@ -23,6 +23,15 @@ USE_SIMD = "best"
 -- so we can only distinguish between AARCH64 and x86, and must use the ARM build of Premake5 on ARM platforms.
 PREMAKE_ARCH = os.hostarch()
 
+-- Return val if it's not nil; otherwise, return default.
+local function ifnil(val, default)
+    if val ~= nil then
+        return val
+    else
+        return default
+    end
+end
+
 ---- Dependency settings
 
 --- When building dependencies from source, the corresponding source code must be placed in the corresponding location
@@ -170,9 +179,10 @@ MINIAUDIO_DEPENDENCIES_METADATA = {
 --- otherwise, the premake option default will always take priority over environment variables.
 
 for _, dep in ipairs(DEPENDENCIES_METADATA) do
-    local name = dep.name
-    local cat  = "YGOPro - " .. name
-    newoption { trigger = "build-"    .. name,    category = cat, description = "" }
+    local name  = dep.name
+    local cat   = "YGOPro - " .. name
+    local build = ifnil(_G["BUILD_" .. string.upper(name)], BUILD_ALL_FROM_SOURCE)
+    newoption { trigger = "build-"    .. name,    category = cat, description = "Build " .. name .. " from source; default: " .. tostring(build) }
     newoption { trigger = "no-build-" .. name,    category = cat, description = "" }
     newoption { trigger = name .. "-include-dir", category = cat, description = "", value = "PATH" }
     newoption { trigger = name .. "-lib-dir",     category = cat, description = "", value = "PATH" }
@@ -194,9 +204,12 @@ newoption { trigger = "no-audio", category = "YGOPro", description = "Disable au
 newoption { trigger = "audio-lib", category = "YGOPro", description = "Specify audio library (only miniaudio is supported for now)", value = "NAME" }
 
 newoption { trigger = "miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "Enable support for OGG format (Opus and Vorbis) in miniaudio" }
-newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "Disable support for OGG format in miniaudio" }
-newoption { trigger = "build-opus-vorbis", category = "YGOPro - miniaudio", description = "Build Opus and Vorbis libraries from source" }
-newoption { trigger = "no-build-opus-vorbis", category = "YGOPro - miniaudio", description = "Do not build Opus and Vorbis libraries from source" }
+newoption { trigger = "no-miniaudio-support-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
+do
+    local build_opus_vorbis = ifnil(_G["BUILD_OPUS_VORBIS"], BUILD_ALL_FROM_SOURCE)
+    newoption { trigger = "build-opus-vorbis", category = "YGOPro - miniaudio", description = "Build Opus and Vorbis libraries from source; default: " .. tostring(build_opus_vorbis) }
+    newoption { trigger = "no-build-opus-vorbis", category = "YGOPro - miniaudio", description = "" }
+end
 
 newoption { trigger = "vs2026-win7-support", category = "YGOPro", description = "Enable Windows 7 support (toolset v143) for Visual Studio 2026" }
 
@@ -214,15 +227,6 @@ newoption { trigger = "use-simd", category = "YGOPro", description = "Specify SI
 }}
 
 ---- Process options
-
--- Return val if it's not nil; otherwise, return default.
-local function ifnil(val, default)
-    if val ~= nil then
-        return val
-    else
-        return default
-    end
-end
 
 -- Read settings from command line or environment variables.
 -- Command-line options take priority over environment variables.
