@@ -224,6 +224,7 @@ public:
 	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) = 0;
 	virtual void TimeConfirm(DuelPlayer* dp) = 0;
 	virtual void EndDuel() = 0;
+	virtual void OnPlayerDisconnected(DuelPlayer* dp) = 0;
 
 public:
 	event* etimer { nullptr };
