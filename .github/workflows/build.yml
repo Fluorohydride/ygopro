@@ -650,8 +650,8 @@ jobs:
     - name: Install dependencies
       if: matrix.static-link != true
       run: |
-        brew reinstall sqlite libx11 freetype libevent libjpeg-turbo webp opus opusfile libvorbis zlib
-      # libpng is dependency of freetype, xz is dependency of webp, so they are installed as well.
+        brew install libevent webp opus opusfile libvorbis zlib
+#        brew install sqlite libx11 freetype libjpeg-turbo libpng xz
 
     - name: Install NASM
       if: matrix.static-link == true

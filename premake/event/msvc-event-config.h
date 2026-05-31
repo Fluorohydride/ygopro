@@ -121,7 +121,6 @@
 /* Define to 1 if you have the `geteuid' function. */
 /* #undef EVENT__HAVE_GETEUID */
 
-/* TODO: Check for different gethostname argument counts. CheckPrototypeDefinition.cmake can be used. */
 /* Define this if you have any gethostbyname_r() */
 /* #undef EVENT__HAVE_GETHOSTBYNAME_R */
 
