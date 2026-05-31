@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
 	ygo::Game _game;
 	ygo::mainGame = &_game;
 	if(!ygo::mainGame->Initialize())
-		return 0;
+		return EXIT_FAILURE;
 
 #ifdef _WIN32
 	int wargc = 0;
