@@ -45,7 +45,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			if(linebuf[0] == '$') {
 				int limitValue = 0;
 				char keybuf[256];
-				if (std::sscanf(linebuf, "$%255s %d", keybuf, &limitValue) != 2)
+				if (std::sscanf(linebuf, "$%255[^ \t\n] %d", keybuf, &limitValue) != 2)
 					continue;
 				if (limitValue < 0)
 					limitValue = 0;
