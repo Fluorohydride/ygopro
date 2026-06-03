@@ -32,7 +32,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			if(linebuf[0] == '!') {
 				auto len = std::strcspn(linebuf, "\r\n");
 				linebuf[len] = 0;
-				BufferIO::DecodeUTF8(&linebuf[1], strBuffer);
+				BufferIO::DecodeUTF8(linebuf + 1, strBuffer);
 				LFList newlist;
 				newlist.listName = strBuffer;
 				newlist.hash = 0x7dfcee6a;
@@ -42,6 +42,14 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			}
 			if (cur == _lfList.rend())
 				continue;
+			if (linebuf[0] == 'M' || linebuf[1] == ' ') {
+				errno = 0;
+				auto type = std::strtoul(linebuf + 2, nullptr, 16);
+				if (errno || type > UINT32_MAX)
+					continue;
+				cur->noMonsterType = type;
+				continue;
+			}
 			if(linebuf[0] == '$') {
 				int limitValue = 0;
 				char keybuf[256];
@@ -149,6 +157,8 @@ uint32_t DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, size_t ru
 		auto it = list.find(code);
 		if(it != list.end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) | cit->code;
+		if ((cit->type & TYPE_MONSTER) && (cit->type & lflist->noMonsterType))
+			return (DECKERROR_LFLIST << 28) | cit->code;
 	}
 	for (auto& cit : deck.extra) {
 		auto gameruleDeckError = checkAvail(cit->ot, avail);
@@ -164,6 +174,8 @@ uint32_t DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, size_t ru
 		auto it = list.find(code);
 		if(it != list.end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) | cit->code;
+		if ((cit->type & TYPE_MONSTER) && (cit->type & lflist->noMonsterType))
+			return (DECKERROR_LFLIST << 28) | cit->code;
 	}
 	for (auto& cit : deck.side) {
 		auto gameruleDeckError = checkAvail(cit->ot, avail);
@@ -178,6 +190,8 @@ uint32_t DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, size_t ru
 			return (DECKERROR_CARDCOUNT << 28) | cit->code;
 		auto it = list.find(code);
 		if(it != list.end() && dc > it->second)
+			return (DECKERROR_LFLIST << 28) | cit->code;
+		if ((cit->type & TYPE_MONSTER) && (cit->type & lflist->noMonsterType))
 			return (DECKERROR_LFLIST << 28) | cit->code;
 	}
 	std::vector<int> sum = GetDeckPoint(deck, lflist);
