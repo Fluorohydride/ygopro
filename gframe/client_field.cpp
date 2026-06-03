@@ -52,6 +52,10 @@ ClientField::~ClientField() {
 		delete card;
 	}
 	overlay_cards.clear();
+	for (auto& card : limbo_temp) {
+		delete card;
+	}
+	limbo_temp.clear();
 }
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
@@ -93,6 +97,10 @@ void ClientField::Clear() {
 		delete card;
 	}
 	overlay_cards.clear();
+	for (auto& card : limbo_temp) {
+		delete card;
+	}
+	limbo_temp.clear();
 	extra_p_count[0] = 0;
 	extra_p_count[1] = 0;
 	player_desc_hints[0].clear();

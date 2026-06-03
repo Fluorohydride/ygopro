@@ -1343,6 +1343,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			seq = BufferIO::Read<uint8_t>(pbuf);
 			desc = BufferIO::Read<int32_t>(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
+			if(!pcard) {
+				pcard = new ClientCard();
+				mainGame->dField.limbo_temp.push_back(pcard);
+			}
 			int flag = 0;
 			if(code & 0x80000000) {
 				flag = EDESC_OPERATION;
@@ -1475,6 +1479,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			seq = BufferIO::Read<uint8_t>(pbuf);
 			desc = BufferIO::Read<int32_t>(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
+			if(!pcard) {
+				pcard = new ClientCard();
+				mainGame->dField.limbo_temp.push_back(pcard);
+			}
 			int flag = 0;
 			if(code & 0x80000000) {
 				flag = EDESC_OPERATION;
@@ -1752,6 +1760,10 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			ss = BufferIO::Read<uint8_t>(pbuf);
 			desc = BufferIO::Read<int32_t>(pbuf);
 			pcard = mainGame->dField.GetCard(c, l, s, ss);
+			if(!pcard) {
+				pcard = new ClientCard();
+				mainGame->dField.limbo_temp.push_back(pcard);
+			}
 			mainGame->dField.activatable_cards.push_back(pcard);
 			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, flag));
 			pcard->is_selected = false;
