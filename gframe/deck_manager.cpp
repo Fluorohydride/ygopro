@@ -46,12 +46,12 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			}
 			if (cur == _lfList.rend())
 				continue;
-			if (linebuf[0] == 'M' || linebuf[1] == ' ') {
+			if (linebuf[0] == 'M' && linebuf[1] == ' ') {
 				errno = 0;
 				auto type = std::strtoul(linebuf + 2, nullptr, 16);
 				if (errno || type > UINT32_MAX)
 					continue;
-				cur->noMonsterType = type;
+				cur->noMonsterType = static_cast<uint32_t>(type);
 				cur->hash = code_update_hash(cur->hash, cur->noMonsterType, 3);
 				continue;
 			}
