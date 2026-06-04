@@ -17,14 +17,18 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	uint32_t pointHash{};
 	auto credit_hash = [](const char* s) -> uint32_t {
 		uint32_t h = 2166136261u;
-		for(auto p = s; *p; ++p) {
+		for (auto p = s; *p; ++p) {
 			h ^= static_cast<unsigned char>(*p);
 			h *= 16777619u;
 		}
 		return h;
 	};
 	auto credit_update_hash = [](uint32_t h, uint32_t a, uint32_t b, uint32_t c) -> uint32_t {
-		return h ^ ((a << 18) | (a >> 14)) ^ ((b << 9) | (b >> 23)) ^ ((c << 27) | (c >> 5));
+		uint32_t mix = a + 0x9e3779b9;
+		mix = (mix ^ b) * 0x85ebca6b;
+		mix = (mix ^ c) * 0xc2b2ae35;
+		mix ^= (mix >> 16);
+		return h ^ mix;
 	};
 	auto code_update_hash = [](uint32_t hash, uint32_t code, uint32_t count)-> uint32_t {
 		return hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
