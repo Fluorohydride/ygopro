@@ -1195,6 +1195,8 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList
 	};
 	auto lfit = lflist->content.find(lcode);
 	int count = lfit != lflist->content.end() ? lfit->second : 3;
+	if ((cp->type & TYPE_MONSTER) && (cp->type & lflist->noMonsterType))
+		count = 0;
 	if (count >= 0 && count <= 2) {
 		auto lim_texture_offset_x = 0;
 		auto lim_texture_offset_y = 0;
