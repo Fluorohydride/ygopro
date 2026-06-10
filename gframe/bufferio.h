@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstring>
 #include <cwchar>
+#include <string>
 #include <vector>
 
 class BufferIO {
@@ -122,6 +123,19 @@ public:
 		return true;
 	}
 	// UTF-16/UTF-32 to UTF-8
+	static std::string EncodeUTF8String(const std::wstring& wstr) {
+		if (wstr.empty())
+			return std::string();
+		std::mbstate_t state{};
+		const wchar_t* src = wstr.c_str();
+		size_t len = std::wcsrtombs(nullptr, &src, 0, &state);
+		if (len == static_cast<size_t>(-1))
+			return std::string();
+		std::string result(len, 0);
+		state = std::mbstate_t{};
+		std::wcsrtombs(&result[0], &src, len, &state);
+		return result;
+	}
 	// return: string length
 	static int EncodeUTF8String(const wchar_t* wsrc, char* str, size_t size) {
 		if (size == 0) {
@@ -135,6 +149,19 @@ public:
 		return static_cast<int>(result_len);
 	}
 	// UTF-8 to UTF-16/UTF-32
+	static std::wstring DecodeUTF8String(const std::string& str) {
+		if (str.empty())
+			return std::wstring();
+		std::mbstate_t state{};
+		const char* src = str.c_str();
+		size_t len = std::mbsrtowcs(nullptr, &src, 0, &state);
+		if (len == static_cast<size_t>(-1))
+			return std::wstring();
+		std::wstring result(len, 0);
+		state = std::mbstate_t{};
+		std::mbsrtowcs(&result[0], &src, len, &state);
+		return result;
+	}
 	// return: string length
 	static int DecodeUTF8String(const char* src, wchar_t* wstr, size_t size) {
 		if (size == 0) {
