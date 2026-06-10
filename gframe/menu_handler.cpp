@@ -350,6 +350,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				std::wstring executableName = L"./bot";
 #endif
 				if (!Game::SpawnAsync(executableName, processArgs)) {
+					DuelClient::StopClient();
 					NetServer::StopServer();
 					break;
 				}

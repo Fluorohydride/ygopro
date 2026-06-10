@@ -131,8 +131,9 @@ public:
 		size_t len = std::wcsrtombs(nullptr, &src, 0, &state);
 		if (len == static_cast<size_t>(-1))
 			return std::string();
-		std::string result(len, 0);
+		std::string result(len, '\0');
 		state = std::mbstate_t{};
+		src = wstr.c_str();
 		std::wcsrtombs(&result[0], &src, len, &state);
 		return result;
 	}
@@ -157,8 +158,9 @@ public:
 		size_t len = std::mbsrtowcs(nullptr, &src, 0, &state);
 		if (len == static_cast<size_t>(-1))
 			return std::wstring();
-		std::wstring result(len, 0);
+		std::wstring result(len, L'\0');
 		state = std::mbstate_t{};
+		src = str.c_str();
 		std::mbsrtowcs(&result[0], &src, len, &state);
 		return result;
 	}

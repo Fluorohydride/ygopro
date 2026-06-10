@@ -2429,12 +2429,11 @@ bool Game::SpawnAsync(const std::wstring& exePath, const std::vector<std::wstrin
 	CloseHandle(pi.hThread);
 	CloseHandle(pi.hProcess);
 	return true;
-
 #else
-	std::string exePathUtf8 = BufferIO::EncodeUTF8String(exePath);
+	std::string exePathUTF8 = BufferIO::EncodeUTF8String(exePath);
 
 	std::vector<std::string> utf8Args;
-	utf8Args.emplace_back(exePathUtf8);
+	utf8Args.emplace_back(exePathUTF8);
 	for (const auto& arg : args) {
 		utf8Args.push_back(BufferIO::EncodeUTF8String(arg));
 	}
@@ -2447,7 +2446,7 @@ bool Game::SpawnAsync(const std::wstring& exePath, const std::vector<std::wstrin
 	execArgs.push_back(nullptr);
 
 	pid_t pid{}; // ignore pid return value, use SIG_IGN to prevent zombie process
-	return posix_spawn(&pid, exePathUtf8.c_str(), nullptr, nullptr, execArgs.data(), GetEnviron()) == 0;
+	return posix_spawn(&pid, exePathUTF8.c_str(), nullptr, nullptr, execArgs.data(), GetEnviron()) == 0;
 #endif
 }
 
