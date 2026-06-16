@@ -1485,7 +1485,7 @@ void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 		qlen += clen;
 		if (clen <= LEN_HEADER)
 			continue;
-		auto position = GetPosition(qbuf, 8);
+		auto position = GetPosition(qbuf);
 		if (position & POS_FACEDOWN)
 			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
@@ -1505,7 +1505,7 @@ void SingleDuel::RefreshSzone(int player, int flag, int use_cache) {
 		qlen += clen;
 		if (clen <= LEN_HEADER)
 			continue;
-		auto position = GetPosition(qbuf, 8);
+		auto position = GetPosition(qbuf);
 		if (position & POS_FACEDOWN)
 			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
@@ -1525,7 +1525,7 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
 		qlen += slen;
 		if (slen <= LEN_HEADER)
 			continue;
-		auto position = GetPosition(qbuf, 8);
+		auto position = GetPosition(qbuf);
 		if(!(position & POS_FACEUP))
 			std::memset(qbuf, 0, slen - 4);
 		qbuf += slen - 4;
@@ -1562,7 +1562,7 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	if (len <= LEN_HEADER)
 		return;
 	const int clen = BufferIO::Read<int32_t>(qbuf);
-	auto position = GetPosition(qbuf, 8);
+	auto position = GetPosition(qbuf);
 	if (position & POS_FACEDOWN) {
 		BufferIO::Write<int32_t>(qbuf, QUERY_CODE);
 		BufferIO::Write<int32_t>(qbuf, 0);

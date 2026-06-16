@@ -1597,11 +1597,11 @@ void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 	NetServer::ReSendToPlayer(players[pid + 1]);
 	int qlen = 0;
 	while(qlen < len) {
-		int clen = BufferIO::Read<int32_t>(qbuf);
+		const int clen = BufferIO::Read<int32_t>(qbuf);
 		qlen += clen;
 		if (clen <= LEN_HEADER)
 			continue;
-		auto position = GetPosition(qbuf, 8);
+		auto position = GetPosition(qbuf);
 		if (position & POS_FACEDOWN)
 			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
@@ -1621,11 +1621,11 @@ void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
 	NetServer::ReSendToPlayer(players[pid + 1]);
 	int qlen = 0;
 	while(qlen < len) {
-		int clen = BufferIO::Read<int32_t>(qbuf);
+		const int clen = BufferIO::Read<int32_t>(qbuf);
 		qlen += clen;
 		if (clen <= LEN_HEADER)
 			continue;
-		auto position = GetPosition(qbuf, 8);
+		auto position = GetPosition(qbuf);
 		if (position & POS_FACEDOWN)
 			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
@@ -1643,11 +1643,11 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache) {
 	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer.data(), len + 3);
 	int qlen = 0;
 	while(qlen < len) {
-		int slen = BufferIO::Read<int32_t>(qbuf);
+		const int slen = BufferIO::Read<int32_t>(qbuf);
 		qlen += slen;
 		if (slen <= LEN_HEADER)
 			continue;
-		auto position = GetPosition(qbuf, 8);
+		auto position = GetPosition(qbuf);
 		if(!(position & POS_FACEUP))
 			std::memset(qbuf, 0, slen - 4);
 		qbuf += slen - 4;
@@ -1684,7 +1684,8 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	BufferIO::Write<uint8_t>(qbuf, location);
 	BufferIO::Write<uint8_t>(qbuf, sequence);
 	int len = query_card(pduel, player, location, sequence, flag, qbuf, 0);
-	auto position = GetPosition(qbuf, 12);
+	const int clen = BufferIO::Read<int32_t>(qbuf);
+	auto position = GetPosition(qbuf);
 	if(location & LOCATION_ONFIELD) {
 		int pid = (player == 0) ? 0 : 2;
 		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 4);
