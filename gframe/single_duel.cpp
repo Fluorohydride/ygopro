@@ -1565,12 +1565,13 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 4);
 	if (len <= LEN_HEADER)
 		return;
-	const int clen = BufferIO::Read<int32_t>(qbuf);
-	auto position = qbuf[11];
+	auto position = qbuf[15];
 	if (position & POS_FACEDOWN) {
-		BufferIO::Write<int32_t>(qbuf, QUERY_CODE);
-		BufferIO::Write<int32_t>(qbuf, 0);
-		std::memset(qbuf, 0, clen - 12);
+		BufferIO::Write<int32_t>(qbuf, 16);
+		BufferIO::Write<uint32_t>(qbuf, QUERY_CODE | QUERY_POSITION);
+		BufferIO::Write<uint32_t>(qbuf, 0);
+		// keep the 4 bytes position data
+		len = 16;
 	}
 	NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer, len + 4);
 	for (auto pit = observers.begin(); pit != observers.end(); ++pit)
