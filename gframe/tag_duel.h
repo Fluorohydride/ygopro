@@ -43,7 +43,7 @@ public:
 	static void TagTimer(evutil_socket_t fd, short events, void* arg);
 
 private:
-	int WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache);
+	int WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache);
 	
 protected:
 	DuelPlayer* players[4];
