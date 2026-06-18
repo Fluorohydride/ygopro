@@ -47,6 +47,38 @@ void Replay::WriteData(const void* data, size_t length, bool flush) {
 void Replay::WriteInt32(int32_t data, bool flush) {
 	Write<int32_t>(data, flush);
 }
+size_t Replay::WriteResponse(const void* data, size_t length) {
+	if(!is_recording || !data)
+		return 0;
+	const size_t response_length = std::min<size_t>(length, SIZE_RETURN_VALUE);
+	if(!response_length)
+		return 0;
+	const bool extended = response_length > UINT8_MAX;
+	const size_t prefix_length = extended ? sizeof(uint8_t) + sizeof(uint16_t) : sizeof(uint8_t);
+	const size_t total_length = prefix_length + response_length;
+	if(total_length > MAX_REPLAY_SIZE - replay_size)
+		return 0;
+	if(extended) {
+		Write<uint8_t>(0, false);
+		Write<uint16_t>(static_cast<uint16_t>(response_length), false);
+	} else {
+		Write<uint8_t>(static_cast<uint8_t>(response_length), false);
+	}
+	WriteData(data, response_length);
+	return total_length;
+}
+bool Replay::RemoveData(size_t length) {
+	if(!is_recording)
+		return false;
+	if(length > replay_size)
+		return false;
+	replay_size -= length;
+	if(fp) {
+		std::fflush(fp);
+		std::fseek(fp, -static_cast<long>(length), SEEK_CUR);
+	}
+	return true;
+}
 void Replay::Flush() {
 	if(!is_recording)
 		return;
@@ -189,11 +221,24 @@ bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 	return FileSystem::Rename(old_path, new_path);
 }
 bool Replay::ReadNextResponse(unsigned char resp[]) {
-	unsigned char len{};
-	if (!ReadData(&len, sizeof len))
+	uint8_t len{};
+	if(!ReadData(&len, sizeof len))
 		return false;
-	if (!ReadData(resp, len))
+	std::memset(resp, 0, SIZE_RETURN_VALUE);
+	if(len)
+		return ReadData(resp, len);
+	uint16_t extended_length{};
+	if(!ReadData(&extended_length, sizeof extended_length))
 		return false;
+	const size_t response_length = extended_length;
+	if(response_length > replay_size - data_position) {
+		can_read = false;
+		return false;
+	}
+	const size_t copy_length = std::min<size_t>(response_length, SIZE_RETURN_VALUE);
+	if(copy_length)
+		std::memcpy(resp, replay_data + data_position, copy_length);
+	data_position += response_length;
 	return true;
 }
 bool Replay::ReadName(wchar_t* data) {

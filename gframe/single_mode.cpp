@@ -25,8 +25,7 @@ void SingleMode::StopPlay(bool is_exiting) {
 void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	if(!pduel)
 		return;
-	last_replay.Write<uint8_t>(len);
-	last_replay.WriteData(resp, len);
+	last_replay.WriteResponse(resp, len);
 	set_responseb(pduel, resp);
 }
 int SingleMode::SinglePlayThread() {

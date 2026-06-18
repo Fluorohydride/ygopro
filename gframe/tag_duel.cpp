@@ -544,6 +544,10 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 		unsigned char engType = BufferIO::Read<uint8_t>(pbuf);
 		switch (engType) {
 		case MSG_RETRY: {
+			if(last_replay_response_size) {
+				last_replay.RemoveData(last_replay_response_size);
+				last_replay_response_size = 0;
+			}
 			WaitforResponse(last_response);
 			NetServer::SendBufferToPlayer(cur_player[last_response], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
@@ -1521,8 +1525,7 @@ void TagDuel::GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len
 	if (len > SIZE_RETURN_VALUE)
 		len = SIZE_RETURN_VALUE;
 	std::memcpy(resb, pdata, len);
-	last_replay.Write<uint8_t>(len);
-	last_replay.WriteData(resb, len);
+	last_replay_response_size = last_replay.WriteResponse(resb, len);
 	set_responseb(pduel, resb);
 	players[dp->type]->state = 0xff;
 	if(host_info.time_limit) {
@@ -1533,6 +1536,7 @@ void TagDuel::GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len
 		time_elapsed = 0;
 	}
 	Process();
+	last_replay_response_size = 0;
 }
 void TagDuel::EndDuel() {
 	if(!pduel)
