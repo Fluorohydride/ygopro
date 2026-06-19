@@ -230,16 +230,8 @@ bool Replay::ReadNextResponse(unsigned char resp[]) {
 	uint16_t extended_length{};
 	if(!ReadData(&extended_length, sizeof extended_length))
 		return false;
-	const size_t response_length = extended_length;
-	if(response_length > replay_size - data_position) {
-		can_read = false;
-		return false;
-	}
-	const size_t copy_length = std::min<size_t>(response_length, SIZE_RETURN_VALUE);
-	if(copy_length)
-		std::memcpy(resp, replay_data + data_position, copy_length);
-	data_position += response_length;
-	return true;
+	const size_t response_length = std::min<size_t>(extended_length, SIZE_RETURN_VALUE);
+	return ReadData(resp, response_length);
 }
 bool Replay::ReadName(wchar_t* data) {
 	uint16_t buffer[20]{};
