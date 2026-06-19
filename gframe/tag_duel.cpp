@@ -1,3 +1,4 @@
+#include <cstdint>
 #include "config.h"
 #include "tag_duel.h"
 #include "netserver.h"
@@ -1517,9 +1518,9 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 	return 0;
 }
 void TagDuel::GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {
-	unsigned char resb[SIZE_RETURN_VALUE]{};
-	if (len > SIZE_RETURN_VALUE)
-		len = SIZE_RETURN_VALUE;
+	unsigned char resb[256]{};
+	if (len > UINT8_MAX)
+		len = UINT8_MAX;
 	std::memcpy(resb, pdata, len);
 	last_replay.Write<uint8_t>(len);
 	last_replay.WriteData(resb, len);
