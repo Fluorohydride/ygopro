@@ -1639,6 +1639,7 @@ void DeckBuilder::SortList() {
 			++left;
 		}
 	}
+	std::sort(results.begin(), left, DataManager::deck_sort_id);
 	switch(mainGame->cbSortType->getSelected()) {
 	case 0:
 		std::sort(left, results.end(), DataManager::deck_sort_lv);

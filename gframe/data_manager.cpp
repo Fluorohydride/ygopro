@@ -603,5 +603,8 @@ bool DataManager::deck_sort_name(const CardDataC* p1, const CardDataC* p2) {
 		return res < 0;
 	return p1->code < p2->code;
 }
+bool DataManager::deck_sort_id(const CardDataC* p1, const CardDataC* p2) {
+	return p1->code < p2->code;
+}
 
 }
