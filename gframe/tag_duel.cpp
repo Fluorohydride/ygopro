@@ -1,4 +1,3 @@
-#include <cstdint>
 #include "config.h"
 #include "tag_duel.h"
 #include "netserver.h"

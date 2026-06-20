@@ -1,4 +1,3 @@
-#include <cstdint>
 #include "config.h"
 #include "single_duel.h"
 #include "netserver.h"
