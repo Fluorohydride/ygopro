@@ -1411,7 +1411,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 	return 0;
 }
 void SingleDuel::GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {
-	unsigned char resb[256]{};
+	unsigned char resb[SIZE_RETURN_VALUE]{};
 	if (len > UINT8_MAX)
 		len = UINT8_MAX;
 	std::memcpy(resb, pdata, len);

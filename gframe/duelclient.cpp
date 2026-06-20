@@ -18,7 +18,7 @@ namespace ygo {
 
 namespace {
 	unsigned connect_state{};
-	unsigned char response_buf[256]{};
+	unsigned char response_buf[SIZE_RETURN_VALUE]{};
 	size_t response_len{};
 	unsigned int watching{};
 	bool is_host{};
@@ -1842,7 +1842,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 		if(selecting_player == mainGame->LocalPlayer(1))
 			mainGame->dField.selectable_field = (mainGame->dField.selectable_field >> 16) | (mainGame->dField.selectable_field << 16);
 		mainGame->dField.selected_field = 0;
-		unsigned char respbuf[256];
+		unsigned char respbuf[SIZE_RETURN_VALUE];
 		int pzone = 0;
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE) {
 			if (select_hint)

@@ -50,7 +50,7 @@ void ReplayMode::Pause(bool is_pause, bool is_step) {
 	}
 }
 bool ReplayMode::ReadReplayResponse() {
-	unsigned char resp[256];
+	unsigned char resp[SIZE_RETURN_VALUE];
 	bool result = cur_replay.ReadNextResponse(resp);
 	if(result)
 		set_responseb(pduel, resp);
