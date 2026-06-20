@@ -197,9 +197,9 @@ struct DuelPlayer {
 	bufferevent* bev{};
 };
 
-inline unsigned int GetPosition(unsigned char* qbuf) {
+inline unsigned int GetPosition(unsigned char* qbuf, size_t offset) {
 	unsigned int info = 0;
-	std::memcpy(&info, qbuf + 2 * sizeof(uint32_t), sizeof info);	// skip flag, code
+	std::memcpy(&info, qbuf + offset, sizeof info);
 	return info >> 24;
 }
 
