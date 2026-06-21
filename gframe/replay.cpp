@@ -50,20 +50,13 @@ void Replay::WriteInt32(int32_t data, bool flush) {
 size_t Replay::WriteResponse(const void* data, size_t length) {
 	if(!is_recording || !data)
 		return 0;
-	const size_t response_length = std::min<size_t>(length, SIZE_RETURN_VALUE);
+	const size_t response_length = std::min<size_t>(length, UINT8_MAX);
 	if(!response_length)
 		return 0;
-	const bool extended = response_length > UINT8_MAX;
-	const size_t prefix_length = extended ? sizeof(uint8_t) + sizeof(uint16_t) : sizeof(uint8_t);
-	const size_t total_length = prefix_length + response_length;
+	const size_t total_length = sizeof(uint8_t) + response_length;
 	if(total_length > MAX_REPLAY_SIZE - replay_size)
 		return 0;
-	if(extended) {
-		Write<uint8_t>(0, false);
-		Write<uint16_t>(static_cast<uint16_t>(response_length), false);
-	} else {
-		Write<uint8_t>(static_cast<uint8_t>(response_length), false);
-	}
+	Write<uint8_t>(static_cast<uint8_t>(response_length), false);
 	WriteData(data, response_length);
 	return total_length;
 }
@@ -224,14 +217,9 @@ bool Replay::ReadNextResponse(unsigned char resp[]) {
 	uint8_t len{};
 	if(!ReadData(&len, sizeof len))
 		return false;
-	std::memset(resp, 0, SIZE_RETURN_VALUE);
-	if(len)
-		return ReadData(resp, len);
-	uint16_t extended_length{};
-	if(!ReadData(&extended_length, sizeof extended_length))
+	if(!ReadData(resp, len))
 		return false;
-	const size_t response_length = std::min<size_t>(extended_length, SIZE_RETURN_VALUE);
-	return ReadData(resp, response_length);
+	return true;
 }
 bool Replay::ReadName(wchar_t* data) {
 	uint16_t buffer[20]{};
