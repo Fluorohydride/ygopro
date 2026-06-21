@@ -354,13 +354,12 @@ void SingleDuel::StartDuel(DuelPlayer* dp) {
 	duel_stage = DUEL_STAGE_FINGER;
 }
 void SingleDuel::HandResult(DuelPlayer* dp, unsigned char res) {
-	if(res == 0 || res > 3)
+	if(res == 0 || res > 3 || dp->state != CTOS_HAND_RESULT)
 		return;
-	if(dp->state != CTOS_HAND_RESULT)
+	auto player = dp->type;
+	if(hand_result[player])
 		return;
-	if(hand_result[dp->type])
-		return;
-	hand_result[dp->type] = res;
+	hand_result[player] = res;
 	if(hand_result[0] && hand_result[1]) {
 		STOC_HandResult schr;
 		schr.res1 = hand_result[0];
