@@ -1,3 +1,4 @@
+#include <array>
 #include <utility>
 #include "config.h"
 #include "tag_duel.h"
@@ -1586,7 +1587,7 @@ void TagDuel::TimeConfirm(DuelPlayer* dp) {
 	if(time_elapsed < 10)
 		time_elapsed = 0;
 }
-inline int TagDuel::WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache) {
+inline int TagDuel::WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache) {
 	flag |= (QUERY_CODE | QUERY_POSITION);
 	BufferIO::Write<uint8_t>(qbuf, MSG_UPDATE_DATA);
 	BufferIO::Write<uint8_t>(qbuf, player);
@@ -1595,8 +1596,7 @@ inline int TagDuel::WriteUpdateData(int& player, int location, int& flag, unsign
 	return len;
 }
 void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
-	std::vector<unsigned char> query_buffer;
-	query_buffer.resize(SIZE_QUERY_BUFFER);
+	std::array<unsigned char, SIZE_QUERY_BUFFER> query_buffer;
 	auto qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_MZONE, flag, qbuf, use_cache);
 	std::vector<std::pair<unsigned char*, int>> hidden_segments;
@@ -1625,8 +1625,7 @@ void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
-	std::vector<unsigned char> query_buffer;
-	query_buffer.resize(SIZE_QUERY_BUFFER);
+	std::array<unsigned char, SIZE_QUERY_BUFFER> query_buffer;
 	auto qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_SZONE, flag, qbuf, use_cache);
 	std::vector<std::pair<unsigned char*, int>> hidden_segments;
@@ -1655,8 +1654,7 @@ void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshHand(int player, int flag, int use_cache) {
-	std::vector<unsigned char> query_buffer;
-	query_buffer.resize(SIZE_QUERY_BUFFER);
+	std::array<unsigned char, SIZE_QUERY_BUFFER> query_buffer;
 	auto qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_HAND, flag, qbuf, use_cache);
 	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer.data(), len + 3);
@@ -1678,8 +1676,7 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshGrave(int player, int flag, int use_cache) {
-	std::vector<unsigned char> query_buffer;
-	query_buffer.resize(SIZE_QUERY_BUFFER);
+	std::array<unsigned char, SIZE_QUERY_BUFFER> query_buffer;
 	auto qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_GRAVE, flag, qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, query_buffer.data(), len + 3);
@@ -1690,8 +1687,7 @@ void TagDuel::RefreshGrave(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshExtra(int player, int flag, int use_cache) {
-	std::vector<unsigned char> query_buffer;
-	query_buffer.resize(SIZE_QUERY_BUFFER);
+	std::array<unsigned char, SIZE_QUERY_BUFFER> query_buffer;
 	auto qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_EXTRA, flag, qbuf, use_cache);
 	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer.data(), len + 3);
