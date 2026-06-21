@@ -1518,8 +1518,8 @@ int TagDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 }
 void TagDuel::GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {
 	unsigned char resb[SIZE_RETURN_VALUE]{};
-	if (len > SIZE_RETURN_VALUE)
-		len = SIZE_RETURN_VALUE;
+	if (len > UINT8_MAX)
+		len = UINT8_MAX;
 	std::memcpy(resb, pdata, len);
 	last_replay.Write<uint8_t>(len);
 	last_replay.WriteData(resb, len);
