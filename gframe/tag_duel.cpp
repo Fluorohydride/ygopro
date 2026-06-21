@@ -320,12 +320,12 @@ void TagDuel::StartDuel(DuelPlayer* dp) {
 	duel_stage = DUEL_STAGE_FINGER;
 }
 void TagDuel::HandResult(DuelPlayer* dp, unsigned char res) {
-	if(res > 3 || dp->state != CTOS_HAND_RESULT)
+	if(res == 0 || res > 3 || dp->state != CTOS_HAND_RESULT)
 		return;
-	if(dp->type == 0)
-		hand_result[0] = res;
-	else
-		hand_result[1] = res;
+	auto player = (dp->type & 0x2) >> 1;
+	if(hand_result[player])
+		return;
+	hand_result[player] = res;
 	if(hand_result[0] && hand_result[1]) {
 		STOC_HandResult schr;
 		schr.res1 = hand_result[0];
