@@ -766,6 +766,8 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1482));
 	cbLimit->addItem(dataManager.GetSysString(1483));
 	cbLimit->addItem(dataManager.GetSysString(1484));
+	cbLimit->addItem(dataManager.GetSysString(1487));
+	cbLimit->addItem(dataManager.GetSysString(1488));
 	cbLimit->addItem(dataManager.GetSysString(1485));
 	stAttribute = env->addStaticText(dataManager.GetSysString(1319), irr::core::rect<irr::s32>(10, 22 + 50 / 6, 70, 42 + 50 / 6), false, false, wFilter);
 	cbAttribute = env->addComboBox(irr::core::rect<irr::s32>(60, 20 + 50 / 6, 195, 40 + 50 / 6), wFilter, COMBOBOX_ATTRIBUTE);
