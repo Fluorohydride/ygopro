@@ -215,9 +215,9 @@ bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 }
 bool Replay::ReadNextResponse(unsigned char resp[]) {
 	uint8_t len{};
-	if(!ReadData(&len, sizeof len))
+	if (!ReadData(&len, sizeof len))
 		return false;
-	if(!ReadData(resp, len))
+	if (!ReadData(resp, len))
 		return false;
 	return true;
 }
