@@ -34,6 +34,7 @@ public:
 
 protected:
 	static Replay last_replay;
+	static size_t last_replay_response_size;
 };
 
 }
