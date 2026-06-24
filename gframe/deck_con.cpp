@@ -1835,6 +1835,8 @@ void DeckBuilder::pop_side(int seq) {
 	GetHoveredCard();
 }
 bool DeckBuilder::check_limit(const CardDataC* pointer) {
+	if ((pointer->type & TYPE_MONSTER) && (pointer->type & filterList->noMonsterType))
+		return false;
 	auto limitcode = pointer->get_duel_code();
 	int limit = 3;
 	auto flit = filterList->content.find(limitcode);
@@ -1852,6 +1854,29 @@ bool DeckBuilder::check_limit(const CardDataC* pointer) {
 		if (card->get_duel_code() == limitcode)
 			limit--;
 	}
-	return limit > 0;
+	if (limit <= 0)
+		return false;
+	
+	uint32_t original_code = pointer->get_original_code();
+	bool has_point = false;
+	for (auto& point : filterList->pointList) {
+		if (point.table.find(original_code) != point.table.end()) {
+			has_point = true;
+			break;
+		}
+	}
+	if (!has_point)
+		return true;
+	std::vector<int> sum = DeckManager::GetDeckPoint(deckManager.current_deck, filterList);
+	for (size_t i = 0; i < filterList->pointList.size(); ++i) {
+		auto& point = filterList->pointList[i];
+		auto it = point.table.find(original_code);
+		if (it == point.table.end())
+			continue;
+		sum[i] = sum[i] + it->second;
+		if (sum[i] > point.limit)
+			return false;
+	}
+	return true;
 }
 }
