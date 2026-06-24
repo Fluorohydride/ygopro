@@ -55,6 +55,7 @@ protected:
 	unsigned char last_response{ 0 };
 	std::set<DuelPlayer*> observers;
 	Replay last_replay;
+	size_t last_replay_response_size{ 0 };
 	bool match_mode{ false };
 	int match_kill{ 0 };
 	unsigned char duel_count{ 0 };
