@@ -2455,7 +2455,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			lst = mainGame->dField.mzone;
 		else
 			lst = mainGame->dField.szone;
-		ClientCard* mc[5]{ nullptr };
+		ClientCard* mc[7]{ nullptr };
 		ClientCard* swp;
 		int c, s, ps;
 		unsigned int l;
