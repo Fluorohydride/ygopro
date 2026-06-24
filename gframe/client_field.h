@@ -131,6 +131,9 @@ public:
 	void UpdateDeclarableList();
 
 	irr::gui::IGUIElement* panel{ nullptr };
+	bool is_dragging_cardtext{ false };
+	int dragging_cardtext_start_pos{ 0 };
+	int dragging_cardtext_start_y{ 0 };
 	std::vector<int> ancard;
 	int hovered_controler{ 0 };
 	int hovered_location{ 0 };
