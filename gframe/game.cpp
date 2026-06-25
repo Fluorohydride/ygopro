@@ -92,6 +92,8 @@ bool Game::Initialize() {
 	device->getLogger()->setLogLevel(irr::ELOG_LEVEL::ELL_ERROR);
 #endif
 	deckManager.LoadLFList();
+	if (gameConf.default_lflist >= 0 && gameConf.default_lflist < (int)deckManager._lfList.size())
+		deckBuilder.default_index = gameConf.default_lflist;
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
@@ -240,7 +242,7 @@ bool Game::Initialize() {
 	cbHostLFlist = env->addComboBox(irr::core::rect<irr::s32>(140, 25, 300, 50), wCreateHost);
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
 		cbHostLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
-	cbHostLFlist->setSelected(gameConf.use_lflist ? gameConf.default_lflist : cbHostLFlist->getItemCount() - 1);
+	cbHostLFlist->setSelected(gameConf.use_lflist ? deckBuilder.default_index : cbHostLFlist->getItemCount() - 1);
 	env->addStaticText(dataManager.GetSysString(1225), irr::core::rect<irr::s32>(20, 60, 220, 80), false, false, wCreateHost);
 	cbRule = env->addComboBox(irr::core::rect<irr::s32>(140, 55, 300, 80), wCreateHost);
 	cbRule->setMaxSelectionRows(10);
@@ -485,7 +487,7 @@ bool Game::Initialize() {
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
 		cbLFlist->addItem(deckManager._lfList[i].listName.c_str());
 	cbLFlist->setEnabled(gameConf.use_lflist);
-	cbLFlist->setSelected(gameConf.use_lflist ? gameConf.default_lflist : cbLFlist->getItemCount() - 1);
+	cbLFlist->setSelected(gameConf.use_lflist ? deckBuilder.default_index : cbLFlist->getItemCount() - 1);
 	posY += 30;
 	chkEnableSound = env->addCheckBox(gameConf.enable_sound, irr::core::rect<irr::s32>(posX, posY, posX + 120, posY + 25), tabSystem, -1, dataManager.GetSysString(1279));
 	chkEnableSound->setChecked(gameConf.enable_sound);
@@ -1579,7 +1581,7 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "mute_opponent = %d\n", (chkIgnore1->isChecked() ? 1 : 0));
 	std::fprintf(fp, "mute_spectators = %d\n", (chkIgnore2->isChecked() ? 1 : 0));
 	std::fprintf(fp, "use_lflist = %d\n", gameConf.use_lflist);
-	std::fprintf(fp, "default_lflist = %d\n", gameConf.default_lflist);
+	std::fprintf(fp, "default_lflist = %d\n", deckBuilder.default_index);
 	std::fprintf(fp, "default_rule = %d\n", gameConf.default_rule == DEFAULT_DUEL_RULE ? 0 : gameConf.default_rule);
 	std::fprintf(fp, "hide_setname = %d\n", gameConf.hide_setname);
 	std::fprintf(fp, "hide_hint_button = %d\n", gameConf.hide_hint_button);

@@ -1951,10 +1951,18 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				break;
 			}
 			case CHECKBOX_LFLIST: {
-				mainGame->gameConf.use_lflist = mainGame->chkLFlist->isChecked() ? 1 : 0;
-				mainGame->cbLFlist->setEnabled(mainGame->gameConf.use_lflist);
-				mainGame->cbLFlist->setSelected(mainGame->gameConf.use_lflist ? mainGame->gameConf.default_lflist : mainGame->cbLFlist->getItemCount() - 1);
-				mainGame->cbHostLFlist->setSelected(mainGame->gameConf.use_lflist ? mainGame->gameConf.default_lflist : mainGame->cbHostLFlist->getItemCount() - 1);
+				if (mainGame->chkLFlist->isChecked()) {
+					mainGame->gameConf.use_lflist = 1;
+					mainGame->cbLFlist->setEnabled(true);
+					mainGame->cbLFlist->setSelected(mainGame->deckBuilder.default_index);
+					mainGame->cbHostLFlist->setSelected(mainGame->deckBuilder.default_index);
+				}
+				else {
+					mainGame->gameConf.use_lflist = 0;
+					mainGame->cbLFlist->setEnabled(false);
+					mainGame->cbLFlist->setSelected(mainGame->cbLFlist->getItemCount() - 1);
+					mainGame->cbHostLFlist->setSelected(mainGame->cbHostLFlist->getItemCount() - 1);
+				}
 				mainGame->deckBuilder.filterList = &deckManager._lfList[mainGame->cbLFlist->getSelected()];
 				return true;
 				break;
@@ -1965,9 +1973,12 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
 			case COMBOBOX_LFLIST: {
-				mainGame->gameConf.default_lflist = mainGame->cbLFlist->getSelected();
-				mainGame->cbHostLFlist->setSelected(mainGame->gameConf.default_lflist);
-				mainGame->deckBuilder.filterList = &deckManager._lfList[mainGame->gameConf.default_lflist];
+				int sel = mainGame->cbLFlist->getSelected();
+				if (sel != -1) {
+					mainGame->deckBuilder.default_index = mainGame->cbLFlist->getSelected();
+					mainGame->cbHostLFlist->setSelected(sel);
+					mainGame->deckBuilder.filterList = &deckManager._lfList[mainGame->deckBuilder.default_index];
+				}
 				return true;
 				break;
 			}

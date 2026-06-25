@@ -84,6 +84,7 @@ public:
 	std::mt19937 rnd;
 
 	const LFList* filterList{};
+	size_t default_index{};
 	std::vector<const CardDataC*> results;
 	wchar_t result_string[8]{};
 	std::vector<std::wstring> expansionPacks;

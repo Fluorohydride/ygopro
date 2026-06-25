@@ -80,13 +80,7 @@ void DeckBuilder::Initialize() {
 	mainGame->btnSideSort->setVisible(false);
 	mainGame->btnSideReload->setVisible(false);
 	if (mainGame->gameConf.use_lflist) {
-		if (mainGame->gameConf.default_lflist >= 0 && mainGame->gameConf.default_lflist < (int)deckManager._lfList.size()) {
-			filterList = &deckManager._lfList[mainGame->gameConf.default_lflist];
-		}
-		else {
-			mainGame->gameConf.default_lflist = 0;
-			filterList = &deckManager._lfList.front();
-		}
+		filterList = &deckManager._lfList[default_index];
 	}
 	else {
 		filterList = &deckManager._lfList.back();
