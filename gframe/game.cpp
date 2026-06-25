@@ -1220,7 +1220,7 @@ void Game::LoadExpansions() {
 				errmsg.append(fpath);
 				errmsg.append(")! ");
 				errmsg.append(dataManager.errmsg);
-				ErrorLog(errmsg.c_str());
+				mainGame->ErrorLog(errmsg.c_str());
 			}
 			return;
 		}
