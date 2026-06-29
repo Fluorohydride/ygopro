@@ -1880,7 +1880,6 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			SetResponseI(positions);
 			return true;
 		}
-		mainGame->gMutex.lock();
 		if(positions & 0x1) {
 			mainGame->btnImagePending[mainGame->btnPSAU] = std::make_pair((int)code, false);
 			mainGame->btnPSAU->setVisible(true);
