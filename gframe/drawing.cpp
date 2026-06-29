@@ -268,8 +268,8 @@ void Game::DrawBackGround() {
 	matManager.mTexture.setTexture(0, drawField ? imageManager.tFieldTransparent[rule] : imageManager.tField[rule]);
 	driver->setMaterial(matManager.mTexture);
 	driver->drawVertexPrimitiveList(matManager.vField, 4, matManager.iRectangle, 2);
-	driver->setMaterial(matManager.mBackLine);
 	//select field
+	driver->setMaterial(matManager.mOutLine);
 	if(dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD || dInfo.curMsg == MSG_HINT) {
 		unsigned int filter = 0x1;
 		for (int i = 0; i < 7; ++i, filter <<= 1) {
@@ -293,6 +293,7 @@ void Game::DrawBackGround() {
 		}
 	}
 	//disabled field
+	driver->setMaterial(matManager.mBackLine);
 	{
 		/*float cv[4] = {0.0f, 0.0f, 1.0f, 1.0f};*/
 		unsigned int filter = 0x1;
