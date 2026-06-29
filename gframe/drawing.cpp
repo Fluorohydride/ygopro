@@ -64,7 +64,6 @@ void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver, irr::video::ITextur
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::video::SColor color) {
 	static const int edgeStart[] = { 0, 1, 3, 2 };
 	static const int edgeEnd[]   = { 1, 3, 2, 0 };
-	driver->setMaterial(matManager.mOutLine);
 	const irr::core::matrix4 oldWorld = driver->getTransform(irr::video::ETS_WORLD);
 	irr::core::vector3df wp[4];
 	for(int i = 0; i < 4; ++i)
@@ -72,9 +71,6 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 	const irr::core::matrix4& view = driver->getTransform(irr::video::ETS_VIEW);
 	irr::core::matrix4 pv = driver->getTransform(irr::video::ETS_PROJECTION);
 	pv *= view;
-	irr::core::matrix4 invPv;
-	if(!pv.getInverse(invPv))
-		return;
 	const auto sz = driver->getCurrentRenderTargetSize();
 	if(sz.Width == 0 || sz.Height == 0)
 		return;
@@ -83,6 +79,11 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 	const irr::f32 yScale = sz.Height / static_cast<irr::f32>(GAME_WINDOW_HEIGHT);
 	const irr::f32 pixelScale = (xScale < yScale) ? xScale : yScale;
 	const irr::f32 halfThick = matManager.mOutLine.Thickness * pixelScale * 0.2f;
+	if(halfThick <= 0.0f)
+		return;
+	irr::core::matrix4 invPv;
+	if(!pv.getInverse(invPv))
+		return;
 	struct ProjectedPoint {
 		irr::core::vector2df screen;
 		irr::f32 ndcZ;
@@ -105,31 +106,19 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 		const irr::f32 invW = 1.0f / point[3];
 		return irr::core::vector3df(point[0] * invW, point[1] * invW, point[2] * invW);
 	};
-	std::vector<irr::video::S3DVertex> vertices;
-	std::vector<irr::u16> indices;
-	vertices.reserve(128);
-	indices.reserve(240);
 	constexpr size_t THICK_LINE_VERTICES_PER_SEGMENT = 8;
-	constexpr size_t MAX_THICK_LINE_BATCH_VERTICES = (size_t{1} << (sizeof(irr::u16) * 8)) - THICK_LINE_VERTICES_PER_SEGMENT;
-	const auto drawBatch = [&]() {
-		if(indices.empty())
-			return;
-		driver->drawVertexPrimitiveList(vertices.data(), static_cast<irr::u32>(vertices.size()),
-		    indices.data(), static_cast<irr::u32>(indices.size() / 3),
-		    irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLES);
-		vertices.clear();
-		indices.clear();
+	constexpr size_t THICK_LINE_INDICES_PER_SEGMENT = 30;
+	const auto lerpProjected = [](const ProjectedPoint& start, const ProjectedPoint& end, irr::f32 t) {
+		ProjectedPoint result;
+		result.screen = start.screen + (end.screen - start.screen) * t;
+		result.ndcZ = start.ndcZ + (end.ndcZ - start.ndcZ) * t;
+		return result;
 	};
-	const auto appendThickLine = [&](const irr::core::vector3df& start, const irr::core::vector3df& end) {
-		if(halfThick <= 0.0f) return;
-		ProjectedPoint ps, pe;
-		if(!projectPoint(start, ps) || !projectPoint(end, pe))
-			return;
+	const auto buildThickLine = [&](const ProjectedPoint& ps, const ProjectedPoint& pe,
+	                                irr::video::S3DVertex* outVertices, irr::u16* outIndices, irr::u16 base) {
 		const auto screenDirection = pe.screen - ps.screen;
 		const irr::f32 screenLenSq = screenDirection.getLengthSQ();
-		if(screenLenSq < 1e-4f) return;
-		if(vertices.size() > MAX_THICK_LINE_BATCH_VERTICES)
-			drawBatch();
+		if(screenLenSq < 1e-4f) return false;
 		const irr::f32 invScreenLen = 1.0f / std::sqrt(screenLenSq);
 		const irr::core::vector2df dir = screenDirection * invScreenLen;
 		const irr::core::vector2df perp(-dir.Y, dir.X);
@@ -137,7 +126,6 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 		const auto innerPerp = perp * halfThick;
 		const auto outerPerp = perp * (halfThick + feather);
 		const auto endFeather = dir * feather;
-		const auto base = static_cast<irr::u16>(vertices.size());
 		static const irr::u16 idx[30] = {
 			0, 1, 3, 0, 3, 2,
 			4, 5, 0, 0, 5, 1,
@@ -148,55 +136,130 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 		const irr::core::vector3df normal(0.0f, 0.0f, -1.0f);
 		irr::video::SColor transparent = color;
 		transparent.setAlpha(0);
-		vertices.emplace_back(unprojectScreen(ps.screen + innerPerp, ps.ndcZ), normal, color, irr::core::vector2df());
-		vertices.emplace_back(unprojectScreen(pe.screen + innerPerp, pe.ndcZ), normal, color, irr::core::vector2df());
-		vertices.emplace_back(unprojectScreen(ps.screen - innerPerp, ps.ndcZ), normal, color, irr::core::vector2df());
-		vertices.emplace_back(unprojectScreen(pe.screen - innerPerp, pe.ndcZ), normal, color, irr::core::vector2df());
-		vertices.emplace_back(unprojectScreen(ps.screen - endFeather + outerPerp, ps.ndcZ), normal, transparent, irr::core::vector2df());
-		vertices.emplace_back(unprojectScreen(pe.screen + endFeather + outerPerp, pe.ndcZ), normal, transparent, irr::core::vector2df());
-		vertices.emplace_back(unprojectScreen(pe.screen + endFeather - outerPerp, pe.ndcZ), normal, transparent, irr::core::vector2df());
-		vertices.emplace_back(unprojectScreen(ps.screen - endFeather - outerPerp, ps.ndcZ), normal, transparent, irr::core::vector2df());
-		for(int i = 0; i < 30; ++i)
-			indices.push_back(base + idx[i]);
+		outVertices[0] = irr::video::S3DVertex(unprojectScreen(ps.screen + innerPerp, ps.ndcZ), normal, color, irr::core::vector2df());
+		outVertices[1] = irr::video::S3DVertex(unprojectScreen(pe.screen + innerPerp, pe.ndcZ), normal, color, irr::core::vector2df());
+		outVertices[2] = irr::video::S3DVertex(unprojectScreen(ps.screen - innerPerp, ps.ndcZ), normal, color, irr::core::vector2df());
+		outVertices[3] = irr::video::S3DVertex(unprojectScreen(pe.screen - innerPerp, pe.ndcZ), normal, color, irr::core::vector2df());
+		outVertices[4] = irr::video::S3DVertex(unprojectScreen(ps.screen - endFeather + outerPerp, ps.ndcZ), normal, transparent, irr::core::vector2df());
+		outVertices[5] = irr::video::S3DVertex(unprojectScreen(pe.screen + endFeather + outerPerp, pe.ndcZ), normal, transparent, irr::core::vector2df());
+		outVertices[6] = irr::video::S3DVertex(unprojectScreen(pe.screen + endFeather - outerPerp, pe.ndcZ), normal, transparent, irr::core::vector2df());
+		outVertices[7] = irr::video::S3DVertex(unprojectScreen(ps.screen - endFeather - outerPerp, ps.ndcZ), normal, transparent, irr::core::vector2df());
+		for(size_t i = 0; i < THICK_LINE_INDICES_PER_SEGMENT; ++i)
+			outIndices[i] = base + idx[i];
+		return true;
 	};
+	driver->setMaterial(matManager.mOutLine);
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::matrix4());
+	const auto drawFixedSegments = [&](const auto& getSegment) {
+		irr::video::S3DVertex vertices[4 * THICK_LINE_VERTICES_PER_SEGMENT];
+		irr::u16 indices[4 * THICK_LINE_INDICES_PER_SEGMENT];
+		size_t vertexCount = 0;
+		size_t indexCount = 0;
+		for(int i = 0; i < 4; ++i) {
+			ProjectedPoint ps, pe;
+			if(!getSegment(i, ps, pe))
+				continue;
+			if(buildThickLine(ps, pe, vertices + vertexCount, indices + indexCount, static_cast<irr::u16>(vertexCount))) {
+				vertexCount += THICK_LINE_VERTICES_PER_SEGMENT;
+				indexCount += THICK_LINE_INDICES_PER_SEGMENT;
+			}
+		}
+		if(indexCount)
+			driver->drawVertexPrimitiveList(vertices, static_cast<irr::u32>(vertexCount),
+			    indices, static_cast<irr::u32>(indexCount / 3),
+			    irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLES);
+	};
 	if(!stipple) {
-		for(int i = 0; i < 4; ++i)
-			appendThickLine(wp[edgeStart[i]], wp[edgeEnd[i]]);
+		drawFixedSegments([&](int i, ProjectedPoint& ps, ProjectedPoint& pe) {
+			return projectPoint(wp[edgeStart[i]], ps) && projectPoint(wp[edgeEnd[i]], pe);
+		});
 	} else if(gameConf.solid_selection_line) {
 		const irr::f32 t0 = (linePattern < 15) ? 0.0f : (linePattern - 14) / 15.0f;
 		const irr::f32 t1 = (linePattern < 15) ? (linePattern + 1) / 15.0f : 1.0f;
-		for(int i = 0; i < 4; ++i) {
+		drawFixedSegments([&](int i, ProjectedPoint& ps, ProjectedPoint& pe) {
 			const auto& s = wp[edgeStart[i]];
 			const auto d = wp[edgeEnd[i]] - s;
-			appendThickLine(s + d * t0, s + d * t1);
-		}
+			return projectPoint(s + d * t0, ps) && projectPoint(s + d * t1, pe);
+		});
 	} else {
+		constexpr size_t MAX_THICK_LINE_BATCH_VERTICES = size_t{1} << (sizeof(irr::u16) * 8);
+		struct ProjectedEdge {
+			ProjectedPoint start;
+			ProjectedPoint end;
+			irr::f32 screenLen;
+			bool projected;
+		};
+		ProjectedEdge projectedEdges[4];
+		irr::f32 totalProjectedLen = 0.0f;
+		for(int i = 0; i < 4; ++i) {
+			auto& edge = projectedEdges[i];
+			edge.projected = projectPoint(wp[edgeStart[i]], edge.start) && projectPoint(wp[edgeEnd[i]], edge.end);
+			edge.screenLen = 1.0f;
+			if(edge.projected) {
+				edge.screenLen = std::sqrt((edge.start.screen - edge.end.screen).getLengthSQ());
+				totalProjectedLen += edge.screenLen;
+			}
+		}
+		const size_t estimatedSegments = static_cast<size_t>(totalProjectedLen * 0.5f) + 4;
+		size_t reserveVertices = estimatedSegments * THICK_LINE_VERTICES_PER_SEGMENT;
+		if(reserveVertices > MAX_THICK_LINE_BATCH_VERTICES)
+			reserveVertices = MAX_THICK_LINE_BATCH_VERTICES;
+		std::vector<irr::video::S3DVertex> vertices;
+		std::vector<irr::u16> indices;
+		vertices.reserve(reserveVertices);
+		indices.reserve((reserveVertices / THICK_LINE_VERTICES_PER_SEGMENT) * THICK_LINE_INDICES_PER_SEGMENT);
+		const auto drawBatch = [&]() {
+			if(indices.empty())
+				return;
+			driver->drawVertexPrimitiveList(vertices.data(), static_cast<irr::u32>(vertices.size()),
+			    indices.data(), static_cast<irr::u32>(indices.size() / 3),
+			    irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLES);
+			vertices.clear();
+			indices.clear();
+		};
+		const auto appendProjectedThickLine = [&](const ProjectedPoint& ps, const ProjectedPoint& pe) {
+			if(vertices.size() + THICK_LINE_VERTICES_PER_SEGMENT > MAX_THICK_LINE_BATCH_VERTICES)
+				drawBatch();
+			const auto base = static_cast<irr::u16>(vertices.size());
+			const size_t oldVertexCount = vertices.size();
+			const size_t oldIndexCount = indices.size();
+			vertices.resize(oldVertexCount + THICK_LINE_VERTICES_PER_SEGMENT);
+			indices.resize(oldIndexCount + THICK_LINE_INDICES_PER_SEGMENT);
+			if(!buildThickLine(ps, pe, vertices.data() + oldVertexCount, indices.data() + oldIndexCount, base)) {
+				vertices.resize(oldVertexCount);
+				indices.resize(oldIndexCount);
+			}
+		};
 		// Project edge endpoints to screen space to get pixel length for pattern tiling.
 		// (1 pattern bit = 1 screen pixel, matching the original GL stipple behaviour.)
 		irr::f32 patternCursor = 0.0f;
 		for(int i = 0; i < 4; ++i) {
-			const auto& s = wp[edgeStart[i]];
-			const auto d = wp[edgeEnd[i]] - s;
-			ProjectedPoint ps, pe;
-			irr::f32 screenLen = 1.0f;
-			if(projectPoint(s, ps) && projectPoint(s + d, pe))
-				screenLen = std::sqrt((ps.screen - pe.screen).getLengthSQ());
+			const auto& edge = projectedEdges[i];
+			const irr::f32 screenLen = edge.screenLen;
 			for(irr::f32 cursor = 0.0f; cursor < screenLen; ) {
 				const int bit = static_cast<int>(patternCursor + cursor) & 0xf;
-				if(!((stippleMask >> bit) & 1)) { cursor += 1.0f; continue; }
+				if(!((stippleMask >> bit) & 1)) {
+					irr::f32 runEnd = cursor + 1.0f;
+					while(runEnd < screenLen && !((stippleMask >> (static_cast<int>(patternCursor + runEnd) & 0xf)) & 1))
+						runEnd += 1.0f;
+					cursor = runEnd;
+					continue;
+				}
 				irr::f32 runEnd = cursor + 1.0f;
 				while(runEnd < screenLen && ((stippleMask >> (static_cast<int>(patternCursor + runEnd) & 0xf)) & 1))
 					runEnd += 1.0f;
 				if(runEnd > screenLen)
 					runEnd = screenLen;
-				appendThickLine(s + d * (cursor / screenLen), s + d * (runEnd / screenLen));
+				if(edge.projected) {
+					appendProjectedThickLine(lerpProjected(edge.start, edge.end, cursor / screenLen),
+					    lerpProjected(edge.start, edge.end, runEnd / screenLen));
+				}
 				cursor = runEnd;
 			}
 			patternCursor = std::fmod(patternCursor + screenLen, 16.0f);
 		}
+		drawBatch();
 	}
-	drawBatch();
 	driver->setTransform(irr::video::ETS_WORLD, oldWorld);
 }
 void Game::DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color) {

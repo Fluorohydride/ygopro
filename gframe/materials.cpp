@@ -124,6 +124,7 @@ Materials::Materials() {
 	mOutLine.ColorMaterial = irr::video::ECM_AMBIENT;
 	mOutLine.DiffuseColor = 0xff000000;
 	mOutLine.MaterialType = irr::video::EMT_TRANSPARENT_VERTEX_ALPHA;
+	mOutLine.ZWriteEnable = irr::video::EZW_ON;
 	mOutLine.Thickness = 2;
 	mOutLine.setFlag(irr::video::EMF_LIGHTING, false);
 	mOutLine.setFlag(irr::video::EMF_BACK_FACE_CULLING, false);
