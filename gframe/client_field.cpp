@@ -19,69 +19,36 @@ ClientField::ClientField() {
 }
 ClientField::~ClientField() {
 	for (int i = 0; i < 2; ++i) {
-		for (auto& card : deck[i]) {
-			delete card;
-		}
 		deck[i].clear();
-		for (auto& card : hand[i]) {
-			delete card;
-		}
 		hand[i].clear();
 		for (auto& card : mzone[i]) {
-			delete card;
 			card = nullptr;
 		}
 		for (auto& card : szone[i]) {
-			delete card;
 			card = nullptr;
 		}
-		for (auto& card : grave[i]) {
-			delete card;
-		}
 		grave[i].clear();
-		for (auto& card : remove[i]) {
-			delete card;
-		}
 		remove[i].clear();
-		for (auto& card : extra[i]) {
-			delete card;
-		}
 		extra[i].clear();
 	}
-	for (auto& card : overlay_cards) {
-		delete card;
-	}
 	overlay_cards.clear();
+	for (auto pcard : cards_) {
+		delete pcard;
+	}
+	cards_.clear();
 }
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
-		for (auto& card : deck[i]) {
-			delete card;
-		}
 		deck[i].clear();
-		for (auto& card : hand[i]) {
-			delete card;
-		}
 		hand[i].clear();
 		for (auto& card : mzone[i]) {
-			delete card;
 			card = nullptr;
 		}
 		for (auto& card : szone[i]) {
-			delete card;
 			card = nullptr;
 		}
-		for (auto& card : grave[i]) {
-			delete card;
-		}
 		grave[i].clear();
-		for (auto& card : remove[i]) {
-			delete card;
-		}
 		remove[i].clear();
-		for (auto& card : extra[i]) {
-			delete card;
-		}
 		extra[i].clear();
 		deck_act[i] = false;
 		grave_act[i] = false;
@@ -89,9 +56,10 @@ void ClientField::Clear() {
 		extra_act[i] = false;
 		pzone_act[i] = false;
 	}
-	for (auto& card : overlay_cards) {
-		delete card;
+	for(auto pcard : cards_) {
+		delete pcard;
 	}
+	cards_.clear();
 	overlay_cards.clear();
 	extra_p_count[0] = 0;
 	extra_p_count[1] = 0;
@@ -123,7 +91,7 @@ void ClientField::Clear() {
 void ClientField::Initial(int player, int deckc, int extrac, int sidec) {
 	auto load_location = [&](std::vector<ClientCard*>& container, int count, uint8_t location) {
 		for(int i = 0; i < count; ++i) {
-			ClientCard* pcard = new ClientCard;
+			ClientCard* pcard = CreateCard();
 			container.push_back(pcard);
 			pcard->owner = player;
 			pcard->controler = player;
@@ -147,6 +115,11 @@ void ClientField::ResetSequence(std::vector<ClientCard*>& list, bool reset_heigh
 			pcard->mTransform.setTranslation(pcard->curPos);
 		}
 	}
+}
+ClientCard* ClientField::CreateCard() {
+	ClientCard* pcard = new ClientCard(this);
+	cards_.push_back(pcard);
+	return pcard;
 }
 ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
 	std::vector<ClientCard*>* lst = 0;

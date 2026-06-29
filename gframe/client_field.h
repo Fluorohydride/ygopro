@@ -96,6 +96,7 @@ public:
 	~ClientField() override;
 	void Clear();
 	void Initial(int player, int deckc, int extrac, int sidec = 0);
+	ClientCard* CreateCard();
 	void ResetSequence(std::vector<ClientCard*>& list, bool reset_height);
 	ClientCard* GetCard(int controler, int location, int sequence, int sub_seq = 0);
 	void AddCard(ClientCard* pcard, int controler, int location, int sequence);
@@ -158,6 +159,9 @@ public:
 	void SetResponseSelectedCards() const;
 	void SetResponseSelectedOption() const;
 	void CancelOrFinish();
+
+private:
+	std::vector<ClientCard*> cards_;
 };
 
 }
