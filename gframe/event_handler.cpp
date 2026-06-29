@@ -1954,8 +1954,8 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				if (mainGame->chkLFlist->isChecked()) {
 					mainGame->gameConf.use_lflist = 1;
 					mainGame->cbLFlist->setEnabled(true);
-					mainGame->cbLFlist->setSelected(mainGame->deckBuilder.default_index);
-					mainGame->cbHostLFlist->setSelected(mainGame->deckBuilder.default_index);
+					mainGame->cbLFlist->setSelected(mainGame->deckBuilder.default_lflist_index);
+					mainGame->cbHostLFlist->setSelected(mainGame->deckBuilder.default_lflist_index);
 				}
 				else {
 					mainGame->gameConf.use_lflist = 0;
@@ -1975,9 +1975,9 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			case COMBOBOX_LFLIST: {
 				int sel = mainGame->cbLFlist->getSelected();
 				if (sel != -1) {
-					mainGame->deckBuilder.default_index = mainGame->cbLFlist->getSelected();
+					mainGame->deckBuilder.default_lflist_index = mainGame->cbLFlist->getSelected();
 					mainGame->cbHostLFlist->setSelected(sel);
-					mainGame->deckBuilder.filterList = &deckManager._lfList[mainGame->deckBuilder.default_index];
+					mainGame->deckBuilder.filterList = &deckManager._lfList[mainGame->deckBuilder.default_lflist_index];
 				}
 				return true;
 				break;
