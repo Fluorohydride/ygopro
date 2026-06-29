@@ -2604,7 +2604,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 		}
 		int appear = mainGame->gameConf.quick_animation ? 12 : 20;
 		if (pl == 0) {
-			ClientCard* pcard = new ClientCard;
+			ClientCard* pcard = mainGame->dField.CreateCard();
 			pcard->position = cp;
 			pcard->SetCode(code);
 			if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
@@ -3820,7 +3820,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			}
 		} else {
 			while(mainGame->dField.deck[player].size() < mcount) {
-				ClientCard* ccard = new ClientCard;
+				ClientCard* ccard = mainGame->dField.CreateCard();
 				ccard->controler = player;
 				ccard->location = LOCATION_DECK;
 				ccard->sequence = (unsigned char)mainGame->dField.deck[player].size();
@@ -3835,7 +3835,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			}
 		} else {
 			while(mainGame->dField.hand[player].size() < hcount) {
-				ClientCard* ccard = new ClientCard;
+				ClientCard* ccard = mainGame->dField.CreateCard();
 				ccard->controler = player;
 				ccard->location = LOCATION_HAND;
 				ccard->sequence = (unsigned char)mainGame->dField.hand[player].size();
@@ -3850,7 +3850,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			}
 		} else {
 			while(mainGame->dField.extra[player].size() < ecount) {
-				ClientCard* ccard = new ClientCard;
+				ClientCard* ccard = mainGame->dField.CreateCard();
 				ccard->controler = player;
 				ccard->location = LOCATION_EXTRA;
 				ccard->sequence = (unsigned char)mainGame->dField.extra[player].size();
@@ -3905,13 +3905,13 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			for(int seq = 0; seq < 7; ++seq) {
 				val = BufferIO::Read<uint8_t>(pbuf);
 				if(val) {
-					ClientCard* ccard = new ClientCard;
+					ClientCard* ccard = mainGame->dField.CreateCard();
 					mainGame->dField.AddCard(ccard, p, LOCATION_MZONE, seq);
 					ccard->position = BufferIO::Read<uint8_t>(pbuf);
 					val = BufferIO::Read<uint8_t>(pbuf);
 					if(val) {
 						for(int xyz = 0; xyz < val; ++xyz) {
-							ClientCard* xcard = new ClientCard;
+							ClientCard* xcard = mainGame->dField.CreateCard();
 							ccard->overlayed.push_back(xcard);
 							mainGame->dField.overlay_cards.insert(xcard);
 							xcard->overlayTarget = ccard;
@@ -3926,34 +3926,34 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			for(int seq = 0; seq < 8; ++seq) {
 				val = BufferIO::Read<uint8_t>(pbuf);
 				if(val) {
-					ClientCard* ccard = new ClientCard;
+					ClientCard* ccard = mainGame->dField.CreateCard();
 					mainGame->dField.AddCard(ccard, p, LOCATION_SZONE, seq);
 					ccard->position = BufferIO::Read<uint8_t>(pbuf);
 				}
 			}
 			val = BufferIO::Read<uint8_t>(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
-				ClientCard* ccard = new ClientCard;
+				ClientCard* ccard = mainGame->dField.CreateCard();
 				mainGame->dField.AddCard(ccard, p, LOCATION_DECK, seq);
 			}
 			val = BufferIO::Read<uint8_t>(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
-				ClientCard* ccard = new ClientCard;
+				ClientCard* ccard = mainGame->dField.CreateCard();
 				mainGame->dField.AddCard(ccard, p, LOCATION_HAND, seq);
 			}
 			val = BufferIO::Read<uint8_t>(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
-				ClientCard* ccard = new ClientCard;
+				ClientCard* ccard = mainGame->dField.CreateCard();
 				mainGame->dField.AddCard(ccard, p, LOCATION_GRAVE, seq);
 			}
 			val = BufferIO::Read<uint8_t>(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
-				ClientCard* ccard = new ClientCard;
+				ClientCard* ccard = mainGame->dField.CreateCard();
 				mainGame->dField.AddCard(ccard, p, LOCATION_REMOVED, seq);
 			}
 			val = BufferIO::Read<uint8_t>(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
-				ClientCard* ccard = new ClientCard;
+				ClientCard* ccard = mainGame->dField.CreateCard();
 				mainGame->dField.AddCard(ccard, p, LOCATION_EXTRA, seq);
 			}
 			val = BufferIO::Read<uint8_t>(pbuf);
