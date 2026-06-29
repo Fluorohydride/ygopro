@@ -1178,6 +1178,8 @@ bool Game::ProcessAnalyzeQueue() {
 bool Game::WaitForAction(Signal& sig) {
 	sig.Reset();
 	while(true) {
+		if(sig.IsNoWait())
+			return true;
 		if(sig.TryWait())
 			return true;
 		if(closePending || closeSignal.TryWait()) {
