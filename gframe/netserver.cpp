@@ -184,13 +184,12 @@ int NetServer::ServerThread() {
 void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 	auto bit = users.find(dp->bev);
 	if(bit != users.end()) {
-		if(dp->game)
+		if(dp->game) {
 			dp->game->OnPlayerDisconnected(dp);
+			dp->game = nullptr;
+		}
 		bufferevent_flush(dp->bev, EV_WRITE, BEV_FLUSH);
 		bufferevent_disable(dp->bev, EV_READ);
-		dp->game = nullptr;
-		dp->state = 0xff;
-		dp->type = 0xff;
 		bufferevent_free(dp->bev);
 		dp->bev = nullptr;
 		users.erase(bit);
