@@ -224,6 +224,8 @@ irr::video::IImage* ImageManager::GetImage(int code, irr::s32 targetWidth, irr::
 		return nullptr;
 	irr::video::IImage* img = ImageUtility::LoadJpegImage(driver, reader, targetWidth, targetHeight);
 	reader->drop();
+	if(img == nullptr) // fallback, file is ensured to be accessible already
+		img = driver->createImageFromFile(file);
 	return img;
 }
 /**
