@@ -11,6 +11,7 @@ intptr_t SingleMode::pduel = 0;
 bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
 Replay SingleMode::last_replay;
+size_t SingleMode::last_replay_response_size = 0;
 
 bool SingleMode::StartPlay() {
 	std::thread(SinglePlayThread).detach();
@@ -25,8 +26,7 @@ void SingleMode::StopPlay(bool is_exiting) {
 void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	if(!pduel)
 		return;
-	last_replay.Write<uint8_t>(len);
-	last_replay.WriteData(resp, len);
+	last_replay_response_size = last_replay.WriteResponse(resp, len);
 	set_responseb(pduel, resp);
 }
 int SingleMode::SinglePlayThread() {
@@ -112,6 +112,7 @@ int SingleMode::SinglePlayThread() {
 	if (len > 0)
 		is_continuing = SinglePlayAnalyze(engineBuffer.data(), len);
 	last_replay.BeginRecord();
+	last_replay_response_size = 0;
 	last_replay.WriteHeader(rh);
 	uint16_t host_name[20]{};
 	BufferIO::CopyCharArray(mainGame->dInfo.hostname, host_name);
@@ -191,6 +192,10 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 		mainGame->dInfo.curMsg = BufferIO::Read<uint8_t>(pbuf);
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_RETRY: {
+			if(last_replay_response_size) {
+				last_replay.RemoveData(last_replay_response_size);
+				last_replay_response_size = 0;
+			}
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
 				mainGame->singleSignal.Wait();
