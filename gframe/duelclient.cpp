@@ -3885,8 +3885,8 @@ void DuelClient::SetResponseI(int32_t respI) {
 	response_len = sizeof respI;
 }
 void DuelClient::SetResponseB(void* respB, size_t len) {
-	if (len > SIZE_RETURN_VALUE)
-		len = SIZE_RETURN_VALUE;
+	if (len > UINT8_MAX)
+		len = UINT8_MAX;
 	std::memcpy(response_buf, respB, len);
 	response_len = len;
 }

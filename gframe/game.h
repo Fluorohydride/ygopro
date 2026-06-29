@@ -272,6 +272,7 @@ public:
 	irr::core::vector2di ResizeCardMid(irr::s32 x, irr::s32 y, irr::s32 midx, irr::s32 midy);
 	irr::core::recti ResizeFit(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2);
 
+	static void FixMacOSBundleWorkingDirectory();
 	void SetWindowsIcon();
 	void SetWindowsScale(float scale);
 	void FlashWindow();

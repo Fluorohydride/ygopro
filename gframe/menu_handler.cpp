@@ -56,39 +56,35 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->bot_mode = false;
 				mainGame->TrimText(mainGame->ebJoinHost);
 				mainGame->TrimText(mainGame->ebJoinPort);
-				char ip[20];
-				wchar_t pstr[100];
-				wchar_t portstr[10];
-				BufferIO::CopyWideString(mainGame->ebJoinHost->getText(), pstr);
+				wchar_t hoststr[100];
+				wchar_t portstr[6];
+				BufferIO::CopyWideString(mainGame->ebJoinHost->getText(), hoststr);
 				BufferIO::CopyWideString(mainGame->ebJoinPort->getText(), portstr);
-				BufferIO::EncodeUTF8(pstr, ip);
-				unsigned int remote_addr = htonl(inet_addr(ip));
-				if(remote_addr == -1) {
-					char hostname[100];
-					char port[6];
-					BufferIO::EncodeUTF8(pstr, hostname);
-					BufferIO::EncodeUTF8(portstr, port);
-					struct evutil_addrinfo hints;
-					struct evutil_addrinfo *answer = nullptr;
-					std::memset(&hints, 0, sizeof hints);
+				char hostname[100];
+				char port[6];
+				BufferIO::EncodeUTF8(hoststr, hostname);
+				BufferIO::EncodeUTF8(portstr, port);
+				unsigned int remote_addr = htonl(inet_addr(hostname));
+				if(remote_addr == INADDR_NONE) {
+					evutil_addrinfo hints{};
 					hints.ai_family = AF_INET;
 					hints.ai_socktype = SOCK_STREAM;
 					hints.ai_protocol = IPPROTO_TCP;
 					hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
-					int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
-					if(status != 0) {
+					evutil_addrinfo* answer = nullptr;
+					if(evutil_getaddrinfo(hostname, port, &hints, &answer) != 0) {
 						soundManager.PlaySoundEffect(SOUND_INFO);
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412));
 						break;
-					} else {
-						sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
-						evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
-						remote_addr = htonl(inet_addr(ip));
-						evutil_freeaddrinfo(answer);
 					}
+					char ip[20];
+					auto* sin = reinterpret_cast<sockaddr_in*>(answer->ai_addr);
+					evutil_inet_ntop(AF_INET, &sin->sin_addr, ip, sizeof(ip));
+					remote_addr = htonl(inet_addr(ip));
+					evutil_freeaddrinfo(answer);
 				}
 				unsigned int remote_port = std::wcstol(portstr, nullptr, 10);
-				BufferIO::CopyWideString(pstr, mainGame->gameConf.lasthost);
+				BufferIO::CopyWideString(hoststr, mainGame->gameConf.lasthost);
 				BufferIO::CopyWideString(portstr, mainGame->gameConf.lastport);
 				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
 					mainGame->btnCreateHost->setEnabled(false);

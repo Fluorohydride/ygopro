@@ -1522,7 +1522,11 @@ void DeckBuilder::FilterCards() {
 				continue;
 			if(filter_lm == 7 && !(data.ot & AVAIL_CUSTOM))
 				continue;
-			if(filter_lm == 8 && ((data.ot & AVAIL_OCGTCG) != AVAIL_OCGTCG))
+			if(filter_lm == 8 && (!(data.ot & AVAIL_OCG) || (data.ot & AVAIL_TCG)))
+				continue;
+			if(filter_lm == 9 && (!(data.ot & AVAIL_TCG) || (data.ot & AVAIL_OCG)))
+				continue;
+			if(filter_lm == 10 && ((data.ot & AVAIL_OCGTCG) != AVAIL_OCGTCG))
 				continue;
 		}
 		bool is_target = true;
@@ -1609,6 +1613,7 @@ void DeckBuilder::SortList() {
 			++left;
 		}
 	}
+	std::sort(results.begin(), left, DataManager::deck_sort_id);
 	switch(mainGame->cbSortType->getSelected()) {
 	case 0:
 		std::sort(left, results.end(), DataManager::deck_sort_lv);
