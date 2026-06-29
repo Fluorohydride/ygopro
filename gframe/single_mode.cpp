@@ -247,8 +247,7 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 			pbuf += count * 7;
 			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
-				if(!mainGame->WaitForAction(mainGame->singleSignal))
-					return false;
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
 			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 7;
