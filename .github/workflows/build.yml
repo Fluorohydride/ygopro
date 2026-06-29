@@ -429,6 +429,7 @@ jobs:
         name:
           - ubuntu-22
           - ubuntu-24
+          - ubuntu-26
           - ubuntu-static-link
           - ubuntu-arm-static-link
         include:
@@ -437,6 +438,8 @@ jobs:
             apt-outdated: true
           - name: ubuntu-24
             os: ubuntu-24.04
+          - name: ubuntu-26
+            os: ubuntu-26.04
           - name: ubuntu-static-link
             os: ubuntu-22.04
             static-link: true
