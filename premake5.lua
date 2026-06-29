@@ -38,6 +38,8 @@ MINIAUDIO_BUILD_OPUS_VORBIS = os.istarget("windows")
 
 BUILD_LZMA = os.istarget("windows")
 
+BUILD_WEBP = os.istarget("windows")
+
 -- Available: none, sse2, avx2, neon, best
 -- "best" means avx2 on x86 and neon on ARM
 USE_SIMD = "best"
@@ -64,6 +66,7 @@ MINIAUDIO_INCLUDE_DIR = path.getabsolute("./miniaudio")
 MINIAUDIO_OPUS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libopus")
 MINIAUDIO_VORBIS_INCLUDE_DIR = path.getabsolute("./miniaudio/extras/decoders/libvorbis")
 LZMA_INCLUDE_DIR = path.getabsolute("./lzma/src/liblzma/api")
+WEBP_INCLUDE_DIR = path.getabsolute("./webp/src")
 
 -- Read settings from command line or environment variables
 -- Default values should be defined at the top of the script. If any values are set in the premake options, GetParam will not
@@ -133,6 +136,11 @@ newoption { trigger = "build-lzma", category = "YGOPro - lzma", description = ""
 newoption { trigger = "no-build-lzma", category = "YGOPro - lzma", description = "" }
 newoption { trigger = "lzma-include-dir", category = "YGOPro - lzma", description = "", value = "PATH" }
 newoption { trigger = "lzma-lib-dir", category = "YGOPro - lzma", description = "", value = "PATH" }
+
+newoption { trigger = "build-webp", category = "YGOPro - webp", description = "" }
+newoption { trigger = "no-build-webp", category = "YGOPro - webp", description = "" }
+newoption { trigger = "webp-include-dir", category = "YGOPro - webp", description = "", value = "PATH" }
+newoption { trigger = "webp-lib-dir", category = "YGOPro - webp", description = "", value = "PATH" }
 
 newoption { trigger = "vs2026-win7-support", category = "YGOPro", description = "Enable Windows 7 support (toolset v143) for Visual Studio 2026" }
 
@@ -206,6 +214,16 @@ end
 if not BUILD_LZMA then
     LZMA_INCLUDE_DIR = GetParam("lzma-include-dir") or os.findheader("lzma.h")
     LZMA_LIB_DIR = GetParam("lzma-lib-dir") or os.findlib("lzma")
+end
+
+if GetParam("build-webp") then
+    BUILD_WEBP = true
+elseif GetParam("no-build-webp") then
+    BUILD_WEBP = false
+end
+if not BUILD_WEBP then
+    WEBP_INCLUDE_DIR = GetParam("webp-include-dir") or os.findheader("webp/decode.h")
+    WEBP_LIB_DIR = GetParam("webp-lib-dir") or os.findlib("webp")
 end
 
 if GetParam("build-irrlicht") then
@@ -486,6 +504,9 @@ workspace "YGOPro"
     end
     if BUILD_LZMA then
         include "lzma/."
+    end
+    if BUILD_WEBP then
+        include "webp"
     end
     if USE_AUDIO then
         if AUDIO_LIB=="miniaudio" then

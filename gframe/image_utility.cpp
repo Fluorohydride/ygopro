@@ -11,6 +11,7 @@
 
 extern "C" {
 #include <jpeglib.h>
+#include <webp/decode.h>
 }
 
 namespace ygo {
@@ -348,6 +349,103 @@ irr::video::IImage* ImageUtility::LoadJpegImage(irr::video::IVideoDriver* driver
 	return driver->createImageFromData(
 		irr::video::ECF_A8R8G8B8,
 		irr::core::dimension2d<irr::u32>(width, height),
+		outputData, true, true);
+}
+
+/**
+ * Decode a WebP file using libwebp with optional decode-time scaling.
+ * When targetWidth / targetHeight are provided, the image is decoded directly
+ * to the smallest size that keeps both dimensions >= target, saving memory and
+ * CPU time compared to decoding at full resolution and then downscaling.
+ * The reader is not dropped by this function.
+ * @return Image pointer (ECF_A8R8G8B8). Must be dropped after use.
+ */
+irr::video::IImage* ImageUtility::LoadWebPImage(irr::video::IVideoDriver* driver, irr::io::IReadFile* reader, irr::s32 targetWidth, irr::s32 targetHeight) {
+	if(!reader) return nullptr;
+	long fileSize = reader->getSize();
+	if(fileSize <= 0) return nullptr;
+
+	unsigned char* input = new (std::nothrow) unsigned char[fileSize];
+	if(!input) return nullptr;
+
+	if(reader->read(input, (irr::u32)fileSize) != (irr::s32)fileSize) {
+		delete[] input;
+		return nullptr;
+	}
+
+	WebPDecoderConfig config;
+	if(!WebPInitDecoderConfig(&config)) {
+		delete[] input;
+		return nullptr;
+	}
+
+	if(WebPGetFeatures(input, (size_t)fileSize, &config.input) != VP8_STATUS_OK) {
+		delete[] input;
+		return nullptr;
+	}
+
+	const int imgWidth = config.input.width;
+	const int imgHeight = config.input.height;
+
+	// If a target size is requested and the image is larger, enable decode-time
+	// scaling to the smallest proportional size that is still >= target.
+	int width = imgWidth, height = imgHeight;
+	if(targetWidth > 0 && targetHeight > 0 && (imgWidth > targetWidth || imgHeight > targetHeight)) {
+		const double scaleX = (double)targetWidth  / imgWidth;
+		const double scaleY = (double)targetHeight / imgHeight;
+		// Use the larger ratio so both axes stay >= target.
+		const double scale = (scaleX > scaleY) ? scaleX : scaleY;
+		if(scale < 1.0) {
+			width = (int)(imgWidth * scale + 0.5);
+			height = (int)(imgHeight * scale + 0.5);
+			if(width < targetWidth)  width = targetWidth;
+			if(height < targetHeight) height = targetHeight;
+			config.options.use_scaling   = 1;
+			config.options.scaled_width  = width;
+			config.options.scaled_height = height;
+		}
+	}
+
+	// Disable multi-threaded decode - threading overhead is significant for small images.
+	config.options.use_threads = 0;
+	// Disable dithering - irrelevant for card art scaled to screen.
+	config.options.dithering_strength       = 0;
+	config.options.alpha_dithering_strength = 0;
+	// When downscaling by more than 2x, skip the in-loop deblocking filter and
+	// fancy chroma upsampling - both are expensive and imperceptible at thumbnail size.
+	const bool fastDecoding = (width * 2 < imgWidth || height * 2 < imgHeight);
+	if(fastDecoding) {
+		config.options.bypass_filtering    = 1;
+		config.options.no_fancy_upsampling = 1;
+	}
+
+	// Ownership of outputData will be transferred to the IImage created by createImageFromData()
+	unsigned char* outputData = new (std::nothrow) unsigned char[(size_t)width * height * 4];
+	if(!outputData) {
+		delete[] input;
+		return nullptr;
+	}
+
+	// Decode directly to BGRA - matches ECF_A8R8G8B8 memory layout on little-endian.
+	config.output.colorspace       = MODE_BGRA;
+	config.output.u.RGBA.rgba      = outputData;
+	config.output.u.RGBA.stride    = width * 4;
+	config.output.u.RGBA.size      = (size_t)width * height * 4;
+	config.output.is_external_memory = 1;
+
+	if(WebPDecode(input, (size_t)fileSize, &config) != VP8_STATUS_OK) {
+		WebPFreeDecBuffer(&config.output);
+		delete[] outputData;
+		delete[] input;
+		return nullptr;
+	}
+
+	WebPFreeDecBuffer(&config.output);
+	delete[] input;
+
+	return driver->createImageFromData(
+		irr::video::ECF_A8R8G8B8,
+		irr::core::dimension2d<irr::u32>((irr::u32)width, (irr::u32)height),
 		outputData, true, true);
 }
 

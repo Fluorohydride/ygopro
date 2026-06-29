@@ -7,8 +7,8 @@ project "YGOPro"
 
     defines { "_IRR_STATIC_LIB_" }
     files { "*.cpp", "*.h" }
-    includedirs { "../ocgcore", EVENT_INCLUDE_DIR, IRRLICHT_INCLUDE_DIR, JPEG_INCLUDE_DIR, ZLIB_INCLUDE_DIR, LZMA_INCLUDE_DIR, SQLITE_INCLUDE_DIR }
-    links { "ocgcore", "lzma", "sqlite3", "irrlicht", "png", "freetype", "event" }
+    includedirs { "../ocgcore", EVENT_INCLUDE_DIR, IRRLICHT_INCLUDE_DIR, JPEG_INCLUDE_DIR, WEBP_INCLUDE_DIR, ZLIB_INCLUDE_DIR, LZMA_INCLUDE_DIR, SQLITE_INCLUDE_DIR }
+    links { "ocgcore", "lzma", "sqlite3", "irrlicht", "png", "webp", "freetype", "event" }
 
     if BUILD_LUA then
         links { "lua" }
@@ -57,6 +57,10 @@ project "YGOPro"
 
     if not BUILD_LZMA then
         libdirs { LZMA_LIB_DIR }
+    end
+
+    if not BUILD_WEBP then
+        libdirs { WEBP_LIB_DIR }
     end
 
     if USE_SIMD == "none" then
