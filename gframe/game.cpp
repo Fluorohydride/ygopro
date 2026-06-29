@@ -1018,7 +1018,8 @@ void Game::MainLoop() {
 		timeBeginPeriod(1);
 #endif
 	while(true) {
-		ProcessAnalyzeQueue();
+		for(int analyzed = 0; analyzed < 16 && ProcessAnalyzeQueue(); ++analyzed)
+			std::this_thread::yield();
 		if(!RenderOneFrame())
 			break;
 	}
