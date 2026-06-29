@@ -65,14 +65,46 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 	static const int edgeStart[] = { 0, 1, 3, 2 };
 	static const int edgeEnd[]   = { 1, 3, 2, 0 };
 	driver->setMaterial(matManager.mOutLine);
-	// Transform vertices to world space and draw there
 	const irr::core::matrix4 oldWorld = driver->getTransform(irr::video::ETS_WORLD);
 	irr::core::vector3df wp[4];
 	for(int i = 0; i < 4; ++i)
 		oldWorld.transformVect(wp[i], vec[i].Pos);
 	const irr::core::matrix4& view = driver->getTransform(irr::video::ETS_VIEW);
-	const irr::core::vector3df camFwd(view(0,2), view(1,2), view(2,2));
-	const irr::f32 halfThick = matManager.mOutLine.Thickness * 0.0025f;
+	irr::core::matrix4 pv = driver->getTransform(irr::video::ETS_PROJECTION);
+	pv *= view;
+	irr::core::matrix4 invPv;
+	if(!pv.getInverse(invPv))
+		return;
+	const auto sz = driver->getCurrentRenderTargetSize();
+	if(sz.Width == 0 || sz.Height == 0)
+		return;
+	const irr::f32 hw = sz.Width * 0.5f, hh = sz.Height * 0.5f;
+	const irr::f32 xScale = sz.Width / static_cast<irr::f32>(GAME_WINDOW_WIDTH);
+	const irr::f32 yScale = sz.Height / static_cast<irr::f32>(GAME_WINDOW_HEIGHT);
+	const irr::f32 pixelScale = (xScale < yScale) ? xScale : yScale;
+	const irr::f32 halfThick = matManager.mOutLine.Thickness * pixelScale * 0.2f;
+	struct ProjectedPoint {
+		irr::core::vector2df screen;
+		irr::f32 ndcZ;
+	};
+	const auto projectPoint = [&](const irr::core::vector3df& point, ProjectedPoint& projected) {
+		irr::f32 clip[4] = { point.X, point.Y, point.Z, 1.0f };
+		pv.multiplyWith1x4Matrix(clip);
+		if(clip[3] <= 1e-6f)
+			return false;
+		const irr::f32 invW = 1.0f / clip[3];
+		projected.screen = irr::core::vector2df(clip[0] * invW * hw, clip[1] * invW * hh);
+		projected.ndcZ = clip[2] * invW;
+		return true;
+	};
+	const auto unprojectScreen = [&](const irr::core::vector2df& screen, irr::f32 ndcZ) {
+		irr::f32 point[4] = { screen.X / hw, screen.Y / hh, ndcZ, 1.0f };
+		invPv.multiplyWith1x4Matrix(point);
+		if(std::fabs(point[3]) < 1e-6f)
+			return irr::core::vector3df();
+		const irr::f32 invW = 1.0f / point[3];
+		return irr::core::vector3df(point[0] * invW, point[1] * invW, point[2] * invW);
+	};
 	std::vector<irr::video::S3DVertex> vertices;
 	std::vector<irr::u16> indices;
 	vertices.reserve(128);
@@ -90,18 +122,20 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 	};
 	const auto appendThickLine = [&](const irr::core::vector3df& start, const irr::core::vector3df& end) {
 		if(halfThick <= 0.0f) return;
-		const auto direction = end - start;
-		const irr::f32 dirLenSq = direction.getLengthSQ();
-		if(dirLenSq < 1e-12f) return;
+		ProjectedPoint ps, pe;
+		if(!projectPoint(start, ps) || !projectPoint(end, pe))
+			return;
+		const auto screenDirection = pe.screen - ps.screen;
+		const irr::f32 screenLenSq = screenDirection.getLengthSQ();
+		if(screenLenSq < 1e-4f) return;
 		if(vertices.size() > MAX_THICK_LINE_BATCH_VERTICES)
 			drawBatch();
-		const irr::core::vector3df dir = direction * (1.0f / std::sqrt(dirLenSq));
-		irr::core::vector3df perp = direction.crossProduct(camFwd);
-		const irr::f32 lenSq = perp.getLengthSQ();
-		if(lenSq < 1e-12f) return;
-		perp *= halfThick / std::sqrt(lenSq);
+		const irr::f32 invScreenLen = 1.0f / std::sqrt(screenLenSq);
+		const irr::core::vector2df dir = screenDirection * invScreenLen;
+		const irr::core::vector2df perp(-dir.Y, dir.X);
 		const irr::f32 feather = halfThick * 2.0f;
-		const auto outerPerp = perp * ((halfThick + feather) / halfThick);
+		const auto innerPerp = perp * halfThick;
+		const auto outerPerp = perp * (halfThick + feather);
 		const auto endFeather = dir * feather;
 		const auto base = static_cast<irr::u16>(vertices.size());
 		static const irr::u16 idx[30] = {
@@ -114,14 +148,14 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 		const irr::core::vector3df normal(0.0f, 0.0f, -1.0f);
 		irr::video::SColor transparent = color;
 		transparent.setAlpha(0);
-		vertices.emplace_back(start + perp, normal, color, irr::core::vector2df());
-		vertices.emplace_back(end + perp, normal, color, irr::core::vector2df());
-		vertices.emplace_back(start - perp, normal, color, irr::core::vector2df());
-		vertices.emplace_back(end - perp, normal, color, irr::core::vector2df());
-		vertices.emplace_back(start - endFeather + outerPerp, normal, transparent, irr::core::vector2df());
-		vertices.emplace_back(end + endFeather + outerPerp, normal, transparent, irr::core::vector2df());
-		vertices.emplace_back(end + endFeather - outerPerp, normal, transparent, irr::core::vector2df());
-		vertices.emplace_back(start - endFeather - outerPerp, normal, transparent, irr::core::vector2df());
+		vertices.emplace_back(unprojectScreen(ps.screen + innerPerp, ps.ndcZ), normal, color, irr::core::vector2df());
+		vertices.emplace_back(unprojectScreen(pe.screen + innerPerp, pe.ndcZ), normal, color, irr::core::vector2df());
+		vertices.emplace_back(unprojectScreen(ps.screen - innerPerp, ps.ndcZ), normal, color, irr::core::vector2df());
+		vertices.emplace_back(unprojectScreen(pe.screen - innerPerp, pe.ndcZ), normal, color, irr::core::vector2df());
+		vertices.emplace_back(unprojectScreen(ps.screen - endFeather + outerPerp, ps.ndcZ), normal, transparent, irr::core::vector2df());
+		vertices.emplace_back(unprojectScreen(pe.screen + endFeather + outerPerp, pe.ndcZ), normal, transparent, irr::core::vector2df());
+		vertices.emplace_back(unprojectScreen(pe.screen + endFeather - outerPerp, pe.ndcZ), normal, transparent, irr::core::vector2df());
+		vertices.emplace_back(unprojectScreen(ps.screen - endFeather - outerPerp, ps.ndcZ), normal, transparent, irr::core::vector2df());
 		for(int i = 0; i < 30; ++i)
 			indices.push_back(base + idx[i]);
 	};
@@ -140,24 +174,14 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 	} else {
 		// Project edge endpoints to screen space to get pixel length for pattern tiling.
 		// (1 pattern bit = 1 screen pixel, matching the original GL stipple behaviour.)
-		irr::core::matrix4 pv = driver->getTransform(irr::video::ETS_PROJECTION);
-		pv *= view;
-		const auto sz = driver->getCurrentRenderTargetSize();
-		const irr::f32 hw = sz.Width * 0.5f, hh = sz.Height * 0.5f;
 		irr::f32 patternCursor = 0.0f;
 		for(int i = 0; i < 4; ++i) {
 			const auto& s = wp[edgeStart[i]];
 			const auto d = wp[edgeEnd[i]] - s;
-			irr::f32 ps[4] = {s.X, s.Y, s.Z, 1.0f};
-			pv.multiplyWith1x4Matrix(ps);
-			irr::f32 pe[4] = {s.X+d.X, s.Y+d.Y, s.Z+d.Z, 1.0f};
-			pv.multiplyWith1x4Matrix(pe);
+			ProjectedPoint ps, pe;
 			irr::f32 screenLen = 1.0f;
-			if(ps[3] > 0.0f && pe[3] > 0.0f) {
-				const irr::f32 dx = ps[0]/ps[3]*hw - pe[0]/pe[3]*hw;
-				const irr::f32 dy = ps[1]/ps[3]*hh - pe[1]/pe[3]*hh;
-				screenLen = std::sqrt(dx*dx + dy*dy);
-			}
+			if(projectPoint(s, ps) && projectPoint(s + d, pe))
+				screenLen = std::sqrt((ps.screen - pe.screen).getLengthSQ());
 			for(irr::f32 cursor = 0.0f; cursor < screenLen; ) {
 				const int bit = static_cast<int>(patternCursor + cursor) & 0xf;
 				if(!((stippleMask >> bit) & 1)) { cursor += 1.0f; continue; }
