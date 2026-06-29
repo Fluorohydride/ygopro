@@ -1,4 +1,5 @@
 #include <cmath>
+#include <vector>
 #include "game.h"
 #include "client_card.h"
 #include "materials.h"
@@ -7,30 +8,6 @@
 #include "deck_manager.h"
 #include "sound_manager.h"
 #include "duelclient.h"
-
-namespace {
-
-// Draws a camera-facing quad between two world-space points.
-void DrawThickLine3D(irr::video::IVideoDriver* driver,
-                     const irr::core::vector3df& start, const irr::core::vector3df& end,
-                     const irr::core::vector3df& camFwd, irr::f32 halfThick,
-                     irr::video::SColor color) {
-	irr::core::vector3df perp = (end - start).crossProduct(camFwd);
-	const irr::f32 len = perp.getLength();
-	if(len < 1e-6f) return;
-	perp *= halfThick / len;
-	irr::video::S3DVertex v[4];
-	static const irr::u16 idx[6] = {0, 2, 1, 1, 2, 3};
-	for(int i = 0; i < 4; ++i) { v[i].Color = color; v[i].Normal = {0, 0, -1}; }
-	v[0].Pos = start + perp;
-	v[1].Pos = start - perp;
-	v[2].Pos = end + perp;
-	v[3].Pos = end - perp;
-	driver->drawVertexPrimitiveList(v, 4, idx, 2,
-	    irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLES);
-}
-
-}
 
 namespace ygo {
 
@@ -96,17 +73,40 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 	const irr::core::matrix4& view = driver->getTransform(irr::video::ETS_VIEW);
 	const irr::core::vector3df camFwd(view(0,2), view(1,2), view(2,2));
 	const irr::f32 halfThick = matManager.mOutLine.Thickness * 0.005f;
+	std::vector<irr::video::S3DVertex> vertices;
+	std::vector<irr::u16> indices;
+	vertices.reserve(64);
+	indices.reserve(96);
+	constexpr size_t MAX_THICK_LINE_BATCH_VERTICES = (1 << (sizeof(irr::u16) * 8)) - 4;
+	const auto appendThickLine = [&](const irr::core::vector3df& start, const irr::core::vector3df& end) {
+		if(vertices.size() > MAX_THICK_LINE_BATCH_VERTICES)
+			return;
+		const auto direction = end - start;
+		irr::core::vector3df perp = direction.crossProduct(camFwd);
+		const irr::f32 lenSq = perp.getLengthSQ();
+		if(lenSq < 1e-12f) return;
+		perp *= halfThick / std::sqrt(lenSq);
+		const auto base = static_cast<irr::u16>(vertices.size());
+		static const irr::u16 idx[6] = {0, 2, 1, 1, 2, 3};
+		const irr::core::vector3df normal(0.0f, 0.0f, -1.0f);
+		vertices.emplace_back(start + perp, normal, color, irr::core::vector2df());
+		vertices.emplace_back(start - perp, normal, color, irr::core::vector2df());
+		vertices.emplace_back(end + perp, normal, color, irr::core::vector2df());
+		vertices.emplace_back(end - perp, normal, color, irr::core::vector2df());
+		for(int i = 0; i < 6; ++i)
+			indices.push_back(base + idx[i]);
+	};
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::matrix4());
 	if(!stipple) {
 		for(int i = 0; i < 4; ++i)
-			DrawThickLine3D(driver, wp[edgeStart[i]], wp[edgeEnd[i]], camFwd, halfThick, color);
+			appendThickLine(wp[edgeStart[i]], wp[edgeEnd[i]]);
 	} else if(gameConf.solid_selection_line) {
 		const irr::f32 t0 = (linePattern < 15) ? 0.0f : (linePattern - 14) / 15.0f;
 		const irr::f32 t1 = (linePattern < 15) ? (linePattern + 1) / 15.0f : 1.0f;
 		for(int i = 0; i < 4; ++i) {
 			const auto& s = wp[edgeStart[i]];
 			const auto d = wp[edgeEnd[i]] - s;
-			DrawThickLine3D(driver, s + d * t0, s + d * t1, camFwd, halfThick, color);
+			appendThickLine(s + d * t0, s + d * t1);
 		}
 	} else {
 		// Project edge endpoints to screen space to get pixel length for pattern tiling.
@@ -137,11 +137,16 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 					runEnd += 1.0f;
 				if(runEnd > screenLen)
 					runEnd = screenLen;
-				DrawThickLine3D(driver, s + d * (cursor / screenLen), s + d * (runEnd / screenLen), camFwd, halfThick, color);
+				appendThickLine(s + d * (cursor / screenLen), s + d * (runEnd / screenLen));
 				cursor = runEnd;
 			}
 			patternCursor = std::fmod(patternCursor + screenLen, 16.0f);
 		}
+	}
+	if(!indices.empty()) {
+		driver->drawVertexPrimitiveList(vertices.data(), static_cast<irr::u32>(vertices.size()),
+		    indices.data(), static_cast<irr::u32>(indices.size() / 3),
+		    irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLES);
 	}
 	driver->setTransform(irr::video::ETS_WORLD, oldWorld);
 }
