@@ -245,14 +245,13 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 		event_base_loopexit(client_base, 0);
 	}
 }
-int DuelClient::ClientThread() {
+void DuelClient::ClientThread() {
 	event_base_dispatch(client_base);
 	bufferevent_free(client_bev);
 	event_base_free(client_base);
 	client_bev = 0;
 	client_base = 0;
 	connect_state = 0;
-	return 0;
 }
 void DuelClient::HandleSTOCPacketLan(unsigned char* data, size_t len) {
 	unsigned char* pdata = data;

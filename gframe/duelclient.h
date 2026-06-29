@@ -20,7 +20,7 @@ public:
 	static void StopClient(bool is_exiting = false);
 	static void ClientRead(bufferevent* bev, void* ctx);
 	static void ClientEvent(bufferevent* bev, short events, void* ctx);
-	static int ClientThread();
+	static void ClientThread();
 	static void HandleSTOCPacketLan(unsigned char* data, size_t len);
 	static bool ClientAnalyze(unsigned char* msg, size_t len);
 	static void SwapField();
