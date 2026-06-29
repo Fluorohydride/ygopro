@@ -638,7 +638,7 @@ jobs:
     - name: Install dependencies
       if: matrix.static-link != true
       run: |
-        brew install libevent opus opusfile libvorbis zlib install sqlite libx11 freetype libjpeg-turbo libpng xz
+        brew install libevent opus opusfile libvorbis zlib sqlite libx11 freetype libjpeg-turbo libpng xz
 
     - name: Install NASM
       if: matrix.static-link == true
