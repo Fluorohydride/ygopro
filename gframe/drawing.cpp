@@ -72,28 +72,57 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 		oldWorld.transformVect(wp[i], vec[i].Pos);
 	const irr::core::matrix4& view = driver->getTransform(irr::video::ETS_VIEW);
 	const irr::core::vector3df camFwd(view(0,2), view(1,2), view(2,2));
-	const irr::f32 halfThick = matManager.mOutLine.Thickness * 0.005f;
+	const irr::f32 halfThick = matManager.mOutLine.Thickness * 0.0025f;
 	std::vector<irr::video::S3DVertex> vertices;
 	std::vector<irr::u16> indices;
-	vertices.reserve(64);
-	indices.reserve(96);
-	constexpr size_t MAX_THICK_LINE_BATCH_VERTICES = (1 << (sizeof(irr::u16) * 8)) - 4;
-	const auto appendThickLine = [&](const irr::core::vector3df& start, const irr::core::vector3df& end) {
-		if(vertices.size() > MAX_THICK_LINE_BATCH_VERTICES)
+	vertices.reserve(128);
+	indices.reserve(240);
+	constexpr size_t THICK_LINE_VERTICES_PER_SEGMENT = 8;
+	constexpr size_t MAX_THICK_LINE_BATCH_VERTICES = (size_t{1} << (sizeof(irr::u16) * 8)) - THICK_LINE_VERTICES_PER_SEGMENT;
+	const auto drawBatch = [&]() {
+		if(indices.empty())
 			return;
+		driver->drawVertexPrimitiveList(vertices.data(), static_cast<irr::u32>(vertices.size()),
+		    indices.data(), static_cast<irr::u32>(indices.size() / 3),
+		    irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLES);
+		vertices.clear();
+		indices.clear();
+	};
+	const auto appendThickLine = [&](const irr::core::vector3df& start, const irr::core::vector3df& end) {
+		if(halfThick <= 0.0f) return;
 		const auto direction = end - start;
+		const irr::f32 dirLenSq = direction.getLengthSQ();
+		if(dirLenSq < 1e-12f) return;
+		if(vertices.size() > MAX_THICK_LINE_BATCH_VERTICES)
+			drawBatch();
+		const irr::core::vector3df dir = direction * (1.0f / std::sqrt(dirLenSq));
 		irr::core::vector3df perp = direction.crossProduct(camFwd);
 		const irr::f32 lenSq = perp.getLengthSQ();
 		if(lenSq < 1e-12f) return;
 		perp *= halfThick / std::sqrt(lenSq);
+		const irr::f32 feather = halfThick * 2.0f;
+		const auto outerPerp = perp * ((halfThick + feather) / halfThick);
+		const auto endFeather = dir * feather;
 		const auto base = static_cast<irr::u16>(vertices.size());
-		static const irr::u16 idx[6] = {0, 2, 1, 1, 2, 3};
+		static const irr::u16 idx[30] = {
+			0, 1, 3, 0, 3, 2,
+			4, 5, 0, 0, 5, 1,
+			5, 6, 1, 1, 6, 3,
+			6, 7, 3, 3, 7, 2,
+			7, 4, 2, 2, 4, 0
+		};
 		const irr::core::vector3df normal(0.0f, 0.0f, -1.0f);
+		irr::video::SColor transparent = color;
+		transparent.setAlpha(0);
 		vertices.emplace_back(start + perp, normal, color, irr::core::vector2df());
-		vertices.emplace_back(start - perp, normal, color, irr::core::vector2df());
 		vertices.emplace_back(end + perp, normal, color, irr::core::vector2df());
+		vertices.emplace_back(start - perp, normal, color, irr::core::vector2df());
 		vertices.emplace_back(end - perp, normal, color, irr::core::vector2df());
-		for(int i = 0; i < 6; ++i)
+		vertices.emplace_back(start - endFeather + outerPerp, normal, transparent, irr::core::vector2df());
+		vertices.emplace_back(end + endFeather + outerPerp, normal, transparent, irr::core::vector2df());
+		vertices.emplace_back(end + endFeather - outerPerp, normal, transparent, irr::core::vector2df());
+		vertices.emplace_back(start - endFeather - outerPerp, normal, transparent, irr::core::vector2df());
+		for(int i = 0; i < 30; ++i)
 			indices.push_back(base + idx[i]);
 	};
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::matrix4());
@@ -143,11 +172,7 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 			patternCursor = std::fmod(patternCursor + screenLen, 16.0f);
 		}
 	}
-	if(!indices.empty()) {
-		driver->drawVertexPrimitiveList(vertices.data(), static_cast<irr::u32>(vertices.size()),
-		    indices.data(), static_cast<irr::u32>(indices.size() / 3),
-		    irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLES);
-	}
+	drawBatch();
 	driver->setTransform(irr::video::ETS_WORLD, oldWorld);
 }
 void Game::DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color) {
