@@ -8,6 +8,8 @@
 
 namespace ygo {
 
+class ClientField;
+
 class ClientCard {
 public:
 	irr::core::matrix4 mTransform;
