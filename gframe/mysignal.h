@@ -8,13 +8,8 @@
 
 class Signal {
 public:
-	Signal() {
-		_state = false;
-		_nowait = false;
-	}
-	~Signal() {
-
-	}
+	Signal() = default;
+	~Signal() = default;
 	void Set() {
 		std::unique_lock<std::mutex> lock(_mutex);
 		_state = true;
@@ -54,8 +49,8 @@ public:
 private:
 	std::mutex _mutex;
 	std::condition_variable _cond;
-	bool _state;
-	std::atomic<bool> _nowait;
+	bool _state{ false };
+	std::atomic<bool> _nowait{ false };
 };
 
 #endif // SIGNAL_H
