@@ -19,7 +19,7 @@ public:
 	void ToObserver(DuelPlayer* dp) override;
 	void PlayerReady(DuelPlayer* dp, bool is_ready) override;
 	void PlayerKick(DuelPlayer* dp, unsigned char pos) override;
-	void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) override;
+	void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, unsigned int len) override;
 	void StartDuel(DuelPlayer* dp) override;
 	void HandResult(DuelPlayer* dp, unsigned char res) override;
 	void TPResult(DuelPlayer* dp, unsigned char tp) override;
@@ -43,7 +43,7 @@ public:
 	static void TagTimer(evutil_socket_t fd, short events, void* arg);
 
 private:
-	int WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache);
+	int WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache);
 	
 protected:
 	DuelPlayer* players[4];
@@ -57,6 +57,7 @@ protected:
 	unsigned char hand_result[2];
 	unsigned char last_response;
 	Replay last_replay;
+	size_t last_replay_response_size{ 0 };
 	unsigned char turn_count;
 	short time_limit[2];
 	short time_elapsed;

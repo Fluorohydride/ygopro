@@ -2,6 +2,8 @@
 #include <array>
 #include "config.h"
 #include "deck_con.h"
+#include "data_manager.h"
+#include "deck_manager.h"
 #include "myfilesystem.h"
 #include "image_manager.h"
 #include "sound_manager.h"
@@ -136,7 +138,7 @@ void DeckBuilder::Terminate() {
 	int decksel = mainGame->cbDBDecks->getSelected();
 	if (decksel >= 0)
 		BufferIO::CopyWideString(mainGame->cbDBDecks->getItem(decksel), mainGame->gameConf.lastdeck);
-	if(exit_on_return)
+	if(mainGame->exit_on_return)
 		mainGame->device->closeDevice();
 }
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
@@ -1550,7 +1552,11 @@ void DeckBuilder::FilterCards() {
 				continue;
 			if(filter_lm == 7 && !(data.ot & AVAIL_CUSTOM))
 				continue;
-			if(filter_lm == 8 && ((data.ot & AVAIL_OCGTCG) != AVAIL_OCGTCG))
+			if(filter_lm == 8 && (!(data.ot & AVAIL_OCG) || (data.ot & AVAIL_TCG)))
+				continue;
+			if(filter_lm == 9 && (!(data.ot & AVAIL_TCG) || (data.ot & AVAIL_OCG)))
+				continue;
+			if(filter_lm == 10 && ((data.ot & AVAIL_OCGTCG) != AVAIL_OCGTCG))
 				continue;
 		}
 		bool is_target = true;
@@ -1637,6 +1643,7 @@ void DeckBuilder::SortList() {
 			++left;
 		}
 	}
+	std::sort(results.begin(), left, DataManager::deck_sort_id);
 	switch(mainGame->cbSortType->getSelected()) {
 	case 0:
 		std::sort(left, results.end(), DataManager::deck_sort_lv);
@@ -1746,10 +1753,7 @@ void DeckBuilder::ShowBigCard(int code, float zoom) {
 	mainGame->gMutex.unlock();
 }
 void DeckBuilder::ZoomBigCard(irr::s32 centerx, irr::s32 centery) {
-	if(bigcard_zoom >= 4)
-		bigcard_zoom = 4;
-	if(bigcard_zoom <= 0.2f)
-		bigcard_zoom = 0.2f;
+	bigcard_zoom = myclamp(bigcard_zoom, 0.2f, 4.0f);
 	auto img = imageManager.GetBigPicture(bigcard_code, bigcard_zoom);
 	mainGame->imgBigCard->setImage(img);
 	auto size = img->getSize();

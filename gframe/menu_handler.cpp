@@ -1,5 +1,6 @@
 #include "config.h"
 #include "menu_handler.h"
+#include "data_manager.h"
 #include "myfilesystem.h"
 #include "netserver.h"
 #include "duelclient.h"
@@ -52,44 +53,40 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_HOST: {
-				bot_mode = false;
+				mainGame->bot_mode = false;
 				mainGame->TrimText(mainGame->ebJoinHost);
 				mainGame->TrimText(mainGame->ebJoinPort);
-				char ip[20];
-				wchar_t pstr[100];
-				wchar_t portstr[10];
-				BufferIO::CopyWideString(mainGame->ebJoinHost->getText(), pstr);
+				wchar_t hoststr[100];
+				wchar_t portstr[6];
+				BufferIO::CopyWideString(mainGame->ebJoinHost->getText(), hoststr);
 				BufferIO::CopyWideString(mainGame->ebJoinPort->getText(), portstr);
-				BufferIO::EncodeUTF8(pstr, ip);
-				unsigned int remote_addr = htonl(inet_addr(ip));
-				if(remote_addr == -1) {
-					char hostname[100];
-					char port[6];
-					BufferIO::EncodeUTF8(pstr, hostname);
-					BufferIO::EncodeUTF8(portstr, port);
-					struct evutil_addrinfo hints;
-					struct evutil_addrinfo *answer = nullptr;
-					std::memset(&hints, 0, sizeof hints);
+				char hostname[100];
+				char port[6];
+				BufferIO::EncodeUTF8(hoststr, hostname);
+				BufferIO::EncodeUTF8(portstr, port);
+				unsigned int remote_addr = htonl(inet_addr(hostname));
+				if(remote_addr == INADDR_NONE) {
+					evutil_addrinfo hints{};
 					hints.ai_family = AF_INET;
 					hints.ai_socktype = SOCK_STREAM;
 					hints.ai_protocol = IPPROTO_TCP;
 					hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
-					int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
-					if(status != 0) {
+					evutil_addrinfo* answer = nullptr;
+					if(evutil_getaddrinfo(hostname, port, &hints, &answer) != 0) {
 						mainGame->gMutex.lock();
 						soundManager.PlaySoundEffect(SOUND_INFO);
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412));
 						mainGame->gMutex.unlock();
 						break;
-					} else {
-						sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
-						evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
-						remote_addr = htonl(inet_addr(ip));
-						evutil_freeaddrinfo(answer);
 					}
+					char ip[20];
+					auto* sin = reinterpret_cast<sockaddr_in*>(answer->ai_addr);
+					evutil_inet_ntop(AF_INET, &sin->sin_addr, ip, sizeof(ip));
+					remote_addr = htonl(inet_addr(ip));
+					evutil_freeaddrinfo(answer);
 				}
 				unsigned int remote_port = std::wcstol(portstr, nullptr, 10);
-				BufferIO::CopyWideString(pstr, mainGame->gameConf.lasthost);
+				BufferIO::CopyWideString(hoststr, mainGame->gameConf.lasthost);
 				BufferIO::CopyWideString(portstr, mainGame->gameConf.lastport);
 				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
 					mainGame->btnCreateHost->setEnabled(false);
@@ -101,7 +98,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_JOIN_CANCEL: {
 				mainGame->HideElement(mainGame->wLanWindow);
 				mainGame->ShowElement(mainGame->wMainMenu);
-				if(exit_on_return)
+				if(mainGame->exit_on_return)
 					mainGame->device->closeDevice();
 				break;
 			}
@@ -117,7 +114,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
-				bot_mode = false;
+				mainGame->bot_mode = false;
 				BufferIO::CopyWideString(mainGame->ebServerName->getText(), mainGame->gameConf.gamename);
 				if(!NetServer::StartServer(mainGame->gameConf.serverport)) {
 					soundManager.PlaySoundEffect(SOUND_INFO);
@@ -197,12 +194,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnStartBot->setEnabled(true);
 				mainGame->btnBotCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostPrepare);
-				if(bot_mode)
+				if(mainGame->bot_mode)
 					mainGame->ShowElement(mainGame->wSinglePlay);
 				else
 					mainGame->ShowElement(mainGame->wLanWindow);
 				mainGame->wChat->setVisible(false);
-				if(exit_on_return)
+				if(mainGame->exit_on_return)
 					mainGame->device->closeDevice();
 				break;
 			}
@@ -223,10 +220,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_LOAD_REPLAY: {
 				int start_turn = 1;
-				if(open_file) {
-					open_file = false;
-					if (!ReplayMode::cur_replay.OpenReplay(open_file_name)) {
-						if (exit_on_return)
+				if(mainGame->open_file) {
+					mainGame->open_file = false;
+					if (!ReplayMode::cur_replay.OpenReplay(mainGame->open_file_name)) {
+						if (mainGame->exit_on_return)
 							mainGame->device->closeDevice();
 						break;
 					}
@@ -321,7 +318,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->lstBotList->getSelected();
 				if(sel == -1)
 					break;
-				bot_mode = true;
+				mainGame->bot_mode = true;
 #ifdef _WIN32
 				if(!NetServer::StartServer(mainGame->gameConf.serverport)) {
 					soundManager.PlaySoundEffect(SOUND_INFO);
@@ -398,7 +395,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_SINGLEPLAY: {
-				if(!open_file && mainGame->lstSinglePlayList->getSelected() == -1)
+				if(!mainGame->open_file && mainGame->lstSinglePlayList->getSelected() == -1)
 					break;
 				mainGame->singleSignal.SetNoWait(false);
 				SingleMode::StartPlay();
@@ -411,13 +408,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_DECK_EDIT: {
 				mainGame->RefreshCategoryDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
-				if(open_file && deckManager.LoadCurrentDeck(open_file_name)) {
+				if(mainGame->open_file && deckManager.LoadCurrentDeck(mainGame->open_file_name)) {
 #ifdef _WIN32
-					wchar_t *dash = std::wcsrchr(open_file_name, L'\\');
+					wchar_t *dash = std::wcsrchr(mainGame->open_file_name, L'\\');
 #else
-					wchar_t *dash = std::wcsrchr(open_file_name, L'/');
+					wchar_t *dash = std::wcsrchr(mainGame->open_file_name, L'/');
 #endif
-					wchar_t *dot = std::wcsrchr(open_file_name, L'.');
+					wchar_t *dot = std::wcsrchr(mainGame->open_file_name, L'.');
 					if(dash && dot && !mywcsncasecmp(dot, L".ydk", 4)) { // full path
 						wchar_t deck_name[256];
 						BufferIO::CopyWideString(dash + 1, deck_name, dot - dash - 1);
@@ -439,14 +436,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						}
 					} else { // only deck name
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
-							if(!std::wcscmp(mainGame->cbDBDecks->getItem(i), open_file_name)) {
-								BufferIO::CopyWideString(open_file_name, mainGame->gameConf.lastdeck);
+							if(!std::wcscmp(mainGame->cbDBDecks->getItem(i), mainGame->open_file_name)) {
+								BufferIO::CopyWideString(mainGame->open_file_name, mainGame->gameConf.lastdeck);
 								mainGame->cbDBDecks->setSelected(i);
 								break;
 							}
 						}
 					}
-					open_file = false;
+					mainGame->open_file = false;
 				} 
 				else if(mainGame->cbDBCategory->getSelected() != -1 && mainGame->cbDBDecks->getSelected() != -1) {
 					deckManager.LoadCurrentDeck(mainGame->cbDBCategory->getSelected(), mainGame->cbDBCategory->getText(), mainGame->cbDBDecks->getText());

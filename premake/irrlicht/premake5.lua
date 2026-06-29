@@ -1,13 +1,16 @@
 project "irrlicht"
     kind "StaticLib"
 
-    includedirs { "include" }
+    includedirs { "include", JPEG_INCLUDE_DIR, PNG_INCLUDE_DIR, ZLIB_INCLUDE_DIR }
 
     exceptionhandling "Off"
     rtti "Off"
 
     defines {
         "_IRR_STATIC_LIB_",
+        "NO_IRR_USE_NON_SYSTEM_JPEG_LIB_",
+        "NO_IRR_USE_NON_SYSTEM_LIB_PNG_",
+        "NO_IRR_USE_NON_SYSTEM_ZLIB_",
         "NO_IRR_LINUX_X11_VIDMODE_",
         "NO_IRR_COMPILE_WITH_BZIP2_",
         "NO_IRR_COMPILE_WITH_LZMA_",
@@ -44,6 +47,8 @@ project "irrlicht"
         "NO_IRR_COMPILE_WITH_PCX_LOADER_",
         "NO_IRR_COMPILE_WITH_PPM_LOADER_",
         "NO_IRR_COMPILE_WITH_PSD_LOADER_",
+        "NO_IRR_COMPILE_WITH_PVR_LOADER_",
+        "NO_IRR_COMPILE_WITH_DDS_LOADER_",
         "NO_IRR_COMPILE_WITH_TGA_LOADER_",
         "NO_IRR_COMPILE_WITH_WAL_LOADER_",
         "NO_IRR_COMPILE_WITH_LMP_LOADER_",
@@ -61,104 +66,7 @@ project "irrlicht"
     files {
         "include/*.h",
         "source/Irrlicht/*.cpp",
-        "source/Irrlicht/zlib/zlib.h",
-        "source/Irrlicht/zlib/adler32.c",
-        "source/Irrlicht/zlib/compress.c",
-        "source/Irrlicht/zlib/crc32.h",
-        "source/Irrlicht/zlib/crc32.c",
-        "source/Irrlicht/zlib/deflate.h",
-        "source/Irrlicht/zlib/deflate.c",
-        "source/Irrlicht/zlib/inffast.h",
-        "source/Irrlicht/zlib/inffast.c",
-        "source/Irrlicht/zlib/inflate.h",
-        "source/Irrlicht/zlib/inflate.c",
-        "source/Irrlicht/zlib/inftrees.h",
-        "source/Irrlicht/zlib/inftrees.c",
-        "source/Irrlicht/zlib/trees.h",
-        "source/Irrlicht/zlib/trees.c",
-        "source/Irrlicht/zlib/uncompr.c",
-        "source/Irrlicht/zlib/zutil.h",
-        "source/Irrlicht/zlib/zutil.c",
     }
-
-    if IRRLICHT_BUILD_JPEG_PNG then
-        files {
-            "source/Irrlicht/jpeglib/jaricom.c",
-            "source/Irrlicht/jpeglib/jcapimin.c",
-            "source/Irrlicht/jpeglib/jcapistd.c",
-            "source/Irrlicht/jpeglib/jcarith.c",
-            "source/Irrlicht/jpeglib/jccoefct.c",
-            "source/Irrlicht/jpeglib/jccolor.c",
-            "source/Irrlicht/jpeglib/jcdctmgr.c",
-            "source/Irrlicht/jpeglib/jchuff.c",
-            "source/Irrlicht/jpeglib/jcinit.c",
-            "source/Irrlicht/jpeglib/jcmainct.c",
-            "source/Irrlicht/jpeglib/jcmarker.c",
-            "source/Irrlicht/jpeglib/jcmaster.c",
-            "source/Irrlicht/jpeglib/jcomapi.c",
-            "source/Irrlicht/jpeglib/jcparam.c",
-            "source/Irrlicht/jpeglib/jcprepct.c",
-            "source/Irrlicht/jpeglib/jcsample.c",
-            "source/Irrlicht/jpeglib/jctrans.c",
-            "source/Irrlicht/jpeglib/jdapimin.c",
-            "source/Irrlicht/jpeglib/jdapistd.c",
-            "source/Irrlicht/jpeglib/jdarith.c",
-            "source/Irrlicht/jpeglib/jdatadst.c",
-            "source/Irrlicht/jpeglib/jdatasrc.c",
-            "source/Irrlicht/jpeglib/jdcoefct.c",
-            "source/Irrlicht/jpeglib/jdcolor.c",
-            "source/Irrlicht/jpeglib/jddctmgr.c",
-            "source/Irrlicht/jpeglib/jdhuff.c",
-            "source/Irrlicht/jpeglib/jdinput.c",
-            "source/Irrlicht/jpeglib/jdmainct.c",
-            "source/Irrlicht/jpeglib/jdmarker.c",
-            "source/Irrlicht/jpeglib/jdmaster.c",
-            "source/Irrlicht/jpeglib/jdmerge.c",
-            "source/Irrlicht/jpeglib/jdpostct.c",
-            "source/Irrlicht/jpeglib/jdsample.c",
-            "source/Irrlicht/jpeglib/jdtrans.c",
-            "source/Irrlicht/jpeglib/jerror.c",
-            "source/Irrlicht/jpeglib/jfdctflt.c",
-            "source/Irrlicht/jpeglib/jfdctfst.c",
-            "source/Irrlicht/jpeglib/jfdctint.c",
-            "source/Irrlicht/jpeglib/jidctflt.c",
-            "source/Irrlicht/jpeglib/jidctfst.c",
-            "source/Irrlicht/jpeglib/jidctint.c",
-            "source/Irrlicht/jpeglib/jmemmgr.c",
-            "source/Irrlicht/jpeglib/jmemnobs.c",
-            "source/Irrlicht/jpeglib/jquant1.c",
-            "source/Irrlicht/jpeglib/jquant2.c",
-            "source/Irrlicht/jpeglib/jutils.c",
-            "source/Irrlicht/libpng/png.c",
-            "source/Irrlicht/libpng/pngerror.c",
-            "source/Irrlicht/libpng/pngget.c",
-            "source/Irrlicht/libpng/pngmem.c",
-            "source/Irrlicht/libpng/pngpread.c",
-            "source/Irrlicht/libpng/pngread.c",
-            "source/Irrlicht/libpng/pngrio.c",
-            "source/Irrlicht/libpng/pngrtran.c",
-            "source/Irrlicht/libpng/pngrutil.c",
-            "source/Irrlicht/libpng/pngset.c",
-            "source/Irrlicht/libpng/pngtrans.c",
-            "source/Irrlicht/libpng/pngwio.c",
-            "source/Irrlicht/libpng/pngwrite.c",
-            "source/Irrlicht/libpng/pngwtran.c",
-            "source/Irrlicht/libpng/pngwutil.c",
-            "source/Irrlicht/libpng/intel/intel_init.c",
-            "source/Irrlicht/libpng/intel/filter_sse2_intrinsics.c",
-        }
-        defines {
-            "PNG_INTEL_SSE",
-            "PNG_ARM_NEON_OPT=0",
-            "PNG_ARM_NEON_IMPLEMENTATION=0",
-        }
-    else
-        includedirs { JPEG_INCLUDE_DIR, PNG_INCLUDE_DIR }
-        defines {
-            "NO_IRR_USE_NON_SYSTEM_JPEG_LIB_",
-            "NO_IRR_USE_NON_SYSTEM_LIB_PNG_",
-        }
-    end
 
     filter { "system:windows" }
         if USE_DXSDK then
@@ -170,12 +78,10 @@ project "irrlicht"
     filter { "system:macosx" }
         cppdialect "gnu++14"
         defines { "GL_SILENCE_DEPRECATION" }
-        undefines { "NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_" }
-        includedirs { "source/Irrlicht" }
         files {
-            "source/Irrlicht/MacOSX/*.mm",
-            "source/Irrlicht/MacOSX/*.h",
+            "source/Irrlicht/*.mm",
         }
+        buildoptions { "-Wno-deprecated-declarations" }
 
-    filter { "system:macosx", "files:source/Irrlicht/Irrlicht.cpp or source/Irrlicht/COpenGLDriver.cpp" }
+    filter { "system:macosx", "files:source/Irrlicht/Irrlicht.cpp or source/Irrlicht/COSOperator.cpp" }
         compileas "Objective-C++" 

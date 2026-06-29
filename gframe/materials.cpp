@@ -100,22 +100,26 @@ Materials::Materials() {
 	mCard.DiffuseColor = 0xff000000;
 	mCard.ColorMaterial = irr::video::ECM_NONE;
 	mCard.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
+	mCard.ZWriteEnable = irr::video::EZW_ON;
 	mCard.MaterialTypeParam = pack_textureBlendFunc(irr::video::EBF_SRC_ALPHA, irr::video::EBF_ONE_MINUS_SRC_ALPHA, irr::video::EMFN_MODULATE_1X, irr::video::EAS_VERTEX_COLOR);
 	mTexture.AmbientColor = 0xffffffff;
 	mTexture.DiffuseColor = 0xff000000;
 	mTexture.ColorMaterial = irr::video::ECM_NONE;
 	mTexture.MaterialType = irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+	mTexture.ZWriteEnable = irr::video::EZW_OFF;
 	mBackLine.ColorMaterial = irr::video::ECM_NONE;
 	mBackLine.AmbientColor = 0xffffffff;
 	mBackLine.DiffuseColor = 0xc0000000;
 	mBackLine.AntiAliasing = irr::video::EAAM_FULL_BASIC;
 	mBackLine.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
+	mBackLine.ZWriteEnable = irr::video::EZW_ON;
 	mBackLine.MaterialTypeParam = pack_textureBlendFunc(irr::video::EBF_SRC_ALPHA, irr::video::EBF_ONE_MINUS_SRC_ALPHA, irr::video::EMFN_MODULATE_1X, irr::video::EAS_VERTEX_COLOR);
 	mBackLine.Thickness = 2;
 	mSelField.ColorMaterial = irr::video::ECM_NONE;
 	mSelField.AmbientColor = 0xffffffff;
 	mSelField.DiffuseColor = 0xff000000;
 	mSelField.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
+	mSelField.ZWriteEnable = irr::video::EZW_ON;
 	mSelField.MaterialTypeParam = pack_textureBlendFunc(irr::video::EBF_SRC_ALPHA, irr::video::EBF_ONE_MINUS_SRC_ALPHA, irr::video::EMFN_MODULATE_1X, irr::video::EAS_VERTEX_COLOR);
 	mOutLine.ColorMaterial = irr::video::ECM_AMBIENT;
 	mOutLine.DiffuseColor = 0xff000000;
@@ -126,6 +130,7 @@ Materials::Materials() {
 	mATK.DiffuseColor = 0x80000000;
 	mATK.setFlag(irr::video::EMF_BACK_FACE_CULLING, false);
 	mATK.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
+	mATK.ZWriteEnable = irr::video::EZW_ON;
 	mATK.MaterialTypeParam = pack_textureBlendFunc(irr::video::EBF_SRC_ALPHA, irr::video::EBF_ONE_MINUS_SRC_ALPHA, irr::video::EMFN_MODULATE_1X, irr::video::EAS_VERTEX_COLOR);
 }
 void Materials::GenArrow(float y) {

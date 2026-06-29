@@ -7,6 +7,7 @@
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
+#include "data_manager.h"
 #include "deck_manager.h"
 #include "sound_manager.h"
 #include "duelclient.h"
@@ -51,7 +52,7 @@ void Game::Draw2DImageQuad(irr::video::IVideoDriver* driver, irr::video::ITextur
 	}
 
 	material.Lighting = false;
-	material.ZWriteEnable = false;
+	material.ZWriteEnable = irr::video::EZW_OFF;
 	material.TextureLayer[0].Texture = texture;
 	material.MaterialType = useAlphaChannel ?
 		irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL : irr::video::EMT_SOLID;
@@ -1220,7 +1221,9 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList
 				|| (filter_lm == 5 && !(cp->ot & AVAIL_TCG))
 				|| (filter_lm == 6 && !(cp->ot & AVAIL_SC))
 				|| (filter_lm == 7 && !(cp->ot & AVAIL_CUSTOM))
-				|| (filter_lm == 8 && (cp->ot & AVAIL_OCGTCG) != AVAIL_OCGTCG)));
+				|| (filter_lm == 8 && !(cp->ot & AVAIL_OCG))
+				|| (filter_lm == 9 && !(cp->ot & AVAIL_TCG))
+				|| (filter_lm == 10 && (cp->ot & AVAIL_OCGTCG) != AVAIL_OCGTCG)));
 	if(filter_lm >= 4) {
 		showAvail = avail;
 		showNotAvail = !avail;
