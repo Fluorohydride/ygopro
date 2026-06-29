@@ -13,6 +13,7 @@
 /WindBot
 /cards.cdb
 /error.log
+/system.conf
 /bot.conf
 /Bot.exe
 /bot
@@ -20,8 +21,6 @@
 /ygopro
 /ygopro.exe
 /ygopro.app
-/ikpMP3.dll
-/irrKlang.dll
 
 /.vscode/
 /bin/
@@ -30,11 +29,13 @@
 /event
 /freetype
 /irrlicht
-/irrklang
-/ikpmp3
+/jpeg
 /lua
 /miniaudio
+/png
 /sqlite3
+/lzma
+/zlib
 /gframe/*.ico
 /gframe/ygopro.rc
 /gframe/ygopro.aps

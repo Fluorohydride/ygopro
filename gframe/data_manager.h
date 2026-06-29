@@ -109,6 +109,9 @@ public:
 	std::wstring FormatType(unsigned int type) const;
 	std::wstring FormatSetName(const uint16_t setcode[]) const;
 	std::wstring FormatLinkMarker(unsigned int link_marker) const;
+	static wchar_t NormalizeChar(wchar_t c);
+	static void NormalizeString(const wchar_t* src, wchar_t* dst, size_t dst_size);
+	static bool CardNameContains(const wchar_t* haystack, const wchar_t* needle);
 
 	wstring_map _counterStrings;
 	wstring_map _victoryStrings;
@@ -116,7 +119,7 @@ public:
 	wstring_map _sysStrings;
 	char errmsg[512]{};
 	const wchar_t* unknown_string{ L"???" };
-	irr::io::IFileSystem* FileSystem{};
+	irr::io::IFileSystem* IrrFileSystem{};
 
 	static constexpr uint32_t STRING_ID_LOCATION = 1000;
 	static constexpr uint32_t STRING_ID_ATTRIBUTE = 1010;
@@ -136,6 +139,7 @@ public:
 	static bool deck_sort_atk(const CardDataC* l1, const CardDataC* l2);
 	static bool deck_sort_def(const CardDataC* l1, const CardDataC* l2);
 	static bool deck_sort_name(const CardDataC* l1, const CardDataC* l2);
+	static bool deck_sort_id(const CardDataC* l1, const CardDataC* l2);
 
 private:
 	const wchar_t* GetMapString(const wstring_map& table, uint32_t code) const;

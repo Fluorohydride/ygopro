@@ -1,14 +1,16 @@
 #ifndef DECK_CON_H
 #define DECK_CON_H
 
+#include <string>
 #include <unordered_map>
 #include <vector>
 #include <random>
 #include <irrlicht.h>
-#include "data_manager.h"
-#include "deck_manager.h"
 
 namespace ygo {
+
+struct CardDataC;
+struct LFList;
 
 class DeckBuilder: public irr::IEventReceiver {
 public:
@@ -32,8 +34,6 @@ public:
 	void ShowBigCard(int code, float zoom);
 	void ZoomBigCard(irr::s32 centerx = -1, irr::s32 centery = -1);
 	void CloseBigCard();
-
-	bool CardNameContains(const wchar_t *haystack, const wchar_t *needle);
 
 	bool push_main(const CardDataC* pointer, int seq = -1);
 	bool push_extra(const CardDataC* pointer, int seq = -1);
