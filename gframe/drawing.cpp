@@ -1,3 +1,4 @@
+#include <cmath>
 #include "game.h"
 #include "client_card.h"
 #include "materials.h"
@@ -134,6 +135,8 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 				irr::f32 runEnd = cursor + 1.0f;
 				while(runEnd < screenLen && ((stippleMask >> (static_cast<int>(patternCursor + runEnd) & 0xf)) & 1))
 					runEnd += 1.0f;
+				if(runEnd > screenLen)
+					runEnd = screenLen;
 				DrawThickLine3D(driver, s + d * (cursor / screenLen), s + d * (runEnd / screenLen), camFwd, halfThick, color);
 				cursor = runEnd;
 			}
