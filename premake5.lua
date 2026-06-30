@@ -165,7 +165,7 @@ MINIAUDIO_DEPENDENCIES_METADATA = {
 ---
 --- Linux: The script already attempts to automatically locate include and lib paths for prebuilt dependencies.
 --- In most cases, you should not need to manually specify parameters.
---- If a package is not found, manually specify it. If you installed from a well-known package manager,
+--- If a package is not found, please specify it manually. In this case, if you installed it from a well-known package manager,
 --- please consider reporting the issue.
 ---
 --- macOS: When using Homebrew, use `DYLD_LIBRARY_PATH=$(brew --prefix)/lib` to ensure Homebrew installation paths are found.
