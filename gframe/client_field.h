@@ -6,6 +6,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <memory>
 
 namespace ygo {
 
@@ -93,7 +94,7 @@ public:
 	std::mt19937 rnd;
 
 	ClientField();
-	~ClientField() override;
+	~ClientField() override = default;
 	void Clear();
 	void Initial(int player, int deckc, int extrac, int sidec = 0);
 	ClientCard* CreateCard();
@@ -161,7 +162,7 @@ public:
 	void CancelOrFinish();
 
 private:
-	std::vector<ClientCard*> cards_;
+	std::vector<std::unique_ptr<ClientCard>> cards_;
 };
 
 }

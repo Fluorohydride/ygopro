@@ -17,26 +17,6 @@ ClientField::ClientField() {
 	}
 	rnd.seed(std::random_device()());
 }
-ClientField::~ClientField() {
-	for (int i = 0; i < 2; ++i) {
-		deck[i].clear();
-		hand[i].clear();
-		for (auto& card : mzone[i]) {
-			card = nullptr;
-		}
-		for (auto& card : szone[i]) {
-			card = nullptr;
-		}
-		grave[i].clear();
-		remove[i].clear();
-		extra[i].clear();
-	}
-	overlay_cards.clear();
-	for (auto pcard : cards_) {
-		delete pcard;
-	}
-	cards_.clear();
-}
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
 		deck[i].clear();
@@ -55,9 +35,6 @@ void ClientField::Clear() {
 		remove_act[i] = false;
 		extra_act[i] = false;
 		pzone_act[i] = false;
-	}
-	for(auto pcard : cards_) {
-		delete pcard;
 	}
 	cards_.clear();
 	overlay_cards.clear();
@@ -117,9 +94,10 @@ void ClientField::ResetSequence(std::vector<ClientCard*>& list, bool reset_heigh
 	}
 }
 ClientCard* ClientField::CreateCard() {
-	ClientCard* pcard = new ClientCard(this);
-	cards_.push_back(pcard);
-	return pcard;
+	auto card = std::make_unique<ClientCard>(this);
+	ClientCard* raw_ptr = card.get();
+	cards_.push_back(std::move(card));
+	return raw_ptr;
 }
 ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
 	std::vector<ClientCard*>* lst = 0;
