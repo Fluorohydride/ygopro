@@ -99,6 +99,18 @@ ClientCard* ClientField::CreateCard() {
 	cards_.push_back(std::move(card));
 	return raw_ptr;
 }
+void ClientField::DestroyCard(ClientCard* pcard) {
+	if (!pcard)
+		return;
+	auto it = std::find_if(cards_.begin(), cards_.end(),
+		[pcard](const std::unique_ptr<ClientCard>& ptr) {
+			return ptr.get() == pcard;
+		});
+	if (it != cards_.end()) {
+		std::swap(*it, cards_.back());
+		cards_.pop_back();
+	}
+}
 ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
 	std::vector<ClientCard*>* lst = 0;
 	bool is_xyz = (location & LOCATION_OVERLAY) != 0;
