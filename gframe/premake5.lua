@@ -46,8 +46,8 @@ project "YGOPro"
                 defines { "YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS" }
                 includedirs { MINIAUDIO_OPUS_INCLUDE_DIR, MINIAUDIO_VORBIS_INCLUDE_DIR }
                 if not MINIAUDIO_BUILD_OPUS_VORBIS then
-                    links { OPUS_LIB_NAME, OPUSFILE_LIB_NAME, VORBIS_LIB_NAME, VORBISFILE_LIB_NAME, OGG_LIB_NAME }
-                    libdirs { OPUS_LIB_DIR, OPUSFILE_LIB_DIR, VORBIS_LIB_DIR, OGG_LIB_DIR }
+                    links { OPUSFILE_LIB_NAME, VORBISFILE_LIB_NAME, OPUS_LIB_NAME, VORBIS_LIB_NAME, OGG_LIB_NAME }
+                    libdirs { OPUSFILE_LIB_DIR, OPUS_LIB_DIR, VORBIS_LIB_DIR, OGG_LIB_DIR }
                 end
             end
         end
