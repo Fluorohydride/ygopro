@@ -174,11 +174,14 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 			return projectPoint(wp[edgeStart[i]], ps) && projectPoint(wp[edgeEnd[i]], pe);
 		});
 	} else if(gameConf.solid_selection_line) {
-		const irr::f32 t0 = (linePattern < 15) ? 0.0f : (linePattern - 14) / 15.0f;
-		const irr::f32 t1 = (linePattern < 15) ? (linePattern + 1) / 15.0f : 1.0f;
+		const bool firstHalf = linePattern < 15;
+		const irr::f32 progress = firstHalf ? (linePattern + 1) / 15.0f : (linePattern - 14) / 15.0f;
 		drawFixedSegments([&](int i, ProjectedPoint& ps, ProjectedPoint& pe) {
 			const auto& s = wp[edgeStart[i]];
 			const auto d = wp[edgeEnd[i]] - s;
+			const bool forwardHalf = firstHalf == ((i & 1) == 0);
+			const irr::f32 t0 = forwardHalf ? 0.0f : progress;
+			const irr::f32 t1 = forwardHalf ? progress : 1.0f;
 			return projectPoint(s + d * t0, ps) && projectPoint(s + d * t1, pe);
 		});
 	} else {
