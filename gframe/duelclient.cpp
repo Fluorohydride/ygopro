@@ -2622,8 +2622,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			if (code != 0 && pcard->code != code)
 				pcard->SetCode(code);
 			pcard->ClearTarget();
-			for(auto eqit = pcard->equipped.begin(); eqit != pcard->equipped.end(); ++eqit)
-				(*eqit)->equipTarget = 0;
+			for (auto& equip_card : pcard->equipped)
+				equip_card->equipTarget = nullptr;
 			if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 				mainGame->dField.FadeCard(pcard, 5, appear);
 				mainGame->WaitFrameSignal(appear);
@@ -2634,7 +2634,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 					mainGame->dField.hovered_card = 0;
 			} else
 				mainGame->dField.RemoveCard(pc, pl, ps);
-			delete pcard;
+			mainGame->dField.DestroyCard(pcard);
 		} else {
 			if (!(pl & LOCATION_OVERLAY) && !(cl & LOCATION_OVERLAY)) {
 				ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
@@ -3814,9 +3814,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			mainGame->gMutex.lock();
 		if(mainGame->dField.deck[player].size() > mcount) {
 			while(mainGame->dField.deck[player].size() > mcount) {
-				ClientCard* ccard = *mainGame->dField.deck[player].rbegin();
+				ClientCard* ccard = mainGame->dField.deck[player].back();
 				mainGame->dField.deck[player].pop_back();
-				delete ccard;
+				mainGame->dField.DestroyCard(ccard);
 			}
 		} else {
 			while(mainGame->dField.deck[player].size() < mcount) {
@@ -3829,9 +3829,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 		}
 		if(mainGame->dField.hand[player].size() > hcount) {
 			while(mainGame->dField.hand[player].size() > hcount) {
-				ClientCard* ccard = *mainGame->dField.hand[player].rbegin();
+				ClientCard* ccard = mainGame->dField.hand[player].back();
 				mainGame->dField.hand[player].pop_back();
-				delete ccard;
+				mainGame->dField.DestroyCard(ccard);
 			}
 		} else {
 			while(mainGame->dField.hand[player].size() < hcount) {
@@ -3844,9 +3844,9 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 		}
 		if(mainGame->dField.extra[player].size() > ecount) {
 			while(mainGame->dField.extra[player].size() > ecount) {
-				ClientCard* ccard = *mainGame->dField.extra[player].rbegin();
+				ClientCard* ccard = mainGame->dField.extra[player].back();
 				mainGame->dField.extra[player].pop_back();
-				delete ccard;
+				mainGame->dField.DestroyCard(ccard);
 			}
 		} else {
 			while(mainGame->dField.extra[player].size() < ecount) {
