@@ -79,7 +79,11 @@ ZLIB_LIB_NAME = "z"
 
 --- Dependency metadata entries are used to generate global variables such as LUA_INCLUDE_DIR, LUA_LIB_NAME, LUA_LIB_DIR, etc. during processing.
 
--- Fields: name, header (for finding directory), header_subdir (for FindHeaderWithSubDir), local_include_dir (for building from source)
+-- Fields:
+--   name (will resolve to global variable prefix)
+--   header (for finding directory)
+--   header_subdir (for FindHeaderWithSubDir)
+--   local_include_dir (for building from source)
 DEPENDENCIES_METADATA = {
     {
         name = "lua",
@@ -130,6 +134,8 @@ DEPENDENCIES_METADATA = {
 }
 
 -- These dependencies do not have separate [no-]build-* options; instead, they use [no-]build-opus-vorbis as general build option.
+-- When building from source, they are integrated into the miniaudio subproject instead of being maintained as separate subprojects,
+-- and their locations are predefined in the miniaudio subproject (./miniaudio/external/*), so those options are ignored in this case.
 MINIAUDIO_DEPENDENCIES_METADATA = {
     {
         name = "opus",
