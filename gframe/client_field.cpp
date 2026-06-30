@@ -17,6 +17,7 @@ ClientField::ClientField() {
 	}
 	rnd.seed(std::random_device()());
 }
+ClientField::~ClientField() = default;
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
 		deck[i].clear();

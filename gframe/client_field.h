@@ -94,7 +94,7 @@ public:
 	std::mt19937 rnd;
 
 	ClientField();
-	~ClientField() override = default;
+	~ClientField() override;
 	void Clear();
 	void Initial(int player, int deckc, int extrac, int sidec = 0);
 	ClientCard* CreateCard();
