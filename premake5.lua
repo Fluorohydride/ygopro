@@ -242,7 +242,7 @@ local function FindHeaderWithSubDir(header, subdir)
     return result
 end
 
-local function EnsureAbsoluteDirectory(varname)
+local function ResolveDirectoryVariableToFullPath(varname)
     local dir = _G[varname]
     if not dir or dir == "" then
         print("::warning:: " .. varname .. " is not set")
@@ -255,7 +255,7 @@ local function EnsureAbsoluteDirectory(varname)
 end
 
 -- Get dependency directories from command line or environment variables, and check their validity.
-local function GetPreBuiltDependencyDirectory(dep)
+local function ResolvePreBuiltDependencyDirectory(dep)
     local upper = string.upper(dep.name)
     local include_dir_var = upper .. "_INCLUDE_DIR"
     local lib_name_var = upper .. "_LIB_NAME"
@@ -263,16 +263,16 @@ local function GetPreBuiltDependencyDirectory(dep)
     _G[include_dir_var] = GetParam(dep.name .. "-include-dir") or FindHeaderWithSubDir(dep.header, dep.header_subdir)
     _G[lib_name_var] = GetParam(dep.name .. "-lib-name") or _G[lib_name_var] or dep.name
     _G[lib_dir_var] = GetParam(dep.name .. "-lib-dir") or os.findlib(_G[lib_name_var])
-    EnsureAbsoluteDirectory(include_dir_var)
-    EnsureAbsoluteDirectory(lib_dir_var)
+    ResolveDirectoryVariableToFullPath(include_dir_var)
+    ResolveDirectoryVariableToFullPath(lib_dir_var)
 end
 
 -- Set the include directory for a dependency being built from source, and validate its path.
-local function GetBuildFromSourceDependencyDirectory(dep)
+local function ResolveBuildFromSourceDependencyDirectory(dep)
     local upper = string.upper(dep.name)
     local include_dir_var = upper .. "_INCLUDE_DIR"
     _G[include_dir_var] = dep.local_include_dir
-    EnsureAbsoluteDirectory(include_dir_var)
+    ResolveDirectoryVariableToFullPath(include_dir_var)
 end
 
 if GetParam("build-all") then
@@ -292,9 +292,9 @@ for _, dep in ipairs(DEPENDENCIES_METADATA) do
     end
     _G[flag] = build
     if build then
-        GetBuildFromSourceDependencyDirectory(dep)
+        ResolveBuildFromSourceDependencyDirectory(dep)
     else
-        GetPreBuiltDependencyDirectory(dep)
+        ResolvePreBuiltDependencyDirectory(dep)
     end
 end
 
@@ -332,7 +332,7 @@ if USE_AUDIO then
                 -- Since their locations are predefined in the miniaudio subproject, nothing needs to be done here.
             else
                 for _, dep in ipairs(MINIAUDIO_DEPENDENCIES_METADATA) do
-                    GetPreBuiltDependencyDirectory(dep)
+                    ResolvePreBuiltDependencyDirectory(dep)
                 end
             end
         end
