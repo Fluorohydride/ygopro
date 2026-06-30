@@ -33,7 +33,7 @@
 /lua
 /miniaudio
 /png
-/sqlite3
+/sqlite
 /lzma
 /zlib
 /gframe/*.ico

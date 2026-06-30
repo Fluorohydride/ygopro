@@ -7,56 +7,29 @@ project "YGOPro"
 
     defines { "_IRR_STATIC_LIB_" }
     files { "*.cpp", "*.h" }
-    includedirs { "../ocgcore", EVENT_INCLUDE_DIR, IRRLICHT_INCLUDE_DIR, JPEG_INCLUDE_DIR, ZLIB_INCLUDE_DIR, LZMA_INCLUDE_DIR, SQLITE_INCLUDE_DIR }
-    links { "ocgcore", "lzma", "sqlite3", "irrlicht", "png", "freetype", "event" }
 
-    if BUILD_LUA then
-        links { "lua" }
-    else
-        links { LUA_LIB_NAME }
-        libdirs { LUA_LIB_DIR }
-    end
+    includedirs { "../ocgcore" }
+    links { "ocgcore" }
 
-    if not BUILD_EVENT then
-        libdirs { EVENT_LIB_DIR }
-        links { "event_pthreads" }
-    end
-
-    if not BUILD_IRRLICHT then
-        libdirs { IRRLICHT_LIB_DIR }
-    end
-
-    if BUILD_JPEG then
-        links { "jpeg" }
-    else
-        links { JPEG_LIB_NAME }
-        libdirs { JPEG_LIB_DIR }
-    end
-
-    if not BUILD_PNG then
-        libdirs { PNG_LIB_DIR }
-    end
-
-    if BUILD_ZLIB then
-        links { "zlib" }
-    else
-        links { ZLIB_LIB_NAME }
-        libdirs { ZLIB_LIB_DIR }
-    end
 
     if BUILD_FREETYPE then
-        includedirs { FREETYPE_CUSTOM_INCLUDE_DIR, FREETYPE_INCLUDE_DIR }
-    else
-        includedirs { FREETYPE_INCLUDE_DIR }
-        libdirs { FREETYPE_LIB_DIR }
+        includedirs { FREETYPE_CUSTOM_INCLUDE_DIR }
     end
 
-    if not BUILD_SQLITE then
-        libdirs { SQLITE_LIB_DIR }
+    for _, dep in ipairs(DEPENDENCIES_METADATA) do
+        local upper = string.upper(dep.name)
+        includedirs { _G[upper .. "_INCLUDE_DIR"] }
+        if _G["BUILD_" .. upper] then
+            -- When building from source, the dependencies will be linked with their project names, which can't be changed via options.
+            links { dep.name }
+        else
+            links { _G[upper .. "_LIB_NAME"] }
+            libdirs { _G[upper .. "_LIB_DIR"] }
+        end
     end
 
-    if not BUILD_LZMA then
-        libdirs { LZMA_LIB_DIR }
+    if not BUILD_EVENT and not os.istarget("windows") then
+        links { EVENT_PTHREADS_LIB_NAME }
     end
 
     if USE_SIMD == "none" then
@@ -73,8 +46,8 @@ project "YGOPro"
                 defines { "YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS" }
                 includedirs { MINIAUDIO_OPUS_INCLUDE_DIR, MINIAUDIO_VORBIS_INCLUDE_DIR }
                 if not MINIAUDIO_BUILD_OPUS_VORBIS then
-                    links { "opusfile", "vorbisfile", "opus", "vorbis", "ogg" }
-                    libdirs { OPUS_LIB_DIR, OPUSFILE_LIB_DIR, VORBIS_LIB_DIR, OGG_LIB_DIR }
+                    links { OPUSFILE_LIB_NAME, VORBISFILE_LIB_NAME, OPUS_LIB_NAME, VORBIS_LIB_NAME, OGG_LIB_NAME }
+                    libdirs { OPUSFILE_LIB_DIR, OPUS_LIB_DIR, VORBIS_LIB_DIR, OGG_LIB_DIR }
                 end
             end
         end
