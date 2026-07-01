@@ -103,6 +103,7 @@ ClientCard* ClientField::CreateCard() {
 void ClientField::DestroyCard(ClientCard* pcard) {
 	if (!pcard)
 		return;
+	overlay_cards.erase(pcard);
 	auto it = std::find_if(cards_.begin(), cards_.end(),
 		[pcard](const std::unique_ptr<ClientCard>& ptr) {
 			return ptr.get() == pcard;
