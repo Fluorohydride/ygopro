@@ -95,10 +95,8 @@ void ClientField::ResetSequence(std::vector<ClientCard*>& list, bool reset_heigh
 	}
 }
 ClientCard* ClientField::CreateCard() {
-	auto card = std::make_unique<ClientCard>(this);
-	ClientCard* raw_ptr = card.get();
-	cards_.push_back(std::move(card));
-	return raw_ptr;
+	cards_.emplace_back(std::make_unique<ClientCard>(this));
+	return cards_.back().get();
 }
 void ClientField::DestroyCard(ClientCard* pcard) {
 	if (!pcard)
