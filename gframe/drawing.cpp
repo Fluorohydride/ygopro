@@ -78,7 +78,8 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 	const irr::f32 xScale = sz.Width / static_cast<irr::f32>(GAME_WINDOW_WIDTH);
 	const irr::f32 yScale = sz.Height / static_cast<irr::f32>(GAME_WINDOW_HEIGHT);
 	const irr::f32 pixelScale = (xScale < yScale) ? xScale : yScale;
-	const irr::f32 halfThick = matManager.mOutLine.Thickness * pixelScale * 0.2f;
+	constexpr irr::f32 kSelectionLineHalfThicknessScale = 0.2f; // screen-pixel scaling factor for selection outline thickness
+	const irr::f32 halfThick = matManager.mOutLine.Thickness * pixelScale * kSelectionLineHalfThicknessScale;
 	if(halfThick <= 0.0f)
 		return;
 	irr::core::matrix4 invPv;
