@@ -172,6 +172,7 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 				wbuf[0] = MSG_WIN;
 				wbuf[1] = 1 - dp->type;
 				wbuf[2] = 0x4;
+				duel_stage = DUEL_STAGE_END;
 				NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, wbuf, 3);
 				NetServer::ReSendToPlayer(players[1]);
 				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
@@ -1454,6 +1455,19 @@ void SingleDuel::EndDuel() {
 	end_duel(pduel);
 	event_del(etimer);
 	pduel = 0;
+}
+void SingleDuel::OnPlayerDisconnected(DuelPlayer* dp) {
+	if(host_player == dp)
+		host_player = nullptr;
+	for(int i = 0; i < 2; ++i) {
+		if(players[i] == dp) {
+			players[i] = nullptr;
+			ready[i] = false;
+		}
+		if(pplayer[i] == dp)
+			pplayer[i] = nullptr;
+	}
+	observers.erase(dp);
 }
 void SingleDuel::WaitforResponse(int playerid) {
 	last_response = playerid;
