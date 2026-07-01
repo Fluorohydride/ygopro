@@ -1581,7 +1581,7 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "mute_opponent = %d\n", (chkIgnore1->isChecked() ? 1 : 0));
 	std::fprintf(fp, "mute_spectators = %d\n", (chkIgnore2->isChecked() ? 1 : 0));
 	std::fprintf(fp, "use_lflist = %d\n", gameConf.use_lflist);
-	std::fprintf(fp, "default_lflist = %zu\n", deckBuilder.default_lflist_index);
+	std::fprintf(fp, "default_lflist = %d\n", deckBuilder.default_lflist_index);
 	std::fprintf(fp, "default_rule = %d\n", gameConf.default_rule == DEFAULT_DUEL_RULE ? 0 : gameConf.default_rule);
 	std::fprintf(fp, "hide_setname = %d\n", gameConf.hide_setname);
 	std::fprintf(fp, "hide_hint_button = %d\n", gameConf.hide_hint_button);
