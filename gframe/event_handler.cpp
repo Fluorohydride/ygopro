@@ -1975,9 +1975,9 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			case COMBOBOX_LFLIST: {
 				int sel = mainGame->cbLFlist->getSelected();
 				if (sel != -1) {
-					mainGame->deckBuilder.default_lflist_index = mainGame->cbLFlist->getSelected();
+					mainGame->deckBuilder.default_lflist_index = sel;
 					mainGame->cbHostLFlist->setSelected(sel);
-					mainGame->deckBuilder.filterList = &deckManager._lfList[mainGame->deckBuilder.default_lflist_index];
+					mainGame->deckBuilder.filterList = &deckManager._lfList[sel];
 				}
 				return true;
 				break;
