@@ -1072,66 +1072,57 @@ void Game::MainLoop() {
 		if(atkframe > 6.2832f)
 			atkframe -= 6.2832f;
 		atkdy = (float)sin(atkframe);
-		bool isMinimized = device->isWindowMinimized();
-		if(!isMinimized) {
-			driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
-			gMutex.lock();
-			if(dInfo.isStarted) {
-				if(dInfo.isFinished && showcardcode == 1)
-					soundManager.PlayBGM(BGM_WIN);
-				else if(dInfo.isFinished && (showcardcode == 2 || showcardcode == 3))
-					soundManager.PlayBGM(BGM_LOSE);
-				else if(dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
-					soundManager.PlayBGM(BGM_DISADVANTAGE);
-				else if(dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
-					soundManager.PlayBGM(BGM_ADVANTAGE);
-				else
-					soundManager.PlayBGM(BGM_DUEL);
-				DrawBackImage(imageManager.tBackGround);
-				DrawBackGround();
-				DrawCards();
-				DrawMisc();
-				smgr->drawAll();
-				driver->setMaterial(irr::video::IdentityMaterial);
-				driver->clearZBuffer();
-			} else if(is_building) {
-				soundManager.PlayBGM(BGM_DECK);
-				DrawBackImage(imageManager.tBackGround_deck);
-				DrawDeckBd();
-			} else {
-				soundManager.PlayBGM(BGM_MENU);
-				DrawBackImage(imageManager.tBackGround_menu);
-			}
-			DrawGUI();
-			DrawSpec();
-			gMutex.unlock();
-			if(signalFrame > 0) {
-				signalFrame--;
-				if(!signalFrame)
-					frameSignal.Set();
-			}
-			if(waitFrame >= 0 && logicalTick) {
-				waitFrame++;
-				if(waitFrame % 90 == 0) {
-					stHintMsg->setText(dataManager.GetSysString(1390));
-				} else if(waitFrame % 90 == 30) {
-					stHintMsg->setText(dataManager.GetSysString(1391));
-				} else if(waitFrame % 90 == 60) {
-					stHintMsg->setText(dataManager.GetSysString(1392));
-				}
-			}
-			driver->endScene();
+		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
+		gMutex.lock();
+		if(dInfo.isStarted) {
+			if(dInfo.isFinished && showcardcode == 1)
+				soundManager.PlayBGM(BGM_WIN);
+			else if(dInfo.isFinished && (showcardcode == 2 || showcardcode == 3))
+				soundManager.PlayBGM(BGM_LOSE);
+			else if(dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
+				soundManager.PlayBGM(BGM_DISADVANTAGE);
+			else if(dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
+				soundManager.PlayBGM(BGM_ADVANTAGE);
+			else
+				soundManager.PlayBGM(BGM_DUEL);
+			DrawBackImage(imageManager.tBackGround);
+			DrawBackGround();
+			DrawCards();
+			DrawMisc();
+			smgr->drawAll();
+			driver->setMaterial(irr::video::IdentityMaterial);
+			driver->clearZBuffer();
+		} else if(is_building) {
+			soundManager.PlayBGM(BGM_DECK);
+			DrawBackImage(imageManager.tBackGround_deck);
+			DrawDeckBd();
 		} else {
-			if(signalFrame > 0) {
-				signalFrame--;
-				if(!signalFrame)
-					frameSignal.Set();
+			soundManager.PlayBGM(BGM_MENU);
+			DrawBackImage(imageManager.tBackGround_menu);
+		}
+		DrawGUI();
+		DrawSpec();
+		gMutex.unlock();
+		if(signalFrame > 0) {
+			signalFrame--;
+			if(!signalFrame)
+				frameSignal.Set();
+		}
+		if(waitFrame >= 0 && logicalTick) {
+			waitFrame++;
+			if(waitFrame % 90 == 0) {
+				stHintMsg->setText(dataManager.GetSysString(1390));
+			} else if(waitFrame % 90 == 30) {
+				stHintMsg->setText(dataManager.GetSysString(1391));
+			} else if(waitFrame % 90 == 60) {
+				stHintMsg->setText(dataManager.GetSysString(1392));
 			}
 		}
+		driver->endScene();
 		if(closeSignal.TryWait())
 			CloseDuelWindow();
 		fps++;
-		if(gameConf.vsync && isMinimized) {
+		if(gameConf.vsync && device->isWindowMinimized()) {
 			// downscale to 60fps, reduce CPU usage
 			std::this_thread::sleep_for(std::chrono::microseconds(16667));
 		} else if(!gameConf.vsync) {
