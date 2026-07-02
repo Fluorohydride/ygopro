@@ -405,13 +405,16 @@ void Game::DrawCard(ClientCard* pcard) {
 			pcard->curAlpha += pcard->dAlpha;
 		pcard->aniFrame--;
 		if(pcard->aniFrame == 0) {
+			if(pcard->is_fading)
+				pcard->curAlpha = pcard->targetAlpha;
 			pcard->is_moving = false;
 			pcard->is_fading = false;
 			pcard->chain_code = 0;
 		}
 	}
 	matManager.mCard.AmbientColor = 0xffffffff;
-	matManager.mCard.DiffuseColor = (pcard->curAlpha << 24) | 0xffffff;
+	irr::u32 alpha = myclamp(static_cast<int>(pcard->curAlpha + 0.5f), 0, 255);
+	matManager.mCard.DiffuseColor = (alpha << 24) | 0xffffff;
 	driver->setTransform(irr::video::ETS_WORLD, pcard->mTransform);
 	auto m22 = pcard->mTransform(2, 2);
 	if(m22 > -0.99 || pcard->is_moving) {

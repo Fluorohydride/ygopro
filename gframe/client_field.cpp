@@ -1117,7 +1117,8 @@ void ClientField::MoveCard(ClientCard * pcard, int frame60) {
 }
 void ClientField::FadeCard(ClientCard * pcard, int alpha, int frame60) {
 	int frame = mainGame->ScaleFrame(frame60);
-	pcard->dAlpha = (alpha - pcard->curAlpha) / frame;
+	pcard->targetAlpha = alpha;
+	pcard->dAlpha = (pcard->targetAlpha - pcard->curAlpha) / frame;
 	pcard->is_fading = true;
 	pcard->aniFrame = frame;
 }
