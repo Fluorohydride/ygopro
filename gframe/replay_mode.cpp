@@ -56,7 +56,7 @@ bool ReplayMode::ReadReplayResponse() {
 		set_responseb(pduel, resp);
 	return result;
 }
-int ReplayMode::ReplayThread() {
+void ReplayMode::ReplayThread() {
 	const auto& rh = cur_replay.pheader.base;
 	mainGame->dInfo.Clear();
 	mainGame->dInfo.isFirst = true;
@@ -69,7 +69,7 @@ int ReplayMode::ReplayThread() {
 	set_message_handler(ReplayMode::MessageHandler);
 	if(!StartDuel()) {
 		EndDuel();
-		return 0;
+		return;
 	}
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isFinished = false;
@@ -152,7 +152,6 @@ int ReplayMode::ReplayThread() {
 	skip_turn = 0;
 	current_step = 0;
 	skip_step = 0;
-	return 0;
 }
 bool ReplayMode::StartDuel() {
 	const auto& rh = cur_replay.pheader.base;
