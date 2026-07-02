@@ -1075,6 +1075,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	}
 }
 void ClientField::MoveCard(ClientCard * pcard, int frame) {
+	frame = mainGame->ScaleFrame(frame);
 	irr::core::vector3df trans = pcard->curPos;
 	irr::core::vector3df rot = pcard->curRot;
 	GetCardLocation(pcard, &trans, &rot);
@@ -1105,6 +1106,7 @@ void ClientField::MoveCard(ClientCard * pcard, int frame) {
 	pcard->aniFrame = frame;
 }
 void ClientField::FadeCard(ClientCard * pcard, int alpha, int frame) {
+	frame = mainGame->ScaleFrame(frame);
 	pcard->dAlpha = (alpha - pcard->curAlpha) / frame;
 	pcard->is_fading = true;
 	pcard->aniFrame = frame;
