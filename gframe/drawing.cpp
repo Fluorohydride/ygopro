@@ -1161,11 +1161,6 @@ void Game::SetImageButtonDrawing(irr::gui::IGUIElement* element, bool draw) {
 	}
 #endif
 }
-void Game::WaitFrameSignal(int frame) {
-	frameSignal.Reset();
-	signalFrame = (gameConf.quick_animation && frame >= 12) ? 12 : frame;
-	frameSignal.Wait();
-}
 void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList* lflist, bool drag) {
 	if(!cp)
 		return;

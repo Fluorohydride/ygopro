@@ -81,8 +81,15 @@ void ReplayMode::ReplayThread() {
 	skip_step = 0;
 	if(mainGame->dInfo.isSingleMode) {
 		int len = get_message(pduel, engineBuffer.data());
-		if (len > 0)
-			is_continuing = ReplayAnalyze(engineBuffer.data(), len);
+		if (len > 0) {
+			mainGame->analyzeMsg.type = ANALYZE_REPLAY;
+			mainGame->analyzeMsg.data = engineBuffer.data();
+			mainGame->analyzeMsg.len = len;
+			mainGame->analyzeDone.Reset();
+			mainGame->analyzeSignal.Set();
+			mainGame->analyzeDone.Wait();
+			is_continuing = mainGame->analyzeMsg.result;
+		}
 	} else {
 		ReplayRefreshDeck(0);
 		ReplayRefreshDeck(1);
@@ -91,8 +98,6 @@ void ReplayMode::ReplayThread() {
 	}
 	exit_pending = false;
 	current_step = 0;
-	if(mainGame->dInfo.isReplaySkiping)
-		mainGame->gMutex.lock();
 	while (is_continuing && !exit_pending) {
 		unsigned int result = process(pduel);
 		int len = result & PROCESSOR_BUFFER_LEN;
@@ -100,12 +105,20 @@ void ReplayMode::ReplayThread() {
 			if (len > (int)engineBuffer.size())
 				engineBuffer.resize(len);
 			get_message(pduel, engineBuffer.data());
-			is_continuing = ReplayAnalyze(engineBuffer.data(), len);
+			mainGame->analyzeMsg.type = ANALYZE_REPLAY;
+			mainGame->analyzeMsg.data = engineBuffer.data();
+			mainGame->analyzeMsg.len = len;
+			mainGame->analyzeDone.Reset();
+			mainGame->analyzeSignal.Set();
+			mainGame->analyzeDone.Wait();
+			is_continuing = mainGame->analyzeMsg.result;
 			if(is_restarting) {
-				mainGame->gMutex.lock();
 				is_restarting = false;
-				mainGame->dInfo.isReplaySkiping = true;
-				Restart(false);
+				{
+					std::lock_guard<std::mutex> lock(mainGame->gMutex);
+					mainGame->dInfo.isReplaySkiping = true;
+					Restart(false);
+				}
 				int step = current_step - 1;
 				if(step < 0)
 					step = 0;
@@ -114,9 +127,16 @@ void ReplayMode::ReplayThread() {
 					skip_step = 0;
 					int len = get_message(pduel, engineBuffer.data());
 					if (len > 0) {
-						is_continuing = ReplayAnalyze(engineBuffer.data(), len);
+						mainGame->analyzeMsg.type = ANALYZE_REPLAY;
+						mainGame->analyzeMsg.data = engineBuffer.data();
+						mainGame->analyzeMsg.len = len;
+						mainGame->analyzeDone.Reset();
+						mainGame->analyzeSignal.Set();
+						mainGame->analyzeDone.Wait();
+						is_continuing = mainGame->analyzeMsg.result;
 					}
 				} else {
+					std::lock_guard<std::mutex> lock(mainGame->gMutex);
 					ReplayRefreshDeck(0);
 					ReplayRefreshDeck(1);
 					ReplayRefreshExtra(0);
@@ -124,11 +144,11 @@ void ReplayMode::ReplayThread() {
 				}
 				if(step == 0) {
 					Pause(true, false);
+					std::lock_guard<std::mutex> lock(mainGame->gMutex);
 					mainGame->dInfo.isStarted = true;
 					mainGame->dInfo.isFinished = false;
 					mainGame->dInfo.isReplaySkiping = false;
 					mainGame->dField.RefreshAllCards();
-					mainGame->gMutex.unlock();
 				}
 				skip_step = step;
 				current_step = 0;
@@ -136,9 +156,9 @@ void ReplayMode::ReplayThread() {
 		}
 	}
 	if(mainGame->dInfo.isReplaySkiping) {
+		std::lock_guard<std::mutex> lock(mainGame->gMutex);
 		mainGame->dInfo.isReplaySkiping = false;
 		mainGame->dField.RefreshAllCards();
-		mainGame->gMutex.unlock();
 	}
 	EndDuel();
 	pduel = 0;
@@ -292,9 +312,7 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			return true;
 		}
 		if(is_swaping) {
-			mainGame->gMutex.lock();
 			mainGame->dField.ReplaySwap();
-			mainGame->gMutex.unlock();
 			is_swaping = false;
 		}
 		auto offset = pbuf;
@@ -305,14 +323,11 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			if(mainGame->dInfo.isReplaySkiping) {
 				mainGame->dInfo.isReplaySkiping = false;
 				mainGame->dField.RefreshAllCards();
-				mainGame->gMutex.unlock();
 			}
-			mainGame->gMutex.lock();
 			mainGame->stMessage->setText(L"Error occurs.");
 			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.unlock();
-			mainGame->actionSignal.Reset();
-			mainGame->actionSignal.Wait();
+			if(!mainGame->WaitForAction(mainGame->actionSignal))
+				return false;
 			return false;
 		}
 		case MSG_HINT: {
@@ -324,7 +339,6 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 			if(mainGame->dInfo.isReplaySkiping) {
 				mainGame->dInfo.isReplaySkiping = false;
 				mainGame->dField.RefreshAllCards();
-				mainGame->gMutex.unlock();
 			}
 			pbuf += 2;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
@@ -506,7 +520,6 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 				if(skip_turn == 0) {
 					mainGame->dInfo.isReplaySkiping = false;
 					mainGame->dField.RefreshAllCards();
-					mainGame->gMutex.unlock();
 				}
 			}
 			player = BufferIO::Read<uint8_t>(pbuf);
@@ -845,13 +858,12 @@ bool ReplayMode::ReplayAnalyze(unsigned char* msg, unsigned int len) {
 					mainGame->dInfo.isFinished = false;
 					mainGame->dInfo.isReplaySkiping = false;
 					mainGame->dField.RefreshAllCards();
-					mainGame->gMutex.unlock();
 				}
 			}
 			if(is_pausing) {
 				is_paused = true;
-				mainGame->actionSignal.Reset();
-				mainGame->actionSignal.Wait();
+				if(!mainGame->WaitForAction(mainGame->actionSignal))
+					return false;
 				is_paused = false;
 			}
 		}

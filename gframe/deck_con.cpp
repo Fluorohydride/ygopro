@@ -172,10 +172,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			soundManager.PlaySoundEffect(SOUND_BUTTON);
 			switch(id) {
 			case BUTTON_CLEAR_DECK: {
-				mainGame->gMutex.lock();
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1339));
 				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
@@ -247,22 +245,18 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->cbDBDecks->getSelected();
 				if(sel == -1)
 					break;
-				mainGame->gMutex.lock();
 				wchar_t textBuffer[256];
 				myswprintf(textBuffer, L"%ls\n%ls", mainGame->cbDBDecks->getItem(sel), dataManager.GetSysString(1337));
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				prev_sel = sel;
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
 				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
-					mainGame->gMutex.lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					mainGame->gMutex.unlock();
 					prev_operation = id;
 					break;
 				}
@@ -296,10 +290,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_MANAGE_DECK: {
 				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
-					mainGame->gMutex.lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					mainGame->gMutex.unlock();
 					prev_operation = id;
 					break;
 				}
@@ -307,69 +299,56 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_NEW_CATEGORY: {
-				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1469));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(L"");
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_RENAME_CATEGORY: {
 				if(mainGame->lstCategories->getSelected() < 4)
 					break;
-				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1469));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(mainGame->lstCategories->getListItem(mainGame->lstCategories->getSelected()));
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_DELETE_CATEGORY: {
-				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1470));
 				mainGame->stDMMessage2->setVisible(true);
 				mainGame->stDMMessage2->setText(mainGame->lstCategories->getListItem(mainGame->lstCategories->getSelected()));
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_NEW_DECK: {
-				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1471));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(L"");
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_RENAME_DECK: {
-				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1471));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(mainGame->lstDecks->getListItem(mainGame->lstDecks->getSelected()));
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_DELETE_DECK_DM: {
-				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1337));
 				mainGame->stDMMessage2->setVisible(true);
 				mainGame->stDMMessage2->setText(mainGame->lstDecks->getListItem(mainGame->lstDecks->getSelected()));
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_MOVE_DECK: {
-				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1472));
 				mainGame->cbDMCategory->setVisible(true);
 				mainGame->cbDMCategory->clear();
@@ -381,12 +360,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDMCategory->addItem(mainGame->lstCategories->getListItem(i));
 				}
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_COPY_DECK: {
-				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1473));
 				mainGame->cbDMCategory->setVisible(true);
 				mainGame->cbDMCategory->clear();
@@ -398,7 +375,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDMCategory->addItem(mainGame->lstCategories->getListItem(i));
 				}
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
@@ -406,12 +382,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				time_t nowtime = std::time(nullptr);
 				wchar_t timetext[40];
 				std::wcsftime(timetext, sizeof timetext / sizeof timetext[0], L"%Y-%m-%d %H-%M-%S", std::localtime(&nowtime));
-				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1471));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(timetext);
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
@@ -861,10 +835,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						break;
 				}
 				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
-					mainGame->gMutex.lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					mainGame->gMutex.unlock();
 					prev_operation = id;
 					break;
 				}
@@ -877,10 +849,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
-					mainGame->gMutex.lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					mainGame->gMutex.unlock();
 					prev_operation = id;
 					break;
 				}
@@ -1743,14 +1713,12 @@ void DeckBuilder::ShowBigCard(int code, float zoom) {
 	irr::s32 top = mainGame->window_size.Height / 2 - size.Height / 2;
 	mainGame->imgBigCard->setRelativePosition(irr::core::recti(0, 0, size.Width, size.Height));
 	mainGame->wBigCard->setRelativePosition(irr::core::recti(left, top, left + size.Width, top + size.Height));
-	mainGame->gMutex.lock();
 	mainGame->btnBigCardOriginalSize->setVisible(true);
 	mainGame->btnBigCardZoomIn->setVisible(true);
 	mainGame->btnBigCardZoomOut->setVisible(true);
 	mainGame->btnBigCardClose->setVisible(true);
 	mainGame->ShowElement(mainGame->wBigCard);
 	mainGame->env->getRootGUIElement()->bringToFront(mainGame->wBigCard);
-	mainGame->gMutex.unlock();
 }
 void DeckBuilder::ZoomBigCard(irr::s32 centerx, irr::s32 centery) {
 	bigcard_zoom = myclamp(bigcard_zoom, 0.2f, 4.0f);
