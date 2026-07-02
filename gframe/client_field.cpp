@@ -1074,8 +1074,18 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		pcard->mTransform.setRotationRadians(*r);
 	}
 }
-void ClientField::MoveCard(ClientCard * pcard, int frame) {
-	frame = mainGame->ScaleFrame(frame);
+// Set the movement of a card over a specified number of frames.
+void ClientField::SetCardMovement(ClientCard* pcard, int frame60, irr::core::vector3df dPos, irr::core::vector3df dRot) {
+	int frame = mainGame->ScaleFrame(frame60);
+	float frameScale = static_cast<float>(frame60) / frame;
+	pcard->dPos = dPos * frameScale;
+	pcard->dRot = dRot * frameScale;
+	pcard->is_moving = true;
+	pcard->aniFrame = frame;
+}
+// Move (reset) a card to its current location over a specified number of frames.
+void ClientField::MoveCard(ClientCard * pcard, int frame60) {
+	int frame = mainGame->ScaleFrame(frame60);
 	irr::core::vector3df trans = pcard->curPos;
 	irr::core::vector3df rot = pcard->curRot;
 	GetCardLocation(pcard, &trans, &rot);
@@ -1105,8 +1115,8 @@ void ClientField::MoveCard(ClientCard * pcard, int frame) {
 	pcard->is_moving = true;
 	pcard->aniFrame = frame;
 }
-void ClientField::FadeCard(ClientCard * pcard, int alpha, int frame) {
-	frame = mainGame->ScaleFrame(frame);
+void ClientField::FadeCard(ClientCard * pcard, int alpha, int frame60) {
+	int frame = mainGame->ScaleFrame(frame60);
 	pcard->dAlpha = (alpha - pcard->curAlpha) / frame;
 	pcard->is_fading = true;
 	pcard->aniFrame = frame;
