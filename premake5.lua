@@ -73,63 +73,60 @@ EVENT_PTHREADS_LIB_NAME = "event_pthreads"
 -- When not building from source, both "vorbis" and "vorbisfile" need to be linked.
 VORBISFILE_LIB_NAME = "vorbisfile"
 
--- The following prebuilt lib names differ from the dependency name:
-SQLITE_LIB_NAME = "sqlite3"
-ZLIB_LIB_NAME = "z"
-
 --- Dependency metadata entries are used to generate global variables such as LUA_INCLUDE_DIR, LUA_LIB_NAME, LUA_LIB_DIR, etc. during processing.
 
 -- Fields:
 --   name (will resolve to global variable prefix)
---   header (for finding directory)
---   header_subdir (for FindHeaderWithSubDir)
---   local_include_dir (for building from source)
+--   prebuilt_header (for finding directory)
+--   prebuilt_header_subdir (for FindHeaderWithSubDir)
+--   prebuilt_libname (for prebuilt dependencies only; default: same as name)
+--   source_dir (when building dependency from source, its code should be in this directory relative to the project root; default: ./name)
+--   source_header_subdir (dependency's header subdirectory relative to source_dir; default: .)
 DEPENDENCIES_METADATA = {
     {
         name = "lua",
-        header = "lua.h",
-        local_include_dir = "./lua/src",
+        prebuilt_header = "lua.h",
+        source_header_subdir = "src",
     },
     {
         name = "event",
-        header = "event2/event.h",
-        local_include_dir = "./event/include",
+        prebuilt_header = "event2/event.h",
+        source_header_subdir = "include",
     },
     {
         name = "freetype",
-        header = "freetype2/ft2build.h",
-        header_subdir = "freetype2",
-        local_include_dir = "./freetype/include",
+        prebuilt_header = "freetype2/ft2build.h",
+        prebuilt_header_subdir = "freetype2",
+        source_header_subdir = "include",
     },
     {
         name = "sqlite",
-        header = "sqlite3.h",
-        local_include_dir = "./sqlite",
+        prebuilt_header = "sqlite3.h",
+        prebuilt_libname = "sqlite3",
     },
     {
         name = "irrlicht",
-        header = "irrlicht.h",
-        local_include_dir = "./irrlicht/include",
+        prebuilt_header = "irrlicht.h",
+        source_header_subdir = "include",
     },
     {
         name = "jpeg",
-        header = "jpeglib.h",
-        local_include_dir = "./jpeg/src",
+        prebuilt_header = "jpeglib.h",
+        source_header_subdir = "src",
     },
     {
         name = "png",
-        header = "png.h",
-        local_include_dir = "./png",
+        prebuilt_header = "png.h",
     },
     {
         name = "lzma",
-        header = "lzma.h",
-        local_include_dir = "./lzma/src/liblzma/api",
+        prebuilt_header = "lzma.h",
+        source_header_subdir = "src/liblzma/api",
     },
     {
         name = "zlib",
-        header = "zlib.h",
-        local_include_dir = "./zlib",
+        prebuilt_header = "zlib.h",
+        prebuilt_libname = "z",
     },
 }
 
@@ -139,21 +136,21 @@ DEPENDENCIES_METADATA = {
 MINIAUDIO_DEPENDENCIES_METADATA = {
     {
         name = "opus",
-        header = "opus/opus.h",
-        header_subdir = "opus",
+        prebuilt_header = "opus/opus.h",
+        prebuilt_header_subdir = "opus",
     },
     {
         name = "opusfile",
-        header = "opus/opusfile.h",
-        header_subdir = "opus",
+        prebuilt_header = "opus/opusfile.h",
+        prebuilt_header_subdir = "opus",
     },
     {
         name = "vorbis",
-        header = "vorbis/vorbisfile.h",
+        prebuilt_header = "vorbis/vorbisfile.h",
     },
     {
         name = "ogg",
-        header = "ogg/ogg.h",
+        prebuilt_header = "ogg/ogg.h",
     },
 }
 
@@ -266,8 +263,8 @@ local function ResolvePreBuiltDependencyDirectory(dep)
     local include_dir_var = upper .. "_INCLUDE_DIR"
     local lib_name_var = upper .. "_LIB_NAME"
     local lib_dir_var = upper .. "_LIB_DIR"
-    _G[include_dir_var] = GetParam(dep.name .. "-include-dir") or FindHeaderWithSubDir(dep.header, dep.header_subdir)
-    _G[lib_name_var] = GetParam(dep.name .. "-lib-name") or _G[lib_name_var] or dep.name
+    _G[include_dir_var] = GetParam(dep.name .. "-include-dir") or FindHeaderWithSubDir(dep.prebuilt_header, dep.prebuilt_header_subdir)
+    _G[lib_name_var] = GetParam(dep.name .. "-lib-name") or dep.prebuilt_libname or dep.name
     _G[lib_dir_var] = GetParam(dep.name .. "-lib-dir") or os.findlib(_G[lib_name_var])
     ResolveDirectoryVariableToFullPath(include_dir_var)
     ResolveDirectoryVariableToFullPath(lib_dir_var)
@@ -277,7 +274,9 @@ end
 local function ResolveBuildFromSourceDependencyDirectory(dep)
     local upper = string.upper(dep.name)
     local include_dir_var = upper .. "_INCLUDE_DIR"
-    _G[include_dir_var] = dep.local_include_dir
+    local source_dir = dep.source_dir or ("./" .. dep.name)
+    local source_header_subdir = dep.source_header_subdir or "."
+    _G[include_dir_var] = path.join(source_dir, source_header_subdir)
     ResolveDirectoryVariableToFullPath(include_dir_var)
 end
 
@@ -520,7 +519,7 @@ workspace "YGOPro"
     for _, dep in ipairs(DEPENDENCIES_METADATA) do
         if _G["BUILD_" .. string.upper(dep.name)] then
             -- Build dependency as subproject, using our pre-provided premake script (copy from the premake directory of the project before running premake)
-            include(dep.name .. "/.")
+            include(path.join(dep.source_dir or dep.name, "."))
         end
     end
     if USE_AUDIO then
