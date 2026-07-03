@@ -103,6 +103,7 @@ DEPENDENCIES_METADATA = {
         name = "sqlite",
         prebuilt_header = "sqlite3.h",
         prebuilt_libname = "sqlite3",
+        source_dir = "sqlite3",
     },
     {
         name = "irrlicht",

@@ -178,7 +178,7 @@ jobs:
     - name: Extract sqlite
       run: |
         7z x ${{ steps.sqlite.outputs.filepath }}
-        mv sqlite-amalgamation-3510300 sqlite
+        mv sqlite-amalgamation-3510300 sqlite3
 
     - name: Download lzma (xz)
       id: lzma
@@ -257,7 +257,7 @@ jobs:
           !jpeg/testimages/
           png/
           zlib/
-          sqlite/
+          sqlite3/
           lzma/
           miniaudio/
           !miniaudio/external/opus/dnn/
