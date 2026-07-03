@@ -1191,7 +1191,7 @@ void Game::MainLoop() {
 	device->drop();
 }
 int Game::ScaleFrame(int frame60) const {
-	if(device->isWindowMinimized()) return frame60;
+	if(gameConf.vsync && device->isWindowMinimized()) return frame60;
 	int scaled = (int)(frame60 * fpsScale + 0.5f);
 	return scaled < 1 ? 1 : scaled;
 }
