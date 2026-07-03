@@ -816,6 +816,10 @@ void Game::DrawGUI() {
 				fu.fadingUL.Y += fadingDiff;
 				fu.fadingLR.Y -= fadingDiff;
 			}
+			if(fu.isFadein && fu.fadingFrame == fu.fadingHalf) {
+				fu.fadingUL.X = fu.fadingSize.UpperLeftCorner.X;
+				fu.fadingLR.X = fu.fadingSize.LowerRightCorner.X;
+			}
 			fu.fadingFrame--;
 			if(fu.fadingFrame > 0) {
 				fu.guiFading->setRelativePosition(irr::core::recti(
@@ -1095,14 +1099,14 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 			fu.fadingSize = fit->fadingSize;
 	irr::core::vector2di center = fu.fadingSize.getCenter();
 	int frame = ScaleFrame(10);
-	fu.fadingDiff.X = static_cast<irr::f32>(fu.fadingSize.getWidth()) / frame;
-	fu.fadingDiff.Y = static_cast<irr::f32>(fu.fadingSize.getHeight() - 4) / frame;
+	fu.fadingFrame = frame;
+	fu.fadingHalf = frame / 2;
+	fu.fadingDiff.X = static_cast<irr::f32>(fu.fadingSize.getWidth()) / ((fu.fadingFrame - fu.fadingHalf) * 2);
+	fu.fadingDiff.Y = static_cast<irr::f32>(fu.fadingSize.getHeight() - 4) / (fu.fadingHalf * 2);
 	fu.fadingUL = irr::core::vector2df(center.X, center.Y - 2);
 	fu.fadingLR = irr::core::vector2df(center.X, center.Y + 2);
 	fu.guiFading = win;
 	fu.isFadein = true;
-	fu.fadingFrame = frame;
-	fu.fadingHalf = frame / 2;
 	fu.autoFadeoutFrame = autoframe ? ScaleFrame(autoframe) : 0;
 	fu.signalAction = false;
 	SetImageButtonDrawing(win, false);
@@ -1119,14 +1123,14 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 		if(win == fit->guiFading)
 			fu.fadingSize = fit->fadingSize;
 	int frame = ScaleFrame(10);
-	fu.fadingDiff.X = static_cast<irr::f32>(fu.fadingSize.getWidth()) / frame;
-	fu.fadingDiff.Y = static_cast<irr::f32>(fu.fadingSize.getHeight() - 4) / frame;
+	fu.fadingFrame = frame;
+	fu.fadingHalf = frame / 2;
+	fu.fadingDiff.X = static_cast<irr::f32>(fu.fadingSize.getWidth()) / (fu.fadingHalf * 2);
+	fu.fadingDiff.Y = static_cast<irr::f32>(fu.fadingSize.getHeight() - 4) / ((fu.fadingFrame - fu.fadingHalf) * 2);
 	fu.fadingUL = irr::core::vector2df(fu.fadingSize.UpperLeftCorner.X, fu.fadingSize.UpperLeftCorner.Y);
 	fu.fadingLR = irr::core::vector2df(fu.fadingSize.LowerRightCorner.X, fu.fadingSize.LowerRightCorner.Y);
 	fu.guiFading = win;
 	fu.isFadein = false;
-	fu.fadingFrame = frame;
-	fu.fadingHalf = frame / 2;
 	fu.autoFadeoutFrame = 0;
 	fu.signalAction = set_action;
 	SetImageButtonDrawing(win, false);
