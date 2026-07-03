@@ -158,9 +158,9 @@ struct FadingUnit {
 	int autoFadeoutFrame{};
 	irr::gui::IGUIElement* guiFading{};
 	irr::core::recti fadingSize;
-	irr::core::vector2di fadingUL;
-	irr::core::vector2di fadingLR;
-	irr::core::vector2di fadingDiff;
+	irr::core::vector2df fadingUL;
+	irr::core::vector2df fadingLR;
+	irr::core::vector2df fadingDiff;
 };
 
 class Game {

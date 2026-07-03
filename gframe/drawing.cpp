@@ -804,43 +804,36 @@ void Game::DrawGUI() {
 	for(auto fit = fadingList.begin(); fit != fadingList.end();) {
 		auto fthis = fit++;
 		FadingUnit& fu = *fthis;
-		if(fu.fadingFrame) {
+		if(fu.fadingFrame > 0) {
 			fu.guiFading->setVisible(true);
-			if(fu.isFadein) {
-				if(fu.fadingFrame > fu.fadingHalf) {
-					fu.fadingUL.X -= fu.fadingDiff.X;
-					fu.fadingLR.X += fu.fadingDiff.X;
-					fu.fadingFrame--;
-					fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
-				} else {
-					fu.fadingUL.Y -= fu.fadingDiff.Y;
-					fu.fadingLR.Y += fu.fadingDiff.Y;
-					fu.fadingFrame--;
-					if(!fu.fadingFrame) {
-						fu.guiFading->setRelativePosition(fu.fadingSize);
-						SetImageButtonDrawing(fu.guiFading, true);
-						env->setFocus(fu.guiFading);
-					} else
-						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
-				}
+			const bool isFirstHalf = fu.fadingFrame > fu.fadingHalf;
+			if(fu.isFadein == isFirstHalf) {
+				const auto fadingDiff = fu.fadingDiff.X * (fu.isFadein ? -1 : 1);
+				fu.fadingUL.X += fadingDiff;
+				fu.fadingLR.X -= fadingDiff;
 			} else {
-				if(fu.fadingFrame > fu.fadingHalf) {
-					fu.fadingUL.Y += fu.fadingDiff.Y;
-					fu.fadingLR.Y -= fu.fadingDiff.Y;
-					fu.fadingFrame--;
-					fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
+				const auto fadingDiff = fu.fadingDiff.Y * (fu.isFadein ? -1 : 1);
+				fu.fadingUL.Y += fadingDiff;
+				fu.fadingLR.Y -= fadingDiff;
+			}
+			fu.fadingFrame--;
+			if(fu.fadingFrame > 0) {
+				fu.guiFading->setRelativePosition(irr::core::recti(
+					static_cast<irr::s32>(fu.fadingUL.X),
+					static_cast<irr::s32>(fu.fadingUL.Y),
+					static_cast<irr::s32>(fu.fadingLR.X),
+					static_cast<irr::s32>(fu.fadingLR.Y)
+				));
+			} else {
+				fu.guiFading->setRelativePosition(fu.fadingSize);
+				if(fu.isFadein) {
+					SetImageButtonDrawing(fu.guiFading, true);
+					env->setFocus(fu.guiFading);
 				} else {
-					fu.fadingUL.X += fu.fadingDiff.X;
-					fu.fadingLR.X -= fu.fadingDiff.X;
-					fu.fadingFrame--;
-					if(!fu.fadingFrame) {
-						fu.guiFading->setVisible(false);
-						fu.guiFading->setRelativePosition(fu.fadingSize);
-						SetImageButtonDrawing(fu.guiFading, false);
-					} else
-						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
+					fu.guiFading->setVisible(false);
+					SetImageButtonDrawing(fu.guiFading, false);
 				}
-				if(fu.signalAction && !fu.fadingFrame) {
+				if(fu.signalAction) {
 					DuelClient::SendResponse();
 					fu.signalAction = false;
 				}
@@ -1102,18 +1095,16 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 			fu.fadingSize = fit->fadingSize;
 	irr::core::vector2di center = fu.fadingSize.getCenter();
 	int frame = ScaleFrame(10);
-	fu.fadingDiff.X = fu.fadingSize.getWidth() / frame;
-	fu.fadingDiff.Y = (fu.fadingSize.getHeight() - 4) / frame;
-	fu.fadingUL = center;
-	fu.fadingLR = center;
-	fu.fadingUL.Y -= 2;
-	fu.fadingLR.Y += 2;
+	fu.fadingDiff.X = static_cast<irr::f32>(fu.fadingSize.getWidth()) / frame;
+	fu.fadingDiff.Y = static_cast<irr::f32>(fu.fadingSize.getHeight() - 4) / frame;
+	fu.fadingUL = irr::core::vector2df(center.X, center.Y - 2);
+	fu.fadingLR = irr::core::vector2df(center.X, center.Y + 2);
 	fu.guiFading = win;
 	fu.isFadein = true;
 	fu.fadingFrame = frame;
 	fu.fadingHalf = frame / 2;
 	fu.autoFadeoutFrame = autoframe ? ScaleFrame(autoframe) : 0;
-	fu.signalAction = 0;
+	fu.signalAction = false;
 	SetImageButtonDrawing(win, false);
 	win->setRelativePosition(irr::core::recti(center.X, center.Y, 0, 0));
 	win->setVisible(true);
@@ -1128,10 +1119,10 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 		if(win == fit->guiFading)
 			fu.fadingSize = fit->fadingSize;
 	int frame = ScaleFrame(10);
-	fu.fadingDiff.X = fu.fadingSize.getWidth() / frame;
-	fu.fadingDiff.Y = (fu.fadingSize.getHeight() - 4) / frame;
-	fu.fadingUL = fu.fadingSize.UpperLeftCorner;
-	fu.fadingLR = fu.fadingSize.LowerRightCorner;
+	fu.fadingDiff.X = static_cast<irr::f32>(fu.fadingSize.getWidth()) / frame;
+	fu.fadingDiff.Y = static_cast<irr::f32>(fu.fadingSize.getHeight() - 4) / frame;
+	fu.fadingUL = irr::core::vector2df(fu.fadingSize.UpperLeftCorner.X, fu.fadingSize.UpperLeftCorner.Y);
+	fu.fadingLR = irr::core::vector2df(fu.fadingSize.LowerRightCorner.X, fu.fadingSize.LowerRightCorner.Y);
 	fu.guiFading = win;
 	fu.isFadein = false;
 	fu.fadingFrame = frame;
