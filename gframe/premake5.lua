@@ -13,6 +13,7 @@ project "YGOPro"
 
 
     if BUILD_FREETYPE then
+        -- Add custom include directory for FreeType before the default include directory
         includedirs { FREETYPE_CUSTOM_INCLUDE_DIR }
     end
 

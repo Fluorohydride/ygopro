@@ -257,7 +257,7 @@ local function ResolveDirectoryVariableToFullPath(varname)
     _G[varname] = path.getabsolute(dir)
 end
 
--- Get dependency directories from command line or environment variables, and check their validity.
+-- Set dependency directories from command line or environment variables, and check their validity.
 local function ResolvePreBuiltDependencyDirectory(dep)
     local upper = string.upper(dep.name)
     local include_dir_var = upper .. "_INCLUDE_DIR"
