@@ -17,13 +17,13 @@
 namespace ygo {
 
 namespace {
-	unsigned connect_state{};
+	unsigned connect_state{ CONNECT_STATE_NONE };
 	unsigned char response_buf[SIZE_RETURN_VALUE]{};
 	size_t response_len{};
 	unsigned int watching{};
 	bool is_host{};
 	event_base* client_base{};
-	bool is_closing{};
+	unsigned close_reason{};
 	bool is_swapping{};
 	int select_hint{};
 	int select_unselect_hint{};
@@ -48,12 +48,13 @@ unsigned char DuelClient::selftype = 0;
 std::vector<HostPacket> DuelClient::hosts;
 
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
-	if(connect_state)
+	if(connect_state != CONNECT_STATE_NONE)
 		return false;
 	sockaddr_in sin;
 	client_base = event_base_new();
 	if(!client_base)
 		return false;
+	close_reason = CLIENT_CLOSE_REASON_NONE;
 	std::memset(&sin, 0, sizeof sin);
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = htonl(ip);
@@ -67,7 +68,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 		client_base = 0;
 		return false;
 	}
-	connect_state = 0x1;
+	connect_state = CONNECT_STATE_CONNECTING;
 	rnd.seed(std::random_device()());
 	if(!create_game) {
 		timeval timeout = {5, 0};
@@ -78,9 +79,9 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 	return true;
 }
 void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
-	if(connect_state == 0x7)
+	if(connect_state & CONNECT_STATE_JOINED)
 		return;
-	if(!is_closing) {
+	if(close_reason == CLIENT_CLOSE_REASON_NONE) {
 		mainGame->btnCreateHost->setEnabled(true);
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
@@ -95,16 +96,15 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 		mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400));
 		mainGame->gMutex.unlock();
 	}
-	event_base_loopbreak(client_base);
+	if(client_base)
+		event_base_loopbreak(client_base);
 }
-void DuelClient::StopClient(bool is_exiting) {
-	if(connect_state != 0x7)
+void DuelClient::StopClient(unsigned reason) {
+	if(connect_state == CONNECT_STATE_NONE)
 		return;
-	is_closing = is_exiting;
-	if(!is_closing) {
-
-	}
-	event_base_loopbreak(client_base);
+	close_reason = reason;
+	if(client_base)
+		event_base_loopbreak(client_base);
 }
 void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
@@ -176,11 +176,11 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 			SendPacketToServer(CTOS_JOIN_GAME, csjg);
 		}
 		bufferevent_enable(bev, EV_READ);
-		connect_state |= 0x2;
+		connect_state |= CONNECT_STATE_CONNECTED;
 	} else if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
 		bufferevent_disable(bev, EV_READ);
-		if(!is_closing) {
-			if(connect_state == 0x1) {
+		if(close_reason == CLIENT_CLOSE_REASON_NONE) {
+			if(!(connect_state & CONNECT_STATE_JOINED)) {
 				mainGame->btnCreateHost->setEnabled(true);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
@@ -192,9 +192,12 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 				else if(!mainGame->bot_mode && !mainGame->wLanWindow->isVisible())
 					mainGame->ShowElement(mainGame->wLanWindow);
 				soundManager.PlaySoundEffect(SOUND_INFO);
-				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400));
+				if(connect_state == CONNECT_STATE_CONNECTING)
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400));
+				else
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 				mainGame->gMutex.unlock();
-			} else if(connect_state == 0x7) {
+			} else {
 				if(!mainGame->dInfo.isStarted && !mainGame->is_building) {
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
@@ -251,7 +254,7 @@ void DuelClient::ClientThread() {
 	event_base_free(client_base);
 	client_bev = 0;
 	client_base = 0;
-	connect_state = 0;
+	connect_state = CONNECT_STATE_NONE;
 }
 void DuelClient::HandleSTOCPacketLan(unsigned char* data, size_t len) {
 	unsigned char* pdata = data;
@@ -535,7 +538,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, size_t len) {
 		mainGame->dInfo.duel_rule = pkt->info.duel_rule;
 		mainGame->dInfo.start_lp = pkt->info.start_lp;
 		watching = 0;
-		connect_state |= 0x4;
+		connect_state |= CONNECT_STATE_JOINED;
 		break;
 	}
 	case STOC_TYPE_CHANGE: {
@@ -4139,7 +4142,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 	if(events & EV_TIMEOUT) {
 		evutil_closesocket(fd);
 		event_base_loopbreak((event_base*)arg);
-		if(!is_closing)
+		if(close_reason != CLIENT_CLOSE_REASON_EXIT)
 			mainGame->btnLanRefresh->setEnabled(true);
 	} else if(events & EV_READ) {
 		sockaddr_in bc_addr;
@@ -4151,7 +4154,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 		HostPacket packet;
 		std::memcpy(&packet, buf, sizeof packet);
 		HostPacket* pHP = &packet;
-		if(is_closing || pHP->identifier != NETWORK_SERVER_ID)
+		if(close_reason == CLIENT_CLOSE_REASON_EXIT || pHP->identifier != NETWORK_SERVER_ID)
 			return;
 		if(pHP->version != PRO_VERSION)
 			return;

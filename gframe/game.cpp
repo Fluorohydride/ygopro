@@ -1153,7 +1153,7 @@ void Game::MainLoop() {
 	else
 		timeEndPeriod(1);
 #endif
-	DuelClient::StopClient(true);
+	DuelClient::StopClient(CLIENT_CLOSE_REASON_EXIT);
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
