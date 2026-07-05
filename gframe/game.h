@@ -265,6 +265,9 @@ public:
 	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(irr::gui::ECURSOR_ICON icon);
+
+	static bool SpawnAsync(const std::wstring& exePath, const std::vector<std::wstring>& args);
+
 	template<typename T>
 	static void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const irr::core::rect<irr::s32>& position, const irr::core::rect<irr::s32>& padding,
 		irr::video::SColor color = 0xffffffff, irr::video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const irr::core::rect<irr::s32>* clip = nullptr);
