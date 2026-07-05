@@ -4275,7 +4275,7 @@ unsigned int DuelClient::ResolveHostName(const char* hostname, const char* port)
 	if(evutil_getaddrinfo(hostname, port, &hints, &answer) != 0 || answer == nullptr) {
 		return 0;
 	}
-	if(!answer->ai_addr) {
+	if(!answer->ai_addr || answer->ai_addrlen < sizeof(sockaddr_in) || answer->ai_family != AF_INET) {
 		evutil_freeaddrinfo(answer);
 		return 0;
 	}
