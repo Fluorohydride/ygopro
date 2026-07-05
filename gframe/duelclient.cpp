@@ -33,6 +33,7 @@ namespace {
 	wchar_t event_string[256]{};
 	std::mt19937 rnd{};
 	std::uniform_real_distribution<float> real_dist{};
+	unsigned char duel_client_read[SIZE_NETWORK_BUFFER]{};
 
 	bool is_refreshing{};
 	int match_kill{};
@@ -110,7 +111,6 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	size_t len = evbuffer_get_length(input);
 	if (len < 2)
 		return;
-	unsigned char* duel_client_read = new unsigned char[SIZE_NETWORK_BUFFER];
 	uint16_t packet_len = 0;
 	while (len >= 2) {
 		evbuffer_copyout(input, &packet_len, sizeof packet_len);
@@ -121,7 +121,6 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 			HandleSTOCPacketLan(&duel_client_read[2], read_len - 2);
 		len -= packet_len + 2;
 	}
-	delete[] duel_client_read;
 }
 void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 	if (events & BEV_EVENT_CONNECTED) {
@@ -246,14 +245,13 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 		event_base_loopexit(client_base, 0);
 	}
 }
-int DuelClient::ClientThread() {
+void DuelClient::ClientThread() {
 	event_base_dispatch(client_base);
 	bufferevent_free(client_bev);
 	event_base_free(client_base);
 	client_bev = 0;
 	client_base = 0;
 	connect_state = 0;
-	return 0;
 }
 void DuelClient::HandleSTOCPacketLan(unsigned char* data, size_t len) {
 	unsigned char* pdata = data;
