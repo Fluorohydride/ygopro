@@ -352,6 +352,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if (!Game::SpawnAsync(executableName, processArgs)) {
 					DuelClient::StopClient();
 					NetServer::StopServer();
+					mainGame->btnCreateHost->setEnabled(true);
+					mainGame->btnJoinHost->setEnabled(true);
+					mainGame->btnJoinCancel->setEnabled(true);
+					mainGame->btnStartBot->setEnabled(true);
+					mainGame->btnBotCancel->setEnabled(true);
+					mainGame->HideElement(mainGame->wHostPrepare);
+					if(!mainGame->wSinglePlay->isVisible())
+						mainGame->ShowElement(mainGame->wSinglePlay);
+					mainGame->wChat->setVisible(false);
+					soundManager.PlaySoundEffect(SOUND_INFO);
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1401));
 					break;
 				}
 				mainGame->btnStartBot->setEnabled(false);
