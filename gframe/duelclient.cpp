@@ -112,6 +112,8 @@ void DuelClient::StopClient(unsigned reason) {
 	if(connect_state == CONNECT_STATE_NONE)
 		return;
 	close_reason = reason;
+	if(client_bev)
+		bufferevent_disable(client_bev, EV_READ | EV_WRITE);
 	if(client_base)
 		event_base_loopbreak(client_base);
 }
