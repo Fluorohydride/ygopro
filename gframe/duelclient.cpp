@@ -23,6 +23,7 @@ namespace {
 	unsigned int watching{};
 	bool is_host{};
 	event_base* client_base{};
+	event* connect_timeout_event{};
 	unsigned close_reason{};
 	bool is_swapping{};
 	int select_hint{};
@@ -40,6 +41,14 @@ namespace {
 	std::set<std::pair<unsigned int, unsigned short>> remotes{};
 	event* resp_event{};
 	const std::set<int> select_effectyn_id{ 95, 96, 97, 218, 219, 220 };
+
+	void CancelConnectTimeout() {
+		if(!connect_timeout_event)
+			return;
+		event_del(connect_timeout_event);
+		event_free(connect_timeout_event);
+		connect_timeout_event = nullptr;
+	}
 }
 
 bufferevent* DuelClient::client_bev = 0;
@@ -72,8 +81,8 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 	rnd.seed(std::random_device()());
 	if(!create_game) {
 		timeval timeout = {5, 0};
-		event* timeout_event = event_new(client_base, 0, EV_TIMEOUT, ConnectTimeout, 0);
-		event_add(timeout_event, &timeout);
+		connect_timeout_event = event_new(client_base, 0, EV_TIMEOUT, ConnectTimeout, 0);
+		event_add(connect_timeout_event, &timeout);
 	}
 	std::thread(ClientThread).detach();
 	return true;
@@ -250,6 +259,7 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 }
 void DuelClient::ClientThread() {
 	event_base_dispatch(client_base);
+	CancelConnectTimeout();
 	bufferevent_free(client_bev);
 	event_base_free(client_base);
 	client_bev = 0;
@@ -539,6 +549,7 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, size_t len) {
 		mainGame->dInfo.start_lp = pkt->info.start_lp;
 		watching = 0;
 		connect_state |= CONNECT_STATE_JOINED;
+		CancelConnectTimeout();
 		break;
 	}
 	case STOC_TYPE_CHANGE: {
