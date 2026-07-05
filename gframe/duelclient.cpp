@@ -42,6 +42,12 @@ namespace {
 	event* resp_event{};
 	const std::set<int> select_effectyn_id{ 95, 96, 97, 218, 219, 220 };
 
+	void EndRefreshHost() {
+		is_refreshing = false;
+		if(close_reason != CLIENT_CLOSE_REASON_EXIT)
+			mainGame->btnLanRefresh->setEnabled(true);
+	}
+
 	void CancelConnectTimeout() {
 		if(!connect_timeout_event)
 			return;
@@ -4092,13 +4098,40 @@ void DuelClient::BeginRefreshHost() {
 	mainGame->lstHostList->clear();
 	remotes.clear();
 	hosts.clear();
+	std::vector<unsigned int> local_addresses;
+	char hname[256]{};
+	if(gethostname(hname, sizeof(hname) - 1) != SOCKET_ERROR) {
+		evutil_addrinfo hints{};
+		hints.ai_family = AF_INET;
+		hints.ai_socktype = SOCK_DGRAM;
+		hints.ai_protocol = IPPROTO_UDP;
+		hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
+		evutil_addrinfo* answer = nullptr;
+		if(evutil_getaddrinfo(hname, nullptr, &hints, &answer) == 0 && answer) {
+			for(auto addr = answer; addr; addr = addr->ai_next) {
+				if(!addr->ai_addr || addr->ai_addrlen < sizeof(sockaddr_in))
+					continue;
+				auto* sin = reinterpret_cast<sockaddr_in*>(addr->ai_addr);
+				if(std::find(local_addresses.begin(), local_addresses.end(), sin->sin_addr.s_addr) == local_addresses.end())
+					local_addresses.push_back(sin->sin_addr.s_addr);
+			}
+		}
+		if(answer)
+			evutil_freeaddrinfo(answer);
+	}
+	if(local_addresses.empty())
+		local_addresses.push_back(INADDR_ANY);
 	event_base* broadev = event_base_new();
-	char hname[256];
-	gethostname(hname, 256);
-	hostent* host = gethostbyname(hname);
-	if(!host)
+	if(!broadev) {
+		EndRefreshHost();
 		return;
+	}
 	SOCKET reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if(reply == INVALID_SOCKET) {
+		event_base_free(broadev);
+		EndRefreshHost();
+		return;
+	}
 	sockaddr_in reply_addr;
 	std::memset(&reply_addr, 0, sizeof reply_addr);
 	reply_addr.sin_family = AF_INET;
@@ -4106,11 +4139,22 @@ void DuelClient::BeginRefreshHost() {
 	reply_addr.sin_addr.s_addr = 0;
 	if(bind(reply, (sockaddr*)&reply_addr, sizeof(reply_addr)) == SOCKET_ERROR) {
 		closesocket(reply);
+		event_base_free(broadev);
+		EndRefreshHost();
 		return;
 	}
 	timeval timeout = {3, 0};
 	resp_event = event_new(broadev, reply, EV_TIMEOUT | EV_READ | EV_PERSIST, BroadcastReply, broadev);
-	event_add(resp_event, &timeout);
+	if(!resp_event || event_add(resp_event, &timeout) != 0) {
+		if(resp_event) {
+			event_free(resp_event);
+			resp_event = nullptr;
+		}
+		closesocket(reply);
+		event_base_free(broadev);
+		EndRefreshHost();
+		return;
+	}
 	std::thread(RefreshThread, broadev).detach();
 	//send request
 	SOCKADDR_IN local;
@@ -4122,20 +4166,16 @@ void DuelClient::BeginRefreshHost() {
 	sockTo.sin_port = htons(7920);
 	HostRequest hReq;
 	hReq.identifier = NETWORK_CLIENT_ID;
-	for(int i = 0; i < 8; ++i) {
-		if(host->h_addr_list[i] == 0)
-			break;
-		unsigned int local_addr = 0;
-		std::memcpy(&local_addr, host->h_addr_list[i], sizeof local_addr);
+	for(auto local_addr : local_addresses) {
 		local.sin_addr.s_addr = local_addr;
 		SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 		if(sSend == INVALID_SOCKET)
-			break;
+			continue;
 		int opt = TRUE;
 		setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof opt);
 		if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_ERROR) {
 			closesocket(sSend);
-			break;
+			continue;
 		}
 		sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
 		closesocket(sSend);
@@ -4147,16 +4187,14 @@ int DuelClient::RefreshThread(event_base* broadev) {
 	event_get_assignment(resp_event, 0, &fd, 0, 0, 0);
 	evutil_closesocket(fd);
 	event_free(resp_event);
+	resp_event = nullptr;
 	event_base_free(broadev);
-	is_refreshing = false;
+	EndRefreshHost();
 	return 0;
 }
 void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 	if(events & EV_TIMEOUT) {
-		evutil_closesocket(fd);
 		event_base_loopbreak((event_base*)arg);
-		if(close_reason != CLIENT_CLOSE_REASON_EXIT)
-			mainGame->btnLanRefresh->setEnabled(true);
 	} else if(events & EV_READ) {
 		sockaddr_in bc_addr;
 		socklen_t sz = sizeof(sockaddr_in);
