@@ -319,12 +319,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 					break;
 				}
-				if(!DuelClient::StartClient(localhost, bot_server_port)) {
-					NetServer::StopServer();
-					soundManager.PlaySoundEffect(SOUND_INFO);
-					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
-					break;
-				}
 				std::vector<std::wstring> processArgs;
 				wchar_t arg1[512];
 				if(mainGame->botInfo[sel].select_deckfile) {
@@ -344,20 +338,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 #else
 				std::wstring executableName = L"./bot";
 #endif
-				if (!Game::SpawnAsync(executableName, processArgs)) {
-					DuelClient::StopClient();
+				mainGame->pending_bot_executable = executableName;
+				mainGame->pending_bot_args = processArgs;
+				if(!DuelClient::StartClient(localhost, bot_server_port)) {
+					mainGame->pending_bot_executable.clear();
+					mainGame->pending_bot_args.clear();
 					NetServer::StopServer();
-					mainGame->btnCreateHost->setEnabled(true);
-					mainGame->btnJoinHost->setEnabled(true);
-					mainGame->btnJoinCancel->setEnabled(true);
-					mainGame->btnStartBot->setEnabled(true);
-					mainGame->btnBotCancel->setEnabled(true);
-					mainGame->HideElement(mainGame->wHostPrepare);
-					if(!mainGame->wSinglePlay->isVisible())
-						mainGame->ShowElement(mainGame->wSinglePlay);
-					mainGame->wChat->setVisible(false);
 					soundManager.PlaySoundEffect(SOUND_INFO);
-					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1401));
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 					break;
 				}
 				mainGame->btnStartBot->setEnabled(false);

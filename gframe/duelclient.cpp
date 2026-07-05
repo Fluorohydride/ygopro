@@ -635,6 +635,29 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, size_t len) {
 			}
 		}
 		mainGame->dInfo.player_type = selftype;
+		if(mainGame->bot_mode && !mainGame->pending_bot_executable.empty()) {
+			std::wstring executableName = mainGame->pending_bot_executable;
+			std::vector<std::wstring> processArgs = mainGame->pending_bot_args;
+			mainGame->pending_bot_executable.clear();
+			mainGame->pending_bot_args.clear();
+			if(!is_host) break; // should not happen
+			if(!Game::SpawnAsync(executableName, processArgs)) {
+				StopClient();
+				// don't call NetServer::StopServer(), StopClient will trigger LeaveGame, which will call StopServer
+				mainGame->btnCreateHost->setEnabled(true);
+				mainGame->btnJoinHost->setEnabled(true);
+				mainGame->btnJoinCancel->setEnabled(true);
+				mainGame->btnStartBot->setEnabled(true);
+				mainGame->btnBotCancel->setEnabled(true);
+				mainGame->gMutex.lock();
+				mainGame->HideElement(mainGame->wHostPrepare);
+				mainGame->ShowElement(mainGame->wSinglePlay);
+				mainGame->wChat->setVisible(false);
+				soundManager.PlaySoundEffect(SOUND_INFO);
+				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1439));
+				mainGame->gMutex.unlock();
+			}
+		}
 		break;
 	}
 	case STOC_DUEL_START: {
