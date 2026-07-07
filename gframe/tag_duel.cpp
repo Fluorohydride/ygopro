@@ -1564,6 +1564,24 @@ void TagDuel::EndDuel() {
 	event_del(etimer);
 	pduel = 0;
 }
+void TagDuel::OnPlayerDisconnected(DuelPlayer* dp) {
+	if(host_player == dp)
+		host_player = nullptr;
+	for(int i = 0; i < 4; ++i) {
+		if(players[i] == dp) {
+			players[i] = nullptr;
+			ready[i] = false;
+			surrender[i] = false;
+		}
+		if(pplayer[i] == dp)
+			pplayer[i] = nullptr;
+	}
+	for(int i = 0; i < 2; ++i) {
+		if(cur_player[i] == dp)
+			cur_player[i] = nullptr;
+	}
+	observers.erase(dp);
+}
 void TagDuel::WaitforResponse(int playerid) {
 	last_response = playerid;
 	unsigned char msg = MSG_WAITING;

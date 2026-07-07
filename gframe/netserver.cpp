@@ -19,6 +19,7 @@ namespace{
 
 unsigned char NetServer::net_server_write[SIZE_NETWORK_BUFFER]{};
 size_t NetServer::last_sent{};
+bufferevent* NetServer::disconnecting_bev = nullptr;
 
 bool NetServer::StartServer(unsigned short port) {
 	if(net_evbase)
@@ -146,10 +147,13 @@ void NetServer::ServerEchoEvent(bufferevent* bev, short events, void* ctx) {
 	if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
 		DuelPlayer* dp = &users[bev];
 		DuelMode* dm = dp->game;
+		auto* prev_disconnect = disconnecting_bev;
+		disconnecting_bev = bev;
 		if(dm)
 			dm->LeaveGame(dp);
 		else
 			DisconnectPlayer(dp);
+		disconnecting_bev = prev_disconnect;
 	}
 }
 void NetServer::ServerThread() {
@@ -179,9 +183,14 @@ void NetServer::ServerThread() {
 void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 	auto bit = users.find(dp->bev);
 	if(bit != users.end()) {
+		if(dp->game) {
+			dp->game->OnPlayerDisconnected(dp);
+			dp->game = nullptr;
+		}
 		bufferevent_flush(dp->bev, EV_WRITE, BEV_FLUSH);
 		bufferevent_disable(dp->bev, EV_READ);
 		bufferevent_free(dp->bev);
+		dp->bev = nullptr;
 		users.erase(bit);
 	}
 }
