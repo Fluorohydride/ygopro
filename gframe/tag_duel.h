@@ -47,24 +47,23 @@ private:
 	int WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache);
 	
 protected:
-	DuelPlayer* players[4];
-	DuelPlayer* pplayer[4];
-	DuelPlayer* cur_player[2];
+	DuelPlayer* players[4]{};
+	DuelPlayer* pplayer[4]{};
+	DuelPlayer* cur_player[2]{};
 	std::set<DuelPlayer*> observers;
-	bool ready[4];
-	bool surrender[4];
+	bool ready[4]{};
+	bool surrender[4]{};
 	Deck pdeck[4];
-	int deck_error[4];
-	unsigned char hand_result[2];
-	unsigned char last_response;
+	int deck_error[4]{};
+	unsigned char hand_result[2]{};
+	unsigned char last_response{ 0 };
 	Replay last_replay;
 	size_t last_replay_response_size{ 0 };
-	unsigned char turn_count;
-	short time_limit[2];
-	short time_elapsed;
+	unsigned char turn_count{ 0 };
+	short time_limit[2]{};
+	short time_elapsed{ 0 };
 };
 
 }
 
 #endif //TAG_DUEL_H
-

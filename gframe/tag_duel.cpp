@@ -9,15 +9,8 @@
 
 namespace ygo {
 
-TagDuel::TagDuel() {
-	for(int i = 0; i < 4; ++i) {
-		players[i] = 0;
-		ready[i] = false;
-		surrender[i] = false;
-	}
-}
-TagDuel::~TagDuel() {
-}
+TagDuel::TagDuel() = default;
+TagDuel::~TagDuel() = default;
 void TagDuel::Chat(DuelPlayer* dp, unsigned char* pdata, int len) {
 	unsigned char scc[SIZE_STOC_CHAT];
 	const auto scc_size = NetServer::CreateChatPacket(pdata, len, scc, dp->type);
@@ -1609,7 +1602,7 @@ void TagDuel::TimeConfirm(DuelPlayer* dp) {
 	if(time_elapsed < 10)
 		time_elapsed = 0;
 }
-inline int TagDuel::WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache) {
+int TagDuel::WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache) {
 	flag |= (QUERY_CODE | QUERY_POSITION);
 	BufferIO::Write<uint8_t>(qbuf, MSG_UPDATE_DATA);
 	BufferIO::Write<uint8_t>(qbuf, player);
