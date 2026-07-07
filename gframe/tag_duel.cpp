@@ -10,8 +10,7 @@
 namespace ygo {
 
 TagDuel::TagDuel() = default;
-TagDuel::~TagDuel() {
-}
+TagDuel::~TagDuel() = default;
 void TagDuel::Chat(DuelPlayer* dp, unsigned char* pdata, int len) {
 	unsigned char scc[SIZE_STOC_CHAT];
 	const auto scc_size = NetServer::CreateChatPacket(pdata, len, scc, dp->type);

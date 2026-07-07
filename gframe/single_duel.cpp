@@ -12,8 +12,7 @@ namespace ygo {
 SingleDuel::SingleDuel(bool is_match) {
 	match_mode = is_match;
 }
-SingleDuel::~SingleDuel() {
-}
+SingleDuel::~SingleDuel() = default;
 void SingleDuel::Chat(DuelPlayer* dp, unsigned char* pdata, int len) {
 	unsigned char scc[SIZE_STOC_CHAT];
 	const auto scc_size = NetServer::CreateChatPacket(pdata, len, scc, dp->type);
