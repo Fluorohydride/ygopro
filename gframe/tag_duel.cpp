@@ -9,13 +9,7 @@
 
 namespace ygo {
 
-TagDuel::TagDuel() {
-	for(int i = 0; i < 4; ++i) {
-		players[i] = 0;
-		ready[i] = false;
-		surrender[i] = false;
-	}
-}
+TagDuel::TagDuel() = default;
 TagDuel::~TagDuel() {
 }
 void TagDuel::Chat(DuelPlayer* dp, unsigned char* pdata, int len) {
