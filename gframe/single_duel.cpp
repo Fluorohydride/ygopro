@@ -13,6 +13,18 @@ SingleDuel::SingleDuel(bool is_match) {
 	match_mode = is_match;
 }
 SingleDuel::~SingleDuel() = default;
+void SingleDuel::SetPlayerReady(DuelPlayer* dp, bool is_ready) {
+	if(ready[dp->type] == is_ready)
+		return;
+	ready[dp->type] = is_ready;
+	STOC_HS_PlayerChange scpc;
+	scpc.status = (dp->type << 4) | (is_ready ? PLAYERCHANGE_READY : PLAYERCHANGE_NOTREADY);
+	NetServer::SendPacketToPlayer(players[dp->type], STOC_HS_PLAYER_CHANGE, scpc);
+	if(players[1 - dp->type])
+		NetServer::SendPacketToPlayer(players[1 - dp->type], STOC_HS_PLAYER_CHANGE, scpc);
+	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
+}
 void SingleDuel::Chat(DuelPlayer* dp, unsigned char* pdata, int len) {
 	unsigned char scc[SIZE_STOC_CHAT];
 	const auto scc_size = NetServer::CreateChatPacket(pdata, len, scc, dp->type);
@@ -86,6 +98,9 @@ void SingleDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater)
 			dp->type = NETPLAYER_TYPE_PLAYER2;
 			sctc.type |= NETPLAYER_TYPE_PLAYER2;
 		}
+		pending_ready[dp->type] = false;
+		deck_status[dp->type] = DECKSTATUS_EMPTY;
+		pdeck[dp->type].clear();
 	} else {
 		observers.insert(dp);
 		dp->type = NETPLAYER_TYPE_OBSERVER;
@@ -151,6 +166,9 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 			STOC_HS_PlayerChange scpc;
 			players[dp->type] = 0;
 			ready[dp->type] = false;
+			pending_ready[dp->type] = false;
+			deck_status[dp->type] = DECKSTATUS_EMPTY;
+			pdeck[dp->type].clear();
 			scpc.status = (dp->type << 4) | PLAYERCHANGE_LEAVE;
 			if(players[0] && dp->type != 0)
 				NetServer::SendPacketToPlayer(players[0], STOC_HS_PLAYER_CHANGE, scpc);
@@ -203,6 +221,9 @@ void SingleDuel::ToDuelist(DuelPlayer* dp) {
 		dp->type = NETPLAYER_TYPE_PLAYER2;
 		scpe.pos = 1;
 	}
+	pending_ready[dp->type] = false;
+	deck_status[dp->type] = DECKSTATUS_EMPTY;
+	pdeck[dp->type].clear();
 	STOC_HS_WatchChange scwc;
 	scwc.watch_count = (unsigned short)observers.size();
 	NetServer::SendPacketToPlayer(players[0], STOC_HS_PLAYER_ENTER, scpe);
@@ -232,6 +253,9 @@ void SingleDuel::ToObserver(DuelPlayer* dp) {
 		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
 	players[dp->type] = 0;
 	ready[dp->type] = false;
+	pending_ready[dp->type] = false;
+	deck_status[dp->type] = DECKSTATUS_EMPTY;
+	pdeck[dp->type].clear();
 	dp->type = NETPLAYER_TYPE_OBSERVER;
 	observers.insert(dp);
 	STOC_TypeChange sctc;
@@ -241,36 +265,34 @@ void SingleDuel::ToObserver(DuelPlayer* dp) {
 void SingleDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	if(dp->type > 1)
 		return;
-	if(ready[dp->type] == is_ready)
+	if(duel_stage != DUEL_STAGE_BEGIN)
 		return;
-	if(is_ready) {
-		uint32_t deckerror = 0;
-		if(!host_info.no_check_deck) {
-			if(deck_error[dp->type]) {
-				deckerror = (DECKERROR_UNKNOWNCARD << 28) | deck_error[dp->type];
-			} else {
-				deckerror = deckManager.CheckDeck(pdeck[dp->type], host_info.lflist, host_info.rule);
-			}
-		}
-		if(deckerror) {
-			STOC_HS_PlayerChange scpc;
-			scpc.status = (dp->type << 4) | PLAYERCHANGE_NOTREADY;
-			NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
-			STOC_ErrorMsg scem;
-			scem.msg = ERRMSG_DECKERROR;
-			scem.code = deckerror;
-			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
-			return;
-		}
+	if(!is_ready) {
+		pending_ready[dp->type] = false;
+		deck_status[dp->type] = DECKSTATUS_EMPTY;
+		pdeck[dp->type].clear();
+		SetPlayerReady(dp, false);
+		return;
 	}
-	ready[dp->type] = is_ready;
-	STOC_HS_PlayerChange scpc;
-	scpc.status = (dp->type << 4) | (is_ready ? PLAYERCHANGE_READY : PLAYERCHANGE_NOTREADY);
-	NetServer::SendPacketToPlayer(players[dp->type], STOC_HS_PLAYER_CHANGE, scpc);
-	if(players[1 - dp->type])
-		NetServer::SendPacketToPlayer(players[1 - dp->type], STOC_HS_PLAYER_CHANGE, scpc);
-	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
-		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
+	if(ready[dp->type])
+		return;
+	if(deck_status[dp->type] != DECKSTATUS_CONFIRMED) {
+		if(deck_status[dp->type] == DECKSTATUS_REJECTED) {
+			// A rejected deck consumes one ready request; the next deck-only update must not inherit it.
+			deck_status[dp->type] = DECKSTATUS_EMPTY;
+			pending_ready[dp->type] = false;
+		} else {
+			if(pending_ready[dp->type])
+				return;
+			pending_ready[dp->type] = true;
+		}
+		STOC_HS_PlayerChange scpc;
+		scpc.status = (dp->type << 4) | PLAYERCHANGE_NOTREADY;
+		NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
+		return;
+	}
+	pending_ready[dp->type] = false;
+	SetPlayerReady(dp, true);
 }
 void SingleDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 	if(pos > 1 || dp != host_player || dp == players[pos] || !players[pos])
@@ -278,32 +300,72 @@ void SingleDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 	LeaveGame(players[pos]);
 }
 void SingleDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {
-	if(dp->type > 1 || ready[dp->type])
+	if(dp->type > 1)
+		return;
+	if(duel_stage != DUEL_STAGE_BEGIN && duel_stage != DUEL_STAGE_SIDING)
+		return;
+	if(ready[dp->type])
 		return;
 	if (len < sizeof(uint32_t) * 2)
 		return;
-	bool valid = true;
 	uint32_t mainc = BufferIO::Read<uint32_t>(pdata);
 	uint32_t sidec = BufferIO::Read<uint32_t>(pdata);
+	bool deck_failed = false;
+	uint32_t deckerror = 0;
 	if (mainc > MAINC_MAX)
-		valid = false;
+		deck_failed = true;
 	else if (sidec > SIDEC_MAX)
-		valid = false;
+		deck_failed = true;
 	else if (len < (2 + mainc + sidec) * sizeof(uint32_t))
-		valid = false;
-	if (!valid) {
-		STOC_ErrorMsg scem;
-		scem.msg = ERRMSG_DECKERROR;
-		scem.code = 0;
-		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
-		return;
-	}
+		deck_failed = true;
 	uint32_t deckbuf[MAINC_MAX + SIDEC_MAX];
-	std::memcpy(deckbuf, pdata, (mainc + sidec) * sizeof(uint32_t));
-	if(duel_count == 0) {
-		deck_error[dp->type] = DeckManager::LoadDeck(pdeck[dp->type], deckbuf, mainc, sidec);
+	if(!deck_failed)
+		std::memcpy(deckbuf, pdata, (mainc + sidec) * sizeof(uint32_t));
+	if(duel_stage == DUEL_STAGE_BEGIN) {
+		Deck new_deck;
+		if(!deck_failed) {
+			uint32_t load_error = DeckManager::LoadDeck(new_deck, deckbuf, mainc, sidec);
+			if(!host_info.no_check_deck) {
+				// no_check_deck silently ignores unknown cards. In that case, the size of new_deck will not equal mainc + sidec.
+				if(load_error) {
+					deckerror = (DECKERROR_UNKNOWNCARD << 28) | load_error;
+					deck_failed = true;
+				} else if(new_deck.main.size() + new_deck.extra.size() != mainc || new_deck.side.size() != sidec) {
+					deckerror = 0;
+					deck_failed = true;
+				} else {
+					deckerror = deckManager.CheckDeck(new_deck, host_info.lflist, host_info.rule);
+					deck_failed = deckerror != 0;
+				}
+			}
+		}
+		if(deck_failed) {
+			pending_ready[dp->type] = false;
+			deck_status[dp->type] = DECKSTATUS_REJECTED;
+			STOC_ErrorMsg scem;
+			scem.msg = ERRMSG_DECKERROR;
+			scem.code = deckerror;
+			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
+			return;
+		} else {
+			pdeck[dp->type] = std::move(new_deck);
+			deck_status[dp->type] = DECKSTATUS_CONFIRMED;
+			if(pending_ready[dp->type]) {
+				pending_ready[dp->type] = false;
+				SetPlayerReady(dp, true);
+			}
+		}
 	} else {
+		if(deck_failed) {
+			STOC_ErrorMsg scem;
+			scem.msg = ERRMSG_DECKERROR;
+			scem.code = deckerror;
+			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
+			return;
+		}
 		if(DeckManager::LoadSide(pdeck[dp->type], deckbuf, mainc, sidec)) {
+			pending_ready[dp->type] = false;
+			deck_status[dp->type] = DECKSTATUS_EMPTY;
 			ready[dp->type] = true;
 			NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 			if(ready[0] && ready[1]) {
@@ -323,7 +385,9 @@ void SingleDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, unsigned int l
 void SingleDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)
 		return;
-	if(!ready[0] || !ready[1])
+	if(duel_stage != DUEL_STAGE_BEGIN)
+		return;
+	if(!ready[0] || !ready[1] || deck_status[0] != DECKSTATUS_CONFIRMED || deck_status[1] != DECKSTATUS_CONFIRMED)
 		return;
 	NetServer::StopListen();
 	//NetServer::StopBroadcast();
@@ -540,6 +604,10 @@ void SingleDuel::DuelEndProc() {
 			}
 			ready[0] = false;
 			ready[1] = false;
+			pending_ready[0] = false;
+			deck_status[0] = DECKSTATUS_EMPTY;
+			pending_ready[1] = false;
+			deck_status[1] = DECKSTATUS_EMPTY;
 			players[0]->state = CTOS_UPDATE_DECK;
 			players[1]->state = CTOS_UPDATE_DECK;
 			NetServer::SendPacketToPlayer(players[0], STOC_CHANGE_SIDE);

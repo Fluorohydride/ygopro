@@ -330,6 +330,10 @@ public:
 #define MODE_MATCH		0x1
 #define MODE_TAG		0x2
 
+#define DECKSTATUS_EMPTY		0
+#define DECKSTATUS_REJECTED		1
+#define DECKSTATUS_CONFIRMED	2
+
 #define DUEL_STAGE_BEGIN		0
 #define DUEL_STAGE_FINGER		1
 #define DUEL_STAGE_FIRSTGO		2

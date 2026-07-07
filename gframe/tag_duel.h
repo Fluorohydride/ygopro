@@ -44,6 +44,7 @@ public:
 	static void TagTimer(evutil_socket_t fd, short events, void* arg);
 
 private:
+	void SetPlayerReady(DuelPlayer* dp, bool is_ready);
 	int WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache);
 	
 protected:
@@ -52,9 +53,10 @@ protected:
 	DuelPlayer* cur_player[2]{};
 	std::set<DuelPlayer*> observers;
 	bool ready[4]{};
+	bool pending_ready[4]{};
+	unsigned char deck_status[4]{};
 	bool surrender[4]{};
 	Deck pdeck[4];
-	int deck_error[4]{};
 	unsigned char hand_result[2]{};
 	unsigned char last_response{ 0 };
 	Replay last_replay;

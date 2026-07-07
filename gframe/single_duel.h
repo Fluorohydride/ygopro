@@ -44,14 +44,16 @@ public:
 	static void SingleTimer(evutil_socket_t fd, short events, void* arg);
 
 private:
+	void SetPlayerReady(DuelPlayer* dp, bool is_ready);
 	int WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache);
 	
 protected:
 	DuelPlayer* players[2]{};
 	DuelPlayer* pplayer[2]{};
 	bool ready[2]{};
+	bool pending_ready[2]{};
+	unsigned char deck_status[2]{};
 	Deck pdeck[2];
-	int deck_error[2]{};
 	unsigned char hand_result[2]{};
 	unsigned char last_response{ 0 };
 	std::set<DuelPlayer*> observers;

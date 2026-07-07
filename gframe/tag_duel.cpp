@@ -11,6 +11,18 @@ namespace ygo {
 
 TagDuel::TagDuel() = default;
 TagDuel::~TagDuel() = default;
+void TagDuel::SetPlayerReady(DuelPlayer* dp, bool is_ready) {
+	if(ready[dp->type] == is_ready)
+		return;
+	ready[dp->type] = is_ready;
+	STOC_HS_PlayerChange scpc;
+	scpc.status = (dp->type << 4) | (is_ready ? PLAYERCHANGE_READY : PLAYERCHANGE_NOTREADY);
+	for(int i = 0; i < 4; ++i)
+		if(players[i])
+			NetServer::SendPacketToPlayer(players[i], STOC_HS_PLAYER_CHANGE, scpc);
+	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
+}
 void TagDuel::Chat(DuelPlayer* dp, unsigned char* pdata, int len) {
 	unsigned char scc[SIZE_STOC_CHAT];
 	const auto scc_size = NetServer::CreateChatPacket(pdata, len, scc, dp->type);
@@ -79,6 +91,9 @@ void TagDuel::JoinGame(DuelPlayer* dp, unsigned char* pdata, bool is_creater) {
 		players[scpe.pos] = dp;
 		dp->type = scpe.pos;
 		sctc.type |= scpe.pos;
+		pending_ready[dp->type] = false;
+		deck_status[dp->type] = DECKSTATUS_EMPTY;
+		pdeck[dp->type].clear();
 	} else {
 		observers.insert(dp);
 		dp->type = NETPLAYER_TYPE_OBSERVER;
@@ -132,6 +147,9 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 			STOC_HS_PlayerChange scpc;
 			players[dp->type] = 0;
 			ready[dp->type] = false;
+			pending_ready[dp->type] = false;
+			deck_status[dp->type] = DECKSTATUS_EMPTY;
+			pdeck[dp->type].clear();
 			scpc.status = (dp->type << 4) | PLAYERCHANGE_LEAVE;
 			for(int i = 0; i < 4; ++i)
 				if(players[i])
@@ -161,6 +179,9 @@ void TagDuel::ToDuelist(DuelPlayer* dp) {
 		else
 			dp->type = 3;
 		players[dp->type] = dp;
+		pending_ready[dp->type] = false;
+		deck_status[dp->type] = DECKSTATUS_EMPTY;
+		pdeck[dp->type].clear();
 		scpe.pos = dp->type;
 		STOC_HS_WatchChange scwc;
 		scwc.watch_count = (unsigned short)observers.size();
@@ -179,11 +200,12 @@ void TagDuel::ToDuelist(DuelPlayer* dp) {
 	} else {
 		if(ready[dp->type])
 			return;
+		unsigned char oldtype = dp->type;
 		unsigned char dptype = (dp->type + 1) % 4;
 		while(players[dptype])
 			dptype = (dptype + 1) % 4;
 		STOC_HS_PlayerChange scpc;
-		scpc.status = (dp->type << 4) | dptype;
+		scpc.status = (oldtype << 4) | dptype;
 		for(int i = 0; i < 4; ++i)
 			if(players[i])
 				NetServer::SendPacketToPlayer(players[i], STOC_HS_PLAYER_CHANGE, scpc);
@@ -192,8 +214,14 @@ void TagDuel::ToDuelist(DuelPlayer* dp) {
 		STOC_TypeChange sctc;
 		sctc.type = (dp == host_player ? 0x10 : 0) | dptype;
 		NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
+		pending_ready[oldtype] = false;
+		deck_status[oldtype] = DECKSTATUS_EMPTY;
+		pdeck[oldtype].clear();
+		pending_ready[dptype] = false;
+		deck_status[dptype] = DECKSTATUS_EMPTY;
+		pdeck[dptype].clear();
 		players[dptype] = dp;
-		players[dp->type] = 0;
+		players[oldtype] = 0;
 		dp->type = dptype;
 	}
 }
@@ -209,6 +237,9 @@ void TagDuel::ToObserver(DuelPlayer* dp) {
 		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
 	players[dp->type] = 0;
 	ready[dp->type] = false;
+	pending_ready[dp->type] = false;
+	deck_status[dp->type] = DECKSTATUS_EMPTY;
+	pdeck[dp->type].clear();
 	dp->type = NETPLAYER_TYPE_OBSERVER;
 	observers.insert(dp);
 	STOC_TypeChange sctc;
@@ -216,36 +247,36 @@ void TagDuel::ToObserver(DuelPlayer* dp) {
 	NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
 }
 void TagDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
-	if(dp->type > 3 || ready[dp->type] == is_ready)
+	if(dp->type > 3)
 		return;
-	if(is_ready) {
-		uint32_t deckerror = 0;
-		if(!host_info.no_check_deck) {
-			if(deck_error[dp->type]) {
-				deckerror = (DECKERROR_UNKNOWNCARD << 28) | deck_error[dp->type];
-			} else {
-				deckerror = deckManager.CheckDeck(pdeck[dp->type], host_info.lflist, host_info.rule);
-			}
-		}
-		if(deckerror) {
-			STOC_HS_PlayerChange scpc;
-			scpc.status = (dp->type << 4) | PLAYERCHANGE_NOTREADY;
-			NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
-			STOC_ErrorMsg scem;
-			scem.msg = ERRMSG_DECKERROR;
-			scem.code = deckerror;
-			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
-			return;
-		}
+	if(duel_stage != DUEL_STAGE_BEGIN)
+		return;
+	if(!is_ready) {
+		pending_ready[dp->type] = false;
+		deck_status[dp->type] = DECKSTATUS_EMPTY;
+		pdeck[dp->type].clear();
+		SetPlayerReady(dp, false);
+		return;
 	}
-	ready[dp->type] = is_ready;
-	STOC_HS_PlayerChange scpc;
-	scpc.status = (dp->type << 4) | (is_ready ? PLAYERCHANGE_READY : PLAYERCHANGE_NOTREADY);
-	for(int i = 0; i < 4; ++i)
-		if(players[i])
-			NetServer::SendPacketToPlayer(players[i], STOC_HS_PLAYER_CHANGE, scpc);
-	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
-		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
+	if(ready[dp->type])
+		return;
+	if(deck_status[dp->type] != DECKSTATUS_CONFIRMED) {
+		if(deck_status[dp->type] == DECKSTATUS_REJECTED) {
+			// A rejected deck consumes one ready request; the next deck-only update must not inherit it.
+			deck_status[dp->type] = DECKSTATUS_EMPTY;
+			pending_ready[dp->type] = false;
+		} else {
+			if(pending_ready[dp->type])
+				return;
+			pending_ready[dp->type] = true;
+		}
+		STOC_HS_PlayerChange scpc;
+		scpc.status = (dp->type << 4) | PLAYERCHANGE_NOTREADY;
+		NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
+		return;
+	}
+	pending_ready[dp->type] = false;
+	SetPlayerReady(dp, true);
 }
 void TagDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 	if(pos > 3 || dp != host_player || dp == players[pos] || !players[pos])
@@ -253,35 +284,66 @@ void TagDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 	LeaveGame(players[pos]);
 }
 void TagDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, unsigned int len) {
-	if(dp->type > 3 || ready[dp->type])
+	if(dp->type > 3 || duel_stage != DUEL_STAGE_BEGIN)
+		return;
+	if(ready[dp->type])
 		return;
 	if (len < sizeof(uint32_t) * 2)
 		return;
-	bool valid = true;
 	uint32_t mainc = BufferIO::Read<uint32_t>(pdata);
 	uint32_t sidec = BufferIO::Read<uint32_t>(pdata);
+	bool deck_failed = false;
+	uint32_t deckerror = 0;
 	if (mainc > MAINC_MAX)
-		valid = false;
+		deck_failed = true;
 	else if (sidec > SIDEC_MAX)
-		valid = false;
+		deck_failed = true;
 	else if (len < (2 + mainc + sidec) * sizeof(uint32_t))
-		valid = false;
-	if (!valid) {
+		deck_failed = true;
+	Deck new_deck;
+	if(!deck_failed) {
+		uint32_t deckbuf[MAINC_MAX + SIDEC_MAX];
+		std::memcpy(deckbuf, pdata, (mainc + sidec) * sizeof(uint32_t));
+		uint32_t load_error = DeckManager::LoadDeck(new_deck, deckbuf, mainc, sidec);
+		if(!host_info.no_check_deck) {
+			// no_check_deck silently ignores unknown cards. In that case, the size of new_deck will not equal mainc + sidec.
+			if(load_error) {
+				deckerror = (DECKERROR_UNKNOWNCARD << 28) | load_error;
+				deck_failed = true;
+			} else if(new_deck.main.size() + new_deck.extra.size() != mainc || new_deck.side.size() != sidec) {
+				deckerror = 0;
+				deck_failed = true;
+			} else {
+				deckerror = deckManager.CheckDeck(new_deck, host_info.lflist, host_info.rule);
+				deck_failed = deckerror != 0;
+			}
+		}
+	}
+	if(deck_failed) {
+		pending_ready[dp->type] = false;
+		deck_status[dp->type] = DECKSTATUS_REJECTED;
 		STOC_ErrorMsg scem;
 		scem.msg = ERRMSG_DECKERROR;
-		scem.code = 0;
+		scem.code = deckerror;
 		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 		return;
+	} else {
+		pdeck[dp->type] = std::move(new_deck);
+		deck_status[dp->type] = DECKSTATUS_CONFIRMED;
+		if(pending_ready[dp->type]) {
+			pending_ready[dp->type] = false;
+			SetPlayerReady(dp, true);
+		}
 	}
-	uint32_t deckbuf[MAINC_MAX + SIDEC_MAX];
-	std::memcpy(deckbuf, pdata, (mainc + sidec) * sizeof(uint32_t));
-	deck_error[dp->type] = DeckManager::LoadDeck(pdeck[dp->type], deckbuf, mainc, sidec);
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)
 		return;
-	if(!ready[0] || !ready[1] || !ready[2] || !ready[3])
+	if(duel_stage != DUEL_STAGE_BEGIN)
 		return;
+	for(int i = 0; i < 4; ++i)
+		if(!ready[i] || deck_status[i] != DECKSTATUS_CONFIRMED)
+			return;
 	NetServer::StopListen();
 	//NetServer::StopBroadcast();
 	for(int i = 0; i < 4; ++i)
