@@ -1075,15 +1075,17 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	}
 }
 // Set the movement of a card over a specified number of frames.
-void ClientField::SetCardMovement(ClientCard* pcard, int frame60, irr::core::vector3df dPos, irr::core::vector3df dRot) {
+void ClientField::SetCardMovement(ClientCard* pcard, int frame60, irr::core::vector3df dPos60, irr::core::vector3df dRot60) {
 	int frame = mainGame->ScaleFrame(frame60);
 	float frameScale = static_cast<float>(frame60) / frame;
-	pcard->dPos = dPos * frameScale;
-	pcard->dRot = dRot * frameScale;
+	pcard->dPos = dPos60 * frameScale;
+	pcard->dRot = dRot60 * frameScale;
 	pcard->is_moving = true;
 	pcard->aniFrame = frame;
 }
-// Move (reset) a card to its current location over a specified number of frames.
+// Move a card to its current location over a specified number of frames.
+// Legacy: The name of this function is misleading, as it does not actually move the card to a new location,
+// but rather resets its position and rotation to its current location over a specified number of frames.
 void ClientField::MoveCard(ClientCard * pcard, int frame60) {
 	int frame = mainGame->ScaleFrame(frame60);
 	irr::core::vector3df trans = pcard->curPos;
