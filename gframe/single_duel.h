@@ -29,6 +29,7 @@ public:
 	void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) override;
 	void TimeConfirm(DuelPlayer* dp) override;
 	void EndDuel() override;
+	void OnPlayerDisconnected(DuelPlayer* dp) override;
 	
 	void DuelEndProc();
 	void WaitforResponse(int playerid);
@@ -68,4 +69,3 @@ protected:
 }
 
 #endif //SINGLE_DUEL_H
-

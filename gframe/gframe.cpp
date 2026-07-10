@@ -4,6 +4,9 @@
 #include <event2/thread.h>
 #include <clocale>
 #include <memory>
+#ifndef _WIN32
+#include <signal.h>
+#endif
 
 #if defined(_WIN32) && (!defined(WDK_NTDDI_VERSION) || (WDK_NTDDI_VERSION < 0x0A000005)) // Redstone 4, Version 1803, Build 17134.
 #error "This program requires the Windows 10 SDK version 1803 or above to compile on Windows. Otherwise, non-ASCII characters will not be displayed or processed correctly."
@@ -48,6 +51,7 @@ int main(int argc, char* argv[]) {
 	evthread_use_windows_threads();
 #else
 	evthread_use_pthreads();
+	signal(SIGCHLD, SIG_IGN);
 #endif //_WIN32
 	ygo::Game _game;
 	ygo::mainGame = &_game;
