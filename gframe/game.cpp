@@ -1126,11 +1126,16 @@ void Game::MainLoop() {
 			gMutex.unlock();
 		}
 		const bool isVsyncMinimized = gameConf.vsync && device->isWindowMinimized();
-		logicalFrameAccum += 1.0f;
-		logicalTick = false;
-		if(logicalFrameAccum >= fpsScale) {
-			logicalFrameAccum -= fpsScale;
+		if(isVsyncMinimized) {
+			// The minimized VSync path below is throttled to 60 FPS.
 			logicalTick = true;
+		} else {
+			logicalFrameAccum += 1.0f;
+			logicalTick = false;
+			if(logicalFrameAccum >= fpsScale) {
+				logicalFrameAccum -= fpsScale;
+				logicalTick = true;
+			}
 		}
 		lineAccum += 1.0f;
 		while(lineAccum >= fpsScale) {
