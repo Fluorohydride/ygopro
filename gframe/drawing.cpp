@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "game.h"
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -587,9 +588,9 @@ void Game::DrawMisc() {
 		driver->draw2DRectangle(0xa0000000, Resize(689, 8, 992, 51));
 		driver->draw2DRectangleOutline(Resize(689, 8, 992, 51), 0xffff8080);
 	}
-	if(dInfo.start_lp) {
+	if(dInfo.start_lp > 0) {
 		constexpr float maxBarWidth = 292.0f;
-		auto maxLP = dInfo.isTag ? dInfo.start_lp / 2 : dInfo.start_lp;
+		auto maxLP = dInfo.isTag ? std::max(dInfo.start_lp / 2, 1) : dInfo.start_lp;
 		if(dInfo.lp[0] > maxLP) {
 			auto layerCount = dInfo.lp[0] / maxLP;
 			auto partialLP = dInfo.lp[0] % maxLP;
