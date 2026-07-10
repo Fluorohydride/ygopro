@@ -46,6 +46,67 @@ extern char **environ;
 
 namespace ygo {
 
+namespace {
+using namespace std::chrono;
+
+#ifdef _WIN32
+struct HighResolutionTimer {
+	HighResolutionTimer() {
+		handle = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
+		if(!handle)
+			periodEnabled = timeBeginPeriod(1) == TIMERR_NOERROR;
+	}
+	~HighResolutionTimer() {
+		if(handle)
+			CloseHandle(handle);
+		else if(periodEnabled)
+			timeEndPeriod(1);
+	}
+	HANDLE handle{};
+	bool periodEnabled{};
+};
+#endif
+
+void PreciseWaitUntil(steady_clock::time_point targetTime, bool windowActive) {
+	auto now = steady_clock::now();
+	if(now >= targetTime)
+		return;
+#ifdef _WIN32
+	static HighResolutionTimer highResolutionTimer;
+	if(highResolutionTimer.handle) {
+		auto remaining = duration_cast<microseconds>(targetTime - now);
+		if(remaining.count() > 1500) {
+			LARGE_INTEGER dueTime;
+			dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
+			if(SetWaitableTimer(highResolutionTimer.handle, &dueTime, 0, NULL, NULL, FALSE))
+				WaitForSingleObject(highResolutionTimer.handle, INFINITE);
+		}
+	} else
+#endif
+	{
+		auto sleepTime = targetTime - now - milliseconds(2);
+		if(sleepTime > milliseconds(0))
+			std::this_thread::sleep_for(sleepTime);
+	}
+	while(steady_clock::now() < targetTime) {
+		if(windowActive)
+			CPU_PAUSE();
+		else
+			std::this_thread::sleep_for(milliseconds(1));
+	}
+}
+
+void WaitUntilNextFrame(steady_clock::time_point& lastFrameTime, microseconds targetFrameDuration, bool windowActive) {
+	auto targetTime = lastFrameTime + targetFrameDuration;
+	PreciseWaitUntil(targetTime, windowActive);
+	lastFrameTime = targetTime;
+	auto now = steady_clock::now();
+	if(now - targetTime > targetFrameDuration)
+		lastFrameTime = now;
+}
+
+}
+
 Game* mainGame;
 
 void DuelInfo::Clear() {
@@ -1051,16 +1112,6 @@ void Game::MainLoop() {
 	float atkframe = 0.1f;
 	int fps = 0;
 	auto lastFpsTime = std::chrono::steady_clock::now();
-#ifdef _WIN32
-	HANDLE hWaitTimer = NULL;
-	bool useHighResTimer = false;
-	if(!gameConf.vsync) {
-		hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
-		useHighResTimer = (hWaitTimer != NULL);
-		if(!useHighResTimer)
-			timeBeginPeriod(1);
-	}
-#endif
 	auto lastFrameTime = std::chrono::steady_clock::now();
 	auto targetFrameDuration = std::chrono::microseconds(1000000 / effectiveFps);
 	float lineAccum = 0;
@@ -1074,6 +1125,7 @@ void Game::MainLoop() {
 			OnResize();
 			gMutex.unlock();
 		}
+		const bool isVsyncMinimized = gameConf.vsync && device->isWindowMinimized();
 		logicalFrameAccum += 1.0f;
 		logicalTick = false;
 		if(logicalFrameAccum >= fpsScale) {
@@ -1140,46 +1192,8 @@ void Game::MainLoop() {
 		if(closeSignal.TryWait())
 			CloseDuelWindow();
 		fps++;
-		if(gameConf.vsync && device->isWindowMinimized()) {
-			// downscale to 60fps, reduce CPU usage
-			std::this_thread::sleep_for(std::chrono::microseconds(16667));
-		} else if(!gameConf.vsync) {
-			auto targetTime = lastFrameTime + targetFrameDuration;
-			auto now = std::chrono::steady_clock::now();
-			if(now < targetTime) {
-#ifdef _WIN32
-				if(useHighResTimer)
-				{
-					auto remaining = std::chrono::duration_cast<std::chrono::microseconds>(targetTime - now);
-					if(remaining.count() > 1500) {
-						LARGE_INTEGER dueTime;
-						dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
-						if(SetWaitableTimer(hWaitTimer, &dueTime, 0, NULL, NULL, FALSE))
-							WaitForSingleObject(hWaitTimer, INFINITE);
-					}
-				}
-				else
-#endif
-				{
-					auto sleepTime = targetTime - now - std::chrono::milliseconds(2);
-					if(sleepTime > std::chrono::milliseconds(0)) {
-						std::this_thread::sleep_for(sleepTime);
-					}
-				}
-				// Spin-wait for sub-millisecond precision.
-				// If the window is inactive, sleep 1ms per iteration to avoid wasting CPU.
-				while(std::chrono::steady_clock::now() < targetTime) {
-					if(device->isWindowActive())
-						CPU_PAUSE();
-					else
-						std::this_thread::sleep_for(std::chrono::milliseconds(1));
-				}
-			}
-			lastFrameTime = targetTime;
-			now = std::chrono::steady_clock::now();
-			if(now - targetTime > targetFrameDuration)
-				lastFrameTime = now;
-		}
+		if(isVsyncMinimized || !gameConf.vsync)
+			WaitUntilNextFrame(lastFrameTime, isVsyncMinimized ? std::chrono::microseconds(16667) : targetFrameDuration, device->isWindowActive());
 		auto now = std::chrono::steady_clock::now();
 		if(now - lastFpsTime >= std::chrono::milliseconds(1000)) {
 			myswprintf(cap, L"YGOPro FPS: %d", fps);
@@ -1193,14 +1207,6 @@ void Game::MainLoop() {
 					dInfo.time_left[dInfo.time_player]--;
 		}
 	}
-#ifdef _WIN32
-	if(!gameConf.vsync) {
-		if(useHighResTimer)
-			CloseHandle(hWaitTimer);
-		else
-			timeEndPeriod(1);
-	}
-#endif
 	DuelClient::StopClient(true);
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
