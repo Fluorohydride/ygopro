@@ -115,9 +115,9 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 		event_base_loopbreak(client_base);
 }
 void DuelClient::StopClient(unsigned reason) {
+	close_reason = reason;
 	if(connect_state == CONNECT_STATE_NONE)
 		return;
-	close_reason = reason;
 	if(client_bev)
 		bufferevent_disable(client_bev, EV_READ | EV_WRITE);
 	if(client_base)
