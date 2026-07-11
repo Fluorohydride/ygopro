@@ -108,8 +108,9 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 		const irr::f32 invW = 1.0f / point[3];
 		return irr::core::vector3df(point[0] * invW, point[1] * invW, point[2] * invW);
 	};
-	constexpr size_t THICK_LINE_VERTICES_PER_SEGMENT = 8;
-	constexpr size_t THICK_LINE_INDICES_PER_SEGMENT = 30;
+	// must be static due to a VS2019 compiler bug
+	static constexpr size_t THICK_LINE_VERTICES_PER_SEGMENT = 8;
+	static constexpr size_t THICK_LINE_INDICES_PER_SEGMENT = 30;
 	const auto lerpProjected = [](const ProjectedPoint& start, const ProjectedPoint& end, irr::f32 t) {
 		ProjectedPoint result;
 		result.screen = start.screen + (end.screen - start.screen) * t;
