@@ -29,7 +29,7 @@ void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	last_replay_response_size = last_replay.WriteResponse(resp, len);
 	set_responseb(pduel, resp);
 }
-int SingleMode::SinglePlayThread() {
+void SingleMode::SinglePlayThread() {
 	const int start_lp = 8000;
 	const int start_hand = 5;
 	const int draw_count = 1;
@@ -87,7 +87,7 @@ int SingleMode::SinglePlayThread() {
 	}
 	if(slen == 0) {
 		end_duel(pduel);
-		return 0;
+		return;
 	}
 	mainGame->gMutex.lock();
 	mainGame->HideElement(mainGame->wSinglePlay);
@@ -180,7 +180,6 @@ int SingleMode::SinglePlayThread() {
 		if(mainGame->exit_on_return)
 			mainGame->device->closeDevice();
 	}
-	return 0;
 }
 bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 	unsigned char* offset, * pbuf = msg;
