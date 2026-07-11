@@ -2093,11 +2093,9 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_V: {
 			irr::gui::IGUIElement* focus = mainGame->env->getFocus();
-			if(focus && focus->getType() == irr::gui::EGUIET_EDIT_BOX
+			if(focus && focus->hasType(irr::gui::EGUIET_EDIT_BOX)
 				&& !event.KeyInput.PressedDown && event.KeyInput.Control) {
-				irr::core::stringw t(focus->getText());
-				t.trim();
-				focus->setText(t.c_str());
+				mainGame->TrimText(focus);
 			}
 			break;
 		}
