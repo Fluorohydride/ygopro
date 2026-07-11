@@ -195,24 +195,20 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool stipple, irr::vide
 			bool projected;
 		};
 		ProjectedEdge projectedEdges[4];
-		irr::f32 totalProjectedLen = 0.0f;
 		for(int i = 0; i < 4; ++i) {
 			auto& edge = projectedEdges[i];
 			edge.projected = projectPoint(wp[edgeStart[i]], edge.start) && projectPoint(wp[edgeEnd[i]], edge.end);
 			edge.screenLen = 1.0f;
-			if(edge.projected) {
+			if(edge.projected)
 				edge.screenLen = std::sqrt((edge.start.screen - edge.end.screen).getLengthSQ());
-				totalProjectedLen += edge.screenLen;
-			}
 		}
-		const size_t estimatedSegments = static_cast<size_t>(totalProjectedLen * 0.5f) + 4;
-		size_t reserveVertices = estimatedSegments * THICK_LINE_VERTICES_PER_SEGMENT;
-		if(reserveVertices > MAX_THICK_LINE_BATCH_VERTICES)
-			reserveVertices = MAX_THICK_LINE_BATCH_VERTICES;
-		std::vector<irr::video::S3DVertex> vertices;
-		std::vector<irr::u16> indices;
-		vertices.reserve(reserveVertices);
-		indices.reserve((reserveVertices / THICK_LINE_VERTICES_PER_SEGMENT) * THICK_LINE_INDICES_PER_SEGMENT);
+		constexpr size_t RESERVED_THICK_LINE_SEGMENTS = 128;
+		static std::vector<irr::video::S3DVertex> vertices;
+		static std::vector<irr::u16> indices;
+		vertices.clear();
+		indices.clear();
+		vertices.reserve(RESERVED_THICK_LINE_SEGMENTS * THICK_LINE_VERTICES_PER_SEGMENT);
+		indices.reserve(RESERVED_THICK_LINE_SEGMENTS * THICK_LINE_INDICES_PER_SEGMENT);
 		const auto drawBatch = [&]() {
 			if(indices.empty())
 				return;
