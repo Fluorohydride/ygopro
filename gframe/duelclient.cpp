@@ -2632,7 +2632,6 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 					mainGame->dField.hovered_card = 0;
 			} else
 				mainGame->dField.RemoveCard(pc, pl, ps);
-			mainGame->dField.DestroyCard(pcard);
 		} else {
 			if (!(pl & LOCATION_OVERLAY) && !(cl & LOCATION_OVERLAY)) {
 				ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
@@ -3814,7 +3813,6 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			while(mainGame->dField.deck[player].size() > mcount) {
 				ClientCard* ccard = mainGame->dField.deck[player].back();
 				mainGame->dField.deck[player].pop_back();
-				mainGame->dField.DestroyCard(ccard);
 			}
 		} else {
 			while(mainGame->dField.deck[player].size() < mcount) {
@@ -3829,7 +3827,6 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			while(mainGame->dField.hand[player].size() > hcount) {
 				ClientCard* ccard = mainGame->dField.hand[player].back();
 				mainGame->dField.hand[player].pop_back();
-				mainGame->dField.DestroyCard(ccard);
 			}
 		} else {
 			while(mainGame->dField.hand[player].size() < hcount) {
@@ -3844,7 +3841,6 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			while(mainGame->dField.extra[player].size() > ecount) {
 				ClientCard* ccard = mainGame->dField.extra[player].back();
 				mainGame->dField.extra[player].pop_back();
-				mainGame->dField.DestroyCard(ccard);
 			}
 		} else {
 			while(mainGame->dField.extra[player].size() < ecount) {
