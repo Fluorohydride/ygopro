@@ -14,6 +14,15 @@
 #include <chrono>
 #ifdef _WIN32
 #include <timeapi.h>
+#else
+#include <spawn.h>
+#ifdef __APPLE__
+#include <crt_externs.h>
+#define GetEnviron() (*_NSGetEnviron())
+#else
+extern char **environ;
+#define GetEnviron() environ
+#endif
 #endif
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -92,6 +101,8 @@ bool Game::Initialize() {
 	device->getLogger()->setLogLevel(irr::ELOG_LEVEL::ELL_ERROR);
 #endif
 	deckManager.LoadLFList();
+	if(gameConf.default_lflist >= (int)deckManager._lfList.size() || gameConf.default_lflist < 0)
+		gameConf.default_lflist = 0;
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
@@ -517,6 +528,7 @@ bool Game::Initialize() {
 	for(int i = 0; i < 3; ++i) {
 		btnHand[i] = env->addButton(irr::core::rect<irr::s32>(10 + 105 * i, 10, 105 + 105 * i, 144), wHand, BUTTON_HAND1 + i, L"");
 		btnHand[i]->setImage(imageManager.tHand[i]);
+		btnHand[i]->setUseAlphaChannel(true);
 	}
 	//
 	wFTSelect = env->addWindow(irr::core::rect<irr::s32>(550, 240, 780, 340), false, L"");
@@ -576,11 +588,15 @@ bool Game::Initialize() {
 	wPosSelect->getCloseButton()->setVisible(false);
 	wPosSelect->setVisible(false);
 	btnPSAU = env->addButton(irr::core::rect<irr::s32>(27, 35, 164, 172), wPosSelect, BUTTON_POS_AU);
+	btnPSAU->setUseAlphaChannel(true);
 	btnPSAD = env->addButton(irr::core::rect<irr::s32>(27, 35, 164, 172), wPosSelect, BUTTON_POS_AD);
+	btnPSAD->setUseAlphaChannel(true);
 	btnFacedownImgInfo[btnPSAD] = {0, false};
 	btnPSAD->setVisible(false); // PSAD = PoSition Attack face-Down, is not allowed in the rules, so the width of wPosSelect only support 3 buttons
 	btnPSDU = env->addButton(irr::core::rect<irr::s32>(169, 35, 306, 172), wPosSelect, BUTTON_POS_DU);
+	btnPSDU->setUseAlphaChannel(true);
 	btnPSDD = env->addButton(irr::core::rect<irr::s32>(311, 35, 448, 172), wPosSelect, BUTTON_POS_DD);
+	btnPSDD->setUseAlphaChannel(true);
 	btnFacedownImgInfo[btnPSDD] = {0, true};
 	//card select
 	wCardSelect = env->addWindow(irr::core::rect<irr::s32>(320, 100, 1000, 400), false, L"");
@@ -591,6 +607,7 @@ bool Game::Initialize() {
 		stCardPos[i]->setBackgroundColor(0xffffffff);
 		stCardPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 		btnCardSelect[i] = env->addButton(irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardSelect, BUTTON_CARD_0 + i);
+		btnCardSelect[i]->setUseAlphaChannel(true);
 	}
 	scrCardList = env->addScrollBar(true, irr::core::rect<irr::s32>(30, 235, 650, 255), wCardSelect, SCROLL_CARD_SELECT);
 	btnSelectOK = env->addButton(irr::core::rect<irr::s32>(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_OK, dataManager.GetSysString(1211));
@@ -603,6 +620,7 @@ bool Game::Initialize() {
 		stDisplayPos[i]->setBackgroundColor(0xffffffff);
 		stDisplayPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 		btnCardDisplay[i] = env->addButton(irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardDisplay, BUTTON_DISPLAY_0 + i);
+		btnCardDisplay[i]->setUseAlphaChannel(true);
 	}
 	scrDisplayList = env->addScrollBar(true, irr::core::rect<irr::s32>(30, 235, 650, 255), wCardDisplay, SCROLL_CARD_DISPLAY);
 	btnDisplayOK = env->addButton(irr::core::rect<irr::s32>(300, 265, 380, 290), wCardDisplay, BUTTON_CARD_DISP_OK, dataManager.GetSysString(1211));
@@ -2397,6 +2415,51 @@ void Game::SetCursor(irr::gui::ECURSOR_ICON icon) {
 	if(cursor->getActiveIcon() != icon) {
 		cursor->setActiveIcon(icon);
 	}
+}
+bool Game::SpawnAsync(const std::wstring& exePath, const std::vector<std::wstring>& args) {
+#ifdef _WIN32
+	std::wstring cmdLine = L"\"" + exePath + L"\"";
+	for (const auto& arg : args) {
+		cmdLine += L" \"" + arg + L"\"";
+	}
+
+	STARTUPINFOW si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	// CreateProcessW can modify the command line buffer, so we need to create a mutable copy of it
+	// TODO: Move to C++17 and use cmdLine.data() directly without copying to a vector
+	std::vector<wchar_t> cmdBuffer(cmdLine.begin(), cmdLine.end());
+	cmdBuffer.push_back(L'\0');
+
+	if (!CreateProcessW(exePath.c_str(), cmdBuffer.data(), nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi)) {
+		return false;
+	}
+
+	CloseHandle(pi.hThread);
+	CloseHandle(pi.hProcess);
+	return true;
+#else
+	std::string exePathUTF8 = BufferIO::EncodeUTF8String(exePath);
+
+	std::vector<std::string> utf8Args;
+	utf8Args.emplace_back(exePathUTF8);
+	for (const auto& arg : args) {
+		utf8Args.push_back(BufferIO::EncodeUTF8String(arg));
+	}
+
+	std::vector<char*> execArgs;
+	execArgs.reserve(utf8Args.size() + 1);
+	for (auto& arg : utf8Args) {
+		execArgs.push_back(const_cast<char*>(arg.c_str()));
+	}
+	execArgs.push_back(nullptr);
+
+	pid_t pid{}; // ignore pid return value, use SIG_IGN to prevent zombie process
+	return posix_spawn(&pid, exePathUTF8.c_str(), nullptr, nullptr, execArgs.data(), GetEnviron()) == 0;
+#endif
 }
 
 }

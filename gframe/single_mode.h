@@ -18,7 +18,7 @@ public:
 	static bool StartPlay();
 	static void StopPlay(bool is_exiting = false);
 	static void SetResponse(unsigned char* resp, unsigned int len);
-	static int SinglePlayThread();
+	static void SinglePlayThread();
 	static bool SinglePlayAnalyze(unsigned char* msg, unsigned int len);
 	
 	static void SinglePlayRefresh(int flag = 0xf81fff);
