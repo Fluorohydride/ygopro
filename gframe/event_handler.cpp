@@ -690,17 +690,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
 					if (command_card->is_selected) {
 						command_card->is_selected = false;
-						int i = 0;
-						while(selected_cards[i] != command_card) i++;
-						selected_cards.erase(selected_cards.begin() + i);
-						if(command_card->controler)
-							mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffd0d0d0);
-						else mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffffff);
+						auto it = std::find(selected_cards.begin(), selected_cards.end(), command_card);
+						if(it != selected_cards.end())
+							selected_cards.erase(it);
 					} else {
 						command_card->is_selected = true;
-						mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffff00);
 						selected_cards.push_back(command_card);
 					}
+					SetCardListLabel(mainGame->stCardPos[id - BUTTON_CARD_0], command_card, true);
 					int sel = selected_cards.size();
 					if (sel >= select_max) {
 						SetResponseSelectedCards();
@@ -724,13 +721,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
 					if (command_card->is_selected) {
 						command_card->is_selected = false;
-						if(command_card->controler)
-							mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffd0d0d0);
-						else mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffffff);
 					} else {
 						command_card->is_selected = true;
-						mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffff00);
 					}
+					SetCardListLabel(mainGame->stCardPos[id - BUTTON_CARD_0], command_card, true);
 					selected_cards.push_back(command_card);
 					if (selected_cards.size() > 0) {
 						SetResponseSelectedCards();
@@ -743,17 +737,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
 					if (command_card->is_selected) {
 						command_card->is_selected = false;
-						int i = 0;
-						while(selected_cards[i] != command_card) i++;
-						selected_cards.erase(selected_cards.begin() + i);
-						if(command_card->controler)
-							mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffd0d0d0);
-						else mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffffff);
+						auto it = std::find(selected_cards.begin(), selected_cards.end(), command_card);
+						if(it != selected_cards.end())
+							selected_cards.erase(it);
 					} else {
 						command_card->is_selected = true;
-						mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffff00);
 						selected_cards.push_back(command_card);
 					}
+					SetCardListLabel(mainGame->stCardPos[id - BUTTON_CARD_0], command_card, true);
 					ShowSelectSum(true);
 					break;
 				}
