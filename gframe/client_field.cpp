@@ -418,48 +418,43 @@ void ClientField::ClearChainSelect() {
 	conti_cards.clear();
 	conti_act = false;
 }
-void ClientField::SetCardLabelText(irr::gui::IGUIStaticText* label, ClientCard* pcard,
-	bool check_continuous, bool check_grave, bool show_overlay_detail) {
+void ClientField::SetCardListLabel(irr::gui::IGUIStaticText* label, ClientCard* pcard, bool selecting_card) {
 	wchar_t formatBuffer[2048];
-	if(check_continuous && select_continuous)
+	if(selecting_card && select_continuous)
 		myswprintf(formatBuffer, L"%ls", dataManager.unknown_string);
-	else if(check_grave && cant_check_grave && pcard->location == LOCATION_GRAVE)
+	else if(selecting_card && cant_check_grave && pcard->location == LOCATION_GRAVE)
 		myswprintf(formatBuffer, L"%ls", dataManager.FormatLocation(pcard->location, 0));
-	else if(show_overlay_detail && pcard->location == LOCATION_OVERLAY)
+	else if(pcard->location == LOCATION_OVERLAY)
 		myswprintf(formatBuffer, L"%ls[%d](%d)",
 			dataManager.FormatLocation(pcard->overlayTarget), pcard->overlayTarget->sequence + 1, pcard->sequence + 1);
 	else
 		myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(pcard), pcard->sequence + 1);
 	label->setText(formatBuffer);
-}
-void ClientField::SetCardLabelColor(irr::gui::IGUIStaticText* label, ClientCard* pcard,
-	bool check_selected, bool check_continuous, bool include_deck_facedown) {
 	label->enableOverrideColor(false); // setOverrideColor will turn this on again automatically
-	if(check_continuous && select_continuous) {
+	if(selecting_card && select_continuous) {
 		label->setBackgroundColor(0xffffffff);
 		return;
 	}
 	if(pcard->location == LOCATION_OVERLAY) {
 		if(pcard->owner != pcard->overlayTarget->controler)
 			label->setOverrideColor(0xff0000ff);
-		if(check_selected && pcard->is_selected)
+		if(selecting_card && pcard->is_selected)
 			label->setBackgroundColor(0xffffff00);
 		else if(pcard->overlayTarget->controler)
 			label->setBackgroundColor(0xffd0d0d0);
 		else
 			label->setBackgroundColor(0xffffffff);
-	} else if(pcard->location == LOCATION_EXTRA || pcard->location == LOCATION_REMOVED
-		|| (include_deck_facedown && pcard->location == LOCATION_DECK)) {
+	} else if(pcard->location == LOCATION_EXTRA || pcard->location == LOCATION_REMOVED || pcard->location == LOCATION_DECK) {
 		if(pcard->position & POS_FACEDOWN)
 			label->setOverrideColor(0xff0000ff);
-		if(check_selected && pcard->is_selected)
+		if(selecting_card && pcard->is_selected)
 			label->setBackgroundColor(0xffffff00);
 		else if(pcard->controler)
 			label->setBackgroundColor(0xffd0d0d0);
 		else
 			label->setBackgroundColor(0xffffffff);
 	} else {
-		if(check_selected && pcard->is_selected)
+		if(selecting_card && pcard->is_selected)
 			label->setBackgroundColor(0xffffff00);
 		else if(pcard->controler)
 			label->setBackgroundColor(0xffd0d0d0);
@@ -500,8 +495,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool is_continuous) {
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
 		if(mainGame->dInfo.curMsg != MSG_SORT_CARD) {
-			SetCardLabelText(mainGame->stCardPos[i], selectable_cards[i], true, true, true);
-			SetCardLabelColor(mainGame->stCardPos[i], selectable_cards[i], true, true, true);
+			SetCardListLabel(mainGame->stCardPos[i], selectable_cards[i], true);
 		} else {
 			if(sort_list[i]) {
 				wchar_t formatBuffer[2048];
@@ -546,8 +540,7 @@ void ClientField::ShowChainCard() {
 		}
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
-		SetCardLabelText(mainGame->stCardPos[i], selectable_cards[i], false, false, false);
-		SetCardLabelColor(mainGame->stCardPos[i], selectable_cards[i], false, false, false);
+		SetCardListLabel(mainGame->stCardPos[i], selectable_cards[i], false);
 		mainGame->stCardPos[i]->setVisible(true);
 	} 
 	if(selectable_cards.size() <= 5) {
@@ -582,8 +575,7 @@ void ClientField::ShowLocationCard() {
 		}
 		mainGame->btnCardDisplay[i]->setPressed(false);
 		mainGame->btnCardDisplay[i]->setVisible(true);
-		SetCardLabelText(mainGame->stDisplayPos[i], display_cards[i], false, false, true);
-		SetCardLabelColor(mainGame->stDisplayPos[i], display_cards[i], false, false, false);
+		SetCardListLabel(mainGame->stDisplayPos[i], display_cards[i], false);
 		mainGame->stDisplayPos[i]->setVisible(true);
 	}
 	if(display_cards.size() <= 5) {

@@ -912,8 +912,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->stCardPos[i]->enableOverrideColor(false);
 						mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 					} else {
-						SetCardLabelText(mainGame->stCardPos[i], selectable_cards[i + pos], true, true, true);
-						SetCardLabelColor(mainGame->stCardPos[i], selectable_cards[i + pos], true, true, true);
+						SetCardListLabel(mainGame->stCardPos[i], selectable_cards[i + pos], true);
 					}
 				}
 				break;
@@ -931,8 +930,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->btnFacedownImgInfo[mainGame->btnCardDisplay[i]] = {display_cards[i + pos]->controler, false};
 						mainGame->btnCardImgInfo.erase(mainGame->btnCardDisplay[i]);
 					}
-					SetCardLabelText(mainGame->stDisplayPos[i], display_cards[i + pos], false, false, true);
-					SetCardLabelColor(mainGame->stDisplayPos[i], display_cards[i + pos], false, false, false);
+					SetCardListLabel(mainGame->stDisplayPos[i], display_cards[i + pos], false);
 				}
 				break;
 			}

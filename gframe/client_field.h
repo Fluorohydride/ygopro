@@ -105,10 +105,7 @@ public:
 	void ClearCommandFlag();
 	void ClearSelect();
 	void ClearChainSelect();
-	void SetCardLabelText(irr::gui::IGUIStaticText* label, ClientCard* pcard,
-		bool check_continuous, bool check_grave, bool show_overlay_detail);
-	void SetCardLabelColor(irr::gui::IGUIStaticText* label, ClientCard* pcard,
-		bool check_selected, bool check_continuous, bool include_deck_facedown);
+	void SetCardListLabel(irr::gui::IGUIStaticText* label, ClientCard* pcard, bool selecting_card);
 	void ShowSelectCard(bool buttonok = false, bool is_continuous = false); // caller must hold gMutex
 	void ShowChainCard(); // caller must hold gMutex
 	void ShowLocationCard(); // caller must hold gMutex
