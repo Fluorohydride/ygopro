@@ -910,7 +910,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							myswprintf(formatBuffer, L"");
 						mainGame->stCardPos[i]->setText(formatBuffer);
 						mainGame->stCardPos[i]->enableOverrideColor(false);
-						mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+						mainGame->stCardPos[i]->setBackgroundColor(CARD_LIST_DEFAULT_BACKGROUND_COLOR);
 					} else {
 						SetCardListLabel(mainGame->stCardPos[i], selectable_cards[i + pos], true);
 					}

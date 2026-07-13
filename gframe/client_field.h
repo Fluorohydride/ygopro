@@ -166,4 +166,10 @@ public:
 //special cards
 #define CARD_QUESTION		38723936
 
+// TODO: move these (or all) colors to skin config
+#define CARD_LIST_OVERRIDE_TEXT_COLOR		0xff0000ff // Blue
+#define CARD_LIST_DEFAULT_BACKGROUND_COLOR	0xffffffff // White
+#define CARD_LIST_OPPONENT_BACKGROUND_COLOR	0xffd0d0d0 // Gray
+#define CARD_LIST_SELECTED_BACKGROUND_COLOR	0xffffff00 // Yellow
+
 #endif //CLIENT_FIELD_H

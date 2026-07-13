@@ -604,7 +604,7 @@ bool Game::Initialize() {
 	wCardSelect->setVisible(false);
 	for(int i = 0; i < 5; ++i) {
 		stCardPos[i] = env->addStaticText(L"", irr::core::rect<irr::s32>(30 + 125 * i, 30, 150 + 125 * i, 50), true, false, wCardSelect, -1, true);
-		stCardPos[i]->setBackgroundColor(0xffffffff);
+		stCardPos[i]->setBackgroundColor(CARD_LIST_DEFAULT_BACKGROUND_COLOR);
 		stCardPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 		btnCardSelect[i] = env->addButton(irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardSelect, BUTTON_CARD_0 + i);
 		btnCardSelect[i]->setUseAlphaChannel(true);
@@ -617,7 +617,7 @@ bool Game::Initialize() {
 	wCardDisplay->setVisible(false);
 	for(int i = 0; i < 5; ++i) {
 		stDisplayPos[i] = env->addStaticText(L"", irr::core::rect<irr::s32>(30 + 125 * i, 30, 150 + 125 * i, 50), true, false, wCardDisplay, -1, true);
-		stDisplayPos[i]->setBackgroundColor(0xffffffff);
+		stDisplayPos[i]->setBackgroundColor(CARD_LIST_DEFAULT_BACKGROUND_COLOR);
 		stDisplayPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 		btnCardDisplay[i] = env->addButton(irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardDisplay, BUTTON_DISPLAY_0 + i);
 		btnCardDisplay[i]->setUseAlphaChannel(true);

@@ -432,34 +432,34 @@ void ClientField::SetCardListLabel(irr::gui::IGUIStaticText* label, ClientCard* 
 	label->setText(formatBuffer);
 	label->enableOverrideColor(false); // setOverrideColor will turn this on again automatically
 	if(selecting_card && select_continuous) {
-		label->setBackgroundColor(0xffffffff);
+		label->setBackgroundColor(CARD_LIST_DEFAULT_BACKGROUND_COLOR);
 		return;
 	}
 	if(pcard->location == LOCATION_OVERLAY) {
 		if(pcard->owner != pcard->overlayTarget->controler)
-			label->setOverrideColor(0xff0000ff);
+			label->setOverrideColor(CARD_LIST_OVERRIDE_TEXT_COLOR);
 		if(selecting_card && pcard->is_selected)
-			label->setBackgroundColor(0xffffff00);
+			label->setBackgroundColor(CARD_LIST_SELECTED_BACKGROUND_COLOR);
 		else if(pcard->overlayTarget->controler)
-			label->setBackgroundColor(0xffd0d0d0);
+			label->setBackgroundColor(CARD_LIST_OPPONENT_BACKGROUND_COLOR);
 		else
-			label->setBackgroundColor(0xffffffff);
+			label->setBackgroundColor(CARD_LIST_DEFAULT_BACKGROUND_COLOR);
 	} else if(pcard->location == LOCATION_EXTRA || pcard->location == LOCATION_REMOVED || pcard->location == LOCATION_DECK) {
 		if(pcard->position & POS_FACEDOWN)
-			label->setOverrideColor(0xff0000ff);
+			label->setOverrideColor(CARD_LIST_OVERRIDE_TEXT_COLOR);
 		if(selecting_card && pcard->is_selected)
-			label->setBackgroundColor(0xffffff00);
+			label->setBackgroundColor(CARD_LIST_SELECTED_BACKGROUND_COLOR);
 		else if(pcard->controler)
-			label->setBackgroundColor(0xffd0d0d0);
+			label->setBackgroundColor(CARD_LIST_OPPONENT_BACKGROUND_COLOR);
 		else
-			label->setBackgroundColor(0xffffffff);
+			label->setBackgroundColor(CARD_LIST_DEFAULT_BACKGROUND_COLOR);
 	} else {
 		if(selecting_card && pcard->is_selected)
-			label->setBackgroundColor(0xffffff00);
+			label->setBackgroundColor(CARD_LIST_SELECTED_BACKGROUND_COLOR);
 		else if(pcard->controler)
-			label->setBackgroundColor(0xffd0d0d0);
+			label->setBackgroundColor(CARD_LIST_OPPONENT_BACKGROUND_COLOR);
 		else
-			label->setBackgroundColor(0xffffffff);
+			label->setBackgroundColor(CARD_LIST_DEFAULT_BACKGROUND_COLOR);
 	}
 }
 // needs to be synchronized with EGET_SCROLL_BAR_CHANGED
@@ -504,7 +504,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool is_continuous) {
 			} else
 				mainGame->stCardPos[i]->setText(L"");
 			mainGame->stCardPos[i]->enableOverrideColor(false);
-			mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+			mainGame->stCardPos[i]->setBackgroundColor(CARD_LIST_DEFAULT_BACKGROUND_COLOR);
 		}
 		mainGame->stCardPos[i]->setVisible(true);
 	}
