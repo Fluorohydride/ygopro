@@ -46,6 +46,9 @@ public:
 	void SetNoWait(bool nowait) {
 		_nowait.store(nowait);
 	}
+	bool IsNoWait() {
+		return _nowait.load();
+	}
 private:
 	std::mutex _mutex;
 	std::condition_variable _cond;

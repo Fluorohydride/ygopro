@@ -9,9 +9,9 @@
 #include "materials.h"
 #include "duelclient.h"
 #include "netserver.h"
+#include "replay_mode.h"
 #include "single_mode.h"
 #include <thread>
-#include <chrono>
 #ifdef _WIN32
 #include <timeapi.h>
 #else
@@ -1016,144 +1016,38 @@ bool Game::Initialize() {
 	return true;
 }
 void Game::MainLoop() {
-	wchar_t cap[256];
 	camera = smgr->addCameraSceneNode(0);
 	irr::core::matrix4 mProjection;
 	BuildProjectionMatrix(mProjection, -0.90f, 0.45f, -0.42f, 0.42f, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
-
 	mProjection.buildCameraLookAtMatrixLH(irr::core::vector3df(4.2f, 8.0f, 7.8f), irr::core::vector3df(4.2f, 0, 0), irr::core::vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
-	float atkframe = 0.1f;
-	int fps = 0;
-	auto lastFpsTime = std::chrono::steady_clock::now();
+	atkframe = 0.1f;
+	main_thread_id = std::this_thread::get_id();
+	fpsCounter = 0;
+	closePending = false;
+	lastFrameTime = std::chrono::steady_clock::now();
+	lastFpsTime = lastFrameTime;
 #ifdef _WIN32
-	HANDLE hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
-	bool useHighResTimer = (hWaitTimer != NULL);
+	hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
+	useHighResTimer = (hWaitTimer != NULL);
 	if(!useHighResTimer)
 		timeBeginPeriod(1);
 #endif
-	auto lastFrameTime = std::chrono::steady_clock::now();
-	constexpr auto targetFrameDuration = std::chrono::microseconds(16667);
-	while(device->run()) {
-		auto size = driver->getScreenSize();
-		if(window_size != size) {
-			window_size = size;
-			xScale = window_size.Width / static_cast<float>(GAME_WINDOW_WIDTH);
-			yScale = window_size.Height / static_cast<float>(GAME_WINDOW_HEIGHT);
-			gMutex.lock();
-			OnResize();
-			gMutex.unlock();
-		}
-		linePattern = (linePattern + 1) % 30;
-		stippleMask = (stippleMask << 1) | (stippleMask >> 15);
-		atkframe += 0.1f;
-		if(atkframe > 6.2832f)
-			atkframe -= 6.2832f;
-		atkdy = (float)sin(atkframe);
-		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
-		gMutex.lock();
-		if(dInfo.isStarted) {
-			if(dInfo.isFinished && showcardcode == 1)
-				soundManager.PlayBGM(BGM_WIN);
-			else if(dInfo.isFinished && (showcardcode == 2 || showcardcode == 3))
-				soundManager.PlayBGM(BGM_LOSE);
-			else if(dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
-				soundManager.PlayBGM(BGM_DISADVANTAGE);
-			else if(dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
-				soundManager.PlayBGM(BGM_ADVANTAGE);
-			else
-				soundManager.PlayBGM(BGM_DUEL);
-			DrawBackImage(imageManager.tBackGround);
-			DrawBackGround();
-			DrawCards();
-			DrawMisc();
-			smgr->drawAll();
-			driver->setMaterial(irr::video::IdentityMaterial);
-			driver->clearZBuffer();
-		} else if(is_building) {
-			soundManager.PlayBGM(BGM_DECK);
-			DrawBackImage(imageManager.tBackGround_deck);
-			DrawDeckBd();
-		} else {
-			soundManager.PlayBGM(BGM_MENU);
-			DrawBackImage(imageManager.tBackGround_menu);
-		}
-		DrawGUI();
-		DrawSpec();
-		gMutex.unlock();
-		if(signalFrame > 0) {
-			signalFrame--;
-			if(!signalFrame)
-				frameSignal.Set();
-		}
-		if(waitFrame >= 0) {
-			waitFrame++;
-			if(waitFrame % 90 == 0) {
-				stHintMsg->setText(dataManager.GetSysString(1390));
-			} else if(waitFrame % 90 == 30) {
-				stHintMsg->setText(dataManager.GetSysString(1391));
-			} else if(waitFrame % 90 == 60) {
-				stHintMsg->setText(dataManager.GetSysString(1392));
-			}
-		}
-		driver->endScene();
-		if(closeSignal.TryWait())
-			CloseDuelWindow();
-		fps++;
-		auto targetTime = lastFrameTime + targetFrameDuration;
-		auto now = std::chrono::steady_clock::now();
-		if(now < targetTime) {
-#ifdef _WIN32
-			if(useHighResTimer)
-			{
-				auto remaining = std::chrono::duration_cast<std::chrono::microseconds>(targetTime - now);
-				if(remaining.count() > 1500) {
-					LARGE_INTEGER dueTime;
-					dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
-					if(SetWaitableTimer(hWaitTimer, &dueTime, 0, NULL, NULL, FALSE))
-						WaitForSingleObject(hWaitTimer, INFINITE);
-				}
-			}
-			else
-#endif
-			{
-				auto sleepTime = targetTime - now - std::chrono::milliseconds(2);
-				if(sleepTime > std::chrono::milliseconds(0)) {
-					std::this_thread::sleep_for(sleepTime);
-				}
-			}
-			// Spin-wait for sub-millisecond precision.
-			// If the window is inactive, sleep 1ms per iteration to avoid wasting CPU.
-			while(std::chrono::steady_clock::now() < targetTime) {
-				if(device->isWindowActive())
-					CPU_PAUSE();
-				else
-					std::this_thread::sleep_for(std::chrono::milliseconds(1));
-			}
-		}
-		lastFrameTime = targetTime;
-		now = std::chrono::steady_clock::now();
-		if(now - targetTime > targetFrameDuration)
-			lastFrameTime = now;
-		if(now - lastFpsTime >= std::chrono::milliseconds(1000)) {
-			myswprintf(cap, L"YGOPro FPS: %d", fps);
-			device->setWindowCaption(cap);
-			fps = 0;
-			lastFpsTime += std::chrono::milliseconds(1000);
-			if(now - lastFpsTime > std::chrono::milliseconds(1000))
-				lastFpsTime = now;
-			if(dInfo.time_player == 0 || dInfo.time_player == 1)
-				if(dInfo.time_left[dInfo.time_player])
-					dInfo.time_left[dInfo.time_player]--;
-		}
+	while(true) {
+		for(int analyzed = 0; analyzed < 16 && ProcessAnalyzeQueue(); ++analyzed)
+			std::this_thread::yield();
+		if(!RenderOneFrame())
+			break;
 	}
 #ifdef _WIN32
 	if(useHighResTimer)
 		CloseHandle(hWaitTimer);
 	else
 		timeEndPeriod(1);
+	hWaitTimer = NULL;
+	useHighResTimer = false;
 #endif
 	DuelClient::StopClient(true);
 	if(dInfo.isSingleMode)
@@ -1161,6 +1055,172 @@ void Game::MainLoop() {
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	SaveConfig();
 	device->drop();
+}
+bool Game::RenderOneFrame(bool handleCloseSignal) {
+	constexpr auto targetFrameDuration = std::chrono::microseconds(16667);
+	if(!device->run()) {
+		return false;
+	}
+	auto size = driver->getScreenSize();
+	if(window_size != size) {
+		window_size = size;
+		xScale = window_size.Width / static_cast<float>(GAME_WINDOW_WIDTH);
+		yScale = window_size.Height / static_cast<float>(GAME_WINDOW_HEIGHT);
+		gMutex.lock();
+		OnResize();
+		gMutex.unlock();
+	}
+	linePattern = (linePattern + 1) % 30;
+	stippleMask = (stippleMask << 1) | (stippleMask >> 15);
+	atkframe += 0.1f;
+	if(atkframe > 6.2832f)
+		atkframe -= 6.2832f;
+	atkdy = (float)sin(atkframe);
+	driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
+	gMutex.lock();
+	if(dInfo.isStarted) {
+		if(dInfo.isFinished && showcardcode == 1)
+			soundManager.PlayBGM(BGM_WIN);
+		else if(dInfo.isFinished && (showcardcode == 2 || showcardcode == 3))
+			soundManager.PlayBGM(BGM_LOSE);
+		else if(dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
+			soundManager.PlayBGM(BGM_DISADVANTAGE);
+		else if(dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
+			soundManager.PlayBGM(BGM_ADVANTAGE);
+		else
+			soundManager.PlayBGM(BGM_DUEL);
+		DrawBackImage(imageManager.tBackGround);
+		DrawBackGround();
+		DrawCards();
+		DrawMisc();
+		smgr->drawAll();
+		driver->setMaterial(irr::video::IdentityMaterial);
+		driver->clearZBuffer();
+	} else if(is_building) {
+		soundManager.PlayBGM(BGM_DECK);
+		DrawBackImage(imageManager.tBackGround_deck);
+		DrawDeckBd();
+	} else {
+		soundManager.PlayBGM(BGM_MENU);
+		DrawBackImage(imageManager.tBackGround_menu);
+	}
+	DrawGUI();
+	DrawSpec();
+	gMutex.unlock();
+	if(signalFrame > 0) {
+		signalFrame--;
+		if(!signalFrame)
+			frameSignal.Set();
+	}
+	if(waitFrame >= 0) {
+		waitFrame++;
+		if(waitFrame % 90 == 0) {
+			stHintMsg->setText(dataManager.GetSysString(1390));
+		} else if(waitFrame % 90 == 30) {
+			stHintMsg->setText(dataManager.GetSysString(1391));
+		} else if(waitFrame % 90 == 60) {
+			stHintMsg->setText(dataManager.GetSysString(1392));
+		}
+	}
+	driver->endScene();
+	if(handleCloseSignal && (closePending || closeSignal.TryWait())) {
+		closePending = false;
+		CloseDuelWindow(true);
+	}
+	fpsCounter++;
+	auto targetTime = lastFrameTime + targetFrameDuration;
+	auto now = std::chrono::steady_clock::now();
+	if(now < targetTime) {
+#ifdef _WIN32
+		if(useHighResTimer) {
+			auto remaining = std::chrono::duration_cast<std::chrono::microseconds>(targetTime - now);
+			if(remaining.count() > 1500) {
+				LARGE_INTEGER dueTime;
+				dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
+				if(SetWaitableTimer(hWaitTimer, &dueTime, 0, NULL, NULL, FALSE))
+					WaitForSingleObject(hWaitTimer, INFINITE);
+			}
+		} else
+#endif
+		{
+			auto sleepTime = targetTime - now - std::chrono::milliseconds(2);
+			if(sleepTime > std::chrono::milliseconds(0))
+				std::this_thread::sleep_for(sleepTime);
+		}
+		// Spin-wait for sub-millisecond precision.
+		// If the window is inactive, sleep 1ms per iteration to avoid wasting CPU.
+		while(std::chrono::steady_clock::now() < targetTime) {
+			if(device->isWindowActive())
+				CPU_PAUSE();
+			else
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+	}
+	lastFrameTime = targetTime;
+	now = std::chrono::steady_clock::now();
+	if(now - targetTime > targetFrameDuration)
+		lastFrameTime = now;
+	if(now - lastFpsTime >= std::chrono::milliseconds(1000)) {
+		wchar_t cap[256];
+		myswprintf(cap, L"YGOPro FPS: %d", fpsCounter);
+		device->setWindowCaption(cap);
+		fpsCounter = 0;
+		lastFpsTime += std::chrono::milliseconds(1000);
+		if(now - lastFpsTime > std::chrono::milliseconds(1000))
+			lastFpsTime = now;
+		if(dInfo.time_player == 0 || dInfo.time_player == 1)
+			if(dInfo.time_left[dInfo.time_player])
+				dInfo.time_left[dInfo.time_player]--;
+	}
+	return true;
+}
+bool Game::ProcessAnalyzeQueue() {
+	if(!analyzeSignal.TryWait())
+		return false;
+	switch(analyzeMsg.type) {
+	case ANALYZE_CLIENT:
+		analyzeMsg.result = DuelClient::ClientAnalyze(analyzeMsg.data, analyzeMsg.len);
+		break;
+	case ANALYZE_REPLAY:
+		analyzeMsg.result = ReplayMode::ReplayAnalyze(analyzeMsg.data, analyzeMsg.len);
+		break;
+	case ANALYZE_SINGLE_PLAY:
+		analyzeMsg.result = SingleMode::SinglePlayAnalyze(analyzeMsg.data, analyzeMsg.len);
+		break;
+	default:
+		analyzeMsg.result = false;
+		break;
+	}
+	analyzeDone.Set();
+	return true;
+}
+bool Game::WaitForAction(Signal& sig) {
+	sig.Reset();
+	while(true) {
+		if(sig.IsNoWait())
+			return true;
+		if(sig.TryWait())
+			return true;
+		if(closePending || closeSignal.TryWait()) {
+			closePending = true;
+			return false;
+		}
+		if(!RenderOneFrame(false))
+			return false;
+	}
+}
+void Game::WaitFrameSignal(int frame) {
+	int count = (gameConf.quick_animation && frame >= 12) ? 12 : frame;
+	if(std::this_thread::get_id() == main_thread_id) {
+		for(int i = 0; i < count; ++i) {
+			if(!RenderOneFrame(false))
+				break;
+		}
+	} else {
+		frameSignal.Reset();
+		signalFrame = count;
+		frameSignal.Wait();
+	}
 }
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f32 left, irr::f32 right, irr::f32 bottom, irr::f32 top, irr::f32 znear, irr::f32 zfar) {
 	for(int i = 0; i < 16; ++i)
@@ -1891,7 +1951,7 @@ void Game::CloseGameWindow() {
 	stHintMsg->setVisible(false);
 	stTip->setVisible(false);
 }
-void Game::CloseDuelWindow() {
+void Game::CloseDuelWindow(bool notifyCloseDone) {
 	CloseGameWindow();
 	wCardImg->setVisible(false);
 	wInfos->setVisible(false);
@@ -1908,7 +1968,8 @@ void Game::CloseDuelWindow() {
 	DuelClient::hosts.clear();
 	ClearTextures();
 	ResizeChatInputWindow();
-	closeDoneSignal.Set();
+	if(notifyCloseDone)
+		closeDoneSignal.Set();
 }
 int Game::LocalPlayer(int player) const {
 	int pid = player ? 1 : 0;
