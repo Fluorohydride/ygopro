@@ -89,6 +89,7 @@ struct Config {
 	int quick_animation{ 0 };
 	int auto_save_replay{ 0 };
 	int draw_single_chain{ 0 };
+	int solid_selection_line{ 0 };
 	int hide_player_name{ 0 };
 	int prefer_expansion_script{ 0 };
 	bool enable_sound{ true };
