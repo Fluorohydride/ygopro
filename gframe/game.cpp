@@ -1155,7 +1155,7 @@ void Game::MainLoop() {
 	else
 		timeEndPeriod(1);
 #endif
-	DuelClient::StopClient(true);
+	DuelClient::StopClient(CLIENT_CLOSE_REASON_EXIT);
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -1492,6 +1492,8 @@ void Game::LoadConfig(const char* file) {
 			gameConf.defaultOT = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "enable_bot_mode")) {
 			gameConf.enable_bot_mode = std::strtol(valbuf, nullptr, 10);
+		} else if(!std::strcmp(strbuf, "bot_room_public")) {
+			gameConf.bot_room_public = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "quick_animation")) {
 			gameConf.quick_animation = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "auto_save_replay")) {
@@ -1616,6 +1618,7 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
 	BufferIO::EncodeUTF8(gameConf.bot_deck_path, linebuf);
 	std::fprintf(fp, "bot_deck_path = %s\n", linebuf);
+	std::fprintf(fp, "bot_room_public = %d\n", gameConf.bot_room_public);
 	std::fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	std::fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
 	std::fprintf(fp, "draw_single_chain = %d\n", gameConf.draw_single_chain);
