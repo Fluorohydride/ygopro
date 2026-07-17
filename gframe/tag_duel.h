@@ -59,8 +59,8 @@ protected:
 	Replay last_replay;
 	size_t last_replay_response_size{ 0 };
 	unsigned char turn_count{ 0 };
-	short time_limit[2]{};
-	short time_elapsed{ 0 };
+	uint16_t time_limit[2]{};
+	uint16_t time_elapsed{ 0 };
 };
 
 }

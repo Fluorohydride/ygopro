@@ -61,8 +61,8 @@ protected:
 	unsigned char duel_count{ 0 };
 	unsigned char tp_player{ 0 };
 	unsigned char match_result[3]{};
-	short time_limit[2]{};
-	short time_elapsed{ 0 };
+	uint16_t time_limit[2]{};
+	uint16_t time_elapsed{ 0 };
 };
 
 }

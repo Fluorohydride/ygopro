@@ -430,6 +430,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
+	time_elapsed = 0;
 	set_script_reader(DataManager::ScriptReaderEx);
 	set_card_reader(DataManager::CardReader);
 	set_message_handler(SingleDuel::MessageHandler);
@@ -479,10 +480,8 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	RefreshExtra(0);
 	RefreshExtra(1);
 	start_duel(pduel, opt);
-	if(host_info.time_limit) {
-		time_elapsed = 0;
+	if(host_info.time_limit)
 		NetServer::StartDuelTimer();
-	}
 	Process();
 }
 void SingleDuel::Process() {
@@ -1621,7 +1620,7 @@ uint32_t SingleDuel::MessageHandler(intptr_t fduel, uint32_t type) {
 }
 void SingleDuel::TimerTick() {
 	time_elapsed++;
-	if(time_elapsed >= time_limit[last_response] || time_limit[last_response] <= 0) {
+	if(time_elapsed >= time_limit[last_response]) {
 		unsigned char wbuf[3];
 		uint32_t player = last_response;
 		wbuf[0] = MSG_WIN;
