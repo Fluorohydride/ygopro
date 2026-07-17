@@ -11,11 +11,16 @@ namespace{
 	std::unordered_map<bufferevent*, DuelPlayer> users{};
 	unsigned short server_port{};
 	event_base* net_evbase{};
-	event* broadcast_ev {};
+	event* broadcast_ev{};
+	event* duel_etimer{};
 	evconnlistener* listener{};
 	DuelMode* duel_mode{};
 	bool broadcast_enabled{};
 	unsigned char net_server_read[SIZE_NETWORK_BUFFER]{};
+
+	void DuelTimer(evutil_socket_t, short, void* arg) {
+		static_cast<DuelMode*>(arg)->TimerTick();
+	}
 }
 
 unsigned char NetServer::net_server_write[SIZE_NETWORK_BUFFER]{};
@@ -98,6 +103,16 @@ void NetServer::StopBroadcast() {
 void NetServer::StopListen() {
 	evconnlistener_disable(listener);
 	StopBroadcast();
+}
+void NetServer::StartDuelTimer() {
+	if(!duel_etimer)
+		return;
+	timeval timeout = { 1, 0 };
+	event_add(duel_etimer, &timeout);
+}
+void NetServer::StopDuelTimer() {
+	if(duel_etimer)
+		event_del(duel_etimer);
 }
 void NetServer::BroadcastEvent(evutil_socket_t fd, short events, void* arg) {
 	sockaddr_in bc_addr;
@@ -186,10 +201,11 @@ void NetServer::ServerThread() {
 		event_free(broadcast_ev);
 		broadcast_ev = nullptr;
 	}
-	if(duel_mode) {
-		event_free(duel_mode->etimer);
+	if(duel_etimer)
+		event_free(duel_etimer);
+	duel_etimer = nullptr;
+	if(duel_mode)
 		delete duel_mode;
-	}
 	duel_mode = nullptr;
 	event_base_free(net_evbase);
 	net_evbase = nullptr;
@@ -316,18 +332,16 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, unsigned char* data, size_t len
 		}
 		if (pkt->info.mode == MODE_SINGLE) {
 			duel_mode = new SingleDuel(false);
-			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
 		}
 		else if (pkt->info.mode == MODE_MATCH) {
 			duel_mode = new SingleDuel(true);
-			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
 		}
 		else if (pkt->info.mode == MODE_TAG) {
 			duel_mode = new TagDuel();
-			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, TagDuel::TagTimer, duel_mode);
 		}
 		else
 			return;
+		duel_etimer = event_new(net_evbase, -1, EV_PERSIST, DuelTimer, duel_mode);
 		duel_mode->host_info = pkt->info;
 		BufferIO::NullTerminate(pkt->name);
 		BufferIO::NullTerminate(pkt->pass);

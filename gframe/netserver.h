@@ -22,6 +22,8 @@ public:
 	static void StopServer();
 	static void StopBroadcast();
 	static void StopListen();
+	static void StartDuelTimer();
+	static void StopDuelTimer();
 	static void BroadcastEvent(evutil_socket_t fd, short events, void* arg);
 	static void ServerAccept(evconnlistener* listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx);
 	static void ServerAcceptError(evconnlistener *listener, void* ctx);
