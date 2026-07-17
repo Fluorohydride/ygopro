@@ -71,28 +71,32 @@ void PreciseWaitUntil(steady_clock::time_point targetTime, bool windowActive) {
 	auto now = steady_clock::now();
 	if(now >= targetTime)
 		return;
+	constexpr auto PRECISE_WAIT_EARLY_WAKE = microseconds(2000);
 #ifdef _WIN32
 	static HighResolutionTimer highResolutionTimer;
 	if(highResolutionTimer.handle) {
 		auto remaining = duration_cast<microseconds>(targetTime - now);
-		if(remaining.count() > 1500) {
+		auto earlyWake = windowActive ? PRECISE_WAIT_EARLY_WAKE : microseconds(0);
+		if(remaining > earlyWake) {
 			LARGE_INTEGER dueTime;
-			dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
-			if(SetWaitableTimer(highResolutionTimer.handle, &dueTime, 0, NULL, NULL, FALSE))
-				WaitForSingleObject(highResolutionTimer.handle, INFINITE);
+			dueTime.QuadPart = -(LONGLONG)(remaining - earlyWake).count() * 10;
+			if(SetWaitableTimer(highResolutionTimer.handle, &dueTime, 0, NULL, NULL, FALSE)) {
+				if(WaitForSingleObject(highResolutionTimer.handle, INFINITE) == WAIT_OBJECT_0 && !windowActive)
+					return;
+			}
 		}
 	} else
 #endif
 	{
-		auto sleepTime = targetTime - now - milliseconds(2);
-		if(sleepTime > milliseconds(0))
+		auto sleepTime = targetTime - now - PRECISE_WAIT_EARLY_WAKE;
+		if(sleepTime > microseconds(0))
 			std::this_thread::sleep_for(sleepTime);
 	}
 	while(steady_clock::now() < targetTime) {
 		if(windowActive)
 			CPU_PAUSE();
 		else
-			std::this_thread::sleep_for(milliseconds(1));
+			std::this_thread::sleep_for(microseconds(1000));
 	}
 }
 
