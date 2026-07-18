@@ -64,7 +64,7 @@ jobs:
 
     - name: Download lua
       id: lua
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://www.lua.org/ftp/lua-5.4.8.tar.gz
         sha256: 4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae
@@ -74,12 +74,18 @@ jobs:
         tar xf ${{ steps.lua.outputs.filepath }}
         mv lua-5.4.8 lua
 
-    - name: Download miniaudio
+    - name: Fetch miniaudio
+      uses: actions/checkout@v6
+      with:
+        repository: mackron/miniaudio
+        path: miniaudio-source
+        ref: 9634bedb5b5a2ca38c1ee7108a9358a4e233f14d # tag: 0.11.25
+
+    - name: Use miniaudio split & decoders only
       run: |
-        git clone --depth=1 -b 0.11.25 https://github.com/mackron/miniaudio
-        cd miniaudio
-        cp extras/miniaudio_split/miniaudio.* .
-        cd ..
+        mkdir -p miniaudio/extras
+        cp miniaudio-source/extras/miniaudio_split/miniaudio.* miniaudio/
+        cp -r miniaudio-source/extras/decoders miniaudio/extras/
 
     - name: Upload sources
       uses: actions/upload-artifact@v6
@@ -88,7 +94,11 @@ jobs:
         path: |
           lua/
           miniaudio/
-          irrlicht/
+          irrlicht/include/
+          irrlicht/source/
+          !irrlicht/source/Irrlicht/jpeglib/
+          !irrlicht/source/Irrlicht/libpng/
+          !irrlicht/source/Irrlicht/zlib/
           ocgcore/
 
   prepare-static-dependencies:
@@ -97,7 +107,7 @@ jobs:
     steps:
     - name: Download libevent
       id: libevent
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
         filename: libevent.tar.gz
@@ -110,7 +120,7 @@ jobs:
 
     - name: Download freetype
       id: freetype
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://downloads.sourceforge.net/freetype/freetype-2.14.2.tar.gz
         sha256: 752c2671f85c54a84b7f0dd2b5cd26b6b741117033886ffbc5ac89a68464b848
@@ -122,7 +132,7 @@ jobs:
 
     - name: Download libjpeg-turbo
       id: libjpeg-turbo
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.4.1/libjpeg-turbo-3.1.4.1.tar.gz
         sha256: ecae8008e2cc9ade2f2c1bb9d5e6d4fb73e7c433866a056bd82980741571a022
@@ -133,9 +143,34 @@ jobs:
         mv libjpeg-turbo-3.1.4.1 jpeg
         cp jpeg/src/jversion.h.in jpeg/src/jversion.h
 
+    - name: Download libpng
+      id: libpng
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
+      with:
+        url: https://downloads.sourceforge.net/libpng/libpng-1.6.58.tar.gz
+        sha256: 8c9b05b675ca7301a458df2c2e46f26e1d41ff36b8863f8c33530bc58c2e6225
+
+    - name: Extract libpng
+      run: |
+        tar xf ${{ steps.libpng.outputs.filepath }}
+        mv libpng-1.6.58 png
+        cp png/scripts/pnglibconf.h.prebuilt png/pnglibconf.h
+    
+    - name: Download zlib
+      id: zlib
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
+      with:
+        url: https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz
+        sha256: bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16
+
+    - name: Extract zlib
+      run: |
+        tar xf ${{ steps.zlib.outputs.filepath }}
+        mv zlib-1.3.2 zlib
+
     - name: Download sqlite
       id: sqlite
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://www.sqlite.org/2026/sqlite-amalgamation-3510300.zip
         sha256: acb1e6f5d832484bf6d32b681e858c38add8b2acdfd42ac5df24b8afb46552b4
@@ -145,13 +180,25 @@ jobs:
         7z x ${{ steps.sqlite.outputs.filepath }}
         mv sqlite-amalgamation-3510300 sqlite3
 
+    - name: Download lzma (xz)
+      id: lzma
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
+      with:
+        url: https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz
+        sha256: 3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0
+
+    - name: Extract lzma
+      run: |
+        tar xf ${{ steps.lzma.outputs.filepath }}
+        mv xz-5.8.3 lzma
+
     - name: Create miniaudio external directory
       run: |
         mkdir -p miniaudio/external
 
     - name: Download ogg
       id: ogg
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/ogg/releases/download/v1.3.6/libogg-1.3.6.tar.gz
         sha256: 83e6704730683d004d20e21b8f7f55dcb3383cdf84c0daedf30bde175f774638
@@ -163,7 +210,7 @@ jobs:
 
     - name: Download opus
       id: opus
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
         sha256: 65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1
@@ -175,7 +222,7 @@ jobs:
 
     - name: Download opusfile
       id: opusfile
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/opusfile/releases/download/v0.12/opusfile-0.12.tar.gz
         sha256: 118d8601c12dd6a44f52423e68ca9083cc9f2bfe72da7a8c1acb22a80ae3550b
@@ -187,7 +234,7 @@ jobs:
 
     - name: Download vorbis
       id: vorbis
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/vorbis/releases/download/v1.3.7/libvorbis-1.3.7.tar.gz
         sha256: 0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab
@@ -204,10 +251,14 @@ jobs:
         path: |
           event/
           freetype/
+          !freetype/docs/
           jpeg/
           !jpeg/java/
-          !jpeg/testimgs/
+          !jpeg/testimages/
+          png/
+          zlib/
           sqlite3/
+          lzma/
           miniaudio/
           !miniaudio/external/opus/dnn/
 
@@ -217,25 +268,41 @@ jobs:
       fail-fast: false
       matrix:
         name:
-          - windows
+          - windows-x86-sse2
 #          - windows-no-dxsdk
-          - windows-x64
-#          - windows-2025
+          - windows-x64-avx2
+          - windows-x64-no-simd
+          - windows-arm64
+          - windows-2025
         include:
-          - name: windows
+          - name: windows-x86-sse2
             os: windows-2022
             vs: vs2022
+            platform: Win32
+            simd: sse2
 #          - name: windows-no-dxsdk
 #            os: windows-2022
 #            vs: vs2022
+#            platform: x64
 #            nodxsdk: true
-          - name: windows-x64
+          - name: windows-x64-avx2
             os: windows-2022
             vs: vs2022
-            x64: true
-#          - name: windows-2025
-#            os: windows-2025
-#            vs: vs2025 # to be enabled after the release of Visual Studio 2025
+            platform: x64
+            simd: avx2
+          - name: windows-x64-no-simd
+            os: windows-2022
+            vs: vs2022
+            platform: x64
+            simd: none
+          - name: windows-arm64
+            os: windows-2022
+            vs: vs2022
+            platform: ARM64
+          - name: windows-2025
+            os: windows-2025-vs2026
+            vs: vs2026
+            platform: x64
 
     runs-on: ${{ matrix.os }}
 
@@ -263,7 +330,7 @@ jobs:
 
     - name: Download NASM
       id: nasm
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://www.nasm.us/pub/nasm/releasebuilds/3.01/win64/nasm-3.01-win64.zip
         filename: nasm.zip
@@ -280,11 +347,11 @@ jobs:
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
-        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta7/premake-5.0.0-beta7-windows.zip
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-windows.zip
         filename: premake5.zip
-        sha256: 8baec7b265fd43050f006ef47000457fa93b6fafbb1ead7e333e862a467c2e95
+        sha256: e64ce2ed8778e0098f63674cca61fe33941b5f0c8d9a4afd651152bdea3758ab
 
     - name: Extract premake
       shell: bash
@@ -302,7 +369,7 @@ jobs:
     - name: Download DirectX SDK
       if: matrix.nodxsdk != true && steps.dxsdk.outputs.cache-hit != 'true'
       id: dxsdk-download
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe
         sha256: 705271dc83bfee54d9b94e028426e288d5f070784b7446d164f48ecfbb2a02cb
@@ -335,7 +402,7 @@ jobs:
     - name: Use premake to generate Visual Studio solution
       shell: pwsh
       run: |
-        .\premake5.exe ${{ matrix.vs }}
+        .\premake5.exe ${{ matrix.vs }} ${{ matrix.simd && format('--use-simd={0}', matrix.simd) || '' }}
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v3
@@ -343,7 +410,7 @@ jobs:
     - name: Build solution
       shell: pwsh
       run: |
-        MSBuild.exe build\YGOPro.sln /m /p:Configuration=Release /p:Platform=${{ matrix.x64 && 'x64' || 'Win32' }}
+        MSBuild.exe build\YGOPro.${{ matrix.vs == 'vs2026' && 'slnx' || 'sln' }} /m /p:Configuration=Release /p:Platform=${{ matrix.platform }}
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v6
@@ -352,6 +419,7 @@ jobs:
         path: |
           bin/release/x86/YGOPro.exe
           bin/release/x64/YGOPro.exe
+          bin/release/arm64/YGOPro.exe
 
   build-linux:
     needs: [prepare, prepare-static-dependencies]
@@ -361,17 +429,22 @@ jobs:
         name:
           - ubuntu-22
           - ubuntu-24
+          - ubuntu-26
           - ubuntu-static-link
+          - ubuntu-arm-static-link
         include:
           - name: ubuntu-22
             os: ubuntu-22.04
-            premake-version: 5.0.0-beta4
+            apt-outdated: true
           - name: ubuntu-24
             os: ubuntu-24.04
-            premake-version: 5.0.0-beta7
+          - name: ubuntu-26
+            os: ubuntu-26.04
           - name: ubuntu-static-link
             os: ubuntu-22.04
-            premake-version: 5.0.0-beta4
+            static-link: true
+          - name: ubuntu-arm-static-link
+            os: ubuntu-24.04-arm
             static-link: true
 
     runs-on: ${{ matrix.os }}
@@ -403,19 +476,53 @@ jobs:
     - name: Install dependencies (dynamic link)
       if: matrix.static-link != true
       run: |
-        sudo apt-get install -y libevent-dev libfreetype6-dev libsqlite3-dev libopusfile-dev libvorbis-dev libjpeg-dev libpng-dev
+        sudo apt-get install -y libevent-dev libfreetype6-dev libsqlite3-dev libopusfile-dev libvorbis-dev libjpeg-dev libpng-dev zlib1g-dev liblzma-dev
+
+    - name: Install NASM
+      if: matrix.static-link == true
+      run: |
+        sudo apt-get install -y nasm
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
-        url: https://github.com/premake/premake-core/releases/download/v${{ matrix.premake-version }}/premake-${{ matrix.premake-version }}-linux.tar.gz
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-linux.tar.gz
         filename: premake5.tar.gz
+        sha256: 63edd3e7461eebdd45b500a3c7e8ad4e7a67d68f230010f9a97cbb71b4ec59c8
 
-    - name: Extract premake
+    - name: Extract & test premake
+      id: extract-premake
       run: |
         tar xf ${{ steps.premake.outputs.filepath }}
         chmod +x ./premake5
+        mkdir premake-test
+        cp ./premake5 ./premake-test
+        cd ./premake-test
+        if ./premake5 --version; then
+          echo "premake=ok" >> $GITHUB_OUTPUT
+        else
+          echo "premake=fail" >> $GITHUB_OUTPUT
+        fi
+        cd ..
+
+    - name: Fetch premake source (fallback)
+      if: steps.extract-premake.outputs.premake != 'ok'
+      uses: actions/checkout@v6
+      with:
+        repository: premake/premake-core
+        path: premake-source
+        ref: 2ca338a25ed5f6e62d36c9cd70e5f313953c630d # tag: v5.0.0-beta8
+
+    - name: Build premake (fallback)
+      if: steps.extract-premake.outputs.premake != 'ok'
+      run: |
+        sudo apt-get install -y uuid-dev
+        cd premake-source
+        chmod +x ./Bootstrap.sh
+        ./Bootstrap.sh
+        cp bin/release/premake5 ../premake5
+        cd ..
 
     - name: Configure libevent
       if: matrix.static-link == true
@@ -434,6 +541,20 @@ jobs:
         ./configure
         cd ../../..
 
+    - name: Download lzma (xz)
+      if: matrix.apt-outdated == true
+      id: lzma
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
+      with:
+        url: https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz
+        sha256: 3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0
+
+    - name: Extract lzma
+      if: matrix.apt-outdated == true
+      run: |
+        tar xf ${{ steps.lzma.outputs.filepath }}
+        mv xz-5.8.3 lzma
+
     - name: Copy premake files
       run: |
         cp -pr premake/* .
@@ -442,7 +563,7 @@ jobs:
     - name: Use premake to generate make files (apt packages)
       if: matrix.static-link != true
       run: |
-        ./premake5 gmake
+        ./premake5 gmake ${{ matrix.apt-outdated == true && '--build-lzma' || '' }}
 
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true
@@ -450,9 +571,11 @@ jobs:
         ./premake5 gmake \
           --build-event \
           --build-jpeg \
-          --build-png-irrlicht \
+          --build-png \
+          --build-zlib \
           --build-freetype \
           --build-sqlite \
+          --build-lzma \
           --build-opus-vorbis
 
     - name: Make
@@ -475,23 +598,21 @@ jobs:
       matrix:
         name:
           - macos-15-intel
-          - macos-15-universal-static-link
-          - macos-15-arm
-#          - macos-15-intel-cross-compile-static-link
+          - macos-26-arm
+          - macos-26-intel-cross-compile-static-link
+          - macos-26-arm-static-link
         include:
           - name: macos-15-intel
             os: macos-15-intel
-          - name: macos-15-universal-static-link
-            os: macos-15
+          - name: macos-26-arm
+            os: macos-26
+          - name: macos-26-intel-cross-compile-static-link
+            os: macos-26
             cross-build-intel: true
-            cross-build-arm: true
             static-link: true
-          - name: macos-15-arm
-            os: macos-15
-#          - name: macos-15-intel-cross-compile-static-link
-#            os: macos-15
-#            cross-build-intel: true
-#            static-link: true
+          - name: macos-26-arm-static-link
+            os: macos-26
+            static-link: true
 
     runs-on: ${{ matrix.os }}
 
@@ -517,21 +638,52 @@ jobs:
     - name: Install dependencies
       if: matrix.static-link != true
       run: |
-        brew install opus opusfile libvorbis
-#        brew install sqlite libx11 freetype libevent libjpeg-turbo libpng
+        brew install libevent opus opusfile libvorbis zlib sqlite libx11 freetype libjpeg-turbo libpng xz
+
+    - name: Install NASM
+      if: matrix.static-link == true
+      run: |
+        brew install nasm
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
-        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta7/premake-5.0.0-beta7-macosx.tar.gz
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-macosx.tar.gz
         filename: premake5.tar.gz
-        sha256: f7a6d4978960aefbc0b2c522f211eedf014e6a2783b04a096c3716213c1bff67
+        sha256: fa73a46f093fa6f17494a3d063421aa6cae3ea825a61c62dd59fc2f07a256d03
 
-    - name: Extract premake
+    - name: Extract & test premake
+      id: extract-premake
       run: |
         tar xf ${{ steps.premake.outputs.filepath }}
         chmod +x ./premake5
+        mkdir premake-test
+        cp ./premake5 ./premake-test
+        cd ./premake-test
+        if ./premake5 --version; then
+          echo "premake=ok" >> $GITHUB_OUTPUT
+        else
+          echo "premake=fail" >> $GITHUB_OUTPUT
+        fi
+        cd ..
+
+    - name: Fetch premake source (fallback)
+      if: steps.extract-premake.outputs.premake != 'ok'
+      uses: actions/checkout@v6
+      with:
+        repository: premake/premake-core
+        path: premake-source
+        ref: 9ca696c86d5df6a1f6e674a931eef18e2b1c3b31 # fix: x86_64 architecture detection for macOS in Bootstrap.sh (#2640)
+
+    - name: Build premake (fallback)
+      if: steps.extract-premake.outputs.premake != 'ok'
+      run: |
+        cd premake-source
+        chmod +x ./Bootstrap.sh
+        ./Bootstrap.sh
+        cp bin/release/premake5 ../premake5
+        cd ..
 
     - name: Configure libevent
       if: matrix.static-link == true
@@ -550,7 +702,11 @@ jobs:
     - name: Use premake to generate make files (Homebrew packages)
       if: matrix.static-link != true
       run: |
-        DYLD_LIBRARY_PATH=$(brew --prefix)/lib ./premake5 gmake
+        DYLD_LIBRARY_PATH=$(brew --prefix)/lib ./premake5 gmake \
+          --sqlite-include-dir=$(brew --prefix sqlite)/include \
+          --sqlite-lib-dir=$(brew --prefix sqlite)/lib \
+          --zlib-include-dir=$(brew --prefix zlib)/include \
+          --zlib-lib-dir=$(brew --prefix zlib)/lib
 
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true
@@ -558,9 +714,11 @@ jobs:
         ./premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }} \
           --build-event \
           --build-jpeg \
-          --build-png-irrlicht \
+          --build-png \
+          --build-zlib \
           --build-freetype \
           --build-sqlite \
+          --build-lzma \
           --build-opus-vorbis
 
     - name: Make

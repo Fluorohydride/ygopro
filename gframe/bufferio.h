@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstring>
 #include <cwchar>
+#include <string>
 #include <vector>
 
 class BufferIO {
@@ -77,6 +78,7 @@ public:
 		return l;
 	}
 	template<typename T1, typename T2>
+	[[deprecated]]
 	static int CopyWStrRef(const T1* src, T2*& pstr, int bufsize) {
 		int l = 0;
 		while(src[l] && l < bufsize - 1) {
@@ -121,28 +123,54 @@ public:
 		return true;
 	}
 	// UTF-16/UTF-32 to UTF-8
+	static std::string EncodeUTF8String(const std::wstring& wstr) {
+		if (wstr.empty())
+			return std::string();
+		std::mbstate_t state{};
+		const wchar_t* src = wstr.c_str();
+		size_t len = std::wcsrtombs(nullptr, &src, 0, &state);
+		if (len == static_cast<size_t>(-1))
+			return std::string();
+		std::string result(len, '\0');
+		state = std::mbstate_t{};
+		src = wstr.c_str();
+		std::wcsrtombs(&result[0], &src, len, &state);
+		return result;
+	}
 	// return: string length
-	static int EncodeUTF8String(const wchar_t* wsrc, char* str, size_t len) {
-		if (len == 0) {
-			str[0] = 0;
+	static int EncodeUTF8String(const wchar_t* wsrc, char* str, size_t size) {
+		if (size == 0) {
 			return 0;
 		}
 		std::mbstate_t state{};
-		size_t result_len = std::wcsrtombs(str, &wsrc, len - 1, &state);
+		size_t result_len = std::wcsrtombs(str, &wsrc, size - 1, &state);
 		if (result_len == static_cast<size_t>(-1))
 			result_len = 0;
 		str[result_len] = 0;
 		return static_cast<int>(result_len);
 	}
 	// UTF-8 to UTF-16/UTF-32
+	static std::wstring DecodeUTF8String(const std::string& str) {
+		if (str.empty())
+			return std::wstring();
+		std::mbstate_t state{};
+		const char* src = str.c_str();
+		size_t len = std::mbsrtowcs(nullptr, &src, 0, &state);
+		if (len == static_cast<size_t>(-1))
+			return std::wstring();
+		std::wstring result(len, L'\0');
+		state = std::mbstate_t{};
+		src = str.c_str();
+		std::mbsrtowcs(&result[0], &src, len, &state);
+		return result;
+	}
 	// return: string length
-	static int DecodeUTF8String(const char* src, wchar_t* wstr, size_t len) {
-		if (len == 0) {
-			wstr[0] = 0;
+	static int DecodeUTF8String(const char* src, wchar_t* wstr, size_t size) {
+		if (size == 0) {
 			return 0;
 		}
 		std::mbstate_t state{};
-		size_t result_len = std::mbsrtowcs(wstr, &src, len - 1, &state);
+		size_t result_len = std::mbsrtowcs(wstr, &src, size - 1, &state);
 		if (result_len == static_cast<size_t>(-1))
 			result_len = 0;
 		wstr[result_len] = 0;

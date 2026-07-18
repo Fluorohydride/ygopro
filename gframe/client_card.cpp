@@ -141,6 +141,16 @@ void ClientCard::UpdateInfo(unsigned char* buf) {
 	if(flag & QUERY_OVERLAY_CARD) {
 		int count = BufferIO::Read<int32_t>(buf);
 		for(int i = 0; i < count; ++i) {
+			if(i >= overlayed.size()) {
+				ClientCard* xcard = new ClientCard;
+				overlayed.push_back(xcard);
+				mainGame->dField.overlay_cards.insert(xcard);
+				xcard->overlayTarget = this;
+				xcard->location = LOCATION_OVERLAY;
+				xcard->sequence = (unsigned char)(overlayed.size() - 1);
+				xcard->owner = controler; // not accurate
+				xcard->controler = controler;
+			}
 			overlayed[i]->SetCode(BufferIO::Read<int32_t>(buf));
 		}
 	}

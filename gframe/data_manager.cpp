@@ -205,6 +205,9 @@ bool DataManager::LoadStrings(irr::io::IReadFile* reader) {
 			linebuf.clear();
 		}
 	}
+	if (!linebuf.empty()) {
+		ReadStringConfLine(linebuf.data());
+	}
 	reader->drop();
 	return true;
 }
@@ -433,7 +436,7 @@ std::wstring DataManager::FormatType(unsigned int type) const {
 }
 std::wstring DataManager::FormatSetName(const uint16_t setcode[]) const {
 	std::wstring buffer;
-	for(int i = 0; i < 10; ++i) {
+	for(int i = 0; i < SIZE_SETCODE; ++i) {
 		if (!setcode[i])
 			break;
 		const wchar_t* setname = GetSetName(setcode[i]);
@@ -636,6 +639,9 @@ bool DataManager::deck_sort_name(const CardDataC* p1, const CardDataC* p2) {
 	int res = std::wcscmp(name1, name2);
 	if (res != 0)
 		return res < 0;
+	return p1->code < p2->code;
+}
+bool DataManager::deck_sort_id(const CardDataC* p1, const CardDataC* p2) {
 	return p1->code < p2->code;
 }
 
