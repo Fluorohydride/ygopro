@@ -1,10 +1,49 @@
 #include "sound_manager.h"
+#include "game.h"
 #include "myfilesystem.h"
-#if defined(YGOPRO_USE_MINIAUDIO) && defined(YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS)
+#ifdef YGOPRO_USE_MINIAUDIO
+#include <miniaudio.h>
+#ifdef YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS
 #include <miniaudio_libopus.h>
 #include <miniaudio_libvorbis.h>
 #endif
+#endif
 namespace ygo {
+
+#ifdef YGOPRO_USE_MINIAUDIO
+struct SoundManager::MiniAudioImpl {
+	ma_engine engineSound;
+	bool engineSoundInitialized{};
+	ma_engine engineMusic;
+	bool engineMusicInitialized{};
+	ma_sound soundBGM;
+	bool soundBGMInitialized{};
+#ifdef YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS
+	ma_resource_manager resourceManager;
+	bool resourceManagerInitialized{};
+#endif
+	wchar_t currentPlayingMusic[1024]{};
+
+	~MiniAudioImpl() {
+		if(soundBGMInitialized)
+			ma_sound_uninit(&soundBGM);
+		if(engineMusicInitialized)
+			ma_engine_uninit(&engineMusic);
+		if(engineSoundInitialized)
+			ma_engine_uninit(&engineSound);
+#ifdef YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS
+		if(resourceManagerInitialized)
+			ma_resource_manager_uninit(&resourceManager);
+#endif
+	}
+};
+#endif
+
+SoundManager::~SoundManager() {
+#ifdef YGOPRO_USE_MINIAUDIO
+	delete miniAudio;
+#endif
+}
 
 SoundManager soundManager;
 
@@ -14,33 +53,49 @@ bool SoundManager::Init() {
 	RefreshBGMList();
 	rnd.seed(std::random_device()());
 #ifdef YGOPRO_USE_MINIAUDIO
-	engineConfig = ma_engine_config_init();
+	if(miniAudio)
+		return true;
+	miniAudio = new MiniAudioImpl{};
+	auto engineConfig = ma_engine_config_init();
 #ifdef YGOPRO_MINIAUDIO_SUPPORT_OPUS_VORBIS
 	ma_decoding_backend_vtable* pCustomBackendVTables[] =
 	{
 		ma_decoding_backend_libvorbis,
 		ma_decoding_backend_libopus
 	};
-	resourceManagerConfig = ma_resource_manager_config_init();
+	auto resourceManagerConfig = ma_resource_manager_config_init();
 	resourceManagerConfig.ppCustomDecodingBackendVTables = pCustomBackendVTables;
 	resourceManagerConfig.customDecodingBackendCount = sizeof(pCustomBackendVTables) / sizeof(pCustomBackendVTables[0]);
 	resourceManagerConfig.pCustomDecodingBackendUserData = NULL;
-	if(ma_resource_manager_init(&resourceManagerConfig, &resourceManager) != MA_SUCCESS) {
+	if(ma_resource_manager_init(&resourceManagerConfig, &miniAudio->resourceManager) != MA_SUCCESS) {
+		delete miniAudio;
+		miniAudio = nullptr;
 		return false;
 	}
-	engineConfig.pResourceManager = &resourceManager;
+	miniAudio->resourceManagerInitialized = true;
+	engineConfig.pResourceManager = &miniAudio->resourceManager;
 #endif
-	if(ma_engine_init(&engineConfig, &engineSound) != MA_SUCCESS || ma_engine_init(&engineConfig, &engineMusic) != MA_SUCCESS) {
+	if(ma_engine_init(&engineConfig, &miniAudio->engineSound) != MA_SUCCESS) {
+		delete miniAudio;
+		miniAudio = nullptr;
 		return false;
-	} else {
-		return true;
 	}
+	miniAudio->engineSoundInitialized = true;
+	if(ma_engine_init(&engineConfig, &miniAudio->engineMusic) != MA_SUCCESS) {
+		delete miniAudio;
+		miniAudio = nullptr;
+		return false;
+	}
+	miniAudio->engineMusicInitialized = true;
+	return true;
 #endif // YGOPRO_USE_MINIAUDIO
 #endif // YGOPRO_USE_AUDIO
 	return false;
 }
 void SoundManager::RefreshBGMList() {
 #ifdef YGOPRO_USE_AUDIO
+	for(size_t i = 0; i < sizeof(BGMList) / sizeof(BGMList[0]); ++i)
+		BGMList[i].clear();
 	RefershBGMDir(L"", BGM_DUEL);
 	RefershBGMDir(L"duel", BGM_DUEL);
 	RefershBGMDir(L"menu", BGM_MENU);
@@ -204,7 +259,8 @@ void SoundManager::PlaySoundEffect(int sound) {
 	std::string soundPath = "./sound/" + soundName + ".wav";
 	SetSoundVolume(mainGame->gameConf.sound_volume);
 #ifdef YGOPRO_USE_MINIAUDIO
-	ma_engine_play_sound(&engineSound, soundPath.c_str(), nullptr);
+	if(miniAudio && miniAudio->engineSoundInitialized)
+		ma_engine_play_sound(&miniAudio->engineSound, soundPath.c_str(), nullptr);
 #endif
 #endif // YGOPRO_USE_AUDIO
 }
@@ -235,10 +291,12 @@ void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 }
 bool SoundManager::IsPlayingMusic(wchar_t* music) {
 #ifdef YGOPRO_USE_MINIAUDIO
+	if(!miniAudio || !miniAudio->soundBGMInitialized)
+		return false;
 	if(music) {
-		return !mywcsncasecmp(currentPlayingMusic, music, 1024) && ma_sound_is_playing(&soundBGM);
+		return !mywcsncasecmp(miniAudio->currentPlayingMusic, music, 1024) && ma_sound_is_playing(&miniAudio->soundBGM);
 	} else {
-		return currentPlayingMusic[0] && ma_sound_is_playing(&soundBGM);
+		return miniAudio->currentPlayingMusic[0] && ma_sound_is_playing(&miniAudio->soundBGM);
 	}
 #endif
 	return false;
@@ -251,10 +309,12 @@ void SoundManager::PlayMusic(wchar_t* music, bool loop) {
 		StopBGM();
 		SetMusicVolume(mainGame->gameConf.music_volume);
 #ifdef YGOPRO_USE_MINIAUDIO
-		BufferIO::CopyWStr(music, currentPlayingMusic, 1024);
-		ma_sound_init_from_file_w(&engineMusic, music, MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_STREAM, nullptr, nullptr, &soundBGM);
-		ma_sound_set_looping(&soundBGM, loop);
-		ma_sound_start(&soundBGM);
+		if(!miniAudio || !miniAudio->engineMusicInitialized || ma_sound_init_from_file_w(&miniAudio->engineMusic, music, MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_STREAM, nullptr, nullptr, &miniAudio->soundBGM) != MA_SUCCESS)
+			return;
+		miniAudio->soundBGMInitialized = true;
+		BufferIO::CopyWStr(music, miniAudio->currentPlayingMusic, 1024);
+		ma_sound_set_looping(&miniAudio->soundBGM, loop);
+		ma_sound_start(&miniAudio->soundBGM);
 #endif
 	}
 #endif
@@ -280,20 +340,23 @@ void SoundManager::PlayBGM(int scene) {
 }
 void SoundManager::StopBGM() {
 #ifdef YGOPRO_USE_MINIAUDIO
-	if(!currentPlayingMusic[0])
+	if(!miniAudio || !miniAudio->soundBGMInitialized)
 		return;
-	memset(currentPlayingMusic, 0, sizeof(currentPlayingMusic));
-	ma_sound_uninit(&soundBGM);
+	memset(miniAudio->currentPlayingMusic, 0, sizeof(miniAudio->currentPlayingMusic));
+	ma_sound_uninit(&miniAudio->soundBGM);
+	miniAudio->soundBGMInitialized = false;
 #endif
 }
 void SoundManager::SetSoundVolume(int volume) {
 #ifdef YGOPRO_USE_MINIAUDIO
-	ma_engine_set_volume(&engineSound, volume / 100.0f);
+	if(miniAudio && miniAudio->engineSoundInitialized)
+		ma_engine_set_volume(&miniAudio->engineSound, volume / 100.0f);
 #endif
 }
 void SoundManager::SetMusicVolume(int volume) {
 #ifdef YGOPRO_USE_MINIAUDIO
-	ma_engine_set_volume(&engineMusic, volume / 100.0f);
+	if(miniAudio && miniAudio->engineMusicInitialized)
+		ma_engine_set_volume(&miniAudio->engineMusic, volume / 100.0f);
 #endif
 }
 }
