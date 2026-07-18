@@ -64,7 +64,7 @@ jobs:
 
     - name: Download lua
       id: lua
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://www.lua.org/ftp/lua-5.4.8.tar.gz
         sha256: 4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae
@@ -107,7 +107,7 @@ jobs:
     steps:
     - name: Download libevent
       id: libevent
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
         filename: libevent.tar.gz
@@ -120,7 +120,7 @@ jobs:
 
     - name: Download freetype
       id: freetype
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://downloads.sourceforge.net/freetype/freetype-2.14.2.tar.gz
         sha256: 752c2671f85c54a84b7f0dd2b5cd26b6b741117033886ffbc5ac89a68464b848
@@ -132,7 +132,7 @@ jobs:
 
     - name: Download libjpeg-turbo
       id: libjpeg-turbo
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.4.1/libjpeg-turbo-3.1.4.1.tar.gz
         sha256: ecae8008e2cc9ade2f2c1bb9d5e6d4fb73e7c433866a056bd82980741571a022
@@ -145,7 +145,7 @@ jobs:
 
     - name: Download libpng
       id: libpng
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://downloads.sourceforge.net/libpng/libpng-1.6.58.tar.gz
         sha256: 8c9b05b675ca7301a458df2c2e46f26e1d41ff36b8863f8c33530bc58c2e6225
@@ -158,7 +158,7 @@ jobs:
     
     - name: Download zlib
       id: zlib
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz
         sha256: bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16
@@ -170,7 +170,7 @@ jobs:
 
     - name: Download sqlite
       id: sqlite
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://www.sqlite.org/2026/sqlite-amalgamation-3510300.zip
         sha256: acb1e6f5d832484bf6d32b681e858c38add8b2acdfd42ac5df24b8afb46552b4
@@ -182,7 +182,7 @@ jobs:
 
     - name: Download lzma (xz)
       id: lzma
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz
         sha256: 3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0
@@ -198,7 +198,7 @@ jobs:
 
     - name: Download ogg
       id: ogg
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/ogg/releases/download/v1.3.6/libogg-1.3.6.tar.gz
         sha256: 83e6704730683d004d20e21b8f7f55dcb3383cdf84c0daedf30bde175f774638
@@ -210,7 +210,7 @@ jobs:
 
     - name: Download opus
       id: opus
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
         sha256: 65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1
@@ -222,7 +222,7 @@ jobs:
 
     - name: Download opusfile
       id: opusfile
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/opusfile/releases/download/v0.12/opusfile-0.12.tar.gz
         sha256: 118d8601c12dd6a44f52423e68ca9083cc9f2bfe72da7a8c1acb22a80ae3550b
@@ -234,7 +234,7 @@ jobs:
 
     - name: Download vorbis
       id: vorbis
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/xiph/vorbis/releases/download/v1.3.7/libvorbis-1.3.7.tar.gz
         sha256: 0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab
@@ -330,7 +330,7 @@ jobs:
 
     - name: Download NASM
       id: nasm
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://www.nasm.us/pub/nasm/releasebuilds/3.01/win64/nasm-3.01-win64.zip
         filename: nasm.zip
@@ -347,7 +347,7 @@ jobs:
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-windows.zip
         filename: premake5.zip
@@ -369,7 +369,7 @@ jobs:
     - name: Download DirectX SDK
       if: matrix.nodxsdk != true && steps.dxsdk.outputs.cache-hit != 'true'
       id: dxsdk-download
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe
         sha256: 705271dc83bfee54d9b94e028426e288d5f070784b7446d164f48ecfbb2a02cb
@@ -429,6 +429,7 @@ jobs:
         name:
           - ubuntu-22
           - ubuntu-24
+          - ubuntu-26
           - ubuntu-static-link
           - ubuntu-arm-static-link
         include:
@@ -437,6 +438,8 @@ jobs:
             apt-outdated: true
           - name: ubuntu-24
             os: ubuntu-24.04
+          - name: ubuntu-26
+            os: ubuntu-26.04
           - name: ubuntu-static-link
             os: ubuntu-22.04
             static-link: true
@@ -482,7 +485,7 @@ jobs:
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-linux.tar.gz
         filename: premake5.tar.gz
@@ -541,7 +544,7 @@ jobs:
     - name: Download lzma (xz)
       if: matrix.apt-outdated == true
       id: lzma
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz
         sha256: 3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0
@@ -635,8 +638,7 @@ jobs:
     - name: Install dependencies
       if: matrix.static-link != true
       run: |
-        brew install opus opusfile libvorbis zlib
-#        brew install sqlite libx11 freetype libevent libjpeg-turbo libpng xz
+        brew install libevent opus opusfile libvorbis zlib sqlite libx11 freetype libjpeg-turbo libpng xz
 
     - name: Install NASM
       if: matrix.static-link == true
@@ -645,7 +647,7 @@ jobs:
 
     - name: Download premake
       id: premake
-      uses: mercury233/action-cache-download-file@v1.2.0
+      uses: mercury233/action-cache-download-file@3fffc760bf7b992889fcadf1055bc475b1cd7db6
       with:
         url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-macosx.tar.gz
         filename: premake5.tar.gz

@@ -85,9 +85,11 @@ struct Config {
 	int chkIgnoreDeckChanges{ 0 };
 	int defaultOT{ 1 };
 	int enable_bot_mode{ 0 };
+	int bot_room_public{ 0 };
 	int quick_animation{ 0 };
 	int auto_save_replay{ 0 };
 	int draw_single_chain{ 0 };
+	int solid_selection_line{ 0 };
 	int hide_player_name{ 0 };
 	int prefer_expansion_script{ 0 };
 	bool enable_sound{ true };
@@ -265,6 +267,9 @@ public:
 	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(irr::gui::ECURSOR_ICON icon);
+
+	static bool SpawnAsync(const std::wstring& exePath, const std::vector<std::wstring>& args);
+
 	template<typename T>
 	static void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const irr::core::rect<irr::s32>& position, const irr::core::rect<irr::s32>& padding,
 		irr::video::SColor color = 0xffffffff, irr::video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const irr::core::rect<irr::s32>* clip = nullptr);
@@ -319,6 +324,8 @@ public:
 	bool open_file{ false };
 	wchar_t open_file_name[256]{};
 	bool bot_mode{ false };
+	std::wstring pending_bot_executable;
+	std::vector<std::wstring> pending_bot_args;
 
 	irr::core::dimension2d<irr::u32> window_size;
 	float xScale{ 1.0f };

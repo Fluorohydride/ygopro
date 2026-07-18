@@ -8,6 +8,15 @@
 
 namespace ygo {
 
+#define CONNECT_STATE_NONE			0x0
+#define CONNECT_STATE_CONNECTING	0x1
+#define CONNECT_STATE_CONNECTED		0x2
+#define CONNECT_STATE_JOINED		0x4
+
+#define CLIENT_CLOSE_REASON_NONE	0
+#define CLIENT_CLOSE_REASON_STOP	1
+#define CLIENT_CLOSE_REASON_EXIT	2
+
 class DuelClient {
 private:
 	static bufferevent* client_bev;
@@ -17,10 +26,10 @@ public:
 	static unsigned char selftype;
 	static bool StartClient(unsigned int ip, unsigned short port, bool create_game = true);
 	static void ConnectTimeout(evutil_socket_t fd, short events, void* arg);
-	static void StopClient(bool is_exiting = false);
+	static void StopClient(unsigned reason = CLIENT_CLOSE_REASON_STOP);
 	static void ClientRead(bufferevent* bev, void* ctx);
 	static void ClientEvent(bufferevent* bev, short events, void* ctx);
-	static int ClientThread();
+	static void ClientThread();
 	static void HandleSTOCPacketLan(unsigned char* data, size_t len);
 	static bool ClientAnalyze(unsigned char* msg, size_t len);
 	static void SwapField();
@@ -57,6 +66,8 @@ public:
 	static void BeginRefreshHost();
 	static int RefreshThread(event_base* broadev);
 	static void BroadcastReply(evutil_socket_t fd, short events, void* arg);
+
+	static unsigned int ResolveHostName(const char* hostname, const char* port);
 };
 
 }

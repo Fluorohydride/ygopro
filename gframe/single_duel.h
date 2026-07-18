@@ -29,6 +29,7 @@ public:
 	void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) override;
 	void TimeConfirm(DuelPlayer* dp) override;
 	void EndDuel() override;
+	void OnPlayerDisconnected(DuelPlayer* dp) override;
 	
 	void DuelEndProc();
 	void WaitforResponse(int playerid);
@@ -43,7 +44,7 @@ public:
 	static void SingleTimer(evutil_socket_t fd, short events, void* arg);
 
 private:
-	int WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache);
+	int WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache);
 	
 protected:
 	DuelPlayer* players[2]{};
@@ -55,6 +56,7 @@ protected:
 	unsigned char last_response{ 0 };
 	std::set<DuelPlayer*> observers;
 	Replay last_replay;
+	size_t last_replay_response_size{ 0 };
 	bool match_mode{ false };
 	int match_kill{ 0 };
 	unsigned char duel_count{ 0 };
@@ -67,4 +69,3 @@ protected:
 }
 
 #endif //SINGLE_DUEL_H
-

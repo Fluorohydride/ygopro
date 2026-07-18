@@ -14,6 +14,15 @@
 #include <chrono>
 #ifdef _WIN32
 #include <timeapi.h>
+#else
+#include <spawn.h>
+#ifdef __APPLE__
+#include <crt_externs.h>
+#define GetEnviron() (*_NSGetEnviron())
+#else
+extern char **environ;
+#define GetEnviron() environ
+#endif
 #endif
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -92,6 +101,8 @@ bool Game::Initialize() {
 	device->getLogger()->setLogLevel(irr::ELOG_LEVEL::ELL_ERROR);
 #endif
 	deckManager.LoadLFList();
+	if(gameConf.default_lflist >= (int)deckManager._lfList.size() || gameConf.default_lflist < 0)
+		gameConf.default_lflist = 0;
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
@@ -397,31 +408,32 @@ bool Game::Initialize() {
 	scrTabHelper->setVisible(false);
 	int posX = 0;
 	int posY = 0;
-	chkMAutoPos = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1274));
+	int chkBoxLabelWidth = 520;
+	chkMAutoPos = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabHelper, -1, dataManager.GetSysString(1274));
 	chkMAutoPos->setChecked(gameConf.chkMAutoPos != 0);
 	posY += 30;
-	chkSTAutoPos = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1278));
+	chkSTAutoPos = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabHelper, -1, dataManager.GetSysString(1278));
 	chkSTAutoPos->setChecked(gameConf.chkSTAutoPos != 0);
 	posY += 30;
-	chkRandomPos = env->addCheckBox(false, irr::core::rect<irr::s32>(posX + 20, posY, posX + 20 + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1275));
+	chkRandomPos = env->addCheckBox(false, irr::core::rect<irr::s32>(posX + 20, posY, posX + 20 + chkBoxLabelWidth, posY + 25), tabHelper, -1, dataManager.GetSysString(1275));
 	chkRandomPos->setChecked(gameConf.chkRandomPos != 0);
 	posY += 30;
-	chkAutoChain = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1276));
+	chkAutoChain = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabHelper, -1, dataManager.GetSysString(1276));
 	chkAutoChain->setChecked(gameConf.chkAutoChain != 0);
 	posY += 30;
-	chkWaitChain = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1277));
+	chkWaitChain = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabHelper, -1, dataManager.GetSysString(1277));
 	chkWaitChain->setChecked(gameConf.chkWaitChain != 0);
 	posY += 30;
-	chkDefaultShowChain = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1354));
+	chkDefaultShowChain = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabHelper, -1, dataManager.GetSysString(1354));
 	chkDefaultShowChain->setChecked(gameConf.chkDefaultShowChain != 0);
 	posY += 30;
-	chkQuickAnimation = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabHelper, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299));
+	chkQuickAnimation = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabHelper, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299));
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
 	posY += 30;
-	chkDrawSingleChain = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabHelper, CHECKBOX_DRAW_SINGLE_CHAIN, dataManager.GetSysString(1287));
+	chkDrawSingleChain = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabHelper, CHECKBOX_DRAW_SINGLE_CHAIN, dataManager.GetSysString(1287));
 	chkDrawSingleChain->setChecked(gameConf.draw_single_chain != 0);
 	posY += 30;
-	chkAutoSaveReplay = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1366));
+	chkAutoSaveReplay = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabHelper, -1, dataManager.GetSysString(1366));
 	chkAutoSaveReplay->setChecked(gameConf.auto_save_replay != 0);
 	elmTabHelperLast = chkAutoSaveReplay;
 	//system
@@ -437,31 +449,31 @@ bool Game::Initialize() {
 	scrTabSystem->setSmallStep(1);
 	scrTabSystem->setVisible(false);
 	posY = 0;
-	chkIgnore1 = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_DISABLE_CHAT, dataManager.GetSysString(1290));
+	chkIgnore1 = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabSystem, CHECKBOX_DISABLE_CHAT, dataManager.GetSysString(1290));
 	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
 	posY += 30;
-	chkIgnore2 = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1291));
+	chkIgnore2 = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabSystem, -1, dataManager.GetSysString(1291));
 	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
 	posY += 30;
-	chkHidePlayerName = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_HIDE_PLAYER_NAME, dataManager.GetSysString(1289));
+	chkHidePlayerName = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabSystem, CHECKBOX_HIDE_PLAYER_NAME, dataManager.GetSysString(1289));
 	chkHidePlayerName->setChecked(gameConf.hide_player_name != 0);
 	posY += 30;
-	chkIgnoreDeckChanges = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1357));
+	chkIgnoreDeckChanges = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabSystem, -1, dataManager.GetSysString(1357));
 	chkIgnoreDeckChanges->setChecked(gameConf.chkIgnoreDeckChanges != 0);
 	posY += 30;
-	chkAutoSearch = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_AUTO_SEARCH, dataManager.GetSysString(1358));
+	chkAutoSearch = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabSystem, CHECKBOX_AUTO_SEARCH, dataManager.GetSysString(1358));
 	chkAutoSearch->setChecked(gameConf.auto_search_limit >= 0);
 	posY += 30;
-	chkMultiKeywords = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_MULTI_KEYWORDS, dataManager.GetSysString(1378));
+	chkMultiKeywords = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabSystem, CHECKBOX_MULTI_KEYWORDS, dataManager.GetSysString(1378));
 	chkMultiKeywords->setChecked(gameConf.search_multiple_keywords > 0);
 	posY += 30;
-	chkPreferExpansionScript = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_PREFER_EXPANSION, dataManager.GetSysString(1379));
+	chkPreferExpansionScript = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabSystem, CHECKBOX_PREFER_EXPANSION, dataManager.GetSysString(1379));
 	chkPreferExpansionScript->setChecked(gameConf.prefer_expansion_script != 0);
 	posY += 30;
-	chkSwapYesNoButton = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_SWAP_YES_NO_BUTTON, dataManager.GetSysString(1388));
+	chkSwapYesNoButton = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabSystem, CHECKBOX_SWAP_YES_NO_BUTTON, dataManager.GetSysString(1388));
 	chkSwapYesNoButton->setChecked(gameConf.swap_yes_no_button);
 	posY += 30;
-	chkResizeSelectWindow = env->addCheckBox(gameConf.resize_select_window, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_RESIZE_SELECT_WINDOW, dataManager.GetSysString(1387));
+	chkResizeSelectWindow = env->addCheckBox(gameConf.resize_select_window, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabSystem, CHECKBOX_RESIZE_SELECT_WINDOW, dataManager.GetSysString(1387));
 	posY += 30;
 	env->addStaticText(dataManager.GetSysString(1282), irr::core::rect<irr::s32>(posX + 23, posY + 3, posX + 110, posY + 28), false, false, tabSystem);
 	btnWinResizeS = env->addButton(irr::core::rect<irr::s32>(posX + 115, posY, posX + 145, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_S, dataManager.GetSysString(1283));
@@ -469,8 +481,8 @@ bool Game::Initialize() {
 	btnWinResizeL = env->addButton(irr::core::rect<irr::s32>(posX + 185, posY, posX + 215, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_L, dataManager.GetSysString(1285));
 	btnWinResizeXL = env->addButton(irr::core::rect<irr::s32>(posX + 220, posY, posX + 250, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_XL, dataManager.GetSysString(1286));
 	posY += 30;
-	chkResizePopupMenu = env->addCheckBox(gameConf.resize_popup_menu > 0, irr::core::rect<irr::s32>(posX, posY, posX + 120, posY + 25), tabSystem, CHECKBOX_RESIZE_POPUP_MENU, dataManager.GetSysString(1386));
-	scrResizePopupMenu = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 116, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_RESIZE_POPUP_MENU);
+	chkResizePopupMenu = env->addCheckBox(gameConf.resize_popup_menu > 0, irr::core::rect<irr::s32>(posX, posY, posX + 110, posY + 25), tabSystem, CHECKBOX_RESIZE_POPUP_MENU, dataManager.GetSysString(1386));
+	scrResizePopupMenu = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 115, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_RESIZE_POPUP_MENU);
 	scrResizePopupMenu->setMax(5);
 	scrResizePopupMenu->setMin(1);
 	scrResizePopupMenu->setPos(gameConf.resize_popup_menu > 0 ? gameConf.resize_popup_menu : 3);
@@ -488,7 +500,7 @@ bool Game::Initialize() {
 	posY += 30;
 	chkEnableSound = env->addCheckBox(gameConf.enable_sound, irr::core::rect<irr::s32>(posX, posY, posX + 120, posY + 25), tabSystem, -1, dataManager.GetSysString(1279));
 	chkEnableSound->setChecked(gameConf.enable_sound);
-	scrSoundVolume = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 116, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_VOLUME);
+	scrSoundVolume = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 115, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_VOLUME);
 	scrSoundVolume->setMax(100);
 	scrSoundVolume->setMin(0);
 	scrSoundVolume->setPos(gameConf.sound_volume);
@@ -497,14 +509,14 @@ bool Game::Initialize() {
 	posY += 30;
 	chkEnableMusic = env->addCheckBox(gameConf.enable_music, irr::core::rect<irr::s32>(posX, posY, posX + 120, posY + 25), tabSystem, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(1280));
 	chkEnableMusic->setChecked(gameConf.enable_music);
-	scrMusicVolume = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 116, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_VOLUME);
+	scrMusicVolume = env->addScrollBar(true, irr::core::rect<irr::s32>(posX + 115, posY + 4, posX + 250, posY + 21), tabSystem, SCROLL_VOLUME);
 	scrMusicVolume->setMax(100);
 	scrMusicVolume->setMin(0);
 	scrMusicVolume->setPos(gameConf.music_volume);
 	scrMusicVolume->setLargeStep(1);
 	scrMusicVolume->setSmallStep(1);
 	posY += 30;
-	chkMusicMode = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1281));
+	chkMusicMode = env->addCheckBox(false, irr::core::rect<irr::s32>(posX, posY, posX + chkBoxLabelWidth, posY + 25), tabSystem, -1, dataManager.GetSysString(1281));
 	chkMusicMode->setChecked(gameConf.music_mode != 0);
 	elmTabSystemLast = chkMusicMode;
 	//
@@ -516,6 +528,7 @@ bool Game::Initialize() {
 	for(int i = 0; i < 3; ++i) {
 		btnHand[i] = env->addButton(irr::core::rect<irr::s32>(10 + 105 * i, 10, 105 + 105 * i, 144), wHand, BUTTON_HAND1 + i, L"");
 		btnHand[i]->setImage(imageManager.tHand[i]);
+		btnHand[i]->setUseAlphaChannel(true);
 	}
 	//
 	wFTSelect = env->addWindow(irr::core::rect<irr::s32>(550, 240, 780, 340), false, L"");
@@ -575,11 +588,15 @@ bool Game::Initialize() {
 	wPosSelect->getCloseButton()->setVisible(false);
 	wPosSelect->setVisible(false);
 	btnPSAU = env->addButton(irr::core::rect<irr::s32>(27, 35, 164, 172), wPosSelect, BUTTON_POS_AU);
+	btnPSAU->setUseAlphaChannel(true);
 	btnPSAD = env->addButton(irr::core::rect<irr::s32>(27, 35, 164, 172), wPosSelect, BUTTON_POS_AD);
+	btnPSAD->setUseAlphaChannel(true);
 	btnFacedownImgInfo[btnPSAD] = {0, false};
 	btnPSAD->setVisible(false); // PSAD = PoSition Attack face-Down, is not allowed in the rules, so the width of wPosSelect only support 3 buttons
 	btnPSDU = env->addButton(irr::core::rect<irr::s32>(169, 35, 306, 172), wPosSelect, BUTTON_POS_DU);
+	btnPSDU->setUseAlphaChannel(true);
 	btnPSDD = env->addButton(irr::core::rect<irr::s32>(311, 35, 448, 172), wPosSelect, BUTTON_POS_DD);
+	btnPSDD->setUseAlphaChannel(true);
 	btnFacedownImgInfo[btnPSDD] = {0, true};
 	//card select
 	wCardSelect = env->addWindow(irr::core::rect<irr::s32>(320, 100, 1000, 400), false, L"");
@@ -590,6 +607,7 @@ bool Game::Initialize() {
 		stCardPos[i]->setBackgroundColor(0xffffffff);
 		stCardPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 		btnCardSelect[i] = env->addButton(irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardSelect, BUTTON_CARD_0 + i);
+		btnCardSelect[i]->setUseAlphaChannel(true);
 	}
 	scrCardList = env->addScrollBar(true, irr::core::rect<irr::s32>(30, 235, 650, 255), wCardSelect, SCROLL_CARD_SELECT);
 	btnSelectOK = env->addButton(irr::core::rect<irr::s32>(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_OK, dataManager.GetSysString(1211));
@@ -602,6 +620,7 @@ bool Game::Initialize() {
 		stDisplayPos[i]->setBackgroundColor(0xffffffff);
 		stDisplayPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 		btnCardDisplay[i] = env->addButton(irr::core::rect<irr::s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardDisplay, BUTTON_DISPLAY_0 + i);
+		btnCardDisplay[i]->setUseAlphaChannel(true);
 	}
 	scrDisplayList = env->addScrollBar(true, irr::core::rect<irr::s32>(30, 235, 650, 255), wCardDisplay, SCROLL_CARD_DISPLAY);
 	btnDisplayOK = env->addButton(irr::core::rect<irr::s32>(300, 265, 380, 290), wCardDisplay, BUTTON_CARD_DISP_OK, dataManager.GetSysString(1211));
@@ -766,6 +785,8 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1482));
 	cbLimit->addItem(dataManager.GetSysString(1483));
 	cbLimit->addItem(dataManager.GetSysString(1484));
+	cbLimit->addItem(dataManager.GetSysString(1487));
+	cbLimit->addItem(dataManager.GetSysString(1488));
 	cbLimit->addItem(dataManager.GetSysString(1485));
 	stAttribute = env->addStaticText(dataManager.GetSysString(1319), irr::core::rect<irr::s32>(10, 22 + 50 / 6, 70, 42 + 50 / 6), false, false, wFilter);
 	cbAttribute = env->addComboBox(irr::core::rect<irr::s32>(60, 20 + 50 / 6, 195, 40 + 50 / 6), wFilter, COMBOBOX_ATTRIBUTE);
@@ -1134,7 +1155,7 @@ void Game::MainLoop() {
 	else
 		timeEndPeriod(1);
 #endif
-	DuelClient::StopClient(true);
+	DuelClient::StopClient(CLIENT_CLOSE_REASON_EXIT);
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -1244,7 +1265,7 @@ void Game::LoadExpansions() {
 					errmsg.append(name);
 					errmsg.append(")! ");
 					errmsg.append(dataManager.errmsg);
-					mainGame->ErrorLog(errmsg.c_str());
+					ErrorLog(errmsg.c_str());
 				}
 				continue;
 			}
@@ -1263,7 +1284,7 @@ void Game::LoadExpansions() {
 					errmsg.append(" : ");
 					errmsg.append(name);
 					errmsg.append(")! Please make sure the file name is UTF-8 encoded in the archive.");
-					mainGame->ErrorLog(errmsg.c_str());
+					ErrorLog(errmsg.c_str());
 					continue;
 				}
 				deckBuilder.expansionPacks.push_back(fname);
@@ -1471,12 +1492,16 @@ void Game::LoadConfig(const char* file) {
 			gameConf.defaultOT = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "enable_bot_mode")) {
 			gameConf.enable_bot_mode = std::strtol(valbuf, nullptr, 10);
+		} else if(!std::strcmp(strbuf, "bot_room_public")) {
+			gameConf.bot_room_public = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "quick_animation")) {
 			gameConf.quick_animation = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "auto_save_replay")) {
 			gameConf.auto_save_replay = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "draw_single_chain")) {
 			gameConf.draw_single_chain = std::strtol(valbuf, nullptr, 10);
+		} else if(!std::strcmp(strbuf, "solid_selection_line")) {
+			gameConf.solid_selection_line = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "hide_player_name")) {
 			gameConf.hide_player_name = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "prefer_expansion_script")) {
@@ -1595,9 +1620,11 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
 	BufferIO::EncodeUTF8(gameConf.bot_deck_path, linebuf);
 	std::fprintf(fp, "bot_deck_path = %s\n", linebuf);
+	std::fprintf(fp, "bot_room_public = %d\n", gameConf.bot_room_public);
 	std::fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	std::fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
 	std::fprintf(fp, "draw_single_chain = %d\n", gameConf.draw_single_chain);
+	std::fprintf(fp, "solid_selection_line = %d\n", gameConf.solid_selection_line);
 	std::fprintf(fp, "hide_player_name = %d\n", gameConf.hide_player_name);
 	std::fprintf(fp, "prefer_expansion_script = %d\n", gameConf.prefer_expansion_script);
 	std::fprintf(fp, "swap_yes_no_button = %d\n", (chkSwapYesNoButton->isChecked() ? 1 : 0));
@@ -2394,6 +2421,51 @@ void Game::SetCursor(irr::gui::ECURSOR_ICON icon) {
 	if(cursor->getActiveIcon() != icon) {
 		cursor->setActiveIcon(icon);
 	}
+}
+bool Game::SpawnAsync(const std::wstring& exePath, const std::vector<std::wstring>& args) {
+#ifdef _WIN32
+	std::wstring cmdLine = L"\"" + exePath + L"\"";
+	for (const auto& arg : args) {
+		cmdLine += L" \"" + arg + L"\"";
+	}
+
+	STARTUPINFOW si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	// CreateProcessW can modify the command line buffer, so we need to create a mutable copy of it
+	// TODO: Move to C++17 and use cmdLine.data() directly without copying to a vector
+	std::vector<wchar_t> cmdBuffer(cmdLine.begin(), cmdLine.end());
+	cmdBuffer.push_back(L'\0');
+
+	if (!CreateProcessW(exePath.c_str(), cmdBuffer.data(), nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi)) {
+		return false;
+	}
+
+	CloseHandle(pi.hThread);
+	CloseHandle(pi.hProcess);
+	return true;
+#else
+	std::string exePathUTF8 = BufferIO::EncodeUTF8String(exePath);
+
+	std::vector<std::string> utf8Args;
+	utf8Args.emplace_back(exePathUTF8);
+	for (const auto& arg : args) {
+		utf8Args.push_back(BufferIO::EncodeUTF8String(arg));
+	}
+
+	std::vector<char*> execArgs;
+	execArgs.reserve(utf8Args.size() + 1);
+	for (auto& arg : utf8Args) {
+		execArgs.push_back(const_cast<char*>(arg.c_str()));
+	}
+	execArgs.push_back(nullptr);
+
+	pid_t pid{}; // ignore pid return value, use SIG_IGN to prevent zombie process
+	return posix_spawn(&pid, exePathUTF8.c_str(), nullptr, nullptr, execArgs.data(), GetEnviron()) == 0;
+#endif
 }
 
 }

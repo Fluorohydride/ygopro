@@ -342,7 +342,8 @@ workspace "YGOPro"
     filter "system:windows"
         systemversion "latest"
         startproject "YGOPro"
-        defines { "WINVER=0x0601" } -- WIN7
+        -- Target Windows 7 or later. (Building requires Windows 10 SDK 1803 or newer.)
+        defines { "WINVER=0x0601", "_WIN32_WINNT=0x0601" }
 
     if WIN7_SUPPORT then
         filter { "system:windows", "action:vs2026" }
