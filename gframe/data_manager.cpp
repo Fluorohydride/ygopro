@@ -74,12 +74,6 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 			cd.rule_code = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 11));
 			cd.lscale = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 12));
 			cd.rscale = cd.lscale;
-			uint64_t setcode2 = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 13));
-			uint64_t setcode3 = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 14));
-			uint64_t setcode4 = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 15));
-			write_setcode(cd.setcode, setcode2, 4);
-			write_setcode(cd.setcode, setcode3, 8);
-			write_setcode(cd.setcode, setcode4, 12);
 		}
 		else {
 			// rule_code
