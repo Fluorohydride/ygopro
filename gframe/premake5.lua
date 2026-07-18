@@ -5,6 +5,7 @@ project "YGOPro"
         openmp "On"
     end
 
+    defines { "_IRR_STATIC_LIB_" }
     files { "*.cpp", "*.h" }
     includedirs { "../ocgcore", EVENT_INCLUDE_DIR, IRRLICHT_INCLUDE_DIR, JPEG_INCLUDE_DIR, ZLIB_INCLUDE_DIR, LZMA_INCLUDE_DIR, SQLITE_INCLUDE_DIR }
     links { "ocgcore", "lzma", "sqlite3", "irrlicht", "png", "freetype", "event" }
@@ -83,7 +84,7 @@ project "YGOPro"
         entrypoint "mainCRTStartup"
         files "ygopro.rc"
         links { "ws2_32", "iphlpapi", "winmm" }
-        defines { "_IRR_STATIC_LIB_", "NOMINMAX=1", "WIN32_LEAN_AND_MEAN" }
+        defines { "NOMINMAX=1", "WIN32_LEAN_AND_MEAN" }
 
     filter "not action:vs*"
         cppdialect "C++14"
