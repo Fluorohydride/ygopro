@@ -14,8 +14,8 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	FILE* fp = myfopen(path, "r");
 	char linebuf[1024]{};
 	wchar_t strBuffer[256]{};
-	uint32_t pointHash{};
-	auto credit_hash = [](const char* s) -> uint32_t {
+	uint32_t nameHash{};
+	auto point_hash = [](const char* s) -> uint32_t {
 		uint32_t h = 2166136261u;
 		for (auto p = s; *p; ++p) {
 			h ^= static_cast<unsigned char>(*p);
@@ -23,7 +23,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 		}
 		return h;
 	};
-	auto credit_update_hash = [](uint32_t h, uint32_t a, uint32_t b, uint32_t c) -> uint32_t {
+	auto point_update_hash = [](uint32_t h, uint32_t a, uint32_t b, uint32_t c) -> uint32_t {
 		uint32_t mix = a + 0x9e3779b9;
 		mix = (mix ^ b) * 0x85ebca6b;
 		mix = (mix ^ c) * 0xc2b2ae35;
@@ -67,8 +67,8 @@ void DeckManager::LoadLFListSingle(const char* path) {
 				if (limitValue < 0)
 					limitValue = 0;
 				cur->pointList.push_back({ keybuf, limitValue });
-				pointHash = credit_hash(keybuf);
-				cur->hash = credit_update_hash(cur->hash, pointHash, static_cast<uint32_t>(limitValue), 0x43524544u);
+				nameHash = point_hash(keybuf);
+				cur->hash = point_update_hash(cur->hash, nameHash, static_cast<uint32_t>(limitValue), 0x43524544u);
 				continue;
 			}
 			char* pos = linebuf;
@@ -95,7 +95,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 					continue;
 				auto &point = cur->pointList.back();
 				point.table[code] = value;
-				cur->hash = credit_update_hash(cur->hash, code, pointHash, static_cast<uint32_t>(value));
+				cur->hash = point_update_hash(cur->hash, code, nameHash, static_cast<uint32_t>(value));
 				continue;
 			}
 		}
