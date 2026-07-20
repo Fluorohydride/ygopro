@@ -4,7 +4,9 @@
 #include <event2/thread.h>
 #include <clocale>
 #include <memory>
-#ifndef _WIN32
+#ifdef _WIN32
+#include <shellapi.h>
+#else
 #include <signal.h>
 #endif
 
