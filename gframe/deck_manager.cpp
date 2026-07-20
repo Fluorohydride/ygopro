@@ -78,27 +78,26 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			if (errno || result > UINT32_MAX || end == pos)
 				continue;
 			uint32_t code = static_cast<uint32_t>(result);
-			int creditValue = 0;
-			if (std::sscanf(end, " $%*[^ \t\n] %d", &creditValue) == 1) {
-				if (cur->pointList.empty())
-					continue;
-				if (creditValue <= 0)
-					continue;
-				auto& point = cur->pointList.back();
-				point.table[code] = creditValue;
-				cur->hash = credit_update_hash(cur->hash, code, pointHash, static_cast<uint32_t>(creditValue));
-				continue;
-			}
 			pos = end;
 			end = nullptr;
 			errno = 0;
-			int count = std::strtol(pos, &end, 10);
+			int value = std::strtol(pos, &end, 10);
 			if (errno || end == pos)
 				continue;
-			if (count < 0 || count > 2)
+			if (cur->pointList.empty()){
+				if (value < 0 || value > 2)
+					continue;
+				cur->content[code] = value;
+				cur->hash = code_update_hash(cur->hash, code, value);
+			}
+			else{
+				if (value <= 0)
+					continue;
+				auto &point = cur->pointList.back();
+				point.table[code] = value;
+				cur->hash = credit_update_hash(cur->hash, code, pointHash, static_cast<uint32_t>(value));
 				continue;
-			cur->content[code] = count;
-			cur->hash = code_update_hash(cur->hash, code, count);
+			}
 		}
 		std::fclose(fp);
 	}
