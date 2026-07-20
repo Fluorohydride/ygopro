@@ -224,6 +224,8 @@ irr::video::IImage* ImageManager::GetImage(int code, irr::s32 targetWidth, irr::
 		return nullptr;
 	irr::video::IImage* img = ImageUtility::LoadJpegImage(driver, reader, targetWidth, targetHeight);
 	reader->drop();
+	if(img == nullptr) // fallback, file is ensured to be accessible already
+		img = driver->createImageFromFile(file);
 	return img;
 }
 /**
@@ -288,7 +290,7 @@ irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
 	tBigPicture = addTexture(name, img, origsize.Width * zoom, origsize.Height * zoom);
 	return tBigPicture;
 }
-int ImageManager::LoadThumbThread() {
+void ImageManager::LoadThumbThread() {
 	while(true) {
 		imageManager.tThumbLoadingMutex.lock();
 		imageManager.tThumbLoadingThreadRunning = !imageManager.tThumbLoadingCodes.empty();
@@ -328,7 +330,6 @@ int ImageManager::LoadThumbThread() {
 			imageManager.tThumbLoadingMutex.unlock();
 		}
 	}
-	return 0;
 }
 /**
  * Load managed card thumbnail texture.

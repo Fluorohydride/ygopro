@@ -46,13 +46,14 @@ else
     local turboSimdX86Dir  = path.getabsolute("simd/i386")
 
     filter { "architecture:x86_64" }
+        defines { "SIMD_ARCHITECTURE=X86_64" }
         includedirs {
             "simd",
             "simd/nasm",
             "simd/x86_64",
         }
         files {
-            "simd/x86_64/jsimd.c",
+            "simd/jsimd.c",
             "simd/x86_64/*.asm",
         }
         removefiles {
@@ -63,13 +64,14 @@ else
         }
 
     filter { "architecture:x86" }
+        defines { "SIMD_ARCHITECTURE=I386" }
         includedirs {
             "simd",
             "simd/nasm",
             "simd/i386",
         }
         files {
-            "simd/i386/jsimd.c",
+            "simd/jsimd.c",
             "simd/i386/*.asm",
         }
         removefiles {
@@ -130,12 +132,13 @@ else
         buildoutputs { "%{cfg.objdir}/%{file.basename}.o" }
 
     filter { "architecture:AARCH64" }
-        defines { "NEON_INTRINSICS" }
+        defines { "SIMD_ARCHITECTURE=ARM64" }
         includedirs {
             "simd",
             "simd/arm",
         }
         files {
+            "simd/jsimd.c",
             "simd/arm/jccolor-neon.c",
             "simd/arm/jcgray-neon.c",
             "simd/arm/jcphuff-neon.c",
@@ -150,6 +153,6 @@ else
             "simd/arm/jidctred-neon.c",
             "simd/arm/jquanti-neon.c",
             "simd/arm/aarch64/jchuff-neon.c",
-            "simd/arm/aarch64/jsimd.c",
+            "simd/arm/aarch64/jsimdcpu.c",
         }
 end

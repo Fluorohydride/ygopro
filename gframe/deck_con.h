@@ -1,14 +1,16 @@
 #ifndef DECK_CON_H
 #define DECK_CON_H
 
+#include <string>
 #include <unordered_map>
 #include <vector>
 #include <random>
 #include <irrlicht.h>
-#include "data_manager.h"
-#include "deck_manager.h"
 
 namespace ygo {
+
+struct CardDataC;
+struct LFList;
 
 class DeckBuilder: public irr::IEventReceiver {
 public:
@@ -89,4 +91,4 @@ public:
 
 }
 
-#endif //DECK_CON
+#endif //DECK_CON_H

@@ -54,13 +54,6 @@ struct HostRequest {
 check_trivially_copyable(HostRequest);
 static_assert(sizeof(HostRequest) == 2, "size mismatch: HostRequest");
 
-struct CTOS_DeckData {
-	int32_t mainc{};
-	int32_t sidec{};
-	uint32_t list[MAINC_MAX + SIDEC_MAX]{};
-};
-check_trivially_copyable(CTOS_DeckData);
-
 struct CTOS_HandResult {
 	uint8_t res{};
 };
@@ -221,7 +214,7 @@ public:
 	virtual void ToObserver(DuelPlayer* dp) = 0;
 	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) = 0;
 	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) = 0;
-	virtual void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) = 0;
+	virtual void UpdateDeck(DuelPlayer* dp, unsigned char* pdata, unsigned int len) = 0;
 	virtual void StartDuel(DuelPlayer* dp) = 0;
 	virtual void HandResult(DuelPlayer* dp, unsigned char res) = 0;
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp) = 0;
@@ -231,6 +224,7 @@ public:
 	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) = 0;
 	virtual void TimeConfirm(DuelPlayer* dp) = 0;
 	virtual void EndDuel() = 0;
+	virtual void OnPlayerDisconnected(DuelPlayer* dp) = 0;
 
 public:
 	event* etimer { nullptr };
@@ -256,7 +250,7 @@ public:
 #define NETPLAYER_TYPE_OBSERVER		7
 
 #define CTOS_RESPONSE		0x1		// byte array
-#define CTOS_UPDATE_DECK	0x2		// CTOS_DeckData
+#define CTOS_UPDATE_DECK	0x2		// uint32_t mainc, uint32_t sidec, uint32_t[mainc+sidec]
 #define CTOS_HAND_RESULT	0x3		// CTOS_HandResult
 #define CTOS_TP_RESULT		0x4		// CTOS_TPResult
 #define CTOS_PLAYER_INFO	0x10	// CTOS_PlayerInfo

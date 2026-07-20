@@ -887,7 +887,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case SCROLL_CARD_SELECT: {
 				int pos = mainGame->scrCardList->getPos() / 10;
-				mainGame->gMutex.lock();
 				for(int i = 0; i < 5; ++i) {
 					// draw selectable_cards[i + pos] in btnCardSelect[i]
 					mainGame->stCardPos[i]->enableOverrideColor(false);
@@ -954,12 +953,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 					}
 				}
-				mainGame->gMutex.unlock();
 				break;
 			}
 			case SCROLL_CARD_DISPLAY: {
 				int pos = mainGame->scrDisplayList->getPos() / 10;
-				mainGame->gMutex.lock();
 				for(int i = 0; i < 5; ++i) {
 					// draw display_cards[i + pos] in btnCardDisplay[i]
 					mainGame->stDisplayPos[i]->enableOverrideColor(false);
@@ -1004,7 +1001,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 					}
 				}
-				mainGame->gMutex.unlock();
 				break;
 			}
 			break;
@@ -1982,7 +1978,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			switch(id) {
 			case LISTBOX_LOG: {
 				int sel = mainGame->lstLog->getSelected();
-				if(sel != -1 && (int)mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
+				if(sel >= 0 && (int)mainGame->logParam.size() > sel && mainGame->logParam[sel] > 0) {
 					mainGame->ShowCardInfo(mainGame->logParam[sel]);
 				}
 				return true;
@@ -1995,7 +1991,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			switch(id) {
 			case LISTBOX_LOG: {
 				int sel = mainGame->lstLog->getSelected();
-				if(sel != -1 && (int)mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
+				if(sel >= 0 && (int)mainGame->logParam.size() > sel && mainGame->logParam[sel] > 0) {
 					mainGame->wInfos->setActiveTab(0);
 				}
 				return true;
@@ -2093,6 +2089,14 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			if(!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 				mainGame->device->minimizeWindow();
 			return true;
+			break;
+		}
+		case irr::KEY_KEY_V: {
+			irr::gui::IGUIElement* focus = mainGame->env->getFocus();
+			if(focus && focus->hasType(irr::gui::EGUIET_EDIT_BOX)
+				&& !event.KeyInput.PressedDown && event.KeyInput.Control) {
+				mainGame->TrimText(focus);
+			}
 			break;
 		}
 		default: break;

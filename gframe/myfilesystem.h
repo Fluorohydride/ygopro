@@ -16,7 +16,6 @@
 
 #ifdef _WIN32
 
-#define NOMINMAX 1
 #include <Windows.h>
 #include <shellapi.h>
 
