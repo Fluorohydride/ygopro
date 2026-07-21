@@ -13,6 +13,10 @@
 #include "game.h"
 #include "deck_manager.h"
 #include "replay.h"
+#include "mysocket.h"
+#include <event2/event.h>
+#include <event2/bufferevent.h>
+#include <event2/buffer.h>
 
 namespace ygo {
 
@@ -62,6 +66,10 @@ unsigned char DuelClient::duel_client_write[SIZE_NETWORK_BUFFER]{};
 unsigned char DuelClient::selftype = 0;
 std::vector<HostPacket> DuelClient::hosts;
 
+int DuelClient::WriteBufferEvent(bufferevent* bufev, const void* data, size_t size) {
+	return bufferevent_write(bufev, data, size);
+}
+
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
 	if(connect_state != CONNECT_STATE_NONE)
 		return false;
@@ -93,7 +101,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 	std::thread(ClientThread).detach();
 	return true;
 }
-void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
+void DuelClient::ConnectTimeout(EventSocket fd, short events, void* arg) {
 	if(connect_state & CONNECT_STATE_JOINED)
 		return;
 	if(close_reason == CLIENT_CLOSE_REASON_NONE) {
@@ -4121,7 +4129,7 @@ void DuelClient::BeginRefreshHost() {
 	hosts.clear();
 	std::vector<unsigned int> local_addresses;
 	char hname[256]{};
-	if(gethostname(hname, sizeof(hname) - 1) != SOCKET_ERROR) {
+	if(gethostname(hname, sizeof(hname) - 1) != SOCKET_RESULT_ERROR) {
 		evutil_addrinfo hints{};
 		hints.ai_family = AF_INET;
 		hints.ai_socktype = SOCK_DGRAM;
@@ -4147,8 +4155,8 @@ void DuelClient::BeginRefreshHost() {
 		EndRefreshHost();
 		return;
 	}
-	SOCKET reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if(reply == INVALID_SOCKET) {
+	Socket reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if(reply == INVALID_SOCKET_HANDLE) {
 		event_base_free(broadev);
 		EndRefreshHost();
 		return;
@@ -4158,8 +4166,8 @@ void DuelClient::BeginRefreshHost() {
 	reply_addr.sin_family = AF_INET;
 	reply_addr.sin_port = htons(7921);
 	reply_addr.sin_addr.s_addr = 0;
-	if(bind(reply, (sockaddr*)&reply_addr, sizeof(reply_addr)) == SOCKET_ERROR) {
-		closesocket(reply);
+	if(bind(reply, (sockaddr*)&reply_addr, sizeof(reply_addr)) == SOCKET_RESULT_ERROR) {
+		CloseSocket(reply);
 		event_base_free(broadev);
 		EndRefreshHost();
 		return;
@@ -4171,17 +4179,17 @@ void DuelClient::BeginRefreshHost() {
 			event_free(resp_event);
 			resp_event = nullptr;
 		}
-		closesocket(reply);
+		CloseSocket(reply);
 		event_base_free(broadev);
 		EndRefreshHost();
 		return;
 	}
 	std::thread(RefreshThread, broadev).detach();
 	//send request
-	SOCKADDR_IN local;
+	sockaddr_in local;
 	local.sin_family = AF_INET;
 	local.sin_port = htons(7922);
-	SOCKADDR_IN sockTo;
+	sockaddr_in sockTo;
 	sockTo.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 	sockTo.sin_family = AF_INET;
 	sockTo.sin_port = htons(7920);
@@ -4189,22 +4197,22 @@ void DuelClient::BeginRefreshHost() {
 	hReq.identifier = NETWORK_CLIENT_ID;
 	for(auto local_addr : local_addresses) {
 		local.sin_addr.s_addr = local_addr;
-		SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-		if(sSend == INVALID_SOCKET)
+		Socket sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		if(sSend == INVALID_SOCKET_HANDLE)
 			continue;
 		int opt = TRUE;
 		setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof opt);
-		if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_ERROR) {
-			closesocket(sSend);
+		if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_RESULT_ERROR) {
+			CloseSocket(sSend);
 			continue;
 		}
 		sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
-		closesocket(sSend);
+		CloseSocket(sSend);
 	}
 }
 int DuelClient::RefreshThread(event_base* broadev) {
 	event_base_dispatch(broadev);
-	evutil_socket_t fd;
+	EventSocket fd;
 	event_get_assignment(resp_event, 0, &fd, 0, 0, 0);
 	evutil_closesocket(fd);
 	event_free(resp_event);
@@ -4213,7 +4221,7 @@ int DuelClient::RefreshThread(event_base* broadev) {
 	EndRefreshHost();
 	return 0;
 }
-void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
+void DuelClient::BroadcastReply(EventSocket fd, short events, void * arg) {
 	if(events & EV_TIMEOUT) {
 		event_base_loopbreak((event_base*)arg);
 	} else if(events & EV_READ) {

@@ -5,6 +5,7 @@
 #include "netserver.h"
 #include "game.h"
 #include "data_manager.h"
+#include "deck_manager.h"
 #include "../ocgcore/mtrandom.h"
 
 namespace ygo {
