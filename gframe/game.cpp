@@ -26,6 +26,7 @@ extern char **environ;
 #endif
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
+#include <CoreGraphics/CoreGraphics.h>
 #endif
 
 #if defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || \
@@ -44,6 +45,71 @@ extern char **environ;
 #endif
 
 namespace ygo {
+
+namespace {
+using namespace std::chrono;
+
+#ifdef _WIN32
+struct HighResolutionTimer {
+	HighResolutionTimer() {
+		handle = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
+		if(!handle)
+			periodEnabled = timeBeginPeriod(1) == TIMERR_NOERROR;
+	}
+	~HighResolutionTimer() {
+		if(handle)
+			CloseHandle(handle);
+		else if(periodEnabled)
+			timeEndPeriod(1);
+	}
+	HANDLE handle{};
+	bool periodEnabled{};
+};
+#endif
+
+void PreciseWaitUntil(steady_clock::time_point targetTime, bool windowActive) {
+	auto now = steady_clock::now();
+	if(now >= targetTime)
+		return;
+	constexpr auto PRECISE_WAIT_EARLY_WAKE = microseconds(2000);
+#ifdef _WIN32
+	static HighResolutionTimer highResolutionTimer;
+	if(highResolutionTimer.handle) {
+		auto remaining = duration_cast<microseconds>(targetTime - now);
+		auto earlyWake = windowActive ? PRECISE_WAIT_EARLY_WAKE : microseconds(0);
+		if(remaining > earlyWake) {
+			LARGE_INTEGER dueTime;
+			dueTime.QuadPart = -(LONGLONG)(remaining - earlyWake).count() * 10;
+			if(SetWaitableTimer(highResolutionTimer.handle, &dueTime, 0, NULL, NULL, FALSE)) {
+				if(WaitForSingleObject(highResolutionTimer.handle, INFINITE) == WAIT_OBJECT_0 && !windowActive)
+					return;
+			}
+		}
+	} else
+#endif
+	{
+		auto sleepTime = targetTime - now - PRECISE_WAIT_EARLY_WAKE;
+		if(sleepTime > microseconds(0))
+			std::this_thread::sleep_for(sleepTime);
+	}
+	while(steady_clock::now() < targetTime) {
+		if(windowActive)
+			CPU_PAUSE();
+		else
+			std::this_thread::sleep_for(microseconds(1000));
+	}
+}
+
+void WaitUntilNextFrame(steady_clock::time_point& lastFrameTime, microseconds targetFrameDuration, bool windowActive) {
+	auto targetTime = lastFrameTime + targetFrameDuration;
+	PreciseWaitUntil(targetTime, windowActive);
+	lastFrameTime = targetTime;
+	auto now = steady_clock::now();
+	if(now - targetTime > targetFrameDuration)
+		lastFrameTime = now;
+}
+
+}
 
 Game* mainGame;
 
@@ -84,6 +150,7 @@ bool Game::Initialize() {
 	LoadConfig("load-once.conf");
 	irr::SIrrlichtCreationParameters params{};
 	params.AntiAlias = gameConf.antialias;
+	params.Vsync = gameConf.vsync;
 	if(gameConf.use_d3d)
 		params.DriverType = irr::video::EDT_DIRECT3D9;
 	else
@@ -97,6 +164,27 @@ bool Game::Initialize() {
 		ErrorLog("Failed to create Irrlicht Engine device!");
 		return false;
 	}
+	effectiveFps = gameConf.target_fps;
+	if(gameConf.vsync && effectiveFps <= 0) {
+		int detectedFps = 0;
+#ifdef _WIN32
+		DEVMODE dm{};
+		dm.dmSize = sizeof(dm);
+		if(EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dm) && dm.dmDisplayFrequency > 0)
+			detectedFps = (int)dm.dmDisplayFrequency;
+#elif defined(__APPLE__)
+		CGDisplayModeRef mode = CGDisplayCopyDisplayMode(CGMainDisplayID());
+		if(mode) {
+			double rate = CGDisplayModeGetRefreshRate(mode);
+			if(rate > 0) detectedFps = (int)rate;
+			CGDisplayModeRelease(mode);
+		}
+#endif
+		if(detectedFps > 0) effectiveFps = detectedFps;
+	}
+	if(effectiveFps < 60) effectiveFps = 60;
+	if(effectiveFps > 1000) effectiveFps = 1000;
+	fpsScale = (float)effectiveFps / 60.0f;
 #ifndef _DEBUG
 	device->getLogger()->setLogLevel(irr::ELOG_LEVEL::ELL_ERROR);
 #endif
@@ -1028,14 +1116,9 @@ void Game::MainLoop() {
 	float atkframe = 0.1f;
 	int fps = 0;
 	auto lastFpsTime = std::chrono::steady_clock::now();
-#ifdef _WIN32
-	HANDLE hWaitTimer = CreateWaitableTimerExW(NULL, NULL, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
-	bool useHighResTimer = (hWaitTimer != NULL);
-	if(!useHighResTimer)
-		timeBeginPeriod(1);
-#endif
 	auto lastFrameTime = std::chrono::steady_clock::now();
-	constexpr auto targetFrameDuration = std::chrono::microseconds(16667);
+	auto targetFrameDuration = std::chrono::microseconds(1000000 / effectiveFps);
+	float lineAccum = 0;
 	while(device->run()) {
 		auto size = driver->getScreenSize();
 		if(window_size != size) {
@@ -1046,9 +1129,25 @@ void Game::MainLoop() {
 			OnResize();
 			gMutex.unlock();
 		}
-		linePattern = (linePattern + 1) % 30;
-		stippleMask = (stippleMask << 1) | (stippleMask >> 15);
-		atkframe += 0.1f;
+		const bool isVsyncMinimized = gameConf.vsync && device->isWindowMinimized();
+		if(isVsyncMinimized) {
+			// The minimized VSync path below is throttled to 60 FPS.
+			logicalTick = true;
+		} else {
+			logicalFrameAccum += 1.0f;
+			logicalTick = false;
+			if(logicalFrameAccum >= fpsScale) {
+				logicalFrameAccum -= fpsScale;
+				logicalTick = true;
+			}
+		}
+		lineAccum += 1.0f;
+		while(lineAccum >= fpsScale) {
+			lineAccum -= fpsScale;
+			linePattern = (linePattern + 1) % 30;
+			stippleMask = (stippleMask << 1) | (stippleMask >> 15);
+		}
+		atkframe += 0.1f / fpsScale;
 		if(atkframe > 6.2832f)
 			atkframe -= 6.2832f;
 		atkdy = (float)sin(atkframe);
@@ -1088,7 +1187,7 @@ void Game::MainLoop() {
 			if(!signalFrame)
 				frameSignal.Set();
 		}
-		if(waitFrame >= 0) {
+		if(waitFrame >= 0 && logicalTick) {
 			waitFrame++;
 			if(waitFrame % 90 == 0) {
 				stHintMsg->setText(dataManager.GetSysString(1390));
@@ -1102,41 +1201,9 @@ void Game::MainLoop() {
 		if(closeSignal.TryWait())
 			CloseDuelWindow();
 		fps++;
-		auto targetTime = lastFrameTime + targetFrameDuration;
+		if(isVsyncMinimized || !gameConf.vsync)
+			WaitUntilNextFrame(lastFrameTime, isVsyncMinimized ? std::chrono::microseconds(16667) : targetFrameDuration, device->isWindowActive());
 		auto now = std::chrono::steady_clock::now();
-		if(now < targetTime) {
-#ifdef _WIN32
-			if(useHighResTimer)
-			{
-				auto remaining = std::chrono::duration_cast<std::chrono::microseconds>(targetTime - now);
-				if(remaining.count() > 1500) {
-					LARGE_INTEGER dueTime;
-					dueTime.QuadPart = -(LONGLONG)(remaining.count() - 1000) * 10;
-					if(SetWaitableTimer(hWaitTimer, &dueTime, 0, NULL, NULL, FALSE))
-						WaitForSingleObject(hWaitTimer, INFINITE);
-				}
-			}
-			else
-#endif
-			{
-				auto sleepTime = targetTime - now - std::chrono::milliseconds(2);
-				if(sleepTime > std::chrono::milliseconds(0)) {
-					std::this_thread::sleep_for(sleepTime);
-				}
-			}
-			// Spin-wait for sub-millisecond precision.
-			// If the window is inactive, sleep 1ms per iteration to avoid wasting CPU.
-			while(std::chrono::steady_clock::now() < targetTime) {
-				if(device->isWindowActive())
-					CPU_PAUSE();
-				else
-					std::this_thread::sleep_for(std::chrono::milliseconds(1));
-			}
-		}
-		lastFrameTime = targetTime;
-		now = std::chrono::steady_clock::now();
-		if(now - targetTime > targetFrameDuration)
-			lastFrameTime = now;
 		if(now - lastFpsTime >= std::chrono::milliseconds(1000)) {
 			myswprintf(cap, L"YGOPro FPS: %d", fps);
 			device->setWindowCaption(cap);
@@ -1149,18 +1216,17 @@ void Game::MainLoop() {
 					dInfo.time_left[dInfo.time_player]--;
 		}
 	}
-#ifdef _WIN32
-	if(useHighResTimer)
-		CloseHandle(hWaitTimer);
-	else
-		timeEndPeriod(1);
-#endif
 	DuelClient::StopClient(CLIENT_CLOSE_REASON_EXIT);
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	SaveConfig();
 	device->drop();
+}
+int Game::ScaleFrame(int frame60) const {
+	if(gameConf.vsync && device->isWindowMinimized()) return frame60;
+	int scaled = (int)(frame60 * fpsScale + 0.5f);
+	return scaled < 1 ? 1 : scaled;
 }
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f32 left, irr::f32 right, irr::f32 bottom, irr::f32 top, irr::f32 znear, irr::f32 zfar) {
 	for(int i = 0; i < 16; ++i)
@@ -1434,6 +1500,10 @@ void Game::LoadConfig(const char* file) {
 			gameConf.antialias = std::strtol(valbuf, nullptr, 10);
 		} else if(!std::strcmp(strbuf, "use_d3d")) {
 			gameConf.use_d3d = std::strtol(valbuf, nullptr, 10) > 0;
+		} else if(!std::strcmp(strbuf, "vsync")) {
+			gameConf.vsync = std::strtol(valbuf, nullptr, 10) > 0;
+		} else if(!std::strcmp(strbuf, "target_fps")) {
+			gameConf.target_fps = std::strtol(valbuf, nullptr, 10);
 #ifdef _OPENMP
 		} else if (!std::strcmp(strbuf, "use_image_scale_multi_thread")) {
 			gameConf.use_image_scale_multi_thread = std::strtol(valbuf, nullptr, 10) > 0;
@@ -1571,6 +1641,11 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[CONFIG_LINE_SIZE];
 	std::fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
+	std::fprintf(fp, "vsync = %d\n", gameConf.vsync ? 1 : 0);
+	std::fprintf(fp, "#target_fps: Controls FPS and calculation of animation speed. Default: 0\n");
+	std::fprintf(fp, "# Vsync on:  0 = auto-detect monitor refresh rate. If auto-detect fails, animation speed may be too fast, please try setting this manually\n");
+	std::fprintf(fp, "# Vsync off: 0 = run at default 60 FPS. Can be manually set to any value from 60 to 1000\n");
+	std::fprintf(fp, "target_fps = %d\n", gameConf.target_fps);
 #ifdef _OPENMP
 	std::fprintf(fp, "use_image_scale_multi_thread = %d\n", gameConf.use_image_scale_multi_thread ? 1 : 0);
 #endif

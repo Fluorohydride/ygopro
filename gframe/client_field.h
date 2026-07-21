@@ -117,8 +117,9 @@ public:
 
 	void GetChainLocation(int controler, int location, int sequence, irr::core::vector3df* t);
 	void GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans = false);
-	void MoveCard(ClientCard* pcard, int frame);
-	void FadeCard(ClientCard* pcard, int alpha, int frame);
+	void SetCardMovement(ClientCard* pcard, int frame60, irr::core::vector3df dPos60, irr::core::vector3df dRot60 = irr::core::vector3df(0, 0, 0));
+	void MoveCard(ClientCard* pcard, int frame60);
+	void FadeCard(ClientCard* pcard, int alpha, int frame60);
 	bool ShowSelectSum(bool panelmode); // caller must hold gMutex
 	bool CheckSelectSum();
 	bool CheckSelectTribute();
