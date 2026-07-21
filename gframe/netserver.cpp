@@ -77,7 +77,7 @@ bool NetServer::StartBroadcast() {
 	if(!net_evbase || !broadcast_enabled)
 		return false;
 	Socket udp = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	int opt = TRUE;
+	int opt = 1;
 	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof opt);
 	setsockopt(udp, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof opt);
 	sockaddr_in addr;

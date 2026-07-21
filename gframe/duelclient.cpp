@@ -4200,7 +4200,7 @@ void DuelClient::BeginRefreshHost() {
 		Socket sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 		if(sSend == INVALID_SOCKET_HANDLE)
 			continue;
-		int opt = TRUE;
+		int opt = 1;
 		setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof opt);
 		if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_RESULT_ERROR) {
 			CloseSocket(sSend);
