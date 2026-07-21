@@ -376,6 +376,11 @@ workspace "YGOPro"
     filter { "system:windows", "action:vs*", "platforms:ARM64" }
         architecture "AARCH64"
 
+    filter { "system:windows", "action:gmake" }
+        architecture "x86_64"
+        defines { "UNICODE", "_UNICODE" }
+        buildoptions { "-municode" }
+
     filter "system:macosx"
         systemversion "11"
         if MAC_ARM and MAC_INTEL then
@@ -413,22 +418,22 @@ workspace "YGOPro"
         defines "_DEBUG"
         targetdir "bin/debug"
 
-    filter { "system:windows", "platforms:Win32", "configurations:Release" }
+    filter { "system:windows", "action:vs*", "platforms:Win32", "configurations:Release" }
         targetdir "bin/release/x86"
 
-    filter { "system:windows", "platforms:Win32", "configurations:Debug" }
+    filter { "system:windows", "action:vs*", "platforms:Win32", "configurations:Debug" }
         targetdir "bin/debug/x86"
 
-    filter { "system:windows", "platforms:x64", "configurations:Release" }
+    filter { "system:windows", "action:vs*", "platforms:x64", "configurations:Release" }
         targetdir "bin/release/x64"
 
-    filter { "system:windows", "platforms:x64", "configurations:Debug" }
+    filter { "system:windows", "action:vs*", "platforms:x64", "configurations:Debug" }
         targetdir "bin/debug/x64"
 
-    filter { "system:windows", "platforms:ARM64", "configurations:Release" }
+    filter { "system:windows", "action:vs*", "platforms:ARM64", "configurations:Release" }
         targetdir "bin/release/arm64"
 
-    filter { "system:windows", "platforms:ARM64", "configurations:Debug" }
+    filter { "system:windows", "action:vs*", "platforms:ARM64", "configurations:Debug" }
         targetdir "bin/debug/arm64"
 
     filter { "configurations:Release", "action:vs*" }

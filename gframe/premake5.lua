@@ -89,6 +89,13 @@ project "YGOPro"
     filter "not action:vs*"
         cppdialect "C++14"
 
+    filter { "system:windows", "action:gmake" }
+        links { "opengl32", "imm32" }
+        linkoptions { "-static", "-static-libgcc", "-static-libstdc++" }
+        if USE_OPENMP then
+            linkoptions { "-fopenmp" }
+        end
+
     filter "system:macosx"
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework", "Carbon.framework" }
         defines { "GL_SILENCE_DEPRECATION" }
