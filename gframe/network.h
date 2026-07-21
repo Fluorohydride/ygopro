@@ -223,11 +223,11 @@ public:
 	virtual void Surrender(DuelPlayer* dp) = 0;
 	virtual void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) = 0;
 	virtual void TimeConfirm(DuelPlayer* dp) = 0;
+	virtual void TimerTick() = 0;
 	virtual void EndDuel() = 0;
 	virtual void OnPlayerDisconnected(DuelPlayer* dp) = 0;
 
 public:
-	event* etimer { nullptr };
 	DuelPlayer* host_player{ nullptr };
 	HostInfo host_info;
 	int duel_stage{};

@@ -1,7 +1,7 @@
 #include "config.h"
 #include "menu_handler.h"
 #include "data_manager.h"
-#include "myfilesystem.h"
+#include "file_system.h"
 #include "netserver.h"
 #include "duelclient.h"
 #include "deck_manager.h"
@@ -64,26 +64,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				char port[6];
 				BufferIO::EncodeUTF8(hoststr, hostname);
 				BufferIO::EncodeUTF8(portstr, port);
-				unsigned int remote_addr = htonl(inet_addr(hostname));
-				if(remote_addr == INADDR_NONE) {
-					evutil_addrinfo hints{};
-					hints.ai_family = AF_INET;
-					hints.ai_socktype = SOCK_STREAM;
-					hints.ai_protocol = IPPROTO_TCP;
-					hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
-					evutil_addrinfo* answer = nullptr;
-					if(evutil_getaddrinfo(hostname, port, &hints, &answer) != 0) {
-						mainGame->gMutex.lock();
-						soundManager.PlaySoundEffect(SOUND_INFO);
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412));
-						mainGame->gMutex.unlock();
-						break;
-					}
-					char ip[20];
-					auto* sin = reinterpret_cast<sockaddr_in*>(answer->ai_addr);
-					evutil_inet_ntop(AF_INET, &sin->sin_addr, ip, sizeof(ip));
-					remote_addr = htonl(inet_addr(ip));
-					evutil_freeaddrinfo(answer);
+				unsigned int remote_addr = DuelClient::ResolveHostName(hostname, port);
+				if(remote_addr == 0) {
+					mainGame->gMutex.lock();
+					soundManager.PlaySoundEffect(SOUND_INFO);
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412));
+					mainGame->gMutex.unlock();
+					break;
 				}
 				unsigned int remote_port = std::wcstol(portstr, nullptr, 10);
 				BufferIO::CopyWideString(hoststr, mainGame->gameConf.lasthost);
@@ -319,13 +306,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				mainGame->bot_mode = true;
-				if(!NetServer::StartServer(mainGame->gameConf.serverport)) {
-					soundManager.PlaySoundEffect(SOUND_INFO);
-					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
-					break;
+				constexpr unsigned int localhost = 0x7f000001;
+				unsigned short bot_server_port = 0;
+				unsigned int bot_server_listen = localhost;
+				bool bot_server_public = mainGame->gameConf.bot_room_public;
+				if(bot_server_public) {
+					bot_server_port = mainGame->gameConf.serverport;
+					bot_server_listen = 0; // INADDR_ANY
 				}
-				if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
-					NetServer::StopServer();
+				if(!NetServer::StartServer(bot_server_port, bot_server_listen, &bot_server_port, bot_server_public)) {
 					soundManager.PlaySoundEffect(SOUND_INFO);
 					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 					break;
@@ -343,15 +332,20 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int flag = 0;
 				flag += (mainGame->chkBotHand->isChecked() ? 0x1 : 0);
 				processArgs.push_back(std::to_wstring(flag));
-				processArgs.push_back(std::to_wstring(mainGame->gameConf.serverport));
+				processArgs.push_back(std::to_wstring(bot_server_port));
 #ifdef _WIN32
 				std::wstring executableName = L"Bot.exe";
 #else
 				std::wstring executableName = L"./bot";
 #endif
-				if (!Game::SpawnAsync(executableName, processArgs)) {
-					DuelClient::StopClient();
+				mainGame->pending_bot_executable = executableName;
+				mainGame->pending_bot_args = processArgs;
+				if(!DuelClient::StartClient(localhost, bot_server_port)) {
+					mainGame->pending_bot_executable.clear();
+					mainGame->pending_bot_args.clear();
 					NetServer::StopServer();
+					soundManager.PlaySoundEffect(SOUND_INFO);
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 					break;
 				}
 				mainGame->btnStartBot->setEnabled(false);

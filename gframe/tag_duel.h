@@ -28,6 +28,7 @@ public:
 	int Analyze(unsigned char* msgbuffer, unsigned int len) override;
 	void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) override;
 	void TimeConfirm(DuelPlayer* dp) override;
+	void TimerTick() override;
 	void EndDuel() override;
 	void OnPlayerDisconnected(DuelPlayer* dp) override;
 	
@@ -41,8 +42,6 @@ public:
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 
 	static uint32_t MessageHandler(intptr_t fduel, uint32_t type);
-	static void TagTimer(evutil_socket_t fd, short events, void* arg);
-
 private:
 	int WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache);
 	
@@ -60,8 +59,8 @@ protected:
 	Replay last_replay;
 	size_t last_replay_response_size{ 0 };
 	unsigned char turn_count{ 0 };
-	short time_limit[2]{};
-	short time_elapsed{ 0 };
+	uint16_t time_limit[2]{};
+	uint16_t time_elapsed{ 0 };
 };
 
 }

@@ -17,11 +17,13 @@ private:
 	}
 
 public:
-	static bool StartServer(unsigned short port);
+	static bool StartServer(unsigned short port, unsigned int ip = 0, unsigned short* out_actual_port = nullptr, bool enable_broadcast = true);
 	static bool StartBroadcast();
 	static void StopServer();
 	static void StopBroadcast();
 	static void StopListen();
+	static void StartDuelTimer();
+	static void StopDuelTimer();
 	static void BroadcastEvent(evutil_socket_t fd, short events, void* arg);
 	static void ServerAccept(evconnlistener* listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx);
 	static void ServerAcceptError(evconnlistener *listener, void* ctx);

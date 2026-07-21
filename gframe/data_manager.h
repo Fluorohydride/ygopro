@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
-#include <sqlite3.h>
 #include "../ocgcore/card_data.h"
 
 namespace irr {
@@ -13,6 +12,9 @@ namespace irr {
 		class IFileSystem;
 	}
 }
+
+struct sqlite3;
+struct sqlite3_stmt;
 
 namespace ygo {
 

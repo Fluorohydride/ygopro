@@ -7,7 +7,6 @@
 
 #ifdef _WIN32
 
-#define NOMINMAX
 #include <WinSock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
@@ -61,22 +60,6 @@ template<typename T>
 inline T myclamp(T v, T lo, T hi) {
 	return (v < lo) ? lo : (hi < v) ? hi : v;
 }
-
-inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
-	FILE* fp{};
-#ifdef _WIN32
-	wchar_t wmode[20]{};
-	BufferIO::CopyCharArray(mode, wmode);
-	fp = _wfopen(filename, wmode);
-#else
-	char fname[1024]{};
-	BufferIO::EncodeUTF8(filename, fname);
-	fp = std::fopen(fname, mode);
-#endif
-	return fp;
-}
-
-#define myfopen std::fopen
 
 #include <irrlicht.h>
 
