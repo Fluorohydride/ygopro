@@ -568,15 +568,7 @@ jobs:
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true
       run: |
-        ./premake5 gmake \
-          --build-event \
-          --build-jpeg \
-          --build-png \
-          --build-zlib \
-          --build-freetype \
-          --build-sqlite \
-          --build-lzma \
-          --build-opus-vorbis
+        ./premake5 gmake --build-all
 
     - name: Make
       run: |
@@ -712,14 +704,7 @@ jobs:
       if: matrix.static-link == true
       run: |
         ./premake5 gmake ${{ matrix.cross-build-intel == true && '--mac-intel' || '' }} ${{ matrix.cross-build-arm == true && '--mac-arm' || '' }} \
-          --build-event \
-          --build-jpeg \
-          --build-png \
-          --build-zlib \
-          --build-freetype \
-          --build-sqlite \
-          --build-lzma \
-          --build-opus-vorbis
+          --build-all
 
     - name: Make
       run: |
