@@ -6,13 +6,13 @@
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
-#include <irrlicht.h>
 #include <ctime>
 #include <unordered_map>
 #include <vector>
 #include <list>
 #include <mutex>
 #include <functional>
+#include <irrlicht.h>
 
 #ifdef _WIN32
 struct HWND__;
