@@ -11,6 +11,7 @@ intptr_t SingleMode::pduel = 0;
 bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
 Replay SingleMode::last_replay;
+size_t SingleMode::last_replay_response_size = 0;
 
 bool SingleMode::StartPlay() {
 	std::thread(SinglePlayThread).detach();
@@ -25,11 +26,10 @@ void SingleMode::StopPlay(bool is_exiting) {
 void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	if(!pduel)
 		return;
-	last_replay.Write<uint8_t>(len);
-	last_replay.WriteData(resp, len);
+	last_replay_response_size = last_replay.WriteResponse(resp, len);
 	set_responseb(pduel, resp);
 }
-int SingleMode::SinglePlayThread() {
+void SingleMode::SinglePlayThread() {
 	const int start_lp = 8000;
 	const int start_hand = 5;
 	const int draw_count = 1;
@@ -87,7 +87,7 @@ int SingleMode::SinglePlayThread() {
 	}
 	if(slen == 0) {
 		end_duel(pduel);
-		return 0;
+		return;
 	}
 	mainGame->gMutex.lock();
 	mainGame->HideElement(mainGame->wSinglePlay);
@@ -112,6 +112,7 @@ int SingleMode::SinglePlayThread() {
 	if (len > 0)
 		is_continuing = SinglePlayAnalyze(engineBuffer.data(), len);
 	last_replay.BeginRecord();
+	last_replay_response_size = 0;
 	last_replay.WriteHeader(rh);
 	uint16_t host_name[20]{};
 	BufferIO::CopyCharArray(mainGame->dInfo.hostname, host_name);
@@ -179,7 +180,6 @@ int SingleMode::SinglePlayThread() {
 		if(mainGame->exit_on_return)
 			mainGame->device->closeDevice();
 	}
-	return 0;
 }
 bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 	unsigned char* offset, * pbuf = msg;
@@ -191,6 +191,10 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 		mainGame->dInfo.curMsg = BufferIO::Read<uint8_t>(pbuf);
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_RETRY: {
+			if(last_replay_response_size) {
+				last_replay.RemoveData(last_replay_response_size);
+				last_replay_response_size = 0;
+			}
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
 				mainGame->singleSignal.Wait();
@@ -199,7 +203,7 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 		}
 		case MSG_HINT: {
 			/*int type = */BufferIO::Read<uint8_t>(pbuf);
-			int player = BufferIO::Read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			/*int data = */BufferIO::Read<int32_t>(pbuf);
 			if(player == 0)
 				DuelClient::ClientAnalyze(offset, pbuf - offset);
@@ -391,7 +395,7 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 		}
 		case MSG_SHUFFLE_HAND: {
 			/*int oplayer = */BufferIO::Read<uint8_t>(pbuf);
-			int count = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;

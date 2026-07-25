@@ -28,7 +28,9 @@ public:
 	int Analyze(unsigned char* msgbuffer, unsigned int len) override;
 	void GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len) override;
 	void TimeConfirm(DuelPlayer* dp) override;
+	void TimerTick() override;
 	void EndDuel() override;
+	void OnPlayerDisconnected(DuelPlayer* dp) override;
 	
 	void DuelEndProc();
 	void WaitforResponse(int playerid);
@@ -40,10 +42,8 @@ public:
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 
 	static uint32_t MessageHandler(intptr_t fduel, uint32_t type);
-	static void SingleTimer(evutil_socket_t fd, short events, void* arg);
-
 private:
-	int WriteUpdateData(int& player, int location, int& flag, unsigned char*& qbuf, int& use_cache);
+	int WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache);
 	
 protected:
 	DuelPlayer* players[2]{};
@@ -55,16 +55,16 @@ protected:
 	unsigned char last_response{ 0 };
 	std::set<DuelPlayer*> observers;
 	Replay last_replay;
+	size_t last_replay_response_size{ 0 };
 	bool match_mode{ false };
 	int match_kill{ 0 };
 	unsigned char duel_count{ 0 };
 	unsigned char tp_player{ 0 };
 	unsigned char match_result[3]{};
-	short time_limit[2]{};
-	short time_elapsed{ 0 };
+	uint16_t time_limit[2]{};
+	uint16_t time_elapsed{ 0 };
 };
 
 }
 
 #endif //SINGLE_DUEL_H
-

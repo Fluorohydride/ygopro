@@ -101,7 +101,8 @@ Materials::Materials() {
 	mCard.ColorMaterial = irr::video::ECM_NONE;
 	mCard.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
 	mCard.ZWriteEnable = irr::video::EZW_ON;
-	mCard.MaterialTypeParam = pack_textureBlendFunc(irr::video::EBF_SRC_ALPHA, irr::video::EBF_ONE_MINUS_SRC_ALPHA, irr::video::EMFN_MODULATE_1X, irr::video::EAS_VERTEX_COLOR);
+	mCard.MaterialTypeParam = pack_textureBlendFunc(irr::video::EBF_SRC_ALPHA, irr::video::EBF_ONE_MINUS_SRC_ALPHA, irr::video::EMFN_MODULATE_1X,
+	                                                irr::video::EAS_VERTEX_COLOR | irr::video::EAS_TEXTURE);
 	mTexture.AmbientColor = 0xffffffff;
 	mTexture.DiffuseColor = 0xff000000;
 	mTexture.ColorMaterial = irr::video::ECM_NONE;
@@ -123,7 +124,12 @@ Materials::Materials() {
 	mSelField.MaterialTypeParam = pack_textureBlendFunc(irr::video::EBF_SRC_ALPHA, irr::video::EBF_ONE_MINUS_SRC_ALPHA, irr::video::EMFN_MODULATE_1X, irr::video::EAS_VERTEX_COLOR);
 	mOutLine.ColorMaterial = irr::video::ECM_AMBIENT;
 	mOutLine.DiffuseColor = 0xff000000;
+	mOutLine.MaterialType = irr::video::EMT_TRANSPARENT_VERTEX_ALPHA;
+	mOutLine.ZWriteEnable = irr::video::EZW_ON;
 	mOutLine.Thickness = 2;
+	mOutLine.setFlag(irr::video::EMF_LIGHTING, false);
+	mOutLine.setFlag(irr::video::EMF_BACK_FACE_CULLING, false);
+	mOutLine.setFlag(irr::video::EMF_ANTI_ALIASING, true);
 	mTRTexture = mTexture;
 	mTRTexture.AmbientColor = 0xffffff00;
 	mATK.ColorMaterial = irr::video::ECM_AMBIENT;

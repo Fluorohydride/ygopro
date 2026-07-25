@@ -24,7 +24,7 @@ public:
 	irr::video::ITexture* GetTextureThumb(int code);
 	irr::video::ITexture* GetTextureField(int code);
 	irr::video::ITexture* GetTextureButton(int code, bool defense = false);
-	static int LoadThumbThread();
+	static void LoadThumbThread();
 
 	std::unordered_map<int, irr::video::ITexture*> tMap[2];
 	std::unordered_map<int, irr::video::ITexture*> tThumb;

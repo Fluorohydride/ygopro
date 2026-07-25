@@ -63,6 +63,8 @@ public:
 		WriteData(&data, sizeof(T), flush);
 	}
 	void WriteInt32(int32_t data, bool flush = true);
+	size_t WriteResponse(const void* data, size_t length);
+	bool RemoveData(size_t length);
 	void Flush();
 	void EndRecord();
 	bool SaveReplay(const wchar_t* base_name);
