@@ -13,6 +13,7 @@
 #include <thread>
 #include <chrono>
 #ifdef _WIN32
+#include <windows.h>
 #include <timeapi.h>
 #else
 #include <spawn.h>

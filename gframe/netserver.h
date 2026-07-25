@@ -3,6 +3,7 @@
 
 #include "bufferio.h"
 #include "network.h"
+#include "../ocgcore/ocgapi.h"
 
 namespace ygo {
 
@@ -11,6 +12,7 @@ private:
 	static unsigned char net_server_write[SIZE_NETWORK_BUFFER];
 	static size_t last_sent;
 	static bufferevent* disconnecting_bev;
+	static int WriteBufferEvent(bufferevent* bufev, const void* data, size_t size);
 
 	static bool CanWriteToPlayer(DuelPlayer* dp) {
 		return dp && dp->bev && dp->bev != disconnecting_bev;
@@ -24,8 +26,8 @@ public:
 	static void StopListen();
 	static void StartDuelTimer();
 	static void StopDuelTimer();
-	static void BroadcastEvent(evutil_socket_t fd, short events, void* arg);
-	static void ServerAccept(evconnlistener* listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx);
+	static void BroadcastEvent(EventSocket fd, short events, void* arg);
+	static void ServerAccept(evconnlistener* listener, EventSocket fd, sockaddr* address, int socklen, void* ctx);
 	static void ServerAcceptError(evconnlistener *listener, void* ctx);
 	static void ServerEchoRead(bufferevent* bev, void* ctx);
 	static void ServerEchoEvent(bufferevent* bev, short events, void* ctx);
@@ -50,7 +52,7 @@ public:
 		BufferIO::Write<uint8_t>(p, proto);
 		last_sent = 3;
 		if (CanWriteToPlayer(dp))
-			bufferevent_write(dp->bev, net_server_write, 3);
+			WriteBufferEvent(dp->bev, net_server_write, 3);
 	}
 	template<typename ST>
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, const ST& st) {
@@ -61,7 +63,7 @@ public:
 		std::memcpy(p, &st, sizeof(ST));
 		last_sent = sizeof(ST) + 3;
 		if (CanWriteToPlayer(dp))
-			bufferevent_write(dp->bev, net_server_write, sizeof(ST) + 3);
+			WriteBufferEvent(dp->bev, net_server_write, sizeof(ST) + 3);
 	}
 	static void SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* buffer, size_t len) {
 		auto p = net_server_write;
@@ -72,11 +74,11 @@ public:
 		std::memcpy(p, buffer, len);
 		last_sent = len + 3;
 		if (CanWriteToPlayer(dp))
-			bufferevent_write(dp->bev, net_server_write, len + 3);
+			WriteBufferEvent(dp->bev, net_server_write, len + 3);
 	}
 	static void ReSendToPlayer(DuelPlayer* dp) {
 		if (CanWriteToPlayer(dp))
-			bufferevent_write(dp->bev, net_server_write, last_sent);
+			WriteBufferEvent(dp->bev, net_server_write, last_sent);
 	}
 };
 

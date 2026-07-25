@@ -3,17 +3,23 @@
 
 #include <cstdint>
 #include <cstring>
-#include <event2/event.h>
-#include <event2/listener.h>
-#include <event2/bufferevent.h>
-#include <event2/buffer.h>
-#include <event2/thread.h>
 #include <type_traits>
-#include "deck_manager.h"
+
+struct bufferevent;
+struct event;
+struct event_base;
+struct evconnlistener;
+struct sockaddr;
 
 #define check_trivially_copyable(T) static_assert(std::is_trivially_copyable<T>::value == true && std::is_standard_layout<T>::value == true, "not trivially copyable")
 
 namespace ygo {
+
+#ifdef _WIN32
+using EventSocket = intptr_t; // evutil_socket_t
+#else
+using EventSocket = int;
+#endif
 
 constexpr int SIZE_NETWORK_BUFFER = 0x20000;
 constexpr int MAX_DATA_SIZE = UINT16_MAX - 1;
