@@ -15,8 +15,6 @@ USE_DXSDK = true
 USE_AUDIO = true
 AUDIO_LIB = "miniaudio" -- only miniaudio is supported for now
 
-BUILD_WEBP = os.istarget("windows")
-
 -- Available: none, sse2, avx2, neon, best
 -- "best" means avx2 on x86-* and neon on ARM
 USE_SIMD = "best"
