@@ -1,7 +1,17 @@
 #ifndef IMAGE_UTILITY_H
 #define IMAGE_UTILITY_H
 
-#include <irrlicht.h>
+#include <irrTypes.h>
+
+namespace irr {
+	namespace io {
+		class IReadFile;
+	}
+	namespace video {
+		class IImage;
+		class IVideoDriver;
+	}
+}
 
 namespace ygo {
 
