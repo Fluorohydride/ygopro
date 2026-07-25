@@ -1,6 +1,6 @@
 #include "config.h"
 #include "game.h"
-#include "myfilesystem.h"
+#include "file_system.h"
 #include "image_manager.h"
 #include "data_manager.h"
 #include "deck_manager.h"
@@ -13,6 +13,7 @@
 #include <thread>
 #include <chrono>
 #ifdef _WIN32
+#include <windows.h>
 #include <timeapi.h>
 #else
 #include <spawn.h>
