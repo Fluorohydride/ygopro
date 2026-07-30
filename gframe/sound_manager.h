@@ -22,7 +22,7 @@ private:
 	struct MiniAudioImpl;
 	MiniAudioImpl* miniAudio{};
 #endif
-	void RefershBGMDir(std::wstring path, int scene);
+	void RefreshBGMDir(std::wstring path, int scene);
 
 public:
 	SoundManager() = default;
