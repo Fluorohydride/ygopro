@@ -10,6 +10,12 @@
 #include <IEventReceiver.h>
 #include <vector3d.h>
 
+namespace irr {
+	namespace gui {
+		class IGUIStaticText;
+	}
+}
+
 namespace ygo {
 
 class ClientCard;
