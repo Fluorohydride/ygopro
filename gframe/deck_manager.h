@@ -29,10 +29,18 @@ constexpr int DECK_CATEGORY_NONE = 2;
 constexpr int DECK_CATEGORY_SEPARATOR = 3;
 constexpr int DECK_CATEGORY_CUSTOM = 4;
 
+struct GamePoint {
+	std::string name;
+	int limit{};
+	std::unordered_map<uint32_t, int> table;
+};
+
 struct LFList {
 	unsigned int hash{};
+	uint32_t noMonsterType{};
 	std::wstring listName;
 	std::unordered_map<uint32_t, int> content;
+	std::vector<GamePoint> pointList;
 };
 
 class DeckManager {
@@ -65,6 +73,7 @@ public:
 	static bool RenameCategory(const wchar_t* oldname, const wchar_t* newname);
 	static bool DeleteCategory(const wchar_t* name);
 	static bool SaveDeckArray(const DeckArray& deck, const wchar_t* name);
+	static std::vector<int> GetDeckPoint(const Deck& deck, const LFList* lflist);
 };
 
 extern DeckManager deckManager;
