@@ -59,9 +59,7 @@ project "YGOPro"
         files "ygopro.rc"
         links { "ws2_32", "iphlpapi", "winmm" }
         defines { "NOMINMAX=1", "WIN32_LEAN_AND_MEAN" }
-        if USE_DXSDK then
-            defines { "IRR_COMPILE_WITH_DX9_DEV_PACK" }
-        else
+        if not USE_DXSDK then
             defines { "NO_IRR_COMPILE_WITH_DIRECT3D_9_" }
         end
 
