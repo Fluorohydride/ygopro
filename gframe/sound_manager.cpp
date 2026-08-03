@@ -96,17 +96,17 @@ void SoundManager::RefreshBGMList() {
 #ifdef YGOPRO_USE_AUDIO
 	for(size_t i = 0; i < sizeof(BGMList) / sizeof(BGMList[0]); ++i)
 		BGMList[i].clear();
-	RefershBGMDir(L"", BGM_DUEL);
-	RefershBGMDir(L"duel", BGM_DUEL);
-	RefershBGMDir(L"menu", BGM_MENU);
-	RefershBGMDir(L"deck", BGM_DECK);
-	RefershBGMDir(L"advantage", BGM_ADVANTAGE);
-	RefershBGMDir(L"disadvantage", BGM_DISADVANTAGE);
-	RefershBGMDir(L"win", BGM_WIN);
-	RefershBGMDir(L"lose", BGM_LOSE);
+	RefreshBGMDir(L"", BGM_DUEL);
+	RefreshBGMDir(L"duel", BGM_DUEL);
+	RefreshBGMDir(L"menu", BGM_MENU);
+	RefreshBGMDir(L"deck", BGM_DECK);
+	RefreshBGMDir(L"advantage", BGM_ADVANTAGE);
+	RefreshBGMDir(L"disadvantage", BGM_DISADVANTAGE);
+	RefreshBGMDir(L"win", BGM_WIN);
+	RefreshBGMDir(L"lose", BGM_LOSE);
 #endif
 }
-void SoundManager::RefershBGMDir(std::wstring path, int scene) {
+void SoundManager::RefreshBGMDir(std::wstring path, int scene) {
 #ifdef YGOPRO_USE_AUDIO
 	std::wstring search = L"./sound/BGM/" + path;
 	FileSystem::TraversalDir(search.c_str(), [this, &path, scene](const wchar_t* name, bool isdir) {
