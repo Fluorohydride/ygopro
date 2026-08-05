@@ -25,7 +25,7 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 	ygo::mainGame->device->postEventFromUser(event);
 }
 
-int mymain(int wargc, const wchar_t* const wargv[]) {
+static int mymain(int wargc, const wchar_t* const wargv[]) {
 #ifdef __APPLE__
 	ygo::Game::FixMacOSBundleWorkingDirectory();
 #endif //__APPLE__
