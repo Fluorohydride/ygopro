@@ -15,6 +15,7 @@ project "irrlicht"
     filter { "system:windows" }
         if USE_DXSDK then
             includedirs { "$(DXSDK_DIR)Include" }
+            defines { "IRR_COMPILE_WITH_DX9_DEV_PACK" }
         else
             defines { "NO_IRR_COMPILE_WITH_DIRECT3D_9_" }
         end
