@@ -538,7 +538,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				case BUTTON_RENAME_DECK: {
 					int catesel = mainGame->lstCategories->getSelected();
-					int decksel = mainGame->lstDecks->getSelected();
 					const wchar_t* catename = mainGame->lstCategories->getListItem(catesel);
 					wchar_t oldfilepath[256];
 					get_deck_file(oldfilepath);
