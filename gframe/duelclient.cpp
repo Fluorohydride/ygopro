@@ -2163,12 +2163,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			mainGame->gMutex.unlock();
 			float shift = -0.15f;
 			if (player == 1) shift = 0.15f;
-			pcard->dPos = irr::core::vector3df(shift, 0, 0);
+			irr::core::vector3df dPos(shift, 0, 0);
+			irr::core::vector3df dRot(0, 0, 0);
 			if(!mainGame->dField.deck_reversed)
-				pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-			else pcard->dRot = irr::core::vector3df(0, 0, 0);
-			pcard->is_moving = true;
-			pcard->aniFrame = 5;
+				dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+			mainGame->dField.SetCardMovement(pcard, 5, dPos, dRot);
 			mainGame->WaitFrameSignal(count > 5 ? 12 : 45);
 			mainGame->dField.MoveCard(pcard, 5);
 			mainGame->WaitFrameSignal(5);
@@ -2199,13 +2198,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			myswprintf(textBuffer, L"*[%ls]", dataManager.GetName(pcard->code));
 			mainGame->AddLog(textBuffer, pcard->code);
 			mainGame->gMutex.unlock();
-			if (player == 0)
-				pcard->dPos = irr::core::vector3df(0, -0.20f, 0);
-			else
-				pcard->dPos = irr::core::vector3df(0.15f, 0, 0);
-			pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-			pcard->is_moving = true;
-			pcard->aniFrame = 5;
+			irr::core::vector3df dPos = player == 0 ? irr::core::vector3df(0, -0.20f, 0) : irr::core::vector3df(0.15f, 0, 0);
+			mainGame->dField.SetCardMovement(pcard, 5, dPos, irr::core::vector3df(0, 3.14159f / 5.0f, 0));
 			mainGame->WaitFrameSignal(45);
 			mainGame->dField.MoveCard(pcard, 5);
 			mainGame->WaitFrameSignal(5);
@@ -2244,12 +2238,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 				if(count == 1) {
 					float shift = -0.15f;
 					if (c == 0 && l == 0x40) shift = 0.15f;
-					pcard->dPos = irr::core::vector3df(shift, 0, 0);
-					if((l == LOCATION_DECK) && mainGame->dField.deck_reversed)
-						pcard->dRot = irr::core::vector3df(0, 0, 0);
-					else pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-					pcard->is_moving = true;
-					pcard->aniFrame = 5;
+					irr::core::vector3df dPos(shift, 0, 0);
+					irr::core::vector3df dRot(0, 0, 0);
+					if(!((l == LOCATION_DECK) && mainGame->dField.deck_reversed))
+						dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+					mainGame->dField.SetCardMovement(pcard, 5, dPos, dRot);
 					mainGame->WaitFrameSignal(45);
 					mainGame->dField.MoveCard(pcard, 5);
 					mainGame->WaitFrameSignal(5);
@@ -2274,20 +2267,16 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 				} else if (l == LOCATION_MZONE) {
 					if (pcard->position & POS_FACEUP)
 						continue;
-					pcard->dPos = irr::core::vector3df(0, 0, 0);
+					irr::core::vector3df dRot(0, 0, 0);
 					if (pcard->position == POS_FACEDOWN_ATTACK)
-						pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+						dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
 					else
-						pcard->dRot = irr::core::vector3df(3.14159f / 5.0f, 0, 0);
-					pcard->is_moving = true;
-					pcard->aniFrame = 5;
+						dRot = irr::core::vector3df(3.14159f / 5.0f, 0, 0);
+					mainGame->dField.SetCardMovement(pcard, 5, irr::core::vector3df(0, 0, 0), dRot);
 				} else if (l == LOCATION_SZONE) {
 					if (pcard->position & POS_FACEUP)
 						continue;
-					pcard->dPos = irr::core::vector3df(0, 0, 0);
-					pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-					pcard->is_moving = true;
-					pcard->aniFrame = 5;
+					mainGame->dField.SetCardMovement(pcard, 5, irr::core::vector3df(0, 0, 0), irr::core::vector3df(0, 3.14159f / 5.0f, 0));
 				}
 			}
 			if (mainGame->dInfo.isReplay)
@@ -2335,10 +2324,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			soundManager.PlaySoundEffect(SOUND_SHUFFLE);
 			for (int i = 0; i < 5; ++i) {
 				for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-					(*cit)->dPos = irr::core::vector3df(real_dist(rnd) * 0.4f - 0.2f, 0, 0);
-					(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-					(*cit)->is_moving = true;
-					(*cit)->aniFrame = 3;
+					mainGame->dField.SetCardMovement(*cit, 3, irr::core::vector3df(real_dist(rnd) * 0.4f - 0.2f, 0, 0));
 				}
 				mainGame->WaitFrameSignal(3);
 				for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit)
@@ -2364,22 +2350,16 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 				bool flip = false;
 				for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
 					if((*cit)->code) {
-						(*cit)->dPos = irr::core::vector3df(0, 0, 0);
-						(*cit)->dRot = irr::core::vector3df(1.322f / 5, 3.1415926f / 5, 0);
-						(*cit)->is_moving = true;
 						(*cit)->is_hovered = false;
-						(*cit)->aniFrame = 5;
+						mainGame->dField.SetCardMovement(*cit, 5, irr::core::vector3df(0, 0, 0), irr::core::vector3df(1.322f / 5, 3.1415926f / 5, 0));
 						flip = true;
 					}
 				if(flip)
 					mainGame->WaitFrameSignal(5);
 			}
 			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
-				(*cit)->dPos = irr::core::vector3df((3.9f - (*cit)->curPos.X) / 5, 0, 0);
-				(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-				(*cit)->is_moving = true;
 				(*cit)->is_hovered = false;
-				(*cit)->aniFrame = 5;
+				mainGame->dField.SetCardMovement(*cit, 5, irr::core::vector3df((3.9f - (*cit)->curPos.X) / 5, 0, 0));
 			}
 			mainGame->WaitFrameSignal(11);
 		}
@@ -2407,10 +2387,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			for (int i = 0; i < 5; ++i) {
 				for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 					if(!((*cit)->position & POS_FACEUP)) {
-						(*cit)->dPos = irr::core::vector3df(real_dist(rnd) * 0.4f - 0.2f, 0, 0);
-						(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-						(*cit)->is_moving = true;
-						(*cit)->aniFrame = 3;
+						mainGame->dField.SetCardMovement(*cit, 3, irr::core::vector3df(real_dist(rnd) * 0.4f - 0.2f, 0, 0));
 					}
 				}
 				mainGame->WaitFrameSignal(3);
@@ -2516,10 +2493,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			mc[i] = lst[c][s];
 			mc[i]->SetCode(0);
 			if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-				mc[i]->dPos = irr::core::vector3df((3.95f - mc[i]->curPos.X) / 10, 0, 0.05f);
-				mc[i]->dRot = irr::core::vector3df(0, 0, 0);
-				mc[i]->is_moving = true;
-				mc[i]->aniFrame = 10;
+				mainGame->dField.SetCardMovement(mc[i], 10, irr::core::vector3df((3.95f - mc[i]->curPos.X) / 10, 0, 0.05f));
 			}
 		}
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
@@ -2716,11 +2690,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 					mainGame->dField.AddCard(pcard, cc, cl, cs);
 					mainGame->gMutex.unlock();
 					if (pl == cl && pc == cc && (cl & 0x71)) {
-						pcard->dPos = irr::core::vector3df(-0.3f, 0, 0);
-						pcard->dRot = irr::core::vector3df(0, 0, 0);
-						if (pc == 1) pcard->dPos.X = 0.3f;
-						pcard->is_moving = true;
-						pcard->aniFrame = 5;
+						float shift = pc == 1 ? 0.3f : -0.3f;
+						mainGame->dField.SetCardMovement(pcard, 5, irr::core::vector3df(shift, 0, 0));
 						mainGame->WaitFrameSignal(5);
 						mainGame->dField.MoveCard(pcard, 5);
 						mainGame->WaitFrameSignal(5);
@@ -3031,10 +3002,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 		if(pcard->location & 0x30) {
 			float shift = -0.15f;
 			if(cc == 1) shift = 0.15f;
-			pcard->dPos = irr::core::vector3df(shift, 0, 0);
-			pcard->dRot = irr::core::vector3df(0, 0, 0);
-			pcard->is_moving = true;
-			pcard->aniFrame = 5;
+			mainGame->dField.SetCardMovement(pcard, 5, irr::core::vector3df(shift, 0, 0));
 			mainGame->WaitFrameSignal(30);
 			mainGame->dField.MoveCard(pcard, 5);
 		} else
@@ -3174,10 +3142,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			} else if(pcard->location & 0x30) {
 				float shift = -0.15f;
 				if(c == 1) shift = 0.15f;
-				pcard->dPos = irr::core::vector3df(shift, 0, 0);
-				pcard->dRot = irr::core::vector3df(0, 0, 0);
-				pcard->is_moving = true;
-				pcard->aniFrame = 5;
+				mainGame->dField.SetCardMovement(pcard, 5, irr::core::vector3df(shift, 0, 0));
 				mainGame->WaitFrameSignal(30);
 				mainGame->dField.MoveCard(pcard, 5);
 			} else
@@ -3234,7 +3199,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			return true;
 		}
 		soundManager.PlaySoundEffect(SOUND_DAMAGE);
-		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
+		mainGame->lpInitial = mainGame->dInfo.lp[player];
+		mainGame->lpFinal = final;
 		if (player == 0)
 			myswprintf(event_string, dataManager.GetSysString(1613), val);
 		else
@@ -3244,7 +3210,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 		myswprintf(textBuffer, L"-%d", val);
 		mainGame->lpcstring = textBuffer;
 		mainGame->WaitFrameSignal(30);
-		mainGame->lpframe = 10;
+		mainGame->lpFrameCount = mainGame->ScaleFrame(10);
+		mainGame->lpFrame = mainGame->lpFrameCount;
 		mainGame->WaitFrameSignal(11);
 		mainGame->lpcstring = L"";
 		mainGame->dInfo.lp[player] = final;
@@ -3263,7 +3230,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			return true;
 		}
 		soundManager.PlaySoundEffect(SOUND_RECOVER);
-		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
+		mainGame->lpInitial = mainGame->dInfo.lp[player];
+		mainGame->lpFinal = final;
 		if (player == 0)
 			myswprintf(event_string, dataManager.GetSysString(1615), val);
 		else
@@ -3273,7 +3241,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 		myswprintf(textBuffer, L"+%d", val);
 		mainGame->lpcstring = textBuffer;
 		mainGame->WaitFrameSignal(30);
-		mainGame->lpframe = 10;
+		mainGame->lpFrameCount = mainGame->ScaleFrame(10);
+		mainGame->lpFrame = mainGame->lpFrameCount;
 		mainGame->WaitFrameSignal(11);
 		mainGame->lpcstring = L"";
 		mainGame->dInfo.lp[player] = final;
@@ -3324,9 +3293,11 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
 			return true;
 		}
-		mainGame->lpd = (mainGame->dInfo.lp[player] - val) / 10;
+		mainGame->lpInitial = mainGame->dInfo.lp[player];
+		mainGame->lpFinal = val;
 		mainGame->lpplayer = player;
-		mainGame->lpframe = 10;
+		mainGame->lpFrameCount = mainGame->ScaleFrame(10);
+		mainGame->lpFrame = mainGame->lpFrameCount;
 		mainGame->WaitFrameSignal(11);
 		mainGame->dInfo.lp[player] = val;
 		mainGame->gMutex.lock();
@@ -3419,13 +3390,15 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			return true;
 		}
 		soundManager.PlaySoundEffect(SOUND_DAMAGE);
-		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
+		mainGame->lpInitial = mainGame->dInfo.lp[player];
+		mainGame->lpFinal = final;
 		mainGame->lpccolor = 0xff0000ff;
 		mainGame->lpplayer = player;
 		myswprintf(textBuffer, L"-%d", cost);
 		mainGame->lpcstring = textBuffer;
 		mainGame->WaitFrameSignal(30);
-		mainGame->lpframe = 10;
+		mainGame->lpFrameCount = mainGame->ScaleFrame(10);
+		mainGame->lpFrame = mainGame->lpFrameCount;
 		mainGame->WaitFrameSignal(11);
 		mainGame->lpcstring = L"";
 		mainGame->dInfo.lp[player] = final;
@@ -3835,26 +3808,15 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 		size_t hcount = (size_t)BufferIO::Read<uint8_t>(pbuf);
 		int topcode = BufferIO::Read<int32_t>(pbuf);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			float shift = player == 0 ? 0.4f : -0.6f;
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-				if(player == 0) (*cit)->dPos.Y = 0.4f;
-				else (*cit)->dPos.Y = -0.6f;
-				(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-				(*cit)->is_moving = true;
-				(*cit)->aniFrame = 5;
+				mainGame->dField.SetCardMovement(*cit, 5, irr::core::vector3df(0, shift, 0));
 			}
 			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
-				if(player == 0) (*cit)->dPos.Y = 0.4f;
-				else (*cit)->dPos.Y = -0.6f;
-				(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-				(*cit)->is_moving = true;
-				(*cit)->aniFrame = 5;
+				mainGame->dField.SetCardMovement(*cit, 5, irr::core::vector3df(0, shift, 0));
 			}
 			for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
-				if(player == 0) (*cit)->dPos.Y = 0.4f;
-				else (*cit)->dPos.Y = -0.6f;
-				(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-				(*cit)->is_moving = true;
-				(*cit)->aniFrame = 5;
+				mainGame->dField.SetCardMovement(*cit, 5, irr::core::vector3df(0, shift, 0));
 			}
 			mainGame->WaitFrameSignal(5);
 		}

@@ -17,8 +17,9 @@ public:
 	irr::core::vector3df curRot;
 	irr::core::vector3df dPos;
 	irr::core::vector3df dRot;
-	irr::u32 curAlpha{ 255 };
-	irr::u32 dAlpha{ 0 };
+	float curAlpha{ 255.0f };
+	float dAlpha{ 0.0f };
+	int targetAlpha{ 255 };
 	irr::u32 aniFrame{ 0 };
 	bool is_moving{ false };
 	bool is_fading{ false };
