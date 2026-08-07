@@ -55,7 +55,6 @@ project "YGOPro"
     end
 
     filter "system:windows"
-        entrypoint "mainCRTStartup"
         files "ygopro.rc"
         links { "ws2_32", "iphlpapi", "winmm" }
         defines { "NOMINMAX=1", "WIN32_LEAN_AND_MEAN" }
