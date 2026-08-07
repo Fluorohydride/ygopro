@@ -5,6 +5,19 @@
 #include <unordered_map>
 #include <queue>
 #include <mutex>
+#include <irrTypes.h>
+
+namespace irr {
+	class IrrlichtDevice;
+	namespace io {
+		class IFileSystem;
+	}
+	namespace video {
+		class IImage;
+		class ITexture;
+		class IVideoDriver;
+	}
+}
 
 namespace ygo {
 

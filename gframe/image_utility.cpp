@@ -5,6 +5,9 @@
 #ifdef _OPENMP
 #include <omp.h>
 #endif
+#include <IImage.h>
+#include <IReadFile.h>
+#include <IVideoDriver.h>
 
 #define STB_IMAGE_RESIZE2_IMPLEMENTATION
 #include "stb_image_resize2.h"

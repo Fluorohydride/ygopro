@@ -2,6 +2,7 @@
 #include <cmath>
 #include <vector>
 #include "game.h"
+#include "CGUITTFont.h"
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"

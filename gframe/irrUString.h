@@ -40,6 +40,8 @@
 #include <iterator>
 #include <string>
 
+#include <irrString.h>
+
 
 namespace irr {
 
