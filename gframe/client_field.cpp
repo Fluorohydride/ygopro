@@ -15,7 +15,6 @@ ClientField::ClientField() {
 		mzone[p].resize(7, 0);
 		szone[p].resize(8, 0);
 	}
-	rnd.seed(std::random_device()());
 }
 ClientField::~ClientField() = default;
 void ClientField::Clear() {
@@ -437,7 +436,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool is_continuous) {
 			}
 		}
 		if(has_card_in_grave) {
-			std::shuffle(selectable_cards.begin(), selectable_cards.end(), rnd);
+			std::shuffle(selectable_cards.begin(), selectable_cards.end(), std::random_device{});
 		}
 	}
 	int ct = 5;
