@@ -436,7 +436,8 @@ void ClientField::ShowSelectCard(bool buttonok, bool is_continuous) {
 			}
 		}
 		if(has_card_in_grave) {
-			std::shuffle(selectable_cards.begin(), selectable_cards.end(), std::random_device{});
+			thread_local std::mt19937 rnd{std::random_device{}()};
+			std::shuffle(selectable_cards.begin(), selectable_cards.end(), rnd);
 		}
 	}
 	int ct = 5;
