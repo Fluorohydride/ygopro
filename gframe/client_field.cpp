@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <random>
 #include <stack>
 #include "client_field.h"
 #include "client_card.h"
