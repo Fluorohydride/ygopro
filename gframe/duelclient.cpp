@@ -7,7 +7,6 @@
 #include "data_manager.h"
 #include "client_card.h"
 #include "materials.h"
-#include "image_manager.h"
 #include "sound_manager.h"
 #include "single_mode.h"
 #include "game.h"
