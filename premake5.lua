@@ -120,6 +120,11 @@ DEPENDENCIES_METADATA = {
         prebuilt_header = "png.h",
     },
     {
+        name = "webp",
+        prebuilt_header = "webp/decode.h",
+        source_header_subdir = "src",
+    },
+    {
         name = "lzma",
         prebuilt_header = "lzma.h",
         source_header_subdir = "src/liblzma/api",
