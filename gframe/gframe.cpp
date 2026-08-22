@@ -3,6 +3,7 @@
 #include "data_manager.h"
 #include <event2/thread.h>
 #include <clocale>
+#include <cstdlib>
 #include <memory>
 #ifdef _WIN32
 #include <WinSock2.h>
