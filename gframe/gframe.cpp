@@ -190,8 +190,8 @@ static int mymain(int wargc, const wchar_t* const wargv[]) {
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
 	std::setlocale(LC_CTYPE, ".UTF-8");
 	int wargc = 0;
-	std::unique_ptr<wchar_t*[], void(*)(wchar_t**)> wargv(CommandLineToArgvW(GetCommandLineW(), &wargc), [](wchar_t** wargv) {
-		LocalFree(wargv);
+	std::unique_ptr<wchar_t*[], void(*)(wchar_t**)> wargv(CommandLineToArgvW(GetCommandLineW(), &wargc), [](wchar_t** raw_ptr) {
+		LocalFree(raw_ptr);
 	});
 	if(!wargv)
 		return EXIT_FAILURE;
