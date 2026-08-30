@@ -15,6 +15,11 @@ USE_DXSDK = true
 USE_AUDIO = true
 AUDIO_LIB = "miniaudio" -- only miniaudio is supported for now
 
+DISPLAY_BACKEND = "auto"
+IRR_BUILD_X11 = false
+IRR_BUILD_WAYLAND = false
+IRR_WAYLAND_DIRECT_LINK = false
+
 -- Available: none, sse2, avx2, neon, best
 -- "best" means avx2 on x86-* and neon on ARM
 USE_SIMD = "best"
@@ -203,6 +208,13 @@ end
 newoption { trigger = "build-all", category = "YGOPro", description = "Build all dependencies from source" }
 
 newoption { trigger = "no-dxsdk", category = "YGOPro - irrlicht", description = "Do not use DirectX SDK, disable D3D9 support" }
+newoption { trigger = "display-backend", category = "YGOPro - Wayland", description = "Linux display backend(s); default: auto", value = "BACKEND", allowed = {
+    { "x11", "Build the X11 device" },
+    { "wayland", "Build the Wayland device" },
+    { "x11,wayland", "Build both Linux display devices" },
+    { "auto", "Build every Linux display device whose headers are available" },
+}}
+newoption { trigger = "wayland-direct-link", category = "YGOPro - Wayland", description = "Directly link the complete Wayland runtime stack (automatic for Wayland-only builds)" }
 
 newoption { trigger = "no-audio", category = "YGOPro", description = "Disable audio support" }
 newoption { trigger = "audio-lib", category = "YGOPro", description = "Specify audio library (only miniaudio is supported for now)", value = "NAME" }
@@ -306,6 +318,93 @@ end
 
 if GetParam("no-dxsdk") then
     USE_DXSDK = false
+end
+
+do
+    local requested = GetParam("display-backend")
+    DISPLAY_BACKEND = requested or DISPLAY_BACKEND
+
+    if not os.istarget("linux") then
+        if requested and requested ~= "auto" then
+            error("--display-backend is only supported for Linux targets")
+        end
+        if GetParam("wayland-direct-link") ~= nil then
+            error("--wayland-direct-link is only supported for Linux targets")
+        end
+    else
+        local valid = DISPLAY_BACKEND == "x11" or DISPLAY_BACKEND == "wayland" or
+            DISPLAY_BACKEND == "x11,wayland" or DISPLAY_BACKEND == "auto"
+        if not valid then
+            error("Unknown display backend: " .. tostring(DISPLAY_BACKEND))
+        end
+
+        local x11_header = os.findheader("X11/Xlib.h")
+        local wayland_client_header = os.findheader("wayland-client.h")
+        local wayland_egl_header = os.findheader("wayland-egl.h")
+        local wayland_cursor_header = os.findheader("wayland-cursor.h")
+        local xkb_header = os.findheader("xkbcommon/xkbcommon.h")
+        local egl_header = os.findheader("EGL/egl.h")
+        local x11_library = os.findlib("X11")
+        local wayland_client_library = os.findlib("wayland-client")
+        local wayland_egl_library = os.findlib("wayland-egl")
+        local wayland_cursor_library = os.findlib("wayland-cursor")
+        local xkb_library = os.findlib("xkbcommon")
+        local egl_library = os.findlib("EGL")
+        local x11_available = x11_header ~= nil and x11_library ~= nil
+        local wayland_available = wayland_client_header ~= nil and wayland_egl_header ~= nil and
+            wayland_cursor_header ~= nil and xkb_header ~= nil and egl_header ~= nil and
+            wayland_client_library ~= nil and wayland_egl_library ~= nil and wayland_cursor_library ~= nil and
+            xkb_library ~= nil and egl_library ~= nil
+
+        if DISPLAY_BACKEND == "auto" then
+            IRR_BUILD_X11 = x11_available
+            IRR_BUILD_WAYLAND = wayland_available
+            print("display-backend auto: X11 " .. (IRR_BUILD_X11 and "enabled" or "disabled (missing X11 headers or library)"))
+            if IRR_BUILD_WAYLAND then
+                print("display-backend auto: Wayland enabled")
+            else
+                local missing = {}
+                if not wayland_client_header then table.insert(missing, "wayland-client.h") end
+                if not wayland_egl_header then table.insert(missing, "wayland-egl.h") end
+                if not wayland_cursor_header then table.insert(missing, "wayland-cursor.h") end
+                if not xkb_header then table.insert(missing, "xkbcommon/xkbcommon.h") end
+                if not egl_header then table.insert(missing, "EGL/egl.h") end
+                if not wayland_client_library then table.insert(missing, "libwayland-client") end
+                if not wayland_egl_library then table.insert(missing, "libwayland-egl") end
+                if not wayland_cursor_library then table.insert(missing, "libwayland-cursor") end
+                if not xkb_library then table.insert(missing, "libxkbcommon") end
+                if not egl_library then table.insert(missing, "libEGL") end
+                print("display-backend auto: Wayland disabled (missing " .. table.concat(missing, ", ") .. ")")
+            end
+        else
+            IRR_BUILD_X11 = DISPLAY_BACKEND == "x11" or DISPLAY_BACKEND == "x11,wayland"
+            IRR_BUILD_WAYLAND = DISPLAY_BACKEND == "wayland" or DISPLAY_BACKEND == "x11,wayland"
+            if IRR_BUILD_X11 and not x11_available then
+                error("X11 display backend requested, but its headers or library were not found")
+            end
+            if IRR_BUILD_WAYLAND and not wayland_available then
+                error("Wayland display backend requested, but required headers or libraries were not found")
+            end
+            print("display-backend " .. DISPLAY_BACKEND .. ": X11 " .. (IRR_BUILD_X11 and "enabled" or "disabled") ..
+                ", Wayland " .. (IRR_BUILD_WAYLAND and "enabled" or "disabled"))
+        end
+
+        if not IRR_BUILD_X11 and not IRR_BUILD_WAYLAND then
+            error("No usable Linux display backend was found")
+        end
+
+        local direct_link_requested = GetParam("wayland-direct-link") ~= nil
+        if direct_link_requested and not IRR_BUILD_WAYLAND then
+            error("--wayland-direct-link requires a Wayland display backend")
+        end
+        IRR_WAYLAND_DIRECT_LINK = IRR_BUILD_WAYLAND and (DISPLAY_BACKEND == "wayland" or direct_link_requested)
+        if IRR_WAYLAND_DIRECT_LINK and not os.findlib("decor-0") then
+            error("Direct-linked Wayland requested, but libdecor-0 was not found")
+        end
+        print("Wayland libraries: " .. (IRR_WAYLAND_DIRECT_LINK and
+            "direct link (core, EGL, xkbcommon and libdecor)" or
+            (IRR_BUILD_WAYLAND and "direct link (core, EGL and xkbcommon); runtime load (libdecor)" or "not used")))
+    end
 end
 if USE_DXSDK and os.istarget("windows") then
     if not os.getenv("DXSDK_DIR") then

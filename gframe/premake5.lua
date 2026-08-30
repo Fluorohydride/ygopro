@@ -72,7 +72,17 @@ project "YGOPro"
         defines { "GL_SILENCE_DEPRECATION" }
 
     filter "system:linux"
-        links { "GL", "X11", "dl", "pthread" }
+        defines { "YGOPRO_FONT_WINDOW_SCALED" }
+        links { "GL", "dl", "pthread" }
+        if IRR_BUILD_X11 then
+            links { "X11" }
+        end
+        if IRR_BUILD_WAYLAND then
+            links { "wayland-client", "wayland-egl", "wayland-cursor", "xkbcommon", "EGL" }
+        end
+        if IRR_WAYLAND_DIRECT_LINK then
+            links { "decor-0" }
+        end
         if USE_OPENMP then
             linkoptions { "-fopenmp" }
         end
