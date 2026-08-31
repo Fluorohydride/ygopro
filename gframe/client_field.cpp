@@ -17,54 +17,8 @@ ClientField::ClientField() {
 		szone[p].resize(8, 0);
 	}
 }
-ClientField::~ClientField() = default;
 void ClientField::Clear() {
-	for(int i = 0; i < 2; ++i) {
-		deck[i].clear();
-		hand[i].clear();
-		for (auto& card : mzone[i]) {
-			card = nullptr;
-		}
-		for (auto& card : szone[i]) {
-			card = nullptr;
-		}
-		grave[i].clear();
-		remove[i].clear();
-		extra[i].clear();
-		deck_act[i] = false;
-		grave_act[i] = false;
-		remove_act[i] = false;
-		extra_act[i] = false;
-		pzone_act[i] = false;
-	}
-	cards_.clear();
-	overlay_cards.clear();
-	extra_p_count[0] = 0;
-	extra_p_count[1] = 0;
-	player_desc_hints[0].clear();
-	player_desc_hints[1].clear();
-	chains.clear();
-	activatable_cards.clear();
-	summonable_cards.clear();
-	spsummonable_cards.clear();
-	msetable_cards.clear();
-	ssetable_cards.clear();
-	reposable_cards.clear();
-	attackable_cards.clear();
-	disabled_field = 0;
-	panel = 0;
-	hovered_card = 0;
-	clicked_card = 0;
-	highlighting_card = 0;
-	menu_card = 0;
-	hovered_controler = 0;
-	hovered_location = 0;
-	hovered_sequence = 0;
-	conti_act = false;
-	deck_reversed = false;
-	cant_check_grave = false;
-	tag_surrender = false;
-	tag_teammate_surrender = false;
+	*this = ClientField();
 }
 void ClientField::Initial(int player, int deckc, int extrac, int sidec) {
 	auto load_location = [&](std::vector<ClientCard*>& container, int count, uint8_t location) {

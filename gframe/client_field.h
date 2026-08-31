@@ -8,6 +8,7 @@
 #include <memory>
 #include <IEventReceiver.h>
 #include <vector3d.h>
+#include "client_card.h"
 
 namespace irr {
 	namespace gui {
@@ -16,8 +17,6 @@ namespace irr {
 }
 
 namespace ygo {
-
-class ClientCard;
 
 struct ChainInfo {
 	irr::core::vector3df chain_pos;
@@ -100,7 +99,6 @@ public:
 	bool tag_teammate_surrender{ false };
 
 	ClientField();
-	~ClientField() override;
 	void Clear();
 	void Initial(int player, int deckc, int extrac, int sidec = 0);
 	ClientCard* CreateCard();
