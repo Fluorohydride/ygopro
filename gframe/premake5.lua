@@ -77,11 +77,8 @@ project "YGOPro"
         if IRR_BUILD_X11 then
             links { "X11" }
         end
-        if IRR_BUILD_WAYLAND then
-            links { "wayland-client", "wayland-egl", "wayland-cursor", "xkbcommon", "EGL" }
-        end
         if IRR_WAYLAND_DIRECT_LINK then
-            links { "decor-0" }
+            links { "wayland-client", "wayland-egl", "wayland-cursor", "xkbcommon", "EGL", "decor-0" }
         end
         if USE_OPENMP then
             linkoptions { "-fopenmp" }

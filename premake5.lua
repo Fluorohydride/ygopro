@@ -214,7 +214,7 @@ newoption { trigger = "display-backend", category = "YGOPro - Wayland", descript
     { "x11,wayland", "Build both Linux display devices" },
     { "auto", "Build every Linux display device whose headers are available" },
 }}
-newoption { trigger = "wayland-direct-link", category = "YGOPro - Wayland", description = "Directly link the complete Wayland runtime stack (automatic for Wayland-only builds)" }
+newoption { trigger = "wayland-direct-link", category = "YGOPro - Wayland", description = "Directly link all six Wayland runtime libraries" }
 
 newoption { trigger = "no-audio", category = "YGOPro", description = "Disable audio support" }
 newoption { trigger = "audio-lib", category = "YGOPro", description = "Specify audio library (only miniaudio is supported for now)", value = "NAME" }
@@ -351,10 +351,9 @@ do
         local xkb_library = os.findlib("xkbcommon")
         local egl_library = os.findlib("EGL")
         local x11_available = x11_header ~= nil and x11_library ~= nil
+        local decor_library = os.findlib("decor-0")
         local wayland_available = wayland_client_header ~= nil and wayland_egl_header ~= nil and
-            wayland_cursor_header ~= nil and xkb_header ~= nil and egl_header ~= nil and
-            wayland_client_library ~= nil and wayland_egl_library ~= nil and wayland_cursor_library ~= nil and
-            xkb_library ~= nil and egl_library ~= nil
+            wayland_cursor_header ~= nil and xkb_header ~= nil and egl_header ~= nil
 
         if DISPLAY_BACKEND == "auto" then
             IRR_BUILD_X11 = x11_available
@@ -369,11 +368,6 @@ do
                 if not wayland_cursor_header then table.insert(missing, "wayland-cursor.h") end
                 if not xkb_header then table.insert(missing, "xkbcommon/xkbcommon.h") end
                 if not egl_header then table.insert(missing, "EGL/egl.h") end
-                if not wayland_client_library then table.insert(missing, "libwayland-client") end
-                if not wayland_egl_library then table.insert(missing, "libwayland-egl") end
-                if not wayland_cursor_library then table.insert(missing, "libwayland-cursor") end
-                if not xkb_library then table.insert(missing, "libxkbcommon") end
-                if not egl_library then table.insert(missing, "libEGL") end
                 print("display-backend auto: Wayland disabled (missing " .. table.concat(missing, ", ") .. ")")
             end
         else
@@ -383,7 +377,7 @@ do
                 error("X11 display backend requested, but its headers or library were not found")
             end
             if IRR_BUILD_WAYLAND and not wayland_available then
-                error("Wayland display backend requested, but required headers or libraries were not found")
+                error("Wayland display backend requested, but required headers were not found")
             end
             print("display-backend " .. DISPLAY_BACKEND .. ": X11 " .. (IRR_BUILD_X11 and "enabled" or "disabled") ..
                 ", Wayland " .. (IRR_BUILD_WAYLAND and "enabled" or "disabled"))
@@ -397,13 +391,22 @@ do
         if direct_link_requested and not IRR_BUILD_WAYLAND then
             error("--wayland-direct-link requires a Wayland display backend")
         end
-        IRR_WAYLAND_DIRECT_LINK = IRR_BUILD_WAYLAND and (DISPLAY_BACKEND == "wayland" or direct_link_requested)
-        if IRR_WAYLAND_DIRECT_LINK and not os.findlib("decor-0") then
-            error("Direct-linked Wayland requested, but libdecor-0 was not found")
+        IRR_WAYLAND_DIRECT_LINK = IRR_BUILD_WAYLAND and direct_link_requested
+        if IRR_WAYLAND_DIRECT_LINK then
+            local missing = {}
+            if not wayland_client_library then table.insert(missing, "libwayland-client") end
+            if not wayland_egl_library then table.insert(missing, "libwayland-egl") end
+            if not wayland_cursor_library then table.insert(missing, "libwayland-cursor") end
+            if not xkb_library then table.insert(missing, "libxkbcommon") end
+            if not egl_library then table.insert(missing, "libEGL") end
+            if not decor_library then table.insert(missing, "libdecor-0") end
+            if #missing > 0 then
+                error("Direct-linked Wayland requested, but required libraries were not found: " .. table.concat(missing, ", "))
+            end
         end
         print("Wayland libraries: " .. (IRR_WAYLAND_DIRECT_LINK and
-            "direct link (core, EGL, xkbcommon and libdecor)" or
-            (IRR_BUILD_WAYLAND and "direct link (core, EGL and xkbcommon); runtime load (libdecor)" or "not used")))
+            "all six directly linked" or
+            (IRR_BUILD_WAYLAND and "all six loaded at runtime" or "not used")))
     end
 end
 if USE_DXSDK and os.istarget("windows") then
