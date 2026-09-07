@@ -1253,7 +1253,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if(event.MouseInput.Wheel < 0) {
 				if(mainGame->scrFilter->getPos() < mainGame->scrFilter->getMax())
 					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() + 1);
-			} else {
+			} else if(event.MouseInput.Wheel != 0.0f) {
 				if(mainGame->scrFilter->getPos() > 0)
 					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() - 1);
 			}
