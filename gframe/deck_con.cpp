@@ -1238,6 +1238,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_MOUSE_WHEEL: {
+			if(event.MouseInput.Wheel == 0)
+				break;
 			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 			if(root->getElementFromPoint(mouse_pos) == mainGame->imgBigCard) {
 				bigcard_zoom += 0.1f * event.MouseInput.Wheel;
@@ -1253,7 +1255,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if(event.MouseInput.Wheel < 0) {
 				if(mainGame->scrFilter->getPos() < mainGame->scrFilter->getMax())
 					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() + 1);
-			} else if(event.MouseInput.Wheel != 0.0f) {
+			} else {
 				if(mainGame->scrFilter->getPos() > 0)
 					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() - 1);
 			}
