@@ -101,6 +101,16 @@ else
         }
         buildoutputs { "%{cfg.objdir}/%{file.basename}.obj" }
 
+    filter { "action:gmake", "system:windows", "architecture:x86_64", "files:simd/**.asm" }
+        buildmessage "NASM Compiling %{file.relpath}"
+        buildcommands {
+            '"' .. nasm .. '" -f win64 -DWIN64 -D__x86_64__ -DPIC '
+            .. '-I"' .. turboSimdNasmDir .. '" '
+            .. '-I"' .. turboSimdX64Dir .. '" '
+            .. '"%{file.relpath}" -o "%{cfg.objdir}/%{file.basename}.o"'
+        }
+        buildoutputs { "%{cfg.objdir}/%{file.basename}.o" }
+
     filter { "action:gmake", "system:linux", "architecture:x86_64", "files:simd/**.asm" }
         buildmessage "NASM Compiling %{file.relpath}"
         buildcommands {
