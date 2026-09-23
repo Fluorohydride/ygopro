@@ -594,25 +594,25 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			player = BufferIO::Read<uint8_t>(pbuf);
 			BufferIO::Read<int32_t>(pbuf);
 			switch (type) {
-			case 1:
-			case 2:
-			case 3:
-			case 5: {
+			case HINT_EVENT:
+			case HINT_MESSAGE:
+			case HINT_SELECTMSG:
+			case HINT_EFFECT: {
 				NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 				break;
 			}
-			case 4:
-			case 6:
-			case 7:
-			case 8:
-			case 9:
-			case 11: {
+			case HINT_OPSELECTED:
+			case HINT_RACE:
+			case HINT_ATTRIB:
+			case HINT_CODE:
+			case HINT_NUMBER: {
 				NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, offset, pbuf - offset);
 				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 					NetServer::ReSendToPlayer(*oit);
 				break;
 			}
-			case 10: {
+			case HINT_CARD:
+			case HINT_ZONE: {
 				NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 				NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, offset, pbuf - offset);
 				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
