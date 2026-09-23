@@ -52,6 +52,8 @@ void ClientField::Clear() {
 	reposable_cards.clear();
 	attackable_cards.clear();
 	disabled_field = 0;
+	selectable_field = 0;
+	selected_field = 0;
 	panel = 0;
 	hovered_card = 0;
 	clicked_card = 0;
