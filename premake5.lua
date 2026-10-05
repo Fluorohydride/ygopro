@@ -524,11 +524,11 @@ workspace "YGOPro"
     for _, dep in ipairs(DEPENDENCIES_METADATA) do
         if _G["BUILD_" .. string.upper(dep.name)] then
             -- Build dependency as subproject, using our pre-provided premake script (copy from the premake directory of the project before running premake)
-            include((dep.source_dir or dep.name) .. "/.")
+            include(dep.source_dir or dep.name)
         end
     end
     if USE_AUDIO then
         if AUDIO_LIB == "miniaudio" then
-            include "miniaudio/."
+            include "miniaudio"
         end
     end
