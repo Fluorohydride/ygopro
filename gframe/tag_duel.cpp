@@ -1541,6 +1541,7 @@ void TagDuel::GetResponse(DuelPlayer* dp, unsigned char* pdata, unsigned int len
 void TagDuel::EndDuel() {
 	if(!pduel)
 		return;
+	last_replay.pheader.turns = turn_count;
 	last_replay.EndRecord();
 	std::vector<unsigned char> replay_buffer;
 	replay_buffer.reserve(sizeof last_replay.pheader + last_replay.comp_size);

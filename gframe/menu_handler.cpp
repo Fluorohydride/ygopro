@@ -487,7 +487,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				std::wstring repinfo;
 				time_t curtime;
 				const auto& rh = temp_replay.pheader.base;
-				if(temp_replay.pheader.base.flag & REPLAY_UNIFORM)
+				if (rh.flag & REPLAY_UNIFORM)
 					curtime = rh.start_time;
 				else{
 					curtime = rh.seed;
@@ -497,6 +497,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				std::wcsftime(infobuf, sizeof infobuf / sizeof infobuf[0], L"%Y/%m/%d %H:%M:%S\n", std::localtime(&curtime));
 				repinfo.append(infobuf);
+				if (rh.id == REPLAY_ID_YRP2 && temp_replay.pheader.header_version >= 2) {
+					wchar_t turn_info[256]{};
+					myswprintf(turn_info, L"Turns: %u\n", temp_replay.pheader.turns);
+					repinfo.append(turn_info);
+				}
 				if (rh.flag & REPLAY_SINGLE_MODE) {
 					wchar_t path[256]{};
 					BufferIO::DecodeUTF8(temp_replay.script_name.c_str(), path);

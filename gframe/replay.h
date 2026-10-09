@@ -32,8 +32,8 @@ struct ReplayHeader {
 struct ExtendedReplayHeader {
 	ReplayHeader base;
 	uint32_t seed_sequence[SEED_COUNT]{};
-	uint32_t header_version{ 1 };
-	uint32_t value1{};
+	uint32_t header_version{ 2 };
+	uint32_t turns{};
 	uint32_t value2{};
 	uint32_t value3{};
 };
