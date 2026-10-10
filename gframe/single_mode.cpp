@@ -203,11 +203,33 @@ bool SingleMode::SinglePlayAnalyze(unsigned char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_HINT: {
-			/*int type = */BufferIO::Read<uint8_t>(pbuf);
+			int type = BufferIO::Read<uint8_t>(pbuf);
 			player = BufferIO::Read<uint8_t>(pbuf);
 			/*int data = */BufferIO::Read<int32_t>(pbuf);
-			if(player == 0)
+			switch (type) {
+			case HINT_EVENT:
+			case HINT_MESSAGE:
+			case HINT_SELECTMSG:
+			case HINT_EFFECT: {
+				if(player == 0)
+					DuelClient::ClientAnalyze(offset, pbuf - offset);
+				break;
+			}
+			case HINT_OPSELECTED:
+			case HINT_NUMBER:
+			case HINT_RACE:
+			case HINT_ATTRIB:
+			case HINT_CODE: {
+				if(player == 1)
+					DuelClient::ClientAnalyze(offset, pbuf - offset);
+				break;
+			}
+			case HINT_CARD:
+			case HINT_ZONE: {
 				DuelClient::ClientAnalyze(offset, pbuf - offset);
+				break;
+			}
+			}
 			break;
 		}
 		case MSG_WIN: {

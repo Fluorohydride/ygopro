@@ -1224,15 +1224,16 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 			break;
 		}
 		case HINT_ZONE: {
+			uint32_t zones = static_cast<uint32_t>(data);
 			if(mainGame->LocalPlayer(player) == 1)
-				data = (data >> 16) | (data << 16);
-			for(unsigned filter = 0x1; filter != 0; filter <<= 1) {
+				zones = (zones >> 16) | (zones << 16);
+			// Shared Extra Monster Zones use opposite sequences (5 <-> 6) on the two sides.
+			// Prefer the local player's side when both sides represent the same zone.
+			zones &= ~(((zones & 0x20) << 17) | ((zones & 0x40) << 15));
+			for(uint32_t filter = 0x1; filter != 0; filter <<= 1) {
 				std::wstring str;
-				if(unsigned s = filter & data) {
-					if(s & 0x60) {
-						str += dataManager.GetSysString(1081);
-						data &= ~0x600000;
-					} else if(s & 0xffff)
+				if(uint32_t s = filter & zones) {
+					if(s & 0xffff)
 						str += dataManager.GetSysString(102);
 					else if(s & 0xffff0000) {
 						str += dataManager.GetSysString(103);
@@ -1240,6 +1241,8 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 					}
 					if(s & 0x1f)
 						str += dataManager.GetSysString(1002);
+					else if(s & 0x60)
+						str += dataManager.GetSysString(1081);
 					else if(s & 0xff00) {
 						s >>= 8;
 						if(s & 0x1f)
@@ -1250,7 +1253,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 							str += dataManager.GetSysString(1009);
 					}
 					int seq = 1;
-					for(int i = 0x1; i < 0x100; i <<= 1) {
+					for(uint32_t i = 0x1; i < 0x100; i <<= 1) {
 						if(s & i)
 							break;
 						++seq;
@@ -1260,7 +1263,7 @@ bool DuelClient::ClientAnalyze(unsigned char* msg, size_t len) {
 					mainGame->AddLog(textBuffer);
 				}
 			}
-			mainGame->dField.selectable_field = data;
+			mainGame->dField.selectable_field = zones;
 			mainGame->WaitFrameSignal(40);
 			mainGame->dField.selectable_field = 0;
 			break;

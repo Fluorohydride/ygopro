@@ -349,9 +349,9 @@ jobs:
       id: premake
       uses: mercury233/action-cache-download-file@42a33307a0e00b163efaf26f29149a62d7bbd37d
       with:
-        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-windows.zip
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0/premake-5.0.0-windows.zip
         filename: premake5.zip
-        sha256: e64ce2ed8778e0098f63674cca61fe33941b5f0c8d9a4afd651152bdea3758ab
+        sha256: 15e63506eed5dfd526b96c8e957a7feff2be6cfe70f46e353bfe4813b82e2fdc
 
     - name: Extract premake
       shell: bash
@@ -487,9 +487,9 @@ jobs:
       id: premake
       uses: mercury233/action-cache-download-file@42a33307a0e00b163efaf26f29149a62d7bbd37d
       with:
-        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-linux.tar.gz
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0/premake-5.0.0-linux-glibc-2.35.tar.gz
         filename: premake5.tar.gz
-        sha256: 63edd3e7461eebdd45b500a3c7e8ad4e7a67d68f230010f9a97cbb71b4ec59c8
+        sha256: 8e50e143402de3ce0f0fefe4bb3f4f6a7db46c7d66203dc9f134c0348ebfe6c5
 
     - name: Extract & test premake
       id: extract-premake
@@ -512,7 +512,7 @@ jobs:
       with:
         repository: premake/premake-core
         path: premake-source
-        ref: 2ca338a25ed5f6e62d36c9cd70e5f313953c630d # tag: v5.0.0-beta8
+        ref: 4f6dab3129f86832c9ed745c69438fcaa5fee460 # tag: v5.0.0
 
     - name: Build premake (fallback)
       if: steps.extract-premake.outputs.premake != 'ok'
@@ -573,7 +573,7 @@ jobs:
     - name: Make
       run: |
         cd build
-        make -j 4 config=release
+        make -j 4
         cd ..
 
     - name: Upload build artifacts
@@ -641,9 +641,9 @@ jobs:
       id: premake
       uses: mercury233/action-cache-download-file@42a33307a0e00b163efaf26f29149a62d7bbd37d
       with:
-        url: https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-macosx.tar.gz
+        url: https://github.com/premake/premake-core/releases/download/v5.0.0/premake-5.0.0-macosx${{ runner.arch == 'X64' && '-x64' || '' }}.tar.gz
         filename: premake5.tar.gz
-        sha256: fa73a46f093fa6f17494a3d063421aa6cae3ea825a61c62dd59fc2f07a256d03
+        sha256: ${{ runner.arch == 'X64' && '6005c5da9a76d980bcd13e1c9e0b0b04b53e07a39717137b2ee826429a6bda48' || '8952855a0d824f63ca22721f3f32ee947a4762c01008f9eddefeba133bafda0d' }}
 
     - name: Extract & test premake
       id: extract-premake
@@ -666,7 +666,7 @@ jobs:
       with:
         repository: premake/premake-core
         path: premake-source
-        ref: 9ca696c86d5df6a1f6e674a931eef18e2b1c3b31 # fix: x86_64 architecture detection for macOS in Bootstrap.sh (#2640)
+        ref: 4f6dab3129f86832c9ed745c69438fcaa5fee460 # tag: v5.0.0
 
     - name: Build premake (fallback)
       if: steps.extract-premake.outputs.premake != 'ok'
@@ -709,7 +709,7 @@ jobs:
     - name: Make
       run: |
         cd build
-        make -j 3 config=release
+        make -j 3
         cd ..
 
     - name: Upload build artifacts
