@@ -497,9 +497,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				std::wcsftime(infobuf, sizeof infobuf / sizeof infobuf[0], L"%Y/%m/%d %H:%M:%S\n", std::localtime(&curtime));
 				repinfo.append(infobuf);
-				if (rh.id == REPLAY_ID_YRP2 && temp_replay.pheader.header_version >= 2) {
+				if (rh.id == REPLAY_ID_YRP2 && temp_replay.pheader.header_version >= 2 && temp_replay.pheader.turns) {
 					wchar_t turn_info[256]{};
-					myswprintf(turn_info, L"Turns: %u\n", temp_replay.pheader.turns);
+					myswprintf(turn_info, L"Turns: %hhu\n", temp_replay.pheader.turns);
 					repinfo.append(turn_info);
 				}
 				if (rh.flag & REPLAY_SINGLE_MODE) {
