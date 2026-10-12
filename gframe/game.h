@@ -57,6 +57,12 @@ bool IsExtension(const char* filename, const char(&extension)[N]) {
 
 struct Config {
 	bool use_d3d{ false };
+#if defined(_WIN32)
+	bool vsync{ true };
+#else
+	bool vsync{ false };
+#endif
+	int target_fps{ 0 };
 	bool use_image_scale_multi_thread{ false };
 	bool use_image_load_background_thread{ false };
 	unsigned short antialias{ 2 };
@@ -161,12 +167,13 @@ struct FadingUnit {
 	bool signalAction{};
 	bool isFadein{};
 	int fadingFrame{};
+	int fadingHalf{};
 	int autoFadeoutFrame{};
 	irr::gui::IGUIElement* guiFading{};
 	irr::core::recti fadingSize;
-	irr::core::vector2di fadingUL;
-	irr::core::vector2di fadingLR;
-	irr::core::vector2di fadingDiff;
+	irr::core::vector2df fadingUL;
+	irr::core::vector2df fadingLR;
+	irr::core::vector2df fadingDiff;
 };
 
 class Game {
@@ -174,6 +181,7 @@ class Game {
 public:
 	bool Initialize();
 	void MainLoop();
+	int ScaleFrame(int frame60) const;
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f32 left, irr::f32 right, irr::f32 bottom, irr::f32 top, irr::f32 znear, irr::f32 zfar);
 	void FixFontGlitch();
 	irr::core::dimension2d<irr::u32> GetGUIFontDimension(const wchar_t* text) const;
@@ -310,6 +318,10 @@ public:
 	unsigned short stippleMask{ 0x0f0f };
 	int waitFrame{};
 	int signalFrame{};
+	int effectiveFps{};
+	float fpsScale{ 1.0f };
+	bool logicalTick{};
+	float logicalFrameAccum{};
 	int actionParam{};
 	int showingcode{};
 	const wchar_t* showingtext{};
@@ -322,8 +334,10 @@ public:
 	irr::core::vector3df atk_r;
 	irr::core::vector3df atk_t;
 	float atkdy{};
-	int lpframe{};
-	int lpd{};
+	int lpFrameCount{};
+	int lpFrame{};
+	int lpInitial{};
+	int lpFinal{};
 	int lpplayer{};
 	irr::u32 lpccolor{};
 	std::wstring lpcstring;
