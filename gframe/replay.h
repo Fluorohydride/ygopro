@@ -33,8 +33,7 @@ struct ExtendedReplayHeader {
 	ReplayHeader base;
 	uint32_t seed_sequence[SEED_COUNT]{};
 	uint8_t header_version{ 1 };
-	uint8_t reserved[3]{};
-	uint8_t value[12]{};
+	uint8_t value[15]{};
 };
 
 struct DuelParameters {
