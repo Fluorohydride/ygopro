@@ -1,11 +1,11 @@
 #include "config.h"
 #include "game.h"
+#include "CGUITTFont.h"
 #include "file_system.h"
 #include "image_manager.h"
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "sound_manager.h"
-#include "replay.h"
 #include "materials.h"
 #include "duelclient.h"
 #include "netserver.h"
@@ -1173,6 +1173,14 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f32 left,
 	mProjection[10] = zfar / (zfar - znear);
 	mProjection[11] = 1.0f;
 	mProjection[14] = znear * zfar / (znear - zfar);
+}
+void Game::FixFontGlitch() {
+	textFont->setTransparency(true);
+	guiFont->setTransparency(true);
+}
+// Wrapper for source files which don't include CGUITTFont.
+irr::core::dimension2d<irr::u32> Game::GetGUIFontDimension(const wchar_t* text) const {
+	return guiFont->getDimension(text);
 }
 void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, irr::u32 cWidth, irr::u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text) {
 	std::wstring format_text;

@@ -1,9 +1,8 @@
 #ifndef NETSERVER_H
 #define NETSERVER_H
 
-#include "bufferio.h"
+#include "config.h"
 #include "network.h"
-#include "../ocgcore/ocgapi.h"
 
 namespace ygo {
 

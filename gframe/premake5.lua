@@ -55,7 +55,6 @@ project "YGOPro"
     end
 
     filter "system:windows"
-        entrypoint "mainCRTStartup"
         files "ygopro.rc"
         links { "ws2_32", "iphlpapi", "winmm" }
         defines { "NOMINMAX=1", "WIN32_LEAN_AND_MEAN" }
@@ -81,6 +80,3 @@ project "YGOPro"
 
     filter "system:linux"
         links { "GL", "X11", "dl", "pthread" }
-        if USE_OPENMP then
-            linkoptions { "-fopenmp" }
-        end

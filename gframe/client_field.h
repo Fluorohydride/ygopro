@@ -2,11 +2,18 @@
 #define CLIENT_FIELD_H
 
 #include "config.h"
-#include <random>
 #include <vector>
 #include <set>
 #include <map>
 #include <memory>
+#include <IEventReceiver.h>
+#include <vector3d.h>
+
+namespace irr {
+	namespace gui {
+		class IGUIStaticText;
+	}
+}
 
 namespace ygo {
 
@@ -91,7 +98,6 @@ public:
 	bool cant_check_grave{ false };
 	bool tag_surrender{ false };
 	bool tag_teammate_surrender{ false };
-	std::mt19937 rnd;
 
 	ClientField();
 	~ClientField() override;

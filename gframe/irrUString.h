@@ -32,13 +32,11 @@
 #ifndef __IRR_USTRING_H_INCLUDED__
 #define __IRR_USTRING_H_INCLUDED__
 
-#include <cstring>
-#include <cstdlib>
 #include <cstdint>
-
-#include <utility>
 #include <iterator>
 #include <string>
+
+#include <irrString.h>
 
 
 namespace irr {

@@ -1,7 +1,7 @@
 #ifndef MENU_HANDLER_H
 #define MENU_HANDLER_H
 
-#include <irrlicht.h>
+#include <IEventReceiver.h>
 #include "replay.h"
 
 namespace ygo {

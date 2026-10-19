@@ -538,7 +538,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				case BUTTON_RENAME_DECK: {
 					int catesel = mainGame->lstCategories->getSelected();
-					int decksel = mainGame->lstDecks->getSelected();
 					const wchar_t* catename = mainGame->lstCategories->getListItem(catesel);
 					wchar_t oldfilepath[256];
 					get_deck_file(oldfilepath);
@@ -1239,6 +1238,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_MOUSE_WHEEL: {
+			if(event.MouseInput.Wheel == 0)
+				break;
 			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 			if(root->getElementFromPoint(mouse_pos) == mainGame->imgBigCard) {
 				bigcard_zoom += 0.1f * event.MouseInput.Wheel;

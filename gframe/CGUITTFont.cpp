@@ -28,8 +28,8 @@
    john@suckerfreegames.com
 */
 
-#include <irrlicht.h>
 #include "CGUITTFont.h"
+#include <irrlicht.h>
 
 namespace irr {
 namespace gui {
@@ -58,6 +58,77 @@ scene::IMesh* CGUITTFont::shared_plane_ptr_ = 0;
 scene::SMesh CGUITTFont::shared_plane_;
 
 //
+
+CGUITTGlyphPage::CGUITTGlyphPage(video::IVideoDriver* Driver, const io::path& texture_name) :
+	driver(Driver), name(texture_name) {
+}
+
+CGUITTGlyphPage::~CGUITTGlyphPage() {
+	if (texture) {
+		if (driver)
+			driver->removeTexture(texture);
+		else
+			texture->drop();
+	}
+}
+
+bool CGUITTGlyphPage::createPageTexture(const u8& pixel_mode, const core::dimension2du& texture_size) {
+	if (texture)
+		return false;
+
+	bool flgmip = driver->getTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS);
+	driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, false);
+
+	// Set the texture color format.
+	switch (pixel_mode) {
+	case FT_PIXEL_MODE_MONO:
+		texture = driver->addTexture(texture_size, name, video::ECF_A1R5G5B5);
+		break;
+	case FT_PIXEL_MODE_GRAY:
+	default:
+		texture = driver->addTexture(texture_size, name, video::ECF_A8R8G8B8);
+		break;
+	}
+
+	// Restore our texture creation flags.
+	driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, flgmip);
+	return texture ? true : false;
+}
+
+void CGUITTGlyphPage::updateTexture() {
+	if (!dirty)
+		return;
+
+	if (!texture) {
+		if (!createPageTexture(pixel_mode, texture_size))
+			// TODO: add error message?
+			return;
+	}
+
+	void* ptr = texture->lock();
+	video::ECOLOR_FORMAT format = texture->getColorFormat();
+	core::dimension2du size = texture->getOriginalSize();
+	video::IImage* pageholder = driver->createImageFromData(format, size, ptr, true, false);
+
+	for (u32 i = 0; i < glyph_to_be_paged.size(); ++i) {
+		const SGUITTGlyph* glyph = glyph_to_be_paged[i];
+		if (glyph && glyph->isLoaded) {
+			if (glyph->surface) {
+				glyph->surface->copyTo(pageholder, glyph->source_rect.UpperLeftCorner);
+				glyph->surface->drop();
+				glyph->surface = 0;
+			} else {
+				; // TODO: add error message?
+				//currently, if we failed to create the image, just ignore this operation.
+			}
+		}
+	}
+
+	pageholder->drop();
+	texture->unlock();
+	glyph_to_be_paged.clear();
+	dirty = false;
+}
 
 video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVideoDriver* driver) const {
 	// Determine what our texture size should be.

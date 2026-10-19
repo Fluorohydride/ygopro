@@ -2,6 +2,7 @@
 #include <cmath>
 #include <vector>
 #include "game.h"
+#include "CGUITTFont.h"
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
@@ -1351,13 +1352,13 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList
 	bool showAvail = false;
 	bool showNotAvail = false;
 	int filter_lm = cbLimit->getSelected();
-	bool avail = !((filter_lm == 4 && !(cp->ot & AVAIL_OCG)
+	bool avail = !((filter_lm == 4 && !(cp->ot & AVAIL_OCG))
 				|| (filter_lm == 5 && !(cp->ot & AVAIL_TCG))
 				|| (filter_lm == 6 && !(cp->ot & AVAIL_SC))
 				|| (filter_lm == 7 && !(cp->ot & AVAIL_CUSTOM))
 				|| (filter_lm == 8 && !(cp->ot & AVAIL_OCG))
 				|| (filter_lm == 9 && !(cp->ot & AVAIL_TCG))
-				|| (filter_lm == 10 && (cp->ot & AVAIL_OCGTCG) != AVAIL_OCGTCG)));
+				|| (filter_lm == 10 && (cp->ot & AVAIL_OCGTCG) != AVAIL_OCGTCG));
 	if(filter_lm >= 4) {
 		showAvail = avail;
 		showNotAvail = !avail;
