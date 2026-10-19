@@ -397,6 +397,7 @@ workspace "YGOPro"
     filter "system:windows"
         systemversion "latest"
         startproject "YGOPro"
+        characterset "Unicode"
         -- Target Windows 7 or later. (Building requires Windows 10 SDK 1803 or newer.)
         defines { "WINVER=0x0601", "_WIN32_WINNT=0x0601" }
 
@@ -433,8 +434,6 @@ workspace "YGOPro"
 
     filter { "system:windows", "action:gmake" }
         architecture "x86_64"
-        defines { "UNICODE", "_UNICODE" }
-        buildoptions { "-municode" }
 
     filter "system:macosx"
         systemversion "11"

@@ -69,10 +69,7 @@ project "YGOPro"
 
     filter { "system:windows", "action:gmake" }
         links { "opengl32", "imm32" }
-        linkoptions { "-static", "-static-libgcc", "-static-libstdc++" }
-        if USE_OPENMP then
-            linkoptions { "-fopenmp" }
-        end
+        linkoptions { "-static" }
 
     filter "system:macosx"
         links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework", "Carbon.framework" }
