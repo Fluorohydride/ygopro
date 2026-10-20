@@ -435,24 +435,6 @@ jobs:
       run: |
         ./premake5.exe gmake
 
-    - name: Fix irrlicht.make for MinGW build
-      if: matrix.mingw == true
-      shell: python
-      run: |
-        import re
-        from pathlib import Path
-        makefile = Path('build/irrlicht.make')
-        text = makefile.read_text()
-        pattern = r'^LINKCMD\s*=\s*\$\(AR\)\s+-rcs\s+"\$@"\s+\$\(OBJECTS\)'
-        replacement = (
-            'LINKCMD = $(file >objects.rsp,$(OBJECTS)) \\\n'
-            '\t$(AR) -rcs "$@" @objects.rsp'
-        )
-        new_text, n = re.subn(pattern, replacement, text, flags=re.MULTILINE)
-        if n == 0:
-            raise RuntimeError('No matching archive command found in build/irrlicht.make')
-        makefile.write_text(new_text)
-
     - name: Make
       if: matrix.mingw == true
       shell: msys2 {0}
