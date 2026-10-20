@@ -385,8 +385,7 @@ if GetParam("use-openmp") then
 end
 
 -- workaround for irrlicht static library linking on gmake
-if _ACTION == "gmake" and os.target() == "windows" then
-    require("gmake")
+if _ACTION == "gmake" and os.istarget("windows")  then
     local p = premake
     local cpp = p.modules.gmake.cpp
     local function customLinkCmd(cfg, toolset)
