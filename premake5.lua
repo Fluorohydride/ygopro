@@ -384,6 +384,24 @@ if GetParam("use-openmp") then
     end
 end
 
+-- workaround for irrlicht static library linking on gmake
+if _ACTION == "gmake" and os.target() == "windows" then
+    require("gmake")
+    local p = premake
+    local cpp = p.modules.gmake.cpp
+    local function customLinkCmd(cfg, toolset)
+        p.outln('LINKCMD = $(file >$(OBJDIR)/objects.rsp,$(OBJECTS)) $(AR) -rcs "$@" @$(OBJDIR)/objects.rsp')
+    end
+
+    p.override(cpp.elements, "configuration", function(base, cfg)
+        local calls = base(cfg)
+        if cfg.project.name == "irrlicht" and cfg.kind == p.STATICLIB then
+            table.replace(calls, cpp.linkCmd, customLinkCmd)
+        end
+        return calls
+    end) 
+end
+
 ---- Premake workspace and project configuration
 
 workspace "YGOPro"
