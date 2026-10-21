@@ -471,7 +471,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libgl1-mesa-dev
+        sudo apt-get install -y libgl1-mesa-dev libegl1-mesa-dev libwayland-dev libxkbcommon-dev libdecor-0-dev wayland-protocols
 
     - name: Install dependencies (dynamic link)
       if: matrix.static-link != true
@@ -563,12 +563,12 @@ jobs:
     - name: Use premake to generate make files (apt packages)
       if: matrix.static-link != true
       run: |
-        ./premake5 gmake ${{ matrix.apt-outdated == true && '--build-lzma' || '' }}
+        ./premake5 gmake --display-backend=x11,wayland ${{ matrix.apt-outdated == true && '--build-lzma' || '' }}
 
     - name: Use premake to generate make files (static link)
       if: matrix.static-link == true
       run: |
-        ./premake5 gmake --build-all
+        ./premake5 gmake --display-backend=x11,wayland --build-all
 
     - name: Make
       run: |

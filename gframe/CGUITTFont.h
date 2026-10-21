@@ -308,6 +308,11 @@ private:
 	explicit CGUITTFont(IGUIEnvironment *env);
 	bool load(const io::path& filename, const u32 size, const bool antialias, const bool transparency);
 	void reset_images();
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+	void ensureScale() const;
+	s32 toLogical(s32 value) const;
+	u32 toLogical(u32 value) const;
+#endif
 	void update_glyph_pages() const;
 	void update_load_flags() {
 		// Set up our loading flags.
@@ -336,6 +341,10 @@ private:
 	FT_Face tt_face;
 	FT_Size_Metrics font_metrics;
 	FT_Int32 load_flags;
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+	f32 glyph_scale;
+	u32 raster_size;
+#endif
 
 	mutable core::array<CGUITTGlyphPage*> Glyph_Pages;
 	mutable core::array<SGUITTGlyph> Glyphs;

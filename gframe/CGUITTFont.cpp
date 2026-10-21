@@ -30,6 +30,9 @@
 
 #include "CGUITTFont.h"
 #include <irrlicht.h>
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+#include <cmath>
+#endif
 
 namespace irr {
 namespace gui {
@@ -301,7 +304,11 @@ CGUITTFont* CGUITTFont::create(IrrlichtDevice *device, const io::path& filename,
 //! Constructor.
 CGUITTFont::CGUITTFont(IGUIEnvironment *env)
 	: use_monochrome(false), use_transparency(true), use_hinting(true), use_auto_hinting(true),
-	  batch_load_size(1), Device(0), Environment(env), Driver(0), GlobalKerningWidth(0), GlobalKerningHeight(0), supposed_line_height(0) {
+	  batch_load_size(1), Device(0), Environment(env), Driver(0),
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+	  glyph_scale(1.f), raster_size(0),
+#endif
+	  GlobalKerningWidth(0), GlobalKerningHeight(0), supposed_line_height(0) {
 #ifdef _DEBUG
 	setDebugName("CGUITTFont");
 #endif
@@ -330,6 +337,10 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 	irr::ILogger* logger = (Device != 0 ? Device->getLogger() : 0);
 	this->size = size;
 	this->filename = filename;
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+	glyph_scale = core::clamp(getWindowScaleFactor(), 1.f, 8.f);
+	raster_size = core::max_<u32>(1, static_cast<u32>(std::ceil(size * glyph_scale)));
+#endif
 
 	// Update the font loading flags when the font is first loaded.
 	this->use_monochrome = !antialias;
@@ -390,7 +401,13 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 	tt_face = face->face;
 
 	// Store font metrics.
-	FT_Set_Pixel_Sizes(tt_face, 0, size);
+	FT_Set_Pixel_Sizes(tt_face, 0,
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+		raster_size
+#else
+		size
+#endif
+	);
 	font_metrics = tt_face->size->metrics;
 
 	// Allocate our glyphs.
@@ -475,6 +492,38 @@ void CGUITTFont::reset_images() {
 	update_load_flags();
 }
 
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+void CGUITTFont::ensureScale() const {
+	const f32 current_scale = core::clamp(getWindowScaleFactor(), 1.f, 8.f);
+	if (std::fabs(current_scale - glyph_scale) < 0.01f)
+		return;
+
+	CGUITTFont* self = const_cast<CGUITTFont*>(this);
+	self->glyph_scale = current_scale;
+	self->raster_size = core::max_<u32>(1, static_cast<u32>(std::ceil(size * current_scale)));
+	FT_Set_Pixel_Sizes(tt_face, 0, self->raster_size);
+	self->font_metrics = tt_face->size->metrics;
+	self->reset_images();
+
+	const u32 old_batch_size = self->batch_load_size;
+	self->batch_load_size = 127;
+	self->getGlyphIndexByChar((uchar32_t)0);
+	self->batch_load_size = old_batch_size;
+	const s32 test1 = self->getHeightFromCharacter((uchar32_t)'g') + 1;
+	const s32 test2 = self->getHeightFromCharacter((uchar32_t)'j') + 1;
+	const s32 test3 = self->getHeightFromCharacter((uchar32_t)0x55B5) + 1;
+	self->supposed_line_height = core::max_(test1, core::max_(test2, test3));
+}
+
+s32 CGUITTFont::toLogical(s32 value) const {
+	return static_cast<s32>(std::lround(static_cast<f32>(value) / glyph_scale));
+}
+
+u32 CGUITTFont::toLogical(u32 value) const {
+	return static_cast<u32>(std::lround(static_cast<f32>(value) / glyph_scale));
+}
+#endif
+
 void CGUITTFont::update_glyph_pages() const {
 	for (u32 i = 0; i != Glyph_Pages.size(); ++i) {
 		if (Glyph_Pages[i]->dirty)
@@ -496,6 +545,11 @@ CGUITTGlyphPage* CGUITTFont::getLastGlyphPage() const {
 
 CGUITTGlyphPage* CGUITTFont::createGlyphPage(const u8& pixel_mode) {
 	CGUITTGlyphPage* page = 0;
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+	const u32 page_font_size = raster_size;
+#else
+	const u32 page_font_size = size;
+#endif
 
 	// Name of our page.
 	io::path name("TTFontGlyphPage_");
@@ -503,7 +557,7 @@ CGUITTGlyphPage* CGUITTFont::createGlyphPage(const u8& pixel_mode) {
 	name += ".";
 	name += tt_face->style_name;
 	name += ".";
-	name += size;
+	name += page_font_size;
 	name += "_";
 	name += Glyph_Pages.size(); // The newly created page will be at the end of the collection.
 
@@ -520,10 +574,10 @@ CGUITTGlyphPage* CGUITTFont::createGlyphPage(const u8& pixel_mode) {
 
 	// We want to try to put at least 144 glyphs on a single texture.
 	core::dimension2du page_texture_size;
-	if (size <= 21) page_texture_size = core::dimension2du(256, 256);
-	else if (size <= 42) page_texture_size = core::dimension2du(512, 512);
-	else if (size <= 84) page_texture_size = core::dimension2du(1024, 1024);
-	else if (size <= 168) page_texture_size = core::dimension2du(2048, 2048);
+	if (page_font_size <= 21) page_texture_size = core::dimension2du(256, 256);
+	else if (page_font_size <= 42) page_texture_size = core::dimension2du(512, 512);
+	else if (page_font_size <= 84) page_texture_size = core::dimension2du(1024, 1024);
+	else if (page_font_size <= 168) page_texture_size = core::dimension2du(2048, 2048);
 	else page_texture_size = core::dimension2du(4096, 4096);
 
 	if (page_texture_size.Width > max_texture_size.Width || page_texture_size.Height > max_texture_size.Height)
@@ -534,7 +588,7 @@ CGUITTGlyphPage* CGUITTFont::createGlyphPage(const u8& pixel_mode) {
 
 	if (page) {
 		// Determine the number of glyph slots on the page and add it to the list of pages.
-		page->available_slots = (u32)((page_texture_size.Width - size) / (u32)(size * 1.5)) * (u32)((page_texture_size.Height - size) / (u32)(size * 1.5));
+		page->available_slots = (u32)((page_texture_size.Width - page_font_size) / (u32)(page_font_size * 1.5)) * (u32)((page_texture_size.Height - page_font_size) / (u32)(page_font_size * 1.5));
 		Glyph_Pages.push_back(page);
 	}
 	return page;
@@ -565,6 +619,9 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 void CGUITTFont::drawUstring(const core::ustring& utext, const core::rect<s32>&position, video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>*clip) {
 	if (!Driver)
 		return;
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+	ensureScale();
+#endif
 
 	// Clear the glyph pages of their render information.
 	for (u32 i = 0; i < Glyph_Pages.size(); ++i) {
@@ -619,8 +676,13 @@ void CGUITTFont::drawUstring(const core::ustring& utext, const core::rect<s32>&p
 		bool visible = (Invisible.findFirst(currentChar) == -1);
 		if (n > 0 && visible) {
 			// Calculate the glyph offset.
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+			s32 offx = toLogical(Glyphs[n - 1].offset.X);
+			s32 offy = toLogical(static_cast<s32>(font_metrics.ascender / 64) - Glyphs[n - 1].offset.Y);
+#else
 			s32 offx = Glyphs[n - 1].offset.X;
 			s32 offy = (font_metrics.ascender / 64) - Glyphs[n - 1].offset.Y;
+#endif
 
 			// Apply kerning.
 			core::vector2di k = getKerning(currentChar, previousChar);
@@ -651,7 +713,22 @@ void CGUITTFont::drawUstring(const core::ustring& utext, const core::rect<s32>&p
 		CGUITTGlyphPage* page = n->getValue();
 
 		if (!use_transparency) color.color |= 0xff000000;
-		Driver->draw2DImageBatch(page->texture, page->render_positions, page->render_source_rects, clip, color, true);
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+		if (glyph_scale != 1.f) {
+			const video::SColor colors[4] = { color, color, color, color };
+			for (u32 i = 0; i < page->render_positions.size(); ++i) {
+				const core::recti& source = page->render_source_rects[i];
+				const core::position2di& upper = page->render_positions[i];
+				const core::recti destination(upper, core::dimension2di(
+					core::max_<s32>(1, toLogical(source.getWidth())),
+					core::max_<s32>(1, toLogical(source.getHeight()))));
+				Driver->draw2DImage(page->texture, destination, source, clip, colors, true);
+			}
+		} else
+#endif
+		{
+			Driver->draw2DImageBatch(page->texture, page->render_positions, page->render_source_rects, clip, color, true);
+		}
 	}
 }
 
@@ -664,6 +741,9 @@ core::dimension2d<u32> CGUITTFont::getDimension(const wchar_t* text) const {
 }
 
 core::dimension2d<u32> CGUITTFont::getDimension(const core::ustring& text) const {
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+	ensureScale();
+#endif
 	core::dimension2d<u32> text_dimension(0, supposed_line_height);
 	core::dimension2d<u32> line(0, supposed_line_height);
 
@@ -710,6 +790,9 @@ inline u32 CGUITTFont::getWidthFromCharacter(wchar_t c) const {
 }
 
 inline u32 CGUITTFont::getWidthFromCharacter(uchar32_t c) const {
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+	ensureScale();
+#endif
 	// Set the size of the face.
 	// This is because we cache faces and the face may have been set to a different size.
 	//FT_Set_Pixel_Sizes(tt_face, 0, size);
@@ -717,11 +800,19 @@ inline u32 CGUITTFont::getWidthFromCharacter(uchar32_t c) const {
 	u32 n = getGlyphIndexByChar(c);
 	if (n > 0) {
 		int w = Glyphs[n - 1].advance.x / 64;
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+		w = toLogical(w);
+#endif
 		return w;
 	}
 	if (c >= 0x2000)
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+		return toLogical(static_cast<u32>(font_metrics.ascender / 64));
+	else return toLogical(static_cast<u32>(font_metrics.ascender / 64)) / 2;
+#else
 		return (font_metrics.ascender / 64);
 	else return (font_metrics.ascender / 64) / 2;
+#endif
 }
 
 inline u32 CGUITTFont::getHeightFromCharacter(wchar_t c) const {
@@ -729,6 +820,9 @@ inline u32 CGUITTFont::getHeightFromCharacter(wchar_t c) const {
 }
 
 inline u32 CGUITTFont::getHeightFromCharacter(uchar32_t c) const {
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+	ensureScale();
+#endif
 	// Set the size of the face.
 	// This is because we cache faces and the face may have been set to a different size.
 	//FT_Set_Pixel_Sizes(tt_face, 0, size);
@@ -737,11 +831,20 @@ inline u32 CGUITTFont::getHeightFromCharacter(uchar32_t c) const {
 	if (n > 0) {
 		// Grab the true height of the character, taking into account underhanging glyphs.
 		s32 height = (font_metrics.ascender / 64) - Glyphs[n - 1].offset.Y + Glyphs[n - 1].source_rect.getHeight();
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+		return toLogical(height);
+#else
 		return height;
+#endif
 	}
 	if (c >= 0x2000)
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+		return toLogical(static_cast<u32>(font_metrics.ascender / 64));
+	else return toLogical(static_cast<u32>(font_metrics.ascender / 64)) / 2;
+#else
 		return (font_metrics.ascender / 64);
 	else return (font_metrics.ascender / 64) / 2;
+#endif
 }
 
 u32 CGUITTFont::getGlyphIndexByChar(wchar_t c) const {
@@ -749,6 +852,9 @@ u32 CGUITTFont::getGlyphIndexByChar(wchar_t c) const {
 }
 
 u32 CGUITTFont::getGlyphIndexByChar(uchar32_t c) const {
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+	ensureScale();
+#endif
 	// Get the glyph.
 	u32 glyph = FT_Get_Char_Index(tt_face, c);
 
@@ -775,7 +881,13 @@ u32 CGUITTFont::getGlyphIndexByChar(uchar32_t c) const {
 		if (char_index) {
 			SGUITTGlyph& glyph = Glyphs[char_index - 1];
 			if (!glyph.isLoaded) {
-				glyph.preload(char_index, tt_face, Driver, size, load_flags);
+				glyph.preload(char_index, tt_face, Driver,
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+					raster_size,
+#else
+					size,
+#endif
+					load_flags);
 				Glyph_Pages[glyph.glyph_page]->pushGlyphToBePaged(&glyph);
 			}
 		}
@@ -847,12 +959,21 @@ core::vector2di CGUITTFont::getKerning(const wchar_t thisLetter, const wchar_t p
 }
 
 core::vector2di CGUITTFont::getKerning(const uchar32_t thisLetter, const uchar32_t previousLetter) const {
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+	ensureScale();
+#endif
 	if (tt_face == 0 || thisLetter == 0 || previousLetter == 0)
 		return core::vector2di();
 
 	// Set the size of the face.
 	// This is because we cache faces and the face may have been set to a different size.
-	FT_Set_Pixel_Sizes(tt_face, 0, size);
+	FT_Set_Pixel_Sizes(tt_face, 0,
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+		raster_size
+#else
+		size
+#endif
+	);
 
 	core::vector2di ret(GlobalKerningWidth, GlobalKerningHeight);
 
@@ -867,12 +988,22 @@ core::vector2di CGUITTFont::getKerning(const uchar32_t thisLetter, const uchar32
 	// If we have a scalable font, the return value will be in font points.
 	if (FT_IS_SCALABLE(tt_face)) {
 		// Font points, so divide by 64.
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+		ret.X += toLogical(static_cast<s32>(v.x / 64));
+		ret.Y += toLogical(static_cast<s32>(v.y / 64));
+#else
 		ret.X += (v.x / 64);
 		ret.Y += (v.y / 64);
+#endif
 	} else {
 		// Pixel units.
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+		ret.X += toLogical(static_cast<s32>(v.x));
+		ret.Y += toLogical(static_cast<s32>(v.y));
+#else
 		ret.X += v.x;
 		ret.Y += v.y;
+#endif
 	}
 	return ret;
 }
@@ -1014,10 +1145,17 @@ core::array<scene::ISceneNode*> CGUITTFont::addTextSceneNode(const wchar_t* text
 
 				// Store glyph size and offset informations.
 				SGUITTGlyph const& glyph = Glyphs[n - 1];
+#ifdef YGOPRO_FONT_WINDOW_SCALED
+				u32 texw = toLogical(static_cast<u32>(glyph.source_rect.getWidth()));
+				u32 texh = toLogical(static_cast<u32>(glyph.source_rect.getHeight()));
+				s32 offx = toLogical(glyph.offset.X);
+				s32 offy = toLogical(static_cast<s32>(font_metrics.ascender / 64) - glyph.offset.Y);
+#else
 				u32 texw = glyph.source_rect.getWidth();
 				u32 texh = glyph.source_rect.getHeight();
 				s32 offx = glyph.offset.X;
 				s32 offy = (font_metrics.ascender / 64) - glyph.offset.Y;
+#endif
 
 				// Apply kerning.
 				core::vector2di k = getKerning(current_char, previous_char);
