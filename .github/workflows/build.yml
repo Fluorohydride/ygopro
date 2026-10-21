@@ -275,6 +275,7 @@ jobs:
           - windows-arm64
           - windows-2025
           - windows-mingw
+          - windows-clang
         include:
           - name: windows-x86-sse2
             os: windows-2022
@@ -307,6 +308,11 @@ jobs:
           - name: windows-mingw
             os: windows-2022
             mingw: true
+          - name: windows-clang
+            os: windows-2022
+            vs: vs2022
+            platform: x64
+            cc: clang
 
     runs-on: ${{ matrix.os }}
 
@@ -409,7 +415,7 @@ jobs:
       if: matrix.mingw != true
       shell: pwsh
       run: |
-        .\premake5.exe ${{ matrix.vs }} ${{ matrix.simd && format('--use-simd={0}', matrix.simd) || '' }}
+        .\premake5.exe ${{ matrix.vs }} ${{ matrix.cc && format('--cc={0}', matrix.cc) || '' }} ${{ matrix.simd && format('--use-simd={0}', matrix.simd) || '' }}
 
     - name: Add msbuild to PATH
       if: matrix.mingw != true
