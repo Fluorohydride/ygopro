@@ -532,6 +532,15 @@ workspace "YGOPro"
     filter "action:gmake"
         buildoptions { "-fno-strict-aliasing" }
 
+    filter { "action:gmake", "configurations:Release" }
+        buildoptions { "-ffunction-sections", "-fdata-sections" }
+
+    filter { "action:gmake", "configurations:Release", "system:windows or linux" }
+        linkoptions { "-Wl,--gc-sections" }
+
+    filter { "action:gmake", "configurations:Release", "system:macosx" }
+        linkoptions { "-Wl,-dead_strip" }
+
     filter { "action:gmake", "architecture:x86_64" }
         if USE_SIMD == "best" then
             vectorextensions "AVX2"
