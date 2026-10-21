@@ -527,9 +527,6 @@ workspace "YGOPro"
         buildoptions { "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
 
-    filter "toolset:clang"
-        disablewarnings { "pragma-pack" }
-
     filter { "action:vs*", "toolset:not clang" }
         disablewarnings {
             "4244", -- Intentional narrowing conversions are pervasive in the program and dependencies.

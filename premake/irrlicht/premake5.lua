@@ -30,3 +30,6 @@ project "irrlicht"
 
     filter { "system:macosx", "files:source/Irrlicht/Irrlicht.cpp or source/Irrlicht/COSOperator.cpp" }
         compileas "Objective-C++" 
+
+    filter "toolset:clang"
+        disablewarnings { "pragma-pack" }
