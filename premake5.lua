@@ -484,6 +484,7 @@ workspace "YGOPro"
 
     filter "configurations:Release"
         optimize "Speed"
+        linktimeoptimization "On"
         targetdir "bin/release"
 
     filter "configurations:Debug"
@@ -510,7 +511,6 @@ workspace "YGOPro"
         targetdir "bin/debug/arm64"
 
     filter { "configurations:Release", "action:vs*" }
-        linktimeoptimization "On"
         staticruntime "On"
         disablewarnings {
             "4996", -- Currently only some dependencies use deprecated functions.
