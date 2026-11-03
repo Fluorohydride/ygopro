@@ -389,7 +389,10 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.base.start_time = (uint32_t)std::time(nullptr);
 	for (auto& x : rh.seed_sequence)
 		x = rd();
-	mtrandom rnd(rh.seed_sequence, SEED_COUNT);
+	uint32_t shuffle_seed[SEED_COUNT + 1]{};
+	std::memcpy(shuffle_seed, rh.seed_sequence, sizeof rh.seed_sequence);
+	shuffle_seed[SEED_COUNT] = 1;
+	mtrandom rnd(shuffle_seed, SEED_COUNT + 1);
 	last_replay.BeginRecord();
 	last_replay.WriteHeader(rh);
 	last_replay.WriteData(players[0]->name, 40, false);
