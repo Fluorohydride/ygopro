@@ -442,6 +442,8 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	unsigned int opt = (unsigned int)host_info.duel_rule << 16;
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
+	if(host_info.tcg_segoc)
+		opt |= DUEL_TCG_SEGOC_NONPUBLIC;
 	last_replay.WriteInt32(host_info.start_lp, false);
 	last_replay.WriteInt32(host_info.start_hand, false);
 	last_replay.WriteInt32(host_info.draw_count, false);
