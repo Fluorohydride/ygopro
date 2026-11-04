@@ -417,7 +417,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	ExtendedReplayHeader rh;
 	rh.base.id = REPLAY_ID_YRP2;
 	rh.base.version = PRO_VERSION;
-	rh.base.flag = REPLAY_UNIFORM;
+	rh.base.flag = REPLAY_UNIFORM | REPLAY_SALT;
 	rh.base.start_time = (uint32_t)std::time(nullptr);
 	for (auto& x : rh.seed_sequence)
 		x = rd();
