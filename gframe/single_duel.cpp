@@ -419,6 +419,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.base.version = PRO_VERSION;
 	rh.base.flag = REPLAY_UNIFORM;
 	rh.base.start_time = (uint32_t)std::time(nullptr);
+	rh.base.props[7] = host_info.no_shuffle_deck ? static_cast<uint8_t>(ShuffleVersion::None) : static_cast<uint8_t>(ShuffleVersion::MTRandomWithSalt);
 	for (auto& x : rh.seed_sequence)
 		x = rd();
 	mtrandom rnd(rh.seed_sequence, SEED_COUNT);
@@ -429,10 +430,6 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(!host_info.no_shuffle_deck) {
 		rnd.shuffle_vector(pdeck[0].main);
 		rnd.shuffle_vector(pdeck[1].main);
-		rh.base.props[7] = static_cast<uint8_t>(ShuffleVersion::MTRandomWithSalt);
-	}
-	else {
-		rh.base.props[7] = static_cast<uint8_t>(ShuffleVersion::None);
 	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;

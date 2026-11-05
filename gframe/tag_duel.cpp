@@ -401,10 +401,6 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		rnd.shuffle_vector(pdeck[1].main);
 		rnd.shuffle_vector(pdeck[2].main);
 		rnd.shuffle_vector(pdeck[3].main);
-		rh.base.props[7] = static_cast<uint8_t>(ShuffleVersion::MTRandomWithSalt);
-	}
-	else {
-		rh.base.props[7] = static_cast<uint8_t>(ShuffleVersion::None);
 	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
