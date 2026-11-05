@@ -40,7 +40,7 @@ void SingleMode::SinglePlayThread() {
 	ExtendedReplayHeader rh;
 	rh.base.id = REPLAY_ID_YRP2;
 	rh.base.version = PRO_VERSION;
-	rh.base.flag = REPLAY_UNIFORM | REPLAY_SALT | REPLAY_SINGLE_MODE;
+	rh.base.flag = REPLAY_UNIFORM | REPLAY_SINGLE_MODE;
 	rh.base.start_time = (uint32_t)std::time(nullptr);
 	for (auto& x : rh.seed_sequence)
 		x = rd();

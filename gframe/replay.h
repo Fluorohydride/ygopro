@@ -15,7 +15,6 @@ namespace ygo {
 #define REPLAY_DECODED		0x4
 #define REPLAY_SINGLE_MODE	0x8
 #define REPLAY_UNIFORM		0x10
-#define REPLAY_SALT			0x20
 
 #define REPLAY_ID_YRP1	0x31707279
 #define REPLAY_ID_YRP2	0x32707279
