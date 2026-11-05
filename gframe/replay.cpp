@@ -163,7 +163,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		lzma_filter filter;
 		filter.id = LZMA_FILTER_LZMA1;
 		filter.options = nullptr;
-		if (lzma_properties_decode(&filter, nullptr, pheader.base.props, 5) != LZMA_OK)
+		if (lzma_properties_decode(&filter, nullptr, pheader.base.props, SIZE_LZMA1_PROPS) != LZMA_OK)
 			return false;
 		lzma_options_lzma *lzma_opt = static_cast<lzma_options_lzma *>(filter.options);
 		lzma_set_ext_size(*lzma_opt, replay_size);
