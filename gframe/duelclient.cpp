@@ -188,6 +188,7 @@ void DuelClient::ClientEvent(bufferevent* bev, short events, void* ctx) {
 				cscg.info.duel_rule = mainGame->cbDuelRule->getSelected() + 1;
 				cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 				cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
+				cscg.info.tcg_segoc = mainGame->chkTcgSegoc->isChecked();
 			}
 			SendPacketToServer(CTOS_CREATE_GAME, cscg);
 		} else {
@@ -516,6 +517,10 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, size_t len) {
 		}
 		if(pkt->info.no_shuffle_deck) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1230));
+			str.append(msgbuf);
+		}
+		if(pkt->info.tcg_segoc) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1239));
 			str.append(msgbuf);
 		}
 		mainGame->gMutex.lock();
@@ -4256,7 +4261,7 @@ void DuelClient::BroadcastReply(EventSocket fd, short events, void * arg) {
 			hoststr.append(dataManager.GetSysString(pHP->host.mode + 1244));
 			hoststr.append(L"][");
 			if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
-			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck
+			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck && !pHP->host.tcg_segoc
 			        && pHP->host.duel_rule == DEFAULT_DUEL_RULE)
 				hoststr.append(dataManager.GetSysString(1247));
 			else hoststr.append(dataManager.GetSysString(1248));
