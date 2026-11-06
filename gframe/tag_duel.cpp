@@ -387,6 +387,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.base.version = PRO_VERSION;
 	rh.base.flag = REPLAY_UNIFORM | REPLAY_TAG;
 	rh.base.start_time = (uint32_t)std::time(nullptr);
+	rh.base.props[7] = host_info.no_shuffle_deck ? static_cast<uint8_t>(ShuffleVersion::None) : static_cast<uint8_t>(ShuffleVersion::MTRandomWithSalt);
 	for (auto& x : rh.seed_sequence)
 		x = rd();
 	mtrandom rnd(rh.seed_sequence, SEED_COUNT);
