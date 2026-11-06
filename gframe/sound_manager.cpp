@@ -1,3 +1,4 @@
+#include <chrono>
 #include "sound_manager.h"
 #include "game.h"
 #include "file_system.h"
@@ -51,7 +52,7 @@ bool SoundManager::Init() {
 #ifdef YGOPRO_USE_AUDIO
 	bgm_scene = -1;
 	RefreshBGMList();
-	rnd.seed(std::random_device()());
+	rnd.seed(static_cast<uint32_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
 #ifdef YGOPRO_USE_MINIAUDIO
 	if(miniAudio)
 		return true;
