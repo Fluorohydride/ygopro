@@ -58,7 +58,7 @@ static inline void load_current_deck(irr::gui::IGUIComboBox* cbCategory, irr::gu
 
 DeckBuilder::DeckBuilder() {
 	std::random_device rd;
-	std::array<uint32_t, 8> seed{};
+	std::array<uint32_t, SEED_COUNT> seed{};
 	for (auto& x : seed)
 		x = rd();
 	std::seed_seq seq(seed.begin(), seed.end());
