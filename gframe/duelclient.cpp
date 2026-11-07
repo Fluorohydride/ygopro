@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <chrono>
 #include <set>
 #include <thread>
 #include <random>
@@ -91,7 +92,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 		return false;
 	}
 	connect_state = CONNECT_STATE_CONNECTING;
-	rnd.seed(std::random_device()());
+	rnd.seed(static_cast<uint32_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
 	if(!create_game) {
 		timeval timeout = {5, 0};
 		connect_timeout_event = event_new(client_base, 0, EV_TIMEOUT, ConnectTimeout, 0);
