@@ -512,6 +512,8 @@ workspace "YGOPro"
     filter { "configurations:Release", "action:vs*" }
         linktimeoptimization "On"
         staticruntime "On"
+
+    filter { "configurations:Release", "action:vs*", "toolset:not clang" }
         disablewarnings {
             "4996", -- Currently only some dependencies use deprecated functions.
         }
@@ -524,6 +526,11 @@ workspace "YGOPro"
         conformancemode "On"
         buildoptions { "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
+
+    filter { "action:vs*", "toolset:clang" }
+        buildoptions { "/showFilenames" }
+
+    filter { "action:vs*", "toolset:not clang" }
         disablewarnings {
             "4244", -- Intentional narrowing conversions are pervasive in the program and dependencies.
             "4267", -- The 32-bit APIs frequently consume container sizes represented by size_t on 64-bit builds.
