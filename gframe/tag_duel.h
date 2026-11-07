@@ -61,6 +61,8 @@ protected:
 	unsigned char turn_count{ 0 };
 	uint16_t time_limit[2]{};
 	uint16_t time_elapsed{ 0 };
+	uint16_t time_confirm_elapsed{ 0 };
+	bool awaiting_time_confirm{ false };
 };
 
 }

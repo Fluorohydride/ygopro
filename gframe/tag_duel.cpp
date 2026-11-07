@@ -1579,6 +1579,9 @@ void TagDuel::OnPlayerDisconnected(DuelPlayer* dp) {
 }
 void TagDuel::WaitforResponse(int playerid) {
 	last_response = playerid;
+	time_elapsed = 0;
+	time_confirm_elapsed = 0;
+	awaiting_time_confirm = host_info.time_limit != 0;
 	unsigned char msg = MSG_WAITING;
 	for(int i = 0; i < 4; ++i)
 		if(players[i] != cur_player[playerid])
@@ -1598,11 +1601,16 @@ void TagDuel::WaitforResponse(int playerid) {
 void TagDuel::TimeConfirm(DuelPlayer* dp) {
 	if(host_info.time_limit == 0)
 		return;
-	if(dp != cur_player[last_response])
+	if(!awaiting_time_confirm || dp != cur_player[last_response]
+		|| dp->state != CTOS_TIME_CONFIRM)
 		return;
+	awaiting_time_confirm = false;
+	time_confirm_elapsed = 0;
+	time_elapsed = 0;
 	cur_player[last_response]->state = CTOS_RESPONSE;
-	if(time_elapsed < 10)
-		time_elapsed = 0;
+	// Exhausted input banks must lose before a queued response can be accepted.
+	if(time_limit[last_response] == 0)
+		TimerTick();
 }
 int TagDuel::WriteUpdateData(int player, int location, unsigned int flag, unsigned char*& qbuf, int use_cache) {
 	flag |= (QUERY_CODE | QUERY_POSITION);
@@ -1752,8 +1760,19 @@ uint32_t TagDuel::MessageHandler(intptr_t fduel, uint32_t type) {
 	return 0;
 }
 void TagDuel::TimerTick() {
-	time_elapsed++;
-	if(time_elapsed >= time_limit[last_response]) {
+	if(!pduel || !host_info.time_limit)
+		return;
+	bool expired;
+	if(awaiting_time_confirm) {
+		// Presentation readiness has a separate, bounded deadline. It does not
+		// spend the player's remaining decision time.
+		expired = ++time_confirm_elapsed >= 60;
+	} else {
+		if(!cur_player[last_response] || cur_player[last_response]->state != CTOS_RESPONSE)
+			return;
+		expired = ++time_elapsed >= time_limit[last_response];
+	}
+	if(expired) {
 		unsigned char wbuf[3];
 		uint32_t player = last_response;
 		wbuf[0] = MSG_WIN;
