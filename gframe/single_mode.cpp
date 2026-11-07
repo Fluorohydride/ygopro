@@ -42,6 +42,7 @@ void SingleMode::SinglePlayThread() {
 	rh.base.version = PRO_VERSION;
 	rh.base.flag = REPLAY_UNIFORM | REPLAY_SINGLE_MODE;
 	rh.base.start_time = (uint32_t)std::time(nullptr);
+	rh.base.props[7] = static_cast<uint8_t>(ShuffleVersion::None);
 	for (auto& x : rh.seed_sequence)
 		x = rd();
 	std::seed_seq seed(rh.seed_sequence, rh.seed_sequence + SEED_COUNT);
