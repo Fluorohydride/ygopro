@@ -23,6 +23,7 @@ enum class ShuffleVersion : uint8_t {
 	None = 1,
 	MTRandom = 2,			// mtrandom with seed_sequence[0:8]
 	MTRandomWithSalt = 3,	// mtrandom with seed_sequence[0:8], 1
+	Other = 4,				// other than mtrandom
 };
 
 struct ReplayHeader {
