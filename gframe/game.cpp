@@ -1453,6 +1453,10 @@ void Game::LoadConfig(const char* file) {
 			gameConf.enable_log = std::strtol(valbuf, nullptr, 10) & 0xff;
 		} else if(!std::strcmp(strbuf, "serverport")) {
 			gameConf.serverport = std::strtol(valbuf, nullptr, 10);
+		} else if(!std::strcmp(strbuf, "duel_timer_lenient")) {
+			gameConf.duel_timer_lenient = std::strtol(valbuf, nullptr, 10) > 0;
+		} else if(!std::strcmp(strbuf, "duel_timer_grace")) {
+			gameConf.duel_timer_grace = myclamp(std::strtol(valbuf, nullptr, 10), 0L, 60L);
 		} else if(!std::strcmp(strbuf, "lasthost")) {
 			BufferIO::DecodeUTF8(valbuf, gameConf.lasthost);
 		} else if(!std::strcmp(strbuf, "lastport")) {
@@ -1598,6 +1602,10 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "textfont = %s %d\n", gameConf.textfont, gameConf.textfontsize);
 	std::fprintf(fp, "numfont = %s\n", gameConf.numfont);
 	std::fprintf(fp, "serverport = %d\n", gameConf.serverport);
+	std::fprintf(fp, "#Host timer: strict by default; lenient trusts client readiness (60-second watchdog)\n");
+	std::fprintf(fp, "duel_timer_lenient = %d\n", gameConf.duel_timer_lenient ? 1 : 0);
+	std::fprintf(fp, "#Strict animation grace per prompt, 0-60 seconds; total per side is the initial duel time limit\n");
+	std::fprintf(fp, "duel_timer_grace = %d\n", gameConf.duel_timer_grace);
 	BufferIO::EncodeUTF8(gameConf.lasthost, linebuf);
 	std::fprintf(fp, "lasthost = %s\n", linebuf);
 	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);

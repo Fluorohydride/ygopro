@@ -405,9 +405,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		rnd.shuffle_vector(pdeck[2].main);
 		rnd.shuffle_vector(pdeck[3].main);
 	}
-	time_limit[0] = host_info.time_limit;
-	time_limit[1] = host_info.time_limit;
-	time_elapsed = 0;
+	InitializeTimer();
 	set_script_reader(DataManager::ScriptReaderEx);
 	set_card_reader(DataManager::CardReader);
 	set_message_handler(TagDuel::MessageHandler);
@@ -1577,6 +1575,19 @@ void TagDuel::OnPlayerDisconnected(DuelPlayer* dp) {
 	}
 	observers.erase(dp);
 }
+void TagDuel::InitializeTimer() {
+	timer_lenient = mainGame->gameConf.duel_timer_lenient;
+	time_grace_limit = mainGame->gameConf.duel_timer_grace;
+	for(int player = 0; player < 2; ++player) {
+		time_limit[player] = host_info.time_limit;
+		// A separate per-side allowance lasts for this duel, including retries
+		// and turn changes. Tag partners share their side's allowance.
+		time_grace_remaining[player] = host_info.time_limit;
+	}
+	time_elapsed = 0;
+	time_confirm_elapsed = 0;
+	awaiting_time_confirm = false;
+}
 void TagDuel::WaitforResponse(int playerid) {
 	last_response = playerid;
 	time_elapsed = 0;
@@ -1605,8 +1616,8 @@ void TagDuel::TimeConfirm(DuelPlayer* dp) {
 		|| dp->state != CTOS_TIME_CONFIRM)
 		return;
 	awaiting_time_confirm = false;
-	time_confirm_elapsed = 0;
-	time_elapsed = 0;
+	// Strict mode may already have charged time beyond the server's grace.
+	// Confirmation ends the grace period; it must never reset that charge.
 	cur_player[last_response]->state = CTOS_RESPONSE;
 	// Exhausted input banks must lose before a queued response can be accepted.
 	if(time_limit[last_response] == 0)
@@ -1764,9 +1775,19 @@ void TagDuel::TimerTick() {
 		return;
 	bool expired;
 	if(awaiting_time_confirm) {
-		// Presentation readiness has a separate, bounded deadline. It does not
-		// spend the player's remaining decision time.
-		expired = ++time_confirm_elapsed >= 60;
+		if(!cur_player[last_response] || cur_player[last_response]->state != CTOS_TIME_CONFIRM)
+			return;
+		if(timer_lenient) {
+			// Opt-in trust policy: wait for client readiness, bounded per prompt.
+			expired = ++time_confirm_elapsed >= 60;
+		} else if(time_confirm_elapsed < time_grace_limit && time_grace_remaining[last_response]) {
+			++time_confirm_elapsed;
+			--time_grace_remaining[last_response];
+			return;
+		} else {
+			// The server charges after its allowance, even without confirmation.
+			expired = ++time_elapsed >= time_limit[last_response];
+		}
 	} else {
 		if(!cur_player[last_response] || cur_player[last_response]->state != CTOS_RESPONSE)
 			return;
