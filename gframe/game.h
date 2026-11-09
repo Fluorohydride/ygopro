@@ -62,6 +62,9 @@ struct Config {
 	unsigned short antialias{ 2 };
 	unsigned int enable_log{ 0x3 };
 	unsigned short serverport{ 7911 };
+	// Host-only timer policy; never supplied by a joining client.
+	bool duel_timer_lenient{ false };
+	unsigned short duel_timer_grace{ 30 };
 	unsigned char textfontsize{ 14 };
 	wchar_t lasthost[100]{};
 	wchar_t lastport[10]{};

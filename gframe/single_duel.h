@@ -33,6 +33,7 @@ public:
 	void OnPlayerDisconnected(DuelPlayer* dp) override;
 	
 	void DuelEndProc();
+	void InitializeTimer();
 	void WaitforResponse(int playerid);
 	void RefreshMzone(int player, int flag = 0x881fff, int use_cache = 1);
 	void RefreshSzone(int player, int flag = 0x681fff, int use_cache = 1);
@@ -63,6 +64,11 @@ protected:
 	unsigned char match_result[3]{};
 	uint16_t time_limit[2]{};
 	uint16_t time_elapsed{ 0 };
+	uint16_t time_confirm_elapsed{ 0 };
+	bool awaiting_time_confirm{ false };
+	bool timer_lenient{ false };
+	uint16_t time_grace_limit{ 30 };
+	uint16_t time_grace_remaining[2]{};
 };
 
 }
