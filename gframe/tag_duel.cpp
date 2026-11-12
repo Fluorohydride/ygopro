@@ -381,7 +381,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	cur_player[0] = players[0];
 	cur_player[1] = players[3];
 	dp->state = CTOS_RESPONSE;
-	std::random_device rd;
+	thread_local std::random_device rd;
 	ExtendedReplayHeader rh;
 	rh.base.id = REPLAY_ID_YRP2;
 	rh.base.version = PRO_VERSION;
