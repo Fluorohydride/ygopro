@@ -39,9 +39,13 @@ struct ReplayHeader {
 struct ExtendedReplayHeader {
 	ReplayHeader base;
 	uint32_t seed_sequence[SEED_COUNT]{};
-	uint8_t header_version{ 1 };
-	uint8_t value[15]{};
+	uint8_t header_version{ 2 };
+	uint8_t turns{};
+	uint8_t value[14]{};
 };
+
+static_assert(sizeof(ReplayHeader) == 32, "ReplayHeader size must be 32 bytes");
+static_assert(sizeof(ExtendedReplayHeader) == 80, "ExtendedReplayHeader size must be 80 bytes");
 
 struct DuelParameters {
 	int32_t start_lp{};
