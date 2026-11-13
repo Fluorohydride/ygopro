@@ -66,13 +66,13 @@ jobs:
       id: lua
       uses: mercury233/action-cache-download-file@42a33307a0e00b163efaf26f29149a62d7bbd37d
       with:
-        url: https://www.lua.org/ftp/lua-5.4.8.tar.gz
-        sha256: 4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae
+        url: https://www.lua.org/ftp/lua-5.4.9.tar.gz
+        sha256: 2335b6c582a52654f94612bf10d2f4672805d05329aa6568b1d8cd9e5c6fb8e6
 
     - name: Extract lua
       run: |
         tar xf ${{ steps.lua.outputs.filepath }}
-        mv lua-5.4.8 lua
+        mv lua-5.4.9 lua
 
     - name: Fetch miniaudio
       uses: actions/checkout@v6
