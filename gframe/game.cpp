@@ -1258,7 +1258,7 @@ void Game::LoadExpansions() {
 			return;
 		}
 		if (IsExtension(name, ".zip") || IsExtension(name, ".ypk")) {
-			dataManager.IrrFileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
+			dataManager.IrrFileSystem->addFileArchive(fpath, false, false, irr::io::EFAT_ZIP);
 			return;
 		}
 	});
