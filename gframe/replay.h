@@ -58,7 +58,7 @@ public:
 
 	// record
 	void BeginRecord();
-	void WriteHeader(ExtendedReplayHeader& header);
+	void WriteHeader(const ExtendedReplayHeader& header);
 	void WriteData(const void* data, size_t length, bool flush = true);
 	template<typename T>
 	void Write(T data, bool flush = true) {

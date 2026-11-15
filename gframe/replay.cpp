@@ -28,10 +28,16 @@ void Replay::BeginRecord() {
 	Reset();
 	is_recording = true;
 }
-void Replay::WriteHeader(ExtendedReplayHeader& header) {
+void Replay::WriteHeader(const ExtendedReplayHeader& header) {
+	if (!is_recording)
+		return;
 	pheader = header;
+	if (!fp)
+		return;
+	std::rewind(fp);
 	std::fwrite(&header, sizeof header, 1, fp);
 	std::fflush(fp);
+	std::fseek(fp, sizeof(header) + replay_size, SEEK_SET);
 }
 void Replay::WriteData(const void* data, size_t length, bool flush) {
 	if(!is_recording)
