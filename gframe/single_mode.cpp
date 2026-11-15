@@ -139,7 +139,8 @@ void SingleMode::SinglePlayThread() {
 			is_continuing = SinglePlayAnalyze(engineBuffer.data(), len);
 		}
 	}
-	last_replay.pheader.turns = mainGame->dInfo.turn > UINT8_MAX ? UINT8_MAX : static_cast<uint8_t>(mainGame->dInfo.turn);
+	rh.turns = mainGame->dInfo.turn > UINT8_MAX ? UINT8_MAX : static_cast<uint8_t>(mainGame->dInfo.turn);
+	last_replay.WriteHeader(rh);
 	last_replay.EndRecord();
 	mainGame->gMutex.lock();
 	time_t nowtime = std::time(nullptr);
