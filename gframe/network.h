@@ -232,7 +232,6 @@ public:
 	virtual void TimerTick() = 0;
 	virtual void EndDuel() = 0;
 	virtual void OnPlayerDisconnected(DuelPlayer* dp) = 0;
-	virtual uint32_t GetTurnCount() const { return turn_count; }
 
 	DuelPlayer* host_player{ nullptr };
 	HostInfo host_info;
