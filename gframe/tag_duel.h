@@ -65,7 +65,7 @@ protected:
 	uint16_t time_confirm_elapsed{ 0 };
 	bool awaiting_time_confirm{ false };
 	bool timer_lenient{ false };
-	uint16_t time_grace_limit{ 30 };
+	uint16_t time_grace_limit{};
 	uint16_t time_grace_remaining[2]{};
 };
 

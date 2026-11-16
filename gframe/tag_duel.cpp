@@ -1577,7 +1577,7 @@ void TagDuel::OnPlayerDisconnected(DuelPlayer* dp) {
 }
 void TagDuel::InitializeTimer() {
 	timer_lenient = mainGame->gameConf.duel_timer_lenient;
-	time_grace_limit = mainGame->gameConf.duel_timer_grace;
+	time_grace_limit = timer_lenient ? 60 : mainGame->gameConf.duel_timer_grace;
 	for(int player = 0; player < 2; ++player) {
 		time_limit[player] = host_info.time_limit;
 		// A separate per-side allowance lasts for this duel, including retries
@@ -1616,8 +1616,7 @@ void TagDuel::TimeConfirm(DuelPlayer* dp) {
 		|| dp->state != CTOS_TIME_CONFIRM)
 		return;
 	awaiting_time_confirm = false;
-	// Strict mode may already have charged time beyond the server's grace.
-	// Confirmation ends the grace period; it must never reset that charge.
+	// Keep any decision time already charged after grace ran out.
 	cur_player[last_response]->state = CTOS_RESPONSE;
 	// Exhausted input banks must lose before a queued response can be accepted.
 	if(time_limit[last_response] == 0)
@@ -1773,27 +1772,17 @@ uint32_t TagDuel::MessageHandler(intptr_t fduel, uint32_t type) {
 void TagDuel::TimerTick() {
 	if(!pduel || !host_info.time_limit)
 		return;
-	bool expired;
-	if(awaiting_time_confirm) {
-		if(!cur_player[last_response] || cur_player[last_response]->state != CTOS_TIME_CONFIRM)
-			return;
-		if(timer_lenient) {
-			// Opt-in trust policy: wait for client readiness, bounded per prompt.
-			expired = ++time_confirm_elapsed >= 60;
-		} else if(time_confirm_elapsed < time_grace_limit && time_grace_remaining[last_response]) {
-			++time_confirm_elapsed;
+	auto* responder = cur_player[last_response];
+	if(!responder || responder->state != (awaiting_time_confirm ? CTOS_TIME_CONFIRM : CTOS_RESPONSE))
+		return;
+	if(awaiting_time_confirm && time_confirm_elapsed < time_grace_limit
+		&& (timer_lenient || time_grace_remaining[last_response])) {
+		++time_confirm_elapsed;
+		if(!timer_lenient)
 			--time_grace_remaining[last_response];
-			return;
-		} else {
-			// The server charges after its allowance, even without confirmation.
-			expired = ++time_elapsed >= time_limit[last_response];
-		}
-	} else {
-		if(!cur_player[last_response] || cur_player[last_response]->state != CTOS_RESPONSE)
-			return;
-		expired = ++time_elapsed >= time_limit[last_response];
+		return;
 	}
-	if(expired) {
+	if(++time_elapsed >= time_limit[last_response]) {
 		unsigned char wbuf[3];
 		uint32_t player = last_response;
 		wbuf[0] = MSG_WIN;

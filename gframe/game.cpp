@@ -1602,7 +1602,7 @@ void Game::SaveConfig() {
 	std::fprintf(fp, "textfont = %s %d\n", gameConf.textfont, gameConf.textfontsize);
 	std::fprintf(fp, "numfont = %s\n", gameConf.numfont);
 	std::fprintf(fp, "serverport = %d\n", gameConf.serverport);
-	std::fprintf(fp, "#Host timer: strict by default; lenient trusts client readiness (60-second watchdog)\n");
+	std::fprintf(fp, "#Lenient host timer allows up to 60 seconds of grace per prompt before charging duel time\n");
 	std::fprintf(fp, "duel_timer_lenient = %d\n", gameConf.duel_timer_lenient ? 1 : 0);
 	std::fprintf(fp, "#Strict animation grace per prompt, 0-60 seconds; total per side is the initial duel time limit\n");
 	std::fprintf(fp, "duel_timer_grace = %d\n", gameConf.duel_timer_grace);

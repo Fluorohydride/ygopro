@@ -6,7 +6,7 @@ The wire protocol and its confirmation-before-response requirement are unchanged
 
 ```ini
 duel_timer_lenient = 0
-duel_timer_grace = 30
+duel_timer_grace = 10
 ```
 
 Strict mode is the default. Each side has a separate presentation allowance equal
@@ -24,10 +24,11 @@ request. A confirmation can shorten that deadline but cannot extend it. This
 still grants a finite amount of time a modified client could use for thinking;
 the server cannot prove that a client is displaying an animation.
 
-Set `duel_timer_lenient = 1` only when that trust trade-off is acceptable. It
-waits for confirmation before charging, with a separate 60-second watchdog on
-each prompt. The watchdog prevents an infinite stall, not repeated free thinking
-time. The strict presentation allowance is unused in lenient mode.
+With `duel_timer_lenient = 1`, each prompt gets up to 60 seconds of grace,
+with no cumulative limit. The server starts charging the decision bank when
+the client confirms or when those 60 seconds have elapsed, whichever comes
+first. For example, a player with three seconds left who never confirms gets
+60 free ticks and loses on tick 63. A new prompt has its own grace period.
 
 Timing retains the existing one-second server ticks. These allowances therefore
 use the same tick granularity as the decision bank. Untimed duels are unchanged.
@@ -40,5 +41,5 @@ The regression compiles the actual initialization, waiting, confirmation,
 response-accounting and timeout methods against controlled hosts. It covers
 strict deadlines without confirmation, early/late/duplicate confirmation,
 cumulative exhaustion across prompts, zero grace, zero/maximum banks, team
-sharing, policy snapshots, lenient watchdogs and inactive/untimed sessions.
+sharing, policy snapshots, lenient grace across prompts and inactive/untimed sessions.
 It is not a complete GUI build or socket integration test.

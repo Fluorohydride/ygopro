@@ -85,7 +85,7 @@ struct TimerHost {
     unsigned char last_response=0, duel_count=0, tp_player=0, match_result[5]{};
     uint16_t time_limit[2]{1,1}, time_elapsed=0, time_confirm_elapsed=0;
     bool awaiting_time_confirm=false, timer_lenient=false;
-    uint16_t time_grace_limit=30, time_grace_remaining[2]{};
+    uint16_t time_grace_limit=0, time_grace_remaining[2]{};
     size_t last_replay_response_size=0;
     struct { size_t WriteResponse(unsigned char*, unsigned int) { return 1; } } last_replay;
     int processed=0;
@@ -112,12 +112,12 @@ struct TagDuel : TimerHost { TagDuel() { InitializeTimer(); } void InitializeTim
 template<class Duel> int check(const char* name) {
     int cases=0;
     auto run=[&](auto test) { test(); ++cases; };
-    run([] { Duel d; assert(!d.timer_lenient && d.time_grace_limit==30);
+    run([] { Duel d; assert(!d.timer_lenient && d.time_grace_limit==10);
         assert(d.time_grace_remaining[0]==180 && d.time_grace_remaining[1]==180); });
     run([] { Duel d; for(int i=0;i<20;i++)d.TimerTick();
         assert(d.time_elapsed==0 && d.time_grace_remaining[0]==180 && d.ended==0); });
-    run([] { Duel d; d.time_limit[0]=1; d.WaitforResponse(0); for(int i=0;i<12;i++)d.TimerTick();
-        assert(d.time_elapsed==0 && d.time_limit[0]==1 && d.time_grace_remaining[0]==168 && d.ended==0);
+    run([] { Duel d; d.time_limit[0]=1; d.WaitforResponse(0); for(int i=0;i<10;i++)d.TimerTick();
+        assert(d.time_elapsed==0 && d.time_limit[0]==1 && d.time_grace_remaining[0]==170 && d.ended==0);
         d.TimeConfirm(d.players[1]); assert(d.awaiting_time_confirm);
         int packets=NetServer::packets; d.TimeConfirm(d.players[0]);
         assert(!d.awaiting_time_confirm && d.time_elapsed==0 && NetServer::packets==packets);
@@ -125,12 +125,12 @@ template<class Duel> int check(const char* name) {
     run([] { Duel d; d.time_limit[0]=3; d.WaitforResponse(0); d.TimeConfirm(d.players[0]); d.TimerTick();
         d.TimeConfirm(d.players[0]); assert(d.time_elapsed==1); d.TimerTick(); assert(d.ended==0);
         d.TimerTick(); assert(d.ended==1 && d.time_grace_remaining[0]==180); });
-    run([] { Duel d; d.time_limit[0]=0; d.WaitforResponse(0); for(int i=0;i<12;i++)d.TimerTick();
+    run([] { Duel d; d.time_limit[0]=0; d.WaitforResponse(0); for(int i=0;i<10;i++)d.TimerTick();
         assert(d.ended==0); d.TimeConfirm(d.players[0]); assert(d.ended==1 && d.pduel==0); });
-    run([] { Duel d; d.time_limit[0]=3; d.WaitforResponse(0); for(int i=0;i<32;i++)d.TimerTick();
-        assert(d.ended==0 && d.time_elapsed==2 && d.time_grace_remaining[0]==150);
+    run([] { Duel d; d.time_limit[0]=3; d.WaitforResponse(0); for(int i=0;i<12;i++)d.TimerTick();
+        assert(d.ended==0 && d.time_elapsed==2 && d.time_grace_remaining[0]==170);
         d.TimerTick(); assert(d.ended==1); });
-    run([] { Duel d; d.time_limit[0]=3; d.WaitforResponse(0); for(int i=0;i<32;i++)d.TimerTick();
+    run([] { Duel d; d.time_limit[0]=3; d.WaitforResponse(0); for(int i=0;i<12;i++)d.TimerTick();
         d.TimeConfirm(d.players[0]); assert(d.time_elapsed==2);
         d.TimeConfirm(d.players[0]); assert(d.time_elapsed==2);
         d.TimerTick(); assert(d.ended==1); });
@@ -163,19 +163,34 @@ template<class Duel> int check(const char* name) {
         for(int i=0;i<12;i++)d.TimerTick(); assert(d.time_elapsed==0 && d.ended==0); });
     run([] { Duel d; d.WaitforResponse(0); d.players[0]->state=0xff;
         for(int i=0;i<12;i++)d.TimerTick(); assert(d.time_grace_remaining[0]==180 && d.ended==0); });
-    run([] { Duel d; d.timer_lenient=true; d.time_limit[0]=1; d.WaitforResponse(0);
-        for(int i=0;i<59;i++)d.TimerTick(); assert(d.ended==0 && d.time_elapsed==0);
-        d.TimerTick(); assert(d.ended==1 && d.time_grace_remaining[0]==180); });
-    run([] { Duel d; d.timer_lenient=true; d.time_limit[0]=1; d.WaitforResponse(0);
+    game.gameConf.duel_timer_lenient=true;
+    run([] { Duel d; d.time_limit[0]=3; d.WaitforResponse(0);
+        for(int i=0;i<60;i++)d.TimerTick();
+        assert(d.ended==0 && d.time_elapsed==0 && d.time_grace_remaining[0]==180);
+        d.TimerTick(); assert(d.ended==0 && d.time_elapsed==1);
+        d.TimerTick(); assert(d.ended==0 && d.time_elapsed==2);
+        d.TimerTick(); assert(d.ended==1 && d.completed==1); });
+    run([] { Duel d; d.time_limit[0]=1; d.WaitforResponse(0);
         for(int i=0;i<59;i++)d.TimerTick(); d.TimeConfirm(d.players[0]);
         assert(d.ended==0 && d.time_elapsed==0); d.TimerTick(); assert(d.ended==1); });
-    run([] { Duel d; d.timer_lenient=true; d.time_limit[0]=0; d.WaitforResponse(0);
+    run([] { Duel d; d.time_limit[0]=0; d.WaitforResponse(0);
         d.TimeConfirm(d.players[0]); assert(d.ended==1 && d.pduel==0); });
-    run([] { game.gameConf.duel_timer_lenient=true; game.gameConf.duel_timer_grace=7;
-        Duel d; game.gameConf.duel_timer_lenient=false; game.gameConf.duel_timer_grace=30;
-        assert(d.timer_lenient && d.time_grace_limit==7);
+    run([] { Duel d; d.time_limit[0]=0; d.WaitforResponse(0);
+        for(int i=0;i<60;i++)d.TimerTick(); assert(d.ended==0);
+        d.TimerTick(); assert(d.ended==1); });
+    run([] { Duel d; d.host_info.time_limit=3; d.InitializeTimer(); d.WaitforResponse(0);
+        for(int i=0;i<62;i++)d.TimerTick();
+        d.TimeConfirm(d.players[0]); d.TimeConfirm(d.players[0]);
+        unsigned char data=0; d.GetResponse(d.players[0],&data,1);
+        assert(d.time_limit[0]==1 && d.processed==1);
+        d.WaitforResponse(0); for(int i=0;i<60;i++)d.TimerTick();
+        assert(d.ended==0 && d.time_elapsed==0 && d.time_grace_remaining[0]==3);
+        d.TimerTick(); assert(d.ended==1); });
+    run([] { Duel d; game.gameConf.duel_timer_lenient=false; game.gameConf.duel_timer_grace=7;
+        assert(d.timer_lenient && d.time_grace_limit==60);
         d.time_grace_remaining[0]=0; d.InitializeTimer();
-        assert(!d.timer_lenient && d.time_grace_limit==30 && d.time_grace_remaining[0]==180); });
+        assert(!d.timer_lenient && d.time_grace_limit==7 && d.time_grace_remaining[0]==180); });
+    game.gameConf=Config{};
     run([] { Duel d; d.time_limit[0]=65535; d.time_grace_limit=0; d.WaitforResponse(0);
         for(int i=0;i<65534;i++)d.TimerTick(); assert(d.ended==0);
         d.TimerTick(); assert(d.ended==1); });
@@ -188,7 +203,7 @@ int main() {
         std::fputs(content,fp); std::fclose(fp);
         Game configured; configured.LoadConfig("timer-policy.conf"); return configured.gameConf;
     };
-    auto defaults=load("# no timer override\n"); assert(!defaults.duel_timer_lenient && defaults.duel_timer_grace==30);
+    auto defaults=load("# no timer override\n"); assert(!defaults.duel_timer_lenient && defaults.duel_timer_grace==10);
     auto selected=load("duel_timer_lenient = 1\nduel_timer_grace = 7\n");
     assert(selected.duel_timer_lenient && selected.duel_timer_grace==7);
     assert(load("duel_timer_grace = -1\n").duel_timer_grace==0);
@@ -229,7 +244,7 @@ int main() {
     checked = subprocess.run([str(executable)], capture_output=True, text=True, cwd=root)
     print(checked.stdout + checked.stderr)
     (root / 'source-method-results.json').write_text(json.dumps(dict(
-        sourceHashes=hashes, cases=46, command=command, returnCode=checked.returncode,
+        sourceHashes=hashes, cases=50, command=command, returnCode=checked.returncode,
         output=checked.stdout + checked.stderr,
     ), indent=2), encoding='utf-8')
     checked.check_returncode()
