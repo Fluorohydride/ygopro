@@ -1302,7 +1302,7 @@ void Game::LoadExpansions() {
 				continue;
 			}
 		}
-		std::sort(deckBuilder.expansionPacks.begin() + packStart, deckBuilder.expansionPacks.end(), std::greater<std::wstring>());
+		std::sort(deckBuilder.expansionPacks.begin() + packStart, deckBuilder.expansionPacks.end());
 	}
 }
 void Game::RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck, bool selectlastused) {
