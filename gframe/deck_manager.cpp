@@ -249,7 +249,7 @@ void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) 
 	wchar_t catepath[256];
 	switch(index) {
 	case DECK_CATEGORY_PACK:
-		myswprintf(catepath, L"./pack");
+		myswprintf(catepath, L"pack");
 		break;
 	case DECK_CATEGORY_BOT:
 		BufferIO::CopyWideString(mainGame->gameConf.bot_deck_path, catepath);
@@ -257,6 +257,7 @@ void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) 
 	case -1:
 	case DECK_CATEGORY_NONE:
 	case DECK_CATEGORY_SEPARATOR:
+		// Add "./" otherwise IrrFileSystem may open file in expansion archives instead of the local deck directory.
 		myswprintf(catepath, L"./deck");
 		break;
 	default:
@@ -300,11 +301,6 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 		wchar_t localfile[256];
 		myswprintf(localfile, L"./deck/%ls.ydk", file);
 		reader = OpenDeckReader(localfile);
-	}
-	if(!reader && !mywcsncasecmp(file, L"./pack", 6)) {
-		wchar_t zipfile[256];
-		myswprintf(zipfile, L"%ls", file + 2);
-		reader = OpenDeckReader(zipfile);
 	}
 	if(!reader)
 		return false;
