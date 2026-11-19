@@ -10,6 +10,7 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#include <algorithm>
 #include <thread>
 #include <chrono>
 #ifdef _WIN32
@@ -1258,12 +1259,13 @@ void Game::LoadExpansions() {
 			return;
 		}
 		if (IsExtension(name, ".zip") || IsExtension(name, ".ypk")) {
-			dataManager.IrrFileSystem->addFileArchive(fpath, true, false, irr::io::EFAT_ZIP);
+			dataManager.IrrFileSystem->addFileArchive(fpath, false, false, irr::io::EFAT_ZIP);
 			return;
 		}
 	});
 	for(irr::u32 i = 0; i < dataManager.IrrFileSystem->getFileArchiveCount(); ++i) {
 		auto archive = dataManager.IrrFileSystem->getFileArchive(i)->getFileList();
+		auto packStart = deckBuilder.expansionPacks.size();
 		for(irr::u32 j = 0; j < archive->getFileCount(); ++j) {
 			const char* name = archive->getFullFileName(j).c_str();
 			if (IsExtension(name, ".cdb")) {
@@ -1300,6 +1302,7 @@ void Game::LoadExpansions() {
 				continue;
 			}
 		}
+		std::sort(deckBuilder.expansionPacks.begin() + packStart, deckBuilder.expansionPacks.end());
 	}
 }
 void Game::RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck, bool selectlastused) {
@@ -1351,13 +1354,20 @@ void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const w
 			additem(pack.substr(5, pack.size() - 9).c_str());
 		}
 	}
-	FileSystem::TraversalDir(deckpath, [additem](const wchar_t* name, bool isdir) {
+	std::vector<std::wstring> localPacks;
+	FileSystem::TraversalDir(deckpath, [additem, isPack, &localPacks](const wchar_t* name, bool isdir) {
 		if (!isdir && IsExtension(name, L".ydk")) {
 			wchar_t deckname[256]{};
 			BufferIO::CopyWideString(name, deckname, std::wcslen(name) - 4);
-			additem(deckname);
+			if(isPack)
+				localPacks.emplace_back(deckname);
+			else
+				additem(deckname);
 		}
 	});
+	std::sort(localPacks.rbegin(), localPacks.rend());
+	for(const auto& pack : localPacks)
+		additem(pack.c_str());
 }
 void Game::RefreshReplay() {
 	lstReplayList->clear();
