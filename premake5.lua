@@ -483,12 +483,12 @@ workspace "YGOPro"
         end
 
     filter "configurations:Release"
+        defines "NDEBUG"
         optimize "Speed"
         targetdir "bin/release"
 
     filter "configurations:Debug"
         symbols "On"
-        defines "_DEBUG"
         targetdir "bin/debug"
 
     filter { "system:windows", "action:vs*", "platforms:Win32", "configurations:Release" }
@@ -516,8 +516,9 @@ workspace "YGOPro"
             "4996", -- Currently only some dependencies use deprecated functions.
         }
 
-    filter { "configurations:Release", "not action:vs*" }
-        defines "NDEBUG"
+    filter { "configurations:Debug", "action:vs*" }
+        defines "_DEBUG"
+        staticruntime "On"
 
     filter "action:vs*"
         cdialect "C11"
