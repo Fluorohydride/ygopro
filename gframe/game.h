@@ -457,6 +457,7 @@ public:
 	irr::gui::IGUIComboBox* cbDuelRule{};
 	irr::gui::IGUICheckBox* chkNoCheckDeck{};
 	irr::gui::IGUICheckBox* chkNoShuffleDeck{};
+	irr::gui::IGUICheckBox* chkTcgSegoc{};
 	irr::gui::IGUIButton* btnHostConfirm{};
 	irr::gui::IGUIButton* btnHostCancel{};
 	//host panel

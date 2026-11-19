@@ -31,7 +31,8 @@ struct HostInfo {
 	uint8_t duel_rule{};
 	uint8_t no_check_deck{};
 	uint8_t no_shuffle_deck{};
-	// byte padding[3]
+	uint8_t tcg_segoc{};
+	// byte padding[2]
 
 	int32_t start_lp{};
 	uint8_t start_hand{};
