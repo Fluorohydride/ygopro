@@ -79,7 +79,7 @@ jobs:
       with:
         repository: mackron/miniaudio
         path: miniaudio-source
-        ref: 9634bedb5b5a2ca38c1ee7108a9358a4e233f14d # tag: 0.11.25
+        ref: 877ea4a7c2601c7b0f2a44e83dfac42e6470fea6 # tag: 0.11.26
 
     - name: Use miniaudio split & decoders only
       run: |
@@ -122,13 +122,13 @@ jobs:
       id: freetype
       uses: mercury233/action-cache-download-file@42a33307a0e00b163efaf26f29149a62d7bbd37d
       with:
-        url: https://downloads.sourceforge.net/freetype/freetype-2.14.3.tar.gz
-        sha256: e61b31ab26358b946e767ed7eb7f4bb2e507da1cfefeb7a8861ace7fd5c899a1
+        url: https://downloads.sourceforge.net/freetype/freetype-2.15.0.tar.gz
+        sha256: 9186627467a616d9a9e3e574748ac0c45fa77398e6364edef3041a8ba8d92f64
 
     - name: Extract freetype
       run: |
         tar xf ${{ steps.freetype.outputs.filepath }}
-        mv freetype-2.14.3 freetype
+        mv freetype-2.15.0 freetype
 
     - name: Download libjpeg-turbo
       id: libjpeg-turbo
@@ -160,13 +160,13 @@ jobs:
       id: zlib
       uses: mercury233/action-cache-download-file@42a33307a0e00b163efaf26f29149a62d7bbd37d
       with:
-        url: https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz
-        sha256: bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16
+        url: https://github.com/madler/zlib/releases/download/v1.4/zlib-1.4.tar.gz
+        sha256: 02dd159783677a749c04adbdd02b55b8a2bcc7e054f51b76b549199a916ad584
 
     - name: Extract zlib
       run: |
         tar xf ${{ steps.zlib.outputs.filepath }}
-        mv zlib-1.3.2 zlib
+        mv zlib-1.4 zlib
 
     - name: Download sqlite
       id: sqlite
@@ -212,13 +212,13 @@ jobs:
       id: opus
       uses: mercury233/action-cache-download-file@42a33307a0e00b163efaf26f29149a62d7bbd37d
       with:
-        url: https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz
-        sha256: 65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1
+        url: https://downloads.xiph.org/releases/opus/opus-1.6.1.tar.gz
+        sha256: 6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1
 
     - name: Extract opus
       run: |
         tar xf ${{ steps.opus.outputs.filepath }}
-        mv opus-1.5.2 miniaudio/external/opus
+        mv opus-1.6.1 miniaudio/external/opus
 
     - name: Download opusfile
       id: opusfile
