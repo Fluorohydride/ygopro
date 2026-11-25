@@ -511,18 +511,14 @@ workspace "YGOPro"
 
     filter { "configurations:Release", "action:vs*" }
         linktimeoptimization "On"
-        staticruntime "On"
         disablewarnings {
             "4996", -- Currently only some dependencies use deprecated functions.
         }
 
-    filter { "configurations:Debug", "action:vs*" }
-        defines "_DEBUG"
-        staticruntime "On"
-
     filter "action:vs*"
         cdialect "C11"
         conformancemode "On"
+        staticruntime "On"
         buildoptions { "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
         disablewarnings {
