@@ -1321,7 +1321,6 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList
 	if(!cp)
 		return;
 	auto code = cp->code;
-	auto lcode = cp->get_duel_code();
 	irr::video::ITexture* img = imageManager.GetTextureThumb(code);
 	if(img == nullptr)
 		return; //nullptr->getSize() will cause a crash
@@ -1335,7 +1334,7 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::vector2di pos, const LFList
 		otloc = irr::core::recti(pos.X + 7, pos.Y + 50 * yScale, pos.X + 37 * xScale, pos.Y + 65 * yScale);
 	}
 	driver->draw2DImage(img, dragloc, irr::core::rect<irr::s32>(0, 0, size.Width, size.Height), 0, 0, true);
-	auto lfit = lflist->content.find(lcode);
+	auto lfit = lflist->content.find(cp->get_original_code());
 	if (lfit != lflist->content.end()) {
 		switch(lfit->second) {
 		case 0:
