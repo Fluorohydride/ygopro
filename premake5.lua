@@ -484,6 +484,7 @@ workspace "YGOPro"
 
     filter "configurations:Release"
         optimize "Speed"
+        linktimeoptimization "On"
         targetdir "bin/release"
 
     filter "configurations:Debug"
@@ -510,7 +511,6 @@ workspace "YGOPro"
         targetdir "bin/debug/arm64"
 
     filter { "configurations:Release", "action:vs*" }
-        linktimeoptimization "On"
         staticruntime "On"
         disablewarnings {
             "4996", -- Currently only some dependencies use deprecated functions.
@@ -531,6 +531,15 @@ workspace "YGOPro"
 
     filter "action:gmake"
         buildoptions { "-fno-strict-aliasing" }
+
+    filter { "action:gmake", "configurations:Release" }
+        buildoptions { "-ffunction-sections", "-fdata-sections" }
+
+    filter { "action:gmake", "configurations:Release", "system:windows or linux" }
+        linkoptions { "-Wl,--gc-sections" }
+
+    filter { "action:gmake", "configurations:Release", "system:macosx" }
+        linkoptions { "-Wl,-dead_strip" }
 
     filter { "action:gmake", "architecture:x86_64" }
         if USE_SIMD == "best" then
