@@ -1538,7 +1538,9 @@ void DeckBuilder::FilterCards() {
 			continue;
 		if(filter_lm) {
 			if (filter_lm <= 3) {
-				auto limit = filterList->content.find(data.get_original_code());
+				if (code != data.get_original_code())
+					continue;
+				auto limit = filterList->content.find(code);
 				if (limit == filterList->content.end() || limit->second != filter_lm - 1)
 					continue;
 			}
