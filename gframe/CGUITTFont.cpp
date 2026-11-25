@@ -302,7 +302,7 @@ CGUITTFont* CGUITTFont::create(IrrlichtDevice *device, const io::path& filename,
 CGUITTFont::CGUITTFont(IGUIEnvironment *env)
 	: use_monochrome(false), use_transparency(true), use_hinting(true), use_auto_hinting(true),
 	  batch_load_size(1), Device(0), Environment(env), Driver(0), GlobalKerningWidth(0), GlobalKerningHeight(0), supposed_line_height(0) {
-#ifdef _DEBUG
+#ifdef NDEBUG
 	setDebugName("CGUITTFont");
 #endif
 
