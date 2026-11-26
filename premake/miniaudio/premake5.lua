@@ -18,6 +18,7 @@ project "miniaudio"
                 "external/opus/src/opus_decoder.c",
                 "external/opus/src/opus_multistream.c",
                 "external/opus/src/opus_multistream_decoder.c",
+                "external/opus/src/extensions.c",
 
                 "external/opus/celt/bands.c",
                 "external/opus/celt/celt.c",
