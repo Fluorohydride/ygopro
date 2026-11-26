@@ -1336,37 +1336,37 @@ void Game::RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGU
 	}
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
-	if(cbCategory != cbDBCategory && cbCategory->getSelected() == 0) {
+	auto category = cbCategory->getSelected();
+	if (cbCategory != cbDBCategory && category == DECK_CATEGORY_PACK) {
 		// can't use pack list in duel
 		cbDeck->clear();
 		return;
 	}
 	wchar_t catepath[256];
-	DeckManager::GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
+	DeckManager::GetCategoryPath(catepath, category, cbCategory->getText());
 	cbDeck->clear();
-	RefreshDeck(catepath, [cbDeck](const wchar_t* item) { cbDeck->addItem(item); });
+	RefreshDeck(catepath, [cbDeck](const wchar_t* item) { cbDeck->addItem(item); }, category == DECK_CATEGORY_PACK);
 }
-void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const wchar_t*)>& additem) {
-	bool isPack = !mywcsncasecmp(deckpath, L"pack", 5); // match 4 chars + 1 null terminator
+void Game::RefreshDeck(const wchar_t *deckpath, const std::function<void(const wchar_t *)> &additem, bool isPack) {
 	if(isPack) {
 		for(auto& pack : deckBuilder.expansionPacks) {
 			// add pack/xxx.ydk
 			additem(pack.substr(5, pack.size() - 9).c_str());
 		}
 	}
-	std::vector<std::wstring> localPacks;
-	FileSystem::TraversalDir(deckpath, [additem, isPack, &localPacks](const wchar_t* name, bool isdir) {
+	std::vector<std::wstring> localFiles;
+	FileSystem::TraversalDir(deckpath, [&localFiles](const wchar_t* name, bool isdir) {
 		if (!isdir && IsExtension(name, L".ydk")) {
 			wchar_t deckname[256]{};
 			BufferIO::CopyWideString(name, deckname, std::wcslen(name) - 4);
-			if(isPack)
-				localPacks.emplace_back(deckname);
-			else
-				additem(deckname);
+			localFiles.emplace_back(deckname);
 		}
 	});
-	std::sort(localPacks.rbegin(), localPacks.rend());
-	for(const auto& pack : localPacks)
+	if(isPack)
+		std::sort(localFiles.rbegin(), localFiles.rend());
+	else
+		std::sort(localFiles.begin(), localFiles.end());
+	for(const auto& pack : localFiles)
 		additem(pack.c_str());
 }
 void Game::RefreshReplay() {

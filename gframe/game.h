@@ -182,7 +182,7 @@ public:
 	void LoadExpansions();
 	void RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck, bool selectlastused = true);
 	void RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
-	void RefreshDeck(const wchar_t* deckpath, const std::function<void(const wchar_t*)>& additem);
+	void RefreshDeck(const wchar_t* deckpath, const std::function<void(const wchar_t*)>& additem, bool isPack);
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void RefreshBot();
