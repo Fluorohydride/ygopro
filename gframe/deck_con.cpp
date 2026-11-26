@@ -1537,8 +1537,13 @@ void DeckBuilder::FilterCards() {
 		if(filter_marks && (data.link_marker & filter_marks) != filter_marks)
 			continue;
 		if(filter_lm) {
-			if(filter_lm <= 3 && (!filterList->content.count(code) || filterList->content.at(code) != filter_lm - 1))
-				continue;
+			if (filter_lm <= 3) {
+				if (code != data.get_original_code())
+					continue;
+				auto limit = filterList->content.find(code);
+				if (limit == filterList->content.end() || limit->second != filter_lm - 1)
+					continue;
+			}
 			if(filter_lm == 4 && !(data.ot & AVAIL_OCG))
 				continue;
 			if(filter_lm == 5 && !(data.ot & AVAIL_TCG))
@@ -1834,23 +1839,23 @@ void DeckBuilder::pop_side(int seq) {
 	GetHoveredCard();
 }
 bool DeckBuilder::check_limit(const CardDataC* pointer) {
-	auto limitcode = pointer->get_duel_code();
-	int limit = 3;
-	auto flit = filterList->content.find(limitcode);
-	if(flit != filterList->content.end())
-		limit = flit->second;
-	for (auto& card : deckManager.current_deck.main) {
-		if (card->get_duel_code() == limitcode)
-			limit--;
-	}
-	for (auto& card : deckManager.current_deck.extra) {
-		if (card->get_duel_code() == limitcode)
-			limit--;
-	}
-	for (auto& card : deckManager.current_deck.side) {
-		if (card->get_duel_code() == limitcode)
-			limit--;
-	}
-	return limit > 0;
+	auto duel_code = pointer->get_duel_code();
+	auto original_code = pointer->get_original_code();
+	auto limit = filterList->content.find(original_code);
+	int duel_count = 1;
+	int limit_count = 1;
+	auto count_copies = [&](const CardDataC* card) {
+		if (card->get_duel_code() == duel_code)
+			++duel_count;
+		if (card->get_original_code() == original_code)
+			++limit_count;
+	};
+	for (auto card : deckManager.current_deck.main)
+		count_copies(card);
+	for (auto card : deckManager.current_deck.extra)
+		count_copies(card);
+	for (auto card : deckManager.current_deck.side)
+		count_copies(card);
+	return duel_count <= 3 && (limit == filterList->content.end() || limit_count <= limit->second);
 }
 }
