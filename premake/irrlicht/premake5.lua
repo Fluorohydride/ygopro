@@ -13,7 +13,7 @@ project "irrlicht"
     }
 
     -- Irrlicht relies on the MSVC-specific _DEBUG macro to detect Debug builds.
-    filter { "configurations:Debug", "not action:vs*" }
+    filter "configurations:Debug"
         defines "_DEBUG"
 
     filter { "system:windows" }

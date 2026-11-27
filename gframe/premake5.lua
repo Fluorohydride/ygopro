@@ -54,6 +54,9 @@ project "YGOPro"
         end
     end
 
+    filter "configurations:Debug"
+        defines "_DEBUG"
+
     filter "system:windows"
         files "ygopro.rc"
         links { "ws2_32", "iphlpapi", "winmm" }
