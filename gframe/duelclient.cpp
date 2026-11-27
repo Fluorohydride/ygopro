@@ -481,6 +481,22 @@ void DuelClient::HandleSTOCPacketLan(unsigned char* data, size_t len) {
 		mainGame->gMutex.unlock();
 		break;
 	}
+	case STOC_OVERRIDE_DECK: {
+		if (len < 1 + sizeof(uint32_t) * 2)
+			return;
+		uint32_t main_count = BufferIO::Read<uint32_t>(pdata);
+		uint32_t side_count = BufferIO::Read<uint32_t>(pdata);
+		if (main_count > MAINC_MAX || side_count > SIDEC_MAX)
+			return;
+		if (len - 1 < (2 + main_count + side_count) * sizeof(uint32_t))
+			return;
+		uint32_t deckbuf[MAINC_MAX + SIDEC_MAX];
+		std::memcpy(deckbuf, pdata, (main_count + side_count) * sizeof(uint32_t));
+		mainGame->gMutex.lock();
+		DeckManager::LoadDeck(deckManager.current_deck, deckbuf, main_count, side_count);
+		mainGame->gMutex.unlock();
+		break;
+	}
 	case STOC_JOIN_GAME: {
 		if (len < 1 + sizeof(STOC_JoinGame))
 			return;
