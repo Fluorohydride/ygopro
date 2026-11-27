@@ -1347,7 +1347,7 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBo
 	RefreshDeck(catepath, [cbDeck](const wchar_t* item) { cbDeck->addItem(item); });
 }
 void Game::RefreshDeck(const wchar_t* deckpath, const std::function<void(const wchar_t*)>& additem) {
-	bool isPack = !mywcsncasecmp(deckpath, L"./pack", 6);
+	bool isPack = !mywcsncasecmp(deckpath, L"pack", 5); // match 4 chars + 1 null terminator
 	if(isPack) {
 		for(auto& pack : deckBuilder.expansionPacks) {
 			// add pack/xxx.ydk
