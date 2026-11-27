@@ -34,7 +34,9 @@ struct ExtendedReplayHeader {
 	uint32_t seed_sequence[SEED_COUNT]{};
 	uint8_t header_version{ 2 };
 	uint8_t turns{};
-	uint8_t value[14]{};
+	uint8_t win_player{};	// reserved
+	uint8_t win_reason{};	// reserved
+	uint8_t value[12]{};
 };
 
 static_assert(sizeof(ReplayHeader) == 32, "ReplayHeader size must be 32 bytes");
