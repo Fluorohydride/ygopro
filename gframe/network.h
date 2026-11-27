@@ -284,6 +284,7 @@ public:
 #define STOC_CHANGE_SIDE	0x7		// no data
 #define STOC_WAITING_SIDE	0x8		// no data
 #define STOC_DECK_COUNT		0x9		// int16_t[6]
+#define STOC_OVERRIDE_DECK  0xa     // uint32_t mainc, uint32_t sidec, uint32_t[mainc+sidec]
 #define STOC_CREATE_GAME	0x11	// reserved
 #define STOC_JOIN_GAME		0x12	// STOC_JoinGame
 #define STOC_TYPE_CHANGE	0x13	// STOC_TypeChange
