@@ -39,9 +39,15 @@ struct ReplayHeader {
 struct ExtendedReplayHeader {
 	ReplayHeader base;
 	uint32_t seed_sequence[SEED_COUNT]{};
-	uint8_t header_version{ 1 };
-	uint8_t value[15]{};
+	uint8_t header_version{ 2 };
+	uint8_t turns{};
+	uint8_t win_player{};	// reserved
+	uint8_t win_reason{};	// reserved
+	uint8_t value[12]{};
 };
+
+static_assert(sizeof(ReplayHeader) == 32, "ReplayHeader size must be 32 bytes");
+static_assert(sizeof(ExtendedReplayHeader) == 80, "ExtendedReplayHeader size must be 80 bytes");
 
 struct DuelParameters {
 	int32_t start_lp{};
@@ -62,7 +68,7 @@ public:
 
 	// record
 	void BeginRecord();
-	void WriteHeader(ExtendedReplayHeader& header);
+	void WriteHeader(const ExtendedReplayHeader& header);
 	void WriteData(const void* data, size_t length, bool flush = true);
 	template<typename T>
 	void Write(T data, bool flush = true) {

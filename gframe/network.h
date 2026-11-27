@@ -233,13 +233,15 @@ public:
 	virtual void EndDuel() = 0;
 	virtual void OnPlayerDisconnected(DuelPlayer* dp) = 0;
 
-public:
 	DuelPlayer* host_player{ nullptr };
 	HostInfo host_info;
 	int duel_stage{};
 	intptr_t pduel{};
 	wchar_t name[20]{};
 	wchar_t pass[20]{};
+
+protected:
+	uint32_t turn_count{};
 };
 
 }
