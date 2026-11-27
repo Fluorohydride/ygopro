@@ -99,7 +99,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to create Irrlicht Engine device!");
 		return false;
 	}
-#ifdef NDEBUG
+#ifndef _DEBUG
 	device->getLogger()->setLogLevel(irr::ELOG_LEVEL::ELL_ERROR);
 #endif
 	deckManager.LoadLFList();
